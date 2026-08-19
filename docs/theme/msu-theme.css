@@ -1,0 +1,310 @@
+/* ============================================================================
+   msu-theme.css - the shared token layer for every DET HTML surface.
+
+   Palette, type scale and contrast rules come from the university Branding
+   Toolkit and are recorded in [[official-document-branding]]. Do not invent a
+   colour here; if a new one is needed, it goes in the artifact first.
+
+   THE CONTRAST RULES THIS FILE ENCODES - all three have bitten before:
+     1. Gold #ECAC00 fails as text on white. Borders, rules and fills only;
+        text inside a gold block is set in navy.
+     2. Red Orange #FF4500 (3.4:1 on white) fails for body text too. Same
+        treatment as gold - a border and fill colour, never a text colour on
+        a light ground.
+     3. Navy #002144 is unreadable on a dark ground. The dark theme swaps the
+        accent to the official Lite Blue #00A4E3 rather than lightening navy.
+
+   Consequence: on a light ground ALL coloured text is navy. The category
+   colours appear as borders, tints and badge grounds - never as type.
+
+   Two skins sit on this core:
+     .skin-document  reference and policy pages - serif body, square corners
+     .skin-app       interactive surfaces - rounded, denser
+   ==========================================================================*/
+
+:root {
+  /* ---- official palette -------------------------------------------------*/
+  --msu-navy:       #002144;   /* PMS 289  - primary */
+  --msu-gold:       #ECAC00;   /* PMS 123  - primary */
+  --msu-liteblue:   #00A4E3;   /* PMS 2995 - accent  */
+  --msu-redorange:  #FF4500;   /* Warm Red - accent  */
+
+  /* ---- surface ----------------------------------------------------------*/
+  --paper:      #F2F1EE;
+  --surface:    #FBFAF8;
+  --surface-2:  #EDECE6;
+  --ink:        #1F1E1C;
+  --ink-soft:   #565350;
+  --rule:       #D8D5D0;
+  --accent:     #002144;
+  --band:       #002144;
+  --band-ink:   #FFFFFF;
+
+  /* ---- flag: the single highlighted block (gold) ------------------------*/
+  --flag:       #ECAC00;
+  --flag-soft:  #FDF7E7;
+  --flag-ink:   #002144;
+
+  /* ---- equipment-category ramp -----------------------------------------
+     A learnable escalation built only from official colours:
+       Cat 1 lite blue (proceed) - Cat 2 gold (caution) - Cat 3 red (stop).
+     Each is a tint plus a border. Text inside is always --cat-ink.         */
+  --cat1:       #00A4E3;
+  --cat1-soft:  #E8F6FC;
+  --cat2:       #ECAC00;
+  --cat2-soft:  #FDF7E7;
+  --cat3:       #FF4500;
+  --cat3-soft:  #FFEDE5;
+  --cat-ink:    #002144;
+
+  /* ---- type -------------------------------------------------------------*/
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:    "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-mono:    "JetBrains Mono", ui-monospace, Consolas, monospace;
+
+  --measure:      36rem;   /* reading column          */
+  --measure-wide: 64rem;   /* hub grids, deck slides  */
+
+  /* ---- skin knobs - the two skins differ only in these ------------------*/
+  --radius:    0;
+  --radius-sm: 0;
+  --radius-xs: 0;
+}
+
+/* Dark theme. Redefine tokens only - never a colour's sole definition. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:      #16181A;
+    --surface:    #1E2124;
+    --surface-2:  #23272B;
+    --ink:        #ECEAE6;
+    --ink-soft:   #A7A29B;
+    --rule:       #33383C;
+    --accent:     #00A4E3;
+    --band:       #0A2B47;
+    --band-ink:   #ECEAE6;
+    --flag-soft:  #2A2413;
+    --flag-ink:   #ECAC00;
+    --cat1-soft:  #0C2530;
+    --cat2-soft:  #2A2413;
+    --cat3-soft:  #2E1409;
+    --cat-ink:    #ECEAE6;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:      #16181A;
+  --surface:    #1E2124;
+  --surface-2:  #23272B;
+  --ink:        #ECEAE6;
+  --ink-soft:   #A7A29B;
+  --rule:       #33383C;
+  --accent:     #00A4E3;
+  --band:       #0A2B47;
+  --band-ink:   #ECEAE6;
+  --flag-soft:  #2A2413;
+  --flag-ink:   #ECAC00;
+  --cat1-soft:  #0C2530;
+  --cat2-soft:  #2A2413;
+  --cat3-soft:  #2E1409;
+  --cat-ink:    #ECEAE6;
+}
+
+/* The app skin is the only place radii are non-zero. */
+.skin-app {
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================*/
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Type scale - user-corrected twice, do not regress.
+   The generating rule: a heading is never smaller than the text it heads. */
+h1 {
+  font-family: var(--f-display); font-weight: 700;
+  font-size: clamp(2.2rem, 7vw, 3rem); line-height: 1.03;
+  letter-spacing: -.02em; margin: 0; text-wrap: balance;
+}
+h2 {
+  font-family: var(--f-display); font-weight: 600;
+  font-size: 1.28rem; letter-spacing: -.01em; margin: 0;
+  padding-bottom: .5rem; border-bottom: 2px solid var(--ink);
+  text-wrap: balance;
+}
+h3 {
+  font-family: var(--f-display); font-weight: 700;
+  font-size: 1.02rem; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--accent); margin: .9rem 0 0;
+}
+p { margin: 0; }
+strong { font-weight: 600; }
+em { font-style: italic; }
+code { font-family: var(--f-mono); font-size: .86em; }
+
+ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .55rem; }
+ul li { position: relative; padding-left: 1.35rem; }
+ul li::before {
+  content: ""; position: absolute; left: 0; top: .62em;
+  width: .5rem; height: 1px; background: var(--accent);
+}
+
+.aside { color: var(--ink-soft); font-size: .93em; }
+.lede  { color: var(--ink-soft); font-size: 1.02rem; }
+
+/* ==========================================================================
+   Cross-page links - the mechanism the whole system turns on.
+
+   A page link resolves differently depending on whether its target is inside
+   the presentation being viewed. The generator decides at build time and
+   stamps the class; these rules are what the reader actually sees.
+   ========================================================================*/
+a { color: var(--accent); text-underline-offset: .18em; text-decoration-thickness: 1px; }
+
+/* wiki mode - every link is page navigation, so they all look alike */
+a.xref-page {
+  text-decoration: none;
+  border-bottom: 1.5px solid var(--accent);
+  font-weight: 600;
+}
+
+/* target IS in this deck - jumps to a slide, stays in the presentation */
+a.xref-in {
+  text-decoration: none;
+  border-bottom: 1.5px solid var(--accent);
+  font-weight: 600;
+}
+a.xref-in::after { content: " \2192"; font-weight: 400; }
+
+/* target is NOT in this deck - leaves for the wiki, opens in a new tab.
+   Marked so a presenter knows before clicking that the deck will be left. */
+a.xref-out {
+  text-decoration: none;
+  border-bottom: 1.5px dotted var(--accent);
+}
+a.xref-out::after {
+  content: " \2197"; font-size: .82em; vertical-align: .12em; color: var(--ink-soft);
+}
+
+/* a link whose target does not exist yet - visible, not silently broken.
+   Rendered as a <span>, so this selector must not require an <a>. */
+.xref-missing {
+  color: var(--ink-soft); border-bottom: 1.5px dotted var(--ink-soft);
+  text-decoration: none; cursor: help;
+}
+.xref-missing::after { content: " (page pending)"; font-size: .82em; }
+
+/* ==========================================================================
+   Shared components
+   ========================================================================*/
+
+/* Masthead - the SoE lockup already says "School of Engineering".
+   Never set that as a text label beside it. */
+.stamp { display: flex; align-items: center; gap: .85rem; }
+.stamp::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+.logo { width: 13.5rem; max-width: 62%; height: auto; display: block; }
+
+/* Category badge - tint, border, navy text. Never coloured type. */
+.cat {
+  display: inline-flex; align-items: baseline; gap: .4rem;
+  font-family: var(--f-display); font-weight: 700;
+  font-size: .82rem; letter-spacing: .06em; text-transform: uppercase;
+  padding: .28rem .6rem; border: 1.5px solid; border-radius: var(--radius-xs);
+  color: var(--cat-ink); white-space: nowrap;
+}
+.cat-1 { background: var(--cat1-soft); border-color: var(--cat1); }
+.cat-2 { background: var(--cat2-soft); border-color: var(--cat2); }
+.cat-3 { background: var(--cat3-soft); border-color: var(--cat3); }
+
+/* Callouts */
+.gate {
+  background: var(--flag-soft); border: 1px solid var(--flag);
+  border-radius: var(--radius-sm);
+  padding: 1.35rem 1.25rem; display: flex; flex-direction: column; gap: .8rem;
+}
+.gate h2 { border-bottom-color: var(--flag); }
+.gate ul li::before { background: var(--flag); }
+
+.stop {
+  background: var(--cat3-soft); border: 1px solid var(--cat3);
+  border-radius: var(--radius-sm);
+  padding: 1.35rem 1.25rem; display: flex; flex-direction: column; gap: .8rem;
+}
+.stop h2 { border-bottom-color: var(--cat3); }
+.stop ul li::before { background: var(--cat3); }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius-sm); padding: 1.35rem 1.25rem;
+  display: flex; flex-direction: column; gap: .8rem;
+}
+
+/* Tick boxes - the only place a box belongs */
+.boxes li { padding-left: 1.9rem; }
+.boxes li::before {
+  content: ""; position: absolute; left: 0; top: .32em;
+  width: .95rem; height: .95rem; background: transparent;
+  border: 1.5px solid var(--accent); border-radius: 2px;
+}
+
+/* Definition rows, ruled like a spec sheet */
+.dims { margin: 0; display: flex; flex-direction: column; gap: 0; }
+.dims > div {
+  display: grid; grid-template-columns: 11rem 1fr; gap: 1rem;
+  padding: .7rem 0; border-top: 1px solid var(--rule);
+}
+.dims > div:last-child { border-bottom: 1px solid var(--rule); }
+.dims dt {
+  font-family: var(--f-display); font-weight: 600;
+  font-size: .8rem; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--accent); line-height: 1.4;
+}
+.dims dd { margin: 0; }
+@media (max-width: 34rem) { .dims > div { grid-template-columns: 1fr; gap: .25rem; } }
+
+.footerband {
+  background: var(--band); color: var(--band-ink);
+  padding: 1.15rem 1.25rem; font-size: 1.02rem; border-radius: var(--radius-sm);
+}
+.footerband a { color: var(--band-ink); }
+
+.colophon {
+  font-family: var(--f-display); font-size: .72rem; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--ink-soft);
+  padding-top: 1.1rem; border-top: 1px solid var(--rule);
+}
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ==========================================================================
+   Logo theme swap - MUST STAY LAST, and the doubled class is deliberate.
+
+   The mark is never recoloured; the light and reversed lockups are both
+   shipped and one is hidden by `display`. That makes these rules collide with
+   any component rule that also sets `display` on the same element.
+
+   `.logo { display: block }` is exactly such a rule, and at equal specificity
+   the later declaration wins - so a plain `.dark-only { display: none }`
+   placed above it silently stopped working and BOTH lockups rendered side by
+   side in light mode. Doubling the class (0,0,2,0) beats any single-class
+   rule regardless of order, without reaching for !important.
+   ========================================================================*/
+.dark-only.dark-only { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .light-only.light-only { display: none; }
+  :root:not([data-theme="light"]) .dark-only.dark-only   { display: block; }
+}
+:root[data-theme="dark"] .light-only.light-only { display: none; }
+:root[data-theme="dark"] .dark-only.dark-only   { display: block; }

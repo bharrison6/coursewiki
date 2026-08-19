@@ -1,0 +1,161 @@
+/* ============================================================================
+   deck.css - the presentation surface.
+
+   A deck is the SAME page content re-flowed: every <section> of every page in
+   the manifest becomes one slide. Nothing is authored twice.
+
+   Navigation is CSS scroll-snap, not a framework: it keeps working with the
+   keyboard, with a touchpad, with a scrollbar, and when JavaScript is off.
+   ==========================================================================*/
+
+html, body { height: 100%; }
+body.deck {
+  margin: 0;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) { body.deck { scroll-behavior: auto; } }
+
+.slide {
+  position: relative;
+  min-height: 100svh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: clamp(1.5rem, 3.5vh, 2.5rem) clamp(1.25rem, 6vw, 4rem);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* The band across the top names the page a slide came from, so a viewer
+   always knows which wiki topic they are inside. */
+.slide-top {
+  display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+  font-family: var(--f-display); font-size: .76rem;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+  padding-bottom: .8rem; border-bottom: 1px solid var(--rule);
+}
+.slide-top .src { color: var(--accent); font-weight: 700; text-decoration: none; }
+.slide-top .sec { margin-left: auto; }
+
+.slide-body {
+  align-self: center;
+  width: 100%; max-width: var(--measure-wide); margin: 0 auto;
+  padding: clamp(1.25rem, 4vh, 2.75rem) 0;
+  display: flex; flex-direction: column; gap: 1.1rem;
+  font-size: clamp(1.0625rem, 1.55vh + .55rem, 1.45rem);
+}
+/* Deck type runs larger than wiki type - it is read from across a room.
+   The scale stays proportional so no heading lands under its body text. */
+.slide-body h2 { font-size: clamp(1.6rem, 3.4vh, 2.4rem); border-bottom-width: 3px; }
+.slide-body h3 { font-size: clamp(1.05rem, 1.7vh, 1.35rem); }
+.slide-body ul { gap: .7em; }
+.slide-body .lede { font-size: 1.05em; }
+
+/* Title slide - the deck opens on it. */
+.slide.title .slide-body { gap: 1.5rem; }
+.slide.title h1 { font-size: clamp(2.8rem, 8vh, 5rem); }
+.slide.title .logo { width: 17rem; }
+/* The stamp rule-line is a masthead device on a document page; on a title
+   slide it reads as a stray line running off the lockup. */
+.slide.title .stamp::after { content: none; }
+.slide.title .stamp { display: block; }
+
+/* Section-divider slide, emitted between pages. */
+.slide.divider { background: var(--band); border-bottom-color: var(--band); }
+.slide.divider, .slide.divider .slide-top, .slide.divider h1 { color: var(--band-ink); }
+/* .src is --accent, which is navy in the light theme - i.e. navy on the navy
+   band, which renders as nothing at all. Every element on this slide takes
+   the band ink, not the page accent. */
+.slide.divider .slide-top .src { color: var(--band-ink); }
+.slide.divider .slide-top { border-bottom-color: color-mix(in srgb, var(--band-ink) 30%, transparent); }
+.slide.divider .slide-bottom { border-top-color: color-mix(in srgb, var(--band-ink) 30%, transparent); color: var(--band-ink); }
+.slide.divider .lede { color: color-mix(in srgb, var(--band-ink) 78%, transparent); }
+
+.slide-bottom {
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  padding-top: .8rem; border-top: 1px solid var(--rule);
+  font-family: var(--f-display); font-size: .76rem;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft);
+  /* Clear the fixed control cluster in the bottom-right corner, which
+     otherwise sits directly on top of the slide number. */
+  padding-right: 15rem;
+}
+@media print { .slide-bottom { padding-right: 0; } }
+.slide-bottom .num { margin-left: auto; font-family: var(--f-mono); letter-spacing: 0; }
+
+/* ---- progress -------------------------------------------------------------*/
+.progress {
+  position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 40;
+  background: transparent;
+}
+.progress > i {
+  display: block; height: 100%; width: 0;
+  background: var(--msu-gold);
+  transition: width .15s linear;
+}
+@media (prefers-reduced-motion: reduce) { .progress > i { transition: none; } }
+
+/* ---- controls -------------------------------------------------------------*/
+.deck-ctl {
+  position: fixed; right: clamp(.75rem, 2vw, 1.5rem); bottom: clamp(.75rem, 2vw, 1.5rem);
+  z-index: 40; display: flex; gap: .4rem;
+}
+.deck-ctl button {
+  font-family: var(--f-display); font-size: .74rem;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: .5rem .7rem; cursor: pointer;
+  background: var(--surface); color: var(--accent);
+  border: 1px solid var(--rule); border-radius: var(--radius-xs);
+}
+.deck-ctl button:hover { border-color: var(--accent); }
+
+/* ---- overview (press O, or Esc to close) ---------------------------------*/
+.overview {
+  position: fixed; inset: 0; z-index: 50;
+  background: var(--paper);
+  overflow-y: auto; display: none;
+  padding: clamp(1.5rem, 5vw, 3rem);
+}
+.overview[data-open] { display: block; }
+.overview h2 { max-width: var(--measure-wide); margin: 0 auto 1.5rem; }
+.ov-grid {
+  max-width: var(--measure-wide); margin: 0 auto;
+  display: grid; gap: .75rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+.ov-item {
+  display: flex; flex-direction: column; gap: .3rem;
+  padding: .85rem .9rem; text-align: left; cursor: pointer;
+  background: var(--surface); color: inherit;
+  border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  font: inherit;
+}
+.ov-item:hover { border-color: var(--accent); }
+.ov-item .n { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-soft); }
+.ov-item .t {
+  font-family: var(--f-display); font-weight: 700; font-size: .92rem;
+  color: var(--accent); line-height: 1.25;
+}
+.ov-item .p { font-size: .8rem; color: var(--ink-soft); }
+
+/* ---- print: one slide per landscape page ---------------------------------*/
+@page { size: landscape; margin: 0.4in; }
+@media print {
+  :root { --paper: #FFF; --surface: #FFF; }
+  body.deck { overflow: visible; scroll-snap-type: none; }
+  .progress, .deck-ctl, .overview { display: none !important; }
+  .slide {
+    min-height: auto; height: auto; break-after: page; border-bottom: none;
+    padding: 0 0 .4in;
+  }
+  .slide:last-child { break-after: auto; }
+  .slide-body { font-size: 12pt; padding: .35in 0; }
+  .slide-body h2 { font-size: 20pt; }
+  .slide-body h3 { font-size: 12.5pt; }
+  .slide.title h1 { font-size: 34pt; }
+  .slide.divider, .gate, .stop, .panel, .cat {
+    print-color-adjust: exact; -webkit-print-color-adjust: exact;
+  }
+}
