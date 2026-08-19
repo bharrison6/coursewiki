@@ -303,6 +303,10 @@ function New-Topbar([string]$up, [string]$currentColl) {
 
 function New-Colophon { '<div class="colophon">' + (ConvertTo-HtmlText $site.FOOTER) + '</div>' }
 
+function Format-Count([int]$n, [string]$noun) {
+  if ($n -eq 1) { "$n $noun" } else { "$n ${noun}s" }
+}
+
 function New-PageCards($pageList, [string]$up, [string]$fromColl) {
   $sb = New-Object System.Text.StringBuilder
   [void]$sb.AppendLine('    <div class="hub-grid">')
@@ -338,7 +342,7 @@ foreach ($c in $collections.Values) {
   [void]$hub.AppendLine('      <a class="card big" href="' + $c.Id + '/index.html">')
   [void]$hub.AppendLine('        <span class="t">' + (ConvertTo-HtmlText $c.Title) + '</span>')
   [void]$hub.AppendLine('        <span class="s">' + (ConvertTo-HtmlText $c.Summary) + '</span>')
-  [void]$hub.AppendLine('        <span class="n">' + $ready + ' pages</span>')
+  [void]$hub.AppendLine('        <span class="n">' + (Format-Count $ready 'page') + '</span>')
   [void]$hub.AppendLine('      </a>')
 }
 [void]$hub.AppendLine('    </div>')
@@ -351,7 +355,7 @@ foreach ($c in $collections.Values) {
 foreach ($d in $decks.Values) {
   [void]$hub.AppendLine('      <a class="deckrow" href="deck-' + $d.Name + '.html">')
   [void]$hub.AppendLine('        <span class="t">' + (ConvertTo-HtmlText $d.Title) + '</span>')
-  [void]$hub.AppendLine('        <span class="n">' + $d.PageIds.Count + ' pages</span>')
+  [void]$hub.AppendLine('        <span class="n">' + (Format-Count $d.PageIds.Count 'page') + '</span>')
   [void]$hub.AppendLine('      </a>')
 }
 [void]$hub.AppendLine('    </div>')
