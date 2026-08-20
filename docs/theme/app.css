@@ -516,6 +516,61 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 .xcard.is-stop { border-left: 3px solid var(--cat3); }
 .xcard.is-gate { border-left: 3px solid var(--flag); }
 
+/* ---- authored images ---------------------------------------------------
+   [[img:file.png|Alt text]]. On a site page this is a real file; in a
+   docs\print\ aggregate the identical markup carries a data: URI, because
+   that file is handed out on its own. Nothing here may assume which.        */
+.content-img {
+  display: block; max-width: 100%; height: auto;
+  border-radius: var(--radius-sm);
+}
+@media print { .content-img { break-inside: avoid; max-width: 100%; } }
+
+/* ---- figures and captions ----------------------------------------------
+   The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
+   viewport that insets the figure to 222px against 302px of prose -- a
+   graphic rendering 26% narrower than its own caption. Zero the horizontal
+   inset and own the vertical rhythm instead.
+
+   .graphic-slot is a figure whose artwork has not been drawn yet. It is
+   deliberately visible rather than hidden: an empty slot that renders as a
+   bare floating caption reads as a bug, and a slot nobody can see is a slot
+   nobody fills. Filling one replaces the comment with [[img:...|alt]] and
+   the placeholder rule stops matching on its own.                          */
+figure { margin: 1.5rem 0; }
+
+figure > figcaption {
+  margin-top: .5rem;
+  color: var(--ink-soft);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+figure.graphic-slot:not(:has(img))::before {
+  content: "Artwork pending";
+  display: block;
+  padding: 1.75rem .75rem;
+  text-align: center;
+  font-family: var(--f-mono); font-size: .78rem;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-soft);
+  border: 2px dashed var(--rule);
+  border-radius: var(--radius-sm);
+}
+
+/* Both of these are build-error states that reach the page. The build already
+   fails on them; these make the failure visible in the artifact too, because
+   a generated surface that looks fine is how the last three of these got out.
+   Neither should ever be seen on the live site. */
+.img-missing {
+  display: inline-block; padding: .2rem .5rem;
+  font-family: var(--f-mono); font-size: .82rem;
+  color: var(--cat-ink); background: var(--cat3-soft);
+  border: 1.5px dashed var(--cat3); border-radius: var(--radius-xs);
+}
+.img-missing::before { content: "missing image: "; }
+img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
+
 .cardtools {
   display: flex; gap: .5rem; align-items: center;
   margin-bottom: .9rem;
@@ -799,9 +854,12 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    an image cannot show you that the SAME extinguisher is correct for one fire
    and dangerous on another, and that is the thing that has to land.
    ========================================================================*/
+/* The drawing is aria-hidden support; the steps are the content, and the
+   letter badges now claim part of their column. 15rem of a 68ch article left
+   the descriptions wrapping four lines deep, so the split favours the text. */
 .pass {
   display: grid; gap: 1.25rem; align-items: center;
-  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
   background: var(--surface); border: 1px solid var(--rule);
   border-radius: var(--radius); padding: 1.25rem;
 }
@@ -828,24 +886,85 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 .pass[data-active="3"] .ext-base  { opacity: 1; }
 .pass[data-active="3"] .ext-sweep { opacity: 1; }
 
-.pass-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
+/* ---- PASS stepper -------------------------------------------------------
+   The acronym is the thing being taught, so the LETTER is the dominant
+   element: P-A-S-S has to read straight down the left edge before any word
+   does. Strict hierarchy at every width - letter, then word, then
+   description - which also satisfies the type-scale rule that nothing heads
+   something larger than itself.
+
+   The letter is a BADGE rather than coloured type, and that is a contrast
+   requirement, not a style choice. Red Orange fails as text on a light
+   ground; here it is a border and a fill with --cat-ink inside it - navy on
+   light, near-white on dark - the same treatment .cat, .stop and .gate get
+   from the token layer. Before this it was 1.5rem of #FF4500 type on
+   #FBFAF8, which only cleared AA at all because it happened to be large.
+
+   The two colour declarations carry !important for the reason written at the
+   bottom of msu-theme.css: "the letter is never red-orange type" is an
+   invariant, and a specificity fix only outranks the rules that existed when
+   it was written. Three rules in this project have already expired that way.
+   One knob, --pass-k, sizes the badge, its type and the grid column together,
+   so narrow and print variants are a single line each and cannot drift.     */
+.pass-steps {
+  --pass-k: 3rem;
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: .45rem;
+}
 .pass-steps li { padding: 0; }
 .pass-steps li::before { content: none; }
 .pass-steps button {
   width: 100%; text-align: left; cursor: pointer; font: inherit;
-  display: grid; grid-template-columns: 2rem 1fr; gap: .1rem .7rem;
-  padding: .6rem .75rem; border-radius: var(--radius-sm);
+  display: grid; grid-template-columns: var(--pass-k) minmax(0, 1fr);
+  gap: .1rem .8rem;
+  padding: .55rem .7rem; border-radius: var(--radius-sm);
   background: transparent; border: 1px solid transparent; color: inherit;
 }
 .pass-steps button:hover { background: var(--surface-2); }
 .pass-steps button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+
 .pass-steps .k {
-  grid-row: span 2; align-self: start;
-  font-family: var(--f-display); font-weight: 700; font-size: 1.5rem;
-  color: var(--cat3); line-height: 1;
+  grid-row: span 2; align-self: center;
+  display: grid; place-items: center;
+  width: var(--pass-k); height: var(--pass-k);
+  font-family: var(--f-display); font-weight: 700; text-transform: uppercase;
+  font-size: calc(var(--pass-k) * .68); line-height: 1;
+  color: var(--cat-ink) !important;
+  background: var(--cat3-soft);
+  border: 2px solid var(--cat3);
+  border-radius: var(--radius-xs);
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
 }
-.pass-steps .w { font-family: var(--f-display); font-weight: 700; font-size: 1rem; }
-.pass-steps .d { font-size: .9rem; color: var(--ink-soft); line-height: 1.4; }
+/* The step being shown inverts - same letter, same size, same place, so the
+   acronym still reads. --accent is navy on light and Lite Blue on dark, and
+   --paper is the ground of each, so this pair is legible in both. Filling
+   with --cat3 would not be: near-white on Red Orange is 2.9:1. */
+.pass-steps button[aria-pressed="true"] .k {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--paper) !important;
+}
+.pass-steps .w {
+  align-self: end;
+  font-family: var(--f-display); font-weight: 700;
+  font-size: 1.05rem; letter-spacing: .05em; text-transform: uppercase;
+  line-height: 1.2;
+}
+.pass-steps .d { align-self: start; font-size: .88rem; color: var(--ink-soft); line-height: 1.4; }
+
+@media (max-width: 30rem) { .pass-steps { --pass-k: 2.5rem; } }
+/* A panel is read from across a room. */
+.presenting .pass-steps { --pass-k: 3.75rem; }
+@media print {
+  .pass-steps { --pass-k: 2.6rem; }
+  .pass-steps li { break-inside: avoid; }
+  /* On paper no step is "current", and an inverted one would read as an
+     instruction to start there. Later in source and equally specific, so it
+     takes the !important pair above. */
+  .pass-steps button[aria-pressed="true"] { border-color: transparent; background: transparent; }
+  .pass-steps button[aria-pressed="true"] .k {
+    background: var(--cat3-soft); border-color: var(--cat3); color: var(--cat-ink) !important;
+  }
+}
 
 /* ---- fire class matrix -------------------------------------------------*/
 .firetable { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); overflow: hidden; }

@@ -846,6 +846,61 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 .xcard.is-stop { border-left: 3px solid var(--cat3); }
 .xcard.is-gate { border-left: 3px solid var(--flag); }
 
+/* ---- authored images ---------------------------------------------------
+   [[img:file.png|Alt text]]. On a site page this is a real file; in a
+   docs\print\ aggregate the identical markup carries a data: URI, because
+   that file is handed out on its own. Nothing here may assume which.        */
+.content-img {
+  display: block; max-width: 100%; height: auto;
+  border-radius: var(--radius-sm);
+}
+@media print { .content-img { break-inside: avoid; max-width: 100%; } }
+
+/* ---- figures and captions ----------------------------------------------
+   The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
+   viewport that insets the figure to 222px against 302px of prose -- a
+   graphic rendering 26% narrower than its own caption. Zero the horizontal
+   inset and own the vertical rhythm instead.
+
+   .graphic-slot is a figure whose artwork has not been drawn yet. It is
+   deliberately visible rather than hidden: an empty slot that renders as a
+   bare floating caption reads as a bug, and a slot nobody can see is a slot
+   nobody fills. Filling one replaces the comment with [[img:...|alt]] and
+   the placeholder rule stops matching on its own.                          */
+figure { margin: 1.5rem 0; }
+
+figure > figcaption {
+  margin-top: .5rem;
+  color: var(--ink-soft);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+figure.graphic-slot:not(:has(img))::before {
+  content: "Artwork pending";
+  display: block;
+  padding: 1.75rem .75rem;
+  text-align: center;
+  font-family: var(--f-mono); font-size: .78rem;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-soft);
+  border: 2px dashed var(--rule);
+  border-radius: var(--radius-sm);
+}
+
+/* Both of these are build-error states that reach the page. The build already
+   fails on them; these make the failure visible in the artifact too, because
+   a generated surface that looks fine is how the last three of these got out.
+   Neither should ever be seen on the live site. */
+.img-missing {
+  display: inline-block; padding: .2rem .5rem;
+  font-family: var(--f-mono); font-size: .82rem;
+  color: var(--cat-ink); background: var(--cat3-soft);
+  border: 1.5px dashed var(--cat3); border-radius: var(--radius-xs);
+}
+.img-missing::before { content: "missing image: "; }
+img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
+
 .cardtools {
   display: flex; gap: .5rem; align-items: center;
   margin-bottom: .9rem;
@@ -1129,9 +1184,12 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    an image cannot show you that the SAME extinguisher is correct for one fire
    and dangerous on another, and that is the thing that has to land.
    ========================================================================*/
+/* The drawing is aria-hidden support; the steps are the content, and the
+   letter badges now claim part of their column. 15rem of a 68ch article left
+   the descriptions wrapping four lines deep, so the split favours the text. */
 .pass {
   display: grid; gap: 1.25rem; align-items: center;
-  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
   background: var(--surface); border: 1px solid var(--rule);
   border-radius: var(--radius); padding: 1.25rem;
 }
@@ -1158,24 +1216,85 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 .pass[data-active="3"] .ext-base  { opacity: 1; }
 .pass[data-active="3"] .ext-sweep { opacity: 1; }
 
-.pass-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
+/* ---- PASS stepper -------------------------------------------------------
+   The acronym is the thing being taught, so the LETTER is the dominant
+   element: P-A-S-S has to read straight down the left edge before any word
+   does. Strict hierarchy at every width - letter, then word, then
+   description - which also satisfies the type-scale rule that nothing heads
+   something larger than itself.
+
+   The letter is a BADGE rather than coloured type, and that is a contrast
+   requirement, not a style choice. Red Orange fails as text on a light
+   ground; here it is a border and a fill with --cat-ink inside it - navy on
+   light, near-white on dark - the same treatment .cat, .stop and .gate get
+   from the token layer. Before this it was 1.5rem of #FF4500 type on
+   #FBFAF8, which only cleared AA at all because it happened to be large.
+
+   The two colour declarations carry !important for the reason written at the
+   bottom of msu-theme.css: "the letter is never red-orange type" is an
+   invariant, and a specificity fix only outranks the rules that existed when
+   it was written. Three rules in this project have already expired that way.
+   One knob, --pass-k, sizes the badge, its type and the grid column together,
+   so narrow and print variants are a single line each and cannot drift.     */
+.pass-steps {
+  --pass-k: 3rem;
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: .45rem;
+}
 .pass-steps li { padding: 0; }
 .pass-steps li::before { content: none; }
 .pass-steps button {
   width: 100%; text-align: left; cursor: pointer; font: inherit;
-  display: grid; grid-template-columns: 2rem 1fr; gap: .1rem .7rem;
-  padding: .6rem .75rem; border-radius: var(--radius-sm);
+  display: grid; grid-template-columns: var(--pass-k) minmax(0, 1fr);
+  gap: .1rem .8rem;
+  padding: .55rem .7rem; border-radius: var(--radius-sm);
   background: transparent; border: 1px solid transparent; color: inherit;
 }
 .pass-steps button:hover { background: var(--surface-2); }
 .pass-steps button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+
 .pass-steps .k {
-  grid-row: span 2; align-self: start;
-  font-family: var(--f-display); font-weight: 700; font-size: 1.5rem;
-  color: var(--cat3); line-height: 1;
+  grid-row: span 2; align-self: center;
+  display: grid; place-items: center;
+  width: var(--pass-k); height: var(--pass-k);
+  font-family: var(--f-display); font-weight: 700; text-transform: uppercase;
+  font-size: calc(var(--pass-k) * .68); line-height: 1;
+  color: var(--cat-ink) !important;
+  background: var(--cat3-soft);
+  border: 2px solid var(--cat3);
+  border-radius: var(--radius-xs);
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
 }
-.pass-steps .w { font-family: var(--f-display); font-weight: 700; font-size: 1rem; }
-.pass-steps .d { font-size: .9rem; color: var(--ink-soft); line-height: 1.4; }
+/* The step being shown inverts - same letter, same size, same place, so the
+   acronym still reads. --accent is navy on light and Lite Blue on dark, and
+   --paper is the ground of each, so this pair is legible in both. Filling
+   with --cat3 would not be: near-white on Red Orange is 2.9:1. */
+.pass-steps button[aria-pressed="true"] .k {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--paper) !important;
+}
+.pass-steps .w {
+  align-self: end;
+  font-family: var(--f-display); font-weight: 700;
+  font-size: 1.05rem; letter-spacing: .05em; text-transform: uppercase;
+  line-height: 1.2;
+}
+.pass-steps .d { align-self: start; font-size: .88rem; color: var(--ink-soft); line-height: 1.4; }
+
+@media (max-width: 30rem) { .pass-steps { --pass-k: 2.5rem; } }
+/* A panel is read from across a room. */
+.presenting .pass-steps { --pass-k: 3.75rem; }
+@media print {
+  .pass-steps { --pass-k: 2.6rem; }
+  .pass-steps li { break-inside: avoid; }
+  /* On paper no step is "current", and an inverted one would read as an
+     instruction to start there. Later in source and equally specific, so it
+     takes the !important pair above. */
+  .pass-steps button[aria-pressed="true"] { border-color: transparent; background: transparent; }
+  .pass-steps button[aria-pressed="true"] .k {
+    background: var(--cat3-soft); border-color: var(--cat3); color: var(--cat-ink) !important;
+  }
+}
 
 /* ---- fire class matrix -------------------------------------------------*/
 .firetable { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
@@ -1330,15 +1449,6 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="the-procedure-that-never-changes" data-card="the-procedure-that-never-changes" open>
-    <summary>The procedure that never changes<span class="chev"></span></summary>
-    <div class="body">
-      <h2>The procedure that never changes</h2>
-  <p class="lede">This applies to <strong>any</strong> equipment, in <strong>any</strong> lab, on
-  <strong>every</strong> use &mdash; whatever its <a class="xref-page" href="#p-equipment-categories">category</a>.</p>
-  <p>Three phases. Nothing in them is optional, and nothing in them depends on what you are making.</p>
-    </div>
-  </details>
   <details class="xcard" id="before-operating-any-equipment" data-card="before-operating-any-equipment" open>
     <summary>Before operating any equipment<span class="chev"></span></summary>
     <div class="body">
@@ -1645,7 +1755,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 <article class="article bundled" id="p-electrical-safety">
   <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span></div>
   <h1>Electrical Safety</h1>
-  <p class="lede">Voltages present in the lab, the inspection required before every use, and what to do when someone is shocked.</p>
+  <p class="lede">Where the shock hazard actually starts, why 5 V can still burn you, the inspection required before every use, cords on the floor, and what to do when someone is shocked.</p>
 <div class="cardtools">
   <button type="button" data-act="expand">Expand all</button>
   <button type="button" data-act="collapse">Collapse all</button>
@@ -1655,38 +1765,370 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
     <summary>Voltage in this lab<span class="chev"></span></summary>
     <div class="body">
       <h2>Voltage in this lab</h2>
+  <p class="lede">You will work at both ends of this range in the same week &mdash; a 5&nbsp;V
+  microcontroller on the bench in the morning, a 240&nbsp;V machine in the afternoon. They are not
+  the same hazard, and treating them as one thing does not make you safer. It makes the warning
+  easy to ignore.</p>
   <dl class="dims">
-    <div><dt>120 V</dt><dd>Standard receptacles. Still dangerous &mdash; can cause serious injury or death.</dd></div>
-    <div><dt>240 V / 480 V</dt><dd>Industrial equipment. Extremely dangerous &mdash; often fatal.</dd></div>
+    <div><dt>5&nbsp;V / 12&nbsp;V DC</dt><dd>Benchtop electronics &mdash; supplies, controllers,
+    battery packs. <strong>Below the shock threshold.</strong> Not below the burn threshold.</dd></div>
+    <div><dt>120&nbsp;V</dt><dd>Standard receptacles. Dangerous &mdash; can cause serious injury or
+    death.</dd></div>
+    <div><dt>240&nbsp;V / 480&nbsp;V</dt><dd>Industrial equipment. Extremely dangerous &mdash; often
+    fatal.</dd></div>
   </dl>
   <div class="stop">
-    <p><strong>Never assume any voltage is &ldquo;safe&rdquo;.</strong></p>
+    <p><strong>Voltage tells you whether a circuit can push current through <em>you</em>. It does
+    not tell you what that circuit can do to a ring, a dropped tool or a shorted cell.</strong></p>
+    <p>Those are two different hazards with two different thresholds. The next two sections are
+    about where each one starts.</p>
   </div>
     </div>
   </details>
-  <details class="xcard" id="inspection-mandatory-before-each-use" data-card="inspection-mandatory-before-each-use" open>
+  <details class="xcard is-gate" id="where-the-shock-hazard-starts" data-card="where-the-shock-hazard-starts" open>
+    <summary>Where the shock hazard starts<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Where the shock hazard starts</h2>
+  <p class="lede">There is a real number and it is not a secret. In US workplace rules the line is
+  <strong>50&nbsp;volts</strong>.</p>
+  <ul>
+    <li>OSHA requires live parts to be de-energized before you work on or near them &mdash; and then
+    says that <strong>&ldquo;live parts that operate at less than 50 volts to ground need not be
+    deenergized if there will be no increased exposure to electrical burns or to explosion due to
+    electric arcs&rdquo;</strong> (<code>29&nbsp;CFR&nbsp;1910.333(a)(1)</code>). Read that second
+    half again; the rest of this page hangs on it.</li>
+    <li>At or above the line, live parts must be <strong>guarded against accidental contact</strong>.
+    The rule is written for &ldquo;electric equipment operating at 50 volts or more&rdquo;
+    (<code>29&nbsp;CFR&nbsp;1910.303(g)(2)(i)</code>).</li>
+    <li><strong>That number applies to DC as well as AC.</strong> The standard does not distinguish
+    between them, and OSHA has stated it &ldquo;considers all voltages of 50 volts or above to be
+    hazardous&rdquo; (interpretation letter, 4&nbsp;September&nbsp;2015).</li>
+    <li>NFPA&nbsp;70E draws the same line. Below 50&nbsp;V you may work live only where <strong>the
+    capacity of the source and any overcurrent protection have been considered</strong> and found
+    not to add burn or arc exposure (2024 edition, 110.2(B) Exception No.&nbsp;5).</li>
+  </ul>
+
+  <h3>The international standards are not one number</h3>
+  <p>On datasheets you will meet a different set of figures, and there the <strong>AC and DC limits
+  are not the same</strong>:</p>
+  <dl class="dims">
+    <div><dt>50&nbsp;V AC / 120&nbsp;V DC</dt><dd><strong>Extra-Low Voltage</strong> under
+    IEC&nbsp;61140 and IEC&nbsp;60364-4-41 &mdash; 50&nbsp;V AC rms, or 120&nbsp;V
+    <em>ripple-free</em> DC. &ldquo;Ripple-free&rdquo; is a real condition, not a figure of speech:
+    past roughly 10&nbsp;% rms ripple the supply is treated as AC and the lower number applies.</dd></div>
+    <div><dt>30&nbsp;V AC / 60&nbsp;V DC</dt><dd><strong>Class ES1</strong> in IEC&nbsp;62368-1, the
+    standard behind most benchtop and consumer equipment. ES1 is the class that needs no safeguard
+    at all; ES2 runs up to 50&nbsp;V AC / 120&nbsp;V DC and requires one.</dd></div>
+  </dl>
+  <div class="gate">
+    <p><strong>In this lab, use 50&nbsp;V &mdash; AC or DC.</strong> It is the number OSHA enforces,
+    it is the most conservative of the figures above, and it assumes nothing about your skin being
+    dry or your hands being clean. If a circuit is at or above 50&nbsp;V, it is not something you
+    work on live.</p>
+  </div>
+  <p class="aside"><strong>About the 48&nbsp;volts you may have heard.</strong> 48&nbsp;V DC is a
+  <em>system</em> voltage, not a safety threshold. It is the telephone-exchange standard that Bell
+  settled on, carried into military and commercial communications gear ever since, and more recently
+  into 48&nbsp;V vehicle electrical systems (ISO&nbsp;21780). It was picked to sit deliberately
+  <strong>just under</strong> the 50&nbsp;V line so that technicians could keep working on it live.
+  So 48 is the right neighborhood from the wrong side: <strong>the threshold is 50, and 48 is what
+  engineers built in order to stay below it.</strong></p>
+    </div>
+  </details>
+  <details class="xcard is-stop" id="low-voltage-is-not-low-energy" data-card="low-voltage-is-not-low-energy" open>
+    <summary>Low voltage is not low energy<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Low voltage is not low energy</h2>
+  <p class="lede">Below 50&nbsp;V, shock stops being the hazard and <strong>short-circuit current
+  becomes it</strong>. This is the section that matters most on the bench, because 5&nbsp;V and
+  12&nbsp;V is where most of you spend most of your time.</p>
+  <p>Look at what the exemption above is actually conditioned on. Not shock &mdash; <strong>burns
+  and arcs</strong>. NFPA&nbsp;70E names the same condition as <em>the capacity of the source</em>.
+  Both standards are telling you that once you are under the shock line, the question changes from
+  <em>how many volts</em> to <strong>how many amps can this thing deliver into a dead short</strong>.</p>
+
+  <h3>Where the current comes from</h3>
+  <ul>
+    <li>A <strong>bench supply</strong> set to 5&nbsp;V will deliver its full rated current into a
+    short without complaint. That is what the current limit is for &mdash; and if you have wound the
+    limit up to get a motor turning, you have wound the protection off.</li>
+    <li>A <strong>lithium cell or pack</strong> has almost no internal resistance. Shorted, a single
+    cell can dump tens of amps within milliseconds. A pack does considerably worse.</li>
+    <li>A <strong>lead-acid battery</strong> is rated in hundreds of cold-cranking amps. That rating
+    <em>is</em> its short-circuit capability, described politely.</li>
+  </ul>
+  <p>None of these can push meaningful current through your body at 12&nbsp;V. All of them can push
+  hundreds of amps through a piece of metal &mdash; and metal carrying current it was never sized
+  for gets hot, fast.</p>
+
+  <h3>Metal jewelry is the classic way this happens</h3>
+  <div class="stop">
+    <p><strong>ALL jewelry is already PROHIBITED here</strong> &mdash; see
+    <a class="xref-page" href="#p-ppe">clothing and jewelry</a>. That rule was written for rotating machinery. It earns its keep a
+    second time on the bench, and OSHA writes it a second time for exactly this reason: conductive
+    jewelry &ldquo;may not be worn if they might contact exposed energized parts&rdquo;
+    (<code>29&nbsp;CFR&nbsp;1910.333(c)(8)</code>) &mdash; a rule with <strong>no voltage floor at
+    all</strong>.</p>
+    <p>A ring or a metal watch band bridging a low-voltage source is a near-zero-resistance path
+    across something that can supply hundreds of amps. The ring becomes the heating element. This is
+    documented injury, not a story: a mechanic&rsquo;s gold ring touched the positive terminal of a
+    <strong>12&nbsp;V car battery</strong> while the wrench in his hand bridged the ring and the
+    negative terminal, and the result was a deep circumferential burn around the base of the finger
+    that needed a skin graft. A review of nine ring burns at one burn center found the same pattern:
+    <strong>the small size of the burn hides how bad it is</strong>, because a burn that wraps a
+    finger is far more likely to need grafting and to leave lasting loss of function than a burn of
+    the same area anywhere else.</p>
+    <p><strong>You can drop a wrench. You cannot drop a ring.</strong></p>
+  </div>
+  <p class="aside">The silicone wedding ring that the PPE rule allows is also the right answer
+  electrically: silicone does not conduct, so it cannot become the short.</p>
+
+  <h3>A shorted lithium cell does not just get warm</h3>
+  <div class="stop">
+    <p>An external short is one of the recognized triggers for <strong>thermal runaway</strong>
+    &mdash; the cell generates heat faster than it can shed it, and the outcome is
+    &ldquo;extremely high temperatures, violent cell venting, smoke and fire&rdquo; (UL Research
+    Institutes). Once it has started, <strong>disconnecting it does not stop it</strong>. The cell is
+    now its own energy source.</p>
+    <p><strong>NEVER leave loose cells or packs where metal can bridge the terminals</strong>
+    &mdash; a drawer with tools in it, a pocket with keys in it, a bin with offcuts in it. Federal
+    transport rules require lithium cells and batteries to be packed so their terminals cannot short
+    (<code>49&nbsp;CFR&nbsp;173.185</code>). The reason that rule exists is the reason to do the same
+    thing on your own bench.</p>
+    <p>A cell that has been shorted, dropped, crushed, punctured or has swollen is <strong>out of
+    service</strong>. Tell the instructor. Do not put it back on charge to find out. See
+    <a class="xref-page" href="#p-fire-safety">Fire Safety</a>.</p>
+  </div>
+
+  <p class="aside"><strong>The sentence to take away:</strong> low voltage does not mean low energy.
+  Voltage decides whether a circuit can shock you. <strong>Current decides whether it can burn
+  you</strong> &mdash; and current is set by what the source can deliver and what is in the path,
+  not by the number printed on the front of the supply.</p>
+    </div>
+  </details>
+  <details class="xcard is-gate" id="inspection-mandatory-before-each-use" data-card="inspection-mandatory-before-each-use" open>
     <summary>Inspection &mdash; mandatory before each use<span class="chev"></span></summary>
     <div class="body">
       <h2>Inspection &mdash; mandatory before each use</h2>
+  <p class="lede">Every cord, every time, before it goes in the receptacle. It takes about five
+  seconds, and it is the one check that catches most of this page before it happens rather than
+  after.</p>
   <ul class="boxes">
-    <li>Check for frayed, cracked or exposed wiring.</li>
-    <li>Look for damaged plugs or connectors.</li>
-    <li>Inspect extension cords for cuts or wear.</li>
+    <li>Run the cord through your hand end to end. Look for <strong>frayed, cracked, cut or
+    exposed</strong> insulation, and for flat spots where something has been driven over it.</li>
+    <li>Check the <strong>plug</strong>: blades all present, straight, tight in the body, not
+    discolored or pitted. Check the <strong>ground pin is still there</strong> &mdash; a missing
+    ground pin means the cord is out of service, not that you have found a workaround.</li>
+    <li>Check where the cord <strong>enters the plug and enters the tool</strong>. That is where
+    flexing breaks conductors, and it is where the damage hides.</li>
+    <li>Inspect extension cords for cuts, crushing and wear, and check the receptacle end for
+    scorching or melted plastic.</li>
   </ul>
-  <p><strong>If you find damage, discontinue use immediately and notify the instructor.</strong></p>
+
+  <figure class="graphic-slot">
+    <!-- GRAPHIC-SLOT: damaged-cord-inspection
+         STATUS: awaiting artwork. Fill this figure; leave the figcaption text as written.
+
+         LAYOUT NOTE, APPLIES TO ALL THREE SLOTS ON THIS PAGE. There is no rule for
+           .graphic-slot in theme\app.css yet, so the browser default for <figure> insets it
+           40px on each side: measured at 375px viewport the figure is 222px wide where the
+           prose beside it is 302px. A graphic that renders 26% narrower than its own caption
+           is a defect, so before any artwork ships app.css needs roughly:
+             figure.graphic-slot { margin: 1.5rem 0; }
+             figure.graphic-slot figcaption { font-size: .9rem; color: var(--ink-soft); }
+           theme\app.css was being edited by another agent when this page was written; that
+           rule was deliberately NOT added from here. Confirm it exists before filling a slot.
+
+         DEPICTS: a damaged flexible cord, close, at the point a student would find it.
+           Show at least two of the failure modes named in the list above so the graphic
+           teaches the checklist rather than illustrating one word of it:
+             1. outer jacket abraded through, with the colored conductor insulation showing;
+             2. the cord kinked and cracked right where it enters the plug body (strain relief
+                failed), a couple of strands visible;
+             3. a crush/flat spot from being run over or pinched in a door.
+           A student must be able to point at the picture and say WHICH check found it.
+         MEDIUM: a photograph is the right call here. The media README asks for real damage
+           to be photographed rather than drawn. A cutaway drawing works only if it stays
+           strictly literal. NOTE: nothing identifiable, no faces, no room signage.
+         DO NOT SHOW: tape wrapped around the damage as if that were a fix. The gate below
+           says tape is not a repair; a taped cord in the picture would teach the opposite.
+         WHEN FILLED: replace this comment with an image reference of the form
+           img:damaged-cord.jpg piped to the alt text below, wrapped in the site's
+           double-square-bracket link syntax. See media\README.md. Alt text is required and
+           the build fails without it. Do not write a raw HTML img tag.
+         ALT: "A power cord with its outer jacket worn through, exposing the colored insulation
+           of the conductors underneath, and a second cord cracked and kinked where it enters
+           the plug."
+    -->
+    <figcaption>Damage like this means the cord is finished, not that it needs watching.</figcaption>
+  </figure>
+
+  <div class="gate">
+    <p><strong>If you find damage, stop, unplug it, and notify the instructor.</strong> Not
+    &ldquo;just for this one cut&rdquo;. Tag it or hand it over, so the next person does not find it
+    the hard way.</p>
+    <p><strong>Tape is not a repair.</strong> OSHA allows electrical tape over superficial scuffs in
+    the outer jacket, and has stated just as plainly that &ldquo;tape repairs of the jacket may not
+    be used to bring a worn or frayed flexible cord into compliance&rdquo; (interpretation letter,
+    16&nbsp;December&nbsp;1998). If conductors or their insulation are showing, the cord is done.</p>
+  </div>
     </div>
   </details>
-  <details class="xcard" id="safe-practice" data-card="safe-practice" open>
-    <summary>Safe practice<span class="chev"></span></summary>
+  <details class="xcard is-stop" id="plugs-cords-and-connections" data-card="plugs-cords-and-connections" open>
+    <summary>Plugs, cords and connections<span class="chev"></span></summary>
     <div class="body">
-      <h2>Safe practice</h2>
+      <h2>Plugs, cords and connections</h2>
   <ul>
     <li>Always <strong>disconnect power</strong> before performing any maintenance or adjustment.</li>
-    <li><strong>Never yank or pull a cord</strong> &mdash; grasp the plug, not the cord.</li>
-    <li>Keep electrical connections away from water and wet surfaces.</li>
-    <li>Be aware of overhead wiring and floor-level cords, and avoid contact.</li>
+    <li><strong>NEVER yank or pull a cord</strong> &mdash; grasp the plug, not the cord. Pulling by
+    the cord wrecks the strain relief where you cannot see it, and it is how a plug ends up
+    <strong>half out of the receptacle with the blades exposed</strong>.</li>
+    <li>Push a plug <strong>fully home</strong>, and look at it. A plug that will not seat is a
+    fault to report, not a fit problem to force.</li>
+    <li>Keep electrical connections away from water and wet surfaces. Wet skin has on the order of
+    <strong>1,000&nbsp;ohms</strong> of resistance where dry skin has <strong>100,000&nbsp;ohms or
+    more</strong>, so water moves you roughly a hundredfold closer to the current every rule on this
+    page is trying to keep out of you.</li>
+    <li>Be aware of <strong>overhead wiring</strong> when you are handling long stock, moving a
+    ladder or lifting.</li>
   </ul>
-  <p class="aside">Lockout/Tagout for machinery with rotating parts is covered in <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
+
+  <h3>A partly unplugged appliance is a short waiting for something to land on it</h3>
+
+  <figure class="graphic-slot">
+    <!-- GRAPHIC-SLOT: partly-unplugged-short
+         STATUS: awaiting artwork. Fill this figure; leave the figcaption text as written.
+         LAYOUT NOTE: see the damaged-cord-inspection slot above. app.css still has no
+           .graphic-slot rule and the figure is inset 40px each side until it does.
+         THIS IS A SEQUENCE, NOT A STILL. Three panels, read left to right, one caption:
+           1. NORMAL. Plug fully seated in a wall receptacle. Nothing visible but the plug face.
+           2. THE SETUP. Same plug pulled out roughly halfway, so both flat blades are bare
+              between the plug body and the receptacle face. Still energized, still working,
+              nothing looks wrong. This panel is the whole point: the hazard exists BEFORE
+              anything happens, and it looks like nothing.
+           3. THE EVENT. A metal chip (the instructor's example, and the thing that is actually
+              lying around in this building) falls and lands across both exposed blades.
+              Dead short across the supply: flash at the contact point, molten metal thrown.
+         TEACHING POINT: what makes this dangerous is the gap, not the appliance. Panel 2 has
+           to look boring or the sequence does not work.
+         MEDIUM: draw this. Inline SVG, three panels, themed with the site tokens like the
+           PASS stepper on the fire page. Per the media README, browser-drawn beats a flat
+           image where the browser can draw it, and this is geometry, not photography.
+           Do NOT stage and photograph a real energized short.
+         CONSTRAINTS: legible in black and white for the printable aggregate; legible in both
+           light and dark theme; no motion required to read it. If panel numbering is drawn,
+           number the panels 1 2 3.
+         ALT (accessible description; on the SVG use role="img" plus a title/desc pair, or
+           supply it as the label if this ends up as an image file):
+           "Three panels. First, a plug fully seated in a wall receptacle. Second, the same plug
+           pulled halfway out with both metal blades exposed in the gap. Third, a metal chip
+           falling across the two exposed blades and shorting them, with a flash at the contact
+           point."
+    -->
+    <figcaption>The hazard is the gap, and it is there before anything lands in it.</figcaption>
+  </figure>
+
+  <div class="stop">
+    <p>Exposed blades sit at full line voltage with nothing between them but air. Anything
+    conductive that falls across them completes the circuit straight across the supply &mdash; and
+    in this building, the thing that falls is a <strong>metal chip</strong>. What follows is not a
+    shock. It is an arc, at whatever fault current a 120&nbsp;V branch circuit can deliver, throwing
+    molten metal. The breaker will clear it; <strong>a breaker protects the wiring, not your
+    face</strong>, and it does not act until after the arc.</p>
+    <p><strong>Plugs are all the way in or all the way out.</strong> Nothing in between, and nothing
+    left in between.</p>
+  </div>
+  <p class="aside">Chips travel further than you expect and they conduct &mdash; see
+  <a class="xref-page" href="#p-metal-chips">Metal Chips and Swarf</a>. That is the direct line between the housekeeping rules and this one.</p>
+  <p class="aside">Lockout/Tagout for machinery with rotating parts is covered in
+  <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
+    </div>
+  </details>
+  <details class="xcard is-stop" id="cords-on-the-floor-the-one-most-likely-to-get-you" data-card="cords-on-the-floor-the-one-most-likely-to-get-you" open>
+    <summary>Cords on the floor &mdash; the one most likely to get you<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Cords on the floor &mdash; the one most likely to get you</h2>
+  <p class="lede">Nothing else on this page is as likely to actually injure someone here as a cord
+  lying across a walkway. It is not a shock hazard at all. It is a <strong>trip hazard</strong>
+  &mdash; and a trip in a shop is not a trip onto carpet. It is a fall into a machine, onto hot
+  metal, or with a running tool still in your hand.</p>
+  <p>The regulation treats this as a floor problem rather than an electrical one:
+  <strong>&ldquo;walking-working surfaces are maintained free of hazards such as sharp or protruding
+  objects, loose boards, corrosion, leaks, spills, snow, and ice&rdquo;</strong>
+  (<code>29&nbsp;CFR&nbsp;1910.22(a)(3)</code>), and passageways and work areas are kept &ldquo;in a
+  clean, orderly, and sanitary condition&rdquo; (<code>29&nbsp;CFR&nbsp;1910.22(a)(1)</code>). A cord
+  across an aisle is an obstruction in an aisle.</p>
+
+  <figure class="graphic-slot">
+    <!-- GRAPHIC-SLOT: cord-routing-trip-hazard
+         STATUS: awaiting artwork. THIS IS THE MOST IMPORTANT GRAPHIC ON THE PAGE. Give it
+         the most space and the most care. Fill this figure; leave the figcaption as written.
+         LAYOUT NOTE: see the damaged-cord-inspection slot above. This one matters most here,
+           because a three-element plan drawing squeezed into 222px at mobile width will not
+           read. Get the .graphic-slot rule into app.css first.
+         DEPICTS: one bench, one receptacle, one walkway, drawn twice. A plan view (looking
+         down) reads better than perspective here, because the point is the ROUTE.
+           WRONG: the cord takes the short way, straight across the open walkway, with slack
+             coiled in the middle of it. Mark the crossing point clearly as the hazard.
+           RIGHT: the same bench and the same receptacle, cord routed the long way around the
+             edge of the room, following the wall and the bench line, out of the walkway
+             entirely, with no slack on the floor.
+         SECOND ELEMENT, smaller, alongside or below: the fallback for when it genuinely must
+           cross. Show a cord ramp / cord cover over the cord at the crossing, in section or
+           in plan, so the reader knows what the thing looks like. Taped down is the lesser
+           version of the same idea.
+         DO NOT: make the wrong panel look dramatic or the right panel look fussy. The whole
+         message is that the correct route is longer and almost free.
+         MEDIUM: draw it. Inline SVG, site tokens, same family as the PASS stepper and the
+           category ladder on the other safety pages. Must print in black and white and read
+           in both themes, so distinguish the two routes by line style and label as well as
+           by color.
+         ALT (accessible description; role="img" with title/desc if drawn as SVG):
+           "Two floor plans of the same bench and wall outlet. In the first the power cord runs
+           straight across the open walkway with slack coiled on the floor, marked as a hazard.
+           In the second the cord runs along the wall and around the edge of the room, keeping
+           the walkway clear. A third detail shows a cord ramp covering a cord where it has to
+           cross."
+    -->
+    <figcaption>The correct route is longer and costs nothing. That is the whole argument.</figcaption>
+  </figure>
+
+  <h3>What to do, in order of preference</h3>
+  <ul class="boxes">
+    <li><strong>Do not cross the walkway.</strong> Move the work to the outlet, or use a different
+    outlet. This is almost always available, and it is almost never the first thing anyone tries.</li>
+    <li><strong>Route along the wall or the bench line</strong> rather than across open floor. Take
+    the long way around the edge of the room.</li>
+    <li><strong>Go overhead</strong> where a drop or a reel is provided. That is what they are
+    for.</li>
+    <li><strong>If it genuinely must cross, cover or anchor it.</strong> OSHA&rsquo;s own guidance is
+    to &ldquo;ensure that temporary electrical cords that cross aisles are taped or anchored to the
+    floor&rdquo;. A cord ramp or cord cover does the same job better and protects the cord as well
+    as the person.</li>
+    <li><strong>Use the shortest cord that reaches.</strong> Slack on the floor is the hazard, and a
+    coiled surplus in a walkway is the same hazard in a tighter package.</li>
+    <li><strong>Unplug it and put it away when you are done</strong>, in the same movement as
+    shutting the tool down. The cord left out after the job is finished is the one nobody is
+    expecting.</li>
+  </ul>
+
+  <div class="stop">
+    <p><strong>PROHIBITED &mdash; running a flexible cord through a doorway, a window, or a hole in
+    a wall, ceiling or floor, and attaching it to building surfaces.</strong> Those are named
+    prohibitions in the electrical standard (<code>29&nbsp;CFR&nbsp;1910.305(g)(1)(iv)</code>),
+    along with using flexible cord as a substitute for the fixed wiring of a building. Flexible cord
+    is temporary by definition. A cord treated as permanent gets pinched, crushed and forgotten.</p>
+    <p><strong>NEVER walk past a cord lying across a walkway and leave it</strong> because it is not
+    yours. If you can see it, you can move it or say something. The person who trips over it will
+    not have seen it.</p>
+  </div>
+  <p class="aside">The same standard requires flexible cords to be protected from accidental damage
+  at sharp corners, projections, doorways and other pinch points
+  (<code>29&nbsp;CFR&nbsp;1910.305(a)(2)(x)</code>) &mdash; the same rule read from the cord&rsquo;s
+  side. A cord that gets walked on is a cord that fails the inspection above. This section and that
+  one are the same problem twice.</p>
+  <p class="aside">Keeping walkways clear is the <em>Set in Order</em> and <em>Shine</em> part of
+  <a class="xref-page" href="#p-5s-workplace-organization">5S</a>. The safety case and the lean case are the same case.</p>
     </div>
   </details>
   <details class="xcard is-stop" id="if-someone-is-shocked" data-card="if-someone-is-shocked" open>
@@ -1694,14 +2136,24 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
     <div class="body">
       <h2>If someone is shocked</h2>
   <div class="stop">
-    <p><strong>Do NOT touch them directly.</strong></p>
+    <p><strong>Do NOT touch them directly.</strong> If current is still flowing they are part of the
+    circuit, and grabbing them puts you in it as well.</p>
     <ul>
-      <li>Turn off the power source first, or</li>
-      <li>use a non-conductive object to separate them from it.</li>
+      <li><strong>Kill the power first</strong> &mdash; the machine switch, the disconnect, the
+      breaker, or pull the plug.</li>
+      <li>If you cannot kill it, use a <strong>dry, non-conductive object</strong> to separate them
+      from the source, and stand on something dry while you do it.</li>
+      <li><strong>Then</strong> call for help and start first aid.</li>
     </ul>
   </div>
-  <p class="aside">Then follow <a class="xref-page" href="#p-conduct-and-emergency">emergency procedure</a> &mdash; call 911 and
-  notify the instructor.</p>
+  <p>Call <strong>911</strong> and notify the instructor &mdash; follow
+  <a class="xref-page" href="#p-conduct-and-emergency">emergency procedure</a>.</p>
+  <div class="gate">
+    <p><strong>A small mark is not evidence of a small injury.</strong> Electrical and electrothermal
+    burns run deep with very little to see on the surface, and a burn that wraps a finger can cost
+    the use of it. <strong>Any shock, and any electrical burn, gets reported and gets looked at</strong>
+    &mdash; however fine the person says they are.</p>
+  </div>
     </div>
   </details>
 </div>
@@ -1949,10 +2401,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
     torch, a spark or a static discharge, are &mdash; burning travels from one particle to the next
     with extreme speed. It is why you never blow fine dust around, and why you do not raise a cloud
     of it cleaning up.</li>
-    <li><strong>Fines mixed with ferrous dust or sparks.</strong> Aluminum plus iron oxide &mdash;
-    rust, or steel grinding dust off a shared wheel or belt &mdash; is a thermite reaction, and
-    OSHA classes the result as a Class&nbsp;D fire. It is why aluminum and ferrous work should not
-    share an abrasive or a collection container.</li>
+    <li><strong>Fines heavily mixed with rust or grinding scale.</strong> Aluminum plus <strong>iron
+    oxide</strong> &mdash; rust, or the scale off steel grinding &mdash; is a thermite reaction: the
+    aluminum strips the oxygen off the iron, so the mixture burns without needing air from outside.
+    That is what makes it a metal fire rather than an ordinary one, and why water and an ABC
+    extinguisher do nothing to it. It takes a real mixture to go &mdash; something near
+    <strong>three parts iron oxide to one part aluminum by weight</strong>, and an ignition source
+    far hotter than a spark. That is a rust-caked pile, not a trace. See <a class="xref-page" href="#p-metal-chips">Metal Chips and Swarf</a> for how far
+    apart that threshold and the recycling one actually sit.</li>
     <li><strong>Wet fines.</strong> Aluminum fines in contact with water slowly give off hydrogen.
     That is a reason not to seal damp fines into a closed container, and part of the reason water is
     the wrong thing to put on a metal fire.</li>
@@ -1993,8 +2449,18 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
   <ul>
     <li><strong>Grinding throws sparks a surprising distance.</strong> Clear rag, sawdust, solvent
     and packaging out of the area before you start, not after it smolders.</li>
-    <li><strong>Oily rags can self-heat.</strong> Do not leave them in a pile; use the designated
-    container.</li>
+    <li><strong>Oily rags &mdash; it depends entirely on which oil.</strong>
+    <strong>Drying oils</strong> &mdash; linseed, tung, oil-based stains, varnishes and finishes
+    &mdash; cure by reacting with oxygen, and that reaction gives off heat. Bunched in a pile the
+    rags hold the heat in, and the pile can reach ignition on its own with nothing to light it.
+    Those rags <strong>NEVER go in a pile</strong>: spread them flat to dry, drop them in water, or
+    use the designated container.</li>
+    <li><strong>Petroleum oils do not do that.</strong> Way oil, cutting fluid, hydraulic oil and
+    ordinary shop oil do not cure by oxidation, so a rag wiped with them will not self-heat and will
+    not spontaneously combust. It is still <strong>combustible</strong> &mdash; a spark or a hot
+    chip will light it like any oily cloth &mdash; so keep it away from hot work and out of a bin of
+    paper or sawdust. <strong>If you do not know which oil is on the rag, treat it as a drying
+    oil.</strong></li>
     <li><strong>Flammable liquids live in the fireproof cabinet</strong> when they are not in your
     hand &mdash; see <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</li>
     <li><strong>A smoldering fire can restart long after you leave.</strong> If something got hot
@@ -2122,18 +2588,37 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
     <li><strong>Fines go in the trash.</strong> Dust from sanding, grinding, buffing and polishing,
     and what comes out of a vacuum or dust collector &mdash; never the recycling container.</li>
   </ul>
-  <p class="aside"><strong>Why:</strong> chips remelt back into usable metal. Fines largely do not
-  &mdash; a fine particle has so much surface area for its mass that remelting oxidizes much of it
-  to dross instead of recovering aluminum, and melt loss climbs steeply as the scrap gets finer.
-  Fines also arrive contaminated with abrasive grit and with whatever else a shared belt or wheel
-  has touched. So they do not merely add nothing to the bin, they degrade a clean chip stream.
-  Keeping them out is what keeps the chip container worth recycling.</p>
+  <h3>Why &mdash; two reasons, and the second one is the safety reason</h3>
+  <ul>
+    <li><strong>The recycler pays for clean aluminum.</strong> The scrap specification for aluminum
+    turnings requires the load to be <strong>free of free iron</strong>, and once iron is in an
+    aluminum melt ordinary refining does not take it back out &mdash; so the buyer prices what is
+    actually in the bin, not what you meant to put there. Fines pick iron up: off a shared belt or
+    wheel, off steel work at the next bench, out of the vacuum. Fine material is a deduction in its
+    own right as well. Iron in the fines is the reason fines do not go in.</li>
+    <li><strong>The recycling container is emptied about once a semester. The trash goes out every
+    day.</strong> Fines belong in the stream that leaves the building, not the one that stands in
+    the corner for months quietly collecting more of them. <strong>Anything whose problem is
+    accumulation does not go in the container designed to accumulate.</strong></li>
+  </ul>
+
+  <p class="aside"><strong>Two thresholds, same observation.</strong> &ldquo;There is iron in the
+  fines&rdquo; is a real problem for the recycling price and not a fire problem &mdash; and the
+  reason both are true at once is that the two thresholds are orders of magnitude apart. The scrap
+  spec is written against <strong>traces</strong>: the load has to be free of free iron, and a few
+  steel chips are enough to drop it to a contaminated price. A thermite reaction needs <strong>iron
+  oxide</strong> &mdash; rust or grinding scale, not bright steel &mdash; at something near
+  <strong>three parts oxide to one part aluminum by weight</strong>, plus an ignition source far
+  hotter than a spark. That is most of the pile, not a trace. Most rules in a shop have a number
+  behind them; knowing <em>which</em> number you are being measured against, and how far you
+  actually are from it, is the difference between following a rule and understanding it.</p>
 
   <div class="stop">
     <p><strong>Fine dust burns; chips do not.</strong> Aluminum chips and swarf are hard to ignite.
     The fire hazard is <strong>fines</strong> &mdash; and then only when a cloud of them is thrown
-    into the air and meets an ignition source, or when they are mixed with ferrous dust or sparks.
-    Do not let fine dust accumulate, and <strong>do not raise a cloud of it cleaning up</strong>.</p>
+    into the air and meets an ignition source, or when a great deal of rust or steel grinding scale
+    is mixed into them. Do not let fine dust accumulate, and <strong>do not raise a cloud of it
+    cleaning up</strong>.</p>
     <p>If fine metal debris does ignite, <strong>do not fight it</strong>. The ABC extinguisher on
     the wall is the wrong tool and will scatter it. Alarm, evacuate, and tell the fire crew it is a
     metal fire. See <a class="xref-page" href="#p-fire-safety">Fire Safety</a>.</p>
