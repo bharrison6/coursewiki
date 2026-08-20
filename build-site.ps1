@@ -466,6 +466,7 @@ $siteHead = { param($up) @"
 "@ }
 $siteScripts = { param($up) @"
 <script src="${up}search-index.js?v=$script:stamp"></script>
+<script src="${up}playlists.js?v=$script:stamp"></script>
 <script src="${up}theme/app.js?v=$script:stamp"></script>
 "@ }
 
@@ -554,11 +555,68 @@ function New-SearchIndex([string]$mode) {
   $js
 }
 
+# Playlists as DATA, not as rendered documents.
+#
+# A presentation used to be a second rendering of the same content into slide
+# markup. That copy did not load app.js at all, so its 25 checklist items were
+# dead text - the interactivity existed only on the real page. Shipping the
+# order as data instead means the sequence is applied TO the real pages: next
+# and previous move between them, and presentation mode is a view of the page
+# rather than a substitute for it. Adding a page or an interactive feature
+# needs no presentation code, because there is none to change.
+function New-PlaylistData {
+  $rows = @()
+
+  # "Everything" is a playlist too - the user's framing: a lesson is a
+  # playlist, a course is a playlist, the whole program is a playlist. It is
+  # generated, not authored, so it can never fall behind the page set. An
+  # authored deck named 'everything' wins over it.
+  if (-not $decks.Contains('everything')) {
+    $allItems = @()
+    foreach ($c in $collections.Values) {
+      $groupNames = if ($c.Groups.Count) { $c.Groups }
+                    else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
+      foreach ($g in $groupNames) {
+        foreach ($p in @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)) {
+          $allItems += '{"id":"' + (ConvertTo-Json1 $p.Id) +
+                       '","title":"' + (ConvertTo-Json1 $p.Title) +
+                       '","collection":"' + (ConvertTo-Json1 $c.Title) +
+                       '","group":"' + (ConvertTo-Json1 $c.Title) +
+                       '","url":"' + (ConvertTo-Json1 ($c.Id + '/' + $p.Id + '.html')) + '"}'
+        }
+      }
+    }
+    $rows += '{"name":"everything","title":"Everything","auto":true,"items":[' + ($allItems -join ',') + ']}'
+  }
+
+  foreach ($d in $decks.Values) {
+    $items = @()
+    $group = ''
+    foreach ($item in $d.Items) {
+      if ($item.Kind -eq 'divider') { $group = $item.Value; continue }
+      $p = $pages[$item.Value]
+      $items += '{"id":"' + (ConvertTo-Json1 $p.Id) +
+                '","title":"' + (ConvertTo-Json1 $p.Title) +
+                '","collection":"' + (ConvertTo-Json1 $collections[$p.Collection].Title) +
+                '","group":"' + (ConvertTo-Json1 $group) +
+                '","url":"' + (ConvertTo-Json1 ($p.Collection + '/' + $p.Id + '.html')) + '"}'
+    }
+    $rows += '{"name":"' + (ConvertTo-Json1 $d.Name) +
+             '","title":"' + (ConvertTo-Json1 $d.Title) +
+             '","items":[' + ($items -join ',') + ']}'
+  }
+  $js = "window.PLAYLISTS = [`n" + ($rows -join ",`n") + "`n];`n"
+  Write-Host ("    playlists: {0}, {1:n0} bytes" -f $rows.Count, $js.Length)
+  $js
+}
+
 # ------------------------------------------------------------ landing page ---
 Write-Host 'site'
-$searchJs = New-SearchIndex 'site'
+$searchJs   = New-SearchIndex 'site'
+$playlistJs = New-PlaylistData
 $script:stamp = Get-BuildStamp @(
   $searchJs
+  $playlistJs
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'msu-theme.css'))
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.css'))
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.js'))
@@ -603,6 +661,7 @@ Write-Out (Join-Path $docsDir 'index.html') `
 
 Write-Out (Join-Path $docsDir '.nojekyll') ''
 Write-Out (Join-Path $docsDir 'search-index.js') $searchJs
+Write-Out (Join-Path $docsDir 'playlists.js') $playlistJs
 
 # ------------------------------------------------------- presentations ------
 # A playlist view, not a page of content. Each presentation shows its ordered
@@ -628,9 +687,17 @@ foreach ($d in $decks.Values) {
   [void]$pi.AppendLine('        <h2>' + (ConvertTo-HtmlText $d.Title) + '</h2>')
   if ($d.Subtitle) { [void]$pi.AppendLine('        <p class="aside">' + (ConvertTo-HtmlText $d.Subtitle) + '</p>') }
   [void]$pi.AppendLine('        <p class="pl-stat">' + (Format-Count $d.PageIds.Count 'topic') + ' &middot; ' +
-                       (Format-Count (Get-DeckSlideCount $d) 'slide') + '</p>')
+                       (Format-Count (Get-DeckSlideCount $d) 'panel') + '</p>')
   [void]$pi.AppendLine('      </div>')
-  [void]$pi.AppendLine('      <a class="btn-play" href="deck-' + $d.Name + '.html">Start presentation</a>')
+  # Both entry points land on the FIRST REAL PAGE of the playlist. There is no
+  # separate deck document to open - presentation mode is a view of the page.
+  $firstId = @($d.Items | Where-Object { $_.Kind -eq 'page' } | Select-Object -First 1).Value
+  $fp   = $pages[$firstId]
+  $href = $fp.Collection + '/' + $fp.Id + '.html?p=' + $d.Name
+  [void]$pi.AppendLine('      <div class="pl-actions">')
+  [void]$pi.AppendLine('        <a class="btn-play" href="' + $href + '">Start reading</a>')
+  [void]$pi.AppendLine('        <a class="btn-alt" href="' + $href + '&amp;present=1">Presentation mode</a>')
+  [void]$pi.AppendLine('      </div>')
   [void]$pi.AppendLine('    </div>')
   [void]$pi.AppendLine('    <ol class="tracks">')
   $tn = 0
@@ -706,7 +773,7 @@ foreach ($c in $collections.Values) {
       [void]$sb.AppendLine('    <div class="k">Appears in</div>')
       [void]$sb.AppendLine('    <div class="chips">')
       foreach ($dn in ($p.Decks | Select-Object -Unique)) {
-        [void]$sb.AppendLine('      <a class="chip" href="../deck-' + $dn + '.html#p-' + $p.Id + '">' +
+        [void]$sb.AppendLine('      <a class="chip" href="' + $p.Id + '.html?p=' + $dn + '">' +
                              (ConvertTo-HtmlText $decks[$dn].Title) + '</a>')
       }
       [void]$sb.AppendLine('    </div>')
@@ -720,169 +787,6 @@ foreach ($c in $collections.Values) {
     Write-Out (Join-Path $cd "$($p.Id).html") `
               (New-Document ("$($p.Title) - $($site.TITLE)") 'app skin-app' $sb.ToString() '../' $p.Id (& $siteHead '../') (& $siteScripts '../'))
   }
-}
-
-# ------------------------------------------------------------------ decks ----
-$deckJs = @'
-(function () {
-  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
-  var bar    = document.querySelector('.progress > i');
-  var ov     = document.querySelector('.overview');
-  if (!slides.length) return;
-
-  function current() {
-    var best = 0, bestD = Infinity;
-    for (var i = 0; i < slides.length; i++) {
-      var d = Math.abs(slides[i].getBoundingClientRect().top);
-      if (d < bestD) { bestD = d; best = i; }
-    }
-    return best;
-  }
-  function go(i) {
-    i = Math.max(0, Math.min(slides.length - 1, i));
-    slides[i].scrollIntoView({ block: 'start' });
-  }
-  function paint() { if (bar) bar.style.width = ((current() + 1) / slides.length * 100) + '%'; }
-  addEventListener('scroll', paint, { passive: true });
-  paint();
-
-  function toggle(force) {
-    if (!ov) return;
-    var open = (force === undefined) ? !ov.hasAttribute('data-open') : force;
-    if (open) { ov.setAttribute('data-open', ''); } else { ov.removeAttribute('data-open'); }
-  }
-
-  addEventListener('keydown', function (e) {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    var open = ov && ov.hasAttribute('data-open');
-    switch (e.key) {
-      case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ':
-        if (open) return; e.preventDefault(); go(current() + 1); break;
-      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
-        if (open) return; e.preventDefault(); go(current() - 1); break;
-      case 'Home': e.preventDefault(); go(0); break;
-      case 'End':  e.preventDefault(); go(slides.length - 1); break;
-      case 'o': case 'O': e.preventDefault(); toggle(); break;
-      case 'Escape': if (open) { e.preventDefault(); toggle(false); } break;
-    }
-  });
-
-  var ob = document.querySelector('[data-act="overview"]');
-  if (ob) ob.addEventListener('click', function () { toggle(); });
-  var pb = document.querySelector('[data-act="print"]');
-  if (pb) pb.addEventListener('click', function () { print(); });
-
-  Array.prototype.forEach.call(document.querySelectorAll('.ov-item'), function (b) {
-    b.addEventListener('click', function () { toggle(false); go(parseInt(b.getAttribute('data-i'), 10)); });
-  });
-})();
-'@
-$deckScript = "<script>`n" + $deckJs.Trim() + "`n</script>"
-
-function New-DeckBody($d, [string]$mode) {
-  $set = [System.Collections.Generic.HashSet[string]]::new()
-  foreach ($id in $d.PageIds) { [void]$set.Add($id) }
-  $ctx = [pscustomobject]@{ Deck = $set; Coll = '' }
-
-  $slides  = New-Object System.Text.StringBuilder
-  $ovItems = New-Object System.Text.StringBuilder
-  $n = 0
-
-  $n++
-  [void]$slides.AppendLine('<section class="slide title" id="s1">')
-  [void]$slides.AppendLine('  <div class="slide-top"><span class="src">' + (ConvertTo-HtmlText $d.Footer) + '</span></div>')
-  [void]$slides.AppendLine('  <div class="slide-body">')
-  [void]$slides.AppendLine('    <div class="stamp">' + $lockupData + '</div>')
-  [void]$slides.AppendLine('    <h1>' + (ConvertTo-HtmlText $d.Title) + '</h1>')
-  if ($d.Subtitle) { [void]$slides.AppendLine('    <p class="lede">' + (ConvertTo-HtmlText $d.Subtitle) + '</p>') }
-  [void]$slides.AppendLine('  </div>')
-  [void]$slides.AppendLine('  <div class="slide-bottom"><span>Arrow keys to advance &middot; O for an overview</span><span class="num">1</span></div>')
-  [void]$slides.AppendLine('</section>')
-  [void]$ovItems.AppendLine('<button class="ov-item" data-i="0"><span class="n">1</span><span class="t">' +
-                            (ConvertTo-HtmlText $d.Title) + '</span><span class="p">Title</span></button>')
-
-  foreach ($item in $d.Items) {
-    if ($item.Kind -eq 'divider') {
-      $n++
-      [void]$slides.AppendLine('<section class="slide divider" id="s' + $n + '">')
-      [void]$slides.AppendLine('  <div class="slide-top"><span class="src">' + (ConvertTo-HtmlText $d.Title) + '</span></div>')
-      [void]$slides.AppendLine('  <div class="slide-body"><h1>' + (ConvertTo-HtmlText $item.Value) + '</h1></div>')
-      [void]$slides.AppendLine('  <div class="slide-bottom"><span></span><span class="num">' + $n + '</span></div>')
-      [void]$slides.AppendLine('</section>')
-      [void]$ovItems.AppendLine('<button class="ov-item" data-i="' + ($n-1) + '"><span class="n">' + $n +
-                                '</span><span class="t">' + (ConvertTo-HtmlText $item.Value) +
-                                '</span><span class="p">Divider</span></button>')
-      continue
-    }
-
-    $p = $pages[$item.Value]
-    $srcHref = if ($mode -eq 'bundle-deck') { "$script:siteUrl/$($p.Collection)/$($p.Id).html" }
-               else { "$($p.Collection)/$($p.Id).html" }
-    $first = $true
-    foreach ($s in $p.Sections) {
-      if ($s.Mode -eq 'wiki-only') { continue }
-      $html = Resolve-Links $s.Html $ctx $mode
-      if ($s.Mode -eq 'with-previous') { [void]$slides.AppendLine('    ' + $html); continue }
-
-      if (-not $first) {
-        [void]$slides.AppendLine('  </div>')
-        [void]$slides.AppendLine('  <div class="slide-bottom"><span>' + (ConvertTo-HtmlText $d.Footer) +
-                                 '</span><span class="num">' + $n + '</span></div>')
-        [void]$slides.AppendLine('</section>')
-      }
-      $n++
-      $anchorId = if ($first) { ' id="p-' + $p.Id + '"' } else { ' id="s' + $n + '"' }
-      [void]$slides.AppendLine('<section class="slide"' + $anchorId + '>')
-      [void]$slides.AppendLine('  <div class="slide-top"><a class="src" href="' + $srcHref +
-                               '" target="_blank" rel="noopener">' + (ConvertTo-HtmlText $p.Title) +
-                               '</a><span class="sec">' + (ConvertTo-HtmlText $p.Section) + '</span></div>')
-      [void]$slides.AppendLine('  <div class="slide-body">')
-      [void]$slides.AppendLine('    ' + $html)
-
-      $lbl = if ($s.Head) { ConvertTo-Plain $s.Head } else { $p.Title }
-      [void]$ovItems.AppendLine('<button class="ov-item" data-i="' + ($n-1) + '"><span class="n">' + $n +
-                                '</span><span class="t">' + (ConvertTo-HtmlText $lbl) +
-                                '</span><span class="p">' + (ConvertTo-HtmlText $p.Title) + '</span></button>')
-      $first = $false
-    }
-    if (-not $first) {
-      [void]$slides.AppendLine('  </div>')
-      [void]$slides.AppendLine('  <div class="slide-bottom"><span>' + (ConvertTo-HtmlText $d.Footer) +
-                               '</span><span class="num">' + $n + '</span></div>')
-      [void]$slides.AppendLine('</section>')
-    }
-  }
-
-  $homeHref = if ($mode -eq 'bundle-deck') { "$script:siteUrl/index.html" } else { 'index.html' }
-
-  $body = New-Object System.Text.StringBuilder
-  [void]$body.AppendLine('<div class="progress"><i></i></div>')
-  [void]$body.AppendLine($slides.ToString().TrimEnd())
-  [void]$body.AppendLine('<div class="deck-ctl">')
-  [void]$body.AppendLine('  <button data-act="overview" type="button">Overview</button>')
-  [void]$body.AppendLine('  <button data-act="print" type="button">Print</button>')
-  [void]$body.AppendLine('  <a href="' + $homeHref + '"><button type="button">Site</button></a>')
-  [void]$body.AppendLine('</div>')
-  [void]$body.AppendLine('<div class="overview" aria-label="Slide overview">')
-  [void]$body.AppendLine('  <h2>' + (ConvertTo-HtmlText $d.Title) + ' &mdash; ' + $n + ' slides</h2>')
-  [void]$body.AppendLine('  <div class="ov-grid">')
-  [void]$body.AppendLine($ovItems.ToString().TrimEnd())
-  [void]$body.AppendLine('  </div>')
-  [void]$body.AppendLine('</div>')
-
-  [pscustomobject]@{ Html = $body.ToString(); Slides = $n }
-}
-
-Write-Host 'decks'
-$deckHead = @"
-<link rel="stylesheet" href="theme/msu-theme.css?v=$script:stamp">
-<link rel="stylesheet" href="theme/deck.css?v=$script:stamp">
-"@
-foreach ($d in $decks.Values) {
-  $r = New-DeckBody $d 'site-deck'
-  Write-Out (Join-Path $docsDir ('deck-' + $d.Name + '.html')) `
-            (New-Document ("$($d.Title) - $($site.TITLE)") 'deck skin-document' $r.Html '' ('deck-' + $d.Name) $deckHead $deckScript)
-  Write-Host ("    {0,-24} {1} slides" -f $d.Name, $r.Slides)
 }
 
 # ---------------------------------------------------------- theme + assets ---
@@ -909,7 +813,6 @@ if ($Bundle) {
   $bundleDir = Join-Path $root 'bundle'
   $themeCss  = [System.IO.File]::ReadAllText((Join-Path $themeDir 'msu-theme.css'))
   $appCss    = [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.css'))
-  $deckCss   = [System.IO.File]::ReadAllText((Join-Path $themeDir 'deck.css'))
   $appJs     = [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.js'))
   $bundleIdx = New-SearchIndex 'bundle'
   $bundleExtra = @'
@@ -983,11 +886,6 @@ if ($Bundle) {
                                   'app skin-app' $bw.ToString() ('bundle-' + $c.Id) ($bundleIdx + "`n" + $appJs))
   }
 
-  foreach ($d in $decks.Values) {
-    $r = New-DeckBody $d 'bundle-deck'
-    Write-Out (Join-Path $bundleDir ('deck-' + $d.Name + '.html')) `
-              (New-BundleDocument $d.Title ($themeCss + "`n" + $deckCss) 'deck skin-document' $r.Html ('deck-' + $d.Name) $deckJs)
-  }
 }
 
 # ----------------------------------------------------------- stale output ----

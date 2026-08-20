@@ -183,6 +183,136 @@
     targets.forEach(function (t) { io.observe(t); });
   })();
 
+  /* ==========================================================================
+     Playlists
+     ------------------------------------------------------------------------
+     A playlist is an ordered set of REAL PAGES, applied as a URL parameter:
+     <page>.html?p=<playlist>. Nothing is re-rendered. That is the whole point -
+     the earlier design rendered a second copy of the content as slides, and
+     that copy did not load this file, so its checklists were dead text.
+
+     ?present=1 additionally turns the page into panels. It is a class on
+     <body> plus CSS, so every interactive feature keeps working: same DOM,
+     same listeners, same localStorage. Adding a feature or a page needs no
+     presentation code, because there is none.
+     ========================================================================*/
+  (function () {
+    var params = new URLSearchParams(location.search);
+    var pName  = params.get('p');
+    if (!pName) return;
+
+    var lists = window.PLAYLISTS || [];
+    var pl = null;
+    for (var i = 0; i < lists.length; i++) { if (lists[i].name === pName) { pl = lists[i]; break; } }
+    if (!pl) return;
+
+    var base = document.body.getAttribute('data-base') || '';
+    var here = PAGE;
+    var idx  = -1;
+    for (var j = 0; j < pl.items.length; j++) { if (pl.items[j].id === here) { idx = j; break; } }
+    if (idx < 0) return;
+
+    var presenting = params.get('present') === '1';
+    function urlFor(item, present) {
+      return base + item.url + '?p=' + encodeURIComponent(pl.name) + (present ? '&present=1' : '');
+    }
+    var prev = idx > 0 ? pl.items[idx - 1] : null;
+    var next = idx < pl.items.length - 1 ? pl.items[idx + 1] : null;
+
+    /* ---- the sidebar becomes the playlist ------------------------------
+       A presentation posted to Canvas should show the pages it contains, not
+       the whole site. The way back is explicit rather than implied.        */
+    var sb = document.querySelector('.sidebar');
+    if (sb) {
+      var h = '<div class="pl-nav-head"><span class="k">Playlist</span>' +
+              '<span class="t">' + escHtml(pl.title) + '</span>' +
+              '<span class="n">' + (idx + 1) + ' of ' + pl.items.length + '</span></div>';
+      h += '<ol class="pl-nav">';
+      var lastGroup = null;
+      pl.items.forEach(function (it, k) {
+        if (it.group && it.group !== lastGroup) {
+          h += '<li class="pl-nav-group">' + escHtml(it.group) + '</li>';
+          lastGroup = it.group;
+        }
+        h += '<li><a' + (k === idx ? ' aria-current="page"' : '') + ' href="' + urlFor(it, presenting) + '">' +
+             '<span class="num">' + (k + 1) + '</span>' + escHtml(it.title) + '</a></li>';
+      });
+      h += '</ol>';
+      h += '<div class="navsplit"></div>';
+      h += '<ul class="navlist escape">' +
+           '<li><a href="' + base + 'index.html">Browse all topics</a></li>' +
+           '<li><a href="' + base + 'presentations.html">All playlists</a></li>' +
+           '</ul>';
+      sb.innerHTML = h;
+    }
+
+    /* ---- next / previous ----------------------------------------------*/
+    var bar = document.createElement('nav');
+    bar.className = 'seqbar';
+    bar.setAttribute('aria-label', 'Playlist navigation');
+    bar.innerHTML =
+      (prev ? '<a class="seq prev" href="' + urlFor(prev, presenting) + '"><span class="d">Previous</span>' +
+              '<span class="t">' + escHtml(prev.title) + '</span></a>'
+            : '<span class="seq prev disabled"><span class="d">Start of playlist</span></span>') +
+      '<div class="seqmid"><span class="pos">' + (idx + 1) + ' / ' + pl.items.length + '</span>' +
+      '<span class="pl">' + escHtml(pl.title) + '</span></div>' +
+      (next ? '<a class="seq next" href="' + urlFor(next, presenting) + '"><span class="d">Next</span>' +
+              '<span class="t">' + escHtml(next.title) + '</span></a>'
+            : '<span class="seq next disabled"><span class="d">End of playlist</span></span>');
+    document.body.appendChild(bar);
+    document.body.classList.add('has-seqbar');
+
+    /* ---- presentation mode: a view of this page, not a copy of it ------*/
+    if (presenting) {
+      document.body.classList.add('presenting');
+      var panels = $$('.xcard');
+      panels.forEach(function (c) { c.open = true; });   // a collapsed panel is a blank slide
+
+      var toggle = document.createElement('a');
+      toggle.className = 'present-exit';
+      toggle.href = urlFor(pl.items[idx], false);
+      toggle.textContent = 'Exit presentation';
+      document.body.appendChild(toggle);
+
+      var at = function () {
+        var best = 0, bestD = Infinity;
+        panels.forEach(function (p, k) {
+          var d = Math.abs(p.getBoundingClientRect().top);
+          if (d < bestD) { bestD = d; best = k; }
+        });
+        return best;
+      };
+      var go = function (k) {
+        if (k < 0) { if (prev) location.href = urlFor(prev, true); return; }
+        if (k >= panels.length) { if (next) location.href = urlFor(next, true); return; }
+        panels[k].scrollIntoView({ block: 'start' });
+      };
+      addEventListener('keydown', function (e) {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        switch (e.key) {
+          case 'ArrowRight': case 'PageDown': case ' ': e.preventDefault(); go(at() + 1); break;
+          case 'ArrowLeft':  case 'PageUp':            e.preventDefault(); go(at() - 1); break;
+          case 'Escape': location.href = urlFor(pl.items[idx], false); break;
+        }
+      });
+    } else {
+      // In reading mode the arrows move between PAGES, not panels.
+      addEventListener('keydown', function (e) {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        if (e.key === 'ArrowRight' && next) { location.href = urlFor(next, false); }
+        if (e.key === 'ArrowLeft'  && prev) { location.href = urlFor(prev, false); }
+      });
+    }
+  })();
+
+  function escHtml(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
   /* ---- search -----------------------------------------------------------
      Small corpus, so a scored substring match beats pulling in a library.   */
   (function () {

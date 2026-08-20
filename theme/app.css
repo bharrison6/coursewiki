@@ -236,6 +236,167 @@ main, .shell > * { min-width: 0; }
   border-radius: 999px; padding: .05rem .4rem;
 }
 
+/* ==========================================================================
+   Playlist mode — a sequence applied to the real pages
+   ========================================================================*/
+
+/* ---- the sidebar, while inside a playlist -----------------------------*/
+.pl-nav-head { padding: .3rem .55rem 1rem; display: flex; flex-direction: column; gap: .15rem; }
+.pl-nav-head .k {
+  font-family: var(--f-display); font-weight: 700; font-size: .66rem;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft);
+}
+.pl-nav-head .t { font-family: var(--f-display); font-weight: 700; font-size: 1.02rem; color: var(--accent); line-height: 1.2; }
+.pl-nav-head .n { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-soft); }
+
+.pl-nav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.pl-nav li { padding: 0; }
+.pl-nav li::before { content: none; }
+.pl-nav a {
+  display: flex; gap: .6rem; align-items: baseline;
+  padding: .42rem .55rem; font-size: .875rem; line-height: 1.35;
+  color: var(--ink-soft); text-decoration: none;
+  border-left: 2px solid transparent; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.pl-nav a:hover { color: var(--ink); background: var(--surface-2); }
+.pl-nav a[aria-current="page"] {
+  color: var(--accent); font-weight: 700;
+  border-left-color: var(--accent); background: var(--surface-2);
+}
+.pl-nav .num { flex: none; font-family: var(--f-mono); font-size: .72rem; opacity: .75; }
+.pl-nav-group {
+  padding: .9rem .55rem .3rem;
+  font-family: var(--f-display); font-weight: 700; font-size: .66rem;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+}
+.navlist.escape a { padding-left: .55rem; font-weight: 600; }
+
+/* ---- next / previous ---------------------------------------------------*/
+.seqbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 42;
+  display: flex; align-items: stretch; gap: .5rem;
+  padding: .5rem clamp(.6rem, 2vw, 1rem);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--rule);
+}
+/* the bar is fixed, so the page needs room to scroll clear of it */
+body.has-seqbar main { padding-bottom: 7rem; }
+
+.seq {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; justify-content: center; gap: .1rem;
+  padding: .5rem .8rem; border-radius: var(--radius-sm);
+  border: 1px solid var(--rule); background: var(--surface);
+  text-decoration: none; color: inherit;
+}
+.seq:hover { border-color: var(--accent); }
+.seq.next { text-align: right; align-items: flex-end; }
+.seq.disabled { opacity: .45; background: transparent; border-style: dashed; }
+.seq .d {
+  font-family: var(--f-display); font-weight: 700; font-size: .66rem;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+}
+.seq .t {
+  font-family: var(--f-display); font-weight: 600; font-size: .9rem; color: var(--accent);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+.seq.prev .d::before { content: "\2190  "; }
+.seq.next .d::after  { content: "  \2192"; }
+
+.seqmid {
+  flex: 0 0 auto; display: flex; flex-direction: column; justify-content: center;
+  align-items: center; gap: .1rem; padding: 0 .5rem; text-align: center;
+}
+.seqmid .pos { font-family: var(--f-mono); font-size: .8rem; color: var(--ink); }
+.seqmid .pl {
+  font-family: var(--f-display); font-size: .66rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-soft);
+  max-width: 12rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+@media (max-width: 34rem) {
+  .seqmid .pl { display: none; }
+  .seq .t { font-size: .82rem; }
+}
+
+/* ==========================================================================
+   Presentation mode — the SAME page, shown as panels.
+
+   No separate document, no second rendering, no per-page presentation code.
+   Every card is already in the DOM with its listeners attached, so checklists,
+   embedded video and anything added later keep working here.
+   ========================================================================*/
+body.presenting {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) { body.presenting { scroll-behavior: auto; } }
+
+.presenting .sidebar,
+.presenting .toc,
+.presenting .cardtools,
+.presenting .usedin,
+.presenting .crumb,
+.presenting .backdrop { display: none !important; }
+
+.presenting .shell, .presenting .shell.has-toc { display: block; }
+.presenting main { padding: 0; }
+.presenting .article { max-width: none; }
+
+/* the page title becomes the opening panel */
+.presenting .article > h1 {
+  min-height: calc(100svh - var(--appbar-h) - 5rem);
+  display: flex; flex-direction: column; justify-content: center;
+  scroll-snap-align: start; scroll-snap-stop: always;
+  padding: 0 clamp(1.5rem, 6vw, 5rem);
+  font-size: clamp(2.4rem, 7vw, 4.5rem);
+  max-width: 20ch;
+}
+.presenting .article > .lede { display: none; }
+
+.presenting .cards { gap: 0; }
+.presenting .xcard {
+  min-height: calc(100svh - var(--appbar-h) - 5rem);
+  scroll-snap-align: start; scroll-snap-stop: always;
+  display: flex; flex-direction: column; justify-content: center;
+  border: 0; border-radius: 0; background: transparent;
+  border-top: 1px solid var(--rule);
+  padding: 2rem clamp(1.5rem, 6vw, 5rem);
+}
+.presenting .xcard > summary {
+  pointer-events: none;           /* a panel does not collapse */
+  padding: 0 0 1rem; border: 0;
+  font-size: clamp(1.5rem, 3.6vw, 2.6rem);
+  border-bottom: 3px solid var(--ink);
+}
+.presenting .xcard > summary .chev { display: none; }
+.presenting .xcard[open] > summary { border-bottom: 3px solid var(--ink); }
+.presenting .xcard .body {
+  padding: 1.5rem 0 0;
+  font-size: clamp(1.05rem, 1.5vh + .6rem, 1.5rem);
+  overflow-y: auto;
+}
+.presenting .xcard .body h3 { font-size: clamp(1.05rem, 1.7vh, 1.3rem); }
+.presenting .xcard .body ul { gap: .7em; }
+
+.present-exit {
+  position: fixed; right: clamp(.6rem, 2vw, 1rem);
+  bottom: calc(4.6rem + .5rem); z-index: 43;
+  font-family: var(--f-display); font-size: .68rem;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: .4rem .7rem; border-radius: var(--radius-xs);
+  background: var(--surface); color: var(--accent);
+  border: 1px solid var(--rule); text-decoration: none;
+}
+.present-exit:hover { border-color: var(--accent); }
+
+@media print {
+  .seqbar, .present-exit { display: none !important; }
+  body.presenting { scroll-snap-type: none; }
+  .presenting .xcard { min-height: auto; break-inside: avoid; padding: 0 0 .4in; }
+  .presenting .article > h1 { min-height: auto; display: block; }
+}
+
 /* ---- playlists ---------------------------------------------------------*/
 .playlist {
   margin: 2rem 0; padding: 1.25rem 1.3rem;
@@ -482,3 +643,15 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
   .xcard[open] > summary { border-bottom: 2px solid var(--ink); }
   .gate, .stop, .panel, .cat { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
+
+/* ---- playlist entry points --------------------------------------------*/
+.pl-actions { flex: none; display: flex; flex-direction: column; gap: .45rem; }
+.btn-alt {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: .5rem 1rem; border-radius: var(--radius-sm);
+  border: 1px solid var(--rule); background: transparent; color: var(--accent);
+  font-family: var(--f-display); font-weight: 700; font-size: .74rem;
+  letter-spacing: .05em; text-transform: uppercase; text-decoration: none;
+}
+.btn-alt:hover { border-color: var(--accent); }
+@media (max-width: 34rem) { .pl-actions { flex-direction: row; flex-wrap: wrap; } }
