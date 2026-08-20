@@ -791,3 +791,83 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
   padding: .1rem .4rem; margin-right: .3rem; border-radius: var(--radius-xs);
   background: var(--surface-2); color: var(--accent);
 }
+
+/* ==========================================================================
+   Fire safety graphics — PASS stepper and the class/agent matrix
+
+   Both replace a flat image from the source deck. The point is not decoration:
+   an image cannot show you that the SAME extinguisher is correct for one fire
+   and dangerous on another, and that is the thing that has to land.
+   ========================================================================*/
+.pass {
+  display: grid; gap: 1.25rem; align-items: center;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 1.25rem;
+}
+@media (max-width: 40rem) { .pass { grid-template-columns: minmax(0, 1fr); } }
+
+.pass-svg { width: 100%; height: auto; display: block; }
+.pass-svg .ext-body   { fill: var(--cat3); }
+.pass-svg .ext-band   { fill: var(--paper); opacity: .35; }
+.pass-svg .ext-neck,
+.pass-svg .ext-lever  { fill: var(--ink-soft); }
+.pass-svg .ext-nozzle { fill: var(--ink-soft); }
+.pass-svg .ext-hose   { stroke: var(--ink-soft); }
+.pass-svg .ext-pin    { stroke: var(--msu-gold); opacity: .35; transition: opacity .2s ease; }
+.pass-svg .ext-spray  { stroke: var(--msu-liteblue); opacity: 0; transition: opacity .2s ease; }
+.pass-svg .ext-base   { fill: var(--msu-gold); opacity: 0; transition: opacity .2s ease; }
+.pass-svg .ext-sweep  { stroke: var(--msu-gold); opacity: 0; transition: opacity .2s ease; }
+@media (prefers-reduced-motion: reduce) { .pass-svg * { transition: none; } }
+
+/* one highlight per step — the drawing is the same, the emphasis moves */
+.pass[data-active="0"] .ext-pin   { opacity: 1; }
+.pass[data-active="1"] .ext-base  { opacity: 1; }
+.pass[data-active="2"] .ext-spray { opacity: 1; }
+.pass[data-active="3"] .ext-spray { opacity: 1; }
+.pass[data-active="3"] .ext-base  { opacity: 1; }
+.pass[data-active="3"] .ext-sweep { opacity: 1; }
+
+.pass-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
+.pass-steps li { padding: 0; }
+.pass-steps li::before { content: none; }
+.pass-steps button {
+  width: 100%; text-align: left; cursor: pointer; font: inherit;
+  display: grid; grid-template-columns: 2rem 1fr; gap: .1rem .7rem;
+  padding: .6rem .75rem; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid transparent; color: inherit;
+}
+.pass-steps button:hover { background: var(--surface-2); }
+.pass-steps button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+.pass-steps .k {
+  grid-row: span 2; align-self: start;
+  font-family: var(--f-display); font-weight: 700; font-size: 1.5rem;
+  color: var(--cat3); line-height: 1;
+}
+.pass-steps .w { font-family: var(--f-display); font-weight: 700; font-size: 1rem; }
+.pass-steps .d { font-size: .9rem; color: var(--ink-soft); line-height: 1.4; }
+
+/* ---- fire class matrix -------------------------------------------------*/
+.firetable { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.fc-tabs { display: flex; flex-wrap: wrap; gap: .4rem; padding: .85rem; border-bottom: 1px solid var(--rule); }
+.fc-tabs button {
+  cursor: pointer; font: inherit; font-family: var(--f-display); font-weight: 700;
+  font-size: .8rem; letter-spacing: .05em; text-transform: uppercase;
+  padding: .4rem .7rem; border-radius: var(--radius-xs);
+  border: 1.5px solid var(--rule); background: transparent; color: var(--ink-soft);
+}
+.fc-tabs button[aria-selected="true"] { border-color: var(--accent); color: var(--accent); background: var(--surface-2); }
+.fc-body { padding: 1.2rem 1.15rem; }
+.fc-what { margin-bottom: 1rem; }
+.fc-agents { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .45rem; }
+.fc-agents li { padding: .55rem .7rem; border-radius: var(--radius-sm); display: flex; gap: .7rem; align-items: baseline; }
+.fc-agents li::before { content: none; }
+.fc-agents .n { font-family: var(--f-display); font-weight: 700; font-size: .92rem; flex: 0 0 11rem; }
+.fc-agents .r { font-size: .92rem; }
+@media (max-width: 34rem) { .fc-agents li { flex-wrap: wrap; } .fc-agents .n { flex: 1 1 100%; } }
+.fc-agents .ok   { background: color-mix(in srgb, var(--cat1) 12%, transparent); }
+.fc-agents .no   { background: var(--surface-2); color: var(--ink-soft); }
+.fc-agents .bad  { background: var(--cat3-soft); }
+.fc-agents .ok   .n { color: var(--accent); }
+.fc-agents .bad  .n { color: var(--cat-ink); }
+.fc-agents .bad  .r { color: var(--cat-ink); font-weight: 600; }

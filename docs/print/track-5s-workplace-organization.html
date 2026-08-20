@@ -1122,6 +1122,86 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
   background: var(--surface-2); color: var(--accent);
 }
 
+/* ==========================================================================
+   Fire safety graphics — PASS stepper and the class/agent matrix
+
+   Both replace a flat image from the source deck. The point is not decoration:
+   an image cannot show you that the SAME extinguisher is correct for one fire
+   and dangerous on another, and that is the thing that has to land.
+   ========================================================================*/
+.pass {
+  display: grid; gap: 1.25rem; align-items: center;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 1.25rem;
+}
+@media (max-width: 40rem) { .pass { grid-template-columns: minmax(0, 1fr); } }
+
+.pass-svg { width: 100%; height: auto; display: block; }
+.pass-svg .ext-body   { fill: var(--cat3); }
+.pass-svg .ext-band   { fill: var(--paper); opacity: .35; }
+.pass-svg .ext-neck,
+.pass-svg .ext-lever  { fill: var(--ink-soft); }
+.pass-svg .ext-nozzle { fill: var(--ink-soft); }
+.pass-svg .ext-hose   { stroke: var(--ink-soft); }
+.pass-svg .ext-pin    { stroke: var(--msu-gold); opacity: .35; transition: opacity .2s ease; }
+.pass-svg .ext-spray  { stroke: var(--msu-liteblue); opacity: 0; transition: opacity .2s ease; }
+.pass-svg .ext-base   { fill: var(--msu-gold); opacity: 0; transition: opacity .2s ease; }
+.pass-svg .ext-sweep  { stroke: var(--msu-gold); opacity: 0; transition: opacity .2s ease; }
+@media (prefers-reduced-motion: reduce) { .pass-svg * { transition: none; } }
+
+/* one highlight per step — the drawing is the same, the emphasis moves */
+.pass[data-active="0"] .ext-pin   { opacity: 1; }
+.pass[data-active="1"] .ext-base  { opacity: 1; }
+.pass[data-active="2"] .ext-spray { opacity: 1; }
+.pass[data-active="3"] .ext-spray { opacity: 1; }
+.pass[data-active="3"] .ext-base  { opacity: 1; }
+.pass[data-active="3"] .ext-sweep { opacity: 1; }
+
+.pass-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
+.pass-steps li { padding: 0; }
+.pass-steps li::before { content: none; }
+.pass-steps button {
+  width: 100%; text-align: left; cursor: pointer; font: inherit;
+  display: grid; grid-template-columns: 2rem 1fr; gap: .1rem .7rem;
+  padding: .6rem .75rem; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid transparent; color: inherit;
+}
+.pass-steps button:hover { background: var(--surface-2); }
+.pass-steps button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+.pass-steps .k {
+  grid-row: span 2; align-self: start;
+  font-family: var(--f-display); font-weight: 700; font-size: 1.5rem;
+  color: var(--cat3); line-height: 1;
+}
+.pass-steps .w { font-family: var(--f-display); font-weight: 700; font-size: 1rem; }
+.pass-steps .d { font-size: .9rem; color: var(--ink-soft); line-height: 1.4; }
+
+/* ---- fire class matrix -------------------------------------------------*/
+.firetable { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.fc-tabs { display: flex; flex-wrap: wrap; gap: .4rem; padding: .85rem; border-bottom: 1px solid var(--rule); }
+.fc-tabs button {
+  cursor: pointer; font: inherit; font-family: var(--f-display); font-weight: 700;
+  font-size: .8rem; letter-spacing: .05em; text-transform: uppercase;
+  padding: .4rem .7rem; border-radius: var(--radius-xs);
+  border: 1.5px solid var(--rule); background: transparent; color: var(--ink-soft);
+}
+.fc-tabs button[aria-selected="true"] { border-color: var(--accent); color: var(--accent); background: var(--surface-2); }
+.fc-body { padding: 1.2rem 1.15rem; }
+.fc-what { margin-bottom: 1rem; }
+.fc-agents { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .45rem; }
+.fc-agents li { padding: .55rem .7rem; border-radius: var(--radius-sm); display: flex; gap: .7rem; align-items: baseline; }
+.fc-agents li::before { content: none; }
+.fc-agents .n { font-family: var(--f-display); font-weight: 700; font-size: .92rem; flex: 0 0 11rem; }
+.fc-agents .r { font-size: .92rem; }
+@media (max-width: 34rem) { .fc-agents li { flex-wrap: wrap; } .fc-agents .n { flex: 1 1 100%; } }
+.fc-agents .ok   { background: color-mix(in srgb, var(--cat1) 12%, transparent); }
+.fc-agents .no   { background: var(--surface-2); color: var(--ink-soft); }
+.fc-agents .bad  { background: var(--cat3-soft); }
+.fc-agents .ok   .n { color: var(--accent); }
+.fc-agents .bad  .n { color: var(--cat-ink); }
+.fc-agents .bad  .r { color: var(--cat-ink); font-weight: 600; }
+
 /* ---- aggregate: many pages stacked in one printable file --------------- */
 .aggregate main { padding: clamp(1.5rem, 4vw, 3rem); max-width: 52rem; margin: 0 auto; }
 .agg-head { margin-bottom: 3rem; }
@@ -1456,6 +1536,72 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
       });
     });
     show('1');
+  })();
+
+  /* ---- PASS stepper -----------------------------------------------------
+     One drawing; the emphasis moves. Without JS the first step is shown and
+     all four descriptions are already on the page as text.                 */
+  (function () {
+    var root = $('[data-pass]');
+    if (!root) return;
+    var btns = $$('button[data-step]', root);
+    function show(i) {
+      root.setAttribute('data-active', String(i));
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-step') === String(i) ? 'true' : 'false'); });
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { show(+b.getAttribute('data-step')); }); });
+    show(0);
+  })();
+
+  /* ---- fire class / agent matrix ---------------------------------------
+     The whole reason this is not a picture: the same agent is correct for one
+     class and DANGEROUS on another, and a static chart makes that a lookup
+     rather than a consequence. Sources: OSHA 1910.157 / NFPA 10 class
+     definitions; dry powder (Class D) is not dry chemical (ABC).           */
+  (function () {
+    var root = $('[data-firetable]');
+    if (!root) return;
+    var what = $('[data-fc-what]', root), list = $('[data-fc-agents]', root);
+    var tabs = $$('button[data-fc]', root);
+
+    var FC = {
+      A: { what: '<strong>Ordinary combustibles</strong> — wood, paper, cloth, rubber and many plastics. The everyday one.',
+           agents: [['Water', 'ok', 'Works. Cools the fuel below ignition.'],
+                    ['ABC dry chemical', 'ok', 'Works. The usual wall unit.'],
+                    ['CO<sub>2</sub>', 'no', 'Poor. Knocks flame down but does not cool, so it can reflash.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
+      B: { what: '<strong>Flammable liquids and gases</strong> — solvents, oils, paints, grease, fuel.',
+           agents: [['Water', 'bad', 'DANGEROUS. Spreads burning liquid and can flash it.'],
+                    ['ABC dry chemical', 'ok', 'Works. Smothers the surface.'],
+                    ['CO<sub>2</sub>', 'ok', 'Works, and leaves no residue.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
+      C: { what: '<strong>Energised electrical equipment</strong> — a live panel, motor or cord. Kill the power and it becomes a Class A or B fire.',
+           agents: [['Water', 'bad', 'DANGEROUS. Conductive — it puts you in the circuit.'],
+                    ['ABC dry chemical', 'ok', 'Works. Non-conductive agent.'],
+                    ['CO<sub>2</sub>', 'ok', 'Works, and does not foul the equipment.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
+      D: { what: '<strong>Combustible metals</strong> — magnesium, titanium, sodium, lithium, and aluminium in fine form: chips, swarf and grinding dust. We generate this fuel.',
+           agents: [['Water', 'bad', 'DANGEROUS. Can react violently and throw burning metal.'],
+                    ['ABC dry chemical', 'bad', 'DANGEROUS. Dry chemical is not dry powder — it can be useless or make it worse.'],
+                    ['CO<sub>2</sub>', 'bad', 'DANGEROUS. Will not stop a metal fire.'],
+                    ['Class D dry powder', 'ok', 'The only correct agent. Smothers and absorbs heat.']] },
+      K: { what: '<strong>Cooking oils and fats</strong> — kitchen equipment, not lab equipment. Listed so the letter is not a mystery.',
+           agents: [['Wet chemical', 'ok', 'The correct agent. Forms a soapy crust on the oil.'],
+                    ['Water', 'bad', 'DANGEROUS. Erupts burning oil.'],
+                    ['ABC dry chemical', 'no', 'Not rated. May knock flame down but the oil re-ignites.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] }
+    };
+
+    function show(k) {
+      var c = FC[k]; if (!c) return;
+      tabs.forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-fc') === k ? 'true' : 'false'); });
+      what.innerHTML = c.what;
+      list.innerHTML = c.agents.map(function (a) {
+        return '<li class="' + a[1] + '"><span class="n">' + a[0] + '</span><span class="r">' + a[2] + '</span></li>';
+      }).join('');
+    }
+    tabs.forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-fc')); }); });
+    show('A');
   })();
 
   /* ---- on this page: scrollspy -----------------------------------------*/

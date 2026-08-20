@@ -222,6 +222,72 @@
     show('1');
   })();
 
+  /* ---- PASS stepper -----------------------------------------------------
+     One drawing; the emphasis moves. Without JS the first step is shown and
+     all four descriptions are already on the page as text.                 */
+  (function () {
+    var root = $('[data-pass]');
+    if (!root) return;
+    var btns = $$('button[data-step]', root);
+    function show(i) {
+      root.setAttribute('data-active', String(i));
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-step') === String(i) ? 'true' : 'false'); });
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { show(+b.getAttribute('data-step')); }); });
+    show(0);
+  })();
+
+  /* ---- fire class / agent matrix ---------------------------------------
+     The whole reason this is not a picture: the same agent is correct for one
+     class and DANGEROUS on another, and a static chart makes that a lookup
+     rather than a consequence. Sources: OSHA 1910.157 / NFPA 10 class
+     definitions; dry powder (Class D) is not dry chemical (ABC).           */
+  (function () {
+    var root = $('[data-firetable]');
+    if (!root) return;
+    var what = $('[data-fc-what]', root), list = $('[data-fc-agents]', root);
+    var tabs = $$('button[data-fc]', root);
+
+    var FC = {
+      A: { what: '<strong>Ordinary combustibles</strong> — wood, paper, cloth, rubber and many plastics. The everyday one.',
+           agents: [['Water', 'ok', 'Works. Cools the fuel below ignition.'],
+                    ['ABC dry chemical', 'ok', 'Works. The usual wall unit.'],
+                    ['CO<sub>2</sub>', 'no', 'Poor. Knocks flame down but does not cool, so it can reflash.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
+      B: { what: '<strong>Flammable liquids and gases</strong> — solvents, oils, paints, grease, fuel.',
+           agents: [['Water', 'bad', 'DANGEROUS. Spreads burning liquid and can flash it.'],
+                    ['ABC dry chemical', 'ok', 'Works. Smothers the surface.'],
+                    ['CO<sub>2</sub>', 'ok', 'Works, and leaves no residue.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
+      C: { what: '<strong>Energised electrical equipment</strong> — a live panel, motor or cord. Kill the power and it becomes a Class A or B fire.',
+           agents: [['Water', 'bad', 'DANGEROUS. Conductive — it puts you in the circuit.'],
+                    ['ABC dry chemical', 'ok', 'Works. Non-conductive agent.'],
+                    ['CO<sub>2</sub>', 'ok', 'Works, and does not foul the equipment.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
+      D: { what: '<strong>Combustible metals</strong> — magnesium, titanium, sodium, lithium, and aluminium in fine form: chips, swarf and grinding dust. We generate this fuel.',
+           agents: [['Water', 'bad', 'DANGEROUS. Can react violently and throw burning metal.'],
+                    ['ABC dry chemical', 'bad', 'DANGEROUS. Dry chemical is not dry powder — it can be useless or make it worse.'],
+                    ['CO<sub>2</sub>', 'bad', 'DANGEROUS. Will not stop a metal fire.'],
+                    ['Class D dry powder', 'ok', 'The only correct agent. Smothers and absorbs heat.']] },
+      K: { what: '<strong>Cooking oils and fats</strong> — kitchen equipment, not lab equipment. Listed so the letter is not a mystery.',
+           agents: [['Wet chemical', 'ok', 'The correct agent. Forms a soapy crust on the oil.'],
+                    ['Water', 'bad', 'DANGEROUS. Erupts burning oil.'],
+                    ['ABC dry chemical', 'no', 'Not rated. May knock flame down but the oil re-ignites.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] }
+    };
+
+    function show(k) {
+      var c = FC[k]; if (!c) return;
+      tabs.forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-fc') === k ? 'true' : 'false'); });
+      what.innerHTML = c.what;
+      list.innerHTML = c.agents.map(function (a) {
+        return '<li class="' + a[1] + '"><span class="n">' + a[0] + '</span><span class="r">' + a[2] + '</span></li>';
+      }).join('');
+    }
+    tabs.forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-fc')); }); });
+    show('A');
+  })();
+
   /* ---- on this page: scrollspy -----------------------------------------*/
   (function () {
     var links = $$('.toc a');

@@ -1122,6 +1122,86 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
   background: var(--surface-2); color: var(--accent);
 }
 
+/* ==========================================================================
+   Fire safety graphics — PASS stepper and the class/agent matrix
+
+   Both replace a flat image from the source deck. The point is not decoration:
+   an image cannot show you that the SAME extinguisher is correct for one fire
+   and dangerous on another, and that is the thing that has to land.
+   ========================================================================*/
+.pass {
+  display: grid; gap: 1.25rem; align-items: center;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 1.25rem;
+}
+@media (max-width: 40rem) { .pass { grid-template-columns: minmax(0, 1fr); } }
+
+.pass-svg { width: 100%; height: auto; display: block; }
+.pass-svg .ext-body   { fill: var(--cat3); }
+.pass-svg .ext-band   { fill: var(--paper); opacity: .35; }
+.pass-svg .ext-neck,
+.pass-svg .ext-lever  { fill: var(--ink-soft); }
+.pass-svg .ext-nozzle { fill: var(--ink-soft); }
+.pass-svg .ext-hose   { stroke: var(--ink-soft); }
+.pass-svg .ext-pin    { stroke: var(--msu-gold); opacity: .35; transition: opacity .2s ease; }
+.pass-svg .ext-spray  { stroke: var(--msu-liteblue); opacity: 0; transition: opacity .2s ease; }
+.pass-svg .ext-base   { fill: var(--msu-gold); opacity: 0; transition: opacity .2s ease; }
+.pass-svg .ext-sweep  { stroke: var(--msu-gold); opacity: 0; transition: opacity .2s ease; }
+@media (prefers-reduced-motion: reduce) { .pass-svg * { transition: none; } }
+
+/* one highlight per step — the drawing is the same, the emphasis moves */
+.pass[data-active="0"] .ext-pin   { opacity: 1; }
+.pass[data-active="1"] .ext-base  { opacity: 1; }
+.pass[data-active="2"] .ext-spray { opacity: 1; }
+.pass[data-active="3"] .ext-spray { opacity: 1; }
+.pass[data-active="3"] .ext-base  { opacity: 1; }
+.pass[data-active="3"] .ext-sweep { opacity: 1; }
+
+.pass-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
+.pass-steps li { padding: 0; }
+.pass-steps li::before { content: none; }
+.pass-steps button {
+  width: 100%; text-align: left; cursor: pointer; font: inherit;
+  display: grid; grid-template-columns: 2rem 1fr; gap: .1rem .7rem;
+  padding: .6rem .75rem; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid transparent; color: inherit;
+}
+.pass-steps button:hover { background: var(--surface-2); }
+.pass-steps button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+.pass-steps .k {
+  grid-row: span 2; align-self: start;
+  font-family: var(--f-display); font-weight: 700; font-size: 1.5rem;
+  color: var(--cat3); line-height: 1;
+}
+.pass-steps .w { font-family: var(--f-display); font-weight: 700; font-size: 1rem; }
+.pass-steps .d { font-size: .9rem; color: var(--ink-soft); line-height: 1.4; }
+
+/* ---- fire class matrix -------------------------------------------------*/
+.firetable { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.fc-tabs { display: flex; flex-wrap: wrap; gap: .4rem; padding: .85rem; border-bottom: 1px solid var(--rule); }
+.fc-tabs button {
+  cursor: pointer; font: inherit; font-family: var(--f-display); font-weight: 700;
+  font-size: .8rem; letter-spacing: .05em; text-transform: uppercase;
+  padding: .4rem .7rem; border-radius: var(--radius-xs);
+  border: 1.5px solid var(--rule); background: transparent; color: var(--ink-soft);
+}
+.fc-tabs button[aria-selected="true"] { border-color: var(--accent); color: var(--accent); background: var(--surface-2); }
+.fc-body { padding: 1.2rem 1.15rem; }
+.fc-what { margin-bottom: 1rem; }
+.fc-agents { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .45rem; }
+.fc-agents li { padding: .55rem .7rem; border-radius: var(--radius-sm); display: flex; gap: .7rem; align-items: baseline; }
+.fc-agents li::before { content: none; }
+.fc-agents .n { font-family: var(--f-display); font-weight: 700; font-size: .92rem; flex: 0 0 11rem; }
+.fc-agents .r { font-size: .92rem; }
+@media (max-width: 34rem) { .fc-agents li { flex-wrap: wrap; } .fc-agents .n { flex: 1 1 100%; } }
+.fc-agents .ok   { background: color-mix(in srgb, var(--cat1) 12%, transparent); }
+.fc-agents .no   { background: var(--surface-2); color: var(--ink-soft); }
+.fc-agents .bad  { background: var(--cat3-soft); }
+.fc-agents .ok   .n { color: var(--accent); }
+.fc-agents .bad  .n { color: var(--cat-ink); }
+.fc-agents .bad  .r { color: var(--cat-ink); font-weight: 600; }
+
 /* ---- aggregate: many pages stacked in one printable file --------------- */
 .aggregate main { padding: clamp(1.5rem, 4vw, 3rem); max-width: 52rem; margin: 0 auto; }
 .agg-head { margin-bottom: 3rem; }
@@ -1154,6 +1234,8 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
     <li><a href="#p-electrical-safety">Electrical Safety</a></li>
     <li><a href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a></li>
     <li><a href="#p-machine-hazards">Machine Hazards and Housekeeping</a></li>
+    <li><a href="#p-fire-safety">Fire Safety</a></li>
+    <li><a href="#p-metal-chips">Metal Chips and Swarf</a></li>
     <li><a href="#p-conduct-and-emergency">Lab Conduct and Emergencies</a></li>
     <li><a href="#p-5s-workplace-organization">5S Workplace Organization</a></li>
   </ol>
@@ -1519,9 +1601,11 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
     <p><strong>Poor technique injures people at weights they thought were safe.</strong> At the
     loads handled here, how you lift matters more than what it weighs.</p>
   </div>
-  <p>Very little in a shop comes nicely packaged. Material is dense, the shape is rarely
-  convenient, and the grip is often wherever you can get one &mdash; which is what actually forces
-  people into a bad lift.</p>
+  <p>The problem here is rarely that something is <em>heavy</em>. It is that it is <strong>big for
+  its weight</strong>. Sheet goods, tube, extrusion and aluminium stock are all low density, so a
+  40&nbsp;lb load is a large object &mdash; and a large object is one you cannot keep close to your
+  body, cannot see past, and cannot get both hands near the middle of. Every rule below assumes
+  you can hold the load close. Bulk is what takes that away.</p>
   <h3>Team lifting is required for</h3>
   <ul>
     <li>Anything over <strong>40 lbs</strong>.</li>
@@ -1575,9 +1659,6 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
     <div><dt>120 V</dt><dd>Standard receptacles. Still dangerous &mdash; can cause serious injury or death.</dd></div>
     <div><dt>240 V / 480 V</dt><dd>Industrial equipment. Extremely dangerous &mdash; often fatal.</dd></div>
   </dl>
-  <p class="aside">You will hear these called 110 and 220, and a meter will usually read somewhere in
-  that range &mdash; supply voltage sags under load and varies by circuit. <strong>120 and 240 are the
-  nominal values</strong>; the names are interchangeable in the shop and the hazard is identical.</p>
   <div class="stop">
     <p><strong>Never assume any voltage is &ldquo;safe&rdquo;.</strong></p>
   </div>
@@ -1726,6 +1807,271 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
   </ul>
   <p class="aside">The shutdown and cleaning steps that close every session are in
   <a class="xref-page" href="#p-equipment-operating-procedure">After operating any equipment</a>.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-fire-safety">
+  <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span></div>
+  <h1>Fire Safety</h1>
+  <p class="lede">When to fight a fire and when to leave, how to use an extinguisher, and why the wrong extinguisher can make a fire worse.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard is-stop" id="decide-before-you-reach-for-anything" data-card="decide-before-you-reach-for-anything" open>
+    <summary>Decide before you reach for anything<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Decide before you reach for anything</h2>
+  <p class="lede">An extinguisher is for a <strong>small fire you caught early</strong>. It is not
+  for a fire that is already growing, and it is never worth your life.</p>
+  <h3>Fight it only if all four are true</h3>
+  <ul class="boxes">
+    <li>The fire is <strong>small and contained</strong> &mdash; a bin, a rag, a puddle. Not spreading.</li>
+    <li>You know <strong>what is burning</strong>, and you have the <strong>right extinguisher</strong> for it.</li>
+    <li>You have a <strong>clear exit behind you</strong> and the fire is not between you and it.</li>
+    <li>Someone else has already <strong>raised the alarm</strong>.</li>
+  </ul>
+  <div class="stop">
+    <p><strong>Otherwise: get out.</strong> Pull the alarm, leave, call <strong>911</strong> from
+    outside, and tell the instructor and the fire crew what was burning.</p>
+    <p>If you try and it does not go out in the first few seconds, <strong>stop and leave</strong>.
+    A hand extinguisher lasts roughly 10&ndash;20 seconds. That is your whole attempt.</p>
+  </div>
+    </div>
+  </details>
+  <details class="xcard" id="using-an-extinguisher-pass" data-card="using-an-extinguisher-pass" open>
+    <summary>Using an extinguisher &mdash; PASS<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Using an extinguisher &mdash; PASS</h2>
+  <p>Four steps, in order. The one people get wrong is <strong>Aim</strong>: at the base of the
+  flames, not at the flames themselves. Fire burns the fuel, so the fuel is what you have to
+  smother.</p>
+
+  <div class="pass" data-pass>
+    <div class="pass-stage" aria-hidden="true">
+      <svg viewBox="0 0 200 200" class="pass-svg" role="img">
+        <!-- body -->
+        <rect class="ext-body" x="72" y="66" width="56" height="104" rx="12"/>
+        <rect class="ext-band" x="72" y="96" width="56" height="12"/>
+        <!-- neck + handle -->
+        <rect class="ext-neck" x="90" y="50" width="20" height="18" rx="4"/>
+        <rect class="ext-lever" x="78" y="40" width="46" height="9" rx="4.5"/>
+        <!-- pin -->
+        <g class="ext-pin"><circle cx="136" cy="44" r="7" fill="none" stroke-width="4"/><line x1="129" y1="44" x2="104" y2="44" stroke-width="4"/></g>
+        <!-- hose + nozzle -->
+        <path class="ext-hose" d="M78 46 C 46 52, 40 92, 44 122" fill="none" stroke-width="7"/>
+        <rect class="ext-nozzle" x="30" y="120" width="26" height="11" rx="5"/>
+        <!-- discharge -->
+        <g class="ext-spray"><path d="M28 128 L 4 136 M28 132 L 6 148 M28 124 L 6 124" stroke-width="4" fill="none"/></g>
+        <!-- base of fire marker -->
+        <g class="ext-base"><ellipse cx="24" cy="176" rx="22" ry="6"/></g>
+        <!-- sweep arrows -->
+        <g class="ext-sweep"><path d="M6 190 L 46 190" stroke-width="4" fill="none"/><path d="M10 185 L 4 190 L 10 195" fill="none" stroke-width="4"/><path d="M42 185 L 48 190 L 42 195" fill="none" stroke-width="4"/></g>
+      </svg>
+    </div>
+    <ol class="pass-steps">
+      <li><button type="button" data-step="0" aria-pressed="true"><span class="k">P</span><span class="w">Pull</span><span class="d">Pull the pin. It breaks the tamper seal and frees the lever.</span></button></li>
+      <li><button type="button" data-step="1" aria-pressed="false"><span class="k">A</span><span class="w">Aim</span><span class="d">Aim low, at the <strong>base</strong> of the fire &mdash; not at the flames. Stand back about 6&ndash;8&nbsp;ft.</span></button></li>
+      <li><button type="button" data-step="2" aria-pressed="false"><span class="k">S</span><span class="w">Squeeze</span><span class="d">Squeeze the lever slowly and evenly. Releasing it stops the discharge.</span></button></li>
+      <li><button type="button" data-step="3" aria-pressed="false"><span class="k">S</span><span class="w">Sweep</span><span class="d">Sweep side to side across the base until the fire is out. Watch for it reigniting.</span></button></li>
+    </ol>
+  </div>
+  <p class="aside">Keep your back to your exit the whole time, and back away &mdash; never turn
+  around and walk past a fire you have just knocked down.</p>
+    </div>
+  </details>
+  <details class="xcard" id="fire-classes-and-what-puts-them-out" data-card="fire-classes-and-what-puts-them-out" open>
+    <summary>Fire classes, and what puts them out<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Fire classes, and what puts them out</h2>
+  <p class="lede">Fires are classed by <strong>what is burning</strong>. An extinguisher is rated
+  for the classes it can handle, and using the wrong one ranges from useless to dangerous.</p>
+
+  <div class="firetable" data-firetable>
+    <div class="fc-tabs" role="tablist" aria-label="Fire class">
+      <button role="tab" aria-selected="true"  data-fc="A">Class A</button>
+      <button role="tab" aria-selected="false" data-fc="B">Class B</button>
+      <button role="tab" aria-selected="false" data-fc="C">Class C</button>
+      <button role="tab" aria-selected="false" data-fc="D">Class D</button>
+      <button role="tab" aria-selected="false" data-fc="K">Class K</button>
+    </div>
+    <div class="fc-body" role="tabpanel">
+      <p class="fc-what" data-fc-what></p>
+      <ul class="fc-agents" data-fc-agents></ul>
+    </div>
+  </div>
+
+  <p class="aside">Most extinguishers on a wall are <strong>ABC dry chemical</strong> &mdash; one
+  unit covering the first three classes. Check the label; the classes it is rated for are printed
+  on it.</p>
+    </div>
+  </details>
+  <details class="xcard is-stop" id="metal-fires-are-different-and-we-make-the-fuel" data-card="metal-fires-are-different-and-we-make-the-fuel" open>
+    <summary>Metal fires are different &mdash; and we make the fuel<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Metal fires are different &mdash; and we make the fuel</h2>
+  <div class="stop">
+    <p><strong>A Class&nbsp;D fire needs a Class&nbsp;D extinguisher, and nothing else.</strong>
+    &ldquo;Dry powder&rdquo; and &ldquo;dry chemical&rdquo; are not the same thing. An ordinary ABC
+    dry chemical unit on a burning metal is at best useless and can <strong>make the fire
+    worse</strong>.</p>
+    <p><strong>Never put water on a metal fire.</strong> It can react violently and throw burning
+    material.</p>
+  </div>
+  <p>Solid stock does not catch fire. <strong>Fine material does</strong> &mdash; swarf, chips,
+  grinding dust and polishing lint have enormous surface area for their mass. Aluminium fines,
+  magnesium and titanium all burn, and once alight they burn extremely hot and are very hard to
+  put out.</p>
+  <h3>What that means day to day</h3>
+  <ul>
+    <li>Keep chip trays and vacuum contents <strong>emptied and separated</strong>, not left to
+    accumulate. See <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a> for housekeeping, and the chip handling rules for aluminium.</li>
+    <li>Never grind or cut magnesium or titanium without asking first.</li>
+    <li>Do not mix hot chips or grinding debris into a general waste bin with paper or rag.</li>
+    <li>If fine metal debris does ignite, <strong>do not improvise</strong>. Alarm, evacuate, and
+    tell the fire crew it is a metal fire &mdash; that changes how they fight it.</li>
+  </ul>
+    </div>
+  </details>
+  <details class="xcard" id="hot-work-and-the-things-that-start-fires" data-card="hot-work-and-the-things-that-start-fires" open>
+    <summary>Hot work and the things that start fires<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Hot work and the things that start fires</h2>
+  <ul>
+    <li><strong>Grinding throws sparks a surprising distance.</strong> Clear rag, sawdust, solvent
+    and packaging out of the area before you start, not after it smoulders.</li>
+    <li><strong>Oily rags can self-heat.</strong> Do not leave them in a pile; use the designated
+    container.</li>
+    <li><strong>Flammable liquids live in the fireproof cabinet</strong> when they are not in your
+    hand &mdash; see <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</li>
+    <li><strong>A smouldering fire can restart long after you leave.</strong> If something got hot
+    enough to smoke, tell the instructor before you go.</li>
+  </ul>
+    </div>
+  </details>
+  <details class="xcard" id="know-these-before-you-need-them" data-card="know-these-before-you-need-them" open>
+    <summary>Know these before you need them<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Know these before you need them</h2>
+  <p>None of the above helps if you are looking for equipment while a fire grows. On your first
+  day in any lab space, locate:</p>
+  <ul class="boxes">
+    <li>The nearest <strong>fire extinguisher</strong>, and what classes it is rated for.</li>
+    <li>The nearest <strong>alarm pull station</strong>.</li>
+    <li>Both ways out of the room, and the route that does not pass the machines.</li>
+    <li>Where your class <strong>gathers outside</strong>, so you can be accounted for.</li>
+    <li>The <strong>first aid kit</strong> and the emergency stops &mdash; see
+    <a class="xref-page" href="#p-conduct-and-emergency">Lab Conduct and Emergencies</a>.</li>
+  </ul>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-metal-chips">
+  <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Equipment</span></div>
+  <h1>Metal Chips and Swarf</h1>
+  <p class="lede">Chips come off hot, razor sharp and fast. How to handle them, how to clean them up, and the rules on compressed air.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard" id="five-reasons-a-chip-is-dangerous" data-card="five-reasons-a-chip-is-dangerous" open>
+    <summary>Five reasons a chip is dangerous<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Five reasons a chip is dangerous</h2>
+  <p class="lede">A chip is not scrap until it has cooled and stopped moving. Straight off the
+  tool it is every one of these at once.</p>
+  <dl class="dims">
+    <div><dt>Hot</dt><dd>Chips can be upwards of <strong>1000&nbsp;&deg;F</strong> the moment they
+    are cut. They do not look it.</dd></div>
+    <div><dt>Sharp</dt><dd>The leading edge of a chip is <strong>always razor sharp</strong>. It is
+    a freshly cut edge and it will open a hand.</dd></div>
+    <div><dt>Fast</dt><dd>Chips leaving a machine can travel at <strong>over 250&nbsp;mph</strong>.
+    That is why eye protection is not negotiable &mdash; see <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>.</dd></div>
+    <div><dt>Strong</dt><dd>A long continuous chip is a steel ribbon. If it wraps a sleeve or a
+    limb it can <strong>pull you into the machine</strong>.</dd></div>
+    <div><dt>Slippery</dt><dd>Chips on the floor roll underfoot. This is one of the most common
+    ways people get hurt without the machine touching them.</dd></div>
+  </dl>
+    </div>
+  </details>
+  <details class="xcard is-stop" id="never-clear-chips-with-your-hands" data-card="never-clear-chips-with-your-hands" open>
+    <summary>Never clear chips with your hands<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Never clear chips with your hands</h2>
+  <div class="stop">
+    <p><strong>Do not reach into a machine to clear chips while it is running</strong>, and do not
+    pick up a long stringy chip by hand at any time. Stop the spindle, then deal with it.</p>
+  </div>
+  <h3>Gloves</h3>
+  <ul>
+    <li>Gloves may <strong>only</strong> be used for cleanup <strong>after the machine is shut
+    down</strong>.</li>
+    <li><strong>Never wear gloves at a running machine.</strong> A glove catches where bare skin
+    would pull free, and takes your hand with it &mdash; see <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</li>
+  </ul>
+  <h3>Brush</h3>
+  <ul>
+    <li>A brush may be used while the machine is in operation, but with <strong>extreme
+    care</strong>.</li>
+    <li>On a CNC machine, take particular care: the tool can move without warning, and the
+    enclosure invites you to reach further in than you should.</li>
+  </ul>
+    </div>
+  </details>
+  <details class="xcard is-gate" id="compressed-air-there-are-limits-on-this" data-card="compressed-air-there-are-limits-on-this" open>
+    <summary>Compressed air &mdash; there are limits on this<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compressed air &mdash; there are limits on this</h2>
+  <div class="gate">
+    <p>Compressed air is convenient and it is the option people reach for first. It is also
+    <strong>regulated</strong>, because a chip in a moving air stream is a projectile and air
+    forced against skin can be driven into the body.</p>
+  </div>
+  <h3>The rule</h3>
+  <p>OSHA permits compressed air for cleaning <strong>only</strong> where it is
+  <strong>reduced to less than 30&nbsp;psi</strong>, and <strong>only then</strong> with
+  <strong>effective chip guarding and personal protective equipment</strong>
+  (<code>29&nbsp;CFR&nbsp;1910.242(b)</code>). All three conditions, together &mdash; not the
+  pressure alone.</p>
+  <h3>In practice</h3>
+  <ul class="boxes">
+    <li>Check the regulator is set for cleaning, not shop pressure, before you pull the trigger.</li>
+    <li>Eye protection, every time. Everyone nearby too &mdash; you do not get to decide the
+    range.</li>
+    <li><strong>Never at skin</strong>, yours or anyone else&rsquo;s.</li>
+    <li><strong>Never toward another person</strong>, and check who is behind the machine first.</li>
+    <li><strong>Never into an enclosed space</strong>.</li>
+    <li>If air would just relocate the mess into the air or across the shop, use a brush or the
+    vacuum instead.</li>
+  </ul>
+    </div>
+  </details>
+  <details class="xcard is-stop" id="cleaning-up" data-card="cleaning-up" open>
+    <summary>Cleaning up<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Cleaning up</h2>
+  <ul class="boxes">
+    <li>Use cleaning equipment or gloves to handle chips for disposal &mdash; the sharp edge does
+    not dull because the machine stopped.</li>
+    <li><strong>Aluminium chips are separated</strong> and go in the recycling container, not the
+    general bin.</li>
+    <li>Clear the machine so only the residue in the bottom tray remains.</li>
+    <li>Sweep the floor, and mop if the floor is wet with coolant.</li>
+    <li>If cleaning equipment such as a vacuum gets wet, <strong>open it up and let it dry</strong>
+    before it is put away.</li>
+  </ul>
+  <div class="stop">
+    <p><strong>Fine metal debris burns.</strong> Accumulated aluminium chips, swarf and grinding
+    dust are a <strong>Class&nbsp;D fire</strong> hazard, and the ordinary ABC extinguisher on the
+    wall is the wrong tool for one &mdash; it can make it worse. Do not let chips pile up, and never
+    mix them into a bin with paper or oily rag. See <a class="xref-page" href="#p-fire-safety">Fire Safety</a>.</p>
+  </div>
     </div>
   </details>
 </div>
@@ -2108,6 +2454,72 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
       });
     });
     show('1');
+  })();
+
+  /* ---- PASS stepper -----------------------------------------------------
+     One drawing; the emphasis moves. Without JS the first step is shown and
+     all four descriptions are already on the page as text.                 */
+  (function () {
+    var root = $('[data-pass]');
+    if (!root) return;
+    var btns = $$('button[data-step]', root);
+    function show(i) {
+      root.setAttribute('data-active', String(i));
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-step') === String(i) ? 'true' : 'false'); });
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { show(+b.getAttribute('data-step')); }); });
+    show(0);
+  })();
+
+  /* ---- fire class / agent matrix ---------------------------------------
+     The whole reason this is not a picture: the same agent is correct for one
+     class and DANGEROUS on another, and a static chart makes that a lookup
+     rather than a consequence. Sources: OSHA 1910.157 / NFPA 10 class
+     definitions; dry powder (Class D) is not dry chemical (ABC).           */
+  (function () {
+    var root = $('[data-firetable]');
+    if (!root) return;
+    var what = $('[data-fc-what]', root), list = $('[data-fc-agents]', root);
+    var tabs = $$('button[data-fc]', root);
+
+    var FC = {
+      A: { what: '<strong>Ordinary combustibles</strong> — wood, paper, cloth, rubber and many plastics. The everyday one.',
+           agents: [['Water', 'ok', 'Works. Cools the fuel below ignition.'],
+                    ['ABC dry chemical', 'ok', 'Works. The usual wall unit.'],
+                    ['CO<sub>2</sub>', 'no', 'Poor. Knocks flame down but does not cool, so it can reflash.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
+      B: { what: '<strong>Flammable liquids and gases</strong> — solvents, oils, paints, grease, fuel.',
+           agents: [['Water', 'bad', 'DANGEROUS. Spreads burning liquid and can flash it.'],
+                    ['ABC dry chemical', 'ok', 'Works. Smothers the surface.'],
+                    ['CO<sub>2</sub>', 'ok', 'Works, and leaves no residue.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
+      C: { what: '<strong>Energised electrical equipment</strong> — a live panel, motor or cord. Kill the power and it becomes a Class A or B fire.',
+           agents: [['Water', 'bad', 'DANGEROUS. Conductive — it puts you in the circuit.'],
+                    ['ABC dry chemical', 'ok', 'Works. Non-conductive agent.'],
+                    ['CO<sub>2</sub>', 'ok', 'Works, and does not foul the equipment.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
+      D: { what: '<strong>Combustible metals</strong> — magnesium, titanium, sodium, lithium, and aluminium in fine form: chips, swarf and grinding dust. We generate this fuel.',
+           agents: [['Water', 'bad', 'DANGEROUS. Can react violently and throw burning metal.'],
+                    ['ABC dry chemical', 'bad', 'DANGEROUS. Dry chemical is not dry powder — it can be useless or make it worse.'],
+                    ['CO<sub>2</sub>', 'bad', 'DANGEROUS. Will not stop a metal fire.'],
+                    ['Class D dry powder', 'ok', 'The only correct agent. Smothers and absorbs heat.']] },
+      K: { what: '<strong>Cooking oils and fats</strong> — kitchen equipment, not lab equipment. Listed so the letter is not a mystery.',
+           agents: [['Wet chemical', 'ok', 'The correct agent. Forms a soapy crust on the oil.'],
+                    ['Water', 'bad', 'DANGEROUS. Erupts burning oil.'],
+                    ['ABC dry chemical', 'no', 'Not rated. May knock flame down but the oil re-ignites.'],
+                    ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] }
+    };
+
+    function show(k) {
+      var c = FC[k]; if (!c) return;
+      tabs.forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-fc') === k ? 'true' : 'false'); });
+      what.innerHTML = c.what;
+      list.innerHTML = c.agents.map(function (a) {
+        return '<li class="' + a[1] + '"><span class="n">' + a[0] + '</span><span class="r">' + a[2] + '</span></li>';
+      }).join('');
+    }
+    tabs.forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-fc')); }); });
+    show('A');
   })();
 
   /* ---- on this page: scrollspy -----------------------------------------*/
