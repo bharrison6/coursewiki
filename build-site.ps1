@@ -15,6 +15,10 @@
       A LINK is [[page-id]] or [[page-id|text]]. Ids are unique site-wide, and
       one authored link resolves to five destinations - see Resolve-Links.
 
+      An IMAGE is [[img:file.png|Alt text]] - the same link syntax in an
+      `img:` namespace, so it rides the same Resolve-Links seam and the same
+      switch on output mode. Source files live in media\.
+
     WHAT THE GENERATOR ADDS THAT THE SOURCE DOES NOT CARRY
       Each authored <section> is wrapped in <details class="xcard"> for the web
       render. That is done HERE, not in the sources, so that:
@@ -45,6 +49,7 @@ $root     = $PSScriptRoot
 $collDir  = Join-Path $root 'collections'
 $trackDir = Join-Path $root 'tracks'
 $themeDir = Join-Path $root 'theme'
+$mediaDir = Join-Path $root 'media'
 $docsDir  = Join-Path $root 'docs'
 $enc      = New-Object System.Text.UTF8Encoding($false)
 
@@ -61,11 +66,46 @@ function Read-Conf([string]$path) {
   [pscustomobject]@{ Meta = $meta; Body = $split[1] }
 }
 
+# The image formats this site will inline. The MIME type has to be right per
+# extension: a data: URI carrying the wrong type is not decoded, and the
+# aggregate that fails is the PDF fallback nobody opens until they need it.
+$script:mediaMime = [ordered]@{
+  '.png'  = 'image/png'
+  '.jpg'  = 'image/jpeg'
+  '.jpeg' = 'image/jpeg'
+  '.webp' = 'image/webp'
+  '.svg'  = 'image/svg+xml'
+}
+function Get-MediaMime([string]$path) {
+  $ext = [IO.Path]::GetExtension($path).ToLowerInvariant()
+  if (-not $script:mediaMime.Contains($ext)) { return $null }
+  $script:mediaMime[$ext]
+}
+
+function Get-FileSha1([string]$path) {
+  $sha = [System.Security.Cryptography.SHA1]::Create()
+  try {
+    (($sha.ComputeHash([System.IO.File]::ReadAllBytes($path)) |
+        ForEach-Object { $_.ToString('x2') }) -join '')
+  } finally { $sha.Dispose() }
+}
+
 function Get-DataUri([string]$relPath) {
   $p = Join-Path $root $relPath
   if (-not (Test-Path -LiteralPath $p)) { throw "missing asset: $p" }
-  'data:image/png;base64,' + [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($p))
+  $mime = Get-MediaMime $p
+  if (-not $mime) {
+    throw "no MIME type for '$p' - supported: $(($script:mediaMime.Keys) -join ', ')"
+  }
+  "data:$mime;base64," + [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($p))
 }
+
+# ONE regex for the authored link/image token, used by the resolver and by the
+# end-of-build report. Two copies of this pattern would be free to drift, and a
+# report that scans for something slightly different from what the renderer
+# resolved is a report that can miss exactly the case it exists to catch.
+$script:linkRx = '\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]'
+$script:imgPrefix = 'img:'
 
 $script:written = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 
@@ -83,6 +123,39 @@ function Write-Out([string]$path, [string]$text) {
   } else {
     [System.IO.File]::WriteAllText($path, $text, $enc)
     Write-Host ("  {0,-46} {1:n0} bytes" -f $name, $enc.GetByteCount($text))
+  }
+}
+
+# A file the SITE links rather than inlines has to be copied into docs\, and
+# every copy MUST be registered in $script:written - otherwise the stale-output
+# check at the end reports it as an orphan and -Prune deletes it on the next
+# run. assets\ (the lockups) and media\ (page images) are the same operation
+# over two trees, so they share one function rather than two loops that can
+# drift apart.
+#
+# Sameness is length AND content hash. Length alone would skip a re-export that
+# happens to land on the same byte count, leaving docs\ disagreeing with its
+# source - the same shape of silent staleness as the search index.
+function Copy-StaticTree([string]$srcDir, [string]$destDir, [string]$label, [string[]]$onlyExt) {
+  if (-not (Test-Path -LiteralPath $srcDir)) { return }
+  foreach ($f in (Get-ChildItem -LiteralPath $srcDir -Recurse -File | Sort-Object FullName)) {
+    if ($onlyExt.Count -and ($onlyExt -notcontains $f.Extension.ToLowerInvariant())) { continue }
+    $rel  = $f.FullName.Substring($srcDir.Length).TrimStart('\')
+    $dest = Join-Path $destDir $rel
+    [void]$script:written.Add($dest)
+    $same = (Test-Path -LiteralPath $dest) -and
+            ((Get-Item -LiteralPath $dest).Length -eq $f.Length) -and
+            ((Get-FileSha1 $dest) -eq (Get-FileSha1 $f.FullName))
+    $name = $label + '\' + $rel
+    if ($WhatIf) {
+      Write-Host ("  {0,-46} {1}" -f $name, $(if ($same) { 'unchanged' } else { 'would COPY' }))
+      continue
+    }
+    if ($same) { continue }
+    $dir = Split-Path $dest -Parent
+    if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    Copy-Item -LiteralPath $f.FullName -Destination $dest -Force
+    Write-Host ("  {0,-46} {1:n0} bytes" -f $name, $f.Length)
   }
 }
 
@@ -334,17 +407,88 @@ foreach ($t in $tracks.Values) {
               $(if ($t.Parent) { "  (in $($t.Parent))" } else { '' }))
 }
 
+# ------------------------------------------------------------------ media ----
+# Source images live in media\ and are indexed here, BEFORE the build stamp is
+# computed, because the stamp has to cover them: an image edited on its own
+# would otherwise keep its old ?v= and a returning reader would keep the old
+# picture. That is the search-index staleness failure again, in a new asset.
+#
+# The lookup is ORDINAL, deliberately. Windows would happily resolve
+# [[img:Hazard.png]] to media\hazard.png and the build would look clean, then
+# GitHub Pages - case-sensitive - would 404 it. A case-only mismatch is
+# reported as an error here, with the correction, rather than shipping.
+$script:media    = [System.Collections.Generic.Dictionary[string,object]]::new([StringComparer]::Ordinal)
+$script:mediaCi  = [System.Collections.Generic.Dictionary[string,string]]::new([StringComparer]::OrdinalIgnoreCase)
+$script:mediaSkipped = @()
+$mediaStampParts = @()
+if (Test-Path -LiteralPath $mediaDir) {
+  foreach ($f in (Get-ChildItem -LiteralPath $mediaDir -Recurse -File | Sort-Object FullName)) {
+    $rel  = $f.FullName.Substring($mediaDir.Length).TrimStart('\').Replace('\', '/')
+    $mime = Get-MediaMime $f.FullName
+    if (-not $mime) {
+      if ($f.Name -ne 'README.md') { $script:mediaSkipped += $rel }
+      continue
+    }
+    $sha = Get-FileSha1 $f.FullName
+    $script:media[$rel] = [pscustomobject]@{
+      Rel = $rel; Full = $f.FullName; Mime = $mime; Sha = $sha; DataUri = $null
+    }
+    if (-not $script:mediaCi.ContainsKey($rel)) { $script:mediaCi[$rel] = $rel }
+    $mediaStampParts += "$rel|$sha"
+  }
+}
+Write-Host ("media: {0} image{1}" -f $script:media.Count, $(if ($script:media.Count -eq 1) { '' } else { 's' }))
+
 # -------------------------------------------------------- link resolution ----
-# Five containers for one authored link:
-#   site-page    docs\<coll>\<id>.html  -> sibling, or ..\<other>\<id>.html
-#   site-deck    docs\deck-<n>.html     -> #p-<id> in deck, else <coll>\<id>.html
-#   bundle-coll  one file per collection -> #p-<id> inside, else absolute URL
-#   bundle-deck  one file per deck       -> #p-<id> inside, else absolute URL
+# Two containers for one authored token, and the SAME switch decides both what
+# a [[page-id]] points at and where an [[img:file]] comes from:
+#
+#   site-page   docs\<coll>\<id>.html   link -> sibling, or ..\<other>\<id>.html
+#                                       img  -> ..\media\<file>?v=<stamp>
+#   aggregate   docs\print\<slug>.html  link -> #p-<id> inside, else absolute URL
+#                                       img  -> data:<mime>;base64,...
+#
+# The aggregate is handed out as ONE file - it is the PDF fallback and it is
+# uploaded to Canvas on its own - so a relative image path would break it
+# exactly where the site being unreachable is the reason it exists. A site page
+# gets the real file so the browser caches it once instead of carrying the
+# bytes in every page that shows it.
+
+# An image reference. Alt text is the link label and it is REQUIRED: this is
+# teaching material, it gets read with a screen reader, and an unlabelled
+# picture in a safety page is content that silently does not reach a reader.
+# A missing file or a missing label is reported by Test-ImageRefs at the end of
+# the build; what is emitted here is the visible half of the same signal.
+function New-ImageTag([string]$ref, [string]$alt, $ctx, [string]$mode) {
+  $rec = $null
+  if (-not $script:media.TryGetValue($ref, [ref]$rec)) {
+    return '<span class="img-missing" title="No image file media\' + (ConvertTo-HtmlText $ref) + '">' +
+           (ConvertTo-HtmlText $(if ($alt) { $alt } else { $ref })) + '</span>'
+  }
+  switch ($mode) {
+    'site-page' { $src = $ctx.Up + 'media/' + $rec.Rel + '?v=' + $script:stamp }
+    'aggregate' {
+      if (-not $rec.DataUri) {
+        $rec.DataUri = "data:$($rec.Mime);base64," +
+                       [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($rec.Full))
+      }
+      $src = $rec.DataUri
+    }
+    default { throw "New-ImageTag: unknown mode '$mode'" }
+  }
+  '<img class="content-img" src="' + $src + '" alt="' + (ConvertTo-HtmlText $alt) + '"' +
+  $(if ($alt) { '' } else { ' data-alt-missing="1"' }) + '>'
+}
+
 function Resolve-Links([string]$html, $ctx, [string]$mode) {
-  [regex]::Replace($html, '\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]', {
+  [regex]::Replace($html, $script:linkRx, {
     param($m)
     $id    = $m.Groups[1].Value.Trim()
     $label = if ($m.Groups[2].Success) { $m.Groups[2].Value.Trim() } else { $null }
+
+    if ($id.StartsWith($script:imgPrefix, [StringComparison]::Ordinal)) {
+      return New-ImageTag ($id.Substring($script:imgPrefix.Length).Trim()) $label $ctx $mode
+    }
 
     if (-not $script:allPages.Contains($id)) {
       $text = if ($label) { $label } else { $id }
@@ -692,6 +836,9 @@ $script:stamp = Get-BuildStamp @(
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'msu-theme.css'))
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.css'))
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.js'))
+  # Content hashes, not names: an image replaced in place must move the stamp,
+  # or the page updates and the picture does not.
+  ($mediaStampParts -join "`n")
 )
 Write-Host ("    build stamp: {0}" -f $script:stamp)
 $hub = New-Object System.Text.StringBuilder
@@ -814,7 +961,11 @@ foreach ($c in $collections.Values) {
   [void]$ci.AppendLine('  <h1>' + (ConvertTo-HtmlText $c.Title) + '</h1>')
   [void]$ci.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $c.Summary) + '</p>')
   if ($c.Intro) {
-    [void]$ci.AppendLine((Resolve-Links $c.Intro ([pscustomobject]@{ Coll = $c.Id }) 'site-page'))
+    # Up is this document's depth below docs\ - docs\<coll>\index.html - and is
+    # what an image reference is resolved against. Threaded the same way $up is
+    # threaded through the app bar, the sidebar and the lockup, so a page moved
+    # to another depth carries its images with it.
+    [void]$ci.AppendLine((Resolve-Links $c.Intro ([pscustomobject]@{ Coll = $c.Id; Up = '../' }) 'site-page'))
   }
   $groupNames = if ($c.Groups.Count) { $c.Groups }
                 else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
@@ -831,7 +982,7 @@ foreach ($c in $collections.Values) {
 
   foreach ($pageId in $c.PageIds) {
     $p   = $pages[$pageId]
-    $ctx = [pscustomobject]@{ Coll = $c.Id }
+    $ctx = [pscustomobject]@{ Coll = $c.Id; Up = '../' }
     $sb  = New-Object System.Text.StringBuilder
     [void]$sb.AppendLine('<a class="skip" href="#main">Skip to content</a>')
     [void]$sb.AppendLine((New-AppBar '../'))
@@ -872,17 +1023,14 @@ Write-Host 'theme'
 foreach ($f in (Get-ChildItem -LiteralPath $themeDir -File)) {
   Write-Out (Join-Path $docsDir ('theme\' + $f.Name)) ([System.IO.File]::ReadAllText($f.FullName))
 }
-# The site links the logo rather than inlining it, so it has to be copied.
-$outAssets = Join-Path $docsDir 'assets'
-if (-not (Test-Path -LiteralPath $outAssets)) { New-Item -ItemType Directory -Path $outAssets -Force | Out-Null }
-foreach ($f in (Get-ChildItem -LiteralPath (Join-Path $root 'assets') -File)) {
-  $dest = Join-Path $outAssets $f.Name
-  [void]$script:written.Add($dest)
-  $same = (Test-Path -LiteralPath $dest) -and
-          ((Get-Item -LiteralPath $dest).Length -eq $f.Length)
-  if ($WhatIf) { Write-Host ("  {0,-46} {1}" -f ('docs\assets\' + $f.Name), $(if ($same) { 'unchanged' } else { 'would COPY' })) }
-  elseif (-not $same) { Copy-Item -LiteralPath $f.FullName -Destination $dest -Force
-                        Write-Host ("  {0,-46} {1:n0} bytes" -f ('docs\assets\' + $f.Name), $f.Length) }
+# The site links the logo and the page images rather than inlining them, so
+# both trees are copied - and registered in $script:written, or the stale-file
+# check would report every one of them and -Prune would delete them.
+Copy-StaticTree (Join-Path $root 'assets') (Join-Path $docsDir 'assets') 'docs\assets' @()
+Copy-StaticTree $mediaDir (Join-Path $docsDir 'media') 'docs\media' @($script:mediaMime.Keys)
+if ($script:mediaSkipped.Count) {
+  Write-Host ("  media\ files ignored - unsupported type ({0}): {1}" -f
+              $script:mediaSkipped.Count, ($script:mediaSkipped -join ', '))
 }
 
 # -------------------------------------------------------------- aggregates ---
@@ -1033,14 +1181,50 @@ if ($orphans.Count) {
   }
 }
 
-# ------------------------------------------------------------ link report ----
-$dangling = @()
-foreach ($p in $pages.Values) {
-  foreach ($m in [regex]::Matches($p.Body, '\[\[([^\]\|]+)(?:\|[^\]]+)?\]\]')) {
-    $id = $m.Groups[1].Value.Trim()
-    if (-not $pages.Contains($id)) { $dangling += "$($p.Id) -> $id" }
+# ------------------------------------------------- link and image report -----
+# Every authored container, scanned once with the SAME regex the resolver used.
+# Page bodies and collection intros both carry [[tokens]], so both are scanned;
+# an intro's links used to go unchecked.
+$containers = @()
+foreach ($p in $pages.Values) { $containers += [pscustomobject]@{ Where = $p.Id; Text = $p.Body } }
+foreach ($c in $collections.Values) {
+  if ($c.Intro) { $containers += [pscustomobject]@{ Where = "$($c.Id)\intro.html"; Text = $c.Intro } }
+}
+
+$dangling  = @()
+$imgErrors = @()
+$imgUsed   = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+foreach ($ct in $containers) {
+  foreach ($m in [regex]::Matches($ct.Text, $script:linkRx)) {
+    $id    = $m.Groups[1].Value.Trim()
+    $label = if ($m.Groups[2].Success) { $m.Groups[2].Value.Trim() } else { '' }
+
+    if (-not $id.StartsWith($script:imgPrefix, [StringComparison]::Ordinal)) {
+      if (-not $pages.Contains($id)) { $dangling += "$($ct.Where) -> $id" }
+      continue
+    }
+
+    # An image is different from a link in kind: a link to a page that is not
+    # written yet is a normal mid-authoring state and degrades to visible
+    # "pending" text. A broken image is a hole in a published page, and a
+    # picture with no alt text is content that never reaches part of the
+    # audience. Neither is allowed to pass as a note in the log.
+    $ref = $id.Substring($script:imgPrefix.Length).Trim()
+    if ($script:media.ContainsKey($ref)) {
+      [void]$imgUsed.Add($ref)
+      if (-not $label) { $imgErrors += "$($ct.Where): [[img:$ref]] has no alt text - use [[img:$ref|what it shows]]" }
+    } else {
+      $real = $null
+      if ($script:mediaCi.TryGetValue($ref, [ref]$real)) {
+        [void]$imgUsed.Add($real)
+        $imgErrors += "$($ct.Where): [[img:$ref]] is the wrong case - the file is media\$real (GitHub Pages is case-sensitive; this would 404 live)"
+      } else {
+        $imgErrors += "$($ct.Where): [[img:$ref]] - no such file in media\"
+      }
+    }
   }
 }
+
 if ($dangling.Count) {
   Write-Host ''
   Write-Host ("links to pages that do not exist yet ({0}):" -f $dangling.Count)
@@ -1051,5 +1235,22 @@ if ($orphans.Count) {
   Write-Host ''
   Write-Host ("pages in no presentation ({0}): {1}" -f $orphans.Count, ($orphans -join ', '))
 }
+$unusedMedia = @($script:media.Keys | Where-Object { -not $imgUsed.Contains($_) } | Sort-Object)
+if ($unusedMedia.Count) {
+  Write-Host ''
+  Write-Host ("media\ files no page references ({0}): {1}" -f $unusedMedia.Count, ($unusedMedia -join ', '))
+  Write-Host '  they are still copied to docs\ - remove the file if it is not wanted'
+}
+
 Write-Host ''
 Write-Host ("done -> {0}" -f $docsDir)
+
+if ($imgErrors.Count) {
+  Write-Host ''
+  Write-Host ("BUILD ERROR - broken image references ({0}):" -f $imgErrors.Count) -ForegroundColor Red
+  $imgErrors | Sort-Object -Unique | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+  Write-Host ''
+  # Every error is listed before failing, so one run shows all of them; the
+  # site is still written so the broken spots can be looked at in a browser.
+  exit 1
+}
