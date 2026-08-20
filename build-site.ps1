@@ -5,23 +5,26 @@
       A PAGE is one topic, authored once, as an @@FIELD: header plus a stack of
       <section> blocks. It lives in collections\<coll>\pages\<id>.html.
 
-      A COLLECTION is a section of the site - safety, lean, and so on. It gets
-      its own folder, its own landing page, its own URL, and its own bundle.
+      A COLLECTION is a section of the site. It gets its own folder, its own
+      index, its own URL, and its own single-file bundle.
 
       A DECK is a manifest in decks\<name>.deck naming pages in order. Decks are
-      SITE-level, not collection-level, because a presentation may pull from
-      anywhere. Every <section> of every listed page becomes one slide; no slide
-      content is authored twice.
+      SITE-level: a presentation may pull from any collection. Every <section>
+      becomes one slide.
 
-      A LINK is [[page-id]] or [[page-id|text]]. Page ids are unique across the
-      whole site, and the same source line resolves differently by container -
-      see Resolve-Links for the five targets.
+      A LINK is [[page-id]] or [[page-id|text]]. Ids are unique site-wide, and
+      one authored link resolves to five destinations - see Resolve-Links.
+
+    WHAT THE GENERATOR ADDS THAT THE SOURCE DOES NOT CARRY
+      Each authored <section> is wrapped in <details class="xcard"> for the web
+      render. That is done HERE, not in the sources, so that:
+        - the deck renderer keeps splitting on <section> and needs no change,
+        - the same source stays printable and slide-able,
+        - disclosure works with JavaScript off, because <details> is native.
 
     OUTPUT
-      docs\    the site. GitHub Pages serves this directly from main/docs with
-               no CI. Relative links throughout, so it also opens from disk.
-      bundle\  self-contained single files, CSS inlined, no siblings. For
-               Canvas, Drive, email, a flash drive.
+      docs\    the site. GitHub Pages serves it from main/docs with no CI.
+      bundle\  self-contained single files, CSS and JS inlined, no siblings.
 
     Usage
       pwsh -File .\build-site.ps1
@@ -32,8 +35,6 @@
 [CmdletBinding()]
 param(
   [switch] $Bundle,
-  # Overrides @@SITEURL from site.conf. A bundle has no siblings, so links out
-  # of it need an absolute base.
   [string] $SiteUrl,
   [switch] $WhatIf
 )
@@ -84,6 +85,24 @@ function Write-Out([string]$path, [string]$text) {
 function ConvertTo-HtmlText([string]$s) {
   $s.Replace('&','&amp;').Replace('<','&lt;').Replace('>','&gt;').Replace('"','&quot;')
 }
+function ConvertTo-Plain([string]$html) {
+  $t = $html -replace '(?s)<[^>]+>', ' '
+  $t = $t -replace '&mdash;','-' -replace '&middot;','-' -replace '&nbsp;',' '
+  $t = $t -replace '&ldquo;|&rdquo;','"' -replace '&rsquo;',"'" -replace '&amp;','&'
+  ($t -replace '\s+', ' ').Trim()
+}
+function ConvertTo-Slug([string]$s) {
+  $t = (ConvertTo-Plain $s).ToLower()
+  $t = $t -replace '[^a-z0-9]+', '-'
+  $t.Trim('-')
+}
+function ConvertTo-Json1([string]$s) {
+  # Enough escaping for embedding a string in a JS literal.
+  $s.Replace('\','\\').Replace('"','\"').Replace("`r",'').Replace("`n",' ')
+}
+function Format-Count([int]$n, [string]$noun) {
+  if ($n -eq 1) { "$n $noun" } else { "$n ${noun}s" }
+}
 
 # ------------------------------------------------------------------- site ----
 $siteConf = Read-Conf (Join-Path $root 'site.conf')
@@ -99,7 +118,7 @@ foreach ($line in ($siteConf.Body -split "`r?`n")) {
 }
 
 # ------------------------------------------------------ collections + pages --
-$pages       = [ordered]@{}   # id -> page
+$pages       = [ordered]@{}
 $collections = [ordered]@{}
 
 foreach ($cid in $collOrder) {
@@ -129,8 +148,6 @@ foreach ($cid in $collOrder) {
     if ($meta.ID -ne [IO.Path]::GetFileNameWithoutExtension($f.Name)) {
       throw "$($f.Name): @@ID '$($meta.ID)' does not match the filename"
     }
-    # Ids address pages from anywhere on the site, so a duplicate is ambiguous,
-    # not merely untidy. Refuse rather than silently let one shadow the other.
     if ($pages.Contains($meta.ID)) {
       throw "duplicate page id '$($meta.ID)' in collection '$cid' - ids must be unique site-wide"
     }
@@ -139,15 +156,34 @@ foreach ($cid in $collOrder) {
     }
 
     $body = $split[1].Trim()
-    $secs = @()
+    $secs = @(); $i = 0
     foreach ($m in [regex]::Matches($body, '(?s)<section\b([^>]*)>(.*?)</section>')) {
+      $i++
       $inner = $m.Groups[2].Value
       if ($inner -match '<section\b') { throw "$($f.Name): nested <section> is not supported" }
       $mode = 'slide'
       if ($m.Groups[1].Value -match 'data-deck\s*=\s*"([^"]+)"') { $mode = $Matches[1] }
-      $secs += [pscustomobject]@{ Mode = $mode; Html = $inner.Trim() }
+
+      # The <h2> becomes the card's summary. It stays in the body too (hidden
+      # by CSS) rather than being cut out, so nothing depends on a strip regex
+      # being right, and the print stylesheet can still show it.
+      $head = if ($inner -match '(?s)<h2[^>]*>(.*?)</h2>') { $Matches[1].Trim() } else { '' }
+      $slug = if ($head) { ConvertTo-Slug $head } else { "section-$i" }
+      if (-not $slug) { $slug = "section-$i" }
+
+      $flag = ''
+      if ($inner -match '<div class="stop"') { $flag = 'is-stop' }
+      elseif ($inner -match '<div class="gate"') { $flag = 'is-gate' }
+
+      $secs += [pscustomobject]@{
+        Mode = $mode; Html = $inner.Trim(); Head = $head; Slug = $slug; Flag = $flag
+      }
     }
     if ($secs.Count -eq 0) { throw "$($f.Name): no <section> blocks found" }
+
+    # Slugs address cards within a page, so a collision breaks a deep link.
+    $dupe = @($secs | Group-Object Slug | Where-Object Count -gt 1 | ForEach-Object Name)
+    if ($dupe.Count) { throw "$($f.Name): duplicate section slug(s): $($dupe -join ', ')" }
 
     $pages[$meta.ID] = [pscustomobject]@{
       Id         = $meta.ID
@@ -164,11 +200,8 @@ foreach ($cid in $collOrder) {
   }
 
   $collections[$cid] = [pscustomobject]@{
-    Id      = $cid
-    Title   = $cc.Meta.TITLE
-    Summary = $cc.Meta.SUMMARY
-    Groups  = $groups
-    PageIds = $ids
+    Id = $cid; Title = $cc.Meta.TITLE; Summary = $cc.Meta.SUMMARY
+    Groups = $groups; PageIds = $ids
   }
   Write-Host ("collection {0,-10} {1} pages" -f $cid, $ids.Count)
 }
@@ -193,26 +226,21 @@ foreach ($f in (Get-ChildItem -LiteralPath $deckDir -Filter '*.deck' | Sort-Obje
     }
   }
   $decks[$dc.Meta.DECK] = [pscustomobject]@{
-    Name     = $dc.Meta.DECK
-    Title    = $dc.Meta.TITLE
+    Name = $dc.Meta.DECK; Title = $dc.Meta.TITLE
     Subtitle = if ($dc.Meta.ContainsKey('SUBTITLE')) { $dc.Meta.SUBTITLE } else { '' }
     Footer   = if ($dc.Meta.ContainsKey('FOOTER'))   { $dc.Meta.FOOTER }   else { $site.FOOTER }
-    Items    = $items
-    PageIds  = @($items | Where-Object Kind -eq 'page' | ForEach-Object Value)
+    Items = $items
+    PageIds = @($items | Where-Object Kind -eq 'page' | ForEach-Object Value)
   }
 }
 Write-Host ("decks: {0}" -f $decks.Count)
 
 # -------------------------------------------------------- link resolution ----
-# The only place a [[link]] becomes an href. Five containers, because the same
-# authored line has to work in all of them:
-#
-#   site-page    docs\<coll>\<id>.html  -> sibling, or ..\<other-coll>\<id>.html
-#   site-deck    docs\deck-<name>.html  -> #p-<id> if in this deck, else <coll>\<id>.html
-#   bundle-coll  one file per collection -> #p-<id> inside it, else absolute URL
-#   bundle-deck  one file per deck       -> #p-<id> inside it, else absolute URL
-#
-# $ctx carries what the container needs: .Deck (id set) and .Coll (collection id).
+# Five containers for one authored link:
+#   site-page    docs\<coll>\<id>.html  -> sibling, or ..\<other>\<id>.html
+#   site-deck    docs\deck-<n>.html     -> #p-<id> in deck, else <coll>\<id>.html
+#   bundle-coll  one file per collection -> #p-<id> inside, else absolute URL
+#   bundle-deck  one file per deck       -> #p-<id> inside, else absolute URL
 function Resolve-Links([string]$html, $ctx, [string]$mode) {
   [regex]::Replace($html, '\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]', {
     param($m)
@@ -252,11 +280,22 @@ $script:allPages = $pages
 $script:siteUrl  = $SiteUrl
 
 # ----------------------------------------------------------------- chrome ----
-$logoLight = '<img class="logo light-only" alt="Murray State University School of Engineering" src="' +
-             (Get-DataUri 'assets\soe-logo-4c.png') + '">'
-$logoDark  = '<img class="logo dark-only" alt="" aria-hidden="true" src="' +
-             (Get-DataUri 'assets\soe-logo-4c-reversed.png') + '">'
-$lockup    = "$logoLight`n$logoDark"
+# Two ways to carry the same mark. On the SITE it is a real file the browser
+# caches once; inlining it as a data URI would add ~46 KB to every page for no
+# gain. In a BUNDLE there are no sibling files, so it has to be inline.
+# Either way both lockups ship and one is hidden by display - the mark is
+# never recoloured.
+$lockupData = '<img class="logo light-only" alt="Murray State University School of Engineering" src="' +
+              (Get-DataUri 'assets\soe-logo-4c.png') + '">' + "`n" +
+              '<img class="logo dark-only" alt="" aria-hidden="true" src="' +
+              (Get-DataUri 'assets\soe-logo-4c-reversed.png') + '">'
+$script:lockupDataBar = $lockupData.Replace('class="logo ', 'class="brandmark ')
+function New-Lockup([string]$up, [string]$cls) {
+  '<img class="' + $cls + ' light-only" alt="Murray State University School of Engineering" src="' +
+  $up + 'assets/soe-logo-4c.png">' + "`n" +
+  '<img class="' + $cls + ' dark-only" alt="" aria-hidden="true" src="' +
+  $up + 'assets/soe-logo-4c-reversed.png">'
+}
 
 $fontLink = @'
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -264,9 +303,98 @@ $fontLink = @'
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 '@
 
-# $up is '' at the site root and '../' one level down, so the same builder
-# serves the landing page and a page inside a collection.
-function New-Document([string]$title, [string]$css, [string]$bodyClass, [string]$content, [string]$script, [string]$up) {
+# Applied before first paint so a stored dark choice does not flash light.
+$themeBoot = @'
+<script>
+(function(){try{var m=JSON.parse(localStorage.getItem('det:theme'));
+if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m);}}catch(e){}})();
+</script>
+'@
+
+$icoMenu  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>'
+$icoTheme = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 010 16" fill="currentColor" stroke="none"/></svg>'
+
+function New-AppBar([string]$up, [string]$flavour) {
+  # $flavour 'bundle' inlines the mark; anything else links the asset file.
+  $mark = if ($flavour -eq 'bundle') {
+            $script:lockupDataBar
+          } else { New-Lockup $up 'brandmark' }
+  $sb = New-Object System.Text.StringBuilder
+  [void]$sb.AppendLine('<header class="appbar">')
+  [void]$sb.AppendLine('  <button class="iconbtn nav-toggle" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Menu">' + $icoMenu + '</button>')
+  [void]$sb.AppendLine('  <a class="brand" href="' + $up + 'index.html">')
+  [void]$sb.AppendLine('    ' + $mark)
+  [void]$sb.AppendLine('    <span class="sub">' + (ConvertTo-HtmlText $site.TITLE) + '</span>')
+  [void]$sb.AppendLine('  </a>')
+  [void]$sb.AppendLine('  <div class="search">')
+  [void]$sb.AppendLine('    <input type="search" placeholder="Search topics" aria-label="Search topics" autocomplete="off" spellcheck="false">')
+  [void]$sb.AppendLine('    <span class="hint">/</span>')
+  [void]$sb.AppendLine('    <div class="results" role="listbox"></div>')
+  [void]$sb.AppendLine('  </div>')
+  [void]$sb.AppendLine('  <button class="iconbtn" type="button" data-act="theme" aria-label="Theme">' + $icoTheme + '</button>')
+  [void]$sb.AppendLine('</header>')
+  $sb.ToString()
+}
+
+# The side navigation. Nested <details> so it works with JavaScript off; JS
+# only remembers which groups were left open.
+# $mode 'site' -> real page links. 'bundle' -> in-file anchors for $onlyColl,
+# absolute site links for everything else.
+function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$mode, [string]$onlyColl) {
+  $sb = New-Object System.Text.StringBuilder
+  [void]$sb.AppendLine('<aside class="sidebar" id="sidebar">')
+  [void]$sb.AppendLine('  <h2>Topics</h2>')
+  foreach ($c in $collections.Values) {
+    $isCur = ($c.Id -eq $curColl)
+    $open  = if ($isCur -or $collections.Count -le 2) { ' open' } else { '' }
+    [void]$sb.AppendLine('  <details class="navgroup" data-nav="c-' + $c.Id + '"' + $open + '>')
+    [void]$sb.AppendLine('    <summary><span class="chev"></span>' + (ConvertTo-HtmlText $c.Title) + '</summary>')
+
+    $groupNames = if ($c.Groups.Count) { $c.Groups }
+                  else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
+    foreach ($g in $groupNames) {
+      $inGroup = @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
+      if (-not $inGroup.Count) { continue }
+      $gslug = ConvertTo-Slug "$($c.Id)-$g"
+      [void]$sb.AppendLine('    <details class="navgroup" data-nav="g-' + $gslug + '" open>')
+      [void]$sb.AppendLine('      <summary><span class="chev"></span>' + (ConvertTo-HtmlText $g) + '</summary>')
+      [void]$sb.AppendLine('      <ul class="navlist">')
+      foreach ($p in $inGroup) {
+        if ($mode -eq 'bundle') {
+          $href = if ($c.Id -eq $onlyColl) { '#p-' + $p.Id } else { "$script:siteUrl/$($c.Id)/$($p.Id).html" }
+        } else {
+          $href = "$up$($c.Id)/$($p.Id).html"
+        }
+        $cur = if ($p.Id -eq $curPage) { ' aria-current="page"' } else { '' }
+        $pend = if ($p.Status -ne 'ready') { '<span class="pending">pending</span>' } else { '' }
+        [void]$sb.AppendLine('        <li><a' + $cur + ' href="' + $href + '">' +
+                             (ConvertTo-HtmlText $p.Title) + $pend + '</a></li>')
+      }
+      [void]$sb.AppendLine('      </ul>')
+      [void]$sb.AppendLine('    </details>')
+    }
+    [void]$sb.AppendLine('  </details>')
+  }
+
+  [void]$sb.AppendLine('  <details class="navgroup" data-nav="presentations" open>')
+  [void]$sb.AppendLine('    <summary><span class="chev"></span>Presentations</summary>')
+  [void]$sb.AppendLine('    <ul class="navlist">')
+  foreach ($d in $decks.Values) {
+    $href = if ($mode -eq 'bundle') { "$script:siteUrl/deck-$($d.Name).html" } else { "${up}deck-$($d.Name).html" }
+    [void]$sb.AppendLine('      <li><a href="' + $href + '">' + (ConvertTo-HtmlText $d.Title) + '</a></li>')
+  }
+  [void]$sb.AppendLine('    </ul>')
+  [void]$sb.AppendLine('  </details>')
+  [void]$sb.AppendLine('</aside>')
+  [void]$sb.AppendLine('<div class="backdrop"></div>')
+  $sb.ToString()
+}
+
+function New-Document {
+  param(
+    [string]$title, [string]$bodyClass, [string]$content,
+    [string]$up, [string]$pageKey, [string]$extraHead, [string]$scripts
+  )
   $sb = New-Object System.Text.StringBuilder
   [void]$sb.AppendLine('<!DOCTYPE html>')
   [void]$sb.AppendLine('<html lang="en">')
@@ -275,165 +403,183 @@ function New-Document([string]$title, [string]$css, [string]$bodyClass, [string]
   [void]$sb.AppendLine('<meta name="viewport" content="width=device-width, initial-scale=1">')
   [void]$sb.AppendLine('<title>' + (ConvertTo-HtmlText $title) + '</title>')
   [void]$sb.AppendLine($fontLink.Trim())
-  [void]$sb.AppendLine('<link rel="stylesheet" href="' + $up + 'theme/msu-theme.css">')
-  [void]$sb.AppendLine('<link rel="stylesheet" href="' + $up + 'theme/' + $css + '">')
+  [void]$sb.AppendLine($themeBoot.Trim())
+  if ($extraHead) { [void]$sb.AppendLine($extraHead.TrimEnd()) }
   [void]$sb.AppendLine('</head>')
-  [void]$sb.AppendLine('<body class="' + $bodyClass + '">')
+  [void]$sb.AppendLine('<body class="' + $bodyClass + '" data-page="' + $pageKey + '" data-base="' + $up + '">')
   [void]$sb.AppendLine($content.TrimEnd())
-  if ($script) { [void]$sb.AppendLine($script.TrimEnd()) }
+  if ($scripts) { [void]$sb.AppendLine($scripts.TrimEnd()) }
   [void]$sb.AppendLine('</body>')
   [void]$sb.AppendLine('</html>')
   $sb.ToString()
 }
 
-function New-Topbar([string]$up, [string]$currentColl) {
+$siteHead = { param($up) @"
+<link rel="stylesheet" href="${up}theme/msu-theme.css">
+<link rel="stylesheet" href="${up}theme/app.css">
+"@ }
+$siteScripts = { param($up) @"
+<script src="${up}search-index.js"></script>
+<script src="${up}theme/app.js"></script>
+"@ }
+
+# ---------------------------------------------------- section -> card --------
+function New-Cards($p, $ctx, [string]$mode) {
   $sb = New-Object System.Text.StringBuilder
-  [void]$sb.AppendLine('<div class="topbar"><div class="topbar-inner">')
-  [void]$sb.AppendLine('  <a class="home" href="' + $up + 'index.html">' + (ConvertTo-HtmlText $site.TITLE) + '</a>')
-  [void]$sb.AppendLine('  <nav>')
-  foreach ($c in $collections.Values) {
-    $cur = if ($c.Id -eq $currentColl) { ' aria-current="page"' } else { '' }
-    [void]$sb.AppendLine('    <a' + $cur + ' href="' + $up + $c.Id + '/index.html">' + (ConvertTo-HtmlText $c.Title) + '</a>')
+  [void]$sb.AppendLine('<div class="cardtools">')
+  [void]$sb.AppendLine('  <button type="button" data-act="expand">Expand all</button>')
+  [void]$sb.AppendLine('  <button type="button" data-act="collapse">Collapse all</button>')
+  [void]$sb.AppendLine('</div>')
+  [void]$sb.AppendLine('<div class="cards">')
+  foreach ($s in $p.Sections) {
+    $cls = 'xcard'
+    if ($s.Flag) { $cls += ' ' + $s.Flag }
+    $head = if ($s.Head) { $s.Head } else { ConvertTo-HtmlText $p.Title }
+    [void]$sb.AppendLine('  <details class="' + $cls + '" id="' + $s.Slug + '" data-card="' + $s.Slug + '" open>')
+    [void]$sb.AppendLine('    <summary>' + $head + '<span class="chev"></span></summary>')
+    [void]$sb.AppendLine('    <div class="body">')
+    [void]$sb.AppendLine('      ' + (Resolve-Links $s.Html $ctx $mode))
+    [void]$sb.AppendLine('    </div>')
+    [void]$sb.AppendLine('  </details>')
   }
-  [void]$sb.AppendLine('    <a href="' + $up + 'presentations.html">Presentations</a>')
-  [void]$sb.AppendLine('  </nav>')
-  [void]$sb.AppendLine('</div></div>')
+  [void]$sb.AppendLine('</div>')
   $sb.ToString()
 }
 
-function New-Colophon { '<div class="colophon">' + (ConvertTo-HtmlText $site.FOOTER) + '</div>' }
-
-function Format-Count([int]$n, [string]$noun) {
-  if ($n -eq 1) { "$n $noun" } else { "$n ${noun}s" }
+function New-Toc($p) {
+  $sb = New-Object System.Text.StringBuilder
+  [void]$sb.AppendLine('<aside class="toc">')
+  [void]$sb.AppendLine('  <div class="k">On this page</div>')
+  [void]$sb.AppendLine('  <ul>')
+  foreach ($s in $p.Sections) {
+    $lbl = if ($s.Head) { ConvertTo-HtmlText (ConvertTo-Plain $s.Head) } else { ConvertTo-HtmlText $p.Title }
+    [void]$sb.AppendLine('    <li><a href="#' + $s.Slug + '">' + $lbl + '</a></li>')
+  }
+  [void]$sb.AppendLine('  </ul>')
+  [void]$sb.AppendLine('</aside>')
+  $sb.ToString()
 }
 
-function New-PageCards($pageList, [string]$up, [string]$fromColl) {
+function New-Tiles($pageList, [string]$up, [string]$fromColl, [string]$mode) {
   $sb = New-Object System.Text.StringBuilder
-  [void]$sb.AppendLine('    <div class="hub-grid">')
+  [void]$sb.AppendLine('<div class="grid">')
   foreach ($p in $pageList) {
-    $cls  = if ($p.Status -eq 'ready') { 'card' } else { 'card pending' }
-    $href = if ($p.Collection -eq $fromColl) { "$($p.Id).html" } else { "$up$($p.Collection)/$($p.Id).html" }
-    [void]$sb.AppendLine('      <a class="' + $cls + '" href="' + $href + '">')
-    [void]$sb.AppendLine('        <span class="t">' + (ConvertTo-HtmlText $p.Title) + '</span>')
-    [void]$sb.AppendLine('        <span class="s">' + (ConvertTo-HtmlText $p.Summary) + '</span>')
-    [void]$sb.AppendLine('      </a>')
+    $cls  = if ($p.Status -eq 'ready') { 'tile' } else { 'tile pending' }
+    if ($mode -eq 'bundle') { $href = '#p-' + $p.Id }
+    elseif ($p.Collection -eq $fromColl) { $href = "$($p.Id).html" }
+    else { $href = "$up$($p.Collection)/$($p.Id).html" }
+    [void]$sb.AppendLine('  <a class="' + $cls + '" href="' + $href + '">')
+    [void]$sb.AppendLine('    <span class="t">' + (ConvertTo-HtmlText $p.Title) + '</span>')
+    [void]$sb.AppendLine('    <span class="s">' + (ConvertTo-HtmlText $p.Summary) + '</span>')
+    [void]$sb.AppendLine('  </a>')
   }
-  [void]$sb.AppendLine('    </div>')
+  [void]$sb.AppendLine('</div>')
   $sb.ToString()
+}
+
+# ------------------------------------------------------------ search index ---
+# Emitted as a script that assigns a global, not JSON fetched at runtime: a
+# browser blocks fetch() of a local file when the site is opened over file://,
+# and a classic <script> is not subject to that.
+function New-SearchIndex([string]$mode) {
+  $rows = @()
+  foreach ($p in $pages.Values) {
+    $heads = ($p.Sections | ForEach-Object { ConvertTo-Plain $_.Head }) -join ' | '
+    $text  = ConvertTo-Plain $p.Body
+    if ($text.Length -gt 1400) { $text = $text.Substring(0, 1400) }
+    $url = if ($mode -eq 'bundle') { '#p-' + $p.Id } else { "$($p.Collection)/$($p.Id).html" }
+    $rows += '{"title":"' + (ConvertTo-Json1 $p.Title) + '","summary":"' + (ConvertTo-Json1 $p.Summary) +
+             '","collection":"' + (ConvertTo-Json1 $collections[$p.Collection].Title) +
+             '","url":"' + (ConvertTo-Json1 $url) + '","headings":"' + (ConvertTo-Json1 $heads) +
+             '","text":"' + (ConvertTo-Json1 $text) + '"}'
+  }
+  "window.SEARCH_INDEX = [`n" + ($rows -join ",`n") + "`n];`n"
 }
 
 # ------------------------------------------------------------ landing page ---
-Write-Host 'landing'
+Write-Host 'site'
 $hub = New-Object System.Text.StringBuilder
-[void]$hub.AppendLine((New-Topbar '' ''))
-[void]$hub.AppendLine('<div class="sheet wide">')
-[void]$hub.AppendLine('  <header class="masthead">')
-[void]$hub.AppendLine('    <div class="stamp">' + $lockup + '</div>')
-[void]$hub.AppendLine('    <div class="eyebrow">' + (ConvertTo-HtmlText $site.TAGLINE) + '</div>')
-[void]$hub.AppendLine('    <h1>' + (ConvertTo-HtmlText $site.TITLE) + '</h1>')
-[void]$hub.AppendLine('    <p class="lede">' + (ConvertTo-HtmlText $site.SUMMARY) + '</p>')
-[void]$hub.AppendLine('  </header>')
-
-[void]$hub.AppendLine('  <section>')
-[void]$hub.AppendLine('    <h2>Sections</h2>')
-[void]$hub.AppendLine('    <div class="hub-grid">')
+[void]$hub.AppendLine('<a class="skip" href="#main">Skip to content</a>')
+[void]$hub.AppendLine((New-AppBar ''))
+[void]$hub.AppendLine('<div class="shell">')
+[void]$hub.AppendLine((New-Sidebar '' '' '' 'site' ''))
+[void]$hub.AppendLine('<main id="main"><div class="article wide">')
+[void]$hub.AppendLine('  <div class="stamp">' + (New-Lockup '' 'logo') + '</div>')
+[void]$hub.AppendLine('  <h1>' + (ConvertTo-HtmlText $site.TITLE) + '</h1>')
+[void]$hub.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $site.SUMMARY) + '</p>')
+[void]$hub.AppendLine('  <h2 class="section-head">Sections</h2>')
+[void]$hub.AppendLine('  <div class="grid">')
 foreach ($c in $collections.Values) {
   $ready = @($c.PageIds | Where-Object { $pages[$_].Status -eq 'ready' }).Count
-  [void]$hub.AppendLine('      <a class="card big" href="' + $c.Id + '/index.html">')
-  [void]$hub.AppendLine('        <span class="t">' + (ConvertTo-HtmlText $c.Title) + '</span>')
-  [void]$hub.AppendLine('        <span class="s">' + (ConvertTo-HtmlText $c.Summary) + '</span>')
-  [void]$hub.AppendLine('        <span class="n">' + (Format-Count $ready 'page') + '</span>')
-  [void]$hub.AppendLine('      </a>')
+  [void]$hub.AppendLine('    <a class="tile big" href="' + $c.Id + '/index.html">')
+  [void]$hub.AppendLine('      <span class="t">' + (ConvertTo-HtmlText $c.Title) + '</span>')
+  [void]$hub.AppendLine('      <span class="s">' + (ConvertTo-HtmlText $c.Summary) + '</span>')
+  [void]$hub.AppendLine('      <span class="n">' + (Format-Count $ready 'page') + '</span>')
+  [void]$hub.AppendLine('    </a>')
 }
-[void]$hub.AppendLine('    </div>')
-[void]$hub.AppendLine('  </section>')
-
-[void]$hub.AppendLine('  <section>')
-[void]$hub.AppendLine('    <h2>Presentations</h2>')
-[void]$hub.AppendLine('    <p class="aside">Each one is a curated selection of the pages above. A link to a page a presentation does not include still works &mdash; it opens that page in a new tab.</p>')
-[void]$hub.AppendLine('    <div class="decklist">')
+[void]$hub.AppendLine('  </div>')
+[void]$hub.AppendLine('  <h2 class="section-head">Presentations</h2>')
+[void]$hub.AppendLine('  <p class="aside">Each is a curated selection of the pages above. A link to a page a presentation does not include still works &mdash; it opens that page in a new tab.</p>')
+[void]$hub.AppendLine('  <div class="grid">')
 foreach ($d in $decks.Values) {
-  [void]$hub.AppendLine('      <a class="deckrow" href="deck-' + $d.Name + '.html">')
-  [void]$hub.AppendLine('        <span class="t">' + (ConvertTo-HtmlText $d.Title) + '</span>')
-  [void]$hub.AppendLine('        <span class="n">' + (Format-Count $d.PageIds.Count 'page') + '</span>')
-  [void]$hub.AppendLine('      </a>')
+  [void]$hub.AppendLine('    <a class="tile" href="deck-' + $d.Name + '.html">')
+  [void]$hub.AppendLine('      <span class="t">' + (ConvertTo-HtmlText $d.Title) + '</span>')
+  [void]$hub.AppendLine('      <span class="s">' + (ConvertTo-HtmlText $d.Subtitle) + '</span>')
+  [void]$hub.AppendLine('      <span class="n">' + (Format-Count $d.PageIds.Count 'page') + '</span>')
+  [void]$hub.AppendLine('    </a>')
 }
-[void]$hub.AppendLine('    </div>')
-[void]$hub.AppendLine('  </section>')
-[void]$hub.AppendLine((New-Colophon))
+[void]$hub.AppendLine('  </div>')
+[void]$hub.AppendLine('</div></main>')
 [void]$hub.AppendLine('</div>')
 Write-Out (Join-Path $docsDir 'index.html') `
-          (New-Document $site.TITLE 'wiki.css' 'skin-document' $hub.ToString() '' '')
+          (New-Document $site.TITLE 'app skin-app' $hub.ToString() '' 'home' (& $siteHead '') (& $siteScripts ''))
 
-# GitHub Pages runs Jekyll unless told not to; nothing here needs it, and
-# Jekyll silently drops files and folders whose names begin with an underscore.
 Write-Out (Join-Path $docsDir '.nojekyll') ''
-
-# ---------------------------------------------------- presentations index ----
-$pi = New-Object System.Text.StringBuilder
-[void]$pi.AppendLine((New-Topbar '' ''))
-[void]$pi.AppendLine('<div class="sheet wide">')
-[void]$pi.AppendLine('  <header class="masthead">')
-[void]$pi.AppendLine('    <div class="eyebrow">' + (ConvertTo-HtmlText $site.TITLE) + '</div>')
-[void]$pi.AppendLine('    <h1>Presentations</h1>')
-[void]$pi.AppendLine('    <p class="lede">Curated from the section pages. Arrow keys advance a slide; press O for an overview of the whole deck.</p>')
-[void]$pi.AppendLine('  </header>')
-foreach ($d in $decks.Values) {
-  [void]$pi.AppendLine('  <section>')
-  [void]$pi.AppendLine('    <h2><a href="deck-' + $d.Name + '.html">' + (ConvertTo-HtmlText $d.Title) + '</a></h2>')
-  if ($d.Subtitle) { [void]$pi.AppendLine('    <p class="lede">' + (ConvertTo-HtmlText $d.Subtitle) + '</p>') }
-  [void]$pi.AppendLine((New-PageCards @($d.PageIds | ForEach-Object { $pages[$_] }) '' ''))
-  [void]$pi.AppendLine('  </section>')
-}
-[void]$pi.AppendLine((New-Colophon))
-[void]$pi.AppendLine('</div>')
-Write-Out (Join-Path $docsDir 'presentations.html') `
-          (New-Document 'Presentations' 'wiki.css' 'skin-document' $pi.ToString() '' '')
+Write-Out (Join-Path $docsDir 'search-index.js') (New-SearchIndex 'site')
 
 # ---------------------------------------------- collection index + pages -----
 foreach ($c in $collections.Values) {
-  Write-Host ("collection: {0}" -f $c.Id)
   $cd = Join-Path $docsDir $c.Id
 
   $ci = New-Object System.Text.StringBuilder
-  [void]$ci.AppendLine((New-Topbar '../' $c.Id))
-  [void]$ci.AppendLine('<div class="sheet wide">')
-  [void]$ci.AppendLine('  <header class="masthead">')
-  [void]$ci.AppendLine('    <div class="stamp">' + $lockup + '</div>')
-  [void]$ci.AppendLine('    <div class="eyebrow">' + (ConvertTo-HtmlText $site.TAGLINE) + '</div>')
-  [void]$ci.AppendLine('    <h1>' + (ConvertTo-HtmlText $c.Title) + '</h1>')
-  [void]$ci.AppendLine('    <p class="lede">' + (ConvertTo-HtmlText $c.Summary) + '</p>')
-  [void]$ci.AppendLine('  </header>')
-
+  [void]$ci.AppendLine('<a class="skip" href="#main">Skip to content</a>')
+  [void]$ci.AppendLine((New-AppBar '../'))
+  [void]$ci.AppendLine('<div class="shell">')
+  [void]$ci.AppendLine((New-Sidebar '../' '' $c.Id 'site' ''))
+  [void]$ci.AppendLine('<main id="main"><div class="article wide">')
+  [void]$ci.AppendLine('  <div class="crumb"><a href="../index.html">' + (ConvertTo-HtmlText $site.TITLE) +
+                       '</a><span class="sep">/</span><span>' + (ConvertTo-HtmlText $c.Title) + '</span></div>')
+  [void]$ci.AppendLine('  <h1>' + (ConvertTo-HtmlText $c.Title) + '</h1>')
+  [void]$ci.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $c.Summary) + '</p>')
   $groupNames = if ($c.Groups.Count) { $c.Groups }
                 else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
   foreach ($g in $groupNames) {
     $inGroup = @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
     if (-not $inGroup.Count) { continue }
-    [void]$ci.AppendLine('  <section>')
-    [void]$ci.AppendLine('    <h2>' + (ConvertTo-HtmlText $g) + '</h2>')
-    [void]$ci.AppendLine((New-PageCards $inGroup '../' $c.Id))
-    [void]$ci.AppendLine('  </section>')
+    [void]$ci.AppendLine('  <h2 class="section-head">' + (ConvertTo-HtmlText $g) + '</h2>')
+    [void]$ci.AppendLine((New-Tiles $inGroup '../' $c.Id 'site'))
   }
-  [void]$ci.AppendLine((New-Colophon))
+  [void]$ci.AppendLine('</div></main>')
   [void]$ci.AppendLine('</div>')
   Write-Out (Join-Path $cd 'index.html') `
-            (New-Document ("$($c.Title) - $($site.TITLE)") 'wiki.css' 'skin-document' $ci.ToString() '' '../')
+            (New-Document ("$($c.Title) - $($site.TITLE)") 'app skin-app' $ci.ToString() '../' ("coll-" + $c.Id) (& $siteHead '../') (& $siteScripts '../'))
 
   foreach ($pageId in $c.PageIds) {
-    $p  = $pages[$pageId]
-    $sb = New-Object System.Text.StringBuilder
-    [void]$sb.AppendLine((New-Topbar '../' $c.Id))
-    [void]$sb.AppendLine('<div class="sheet">')
-    [void]$sb.AppendLine('  <header class="masthead">')
-    [void]$sb.AppendLine('    <div class="stamp">' + $lockup + '</div>')
-    [void]$sb.AppendLine('    <div class="eyebrow"><a href="index.html">' + (ConvertTo-HtmlText $c.Title) +
-                         '</a> &middot; ' + (ConvertTo-HtmlText $p.Section) +
-                         $(if ($p.Status -ne 'ready') { ' &middot; ' + (ConvertTo-HtmlText $p.Status) } else { '' }) + '</div>')
-    [void]$sb.AppendLine('    <h1>' + (ConvertTo-HtmlText $p.Title) + '</h1>')
-    [void]$sb.AppendLine('    <p class="lede">' + (ConvertTo-HtmlText $p.Summary) + '</p>')
-    [void]$sb.AppendLine('  </header>')
-    [void]$sb.AppendLine((Resolve-Links $p.Body ([pscustomobject]@{ Coll = $c.Id }) 'site-page'))
+    $p   = $pages[$pageId]
+    $ctx = [pscustomobject]@{ Coll = $c.Id }
+    $sb  = New-Object System.Text.StringBuilder
+    [void]$sb.AppendLine('<a class="skip" href="#main">Skip to content</a>')
+    [void]$sb.AppendLine((New-AppBar '../'))
+    [void]$sb.AppendLine('<div class="shell has-toc">')
+    [void]$sb.AppendLine((New-Sidebar '../' $p.Id $c.Id 'site' ''))
+    [void]$sb.AppendLine('<main id="main"><div class="article">')
+    [void]$sb.AppendLine('  <div class="crumb"><a href="../index.html">' + (ConvertTo-HtmlText $site.TITLE) +
+                         '</a><span class="sep">/</span><a href="index.html">' + (ConvertTo-HtmlText $c.Title) +
+                         '</a><span class="sep">/</span><span>' + (ConvertTo-HtmlText $p.Section) + '</span></div>')
+    [void]$sb.AppendLine('  <h1>' + (ConvertTo-HtmlText $p.Title) +
+                         $(if ($p.Status -ne 'ready') { ' <span class="pill">' + (ConvertTo-HtmlText $p.Status) + '</span>' } else { '' }) + '</h1>')
+    [void]$sb.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $p.Summary) + '</p>')
+    [void]$sb.AppendLine((New-Cards $p $ctx 'site-page'))
 
     [void]$sb.AppendLine('  <div class="usedin">')
     if ($p.Decks.Count -gt 0) {
@@ -448,16 +594,16 @@ foreach ($c in $collections.Values) {
       [void]$sb.AppendLine('    <div class="k">Not in any presentation yet</div>')
     }
     [void]$sb.AppendLine('  </div>')
-    [void]$sb.AppendLine((New-Colophon))
+    [void]$sb.AppendLine('</div></main>')
+    [void]$sb.AppendLine((New-Toc $p))
     [void]$sb.AppendLine('</div>')
     Write-Out (Join-Path $cd "$($p.Id).html") `
-              (New-Document ("$($p.Title) - $($site.TITLE)") 'wiki.css' 'skin-document' $sb.ToString() '' '../')
+              (New-Document ("$($p.Title) - $($site.TITLE)") 'app skin-app' $sb.ToString() '../' $p.Id (& $siteHead '../') (& $siteScripts '../'))
   }
 }
 
 # ------------------------------------------------------------------ decks ----
-$deckScript = @'
-<script>
+$deckJs = @'
 (function () {
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
   var bar    = document.querySelector('.progress > i');
@@ -476,9 +622,7 @@ $deckScript = @'
     i = Math.max(0, Math.min(slides.length - 1, i));
     slides[i].scrollIntoView({ block: 'start' });
   }
-  function paint() {
-    if (bar) bar.style.width = ((current() + 1) / slides.length * 100) + '%';
-  }
+  function paint() { if (bar) bar.style.width = ((current() + 1) / slides.length * 100) + '%'; }
   addEventListener('scroll', paint, { passive: true });
   paint();
 
@@ -509,17 +653,12 @@ $deckScript = @'
   if (pb) pb.addEventListener('click', function () { print(); });
 
   Array.prototype.forEach.call(document.querySelectorAll('.ov-item'), function (b) {
-    b.addEventListener('click', function () {
-      toggle(false);
-      go(parseInt(b.getAttribute('data-i'), 10));
-    });
+    b.addEventListener('click', function () { toggle(false); go(parseInt(b.getAttribute('data-i'), 10)); });
   });
 })();
-</script>
 '@
+$deckScript = "<script>`n" + $deckJs.Trim() + "`n</script>"
 
-# One deck body, built once per link mode. Everything but link resolution and
-# the home button is identical, so the slide markup is never duplicated.
 function New-DeckBody($d, [string]$mode) {
   $set = [System.Collections.Generic.HashSet[string]]::new()
   foreach ($id in $d.PageIds) { [void]$set.Add($id) }
@@ -533,7 +672,7 @@ function New-DeckBody($d, [string]$mode) {
   [void]$slides.AppendLine('<section class="slide title" id="s1">')
   [void]$slides.AppendLine('  <div class="slide-top"><span class="src">' + (ConvertTo-HtmlText $d.Footer) + '</span></div>')
   [void]$slides.AppendLine('  <div class="slide-body">')
-  [void]$slides.AppendLine('    <div class="stamp">' + $lockup + '</div>')
+  [void]$slides.AppendLine('    <div class="stamp">' + $lockupData + '</div>')
   [void]$slides.AppendLine('    <h1>' + (ConvertTo-HtmlText $d.Title) + '</h1>')
   if ($d.Subtitle) { [void]$slides.AppendLine('    <p class="lede">' + (ConvertTo-HtmlText $d.Subtitle) + '</p>') }
   [void]$slides.AppendLine('  </div>')
@@ -563,7 +702,6 @@ function New-DeckBody($d, [string]$mode) {
     foreach ($s in $p.Sections) {
       if ($s.Mode -eq 'wiki-only') { continue }
       $html = Resolve-Links $s.Html $ctx $mode
-
       if ($s.Mode -eq 'with-previous') { [void]$slides.AppendLine('    ' + $html); continue }
 
       if (-not $first) {
@@ -581,7 +719,7 @@ function New-DeckBody($d, [string]$mode) {
       [void]$slides.AppendLine('  <div class="slide-body">')
       [void]$slides.AppendLine('    ' + $html)
 
-      $lbl = if ($s.Html -match '(?s)<h2[^>]*>(.*?)</h2>') { ($Matches[1] -replace '<[^>]+>','').Trim() } else { $p.Title }
+      $lbl = if ($s.Head) { ConvertTo-Plain $s.Head } else { $p.Title }
       [void]$ovItems.AppendLine('<button class="ov-item" data-i="' + ($n-1) + '"><span class="n">' + $n +
                                 '</span><span class="t">' + (ConvertTo-HtmlText $lbl) +
                                 '</span><span class="p">' + (ConvertTo-HtmlText $p.Title) + '</span></button>')
@@ -616,40 +754,52 @@ function New-DeckBody($d, [string]$mode) {
 }
 
 Write-Host 'decks'
+$deckHead = @'
+<link rel="stylesheet" href="theme/msu-theme.css">
+<link rel="stylesheet" href="theme/deck.css">
+'@
 foreach ($d in $decks.Values) {
   $r = New-DeckBody $d 'site-deck'
   Write-Out (Join-Path $docsDir ('deck-' + $d.Name + '.html')) `
-            (New-Document ("$($d.Title) - $($site.TITLE)") 'deck.css' 'deck skin-document' $r.Html $deckScript '')
+            (New-Document ("$($d.Title) - $($site.TITLE)") 'deck skin-document' $r.Html '' ('deck-' + $d.Name) $deckHead $deckScript)
   Write-Host ("    {0,-24} {1} slides" -f $d.Name, $r.Slides)
 }
 
-# ------------------------------------------------------------------ theme ----
+# ---------------------------------------------------------- theme + assets ---
 Write-Host 'theme'
-foreach ($css in (Get-ChildItem -LiteralPath $themeDir -Filter '*.css')) {
-  Write-Out (Join-Path $docsDir ('theme\' + $css.Name)) ([System.IO.File]::ReadAllText($css.FullName))
+foreach ($f in (Get-ChildItem -LiteralPath $themeDir -File)) {
+  Write-Out (Join-Path $docsDir ('theme\' + $f.Name)) ([System.IO.File]::ReadAllText($f.FullName))
+}
+# The site links the logo rather than inlining it, so it has to be copied.
+$outAssets = Join-Path $docsDir 'assets'
+if (-not (Test-Path -LiteralPath $outAssets)) { New-Item -ItemType Directory -Path $outAssets -Force | Out-Null }
+foreach ($f in (Get-ChildItem -LiteralPath (Join-Path $root 'assets') -File)) {
+  $dest = Join-Path $outAssets $f.Name
+  $same = (Test-Path -LiteralPath $dest) -and
+          ((Get-Item -LiteralPath $dest).Length -eq $f.Length)
+  if ($WhatIf) { Write-Host ("  {0,-46} {1}" -f ('docs\assets\' + $f.Name), $(if ($same) { 'unchanged' } else { 'would COPY' })) }
+  elseif (-not $same) { Copy-Item -LiteralPath $f.FullName -Destination $dest -Force
+                        Write-Host ("  {0,-46} {1:n0} bytes" -f ('docs\assets\' + $f.Name), $f.Length) }
 }
 
 # ----------------------------------------------------------------- bundle ----
-# Self-contained single files - CSS inlined, logo already a data URI, no
-# siblings. Canvas rewrites uploaded-file URLs, so a relative href between two
-# uploaded files does not survive; one file has none to break. The collection
-# bundle needs no JavaScript at all, and a deck bundle keeps scroll-snap paging
-# if a sanitiser strips its script.
 if ($Bundle) {
   Write-Host 'bundle'
   $bundleDir = Join-Path $root 'bundle'
   $themeCss  = [System.IO.File]::ReadAllText((Join-Path $themeDir 'msu-theme.css'))
-  $wikiCss   = [System.IO.File]::ReadAllText((Join-Path $themeDir 'wiki.css'))
+  $appCss    = [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.css'))
   $deckCss   = [System.IO.File]::ReadAllText((Join-Path $themeDir 'deck.css'))
+  $appJs     = [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.js'))
+  $bundleIdx = New-SearchIndex 'bundle'
   $bundleExtra = @'
 
-/* ---- single-file bundle only ------------------------------------------- */
-.sheet.bundled { border-top: 3px solid var(--accent); padding-top: 2.5rem; }
-.sheet.bundled h1 { font-size: clamp(1.9rem, 5.5vw, 2.5rem); }
-@media print { .sheet.bundled { break-before: page; } }
+/* ---- single-file bundle only: every page stacked in one document -------- */
+.article.bundled { border-top: 3px solid var(--accent); padding-top: 2rem; margin-top: 3rem; }
+.article.bundled:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+@media print { .article.bundled { break-before: page; } }
 '@
 
-  function New-BundleDocument([string]$title, [string]$css, [string]$bodyClass, [string]$content, [string]$script) {
+  function New-BundleDocument([string]$title, [string]$css, [string]$bodyClass, [string]$content, [string]$pageKey, [string]$js) {
     $sb = New-Object System.Text.StringBuilder
     [void]$sb.AppendLine('<!DOCTYPE html>')
     [void]$sb.AppendLine('<html lang="en">')
@@ -658,13 +808,14 @@ if ($Bundle) {
     [void]$sb.AppendLine('<meta name="viewport" content="width=device-width, initial-scale=1">')
     [void]$sb.AppendLine('<title>' + (ConvertTo-HtmlText $title) + '</title>')
     [void]$sb.AppendLine($fontLink.Trim())
+    [void]$sb.AppendLine($themeBoot.Trim())
     [void]$sb.AppendLine('<style>')
     [void]$sb.AppendLine($css.TrimEnd())
     [void]$sb.AppendLine('</style>')
     [void]$sb.AppendLine('</head>')
-    [void]$sb.AppendLine('<body class="' + $bodyClass + '">')
+    [void]$sb.AppendLine('<body class="' + $bodyClass + '" data-page="' + $pageKey + '" data-base="">')
     [void]$sb.AppendLine($content.TrimEnd())
-    if ($script) { [void]$sb.AppendLine($script.TrimEnd()) }
+    if ($js) { [void]$sb.AppendLine('<script>'); [void]$sb.AppendLine($js.TrimEnd()); [void]$sb.AppendLine('</script>') }
     [void]$sb.AppendLine('</body>')
     [void]$sb.AppendLine('</html>')
     $sb.ToString()
@@ -673,57 +824,48 @@ if ($Bundle) {
   foreach ($c in $collections.Values) {
     $ctx = [pscustomobject]@{ Coll = $c.Id }
     $bw  = New-Object System.Text.StringBuilder
-    [void]$bw.AppendLine('<a id="top"></a>')
-    [void]$bw.AppendLine('<div class="sheet wide">')
-    [void]$bw.AppendLine('  <header class="masthead">')
-    [void]$bw.AppendLine('    <div class="stamp">' + $lockup + '</div>')
-    [void]$bw.AppendLine('    <div class="eyebrow">' + (ConvertTo-HtmlText $site.TAGLINE) + '</div>')
-    [void]$bw.AppendLine('    <h1>' + (ConvertTo-HtmlText $c.Title) + '</h1>')
-    [void]$bw.AppendLine('    <p class="lede">' + (ConvertTo-HtmlText $c.Summary) + '</p>')
-    [void]$bw.AppendLine('  </header>')
+    [void]$bw.AppendLine('<a class="skip" href="#main">Skip to content</a>')
+    [void]$bw.AppendLine((New-AppBar '' 'bundle'))
+    [void]$bw.AppendLine('<div class="shell">')
+    [void]$bw.AppendLine((New-Sidebar '' '' $c.Id 'bundle' $c.Id))
+    [void]$bw.AppendLine('<main id="main">')
+    [void]$bw.AppendLine('<div class="article wide" id="top">')
+    [void]$bw.AppendLine('  <div class="stamp">' + $lockupData + '</div>')
+    [void]$bw.AppendLine('  <h1>' + (ConvertTo-HtmlText $c.Title) + '</h1>')
+    [void]$bw.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $c.Summary) + '</p>')
     $groupNames = if ($c.Groups.Count) { $c.Groups }
                   else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
     foreach ($g in $groupNames) {
       $inGroup = @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
       if (-not $inGroup.Count) { continue }
-      [void]$bw.AppendLine('  <section>')
-      [void]$bw.AppendLine('    <h2>' + (ConvertTo-HtmlText $g) + '</h2>')
-      [void]$bw.AppendLine('    <div class="hub-grid">')
-      foreach ($p in $inGroup) {
-        $cls = if ($p.Status -eq 'ready') { 'card' } else { 'card pending' }
-        [void]$bw.AppendLine('      <a class="' + $cls + '" href="#p-' + $p.Id + '">')
-        [void]$bw.AppendLine('        <span class="t">' + (ConvertTo-HtmlText $p.Title) + '</span>')
-        [void]$bw.AppendLine('        <span class="s">' + (ConvertTo-HtmlText $p.Summary) + '</span>')
-        [void]$bw.AppendLine('      </a>')
-      }
-      [void]$bw.AppendLine('    </div>')
-      [void]$bw.AppendLine('  </section>')
+      [void]$bw.AppendLine('  <h2 class="section-head">' + (ConvertTo-HtmlText $g) + '</h2>')
+      [void]$bw.AppendLine((New-Tiles $inGroup '' $c.Id 'bundle'))
     }
     [void]$bw.AppendLine('</div>')
 
     foreach ($g in $groupNames) {
       foreach ($p in @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)) {
-        [void]$bw.AppendLine('<article class="sheet bundled" id="p-' + $p.Id + '">')
-        [void]$bw.AppendLine('  <header class="masthead">')
-        [void]$bw.AppendLine('    <div class="eyebrow">' + (ConvertTo-HtmlText $p.Section) +
-                             $(if ($p.Status -ne 'ready') { ' &middot; ' + (ConvertTo-HtmlText $p.Status) } else { '' }) + '</div>')
-        [void]$bw.AppendLine('    <h1>' + (ConvertTo-HtmlText $p.Title) + '</h1>')
-        [void]$bw.AppendLine('    <p class="lede">' + (ConvertTo-HtmlText $p.Summary) + '</p>')
-        [void]$bw.AppendLine('  </header>')
-        [void]$bw.AppendLine((Resolve-Links $p.Body $ctx 'bundle-coll'))
+        [void]$bw.AppendLine('<div class="article bundled" id="p-' + $p.Id + '">')
+        [void]$bw.AppendLine('  <div class="crumb"><span>' + (ConvertTo-HtmlText $p.Section) + '</span></div>')
+        [void]$bw.AppendLine('  <h1>' + (ConvertTo-HtmlText $p.Title) +
+                             $(if ($p.Status -ne 'ready') { ' <span class="pill">' + (ConvertTo-HtmlText $p.Status) + '</span>' } else { '' }) + '</h1>')
+        [void]$bw.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $p.Summary) + '</p>')
+        [void]$bw.AppendLine((New-Cards $p $ctx 'bundle-coll'))
         [void]$bw.AppendLine('  <div class="usedin"><a class="chip" href="#top">Back to contents</a></div>')
-        [void]$bw.AppendLine('</article>')
+        [void]$bw.AppendLine('</div>')
       }
     }
+    [void]$bw.AppendLine('</main>')
+    [void]$bw.AppendLine('</div>')
     Write-Out (Join-Path $bundleDir ($c.Id + '.html')) `
-              (New-BundleDocument ("$($c.Title) - $($site.TITLE)") ($themeCss + "`n" + $wikiCss + $bundleExtra) `
-                                  'skin-document' $bw.ToString() '')
+              (New-BundleDocument ("$($c.Title) - $($site.TITLE)") ($themeCss + "`n" + $appCss + $bundleExtra) `
+                                  'app skin-app' $bw.ToString() ('bundle-' + $c.Id) ($bundleIdx + "`n" + $appJs))
   }
 
   foreach ($d in $decks.Values) {
     $r = New-DeckBody $d 'bundle-deck'
     Write-Out (Join-Path $bundleDir ('deck-' + $d.Name + '.html')) `
-              (New-BundleDocument $d.Title ($themeCss + "`n" + $deckCss) 'deck skin-document' $r.Html $deckScript)
+              (New-BundleDocument $d.Title ($themeCss + "`n" + $deckCss) 'deck skin-document' $r.Html ('deck-' + $d.Name) $deckJs)
   }
 }
 

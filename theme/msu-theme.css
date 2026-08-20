@@ -289,22 +289,28 @@ a.xref-out::after {
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
 /* ==========================================================================
-   Logo theme swap - MUST STAY LAST, and the doubled class is deliberate.
+   Logo theme swap. The !important is deliberate and load-bearing.
 
-   The mark is never recoloured; the light and reversed lockups are both
-   shipped and one is hidden by `display`. That makes these rules collide with
-   any component rule that also sets `display` on the same element.
+   The mark is never recoloured, so both lockups ship and one is hidden with
+   `display`. That collides with every component rule that also sets `display`
+   on the mark - and there is one in each skin.
 
-   `.logo { display: block }` is exactly such a rule, and at equal specificity
-   the later declaration wins - so a plain `.dark-only { display: none }`
-   placed above it silently stopped working and BOTH lockups rendered side by
-   side in light mode. Doubling the class (0,0,2,0) beats any single-class
-   rule regardless of order, without reaching for !important.
+   This has now broken TWICE, the same way both times:
+     1. `.logo { display: block }` later in this file tied on specificity and
+        won by order. Fixed by doubling the class to (0,0,2,0).
+     2. `.appbar .brandmark { display: block }` in app.css - also (0,0,2,0),
+        also later, because app.css loads after this file. The doubled class
+        lost again, and both lockups rendered side by side in the app bar.
+
+   The pattern is that a specificity fix only outranks the rules that exist
+   when it is written. "Exactly one lockup is visible" is an invariant, not a
+   preference, so it is enforced as one. Any new component rule that sets
+   display on .logo or .brandmark is now safe by construction.
    ========================================================================*/
-.dark-only.dark-only { display: none; }
+.dark-only { display: none !important; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .light-only.light-only { display: none; }
-  :root:not([data-theme="light"]) .dark-only.dark-only   { display: block; }
+  :root:not([data-theme="light"]) .light-only { display: none !important; }
+  :root:not([data-theme="light"]) .dark-only  { display: block !important; }
 }
-:root[data-theme="dark"] .light-only.light-only { display: none; }
-:root[data-theme="dark"] .dark-only.dark-only   { display: block; }
+:root[data-theme="dark"] .light-only { display: none !important; }
+:root[data-theme="dark"] .dark-only  { display: block !important; }
