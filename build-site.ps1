@@ -35,6 +35,9 @@
 [CmdletBinding()]
 param(
   [switch] $Bundle,
+  # Remove files in docs that this build did not produce (renamed or deleted
+  # sources leave stale pages that Pages would keep serving).
+  [switch] $Prune,
   [string] $SiteUrl,
   [switch] $WhatIf
 )
@@ -66,7 +69,10 @@ function Get-DataUri([string]$relPath) {
   'data:image/png;base64,' + [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($p))
 }
 
+$script:written = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+
 function Write-Out([string]$path, [string]$text) {
+  [void]$script:written.Add($path)
   $dir = Split-Path $path -Parent
   if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
   $name = $path.Substring($root.Length).TrimStart('\')
@@ -102,6 +108,22 @@ function ConvertTo-Json1([string]$s) {
 }
 function Format-Count([int]$n, [string]$noun) {
   if ($n -eq 1) { "$n $noun" } else { "$n ${noun}s" }
+}
+
+# How many slides a page contributes to a deck: one per section, minus the
+# wiki-only ones, minus those merged onto the previous slide. Counted from the
+# same rules the deck renderer uses, so a playlist's track length cannot drift
+# from what the player actually shows.
+function Get-PageSlideCount($p) {
+  @($p.Sections | Where-Object { $_.Mode -ne 'wiki-only' -and $_.Mode -ne 'with-previous' }).Count
+}
+function Get-DeckSlideCount($d) {
+  $n = 1  # the title slide
+  foreach ($item in $d.Items) {
+    if ($item.Kind -eq 'divider') { $n++ }
+    else { $n += Get-PageSlideCount $script:allPages[$item.Value] }
+  }
+  $n
 }
 
 # ------------------------------------------------------------------- site ----
@@ -376,15 +398,22 @@ function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$m
     [void]$sb.AppendLine('  </details>')
   }
 
-  [void]$sb.AppendLine('  <details class="navgroup" data-nav="presentations" open>')
-  [void]$sb.AppendLine('    <summary><span class="chev"></span>Presentations</summary>')
-  [void]$sb.AppendLine('    <ul class="navlist">')
+  # Presentations are NOT topics, so they do not sit in the topic tree as a
+  # peer of the collections. A presentation is a playlist - an ordered
+  # selection OF the pages above, not a page of its own. It gets its own block
+  # below the tree, and the link goes to the playlist (its track list), not
+  # straight into the player.
+  $plHref = if ($mode -eq 'bundle') { "$script:siteUrl/presentations.html" } else { "${up}presentations.html" }
+  [void]$sb.AppendLine('  <div class="navsplit"></div>')
+  [void]$sb.AppendLine('  <h2>Presentations</h2>')
+  [void]$sb.AppendLine('  <p class="navnote">Playlists built from the topics above.</p>')
+  [void]$sb.AppendLine('  <ul class="navlist playlists">')
   foreach ($d in $decks.Values) {
-    $href = if ($mode -eq 'bundle') { "$script:siteUrl/deck-$($d.Name).html" } else { "${up}deck-$($d.Name).html" }
-    [void]$sb.AppendLine('      <li><a href="' + $href + '">' + (ConvertTo-HtmlText $d.Title) + '</a></li>')
+    [void]$sb.AppendLine('    <li><a href="' + $plHref + '#pl-' + $d.Name + '">' +
+                         (ConvertTo-HtmlText $d.Title) +
+                         '<span class="count">' + $d.PageIds.Count + '</span></a></li>')
   }
-  [void]$sb.AppendLine('    </ul>')
-  [void]$sb.AppendLine('  </details>')
+  [void]$sb.AppendLine('  </ul>')
   [void]$sb.AppendLine('</aside>')
   [void]$sb.AppendLine('<div class="backdrop"></div>')
   $sb.ToString()
@@ -556,13 +585,14 @@ foreach ($c in $collections.Values) {
 }
 [void]$hub.AppendLine('  </div>')
 [void]$hub.AppendLine('  <h2 class="section-head">Presentations</h2>')
-[void]$hub.AppendLine('  <p class="aside">Each is a curated selection of the pages above. A link to a page a presentation does not include still works &mdash; it opens that page in a new tab.</p>')
+[void]$hub.AppendLine('  <p class="aside">A presentation is a <strong>playlist</strong> &mdash; an ordered selection of the topics above, not a separate copy of them. Edit a topic once and every playlist using it follows.</p>')
 [void]$hub.AppendLine('  <div class="grid">')
 foreach ($d in $decks.Values) {
-  [void]$hub.AppendLine('    <a class="tile" href="deck-' + $d.Name + '.html">')
+  [void]$hub.AppendLine('    <a class="tile" href="presentations.html#pl-' + $d.Name + '">')
   [void]$hub.AppendLine('      <span class="t">' + (ConvertTo-HtmlText $d.Title) + '</span>')
   [void]$hub.AppendLine('      <span class="s">' + (ConvertTo-HtmlText $d.Subtitle) + '</span>')
-  [void]$hub.AppendLine('      <span class="n">' + (Format-Count $d.PageIds.Count 'page') + '</span>')
+  [void]$hub.AppendLine('      <span class="n">' + (Format-Count $d.PageIds.Count 'topic') + ' &middot; ' +
+                        (Format-Count (Get-DeckSlideCount $d) 'slide') + '</span>')
   [void]$hub.AppendLine('    </a>')
 }
 [void]$hub.AppendLine('  </div>')
@@ -573,6 +603,59 @@ Write-Out (Join-Path $docsDir 'index.html') `
 
 Write-Out (Join-Path $docsDir '.nojekyll') ''
 Write-Out (Join-Path $docsDir 'search-index.js') $searchJs
+
+# ------------------------------------------------------- presentations ------
+# A playlist view, not a page of content. Each presentation shows its ordered
+# track list - the topics it draws on, in order, with the slide count each
+# contributes - plus one control to start the player. The tracks link to the
+# topic pages, because the topic is the thing that exists; the deck is a way
+# of walking them.
+$pi = New-Object System.Text.StringBuilder
+[void]$pi.AppendLine('<a class="skip" href="#main">Skip to content</a>')
+[void]$pi.AppendLine((New-AppBar ''))
+[void]$pi.AppendLine('<div class="shell">')
+[void]$pi.AppendLine((New-Sidebar '' '' '' 'site' ''))
+[void]$pi.AppendLine('<main id="main"><div class="article wide">')
+[void]$pi.AppendLine('  <div class="crumb"><a href="index.html">' + (ConvertTo-HtmlText $site.TITLE) +
+                     '</a><span class="sep">/</span><span>Presentations</span></div>')
+[void]$pi.AppendLine('  <h1>Presentations</h1>')
+[void]$pi.AppendLine('  <p class="lede">A presentation is a playlist: an ordered selection of topics, not a copy of them. Change a topic and every playlist that uses it changes with it.</p>')
+
+foreach ($d in $decks.Values) {
+  [void]$pi.AppendLine('  <section class="playlist" id="pl-' + $d.Name + '">')
+  [void]$pi.AppendLine('    <div class="pl-head">')
+  [void]$pi.AppendLine('      <div class="pl-meta">')
+  [void]$pi.AppendLine('        <h2>' + (ConvertTo-HtmlText $d.Title) + '</h2>')
+  if ($d.Subtitle) { [void]$pi.AppendLine('        <p class="aside">' + (ConvertTo-HtmlText $d.Subtitle) + '</p>') }
+  [void]$pi.AppendLine('        <p class="pl-stat">' + (Format-Count $d.PageIds.Count 'topic') + ' &middot; ' +
+                       (Format-Count (Get-DeckSlideCount $d) 'slide') + '</p>')
+  [void]$pi.AppendLine('      </div>')
+  [void]$pi.AppendLine('      <a class="btn-play" href="deck-' + $d.Name + '.html">Start presentation</a>')
+  [void]$pi.AppendLine('    </div>')
+  [void]$pi.AppendLine('    <ol class="tracks">')
+  $tn = 0
+  foreach ($item in $d.Items) {
+    if ($item.Kind -eq 'divider') {
+      [void]$pi.AppendLine('      <li class="track-group">' + (ConvertTo-HtmlText $item.Value) + '</li>')
+      continue
+    }
+    $tn++
+    $p = $pages[$item.Value]
+    [void]$pi.AppendLine('      <li class="track">')
+    [void]$pi.AppendLine('        <span class="tn">' + $tn + '</span>')
+    [void]$pi.AppendLine('        <a class="tt" href="' + $p.Collection + '/' + $p.Id + '.html">' +
+                         (ConvertTo-HtmlText $p.Title) + '</a>')
+    [void]$pi.AppendLine('        <span class="tc">' + (ConvertTo-HtmlText $collections[$p.Collection].Title) + '</span>')
+    [void]$pi.AppendLine('        <span class="ts">' + (Format-Count (Get-PageSlideCount $p) 'slide') + '</span>')
+    [void]$pi.AppendLine('      </li>')
+  }
+  [void]$pi.AppendLine('    </ol>')
+  [void]$pi.AppendLine('  </section>')
+}
+[void]$pi.AppendLine('</div></main>')
+[void]$pi.AppendLine('</div>')
+Write-Out (Join-Path $docsDir 'presentations.html') `
+          (New-Document ("Presentations - " + $site.TITLE) 'app skin-app' $pi.ToString() '' 'presentations' (& $siteHead '') (& $siteScripts ''))
 
 # ---------------------------------------------- collection index + pages -----
 foreach ($c in $collections.Values) {
@@ -812,6 +895,7 @@ $outAssets = Join-Path $docsDir 'assets'
 if (-not (Test-Path -LiteralPath $outAssets)) { New-Item -ItemType Directory -Path $outAssets -Force | Out-Null }
 foreach ($f in (Get-ChildItem -LiteralPath (Join-Path $root 'assets') -File)) {
   $dest = Join-Path $outAssets $f.Name
+  [void]$script:written.Add($dest)
   $same = (Test-Path -LiteralPath $dest) -and
           ((Get-Item -LiteralPath $dest).Length -eq $f.Length)
   if ($WhatIf) { Write-Host ("  {0,-46} {1}" -f ('docs\assets\' + $f.Name), $(if ($same) { 'unchanged' } else { 'would COPY' })) }
@@ -903,6 +987,34 @@ if ($Bundle) {
     $r = New-DeckBody $d 'bundle-deck'
     Write-Out (Join-Path $bundleDir ('deck-' + $d.Name + '.html')) `
               (New-BundleDocument $d.Title ($themeCss + "`n" + $deckCss) 'deck skin-document' $r.Html ('deck-' + $d.Name) $deckJs)
+  }
+}
+
+# ----------------------------------------------------------- stale output ----
+# The generator only ever wrote; it never removed. Renaming six pages left six
+# stale files in docs\ that GitHub Pages would keep serving at their old URLs,
+# carrying outdated content with no source left to update them - and nothing
+# said so.
+#
+# Reporting is the default because silence was the actual bug. Deletion is
+# opt-in via -Prune: docs\ is generated output, reproducible in full by one
+# command, but it is not a scratch surface and this script should not remove
+# files from it unasked.
+$orphans = @()
+if (Test-Path -LiteralPath $docsDir) {
+  foreach ($f in (Get-ChildItem -LiteralPath $docsDir -Recurse -File -Force)) {
+    if (-not $script:written.Contains($f.FullName)) { $orphans += $f.FullName }
+  }
+}
+if ($orphans.Count) {
+  Write-Host ''
+  Write-Host ("stale files in docs\ - not produced by this build ({0}):" -f $orphans.Count)
+  foreach ($o in $orphans) { Write-Host ("  {0}" -f $o.Substring($root.Length).TrimStart('\')) }
+  if ($Prune -and -not $WhatIf) {
+    foreach ($o in $orphans) { Remove-Item -LiteralPath $o -Force }
+    Write-Host ("  removed {0}" -f $orphans.Count)
+  } else {
+    Write-Host '  re-run with -Prune to remove them'
   }
 }
 

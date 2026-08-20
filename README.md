@@ -3,8 +3,16 @@
 Course reference for the Design Engineering Technology program, School of Engineering,
 Murray State University.
 
-A page is authored once. It renders as a wiki page, as slides inside any number of curated
+A page is authored once. It renders as a web page, as slides inside any number of
 presentations, and as a self-contained single file — from the same source.
+
+**A presentation is a playlist**, not a page: an ordered selection *of* topics, not a copy of
+them. Edit a topic once and every playlist using it follows.
+
+**Name a page for its subject, not the shape of its content.** A title is read in search
+results, slide headers and track lists, where the section and group are not visible — it has to
+stand on its own. "Before, During and After" became "Equipment Operating Procedure" for exactly
+that reason.
 
 ## Layout
 
@@ -13,7 +21,7 @@ site.conf                      site title, footer, published URL, section order
 collections/<id>/
   collection.conf              section title, summary, page groups
   pages/<page-id>.html         one topic per file
-decks/<name>.deck              a presentation: an ordered list of page ids
+decks/<name>.deck              a playlist: an ordered list of page ids
 theme/*.css                    shared MSU token layer + the two skins
 assets/                        SoE lockups, light and reversed
 build-site.ps1                 the generator
@@ -29,7 +37,7 @@ pwsh -File .\build-site.ps1 -Bundle      # also the single-file copies
 pwsh -File .\build-site.ps1 -WhatIf      # compare against disk, write nothing
 ```
 
-The build fails loudly on a duplicate page id, a `@@SECTION` that is not in the
+The build fails loudly on a duplicate page id, a duplicate section slug, a `@@SECTION` not in the
 collection's `@@GROUPS`, a deck naming a page that does not exist, and a nested
 `<section>`. It reports dangling `[[links]]` and pages in no presentation without
 failing, because both are normal mid-authoring states.
@@ -39,8 +47,8 @@ failing, because both are normal mid-authoring states.
 A page is an `@@FIELD:` header, `@@END`, then a stack of `<section>` blocks:
 
 ```html
-@@ID: lifting
-@@TITLE: Lifting
+@@ID: lifting-and-carrying
+@@TITLE: Lifting and Carrying
 @@SECTION: Universal Rules
 @@SUMMARY: One sentence for the card and the page standfirst.
 @@STATUS: ready
@@ -71,7 +79,7 @@ One authored link, five destinations, decided at build time:
 | Where it renders | Result |
 |---|---|
 | A page, same section | `ppe.html` |
-| A page, different section | `../lean/5s-basics.html` |
+| A page, different section | `../lean/5s-workplace-organization.html` |
 | A presentation that **includes** the target | `#p-ppe` — jumps to the slide |
 | A presentation that **excludes** it | opens the page in a new tab |
 | Target does not exist | inert, visibly marked "page pending" |
