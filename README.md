@@ -26,7 +26,8 @@ theme/*.css                    shared MSU token layer + the two skins
 assets/                        SoE lockups, light and reversed
 build-site.ps1                 the generator
 docs/                          GENERATED — the site. Never hand-edit.
-bundle/                        GENERATED — single-file copies. Not tracked.
+docs/print/                    GENERATED — one self-contained file per section
+                               and per playlist. Print these for PDF.
 ```
 
 ## Build
@@ -94,10 +95,12 @@ link rather than a dead end.
 and GitHub Pages can serve it from `main` / `docs` with no CI. `.nojekyll` is
 emitted because nothing here needs Jekyll.
 
-`bundle/` is for anywhere that cannot host a folder. Canvas rewrites the URL of
+`docs/print/` holds one self-contained file per section and per playlist — CSS,
+script and logo inlined, no sibling files. Print one for a PDF; it is also what
+to upload where a folder cannot be hosted. Canvas rewrites the URL of
 every uploaded file, so relative links between separately-uploaded files break;
-a bundle has none to break. Set the published URL in `site.conf` (or pass
-`-SiteUrl`) so links *out* of a bundle resolve.
+one file has none to break. Set the published URL in `site.conf` (or pass
+`-SiteUrl`) so links *out* of it resolve.
 
 ## Design
 

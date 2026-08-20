@@ -109,6 +109,24 @@
     if (co) co.addEventListener('click', function () { cards.forEach(function (c) { c.open = false; }); save(); });
   }
 
+  /* ---- printing must never lose a collapsed card ------------------------
+     A <details> that is closed prints its summary and nothing else. On the
+     PDF fallback that is silent content loss - a reader who collapsed
+     "Respiratory protection" would print a heading where a PROHIBITED rule
+     should be. Force every card open for the print, then restore exactly what
+     the reader had. CSS cannot do this: it cannot set the open attribute. */
+  (function () {
+    var reclose = [];
+    addEventListener('beforeprint', function () {
+      reclose = $$('details').filter(function (d) { return !d.open; });
+      reclose.forEach(function (d) { d.open = true; });
+    });
+    addEventListener('afterprint', function () {
+      reclose.forEach(function (d) { d.open = false; });
+      reclose = [];
+    });
+  })();
+
   /* A link to a collapsed card would scroll to nothing. Open the target - and
      any ancestor <details> - before the browser tries to reach it. */
   function revealHash() {
@@ -242,6 +260,7 @@
       h += '<ul class="navlist escape">' +
            '<li><a href="' + base + 'index.html">Browse all topics</a></li>' +
            '<li><a href="' + base + 'presentations.html">All playlists</a></li>' +
+           '<li><a href="' + base + 'print/playlist-' + pl.name + '.html">Print this playlist</a></li>' +
            '</ul>';
       sb.innerHTML = h;
     }

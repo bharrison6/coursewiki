@@ -28,13 +28,11 @@
 
     Usage
       pwsh -File .\build-site.ps1
-      pwsh -File .\build-site.ps1 -Bundle
       pwsh -File .\build-site.ps1 -Bundle -SiteUrl "https://example.org/det"
       pwsh -File .\build-site.ps1 -WhatIf
 #>
 [CmdletBinding()]
 param(
-  [switch] $Bundle,
   # Remove files in docs that this build did not produce (renamed or deleted
   # sources leave stale pages that Pages would keep serving).
   [switch] $Prune,
@@ -282,16 +280,11 @@ function Resolve-Links([string]$html, $ctx, [string]$mode) {
         $href = if ($tp.Collection -eq $ctx.Coll) { "$id.html" } else { "../$($tp.Collection)/$id.html" }
         return '<a class="xref-page" href="' + $href + '">' + $text + '</a>'
       }
-      'site-deck' {
-        if ($ctx.Deck.Contains($id)) { return '<a class="xref-in" href="#p-' + $id + '">' + $text + '</a>' }
-        return '<a class="xref-out" href="' + $tp.Collection + '/' + $id + '.html" target="_blank" rel="noopener">' + $text + '</a>'
-      }
-      'bundle-coll' {
-        if ($tp.Collection -eq $ctx.Coll) { return '<a class="xref-page" href="#p-' + $id + '">' + $text + '</a>' }
-        return '<a class="xref-out" href="' + $script:siteUrl + '/' + $tp.Collection + '/' + $id + '.html" target="_blank" rel="noopener">' + $text + '</a>'
-      }
-      'bundle-deck' {
-        if ($ctx.Deck.Contains($id)) { return '<a class="xref-in" href="#p-' + $id + '">' + $text + '</a>' }
+      # An aggregate holds a set of pages in one file. A link to a page inside
+      # the same file is an anchor; anything outside it has to leave for the
+      # live site, because there is no sibling file to reach.
+      'aggregate' {
+        if ($ctx.Ids.Contains($id)) { return '<a class="xref-page" href="#p-' + $id + '">' + $text + '</a>' }
         return '<a class="xref-out" href="' + $script:siteUrl + '/' + $tp.Collection + '/' + $id + '.html" target="_blank" rel="noopener">' + $text + '</a>'
       }
       default { throw "Resolve-Links: unknown mode '$mode'" }
@@ -697,6 +690,7 @@ foreach ($d in $decks.Values) {
   [void]$pi.AppendLine('      <div class="pl-actions">')
   [void]$pi.AppendLine('        <a class="btn-play" href="' + $href + '">Start reading</a>')
   [void]$pi.AppendLine('        <a class="btn-alt" href="' + $href + '&amp;present=1">Presentation mode</a>')
+  [void]$pi.AppendLine('        <a class="btn-alt" href="print/playlist-' + $d.Name + '.html">Print / PDF</a>')
   [void]$pi.AppendLine('      </div>')
   [void]$pi.AppendLine('    </div>')
   [void]$pi.AppendLine('    <ol class="tracks">')
@@ -807,86 +801,125 @@ foreach ($f in (Get-ChildItem -LiteralPath (Join-Path $root 'assets') -File)) {
                         Write-Host ("  {0,-46} {1:n0} bytes" -f ('docs\assets\' + $f.Name), $f.Length) }
 }
 
-# ----------------------------------------------------------------- bundle ----
-if ($Bundle) {
-  Write-Host 'bundle'
-  $bundleDir = Join-Path $root 'bundle'
-  $themeCss  = [System.IO.File]::ReadAllText((Join-Path $themeDir 'msu-theme.css'))
-  $appCss    = [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.css'))
-  $appJs     = [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.js'))
-  $bundleIdx = New-SearchIndex 'bundle'
-  $bundleExtra = @'
+# -------------------------------------------------------------- aggregates ---
+# One self-contained file holding an ordered set of pages, CSS and logo inlined,
+# no sibling files at all. Two jobs, one mechanism:
+#
+#   * PDF fallback. The site is the primary surface, but a playlist has to be
+#     printable as one clean document - print it from a browser, or render it
+#     headless. The print stylesheet forces every collapsed card open, so
+#     nothing is lost to a closed disclosure.
+#   * Canvas / offline. Canvas rewrites the URL of every uploaded file, so
+#     relative links between separately-uploaded files break. One file has none.
+#
+# A collection aggregate and a playlist aggregate are the SAME operation over a
+# different selection, so they share this one function rather than growing a
+# second renderer - which is exactly the mistake the deck made.
+function New-Aggregate {
+  param([string]$slug, [string]$title, [string]$summary, $pageList, [string]$kind)
 
-/* ---- single-file bundle only: every page stacked in one document -------- */
+  $ids = [System.Collections.Generic.HashSet[string]]::new()
+  foreach ($p in $pageList) { [void]$ids.Add($p.Id) }
+  $ctx = [pscustomobject]@{ Ids = $ids }
+
+  $b = New-Object System.Text.StringBuilder
+  [void]$b.AppendLine('<div class="agg-head" id="top">')
+  [void]$b.AppendLine('  <div class="stamp">' + $lockupData + '</div>')
+  [void]$b.AppendLine('  <div class="eyebrow">' + (ConvertTo-HtmlText $site.TAGLINE) +
+                      ' &middot; ' + (ConvertTo-HtmlText $kind) + '</div>')
+  [void]$b.AppendLine('  <h1>' + (ConvertTo-HtmlText $title) + '</h1>')
+  if ($summary) { [void]$b.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $summary) + '</p>') }
+  [void]$b.AppendLine('  <ol class="agg-toc">')
+  foreach ($p in $pageList) {
+    [void]$b.AppendLine('    <li><a href="#p-' + $p.Id + '">' + (ConvertTo-HtmlText $p.Title) + '</a></li>')
+  }
+  [void]$b.AppendLine('  </ol>')
+  [void]$b.AppendLine('</div>')
+
+  foreach ($p in $pageList) {
+    [void]$b.AppendLine('<article class="article bundled" id="p-' + $p.Id + '">')
+    [void]$b.AppendLine('  <div class="crumb"><span>' + (ConvertTo-HtmlText $collections[$p.Collection].Title) +
+                        '</span><span class="sep">/</span><span>' + (ConvertTo-HtmlText $p.Section) + '</span></div>')
+    [void]$b.AppendLine('  <h1>' + (ConvertTo-HtmlText $p.Title) +
+                        $(if ($p.Status -ne 'ready') { ' <span class="pill">' + (ConvertTo-HtmlText $p.Status) + '</span>' } else { '' }) + '</h1>')
+    [void]$b.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $p.Summary) + '</p>')
+    [void]$b.AppendLine((New-Cards $p $ctx 'aggregate'))
+    [void]$b.AppendLine('</article>')
+  }
+
+  $sb = New-Object System.Text.StringBuilder
+  [void]$sb.AppendLine('<!DOCTYPE html>')
+  [void]$sb.AppendLine('<html lang="en">')
+  [void]$sb.AppendLine('<head>')
+  [void]$sb.AppendLine('<meta charset="utf-8">')
+  [void]$sb.AppendLine('<meta name="viewport" content="width=device-width, initial-scale=1">')
+  [void]$sb.AppendLine('<title>' + (ConvertTo-HtmlText "$title - $($site.TITLE)") + '</title>')
+  [void]$sb.AppendLine($fontLink.Trim())
+  [void]$sb.AppendLine($themeBoot.Trim())
+  [void]$sb.AppendLine('<style>')
+  [void]$sb.AppendLine($script:themeCss.TrimEnd())
+  [void]$sb.AppendLine($script:appCss.TrimEnd())
+  [void]$sb.AppendLine($script:aggCss.TrimEnd())
+  [void]$sb.AppendLine('</style>')
+  [void]$sb.AppendLine('</head>')
+  [void]$sb.AppendLine('<body class="app skin-app aggregate" data-page="agg-' + $slug + '" data-base="">')
+  [void]$sb.AppendLine('<main id="main">')
+  [void]$sb.AppendLine($b.ToString().TrimEnd())
+  [void]$sb.AppendLine('</main>')
+  [void]$sb.AppendLine('<script>')
+  [void]$sb.AppendLine($script:appJs.TrimEnd())
+  [void]$sb.AppendLine('</script>')
+  [void]$sb.AppendLine('</body>')
+  [void]$sb.AppendLine('</html>')
+  Write-Out (Join-Path $docsDir ('print\' + $slug + '.html')) $sb.ToString()
+}
+
+Write-Host 'print / offline aggregates'
+$script:themeCss = [System.IO.File]::ReadAllText((Join-Path $themeDir 'msu-theme.css'))
+$script:appCss   = [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.css'))
+$script:appJs    = [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.js'))
+$script:aggCss   = @'
+
+/* ---- aggregate: many pages stacked in one printable file --------------- */
+.aggregate main { padding: clamp(1.5rem, 4vw, 3rem); max-width: 52rem; margin: 0 auto; }
+.agg-head { margin-bottom: 3rem; }
+.agg-head .logo { width: 15rem; margin-bottom: 1.25rem; }
+.agg-toc { margin: 1.5rem 0 0; padding-left: 1.4rem; display: flex; flex-direction: column; gap: .3rem; }
+.agg-toc li::before { content: none; }
+.agg-toc a { font-family: var(--f-display); font-weight: 600; text-decoration: none; }
 .article.bundled { border-top: 3px solid var(--accent); padding-top: 2rem; margin-top: 3rem; }
-.article.bundled:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
-@media print { .article.bundled { break-before: page; } }
+@media print {
+  .aggregate main { padding: 0; max-width: none; }
+  .article.bundled { break-before: page; border-top: 0; margin-top: 0; padding-top: 0; }
+  .agg-head { break-after: page; }
+  .aggregate .xcard[open] > summary, .aggregate .xcard > summary { border-bottom: 2px solid var(--ink); }
+}
 '@
 
-  function New-BundleDocument([string]$title, [string]$css, [string]$bodyClass, [string]$content, [string]$pageKey, [string]$js) {
-    $sb = New-Object System.Text.StringBuilder
-    [void]$sb.AppendLine('<!DOCTYPE html>')
-    [void]$sb.AppendLine('<html lang="en">')
-    [void]$sb.AppendLine('<head>')
-    [void]$sb.AppendLine('<meta charset="utf-8">')
-    [void]$sb.AppendLine('<meta name="viewport" content="width=device-width, initial-scale=1">')
-    [void]$sb.AppendLine('<title>' + (ConvertTo-HtmlText $title) + '</title>')
-    [void]$sb.AppendLine($fontLink.Trim())
-    [void]$sb.AppendLine($themeBoot.Trim())
-    [void]$sb.AppendLine('<style>')
-    [void]$sb.AppendLine($css.TrimEnd())
-    [void]$sb.AppendLine('</style>')
-    [void]$sb.AppendLine('</head>')
-    [void]$sb.AppendLine('<body class="' + $bodyClass + '" data-page="' + $pageKey + '" data-base="">')
-    [void]$sb.AppendLine($content.TrimEnd())
-    if ($js) { [void]$sb.AppendLine('<script>'); [void]$sb.AppendLine($js.TrimEnd()); [void]$sb.AppendLine('</script>') }
-    [void]$sb.AppendLine('</body>')
-    [void]$sb.AppendLine('</html>')
-    $sb.ToString()
+foreach ($c in $collections.Values) {
+  $list = @()
+  $groupNames = if ($c.Groups.Count) { $c.Groups }
+                else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
+  foreach ($g in $groupNames) {
+    $list += @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
   }
-
-  foreach ($c in $collections.Values) {
-    $ctx = [pscustomobject]@{ Coll = $c.Id }
-    $bw  = New-Object System.Text.StringBuilder
-    [void]$bw.AppendLine('<a class="skip" href="#main">Skip to content</a>')
-    [void]$bw.AppendLine((New-AppBar '' 'bundle'))
-    [void]$bw.AppendLine('<div class="shell">')
-    [void]$bw.AppendLine((New-Sidebar '' '' $c.Id 'bundle' $c.Id))
-    [void]$bw.AppendLine('<main id="main">')
-    [void]$bw.AppendLine('<div class="article wide" id="top">')
-    [void]$bw.AppendLine('  <div class="stamp">' + $lockupData + '</div>')
-    [void]$bw.AppendLine('  <h1>' + (ConvertTo-HtmlText $c.Title) + '</h1>')
-    [void]$bw.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $c.Summary) + '</p>')
-    $groupNames = if ($c.Groups.Count) { $c.Groups }
-                  else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
-    foreach ($g in $groupNames) {
-      $inGroup = @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
-      if (-not $inGroup.Count) { continue }
-      [void]$bw.AppendLine('  <h2 class="section-head">' + (ConvertTo-HtmlText $g) + '</h2>')
-      [void]$bw.AppendLine((New-Tiles $inGroup '' $c.Id 'bundle'))
-    }
-    [void]$bw.AppendLine('</div>')
-
-    foreach ($g in $groupNames) {
-      foreach ($p in @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)) {
-        [void]$bw.AppendLine('<div class="article bundled" id="p-' + $p.Id + '">')
-        [void]$bw.AppendLine('  <div class="crumb"><span>' + (ConvertTo-HtmlText $p.Section) + '</span></div>')
-        [void]$bw.AppendLine('  <h1>' + (ConvertTo-HtmlText $p.Title) +
-                             $(if ($p.Status -ne 'ready') { ' <span class="pill">' + (ConvertTo-HtmlText $p.Status) + '</span>' } else { '' }) + '</h1>')
-        [void]$bw.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $p.Summary) + '</p>')
-        [void]$bw.AppendLine((New-Cards $p $ctx 'bundle-coll'))
-        [void]$bw.AppendLine('  <div class="usedin"><a class="chip" href="#top">Back to contents</a></div>')
-        [void]$bw.AppendLine('</div>')
-      }
-    }
-    [void]$bw.AppendLine('</main>')
-    [void]$bw.AppendLine('</div>')
-    Write-Out (Join-Path $bundleDir ($c.Id + '.html')) `
-              (New-BundleDocument ("$($c.Title) - $($site.TITLE)") ($themeCss + "`n" + $appCss + $bundleExtra) `
-                                  'app skin-app' $bw.ToString() ('bundle-' + $c.Id) ($bundleIdx + "`n" + $appJs))
-  }
-
+  New-Aggregate ('section-' + $c.Id) $c.Title $c.Summary $list 'Section'
 }
+foreach ($d in $decks.Values) {
+  $list = @($d.PageIds | ForEach-Object { $pages[$_] })
+  New-Aggregate ('playlist-' + $d.Name) $d.Title $d.Subtitle $list 'Playlist'
+}
+# The whole manual in one document, matching the generated 'everything'
+# playlist. This is the PDF that survives the site being unreachable.
+$allList = @()
+foreach ($c in $collections.Values) {
+  $gn = if ($c.Groups.Count) { $c.Groups }
+        else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
+  foreach ($g in $gn) {
+    $allList += @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
+  }
+}
+New-Aggregate 'playlist-everything' 'Everything' $site.SUMMARY $allList 'Playlist'
 
 # ----------------------------------------------------------- stale output ----
 # The generator only ever wrote; it never removed. Renaming six pages left six
