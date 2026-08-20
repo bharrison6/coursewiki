@@ -280,6 +280,13 @@
     var prev = idx > 0 ? pl.items[idx - 1] : null;
     var next = idx < pl.items.length - 1 ? pl.items[idx + 1] : null;
 
+    /* The label beside the Murray State lockup names the scope you are in.
+       The institution is carried by the mark; the word next to it is the
+       current selection, not a fixed programme - so the same content serves
+       any class or major without a rebuild. */
+    var brand = $('[data-brandlabel]');
+    if (brand) { brand.textContent = pl.title; }
+
     /* ---- the sidebar becomes the playlist ------------------------------
        A presentation posted to Canvas should show the pages it contains, not
        the whole site. The way back is explicit rather than implied.        */

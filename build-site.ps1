@@ -347,7 +347,7 @@ function New-AppBar([string]$up, [string]$flavour) {
   [void]$sb.AppendLine('  <button class="iconbtn nav-toggle" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Menu">' + $icoMenu + '</button>')
   [void]$sb.AppendLine('  <a class="brand" href="' + $up + 'index.html">')
   [void]$sb.AppendLine('    ' + $mark)
-  [void]$sb.AppendLine('    <span class="sub">' + (ConvertTo-HtmlText $site.TITLE) + '</span>')
+  [void]$sb.AppendLine('    <span class="sub" data-brandlabel>' + (ConvertTo-HtmlText $site.TITLE) + '</span>')
   [void]$sb.AppendLine('  </a>')
   [void]$sb.AppendLine('  <div class="search">')
   [void]$sb.AppendLine('    <input type="search" placeholder="Search topics" aria-label="Search topics" autocomplete="off" spellcheck="false">')
