@@ -222,6 +222,14 @@ foreach ($cid in $collOrder) {
   $collections[$cid] = [pscustomobject]@{
     Id = $cid; Title = $cc.Meta.TITLE; Summary = $cc.Meta.SUMMARY
     Groups = $groups; PageIds = $ids
+    # Optional. A collection may open with authored content of its own -
+    # a hero, a visual index, whatever the subject needs - before its topic
+    # grid. It is a normal content file, so [[links]] resolve in it, and a
+    # collection without one simply has no intro.
+    Intro = $(
+      $ip = Join-Path $cdir 'intro.html'
+      if (Test-Path -LiteralPath $ip) { [System.IO.File]::ReadAllText($ip).Trim() } else { '' }
+    )
   }
   Write-Host ("collection {0,-10} {1} pages" -f $cid, $ids.Count)
 }
@@ -732,6 +740,9 @@ foreach ($c in $collections.Values) {
                        '</a><span class="sep">/</span><span>' + (ConvertTo-HtmlText $c.Title) + '</span></div>')
   [void]$ci.AppendLine('  <h1>' + (ConvertTo-HtmlText $c.Title) + '</h1>')
   [void]$ci.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $c.Summary) + '</p>')
+  if ($c.Intro) {
+    [void]$ci.AppendLine((Resolve-Links $c.Intro ([pscustomobject]@{ Coll = $c.Id }) 'site-page'))
+  }
   $groupNames = if ($c.Groups.Count) { $c.Groups }
                 else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
   foreach ($g in $groupNames) {

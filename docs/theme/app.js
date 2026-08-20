@@ -179,6 +179,49 @@
     ul.parentNode.insertBefore(reset, ul.nextSibling);
   });
 
+  /* ---- category ladder --------------------------------------------------
+     A visual index of who must be present, on the Safety intro. The wording is
+     kept identical to the summary table on the Equipment Categories page,
+     which stays the authority - this is a way in, not a second copy of the
+     rules. Without JS the first category is shown and the tabs are inert
+     links to that page's content, so nothing is lost.                      */
+  (function () {
+    var root = $('[data-ladder]');
+    if (!root) return;
+    var text = $('[data-ladder-text]', root);
+    var tabs = $$('[data-cat]', root);
+    var figs = { you: $('.fig-you', root), peer: $('.fig-peer', root), instr: $('.fig-instr', root) };
+
+    var CAT = {
+      '1': { who: ['you'],
+             t: 'Permission may be given in advance. Work alone once you have it.' },
+      '2': { who: ['you', 'peer'],
+             t: 'Permission at the time of use. A peer must be present throughout.' },
+      '3': { who: ['you', 'peer', 'instr'],
+             t: 'Permission at the time of use. A peer and an instructor must be present throughout.' }
+    };
+
+    function show(k) {
+      var c = CAT[k];
+      if (!c) return;
+      tabs.forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-cat') === k ? 'true' : 'false'); });
+      Object.keys(figs).forEach(function (name) {
+        if (!figs[name]) return;
+        figs[name].classList.toggle('is-on', c.who.indexOf(name) >= 0);
+      });
+      text.textContent = c.t;
+    }
+    tabs.forEach(function (b) {
+      b.addEventListener('click', function () { show(b.getAttribute('data-cat')); });
+      b.addEventListener('keydown', function (e) {
+        var i = tabs.indexOf(b);
+        if (e.key === 'ArrowRight') { e.preventDefault(); tabs[(i + 1) % tabs.length].focus(); tabs[(i + 1) % tabs.length].click(); }
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); tabs[(i - 1 + tabs.length) % tabs.length].focus(); tabs[(i - 1 + tabs.length) % tabs.length].click(); }
+      });
+    });
+    show('1');
+  })();
+
   /* ---- on this page: scrollspy -----------------------------------------*/
   (function () {
     var links = $$('.toc a');

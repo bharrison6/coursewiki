@@ -989,6 +989,132 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 .btn-alt:hover { border-color: var(--accent); }
 @media (max-width: 34rem) { .pl-actions { flex-direction: row; flex-wrap: wrap; } }
 
+/* ==========================================================================
+   Collection intro — hero, hazard stripes, category ladder
+
+   The source slide for this was a third-party commercial safety poster with
+   another company's logo and phone number on it. The quote is a common shop
+   slogan and is kept; the artwork is rebuilt here in the MSU palette rather
+   than republished. Hazard stripes are a gradient, so they scale, theme, and
+   animate without an image asset - the thing a slide deck could not do.
+   ========================================================================*/
+.hero {
+  position: relative;
+  margin: 2rem 0 2.5rem;
+  background: var(--band);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.hazard {
+  height: .85rem;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--msu-gold) 0 1rem,
+    #1a1a1a 1rem 2rem
+  );
+  background-size: 2.83rem 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hazard { animation: hazard-slide 2.4s linear infinite; }
+  .hazard-bottom { animation-direction: reverse; }
+}
+@keyframes hazard-slide { to { background-position: 2.83rem 0; } }
+
+.hero-inner { padding: clamp(2rem, 6vw, 3.75rem) clamp(1.25rem, 5vw, 3rem); }
+.hero-eyebrow {
+  font-family: var(--f-display); font-weight: 700;
+  font-size: .7rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--msu-gold); margin-bottom: 1.1rem;
+}
+.hero-quote {
+  margin: 0; border: 0; padding: 0;
+  font-family: var(--f-display); font-weight: 700;
+  text-transform: uppercase; letter-spacing: -.015em; line-height: .98;
+  color: #fff;
+  display: flex; flex-direction: column; gap: .1em;
+}
+.hero-quote .l { font-size: clamp(1.9rem, 6.2vw, 4rem); }
+.hero-quote .l2, .hero-quote .l4 { color: var(--msu-gold); }
+
+.hero-but {
+  display: flex; align-items: center; gap: .8rem;
+  margin: .45em 0; color: #fff;
+}
+.hero-but .rule { flex: 1 1 auto; height: .32rem; background: #fff; }
+.hero-but .but {
+  flex: none; font-size: clamp(.85rem, 1.8vw, 1.15rem);
+  letter-spacing: .22em; font-weight: 600;
+}
+
+/* staged reveal — motion is opt-in, and the text is fully present without it */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-quote .l, .hero-but { opacity: 0; transform: translateY(.5em); animation: rise .55s ease forwards; }
+  .hero-quote .l1 { animation-delay: .05s; }
+  .hero-quote .l2 { animation-delay: .18s; }
+  .hero-but       { animation-delay: .34s; }
+  .hero-quote .l3 { animation-delay: .48s; }
+  .hero-quote .l4 { animation-delay: .60s; }
+}
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+.intro-block { margin: 2.5rem 0; }
+.intro-block > h2 { margin-bottom: .9rem; }
+.intro-block > .lede { margin-bottom: 1.25rem; }
+
+/* ---- category ladder ---------------------------------------------------*/
+.ladder {
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface); overflow: hidden;
+}
+.ladder-tabs { display: flex; flex-wrap: wrap; gap: .5rem; padding: .9rem; border-bottom: 1px solid var(--rule); }
+.ladder-tabs .cat { cursor: pointer; font: inherit; font-family: var(--f-display);
+  font-weight: 700; font-size: .82rem; letter-spacing: .06em; text-transform: uppercase; }
+.ladder-tabs .cat[aria-selected="false"] { background: transparent; color: var(--ink-soft); border-color: var(--rule); }
+.ladder-tabs .cat[aria-selected="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
+
+.ladder-body { padding: 1.4rem 1.15rem; }
+.who { display: flex; gap: clamp(1rem, 5vw, 3rem); justify-content: center; margin-bottom: 1.2rem; }
+.fig { display: flex; flex-direction: column; align-items: center; gap: .5rem; opacity: .28; transition: opacity .25s ease; }
+.fig.is-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .fig { transition: none; } }
+/* a person, drawn in two shapes - no icon font, no image */
+.fig .body { position: relative; width: 2.6rem; height: 3.2rem; display: block; }
+.fig .body::before {
+  content: ""; position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+  width: 1.05rem; height: 1.05rem; border-radius: 50%;
+  background: currentColor;
+}
+.fig .body::after {
+  content: ""; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+  width: 2.1rem; height: 1.85rem; background: currentColor;
+  border-radius: 1.05rem 1.05rem .25rem .25rem;
+}
+.fig-you   { color: var(--cat1); }
+.fig-peer  { color: var(--cat2); }
+.fig-instr { color: var(--cat3); }
+.fig .label {
+  font-family: var(--f-display); font-weight: 700; font-size: .68rem;
+  letter-spacing: .09em; text-transform: uppercase; color: var(--ink);
+}
+.ladder-text { text-align: center; font-size: 1.05rem; max-width: 34rem; margin: 0 auto; }
+
+/* ---- emergency band ----------------------------------------------------*/
+.emergency-band {
+  display: grid; gap: 1px; background: var(--rule);
+  border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+.emergency-band > div {
+  background: var(--cat3-soft); padding: 1rem 1.1rem;
+  display: flex; flex-direction: column; gap: .2rem;
+}
+.emergency-band .k {
+  font-family: var(--f-display); font-weight: 700; font-size: .68rem;
+  letter-spacing: .09em; text-transform: uppercase; color: var(--cat-ink); opacity: .75;
+}
+.emergency-band .v { font-size: 1.1rem; color: var(--cat-ink); }
+.emergency-band a { color: inherit; }
+
 /* ---- aggregate: many pages stacked in one printable file --------------- */
 .aggregate main { padding: clamp(1.5rem, 4vw, 3rem); max-width: 52rem; margin: 0 auto; }
 .agg-head { margin-bottom: 3rem; }
@@ -1281,6 +1407,49 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
     });
     ul.parentNode.insertBefore(reset, ul.nextSibling);
   });
+
+  /* ---- category ladder --------------------------------------------------
+     A visual index of who must be present, on the Safety intro. The wording is
+     kept identical to the summary table on the Equipment Categories page,
+     which stays the authority - this is a way in, not a second copy of the
+     rules. Without JS the first category is shown and the tabs are inert
+     links to that page's content, so nothing is lost.                      */
+  (function () {
+    var root = $('[data-ladder]');
+    if (!root) return;
+    var text = $('[data-ladder-text]', root);
+    var tabs = $$('[data-cat]', root);
+    var figs = { you: $('.fig-you', root), peer: $('.fig-peer', root), instr: $('.fig-instr', root) };
+
+    var CAT = {
+      '1': { who: ['you'],
+             t: 'Permission may be given in advance. Work alone once you have it.' },
+      '2': { who: ['you', 'peer'],
+             t: 'Permission at the time of use. A peer must be present throughout.' },
+      '3': { who: ['you', 'peer', 'instr'],
+             t: 'Permission at the time of use. A peer and an instructor must be present throughout.' }
+    };
+
+    function show(k) {
+      var c = CAT[k];
+      if (!c) return;
+      tabs.forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-cat') === k ? 'true' : 'false'); });
+      Object.keys(figs).forEach(function (name) {
+        if (!figs[name]) return;
+        figs[name].classList.toggle('is-on', c.who.indexOf(name) >= 0);
+      });
+      text.textContent = c.t;
+    }
+    tabs.forEach(function (b) {
+      b.addEventListener('click', function () { show(b.getAttribute('data-cat')); });
+      b.addEventListener('keydown', function (e) {
+        var i = tabs.indexOf(b);
+        if (e.key === 'ArrowRight') { e.preventDefault(); tabs[(i + 1) % tabs.length].focus(); tabs[(i + 1) % tabs.length].click(); }
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); tabs[(i - 1 + tabs.length) % tabs.length].focus(); tabs[(i - 1 + tabs.length) % tabs.length].click(); }
+      });
+    });
+    show('1');
+  })();
 
   /* ---- on this page: scrollspy -----------------------------------------*/
   (function () {
