@@ -247,8 +247,8 @@
   /* ==========================================================================
      Playlists
      ------------------------------------------------------------------------
-     A playlist is an ordered set of REAL PAGES, applied as a URL parameter:
-     <page>.html?p=<playlist>. Nothing is re-rendered. That is the whole point -
+     A track is an ordered set of REAL PAGES, applied as a URL parameter:
+     <page>.html?p=<track>. Nothing is re-rendered. That is the whole point -
      the earlier design rendered a second copy of the content as slides, and
      that copy did not load this file, so its checklists were dead text.
 
@@ -262,7 +262,7 @@
     var pName  = params.get('p');
     if (!pName) return;
 
-    var lists = window.PLAYLISTS || [];
+    var lists = window.TRACKS || [];
     var pl = null;
     for (var i = 0; i < lists.length; i++) { if (lists[i].name === pName) { pl = lists[i]; break; } }
     if (!pl) return;
@@ -287,12 +287,12 @@
     var brand = $('[data-brandlabel]');
     if (brand) { brand.textContent = pl.title; }
 
-    /* ---- the sidebar becomes the playlist ------------------------------
+    /* ---- the sidebar becomes the track ------------------------------
        A presentation posted to Canvas should show the pages it contains, not
        the whole site. The way back is explicit rather than implied.        */
     var sb = document.querySelector('.sidebar');
     if (sb) {
-      var h = '<div class="pl-nav-head"><span class="k">Playlist</span>' +
+      var h = '<div class="pl-nav-head"><span class="k">Track</span>' +
               '<span class="t">' + escHtml(pl.title) + '</span>' +
               '<span class="n">' + (idx + 1) + ' of ' + pl.items.length + '</span></div>';
       h += '<ol class="pl-nav">';
@@ -309,8 +309,8 @@
       h += '<div class="navsplit"></div>';
       h += '<ul class="navlist escape">' +
            '<li><a href="' + base + 'index.html">Browse all topics</a></li>' +
-           '<li><a href="' + base + 'presentations.html">All playlists</a></li>' +
-           '<li><a href="' + base + 'print/playlist-' + pl.name + '.html">Print this playlist</a></li>' +
+           '<li><a href="' + base + 'presentations.html">All tracks</a></li>' +
+           '<li><a href="' + base + 'print/track-' + pl.name + '.html">Print this track</a></li>' +
            '</ul>';
       sb.innerHTML = h;
     }
@@ -318,16 +318,16 @@
     /* ---- next / previous ----------------------------------------------*/
     var bar = document.createElement('nav');
     bar.className = 'seqbar';
-    bar.setAttribute('aria-label', 'Playlist navigation');
+    bar.setAttribute('aria-label', 'Track navigation');
     bar.innerHTML =
       (prev ? '<a class="seq prev" href="' + urlFor(prev, presenting) + '"><span class="d">Previous</span>' +
               '<span class="t">' + escHtml(prev.title) + '</span></a>'
-            : '<span class="seq prev disabled"><span class="d">Start of playlist</span></span>') +
+            : '<span class="seq prev disabled"><span class="d">Start of track</span></span>') +
       '<div class="seqmid"><span class="pos">' + (idx + 1) + ' / ' + pl.items.length + '</span>' +
       '<span class="pl">' + escHtml(pl.title) + '</span></div>' +
       (next ? '<a class="seq next" href="' + urlFor(next, presenting) + '"><span class="d">Next</span>' +
               '<span class="t">' + escHtml(next.title) + '</span></a>'
-            : '<span class="seq next disabled"><span class="d">End of playlist</span></span>');
+            : '<span class="seq next disabled"><span class="d">End of track</span></span>');
     document.body.appendChild(bar);
     document.body.classList.add('has-seqbar');
 

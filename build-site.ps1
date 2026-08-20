@@ -43,7 +43,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root     = $PSScriptRoot
 $collDir  = Join-Path $root 'collections'
-$deckDir  = Join-Path $root 'decks'
+$trackDir = Join-Path $root 'tracks'
 $themeDir = Join-Path $root 'theme'
 $docsDir  = Join-Path $root 'docs'
 $enc      = New-Object System.Text.UTF8Encoding($false)
@@ -106,6 +106,19 @@ function ConvertTo-Json1([string]$s) {
 }
 function Format-Count([int]$n, [string]$noun) {
   if ($n -eq 1) { "$n $noun" } else { "$n ${noun}s" }
+}
+
+# Display order for tracks: a programme, then the courses inside it, then the
+# subject tracks those courses pull from. Alphabetical would interleave them
+# and lose the hierarchy the reader needs to see.
+$script:kindRank = @{ program = 0; course = 1; topic = 2 }
+function Get-TrackRank($t) {
+  $r = $script:kindRank[$t.Kind]
+  if ($null -eq $r) { $r = 3 }
+  $r
+}
+function Get-KindLabel([string]$k) {
+  switch ($k) { 'program' { 'Program' } 'course' { 'Course' } default { 'Topic' } }
 }
 
 # How many slides a page contributes to a deck: one per section, minus the
@@ -234,34 +247,92 @@ foreach ($cid in $collOrder) {
   Write-Host ("collection {0,-10} {1} pages" -f $cid, $ids.Count)
 }
 
-# ------------------------------------------------------------------ decks ----
-$decks = [ordered]@{}
-foreach ($f in (Get-ChildItem -LiteralPath $deckDir -Filter '*.deck' | Sort-Object Name)) {
+# ----------------------------------------------------------------- tracks ----
+# A TRACK is an ordered selection of pages. Two levels are in use:
+#
+#   @@KIND: program   a programme - DET
+#   @@KIND: course    a class within it - DET 130 - declaring @@PARENT: det
+#   @@KIND: topic     a subject track that classes pull in, e.g. general-safety
+#
+# A manifest line beginning with '+' INCLUDES another track by reference. That
+# is how Safety appears in every class without being copied into any of them:
+# edit the safety track once and every course carrying it follows. Copying
+# would fork the content, which is the failure this whole system exists to
+# avoid.
+$rawTracks = [ordered]@{}
+foreach ($f in (Get-ChildItem -LiteralPath $trackDir -Filter '*.track' | Sort-Object Name)) {
   $dc = Read-Conf $f.FullName
-  foreach ($req in 'DECK','TITLE') {
+  foreach ($req in 'TRACK','TITLE') {
     if (-not $dc.Meta.ContainsKey($req)) { throw "$($f.Name): missing @@$req" }
   }
-  $items = @()
+  $lines = @()
   foreach ($line in ($dc.Body -split "`r?`n")) {
     $t = $line.Trim()
     if ($t -eq '' -or $t.StartsWith('#')) { continue }
-    if ($t.StartsWith('>')) {
-      $items += [pscustomobject]@{ Kind = 'divider'; Value = $t.Substring(1).Trim() }
-    } else {
-      if (-not $pages.Contains($t)) { throw "$($f.Name): lists unknown page '$t'" }
-      $items += [pscustomobject]@{ Kind = 'page'; Value = $t }
-      [void]$pages[$t].Decks.Add($dc.Meta.DECK)
-    }
+    $lines += $t
   }
-  $decks[$dc.Meta.DECK] = [pscustomobject]@{
-    Name = $dc.Meta.DECK; Title = $dc.Meta.TITLE
+  $rawTracks[$dc.Meta.TRACK] = [pscustomobject]@{
+    Name = $dc.Meta.TRACK; Title = $dc.Meta.TITLE
+    Kind     = if ($dc.Meta.ContainsKey('KIND'))     { $dc.Meta.KIND }     else { 'topic' }
+    Parent   = if ($dc.Meta.ContainsKey('PARENT'))   { $dc.Meta.PARENT }   else { '' }
     Subtitle = if ($dc.Meta.ContainsKey('SUBTITLE')) { $dc.Meta.SUBTITLE } else { '' }
     Footer   = if ($dc.Meta.ContainsKey('FOOTER'))   { $dc.Meta.FOOTER }   else { $site.FOOTER }
-    Items = $items
-    PageIds = @($items | Where-Object Kind -eq 'page' | ForEach-Object Value)
+    Lines = $lines; File = $f.Name
   }
 }
-Write-Host ("decks: {0}" -f $decks.Count)
+
+# Flatten '+' includes. A cycle would recurse forever, so the chain is carried
+# down and a repeat is a build error rather than a hang.
+function Expand-Track([string]$name, $chain) {
+  if ($chain -contains $name) { throw "track include cycle: $($chain -join ' -> ') -> $name" }
+  $rt = $rawTracks[$name]
+  if (-not $rt) { throw "unknown track '$name'" }
+  $out = @()
+  foreach ($t in $rt.Lines) {
+    if ($t.StartsWith('>')) {
+      $out += [pscustomobject]@{ Kind = 'divider'; Value = $t.Substring(1).Trim() }
+    } elseif ($t.StartsWith('+')) {
+      $inc = $t.Substring(1).Trim()
+      if (-not $rawTracks.Contains($inc)) { throw "$($rt.File): includes unknown track '$inc'" }
+      $out += Expand-Track $inc ($chain + @($name))
+    } else {
+      if (-not $pages.Contains($t)) { throw "$($rt.File): lists unknown page '$t'" }
+      $out += [pscustomobject]@{ Kind = 'page'; Value = $t }
+    }
+  }
+  $out
+}
+
+$tracks = [ordered]@{}
+foreach ($name in $rawTracks.Keys) {
+  $rt = $rawTracks[$name]
+  if ($rt.Parent -and -not $rawTracks.Contains($rt.Parent)) {
+    throw "$($rt.File): @@PARENT '$($rt.Parent)' is not a track"
+  }
+  $items = @(Expand-Track $name @())
+  $ids = @($items | Where-Object Kind -eq 'page' | ForEach-Object Value)
+  # A page included twice (two topic tracks sharing a page) would be walked
+  # twice in the sequence. Keep the first occurrence and drop repeats.
+  $seen = [System.Collections.Generic.HashSet[string]]::new()
+  $dedup = @(); foreach ($it in $items) {
+    if ($it.Kind -eq 'page') { if (-not $seen.Add($it.Value)) { continue } }
+    $dedup += $it
+  }
+  $items = $dedup
+  $ids = @($items | Where-Object Kind -eq 'page' | ForEach-Object Value)
+  foreach ($pid2 in $ids) { [void]$pages[$pid2].Decks.Add($name) }
+
+  $tracks[$name] = [pscustomobject]@{
+    Name = $name; Title = $rt.Title; Kind = $rt.Kind; Parent = $rt.Parent
+    Subtitle = $rt.Subtitle; Footer = $rt.Footer
+    Items = $items; PageIds = $ids
+  }
+}
+Write-Host ("tracks: {0}" -f $tracks.Count)
+foreach ($t in $tracks.Values) {
+  Write-Host ("    {0,-28} {1,-8} {2} pages{3}" -f $t.Name, $t.Kind, $t.PageIds.Count,
+              $(if ($t.Parent) { "  (in $($t.Parent))" } else { '' }))
+}
 
 # -------------------------------------------------------- link resolution ----
 # Five containers for one authored link:
@@ -406,10 +477,10 @@ function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$m
   # straight into the player.
   $plHref = if ($mode -eq 'bundle') { "$script:siteUrl/presentations.html" } else { "${up}presentations.html" }
   [void]$sb.AppendLine('  <div class="navsplit"></div>')
-  [void]$sb.AppendLine('  <h2>Presentations</h2>')
-  [void]$sb.AppendLine('  <p class="navnote">Playlists built from the topics above.</p>')
+  [void]$sb.AppendLine('  <h2>Tracks</h2>')
+  [void]$sb.AppendLine('  <p class="navnote">Tracks built from the topics above.</p>')
   [void]$sb.AppendLine('  <ul class="navlist playlists">')
-  foreach ($d in $decks.Values) {
+  foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
     [void]$sb.AppendLine('    <li><a href="' + $plHref + '#pl-' + $d.Name + '">' +
                          (ConvertTo-HtmlText $d.Title) +
                          '<span class="count">' + $d.PageIds.Count + '</span></a></li>')
@@ -572,7 +643,7 @@ function New-PlaylistData {
   # playlist, a course is a playlist, the whole program is a playlist. It is
   # generated, not authored, so it can never fall behind the page set. An
   # authored deck named 'everything' wins over it.
-  if (-not $decks.Contains('everything')) {
+  if (-not $tracks.Contains('everything')) {
     $allItems = @()
     foreach ($c in $collections.Values) {
       $groupNames = if ($c.Groups.Count) { $c.Groups }
@@ -590,7 +661,7 @@ function New-PlaylistData {
     $rows += '{"name":"everything","title":"Everything","auto":true,"items":[' + ($allItems -join ',') + ']}'
   }
 
-  foreach ($d in $decks.Values) {
+  foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
     $items = @()
     $group = ''
     foreach ($item in $d.Items) {
@@ -606,7 +677,7 @@ function New-PlaylistData {
              '","title":"' + (ConvertTo-Json1 $d.Title) +
              '","items":[' + ($items -join ',') + ']}'
   }
-  $js = "window.PLAYLISTS = [`n" + ($rows -join ",`n") + "`n];`n"
+  $js = "window.TRACKS = [`n" + ($rows -join ",`n") + "`n];`n"
   Write-Host ("    playlists: {0}, {1:n0} bytes" -f $rows.Count, $js.Length)
   $js
 }
@@ -643,10 +714,10 @@ foreach ($c in $collections.Values) {
   [void]$hub.AppendLine('    </a>')
 }
 [void]$hub.AppendLine('  </div>')
-[void]$hub.AppendLine('  <h2 class="section-head">Presentations</h2>')
+[void]$hub.AppendLine('  <h2 class="section-head">Tracks</h2>')
 [void]$hub.AppendLine('  <p class="aside">A presentation is a <strong>playlist</strong> &mdash; an ordered selection of the topics above, not a separate copy of them. Edit a topic once and every playlist using it follows.</p>')
 [void]$hub.AppendLine('  <div class="grid">')
-foreach ($d in $decks.Values) {
+foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
   [void]$hub.AppendLine('    <a class="tile" href="presentations.html#pl-' + $d.Name + '">')
   [void]$hub.AppendLine('      <span class="t">' + (ConvertTo-HtmlText $d.Title) + '</span>')
   [void]$hub.AppendLine('      <span class="s">' + (ConvertTo-HtmlText $d.Subtitle) + '</span>')
@@ -677,17 +748,19 @@ $pi = New-Object System.Text.StringBuilder
 [void]$pi.AppendLine((New-Sidebar '' '' '' 'site' ''))
 [void]$pi.AppendLine('<main id="main"><div class="article wide">')
 [void]$pi.AppendLine('  <div class="crumb"><a href="index.html">' + (ConvertTo-HtmlText $site.TITLE) +
-                     '</a><span class="sep">/</span><span>Presentations</span></div>')
-[void]$pi.AppendLine('  <h1>Presentations</h1>')
+                     '</a><span class="sep">/</span><span>Tracks</span></div>')
+[void]$pi.AppendLine('  <h1>Tracks</h1>')
 [void]$pi.AppendLine('  <p class="lede">A presentation is a playlist: an ordered selection of topics, not a copy of them. Change a topic and every playlist that uses it changes with it.</p>')
 
-foreach ($d in $decks.Values) {
+foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
   [void]$pi.AppendLine('  <section class="playlist" id="pl-' + $d.Name + '">')
   [void]$pi.AppendLine('    <div class="pl-head">')
   [void]$pi.AppendLine('      <div class="pl-meta">')
   [void]$pi.AppendLine('        <h2>' + (ConvertTo-HtmlText $d.Title) + '</h2>')
   if ($d.Subtitle) { [void]$pi.AppendLine('        <p class="aside">' + (ConvertTo-HtmlText $d.Subtitle) + '</p>') }
-  [void]$pi.AppendLine('        <p class="pl-stat">' + (Format-Count $d.PageIds.Count 'topic') + ' &middot; ' +
+  [void]$pi.AppendLine('        <p class="pl-stat"><span class="kind">' + (Get-KindLabel $d.Kind) + '</span>' +
+                       $(if ($d.Parent) { ' in ' + (ConvertTo-HtmlText $tracks[$d.Parent].Title) } else { '' }) +
+                       ' &middot; ' + (Format-Count $d.PageIds.Count 'topic') + ' &middot; ' +
                        (Format-Count (Get-DeckSlideCount $d) 'panel') + '</p>')
   [void]$pi.AppendLine('      </div>')
   # Both entry points land on the FIRST REAL PAGE of the playlist. There is no
@@ -698,7 +771,7 @@ foreach ($d in $decks.Values) {
   [void]$pi.AppendLine('      <div class="pl-actions">')
   [void]$pi.AppendLine('        <a class="btn-play" href="' + $href + '">Start reading</a>')
   [void]$pi.AppendLine('        <a class="btn-alt" href="' + $href + '&amp;present=1">Presentation mode</a>')
-  [void]$pi.AppendLine('        <a class="btn-alt" href="print/playlist-' + $d.Name + '.html">Print / PDF</a>')
+  [void]$pi.AppendLine('        <a class="btn-alt" href="print/track-' + $d.Name + '.html">Print / PDF</a>')
   [void]$pi.AppendLine('      </div>')
   [void]$pi.AppendLine('    </div>')
   [void]$pi.AppendLine('    <ol class="tracks">')
@@ -779,7 +852,7 @@ foreach ($c in $collections.Values) {
       [void]$sb.AppendLine('    <div class="chips">')
       foreach ($dn in ($p.Decks | Select-Object -Unique)) {
         [void]$sb.AppendLine('      <a class="chip" href="' + $p.Id + '.html?p=' + $dn + '">' +
-                             (ConvertTo-HtmlText $decks[$dn].Title) + '</a>')
+                             (ConvertTo-HtmlText $tracks[$dn].Title) + '</a>')
       }
       [void]$sb.AppendLine('    </div>')
     } else {
@@ -916,9 +989,9 @@ foreach ($c in $collections.Values) {
   }
   New-Aggregate ('section-' + $c.Id) $c.Title $c.Summary $list 'Section'
 }
-foreach ($d in $decks.Values) {
+foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
   $list = @($d.PageIds | ForEach-Object { $pages[$_] })
-  New-Aggregate ('playlist-' + $d.Name) $d.Title $d.Subtitle $list 'Playlist'
+  New-Aggregate ('track-' + $d.Name) $d.Title $d.Subtitle $list 'Playlist'
 }
 # The whole manual in one document, matching the generated 'everything'
 # playlist. This is the PDF that survives the site being unreachable.
@@ -930,7 +1003,7 @@ foreach ($c in $collections.Values) {
     $allList += @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
   }
 }
-New-Aggregate 'playlist-everything' 'Everything' $site.SUMMARY $allList 'Playlist'
+New-Aggregate 'track-everything' 'Everything' $site.SUMMARY $allList 'Playlist'
 
 # ----------------------------------------------------------- stale output ----
 # The generator only ever wrote; it never removed. Renaming six pages left six
