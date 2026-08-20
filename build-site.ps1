@@ -414,13 +414,30 @@ function New-Document {
   $sb.ToString()
 }
 
+# Cache-busting stamp.
+#
+# GitHub Pages serves these assets with a cache lifetime, so a reader who has
+# been here before keeps the OLD stylesheet, script and search index after a
+# content update - even through a forced reload. That was observed directly:
+# the deployed index had 42 rows while the browser was still running the
+# previous 10-row copy. A stale search index is the dangerous one, because it
+# looks like it is working while silently missing new content.
+#
+# One stamp over every asset. Occasionally re-fetching an unchanged file is a
+# far cheaper mistake than serving a stale one.
+function Get-BuildStamp([string[]]$parts) {
+  $sha = [System.Security.Cryptography.SHA1]::Create()
+  $bytes = [Text.Encoding]::UTF8.GetBytes(($parts -join "`n"))
+  (( $sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') } ) -join '').Substring(0, 10)
+}
+
 $siteHead = { param($up) @"
-<link rel="stylesheet" href="${up}theme/msu-theme.css">
-<link rel="stylesheet" href="${up}theme/app.css">
+<link rel="stylesheet" href="${up}theme/msu-theme.css?v=$script:stamp">
+<link rel="stylesheet" href="${up}theme/app.css?v=$script:stamp">
 "@ }
 $siteScripts = { param($up) @"
-<script src="${up}search-index.js"></script>
-<script src="${up}theme/app.js"></script>
+<script src="${up}search-index.js?v=$script:stamp"></script>
+<script src="${up}theme/app.js?v=$script:stamp"></script>
 "@ }
 
 # ---------------------------------------------------- section -> card --------
@@ -510,6 +527,14 @@ function New-SearchIndex([string]$mode) {
 
 # ------------------------------------------------------------ landing page ---
 Write-Host 'site'
+$searchJs = New-SearchIndex 'site'
+$script:stamp = Get-BuildStamp @(
+  $searchJs
+  [System.IO.File]::ReadAllText((Join-Path $themeDir 'msu-theme.css'))
+  [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.css'))
+  [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.js'))
+)
+Write-Host ("    build stamp: {0}" -f $script:stamp)
 $hub = New-Object System.Text.StringBuilder
 [void]$hub.AppendLine('<a class="skip" href="#main">Skip to content</a>')
 [void]$hub.AppendLine((New-AppBar ''))
@@ -547,7 +572,7 @@ Write-Out (Join-Path $docsDir 'index.html') `
           (New-Document $site.TITLE 'app skin-app' $hub.ToString() '' 'home' (& $siteHead '') (& $siteScripts ''))
 
 Write-Out (Join-Path $docsDir '.nojekyll') ''
-Write-Out (Join-Path $docsDir 'search-index.js') (New-SearchIndex 'site')
+Write-Out (Join-Path $docsDir 'search-index.js') $searchJs
 
 # ---------------------------------------------- collection index + pages -----
 foreach ($c in $collections.Values) {
@@ -766,10 +791,10 @@ function New-DeckBody($d, [string]$mode) {
 }
 
 Write-Host 'decks'
-$deckHead = @'
-<link rel="stylesheet" href="theme/msu-theme.css">
-<link rel="stylesheet" href="theme/deck.css">
-'@
+$deckHead = @"
+<link rel="stylesheet" href="theme/msu-theme.css?v=$script:stamp">
+<link rel="stylesheet" href="theme/deck.css?v=$script:stamp">
+"@
 foreach ($d in $decks.Values) {
   $r = New-DeckBody $d 'site-deck'
   Write-Out (Join-Path $docsDir ('deck-' + $d.Name + '.html')) `
