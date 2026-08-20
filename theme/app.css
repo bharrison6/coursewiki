@@ -526,6 +526,38 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* ---- figures and captions ----------------------------------------------
+   The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
+   viewport that insets the figure to 222px against 302px of prose -- a
+   graphic rendering 26% narrower than its own caption. Zero the horizontal
+   inset and own the vertical rhythm instead.
+
+   .graphic-slot is a figure whose artwork has not been drawn yet. It is
+   deliberately visible rather than hidden: an empty slot that renders as a
+   bare floating caption reads as a bug, and a slot nobody can see is a slot
+   nobody fills. Filling one replaces the comment with [[img:...|alt]] and
+   the placeholder rule stops matching on its own.                          */
+figure { margin: 1.5rem 0; }
+
+figure > figcaption {
+  margin-top: .5rem;
+  color: var(--ink-soft);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+figure.graphic-slot:not(:has(img))::before {
+  content: "Artwork pending";
+  display: block;
+  padding: 1.75rem .75rem;
+  text-align: center;
+  font-family: var(--f-mono); font-size: .78rem;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-soft);
+  border: 2px dashed var(--rule);
+  border-radius: var(--radius-sm);
+}
+
 /* Both of these are build-error states that reach the page. The build already
    fails on them; these make the failure visible in the artifact too, because
    a generated surface that looks fine is how the last three of these got out.
