@@ -481,19 +481,31 @@ function New-Tiles($pageList, [string]$up, [string]$fromColl, [string]$mode) {
 # Emitted as a script that assigns a global, not JSON fetched at runtime: a
 # browser blocks fetch() of a local file when the site is opened over file://,
 # and a classic <script> is not subject to that.
+# One row per SECTION, not per page.
+#
+# Per-page rows meant one long body string, which had to be capped to keep the
+# index small - and the cap silently hid content. "galvanized" is in the PPE
+# page's respiratory section, past the old 1400-character cut, so a search for
+# a PROHIBITED material returned nothing at all. Sections are naturally short,
+# so nothing is truncated now, and a hit deep-links to the card that holds it
+# rather than dropping the reader at the top of a long page.
 function New-SearchIndex([string]$mode) {
   $rows = @()
   foreach ($p in $pages.Values) {
-    $heads = ($p.Sections | ForEach-Object { ConvertTo-Plain $_.Head }) -join ' | '
-    $text  = ConvertTo-Plain $p.Body
-    if ($text.Length -gt 1400) { $text = $text.Substring(0, 1400) }
-    $url = if ($mode -eq 'bundle') { '#p-' + $p.Id } else { "$($p.Collection)/$($p.Id).html" }
-    $rows += '{"title":"' + (ConvertTo-Json1 $p.Title) + '","summary":"' + (ConvertTo-Json1 $p.Summary) +
-             '","collection":"' + (ConvertTo-Json1 $collections[$p.Collection].Title) +
-             '","url":"' + (ConvertTo-Json1 $url) + '","headings":"' + (ConvertTo-Json1 $heads) +
-             '","text":"' + (ConvertTo-Json1 $text) + '"}'
+    foreach ($s in $p.Sections) {
+      $head = if ($s.Head) { ConvertTo-Plain $s.Head } else { $p.Title }
+      $url  = if ($mode -eq 'bundle') { '#p-' + $p.Id } else { "$($p.Collection)/$($p.Id).html#$($s.Slug)" }
+      $rows += '{"title":"' + (ConvertTo-Json1 $head) +
+               '","page":"' + (ConvertTo-Json1 $p.Title) +
+               '","summary":"' + (ConvertTo-Json1 $p.Summary) +
+               '","collection":"' + (ConvertTo-Json1 $collections[$p.Collection].Title) +
+               '","url":"' + (ConvertTo-Json1 $url) +
+               '","text":"' + (ConvertTo-Json1 (ConvertTo-Plain $s.Html)) + '"}'
+    }
   }
-  "window.SEARCH_INDEX = [`n" + ($rows -join ",`n") + "`n];`n"
+  $js = "window.SEARCH_INDEX = [`n" + ($rows -join ",`n") + "`n];`n"
+  Write-Host ("    search index: {0} sections, {1:n0} bytes" -f $rows.Count, $js.Length)
+  $js
 }
 
 # ------------------------------------------------------------ landing page ---

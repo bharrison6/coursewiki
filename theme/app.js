@@ -207,29 +207,39 @@
     function search(q) {
       q = q.trim().toLowerCase();
       if (q.length < 2) return [];
-      return idx.map(function (p) {
+      var hits = idx.map(function (p) {
         var score = 0;
         if (p.title.toLowerCase().indexOf(q) >= 0) score += 100;
-        if (p.summary.toLowerCase().indexOf(q) >= 0) score += 40;
-        if ((p.headings || '').toLowerCase().indexOf(q) >= 0) score += 25;
-        var bi = p.text.toLowerCase().indexOf(q);
-        if (bi >= 0) score += 10;
+        if (p.page.toLowerCase().indexOf(q) >= 0) score += 60;
+        if (p.summary.toLowerCase().indexOf(q) >= 0) score += 25;
+        if (p.text.toLowerCase().indexOf(q) >= 0) score += 15;
         return score ? { p: p, score: score, q: q } : null;
-      }).filter(Boolean).sort(function (a, b) { return b.score - a.score; }).slice(0, 8);
+      }).filter(Boolean).sort(function (a, b) { return b.score - a.score; });
+
+      // Sections are indexed individually, so one page can otherwise fill the
+      // whole result list. Keep its two best and let other pages be seen.
+      var perPage = {}, out = [];
+      hits.forEach(function (h) {
+        var n = perPage[h.p.page] || 0;
+        if (n < 2) { perPage[h.p.page] = n + 1; out.push(h); }
+      });
+      return out.slice(0, 8);
     }
 
     function render(hits, q) {
       shown = hits; cur = -1;
       if (!q || q.trim().length < 2) { box.removeAttribute('data-open'); box.innerHTML = ''; return; }
       if (!hits.length) {
-        box.innerHTML = '<div class="empty">No page matches &ldquo;' + esc(q) + '&rdquo;.</div>';
+        box.innerHTML = '<div class="empty">Nothing matches &ldquo;' + esc(q) + '&rdquo;.</div>';
         box.setAttribute('data-open', ''); return;
       }
       box.innerHTML = hits.map(function (h) {
+        var crumb = h.p.collection + ' · ' + h.p.page;
+        var label = (h.p.title === h.p.page) ? h.p.page : h.p.title;
         return '<a href="' + base + h.p.url + '">' +
-               '<span class="rc">' + esc(h.p.collection) + '</span>' +
-               '<span class="rt">' + esc(h.p.title) + '</span>' +
-               '<span class="rs">' + snippet(h.p.summary + ' ' + h.p.text, h.q) + '</span></a>';
+               '<span class="rc">' + esc(crumb) + '</span>' +
+               '<span class="rt">' + esc(label) + '</span>' +
+               '<span class="rs">' + snippet(h.p.text || h.p.summary, h.q) + '</span></a>';
       }).join('');
       box.setAttribute('data-open', '');
     }
