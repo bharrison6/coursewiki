@@ -1,5 +1,5 @@
 /* ============================================================================
-   app.js - behaviour for the site shell.
+   app.js - behavior for the site shell.
 
    Everything here is an ENHANCEMENT. With JavaScript off you still get: the
    full sidebar (nested <details>), every card (also <details>, open by
@@ -264,11 +264,11 @@
                     ['ABC dry chemical', 'ok', 'Works. Non-conductive agent.'],
                     ['CO<sub>2</sub>', 'ok', 'Works, and does not foul the equipment.'],
                     ['Class D dry powder', 'no', 'Wrong tool. For metals only.']] },
-      D: { what: '<strong>Combustible metals</strong> — magnesium, titanium, sodium, lithium, and aluminium in fine form: chips, swarf and grinding dust. We generate this fuel.',
+      D: { what: '<strong>Combustible metals</strong> — magnesium, titanium, sodium, lithium, and aluminum in fine form: dust from grinding, sanding, buffing and polishing. Chips and solid stock are not this.',
            agents: [['Water', 'bad', 'DANGEROUS. Can react violently and throw burning metal.'],
                     ['ABC dry chemical', 'bad', 'DANGEROUS. Dry chemical is not dry powder — it can be useless or make it worse.'],
                     ['CO<sub>2</sub>', 'bad', 'DANGEROUS. Will not stop a metal fire.'],
-                    ['Class D dry powder', 'ok', 'The only correct agent. Smothers and absorbs heat.']] },
+                    ['Class D dry powder', 'ok', 'The only correct agent. Do not assume one is on hand.']] },
       K: { what: '<strong>Cooking oils and fats</strong> — kitchen equipment, not lab equipment. Listed so the letter is not a mystery.',
            agents: [['Wet chemical', 'ok', 'The correct agent. Forms a soapy crust on the oil.'],
                     ['Water', 'bad', 'DANGEROUS. Erupts burning oil.'],
