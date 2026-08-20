@@ -1,5 +1,5 @@
 <#
-    build-site.ps1 - render the DET site: landing page, collections, decks.
+    build-site.ps1 - render the Coursewiki site: landing page, collections, decks.
 
     THE MODEL
       A PAGE is one topic, authored once, as an @@FIELD: header plus a stack of

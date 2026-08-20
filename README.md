@@ -1,4 +1,4 @@
-# DET site
+# Coursewiki
 
 Course reference for the Design Engineering Technology program, School of Engineering,
 Murray State University.
