@@ -1,52 +1,388 @@
 @@ID: electrical-safety
 @@TITLE: Electrical Safety
 @@SECTION: Universal Rules
-@@SUMMARY: Voltages present in the lab, the inspection required before every use, and what to do when someone is shocked.
+@@SUMMARY: Where the shock hazard actually starts, why 5 V can still burn you, the inspection required before every use, cords on the floor, and what to do when someone is shocked.
 @@STATUS: ready
-@@TAGS: electrical, voltage, cords, shock, lockout
+@@TAGS: electrical, voltage, cords, shock, lockout, low voltage, short circuit, trip hazard, batteries
 @@END
 
 <section>
   <h2>Voltage in this lab</h2>
+  <p class="lede">You will work at both ends of this range in the same week &mdash; a 5&nbsp;V
+  microcontroller on the bench in the morning, a 240&nbsp;V machine in the afternoon. They are not
+  the same hazard, and treating them as one thing does not make you safer. It makes the warning
+  easy to ignore.</p>
   <dl class="dims">
-    <div><dt>120 V</dt><dd>Standard receptacles. Still dangerous &mdash; can cause serious injury or death.</dd></div>
-    <div><dt>240 V / 480 V</dt><dd>Industrial equipment. Extremely dangerous &mdash; often fatal.</dd></div>
+    <div><dt>5&nbsp;V / 12&nbsp;V DC</dt><dd>Benchtop electronics &mdash; supplies, controllers,
+    battery packs. <strong>Below the shock threshold.</strong> Not below the burn threshold.</dd></div>
+    <div><dt>120&nbsp;V</dt><dd>Standard receptacles. Dangerous &mdash; can cause serious injury or
+    death.</dd></div>
+    <div><dt>240&nbsp;V / 480&nbsp;V</dt><dd>Industrial equipment. Extremely dangerous &mdash; often
+    fatal.</dd></div>
   </dl>
   <div class="stop">
-    <p><strong>Never assume any voltage is &ldquo;safe&rdquo;.</strong></p>
+    <p><strong>Voltage tells you whether a circuit can push current through <em>you</em>. It does
+    not tell you what that circuit can do to a ring, a dropped tool or a shorted cell.</strong></p>
+    <p>Those are two different hazards with two different thresholds. The next two sections are
+    about where each one starts.</p>
   </div>
 </section>
 
 <section>
-  <h2>Inspection &mdash; mandatory before each use</h2>
-  <ul class="boxes">
-    <li>Check for frayed, cracked or exposed wiring.</li>
-    <li>Look for damaged plugs or connectors.</li>
-    <li>Inspect extension cords for cuts or wear.</li>
+  <h2>Where the shock hazard starts</h2>
+  <p class="lede">There is a real number and it is not a secret. In US workplace rules the line is
+  <strong>50&nbsp;volts</strong>.</p>
+  <ul>
+    <li>OSHA requires live parts to be de-energized before you work on or near them &mdash; and then
+    says that <strong>&ldquo;live parts that operate at less than 50 volts to ground need not be
+    deenergized if there will be no increased exposure to electrical burns or to explosion due to
+    electric arcs&rdquo;</strong> (<code>29&nbsp;CFR&nbsp;1910.333(a)(1)</code>). Read that second
+    half again; the rest of this page hangs on it.</li>
+    <li>At or above the line, live parts must be <strong>guarded against accidental contact</strong>.
+    The rule is written for &ldquo;electric equipment operating at 50 volts or more&rdquo;
+    (<code>29&nbsp;CFR&nbsp;1910.303(g)(2)(i)</code>).</li>
+    <li><strong>That number applies to DC as well as AC.</strong> The standard does not distinguish
+    between them, and OSHA has stated it &ldquo;considers all voltages of 50 volts or above to be
+    hazardous&rdquo; (interpretation letter, 4&nbsp;September&nbsp;2015).</li>
+    <li>NFPA&nbsp;70E draws the same line. Below 50&nbsp;V you may work live only where <strong>the
+    capacity of the source and any overcurrent protection have been considered</strong> and found
+    not to add burn or arc exposure (2024 edition, 110.2(B) Exception No.&nbsp;5).</li>
   </ul>
-  <p><strong>If you find damage, discontinue use immediately and notify the instructor.</strong></p>
+
+  <h3>The international standards are not one number</h3>
+  <p>On datasheets you will meet a different set of figures, and there the <strong>AC and DC limits
+  are not the same</strong>:</p>
+  <dl class="dims">
+    <div><dt>50&nbsp;V AC / 120&nbsp;V DC</dt><dd><strong>Extra-Low Voltage</strong> under
+    IEC&nbsp;61140 and IEC&nbsp;60364-4-41 &mdash; 50&nbsp;V AC rms, or 120&nbsp;V
+    <em>ripple-free</em> DC. &ldquo;Ripple-free&rdquo; is a real condition, not a figure of speech:
+    past roughly 10&nbsp;% rms ripple the supply is treated as AC and the lower number applies.</dd></div>
+    <div><dt>30&nbsp;V AC / 60&nbsp;V DC</dt><dd><strong>Class ES1</strong> in IEC&nbsp;62368-1, the
+    standard behind most benchtop and consumer equipment. ES1 is the class that needs no safeguard
+    at all; ES2 runs up to 50&nbsp;V AC / 120&nbsp;V DC and requires one.</dd></div>
+  </dl>
+  <div class="gate">
+    <p><strong>In this lab, use 50&nbsp;V &mdash; AC or DC.</strong> It is the number OSHA enforces,
+    it is the most conservative of the figures above, and it assumes nothing about your skin being
+    dry or your hands being clean. If a circuit is at or above 50&nbsp;V, it is not something you
+    work on live.</p>
+  </div>
+  <p class="aside"><strong>About the 48&nbsp;volts you may have heard.</strong> 48&nbsp;V DC is a
+  <em>system</em> voltage, not a safety threshold. It is the telephone-exchange standard that Bell
+  settled on, carried into military and commercial communications gear ever since, and more recently
+  into 48&nbsp;V vehicle electrical systems (ISO&nbsp;21780). It was picked to sit deliberately
+  <strong>just under</strong> the 50&nbsp;V line so that technicians could keep working on it live.
+  So 48 is the right neighborhood from the wrong side: <strong>the threshold is 50, and 48 is what
+  engineers built in order to stay below it.</strong></p>
 </section>
 
 <section>
-  <h2>Safe practice</h2>
+  <h2>Low voltage is not low energy</h2>
+  <p class="lede">Below 50&nbsp;V, shock stops being the hazard and <strong>short-circuit current
+  becomes it</strong>. This is the section that matters most on the bench, because 5&nbsp;V and
+  12&nbsp;V is where most of you spend most of your time.</p>
+  <p>Look at what the exemption above is actually conditioned on. Not shock &mdash; <strong>burns
+  and arcs</strong>. NFPA&nbsp;70E names the same condition as <em>the capacity of the source</em>.
+  Both standards are telling you that once you are under the shock line, the question changes from
+  <em>how many volts</em> to <strong>how many amps can this thing deliver into a dead short</strong>.</p>
+
+  <h3>Where the current comes from</h3>
+  <ul>
+    <li>A <strong>bench supply</strong> set to 5&nbsp;V will deliver its full rated current into a
+    short without complaint. That is what the current limit is for &mdash; and if you have wound the
+    limit up to get a motor turning, you have wound the protection off.</li>
+    <li>A <strong>lithium cell or pack</strong> has almost no internal resistance. Shorted, a single
+    cell can dump tens of amps within milliseconds. A pack does considerably worse.</li>
+    <li>A <strong>lead-acid battery</strong> is rated in hundreds of cold-cranking amps. That rating
+    <em>is</em> its short-circuit capability, described politely.</li>
+  </ul>
+  <p>None of these can push meaningful current through your body at 12&nbsp;V. All of them can push
+  hundreds of amps through a piece of metal &mdash; and metal carrying current it was never sized
+  for gets hot, fast.</p>
+
+  <h3>Metal jewelry is the classic way this happens</h3>
+  <div class="stop">
+    <p><strong>ALL jewelry is already PROHIBITED here</strong> &mdash; see
+    [[ppe|clothing and jewelry]]. That rule was written for rotating machinery. It earns its keep a
+    second time on the bench, and OSHA writes it a second time for exactly this reason: conductive
+    jewelry &ldquo;may not be worn if they might contact exposed energized parts&rdquo;
+    (<code>29&nbsp;CFR&nbsp;1910.333(c)(8)</code>) &mdash; a rule with <strong>no voltage floor at
+    all</strong>.</p>
+    <p>A ring or a metal watch band bridging a low-voltage source is a near-zero-resistance path
+    across something that can supply hundreds of amps. The ring becomes the heating element. This is
+    documented injury, not a story: a mechanic&rsquo;s gold ring touched the positive terminal of a
+    <strong>12&nbsp;V car battery</strong> while the wrench in his hand bridged the ring and the
+    negative terminal, and the result was a deep circumferential burn around the base of the finger
+    that needed a skin graft. A review of nine ring burns at one burn center found the same pattern:
+    <strong>the small size of the burn hides how bad it is</strong>, because a burn that wraps a
+    finger is far more likely to need grafting and to leave lasting loss of function than a burn of
+    the same area anywhere else.</p>
+    <p><strong>You can drop a wrench. You cannot drop a ring.</strong></p>
+  </div>
+  <p class="aside">The silicone wedding ring that the PPE rule allows is also the right answer
+  electrically: silicone does not conduct, so it cannot become the short.</p>
+
+  <h3>A shorted lithium cell does not just get warm</h3>
+  <div class="stop">
+    <p>An external short is one of the recognized triggers for <strong>thermal runaway</strong>
+    &mdash; the cell generates heat faster than it can shed it, and the outcome is
+    &ldquo;extremely high temperatures, violent cell venting, smoke and fire&rdquo; (UL Research
+    Institutes). Once it has started, <strong>disconnecting it does not stop it</strong>. The cell is
+    now its own energy source.</p>
+    <p><strong>NEVER leave loose cells or packs where metal can bridge the terminals</strong>
+    &mdash; a drawer with tools in it, a pocket with keys in it, a bin with offcuts in it. Federal
+    transport rules require lithium cells and batteries to be packed so their terminals cannot short
+    (<code>49&nbsp;CFR&nbsp;173.185</code>). The reason that rule exists is the reason to do the same
+    thing on your own bench.</p>
+    <p>A cell that has been shorted, dropped, crushed, punctured or has swollen is <strong>out of
+    service</strong>. Tell the instructor. Do not put it back on charge to find out. See
+    [[fire-safety]].</p>
+  </div>
+
+  <p class="aside"><strong>The sentence to take away:</strong> low voltage does not mean low energy.
+  Voltage decides whether a circuit can shock you. <strong>Current decides whether it can burn
+  you</strong> &mdash; and current is set by what the source can deliver and what is in the path,
+  not by the number printed on the front of the supply.</p>
+</section>
+
+<section>
+  <h2>Inspection &mdash; mandatory before each use</h2>
+  <p class="lede">Every cord, every time, before it goes in the receptacle. It takes about five
+  seconds, and it is the one check that catches most of this page before it happens rather than
+  after.</p>
+  <ul class="boxes">
+    <li>Run the cord through your hand end to end. Look for <strong>frayed, cracked, cut or
+    exposed</strong> insulation, and for flat spots where something has been driven over it.</li>
+    <li>Check the <strong>plug</strong>: blades all present, straight, tight in the body, not
+    discolored or pitted. Check the <strong>ground pin is still there</strong> &mdash; a missing
+    ground pin means the cord is out of service, not that you have found a workaround.</li>
+    <li>Check where the cord <strong>enters the plug and enters the tool</strong>. That is where
+    flexing breaks conductors, and it is where the damage hides.</li>
+    <li>Inspect extension cords for cuts, crushing and wear, and check the receptacle end for
+    scorching or melted plastic.</li>
+  </ul>
+
+  <figure class="graphic-slot">
+    <!-- GRAPHIC-SLOT: damaged-cord-inspection
+         STATUS: awaiting artwork. Fill this figure; leave the figcaption text as written.
+
+         LAYOUT NOTE, APPLIES TO ALL THREE SLOTS ON THIS PAGE. There is no rule for
+           .graphic-slot in theme\app.css yet, so the browser default for <figure> insets it
+           40px on each side: measured at 375px viewport the figure is 222px wide where the
+           prose beside it is 302px. A graphic that renders 26% narrower than its own caption
+           is a defect, so before any artwork ships app.css needs roughly:
+             figure.graphic-slot { margin: 1.5rem 0; }
+             figure.graphic-slot figcaption { font-size: .9rem; color: var(--ink-soft); }
+           theme\app.css was being edited by another agent when this page was written; that
+           rule was deliberately NOT added from here. Confirm it exists before filling a slot.
+
+         DEPICTS: a damaged flexible cord, close, at the point a student would find it.
+           Show at least two of the failure modes named in the list above so the graphic
+           teaches the checklist rather than illustrating one word of it:
+             1. outer jacket abraded through, with the colored conductor insulation showing;
+             2. the cord kinked and cracked right where it enters the plug body (strain relief
+                failed), a couple of strands visible;
+             3. a crush/flat spot from being run over or pinched in a door.
+           A student must be able to point at the picture and say WHICH check found it.
+         MEDIUM: a photograph is the right call here. The media README asks for real damage
+           to be photographed rather than drawn. A cutaway drawing works only if it stays
+           strictly literal. NOTE: nothing identifiable, no faces, no room signage.
+         DO NOT SHOW: tape wrapped around the damage as if that were a fix. The gate below
+           says tape is not a repair; a taped cord in the picture would teach the opposite.
+         WHEN FILLED: replace this comment with an image reference of the form
+           img:damaged-cord.jpg piped to the alt text below, wrapped in the site's
+           double-square-bracket link syntax. See media\README.md. Alt text is required and
+           the build fails without it. Do not write a raw HTML img tag.
+         ALT: "A power cord with its outer jacket worn through, exposing the colored insulation
+           of the conductors underneath, and a second cord cracked and kinked where it enters
+           the plug."
+    -->
+    <figcaption>Damage like this means the cord is finished, not that it needs watching.</figcaption>
+  </figure>
+
+  <div class="gate">
+    <p><strong>If you find damage, stop, unplug it, and notify the instructor.</strong> Not
+    &ldquo;just for this one cut&rdquo;. Tag it or hand it over, so the next person does not find it
+    the hard way.</p>
+    <p><strong>Tape is not a repair.</strong> OSHA allows electrical tape over superficial scuffs in
+    the outer jacket, and has stated just as plainly that &ldquo;tape repairs of the jacket may not
+    be used to bring a worn or frayed flexible cord into compliance&rdquo; (interpretation letter,
+    16&nbsp;December&nbsp;1998). If conductors or their insulation are showing, the cord is done.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Plugs, cords and connections</h2>
   <ul>
     <li>Always <strong>disconnect power</strong> before performing any maintenance or adjustment.</li>
-    <li><strong>Never yank or pull a cord</strong> &mdash; grasp the plug, not the cord.</li>
-    <li>Keep electrical connections away from water and wet surfaces.</li>
-    <li>Be aware of overhead wiring and floor-level cords, and avoid contact.</li>
+    <li><strong>NEVER yank or pull a cord</strong> &mdash; grasp the plug, not the cord. Pulling by
+    the cord wrecks the strain relief where you cannot see it, and it is how a plug ends up
+    <strong>half out of the receptacle with the blades exposed</strong>.</li>
+    <li>Push a plug <strong>fully home</strong>, and look at it. A plug that will not seat is a
+    fault to report, not a fit problem to force.</li>
+    <li>Keep electrical connections away from water and wet surfaces. Wet skin has on the order of
+    <strong>1,000&nbsp;ohms</strong> of resistance where dry skin has <strong>100,000&nbsp;ohms or
+    more</strong>, so water moves you roughly a hundredfold closer to the current every rule on this
+    page is trying to keep out of you.</li>
+    <li>Be aware of <strong>overhead wiring</strong> when you are handling long stock, moving a
+    ladder or lifting.</li>
   </ul>
-  <p class="aside">Lockout/Tagout for machinery with rotating parts is covered in [[machine-hazards]].</p>
+
+  <h3>A partly unplugged appliance is a short waiting for something to land on it</h3>
+
+  <figure class="graphic-slot">
+    <!-- GRAPHIC-SLOT: partly-unplugged-short
+         STATUS: awaiting artwork. Fill this figure; leave the figcaption text as written.
+         LAYOUT NOTE: see the damaged-cord-inspection slot above. app.css still has no
+           .graphic-slot rule and the figure is inset 40px each side until it does.
+         THIS IS A SEQUENCE, NOT A STILL. Three panels, read left to right, one caption:
+           1. NORMAL. Plug fully seated in a wall receptacle. Nothing visible but the plug face.
+           2. THE SETUP. Same plug pulled out roughly halfway, so both flat blades are bare
+              between the plug body and the receptacle face. Still energized, still working,
+              nothing looks wrong. This panel is the whole point: the hazard exists BEFORE
+              anything happens, and it looks like nothing.
+           3. THE EVENT. A metal chip (the instructor's example, and the thing that is actually
+              lying around in this building) falls and lands across both exposed blades.
+              Dead short across the supply: flash at the contact point, molten metal thrown.
+         TEACHING POINT: what makes this dangerous is the gap, not the appliance. Panel 2 has
+           to look boring or the sequence does not work.
+         MEDIUM: draw this. Inline SVG, three panels, themed with the site tokens like the
+           PASS stepper on the fire page. Per the media README, browser-drawn beats a flat
+           image where the browser can draw it, and this is geometry, not photography.
+           Do NOT stage and photograph a real energized short.
+         CONSTRAINTS: legible in black and white for the printable aggregate; legible in both
+           light and dark theme; no motion required to read it. If panel numbering is drawn,
+           number the panels 1 2 3.
+         ALT (accessible description; on the SVG use role="img" plus a title/desc pair, or
+           supply it as the label if this ends up as an image file):
+           "Three panels. First, a plug fully seated in a wall receptacle. Second, the same plug
+           pulled halfway out with both metal blades exposed in the gap. Third, a metal chip
+           falling across the two exposed blades and shorting them, with a flash at the contact
+           point."
+    -->
+    <figcaption>The hazard is the gap, and it is there before anything lands in it.</figcaption>
+  </figure>
+
+  <div class="stop">
+    <p>Exposed blades sit at full line voltage with nothing between them but air. Anything
+    conductive that falls across them completes the circuit straight across the supply &mdash; and
+    in this building, the thing that falls is a <strong>metal chip</strong>. What follows is not a
+    shock. It is an arc, at whatever fault current a 120&nbsp;V branch circuit can deliver, throwing
+    molten metal. The breaker will clear it; <strong>a breaker protects the wiring, not your
+    face</strong>, and it does not act until after the arc.</p>
+    <p><strong>Plugs are all the way in or all the way out.</strong> Nothing in between, and nothing
+    left in between.</p>
+  </div>
+  <p class="aside">Chips travel further than you expect and they conduct &mdash; see
+  [[metal-chips]]. That is the direct line between the housekeeping rules and this one.</p>
+  <p class="aside">Lockout/Tagout for machinery with rotating parts is covered in
+  [[machine-hazards]].</p>
+</section>
+
+<section>
+  <h2>Cords on the floor &mdash; the one most likely to get you</h2>
+  <p class="lede">Nothing else on this page is as likely to actually injure someone here as a cord
+  lying across a walkway. It is not a shock hazard at all. It is a <strong>trip hazard</strong>
+  &mdash; and a trip in a shop is not a trip onto carpet. It is a fall into a machine, onto hot
+  metal, or with a running tool still in your hand.</p>
+  <p>The regulation treats this as a floor problem rather than an electrical one:
+  <strong>&ldquo;walking-working surfaces are maintained free of hazards such as sharp or protruding
+  objects, loose boards, corrosion, leaks, spills, snow, and ice&rdquo;</strong>
+  (<code>29&nbsp;CFR&nbsp;1910.22(a)(3)</code>), and passageways and work areas are kept &ldquo;in a
+  clean, orderly, and sanitary condition&rdquo; (<code>29&nbsp;CFR&nbsp;1910.22(a)(1)</code>). A cord
+  across an aisle is an obstruction in an aisle.</p>
+
+  <figure class="graphic-slot">
+    <!-- GRAPHIC-SLOT: cord-routing-trip-hazard
+         STATUS: awaiting artwork. THIS IS THE MOST IMPORTANT GRAPHIC ON THE PAGE. Give it
+         the most space and the most care. Fill this figure; leave the figcaption as written.
+         LAYOUT NOTE: see the damaged-cord-inspection slot above. This one matters most here,
+           because a three-element plan drawing squeezed into 222px at mobile width will not
+           read. Get the .graphic-slot rule into app.css first.
+         DEPICTS: one bench, one receptacle, one walkway, drawn twice. A plan view (looking
+         down) reads better than perspective here, because the point is the ROUTE.
+           WRONG: the cord takes the short way, straight across the open walkway, with slack
+             coiled in the middle of it. Mark the crossing point clearly as the hazard.
+           RIGHT: the same bench and the same receptacle, cord routed the long way around the
+             edge of the room, following the wall and the bench line, out of the walkway
+             entirely, with no slack on the floor.
+         SECOND ELEMENT, smaller, alongside or below: the fallback for when it genuinely must
+           cross. Show a cord ramp / cord cover over the cord at the crossing, in section or
+           in plan, so the reader knows what the thing looks like. Taped down is the lesser
+           version of the same idea.
+         DO NOT: make the wrong panel look dramatic or the right panel look fussy. The whole
+         message is that the correct route is longer and almost free.
+         MEDIUM: draw it. Inline SVG, site tokens, same family as the PASS stepper and the
+           category ladder on the other safety pages. Must print in black and white and read
+           in both themes, so distinguish the two routes by line style and label as well as
+           by color.
+         ALT (accessible description; role="img" with title/desc if drawn as SVG):
+           "Two floor plans of the same bench and wall outlet. In the first the power cord runs
+           straight across the open walkway with slack coiled on the floor, marked as a hazard.
+           In the second the cord runs along the wall and around the edge of the room, keeping
+           the walkway clear. A third detail shows a cord ramp covering a cord where it has to
+           cross."
+    -->
+    <figcaption>The correct route is longer and costs nothing. That is the whole argument.</figcaption>
+  </figure>
+
+  <h3>What to do, in order of preference</h3>
+  <ul class="boxes">
+    <li><strong>Do not cross the walkway.</strong> Move the work to the outlet, or use a different
+    outlet. This is almost always available, and it is almost never the first thing anyone tries.</li>
+    <li><strong>Route along the wall or the bench line</strong> rather than across open floor. Take
+    the long way around the edge of the room.</li>
+    <li><strong>Go overhead</strong> where a drop or a reel is provided. That is what they are
+    for.</li>
+    <li><strong>If it genuinely must cross, cover or anchor it.</strong> OSHA&rsquo;s own guidance is
+    to &ldquo;ensure that temporary electrical cords that cross aisles are taped or anchored to the
+    floor&rdquo;. A cord ramp or cord cover does the same job better and protects the cord as well
+    as the person.</li>
+    <li><strong>Use the shortest cord that reaches.</strong> Slack on the floor is the hazard, and a
+    coiled surplus in a walkway is the same hazard in a tighter package.</li>
+    <li><strong>Unplug it and put it away when you are done</strong>, in the same movement as
+    shutting the tool down. The cord left out after the job is finished is the one nobody is
+    expecting.</li>
+  </ul>
+
+  <div class="stop">
+    <p><strong>PROHIBITED &mdash; running a flexible cord through a doorway, a window, or a hole in
+    a wall, ceiling or floor, and attaching it to building surfaces.</strong> Those are named
+    prohibitions in the electrical standard (<code>29&nbsp;CFR&nbsp;1910.305(g)(1)(iv)</code>),
+    along with using flexible cord as a substitute for the fixed wiring of a building. Flexible cord
+    is temporary by definition. A cord treated as permanent gets pinched, crushed and forgotten.</p>
+    <p><strong>NEVER walk past a cord lying across a walkway and leave it</strong> because it is not
+    yours. If you can see it, you can move it or say something. The person who trips over it will
+    not have seen it.</p>
+  </div>
+  <p class="aside">The same standard requires flexible cords to be protected from accidental damage
+  at sharp corners, projections, doorways and other pinch points
+  (<code>29&nbsp;CFR&nbsp;1910.305(a)(2)(x)</code>) &mdash; the same rule read from the cord&rsquo;s
+  side. A cord that gets walked on is a cord that fails the inspection above. This section and that
+  one are the same problem twice.</p>
+  <p class="aside">Keeping walkways clear is the <em>Set in Order</em> and <em>Shine</em> part of
+  [[5s-workplace-organization|5S]]. The safety case and the lean case are the same case.</p>
 </section>
 
 <section>
   <h2>If someone is shocked</h2>
   <div class="stop">
-    <p><strong>Do NOT touch them directly.</strong></p>
+    <p><strong>Do NOT touch them directly.</strong> If current is still flowing they are part of the
+    circuit, and grabbing them puts you in it as well.</p>
     <ul>
-      <li>Turn off the power source first, or</li>
-      <li>use a non-conductive object to separate them from it.</li>
+      <li><strong>Kill the power first</strong> &mdash; the machine switch, the disconnect, the
+      breaker, or pull the plug.</li>
+      <li>If you cannot kill it, use a <strong>dry, non-conductive object</strong> to separate them
+      from the source, and stand on something dry while you do it.</li>
+      <li><strong>Then</strong> call for help and start first aid.</li>
     </ul>
   </div>
-  <p class="aside">Then follow [[conduct-and-emergency|emergency procedure]] &mdash; call 911 and
-  notify the instructor.</p>
+  <p>Call <strong>911</strong> and notify the instructor &mdash; follow
+  [[conduct-and-emergency|emergency procedure]].</p>
+  <div class="gate">
+    <p><strong>A small mark is not evidence of a small injury.</strong> Electrical and electrothermal
+    burns run deep with very little to see on the surface, and a burn that wraps a finger can cost
+    the use of it. <strong>Any shock, and any electrical burn, gets reported and gets looked at</strong>
+    &mdash; however fine the person says they are.</p>
+  </div>
 </section>
