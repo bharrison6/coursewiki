@@ -23,6 +23,21 @@ is case-sensitive on purpose: Windows would resolve `[[img:Tailstock.jpg]]` to
 `tailstock.jpg` and the build would look clean, then GitHub Pages — which is
 case-sensitive — would serve a 404. The build reports the mismatch instead.
 
+## Reserving a slot for artwork that does not exist yet
+
+Write the real syntax inside an HTML comment:
+
+```html
+<!-- GRAPHIC-SLOT: [[img:cord-routing.svg|The safe route for a cord around a bench.]] -->
+```
+
+A token inside a comment is a placeholder: it is not resolved, and it is not an error. Every
+build lists it under *"image placeholders in comments — waiting on artwork"*, so a slot cannot
+quietly outlive the reason for it, and filling the slot is deleting two comment delimiters.
+
+Comments are **published** — they are in view-source on a public site — so the marker goes when
+the artwork lands.
+
 ## What the build does with them
 
 | Where | What it emits |

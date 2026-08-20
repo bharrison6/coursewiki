@@ -107,6 +107,15 @@ function Get-DataUri([string]$relPath) {
 $script:linkRx = '\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]'
 $script:imgPrefix = 'img:'
 
+# A token inside an HTML comment is not content, and must not resolve or be
+# validated. An author sketching a slot for artwork that does not exist yet -
+#   <!-- GRAPHIC-SLOT: [[img:cord-routing.svg|the safe route]] -->
+# - was failing the build on a picture nobody had claimed to have added. Found
+# within the hour of shipping the image checks, by the first person to use them.
+# Matched FIRST in the alternation below so a comment is consumed whole and
+# whatever is inside it is never looked at.
+$script:commentRx = '(?s)<!--.*?-->'
+
 $script:written = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 
 function Write-Out([string]$path, [string]$text) {
@@ -457,7 +466,7 @@ Write-Host ("media: {0} image{1}" -f $script:media.Count, $(if ($script:media.Co
 # An image reference. Alt text is the link label and it is REQUIRED: this is
 # teaching material, it gets read with a screen reader, and an unlabelled
 # picture in a safety page is content that silently does not reach a reader.
-# A missing file or a missing label is reported by Test-ImageRefs at the end of
+# A missing file or a missing label is reported by the image scan at the end of
 # the build; what is emitted here is the visible half of the same signal.
 function New-ImageTag([string]$ref, [string]$alt, $ctx, [string]$mode) {
   $rec = $null
@@ -481,8 +490,13 @@ function New-ImageTag([string]$ref, [string]$alt, $ctx, [string]$mode) {
 }
 
 function Resolve-Links([string]$html, $ctx, [string]$mode) {
-  [regex]::Replace($html, $script:linkRx, {
+  # The comment branch is FIRST, so a comment is consumed whole and nothing
+  # inside it is looked at. It stays literal in the output, which is what makes
+  # a placeholder slot greppable in the source and in every generated copy.
+  # Neither branch captures, so groups 1 and 2 are still the link's.
+  [regex]::Replace($html, $script:commentRx + '|' + $script:linkRx, {
     param($m)
+    if ($m.Value.StartsWith('<!--', [StringComparison]::Ordinal)) { return $m.Value }
     $id    = $m.Groups[1].Value.Trim()
     $label = if ($m.Groups[2].Success) { $m.Groups[2].Value.Trim() } else { $null }
 
@@ -1193,9 +1207,21 @@ foreach ($c in $collections.Values) {
 
 $dangling  = @()
 $imgErrors = @()
+$imgSlots  = @()
 $imgUsed   = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 foreach ($ct in $containers) {
-  foreach ($m in [regex]::Matches($ct.Text, $script:linkRx)) {
+  # A token inside a comment is a placeholder, not content: it is not resolved
+  # and it is not an error. It IS listed, so a slot waiting on artwork cannot
+  # be forgotten - the reminder that failing the build was doing badly.
+  foreach ($cm in [regex]::Matches($ct.Text, $script:commentRx)) {
+    foreach ($tm in [regex]::Matches($cm.Value, $script:linkRx)) {
+      $tid = $tm.Groups[1].Value.Trim()
+      if ($tid.StartsWith($script:imgPrefix, [StringComparison]::Ordinal)) {
+        $imgSlots += "$($ct.Where) -> $tid"
+      }
+    }
+  }
+  foreach ($m in [regex]::Matches(([regex]::Replace($ct.Text, $script:commentRx, '')), $script:linkRx)) {
     $id    = $m.Groups[1].Value.Trim()
     $label = if ($m.Groups[2].Success) { $m.Groups[2].Value.Trim() } else { '' }
 
@@ -1234,6 +1260,11 @@ $orphans = @($pages.Values | Where-Object { $_.Decks.Count -eq 0 } | ForEach-Obj
 if ($orphans.Count) {
   Write-Host ''
   Write-Host ("pages in no presentation ({0}): {1}" -f $orphans.Count, ($orphans -join ', '))
+}
+if ($imgSlots.Count) {
+  Write-Host ''
+  Write-Host ("image placeholders in comments - not rendered, waiting on artwork ({0}):" -f $imgSlots.Count)
+  $imgSlots | Sort-Object -Unique | ForEach-Object { Write-Host "  $_" }
 }
 $unusedMedia = @($script:media.Keys | Where-Object { -not $imgUsed.Contains($_) } | Sort-Object)
 if ($unusedMedia.Count) {
