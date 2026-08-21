@@ -1198,8 +1198,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
          with JavaScript off, against 12. The old rule is kept because it is
          free and does work on engines that hide the children directly.
      "Printing never loses a card" is an invariant, so it is enforced as one -
-     the same reason the logo swap carries !important. */
-  .xcard::details-content { content-visibility: visible !important; }
+     the same reason the logo swap carries !important.
+
+     Scoped to `details`, NOT to `.xcard`: the JS half already forces every
+     <details> open, and a second disclosure tier nested inside a card is
+     planned. A rule naming one class would have to be remembered and extended
+     when that lands; a rule naming the element covers the tier that does not
+     exist yet. The sidebar's own <details> are display:none in print, so there
+     is nothing here to protect them from. */
+  details::details-content { content-visibility: visible !important; }
   details:not([open]) > *:not(summary) { display: revert !important; }
   .xcard { break-inside: avoid; border: 0; border-radius: 0; }
   .xcard > summary { padding: 0; border-bottom: 2px solid var(--ink); font-size: 14pt; }
