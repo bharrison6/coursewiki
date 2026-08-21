@@ -1500,3 +1500,485 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 .fc-agents .ok   .n { color: var(--accent); }
 .fc-agents .bad  .n { color: var(--cat-ink); }
 .fc-agents .bad  .r { color: var(--cat-ink); font-weight: 600; }
+
+/* ===========================================================================
+   DET 403 Unit 1 — interactive work surfaces
+
+   These are deliberately tools, not a second dashboard. Each one occupies a
+   single continuous surface inside a lesson: inputs establish the situation,
+   a quiet results area gives the current consequence, and any table stays a
+   table. The content remains meaningful when the JavaScript is unavailable.
+   ======================================================================== */
+.unit-lab,
+[data-prefix-explorer],
+[data-unit-converter],
+[data-path-lab],
+[data-acceleration-lab],
+[data-cad-lab] {
+  margin: 1.5rem 0;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  min-width: 0;
+}
+.unit-lab > :first-child,
+[data-prefix-explorer] > :first-child,
+[data-unit-converter] > :first-child,
+[data-path-lab] > :first-child,
+[data-acceleration-lab] > :first-child,
+[data-cad-lab] > :first-child { margin-top: 0; }
+.unit-lab > :last-child,
+[data-prefix-explorer] > :last-child,
+[data-unit-converter] > :last-child,
+[data-path-lab] > :last-child,
+[data-acceleration-lab] > :last-child,
+[data-cad-lab] > :last-child { margin-bottom: 0; }
+.unit-lab :is(h3, h4),
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(h3, h4) { margin-top: 0; }
+
+.unit-controls,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: .9rem;
+  align-items: end;
+  min-width: 0;
+}
+.unit-controls > *, .unit-controls label, .unit-controls fieldset,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset > * { min-width: 0; }
+.unit-controls > p,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset > p {
+  display: grid;
+  gap: .35rem;
+  margin: 0;
+}
+.unit-controls label,
+.unit-controls legend,
+.unit-control-label,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset :is(label, legend) {
+  display: grid;
+  gap: .35rem;
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .045em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+.unit-controls fieldset,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.unit-controls legend,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset legend { padding: 0; }
+.unit-controls :is(input, select, button),
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: .55rem .65rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.unit-controls :is(input, select):hover,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select):hover { border-color: var(--ink-soft); }
+.unit-controls button,
+.practice-check,
+[data-practice-check] {
+  cursor: pointer;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--paper);
+  font-family: var(--f-display);
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.unit-controls button:hover,
+.practice-check:hover,
+[data-practice-check]:hover { filter: brightness(1.08); }
+.unit-lab :is(input, select, button):focus-visible,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab], [data-practice]) :is(input, select, button):focus-visible {
+  outline: 3px solid var(--cat2);
+  outline-offset: 2px;
+}
+
+.unit-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: .75rem;
+  margin: 1rem 0 0;
+  min-width: 0;
+}
+.unit-result {
+  min-width: 0;
+  padding: .8rem .9rem;
+  border-inline-start: .25rem solid var(--accent);
+  background: var(--surface-2);
+}
+.unit-result > :first-child { margin-top: 0; }
+.unit-result > :last-child { margin-bottom: 0; }
+.unit-result .k,
+.unit-result dt,
+.unit-result-label {
+  display: block;
+  margin-bottom: .2rem;
+  color: var(--ink-soft);
+  font-family: var(--f-display);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+.unit-result .v,
+.unit-result dd,
+[data-prefix-result],
+[data-unit-result],
+[data-convert-result],
+[data-path-output],
+[data-acceleration-output],
+[data-cad-output] {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.unit-equation,
+[data-prefix-work],
+[data-unit-work],
+[data-convert-work] {
+  display: block;
+  margin: 1rem 0 0;
+  padding: .75rem .9rem;
+  border-inline-start: 2px solid var(--rule);
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font-size: .94rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.unit-lab[data-state="error"] .unit-result,
+.unit-lab[data-state="error"] .unit-equation,
+.unit-lab[data-state="error"] [data-prefix-result],
+.unit-lab[data-state="error"] [data-unit-result] {
+  border-color: var(--cat3);
+}
+[data-prefix-explorer][data-state="error"] [data-prefix-result],
+[data-unit-converter][data-state="error"] [data-convert-result],
+[data-unit-converter][data-state="error"] [data-unit-result],
+[data-path-lab][data-state="error"] .dims,
+[data-acceleration-lab][data-state="error"] .dims,
+[data-cad-lab][data-state="error"] .dims { border-color: var(--cat3); }
+
+.unit-table-wrap {
+  max-width: 100%;
+  margin: 1rem 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  border: 1px solid var(--rule);
+}
+.unit-table {
+  width: 100%;
+  min-width: 32rem;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+.unit-table :is(th, td) {
+  padding: .65rem .75rem;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  text-align: start;
+  vertical-align: top;
+}
+.unit-table th {
+  background: var(--surface-2);
+  font-family: var(--f-display);
+  font-size: .78rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.unit-table tr:last-child :is(th, td) { border-bottom: 0; }
+
+/* A -20 m to +20 m axis stays deliberately literal. The marker's inline
+   --path-position / left is provided by app.js; labels are real text outside
+   the aria-hidden track so a position is never conveyed by a dot alone. */
+.path-track,
+.path-lab-track,
+[data-path-track] {
+  position: relative;
+  min-height: 4.5rem;
+  margin: 1rem 0 0;
+  padding: .75rem .75rem 1.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.path-track::before,
+.path-lab-track::before,
+[data-path-track]::before {
+  content: "";
+  position: absolute;
+  inset: auto .75rem 1.1rem;
+  height: 2px;
+  background: var(--ink-soft);
+}
+.path-track::after,
+.path-lab-track::after,
+[data-path-track]::after {
+  content: "\2212 20 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 0 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 +20 m";
+  position: absolute;
+  inset: auto .75rem .15rem;
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-soft);
+  font-family: var(--f-display);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .025em;
+  white-space: pre;
+}
+.path-track [data-path-marker],
+.path-track [data-path-start-marker],
+.path-track [data-path-turn-marker],
+.path-track [data-path-end-marker],
+.path-lab-track [data-path-marker],
+.path-lab-track [data-path-start-marker],
+.path-lab-track [data-path-turn-marker],
+.path-lab-track [data-path-end-marker],
+[data-path-track] [data-path-marker],
+[data-path-track] [data-path-start-marker],
+[data-path-track] [data-path-turn-marker],
+[data-path-track] [data-path-end-marker] {
+  position: absolute;
+  z-index: 1;
+  top: .45rem;
+  left: var(--path-position, 50%);
+  display: block;
+  width: max-content;
+  max-width: calc(100% - 1rem);
+  min-height: 1.8rem;
+  padding: .3rem .45rem;
+  transform: translateX(-50%);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.path-track [data-path-marker]::after,
+.path-track [data-path-start-marker]::after,
+.path-track [data-path-turn-marker]::after,
+.path-track [data-path-end-marker]::after,
+.path-lab-track [data-path-marker]::after,
+.path-lab-track [data-path-start-marker]::after,
+.path-lab-track [data-path-turn-marker]::after,
+.path-lab-track [data-path-end-marker]::after,
+[data-path-track] [data-path-marker]::after,
+[data-path-track] [data-path-start-marker]::after,
+[data-path-track] [data-path-turn-marker]::after,
+[data-path-track] [data-path-end-marker]::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  width: 2px;
+  height: 1rem;
+  background: var(--accent);
+}
+.path-track [data-path-marker="end"],
+.path-lab-track [data-path-marker="end"],
+[data-path-track] [data-path-marker="end"] { top: 1.85rem; }
+
+.velocity-bars {
+  display: grid;
+  gap: .75rem;
+  margin: 1rem 0 0;
+}
+.velocity-bars > * {
+  display: grid;
+  grid-template-columns: minmax(5rem, .45fr) minmax(0, 1fr);
+  gap: .65rem;
+  align-items: center;
+  min-width: 0;
+}
+.velocity-bars .velocity-track,
+.velocity-bars [data-velocity-track] {
+  position: relative;
+  min-width: 0;
+  height: 1rem;
+  border: 1px solid var(--rule);
+  background: var(--surface-2);
+}
+.velocity-bars [data-acceleration-initial-bar],
+.velocity-bars [data-acceleration-final-bar],
+.velocity-bars [data-acceleration-bar] {
+  display: block;
+  width: var(--velocity-width, 0%);
+  max-width: 100%;
+  min-width: 0;
+  height: 100%;
+  background: var(--accent);
+}
+.velocity-bars [data-acceleration-final-bar],
+.velocity-bars [data-acceleration-bar="final"] { background: var(--cat2); }
+
+[data-practice] {
+  display: grid;
+  gap: .75rem;
+  align-items: end;
+}
+[data-practice] label {
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .045em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+[data-practice] input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: .55rem .65rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+[data-practice] .practice-check,
+[data-practice] [data-practice-check] { min-height: 2.75rem; }
+[data-practice-feedback],
+[data-practice-result] {
+  min-height: 1.5em;
+  margin: 0;
+  padding: .7rem .8rem;
+  border-inline-start: .25rem solid var(--rule);
+  background: var(--surface-2);
+  color: var(--ink);
+  line-height: 1.45;
+}
+[data-practice][data-state="correct"] :is([data-practice-feedback], [data-practice-result]) { border-color: var(--cat1); }
+[data-practice][data-state="incorrect"] :is([data-practice-feedback], [data-practice-result]) { border-color: var(--cat2); }
+[data-practice][data-state="error"] :is([data-practice-feedback], [data-practice-result]) { border-color: var(--cat3); }
+[data-practice][data-state="correct"] :is(.practice-check, [data-practice-check])::before { content: "\2713 "; }
+[data-practice][data-state="incorrect"] :is(.practice-check, [data-practice-check])::before { content: "\21bb "; }
+[data-practice][data-state="error"] :is(.practice-check, [data-practice-check])::before { content: "! "; }
+
+/* A presenter gets slightly larger controls without ever constraining the
+   tool's height; focus rings and all controls remain available in this mode. */
+.presenting :is(.unit-lab, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) { font-size: 1.08rem; }
+.presenting :is(.unit-controls, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { min-height: 3rem; }
+
+@media (max-width: 36rem) {
+  .unit-lab,
+  [data-prefix-explorer],
+  [data-unit-converter],
+  [data-path-lab],
+  [data-acceleration-lab],
+  [data-cad-lab] { padding: 1rem; overflow: hidden; }
+  .unit-controls,
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset,
+  .unit-results,
+  [data-practice] { grid-template-columns: minmax(0, 1fr); }
+  .unit-controls > *,
+  .unit-results > * { min-width: 0; }
+  .unit-controls :is(input, select, button),
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { max-width: 100%; }
+  .unit-table { min-width: 28rem; }
+  .velocity-bars > * { grid-template-columns: minmax(0, 1fr); gap: .35rem; }
+  :is(.path-track, .path-lab-track, [data-path-track])::after { font-size: .58rem; letter-spacing: 0; }
+}
+
+@media print {
+  .unit-lab,
+  [data-prefix-explorer],
+  [data-unit-converter],
+  [data-path-lab],
+  [data-acceleration-lab],
+  [data-cad-lab] {
+    break-inside: avoid;
+    background: #FFF !important;
+    border-color: #777 !important;
+    color: #111 !important;
+  }
+  .unit-lab :is(input, select),
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select) {
+    min-height: 0;
+    padding: .2rem .3rem;
+    border-color: #777;
+    background: #FFF;
+    color: #111;
+  }
+  .unit-lab :is(button, .practice-check, [data-practice-check]):not([data-print-keep]),
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab], [data-practice]) :is(button, .practice-check, [data-practice-check]):not([data-print-keep]) { display: none; }
+  .unit-result,
+  .unit-equation,
+  [data-practice-feedback],
+  [data-practice-result],
+  .path-track,
+  .path-lab-track,
+  [data-path-track],
+  .unit-table,
+  .unit-table th { background: #FFF !important; color: #111 !important; }
+  .unit-result,
+  .unit-equation,
+  [data-practice-feedback],
+  [data-practice-result] { border-color: #555 !important; }
+  .path-track::before,
+  .path-lab-track::before,
+  [data-path-track]::before,
+  .path-track [data-path-marker]::after,
+  .path-track [data-path-start-marker]::after,
+  .path-track [data-path-turn-marker]::after,
+  .path-track [data-path-end-marker]::after,
+  .path-lab-track [data-path-marker]::after,
+  .path-lab-track [data-path-start-marker]::after,
+  .path-lab-track [data-path-turn-marker]::after,
+  .path-lab-track [data-path-end-marker]::after,
+  [data-path-track] [data-path-marker]::after,
+  [data-path-track] [data-path-start-marker]::after,
+  [data-path-track] [data-path-turn-marker]::after,
+  [data-path-track] [data-path-end-marker]::after { background: #111 !important; }
+  .path-track [data-path-marker],
+  .path-track [data-path-start-marker],
+  .path-track [data-path-turn-marker],
+  .path-track [data-path-end-marker],
+  .path-lab-track [data-path-marker],
+  .path-lab-track [data-path-start-marker],
+  .path-lab-track [data-path-turn-marker],
+  .path-lab-track [data-path-end-marker],
+  [data-path-track] [data-path-marker],
+  [data-path-track] [data-path-start-marker],
+  [data-path-track] [data-path-turn-marker],
+  [data-path-track] [data-path-end-marker] {
+    border-color: #111 !important;
+    background: #FFF !important;
+    color: #111 !important;
+  }
+  .velocity-bars [data-acceleration-initial-bar],
+  .velocity-bars [data-acceleration-final-bar],
+  .velocity-bars [data-acceleration-bar] { background: #333 !important; }
+}

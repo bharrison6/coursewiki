@@ -1878,6 +1878,488 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 .fc-agents .bad  .n { color: var(--cat-ink); }
 .fc-agents .bad  .r { color: var(--cat-ink); font-weight: 600; }
 
+/* ===========================================================================
+   DET 403 Unit 1 — interactive work surfaces
+
+   These are deliberately tools, not a second dashboard. Each one occupies a
+   single continuous surface inside a lesson: inputs establish the situation,
+   a quiet results area gives the current consequence, and any table stays a
+   table. The content remains meaningful when the JavaScript is unavailable.
+   ======================================================================== */
+.unit-lab,
+[data-prefix-explorer],
+[data-unit-converter],
+[data-path-lab],
+[data-acceleration-lab],
+[data-cad-lab] {
+  margin: 1.5rem 0;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  min-width: 0;
+}
+.unit-lab > :first-child,
+[data-prefix-explorer] > :first-child,
+[data-unit-converter] > :first-child,
+[data-path-lab] > :first-child,
+[data-acceleration-lab] > :first-child,
+[data-cad-lab] > :first-child { margin-top: 0; }
+.unit-lab > :last-child,
+[data-prefix-explorer] > :last-child,
+[data-unit-converter] > :last-child,
+[data-path-lab] > :last-child,
+[data-acceleration-lab] > :last-child,
+[data-cad-lab] > :last-child { margin-bottom: 0; }
+.unit-lab :is(h3, h4),
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(h3, h4) { margin-top: 0; }
+
+.unit-controls,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: .9rem;
+  align-items: end;
+  min-width: 0;
+}
+.unit-controls > *, .unit-controls label, .unit-controls fieldset,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset > * { min-width: 0; }
+.unit-controls > p,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset > p {
+  display: grid;
+  gap: .35rem;
+  margin: 0;
+}
+.unit-controls label,
+.unit-controls legend,
+.unit-control-label,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset :is(label, legend) {
+  display: grid;
+  gap: .35rem;
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .045em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+.unit-controls fieldset,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.unit-controls legend,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset legend { padding: 0; }
+.unit-controls :is(input, select, button),
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: .55rem .65rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.unit-controls :is(input, select):hover,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select):hover { border-color: var(--ink-soft); }
+.unit-controls button,
+.practice-check,
+[data-practice-check] {
+  cursor: pointer;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--paper);
+  font-family: var(--f-display);
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.unit-controls button:hover,
+.practice-check:hover,
+[data-practice-check]:hover { filter: brightness(1.08); }
+.unit-lab :is(input, select, button):focus-visible,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab], [data-practice]) :is(input, select, button):focus-visible {
+  outline: 3px solid var(--cat2);
+  outline-offset: 2px;
+}
+
+.unit-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: .75rem;
+  margin: 1rem 0 0;
+  min-width: 0;
+}
+.unit-result {
+  min-width: 0;
+  padding: .8rem .9rem;
+  border-inline-start: .25rem solid var(--accent);
+  background: var(--surface-2);
+}
+.unit-result > :first-child { margin-top: 0; }
+.unit-result > :last-child { margin-bottom: 0; }
+.unit-result .k,
+.unit-result dt,
+.unit-result-label {
+  display: block;
+  margin-bottom: .2rem;
+  color: var(--ink-soft);
+  font-family: var(--f-display);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+.unit-result .v,
+.unit-result dd,
+[data-prefix-result],
+[data-unit-result],
+[data-convert-result],
+[data-path-output],
+[data-acceleration-output],
+[data-cad-output] {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.unit-equation,
+[data-prefix-work],
+[data-unit-work],
+[data-convert-work] {
+  display: block;
+  margin: 1rem 0 0;
+  padding: .75rem .9rem;
+  border-inline-start: 2px solid var(--rule);
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font-size: .94rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.unit-lab[data-state="error"] .unit-result,
+.unit-lab[data-state="error"] .unit-equation,
+.unit-lab[data-state="error"] [data-prefix-result],
+.unit-lab[data-state="error"] [data-unit-result] {
+  border-color: var(--cat3);
+}
+[data-prefix-explorer][data-state="error"] [data-prefix-result],
+[data-unit-converter][data-state="error"] [data-convert-result],
+[data-unit-converter][data-state="error"] [data-unit-result],
+[data-path-lab][data-state="error"] .dims,
+[data-acceleration-lab][data-state="error"] .dims,
+[data-cad-lab][data-state="error"] .dims { border-color: var(--cat3); }
+
+.unit-table-wrap {
+  max-width: 100%;
+  margin: 1rem 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  border: 1px solid var(--rule);
+}
+.unit-table {
+  width: 100%;
+  min-width: 32rem;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+.unit-table :is(th, td) {
+  padding: .65rem .75rem;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  text-align: start;
+  vertical-align: top;
+}
+.unit-table th {
+  background: var(--surface-2);
+  font-family: var(--f-display);
+  font-size: .78rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.unit-table tr:last-child :is(th, td) { border-bottom: 0; }
+
+/* A -20 m to +20 m axis stays deliberately literal. The marker's inline
+   --path-position / left is provided by app.js; labels are real text outside
+   the aria-hidden track so a position is never conveyed by a dot alone. */
+.path-track,
+.path-lab-track,
+[data-path-track] {
+  position: relative;
+  min-height: 4.5rem;
+  margin: 1rem 0 0;
+  padding: .75rem .75rem 1.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.path-track::before,
+.path-lab-track::before,
+[data-path-track]::before {
+  content: "";
+  position: absolute;
+  inset: auto .75rem 1.1rem;
+  height: 2px;
+  background: var(--ink-soft);
+}
+.path-track::after,
+.path-lab-track::after,
+[data-path-track]::after {
+  content: "\2212 20 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 0 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 +20 m";
+  position: absolute;
+  inset: auto .75rem .15rem;
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-soft);
+  font-family: var(--f-display);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .025em;
+  white-space: pre;
+}
+.path-track [data-path-marker],
+.path-track [data-path-start-marker],
+.path-track [data-path-turn-marker],
+.path-track [data-path-end-marker],
+.path-lab-track [data-path-marker],
+.path-lab-track [data-path-start-marker],
+.path-lab-track [data-path-turn-marker],
+.path-lab-track [data-path-end-marker],
+[data-path-track] [data-path-marker],
+[data-path-track] [data-path-start-marker],
+[data-path-track] [data-path-turn-marker],
+[data-path-track] [data-path-end-marker] {
+  position: absolute;
+  z-index: 1;
+  top: .45rem;
+  left: var(--path-position, 50%);
+  display: block;
+  width: max-content;
+  max-width: calc(100% - 1rem);
+  min-height: 1.8rem;
+  padding: .3rem .45rem;
+  transform: translateX(-50%);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.path-track [data-path-marker]::after,
+.path-track [data-path-start-marker]::after,
+.path-track [data-path-turn-marker]::after,
+.path-track [data-path-end-marker]::after,
+.path-lab-track [data-path-marker]::after,
+.path-lab-track [data-path-start-marker]::after,
+.path-lab-track [data-path-turn-marker]::after,
+.path-lab-track [data-path-end-marker]::after,
+[data-path-track] [data-path-marker]::after,
+[data-path-track] [data-path-start-marker]::after,
+[data-path-track] [data-path-turn-marker]::after,
+[data-path-track] [data-path-end-marker]::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  width: 2px;
+  height: 1rem;
+  background: var(--accent);
+}
+.path-track [data-path-marker="end"],
+.path-lab-track [data-path-marker="end"],
+[data-path-track] [data-path-marker="end"] { top: 1.85rem; }
+
+.velocity-bars {
+  display: grid;
+  gap: .75rem;
+  margin: 1rem 0 0;
+}
+.velocity-bars > * {
+  display: grid;
+  grid-template-columns: minmax(5rem, .45fr) minmax(0, 1fr);
+  gap: .65rem;
+  align-items: center;
+  min-width: 0;
+}
+.velocity-bars .velocity-track,
+.velocity-bars [data-velocity-track] {
+  position: relative;
+  min-width: 0;
+  height: 1rem;
+  border: 1px solid var(--rule);
+  background: var(--surface-2);
+}
+.velocity-bars [data-acceleration-initial-bar],
+.velocity-bars [data-acceleration-final-bar],
+.velocity-bars [data-acceleration-bar] {
+  display: block;
+  width: var(--velocity-width, 0%);
+  max-width: 100%;
+  min-width: 0;
+  height: 100%;
+  background: var(--accent);
+}
+.velocity-bars [data-acceleration-final-bar],
+.velocity-bars [data-acceleration-bar="final"] { background: var(--cat2); }
+
+[data-practice] {
+  display: grid;
+  gap: .75rem;
+  align-items: end;
+}
+[data-practice] label {
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .045em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+[data-practice] input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: .55rem .65rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+[data-practice] .practice-check,
+[data-practice] [data-practice-check] { min-height: 2.75rem; }
+[data-practice-feedback],
+[data-practice-result] {
+  min-height: 1.5em;
+  margin: 0;
+  padding: .7rem .8rem;
+  border-inline-start: .25rem solid var(--rule);
+  background: var(--surface-2);
+  color: var(--ink);
+  line-height: 1.45;
+}
+[data-practice][data-state="correct"] :is([data-practice-feedback], [data-practice-result]) { border-color: var(--cat1); }
+[data-practice][data-state="incorrect"] :is([data-practice-feedback], [data-practice-result]) { border-color: var(--cat2); }
+[data-practice][data-state="error"] :is([data-practice-feedback], [data-practice-result]) { border-color: var(--cat3); }
+[data-practice][data-state="correct"] :is(.practice-check, [data-practice-check])::before { content: "\2713 "; }
+[data-practice][data-state="incorrect"] :is(.practice-check, [data-practice-check])::before { content: "\21bb "; }
+[data-practice][data-state="error"] :is(.practice-check, [data-practice-check])::before { content: "! "; }
+
+/* A presenter gets slightly larger controls without ever constraining the
+   tool's height; focus rings and all controls remain available in this mode. */
+.presenting :is(.unit-lab, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) { font-size: 1.08rem; }
+.presenting :is(.unit-controls, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { min-height: 3rem; }
+
+@media (max-width: 36rem) {
+  .unit-lab,
+  [data-prefix-explorer],
+  [data-unit-converter],
+  [data-path-lab],
+  [data-acceleration-lab],
+  [data-cad-lab] { padding: 1rem; overflow: hidden; }
+  .unit-controls,
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset,
+  .unit-results,
+  [data-practice] { grid-template-columns: minmax(0, 1fr); }
+  .unit-controls > *,
+  .unit-results > * { min-width: 0; }
+  .unit-controls :is(input, select, button),
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { max-width: 100%; }
+  .unit-table { min-width: 28rem; }
+  .velocity-bars > * { grid-template-columns: minmax(0, 1fr); gap: .35rem; }
+  :is(.path-track, .path-lab-track, [data-path-track])::after { font-size: .58rem; letter-spacing: 0; }
+}
+
+@media print {
+  .unit-lab,
+  [data-prefix-explorer],
+  [data-unit-converter],
+  [data-path-lab],
+  [data-acceleration-lab],
+  [data-cad-lab] {
+    break-inside: avoid;
+    background: #FFF !important;
+    border-color: #777 !important;
+    color: #111 !important;
+  }
+  .unit-lab :is(input, select),
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select) {
+    min-height: 0;
+    padding: .2rem .3rem;
+    border-color: #777;
+    background: #FFF;
+    color: #111;
+  }
+  .unit-lab :is(button, .practice-check, [data-practice-check]):not([data-print-keep]),
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab], [data-practice]) :is(button, .practice-check, [data-practice-check]):not([data-print-keep]) { display: none; }
+  .unit-result,
+  .unit-equation,
+  [data-practice-feedback],
+  [data-practice-result],
+  .path-track,
+  .path-lab-track,
+  [data-path-track],
+  .unit-table,
+  .unit-table th { background: #FFF !important; color: #111 !important; }
+  .unit-result,
+  .unit-equation,
+  [data-practice-feedback],
+  [data-practice-result] { border-color: #555 !important; }
+  .path-track::before,
+  .path-lab-track::before,
+  [data-path-track]::before,
+  .path-track [data-path-marker]::after,
+  .path-track [data-path-start-marker]::after,
+  .path-track [data-path-turn-marker]::after,
+  .path-track [data-path-end-marker]::after,
+  .path-lab-track [data-path-marker]::after,
+  .path-lab-track [data-path-start-marker]::after,
+  .path-lab-track [data-path-turn-marker]::after,
+  .path-lab-track [data-path-end-marker]::after,
+  [data-path-track] [data-path-marker]::after,
+  [data-path-track] [data-path-start-marker]::after,
+  [data-path-track] [data-path-turn-marker]::after,
+  [data-path-track] [data-path-end-marker]::after { background: #111 !important; }
+  .path-track [data-path-marker],
+  .path-track [data-path-start-marker],
+  .path-track [data-path-turn-marker],
+  .path-track [data-path-end-marker],
+  .path-lab-track [data-path-marker],
+  .path-lab-track [data-path-start-marker],
+  .path-lab-track [data-path-turn-marker],
+  .path-lab-track [data-path-end-marker],
+  [data-path-track] [data-path-marker],
+  [data-path-track] [data-path-start-marker],
+  [data-path-track] [data-path-turn-marker],
+  [data-path-track] [data-path-end-marker] {
+    border-color: #111 !important;
+    background: #FFF !important;
+    color: #111 !important;
+  }
+  .velocity-bars [data-acceleration-initial-bar],
+  .velocity-bars [data-acceleration-final-bar],
+  .velocity-bars [data-acceleration-bar] { background: #333 !important; }
+}
+
 /* ---- aggregate: many pages stacked in one printable file --------------- */
 .aggregate main { padding: clamp(1.5rem, 4vw, 3rem); max-width: 52rem; margin: 0 auto; }
 .agg-head { margin-bottom: 3rem; }
@@ -4657,6 +5139,564 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
         e.preventDefault(); input.focus();
       }
+    });
+  })();
+
+  /* ---- Unit 1: metric-prefix explorer ----------------------------------
+     These lesson tools deliberately live beside the site behavior instead of
+     in the authored pages. A page is still a complete reading experience
+     without JavaScript; the controls only make the worked relationship
+     immediate when a student has a browser available.                          */
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    function symbol(select, root) {
+      if (!select || !select.options || select.selectedIndex < 0) return '';
+      var option = select.options[select.selectedIndex];
+      var prefix = option.hasAttribute('data-symbol') ? option.getAttribute('data-symbol') : option.textContent.trim();
+      /* Prefix menus in Unit 1 describe meters. A future menu can name a
+         different base through data-prefix-base without changing the math. */
+      var base = root.getAttribute('data-prefix-base') || root.getAttribute('data-prefix-unit') || 'm';
+      return prefix + base;
+    }
+
+    document.querySelectorAll('[data-prefix-explorer]').forEach(function (root) {
+      if (root.hasAttribute('data-prefix-wired')) return;
+      root.setAttribute('data-prefix-wired', '');
+
+      var value = root.querySelector('[data-prefix-value]');
+      var from = root.querySelector('[data-prefix-from]');
+      var to = root.querySelector('[data-prefix-to]');
+      var result = root.querySelector('[data-prefix-result]');
+      var work = root.querySelector('[data-prefix-work]');
+
+      function setError(message) {
+        root.setAttribute('data-state', 'error');
+        if (result) result.textContent = message;
+        if (work) work.textContent = 'Use a finite number and choose both prefixes.';
+      }
+
+      function update() {
+        var amount = readNumber(value);
+        var fromExponent = readNumber(from);
+        var toExponent = readNumber(to);
+        if (amount === null || fromExponent === null || toExponent === null) {
+          setError('Enter a finite value to convert.');
+          return;
+        }
+
+        var exponentDifference = fromExponent - toExponent;
+        var factor = Math.pow(10, exponentDifference);
+        var converted = amount * factor;
+        if (!isFinite(factor) || !isFinite(converted)) {
+          setError('That conversion is outside the usable numeric range.');
+          return;
+        }
+
+        root.removeAttribute('data-state');
+        if (result) result.textContent = format(converted) + ' ' + symbol(to, root);
+        if (work) {
+          work.textContent = format(amount) + ' ' + symbol(from, root) + ' \u00d7 10^(' +
+            format(fromExponent) + ' \u2212 ' + format(toExponent) + ') = ' + format(converted) +
+            ' ' + symbol(to, root) + '. Moving from ' + symbol(from, root) + ' to ' + symbol(to, root) +
+            ' changes the number by a factor of ' + format(factor) + '.';
+        }
+      }
+
+      [value, from, to].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: dimension-aware converter ------------------------------
+     The exact values below reproduce the official NIST Special Publication
+     811, Appendix B relationships cited in the DET 403 Unit 1 materials.
+     Factors translate each listed unit to its canonical SI unit; the page
+     never fetches a conversion service or silently mixes dimensions.          */
+  (function () {
+    var units = {
+      s:     { factor: 1,                dimension: 'time',         symbol: 's',      factorLabel: '1 s = 1 s' },
+      min:   { factor: 60,               dimension: 'time',         symbol: 'min',    factorLabel: '1 min = 60 s' },
+      h:     { factor: 3600,             dimension: 'time',         symbol: 'h',      factorLabel: '1 h = 3,600 s' },
+      d:     { factor: 86400,            dimension: 'time',         symbol: 'd',      factorLabel: '1 d = 86,400 s' },
+      mm:    { factor: 0.001,            dimension: 'length',       symbol: 'mm',     factorLabel: '1 mm = 0.001 m' },
+      cm:    { factor: 0.01,             dimension: 'length',       symbol: 'cm',     factorLabel: '1 cm = 0.01 m' },
+      m:     { factor: 1,                dimension: 'length',       symbol: 'm',      factorLabel: '1 m = 1 m' },
+      km:    { factor: 1000,             dimension: 'length',       symbol: 'km',     factorLabel: '1 km = 1,000 m' },
+      in:    { factor: 0.0254,           dimension: 'length',       symbol: 'in',     factorLabel: '1 in = 0.0254 m' },
+      ft:    { factor: 0.3048,           dimension: 'length',       symbol: 'ft',     factorLabel: '1 ft = 0.3048 m' },
+      yd:    { factor: 0.9144,           dimension: 'length',       symbol: 'yd',     factorLabel: '1 yd = 0.9144 m' },
+      mi:    { factor: 1609.344,         dimension: 'length',       symbol: 'mi',     factorLabel: '1 mi = 1,609.344 m' },
+      m2:    { factor: 1,                dimension: 'area',         symbol: 'm\u00b2',     factorLabel: '1 m\u00b2 = 1 m\u00b2' },
+      ft2:   { factor: 0.09290304,       dimension: 'area',         symbol: 'ft\u00b2',    factorLabel: '1 ft\u00b2 = 0.09290304 m\u00b2' },
+      in2:   { factor: 0.00064516,       dimension: 'area',         symbol: 'in\u00b2',    factorLabel: '1 in\u00b2 = 0.00064516 m\u00b2' },
+      m3:    { factor: 1,                dimension: 'volume',       symbol: 'm\u00b3',     factorLabel: '1 m\u00b3 = 1 m\u00b3' },
+      L:     { factor: 0.001,            dimension: 'volume',       symbol: 'L',      factorLabel: '1 L = 0.001 m\u00b3' },
+      ft3:   { factor: 0.028316846592,   dimension: 'volume',       symbol: 'ft\u00b3',    factorLabel: '1 ft\u00b3 = 0.028316846592 m\u00b3' },
+      in3:   { factor: 0.000016387064,   dimension: 'volume',       symbol: 'in\u00b3',    factorLabel: '1 in\u00b3 = 0.000016387064 m\u00b3' },
+      usgal: { factor: 0.003785411784,   dimension: 'volume',       symbol: 'US gal', factorLabel: '1 US gal = 0.003785411784 m\u00b3' },
+      kg:    { factor: 1,                dimension: 'mass',         symbol: 'kg',     factorLabel: '1 kg = 1 kg' },
+      lbm:   { factor: 0.45359237,       dimension: 'mass',         symbol: 'lbm',    factorLabel: '1 lbm = 0.45359237 kg' },
+      slug:  { factor: 14.5939029372,    dimension: 'mass',         symbol: 'slug',   factorLabel: '1 slug = 14.5939029372 kg' },
+      mps:   { factor: 1,                dimension: 'speed',        symbol: 'm/s',    factorLabel: '1 m/s = 1 m/s' },
+      ftps:  { factor: 0.3048,           dimension: 'speed',        symbol: 'ft/s',   factorLabel: '1 ft/s = 0.3048 m/s' },
+      mph:   { factor: 0.44704,          dimension: 'speed',        symbol: 'mph',    factorLabel: '1 mph = 0.44704 m/s' },
+      kmph:  { factor: 0.2777777777777778, dimension: 'speed',      symbol: 'km/h',   factorLabel: '1 km/h = 0.2777777777777778 m/s' },
+      mps2:  { factor: 1,                dimension: 'acceleration', symbol: 'm/s\u00b2',   factorLabel: '1 m/s\u00b2 = 1 m/s\u00b2' },
+      ftps2: { factor: 0.3048,           dimension: 'acceleration', symbol: 'ft/s\u00b2',  factorLabel: '1 ft/s\u00b2 = 0.3048 m/s\u00b2' },
+      N:     { factor: 1,                dimension: 'force',        symbol: 'N',      factorLabel: '1 N = 1 N' },
+      lbf:   { factor: 4.4482216152605,  dimension: 'force',        symbol: 'lbf',    factorLabel: '1 lbf = 4.4482216152605 N' }
+    };
+
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    document.querySelectorAll('[data-unit-converter]').forEach(function (root) {
+      if (root.hasAttribute('data-unit-converter-wired')) return;
+      root.setAttribute('data-unit-converter-wired', '');
+
+      /* data-convert-* is the concise authored spelling in the first three
+         Unit 1 pages; data-unit-* remains the public hook contract for later
+         activities. Supporting both keeps one converter implementation. */
+      var value = root.querySelector('[data-unit-value], [data-convert-value]');
+      var from = root.querySelector('[data-unit-from], [data-convert-from]');
+      var to = root.querySelector('[data-unit-to], [data-convert-to]');
+      var result = root.querySelector('[data-unit-result], [data-convert-result]');
+      var work = root.querySelector('[data-unit-work], [data-convert-work]');
+
+      function showError(resultText, workText) {
+        root.setAttribute('data-state', 'error');
+        if (result) result.textContent = resultText;
+        if (work) work.textContent = workText;
+      }
+
+      function update() {
+        var amount = readNumber(value);
+        var fromUnit = from && units[from.value];
+        var toUnit = to && units[to.value];
+        if (amount === null || !fromUnit || !toUnit) {
+          showError('Enter a finite value and choose two supported units.', 'The converter needs a value, a starting unit, and a destination unit.');
+          return;
+        }
+        if (fromUnit.dimension !== toUnit.dimension) {
+          showError('Cannot convert ' + fromUnit.dimension + ' to ' + toUnit.dimension + '.', 'Choose two units from the same physical dimension.');
+          return;
+        }
+
+        var converted = amount * fromUnit.factor / toUnit.factor;
+        if (!isFinite(converted)) {
+          showError('That conversion is outside the usable numeric range.', 'Choose a smaller finite value and try again.');
+          return;
+        }
+
+        root.removeAttribute('data-state');
+        if (result) result.textContent = format(converted) + ' ' + toUnit.symbol;
+        if (work) {
+          work.textContent = fromUnit.factorLabel + '; ' + toUnit.factorLabel + '. ' +
+            format(amount) + ' ' + fromUnit.symbol + ' \u00d7 ' + format(fromUnit.factor) +
+            ' \u00f7 ' + format(toUnit.factor) + ' = ' + format(converted) + ' ' + toUnit.symbol + '.';
+        }
+      }
+
+      [value, from, to].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: position, distance, and velocity lab -------------------*/
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    function write(root, names, text) {
+      names.forEach(function (name) {
+        root.querySelectorAll('[data-path-' + name + '], [data-path-output="' + name + '"]').forEach(function (output) {
+          output.textContent = text;
+          if (!output.hasAttribute('aria-live')) output.setAttribute('aria-live', 'polite');
+        });
+      });
+    }
+
+    function markerName(marker) {
+      var named = marker.getAttribute('data-path-marker');
+      if (named) return named;
+      if (marker.hasAttribute('data-path-start-marker')) return 'start';
+      if (marker.hasAttribute('data-path-turn-marker')) return 'turn';
+      if (marker.hasAttribute('data-path-end-marker')) return 'end';
+      return '';
+    }
+
+    document.querySelectorAll('[data-path-lab]').forEach(function (root) {
+      if (root.hasAttribute('data-path-lab-wired')) return;
+      root.setAttribute('data-path-lab-wired', '');
+
+      var start = root.querySelector('[data-path-start]');
+      var turn = root.querySelector('[data-path-turn]');
+      var end = root.querySelector('[data-path-end]');
+      var outTime = root.querySelector('[data-path-out-time]');
+      var returnTime = root.querySelector('[data-path-return-time]');
+
+      function clearResults(message) {
+        root.setAttribute('data-state', 'error');
+        write(root, ['distance'], message);
+        write(root, ['displacement'], '\u2014');
+        write(root, ['time', 'total-time'], '\u2014');
+        write(root, ['speed', 'avg-speed', 'average-speed'], '\u2014');
+        write(root, ['velocity', 'avg-velocity', 'average-velocity'], '\u2014');
+      }
+
+      function update() {
+        var startValue = readNumber(start);
+        var turnValue = readNumber(turn);
+        var endValue = readNumber(end);
+        var outTimeValue = readNumber(outTime);
+        var returnTimeValue = readNumber(returnTime);
+        if (startValue === null || turnValue === null || endValue === null ||
+            outTimeValue === null || returnTimeValue === null || outTimeValue <= 0 || returnTimeValue <= 0) {
+          clearResults('Enter positions and positive travel times.');
+          return;
+        }
+
+        var distance = Math.abs(turnValue - startValue) + Math.abs(endValue - turnValue);
+        var displacement = endValue - startValue;
+        var totalTime = outTimeValue + returnTimeValue;
+        var averageSpeed = distance / totalTime;
+        var averageVelocity = displacement / totalTime;
+        root.removeAttribute('data-state');
+        write(root, ['distance'], format(distance) + ' m');
+        write(root, ['displacement'], format(displacement) + ' m');
+        write(root, ['time', 'total-time'], format(totalTime) + ' s');
+        write(root, ['speed', 'avg-speed', 'average-speed'], format(averageSpeed) + ' m/s');
+        write(root, ['velocity', 'avg-velocity', 'average-velocity'], format(averageVelocity) + ' m/s');
+
+        var positions = { start: startValue, turn: turnValue, end: endValue };
+        root.querySelectorAll('[data-path-marker], [data-path-start-marker], [data-path-turn-marker], [data-path-end-marker]').forEach(function (marker) {
+          var name = markerName(marker);
+          var position = positions[name];
+          if (position === undefined) return;
+          var percentage = Math.max(0, Math.min(100, ((position + 20) / 40) * 100));
+          marker.style.setProperty('--path-position', percentage + '%');
+          marker.style.left = percentage + '%';
+          if (name) marker.textContent = name.charAt(0).toUpperCase() + name.slice(1) + ': ' + format(position) + ' m';
+        });
+
+        var track = root.querySelector('.path-track, .path-lab-track, [data-path-track]');
+        if (track && track.hasAttribute('aria-label')) {
+          track.setAttribute('aria-label', 'The path starts at ' + format(startValue) + ' meters, reaches ' +
+            format(turnValue) + ' meters, and ends at ' + format(endValue) + ' meters.');
+        }
+      }
+
+      [start, turn, end, outTime, returnTime].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: average-acceleration lab -------------------------------*/
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    function signed(value) {
+      if (value > 0) return format(value);
+      if (value < 0) return '\u2212' + format(Math.abs(value));
+      return '0';
+    }
+
+    function write(root, names, text) {
+      names.forEach(function (name) {
+        var shortName = {
+          initial: 'initial', vi: 'initial', final: 'final', vf: 'final',
+          delta: 'change', change: 'change', average: 'average', avg: 'average',
+          si: 'si', metric: 'si'
+        }[name] || name;
+        root.querySelectorAll('[data-acceleration-' + name + '], [data-acceleration-output="' + name + '"]' +
+          ', [data-accel-' + shortName + ']').forEach(function (output) {
+          output.textContent = text;
+          if (!output.hasAttribute('aria-live')) output.setAttribute('aria-live', 'polite');
+        });
+      });
+    }
+
+    function setBar(root, names, width) {
+      names.forEach(function (name) {
+        root.querySelectorAll('[data-acceleration-' + name + '-bar], [data-acceleration-bar="' + name + '"]').forEach(function (bar) {
+          bar.style.setProperty('--velocity-width', width + '%');
+          bar.style.width = width + '%';
+        });
+      });
+    }
+
+    document.querySelectorAll('[data-acceleration-lab]').forEach(function (root) {
+      if (root.hasAttribute('data-acceleration-lab-wired')) return;
+      root.setAttribute('data-acceleration-lab-wired', '');
+
+      /* data-accel-* is the compact spelling used by the first authored
+         acceleration page; keep the data-acceleration-* contract available
+         for subsequent labs. */
+      var initial = root.querySelector('[data-acceleration-vi], [data-accel-initial]');
+      var final = root.querySelector('[data-acceleration-vf], [data-accel-final]');
+      var time = root.querySelector('[data-acceleration-time], [data-accel-time]');
+
+      function error(message) {
+        root.setAttribute('data-state', 'error');
+        write(root, ['delta', 'average', 'avg', 'si'], message);
+        setBar(root, ['initial', 'vi'], 0);
+        setBar(root, ['final', 'vf'], 0);
+      }
+
+      function update() {
+        var vi = readNumber(initial);
+        var vf = readNumber(final);
+        var seconds = readNumber(time);
+        if (vi === null || vf === null || seconds === null || seconds <= 0) {
+          error('Enter two velocities and a positive time.');
+          return;
+        }
+
+        var change = vf - vi;
+        var average = change / seconds;
+        var siAverage = average * 0.3048;
+        var scale = Math.max(Math.abs(vi), Math.abs(vf), 1);
+        root.removeAttribute('data-state');
+        write(root, ['initial', 'vi'], signed(vi) + ' ft/s');
+        write(root, ['final', 'vf'], signed(vf) + ' ft/s');
+        write(root, ['delta', 'change'], signed(change) + ' ft/s');
+        write(root, ['average', 'avg'], signed(average) + ' ft/s\u00b2');
+        write(root, ['si', 'metric'], signed(siAverage) + ' m/s\u00b2');
+        setBar(root, ['initial', 'vi'], Math.abs(vi) / scale * 100);
+        setBar(root, ['final', 'vf'], Math.abs(vf) / scale * 100);
+      }
+
+      [initial, final, time].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: CAD scale and material estimator -----------------------*/
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    function formatForce(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 0.05) value = 0;
+      return (Math.round(value * 10) / 10).toFixed(1).replace(/\.0$/, '');
+    }
+
+    function write(root, names, text) {
+      var directOutput = { 'area-factor': true, 'volume-factor': true, mass: true, weight: true, lbf: true, 'pounds-force': true };
+      names.forEach(function (name) {
+        var selector = '[data-cad-' + name + '-result], [data-cad-output="' + name + '"]';
+        if (directOutput[name]) selector += ', [data-cad-' + name + ']';
+        root.querySelectorAll(selector).forEach(function (output) {
+          output.textContent = text;
+          if (!output.hasAttribute('aria-live')) output.setAttribute('aria-live', 'polite');
+        });
+      });
+    }
+
+    document.querySelectorAll('[data-cad-lab]').forEach(function (root) {
+      if (root.hasAttribute('data-cad-lab-wired')) return;
+      root.setAttribute('data-cad-lab-wired', '');
+
+      var scale = root.querySelector('[data-cad-scale]');
+      var baseArea = root.querySelector('[data-cad-area]');
+      var baseVolume = root.querySelector('[data-cad-volume]');
+      var density = root.querySelector('[data-cad-density]');
+      var gravity = root.querySelector('[data-cad-gravity]');
+
+      function error(message) {
+        root.setAttribute('data-state', 'error');
+        write(root, ['area-factor', 'volume-factor', 'area', 'volume', 'mass', 'weight', 'lbf'], message);
+      }
+
+      function update() {
+        var k = readNumber(scale);
+        var area = readNumber(baseArea);
+        var volume = readNumber(baseVolume);
+        var materialDensity = readNumber(density);
+        var g = readNumber(gravity);
+        if (k === null || area === null || volume === null || materialDensity === null || g === null ||
+            k <= 0 || area < 0 || volume < 0 || materialDensity < 0 || g < 0) {
+          error('Use a positive scale and nonnegative dimensions, density, and gravity.');
+          return;
+        }
+
+        var scaledArea = area * k * k;
+        var scaledVolume = volume * k * k * k;
+        var mass = scaledVolume * materialDensity;
+        var weight = mass * g;
+        var poundsForce = weight / 4.4482216152605;
+        if (!isFinite(scaledArea) || !isFinite(scaledVolume) || !isFinite(mass) || !isFinite(weight) || !isFinite(poundsForce)) {
+          error('That scale is outside the usable numeric range.');
+          return;
+        }
+
+        root.removeAttribute('data-state');
+        write(root, ['area-factor'], format(k * k));
+        write(root, ['volume-factor'], format(k * k * k));
+        write(root, ['area', 'scaled-area'], format(scaledArea) + ' m\u00b2');
+        write(root, ['volume', 'scaled-volume'], format(scaledVolume) + ' m\u00b3');
+        write(root, ['mass'], format(mass) + ' kg');
+        write(root, ['weight'], formatForce(weight) + ' N');
+        write(root, ['lbf', 'pounds-force'], formatForce(poundsForce) + ' lbf');
+      }
+
+      [scale, baseArea, baseVolume, density, gravity].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: small numerical practice checks ------------------------*/
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    document.querySelectorAll('[data-practice]').forEach(function (root) {
+      if (root.hasAttribute('data-practice-wired')) return;
+      root.setAttribute('data-practice-wired', '');
+
+      var input = root.querySelector('[data-practice-input], input[type="number"], input[type="text"]');
+      var button = root.querySelector('[data-practice-check], .practice-check, button');
+      var feedback = root.querySelector('[data-practice-feedback], [data-practice-result], [aria-live]');
+      var answer = Number(root.getAttribute('data-answer'));
+      var tolerance = Number(root.getAttribute('data-tolerance'));
+      var unit = root.getAttribute('data-unit') || '';
+      if (feedback && !feedback.hasAttribute('aria-live')) feedback.setAttribute('aria-live', 'polite');
+
+      function say(message, state) {
+        root.setAttribute('data-state', state);
+        if (feedback) feedback.textContent = message;
+      }
+
+      function check() {
+        var attempt = readNumber(input);
+        if (attempt === null) {
+          say('Enter a number before checking your work.', 'error');
+          return;
+        }
+        if (!isFinite(answer) || !isFinite(tolerance) || tolerance < 0) {
+          say('This check is not configured yet. Keep your work and ask your instructor.', 'error');
+          return;
+        }
+        if (Math.abs(attempt - answer) <= tolerance) {
+          say('Correct \u2014 your ' + (unit ? unit + ' ' : '') + 'answer is within the accepted tolerance.', 'correct');
+        } else {
+          say('Not yet \u2014 check the units, conversion factor, and arithmetic, then try again.', 'incorrect');
+        }
+      }
+
+      if (button) button.addEventListener('click', function (event) { event.preventDefault(); check(); });
+      if (input) input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') { event.preventDefault(); check(); }
+      });
     });
   })();
 })();

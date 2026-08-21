@@ -1878,6 +1878,488 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 .fc-agents .bad  .n { color: var(--cat-ink); }
 .fc-agents .bad  .r { color: var(--cat-ink); font-weight: 600; }
 
+/* ===========================================================================
+   DET 403 Unit 1 — interactive work surfaces
+
+   These are deliberately tools, not a second dashboard. Each one occupies a
+   single continuous surface inside a lesson: inputs establish the situation,
+   a quiet results area gives the current consequence, and any table stays a
+   table. The content remains meaningful when the JavaScript is unavailable.
+   ======================================================================== */
+.unit-lab,
+[data-prefix-explorer],
+[data-unit-converter],
+[data-path-lab],
+[data-acceleration-lab],
+[data-cad-lab] {
+  margin: 1.5rem 0;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  min-width: 0;
+}
+.unit-lab > :first-child,
+[data-prefix-explorer] > :first-child,
+[data-unit-converter] > :first-child,
+[data-path-lab] > :first-child,
+[data-acceleration-lab] > :first-child,
+[data-cad-lab] > :first-child { margin-top: 0; }
+.unit-lab > :last-child,
+[data-prefix-explorer] > :last-child,
+[data-unit-converter] > :last-child,
+[data-path-lab] > :last-child,
+[data-acceleration-lab] > :last-child,
+[data-cad-lab] > :last-child { margin-bottom: 0; }
+.unit-lab :is(h3, h4),
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(h3, h4) { margin-top: 0; }
+
+.unit-controls,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: .9rem;
+  align-items: end;
+  min-width: 0;
+}
+.unit-controls > *, .unit-controls label, .unit-controls fieldset,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset > * { min-width: 0; }
+.unit-controls > p,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset > p {
+  display: grid;
+  gap: .35rem;
+  margin: 0;
+}
+.unit-controls label,
+.unit-controls legend,
+.unit-control-label,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset :is(label, legend) {
+  display: grid;
+  gap: .35rem;
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .045em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+.unit-controls fieldset,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.unit-controls legend,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset legend { padding: 0; }
+.unit-controls :is(input, select, button),
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: .55rem .65rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.unit-controls :is(input, select):hover,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select):hover { border-color: var(--ink-soft); }
+.unit-controls button,
+.practice-check,
+[data-practice-check] {
+  cursor: pointer;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--paper);
+  font-family: var(--f-display);
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.unit-controls button:hover,
+.practice-check:hover,
+[data-practice-check]:hover { filter: brightness(1.08); }
+.unit-lab :is(input, select, button):focus-visible,
+:is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab], [data-practice]) :is(input, select, button):focus-visible {
+  outline: 3px solid var(--cat2);
+  outline-offset: 2px;
+}
+
+.unit-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: .75rem;
+  margin: 1rem 0 0;
+  min-width: 0;
+}
+.unit-result {
+  min-width: 0;
+  padding: .8rem .9rem;
+  border-inline-start: .25rem solid var(--accent);
+  background: var(--surface-2);
+}
+.unit-result > :first-child { margin-top: 0; }
+.unit-result > :last-child { margin-bottom: 0; }
+.unit-result .k,
+.unit-result dt,
+.unit-result-label {
+  display: block;
+  margin-bottom: .2rem;
+  color: var(--ink-soft);
+  font-family: var(--f-display);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+.unit-result .v,
+.unit-result dd,
+[data-prefix-result],
+[data-unit-result],
+[data-convert-result],
+[data-path-output],
+[data-acceleration-output],
+[data-cad-output] {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.unit-equation,
+[data-prefix-work],
+[data-unit-work],
+[data-convert-work] {
+  display: block;
+  margin: 1rem 0 0;
+  padding: .75rem .9rem;
+  border-inline-start: 2px solid var(--rule);
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font-size: .94rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.unit-lab[data-state="error"] .unit-result,
+.unit-lab[data-state="error"] .unit-equation,
+.unit-lab[data-state="error"] [data-prefix-result],
+.unit-lab[data-state="error"] [data-unit-result] {
+  border-color: var(--cat3);
+}
+[data-prefix-explorer][data-state="error"] [data-prefix-result],
+[data-unit-converter][data-state="error"] [data-convert-result],
+[data-unit-converter][data-state="error"] [data-unit-result],
+[data-path-lab][data-state="error"] .dims,
+[data-acceleration-lab][data-state="error"] .dims,
+[data-cad-lab][data-state="error"] .dims { border-color: var(--cat3); }
+
+.unit-table-wrap {
+  max-width: 100%;
+  margin: 1rem 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  border: 1px solid var(--rule);
+}
+.unit-table {
+  width: 100%;
+  min-width: 32rem;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+.unit-table :is(th, td) {
+  padding: .65rem .75rem;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  text-align: start;
+  vertical-align: top;
+}
+.unit-table th {
+  background: var(--surface-2);
+  font-family: var(--f-display);
+  font-size: .78rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.unit-table tr:last-child :is(th, td) { border-bottom: 0; }
+
+/* A -20 m to +20 m axis stays deliberately literal. The marker's inline
+   --path-position / left is provided by app.js; labels are real text outside
+   the aria-hidden track so a position is never conveyed by a dot alone. */
+.path-track,
+.path-lab-track,
+[data-path-track] {
+  position: relative;
+  min-height: 4.5rem;
+  margin: 1rem 0 0;
+  padding: .75rem .75rem 1.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.path-track::before,
+.path-lab-track::before,
+[data-path-track]::before {
+  content: "";
+  position: absolute;
+  inset: auto .75rem 1.1rem;
+  height: 2px;
+  background: var(--ink-soft);
+}
+.path-track::after,
+.path-lab-track::after,
+[data-path-track]::after {
+  content: "\2212 20 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 0 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 +20 m";
+  position: absolute;
+  inset: auto .75rem .15rem;
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-soft);
+  font-family: var(--f-display);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .025em;
+  white-space: pre;
+}
+.path-track [data-path-marker],
+.path-track [data-path-start-marker],
+.path-track [data-path-turn-marker],
+.path-track [data-path-end-marker],
+.path-lab-track [data-path-marker],
+.path-lab-track [data-path-start-marker],
+.path-lab-track [data-path-turn-marker],
+.path-lab-track [data-path-end-marker],
+[data-path-track] [data-path-marker],
+[data-path-track] [data-path-start-marker],
+[data-path-track] [data-path-turn-marker],
+[data-path-track] [data-path-end-marker] {
+  position: absolute;
+  z-index: 1;
+  top: .45rem;
+  left: var(--path-position, 50%);
+  display: block;
+  width: max-content;
+  max-width: calc(100% - 1rem);
+  min-height: 1.8rem;
+  padding: .3rem .45rem;
+  transform: translateX(-50%);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.path-track [data-path-marker]::after,
+.path-track [data-path-start-marker]::after,
+.path-track [data-path-turn-marker]::after,
+.path-track [data-path-end-marker]::after,
+.path-lab-track [data-path-marker]::after,
+.path-lab-track [data-path-start-marker]::after,
+.path-lab-track [data-path-turn-marker]::after,
+.path-lab-track [data-path-end-marker]::after,
+[data-path-track] [data-path-marker]::after,
+[data-path-track] [data-path-start-marker]::after,
+[data-path-track] [data-path-turn-marker]::after,
+[data-path-track] [data-path-end-marker]::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  width: 2px;
+  height: 1rem;
+  background: var(--accent);
+}
+.path-track [data-path-marker="end"],
+.path-lab-track [data-path-marker="end"],
+[data-path-track] [data-path-marker="end"] { top: 1.85rem; }
+
+.velocity-bars {
+  display: grid;
+  gap: .75rem;
+  margin: 1rem 0 0;
+}
+.velocity-bars > * {
+  display: grid;
+  grid-template-columns: minmax(5rem, .45fr) minmax(0, 1fr);
+  gap: .65rem;
+  align-items: center;
+  min-width: 0;
+}
+.velocity-bars .velocity-track,
+.velocity-bars [data-velocity-track] {
+  position: relative;
+  min-width: 0;
+  height: 1rem;
+  border: 1px solid var(--rule);
+  background: var(--surface-2);
+}
+.velocity-bars [data-acceleration-initial-bar],
+.velocity-bars [data-acceleration-final-bar],
+.velocity-bars [data-acceleration-bar] {
+  display: block;
+  width: var(--velocity-width, 0%);
+  max-width: 100%;
+  min-width: 0;
+  height: 100%;
+  background: var(--accent);
+}
+.velocity-bars [data-acceleration-final-bar],
+.velocity-bars [data-acceleration-bar="final"] { background: var(--cat2); }
+
+[data-practice] {
+  display: grid;
+  gap: .75rem;
+  align-items: end;
+}
+[data-practice] label {
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .045em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+[data-practice] input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: .55rem .65rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+[data-practice] .practice-check,
+[data-practice] [data-practice-check] { min-height: 2.75rem; }
+[data-practice-feedback],
+[data-practice-result] {
+  min-height: 1.5em;
+  margin: 0;
+  padding: .7rem .8rem;
+  border-inline-start: .25rem solid var(--rule);
+  background: var(--surface-2);
+  color: var(--ink);
+  line-height: 1.45;
+}
+[data-practice][data-state="correct"] :is([data-practice-feedback], [data-practice-result]) { border-color: var(--cat1); }
+[data-practice][data-state="incorrect"] :is([data-practice-feedback], [data-practice-result]) { border-color: var(--cat2); }
+[data-practice][data-state="error"] :is([data-practice-feedback], [data-practice-result]) { border-color: var(--cat3); }
+[data-practice][data-state="correct"] :is(.practice-check, [data-practice-check])::before { content: "\2713 "; }
+[data-practice][data-state="incorrect"] :is(.practice-check, [data-practice-check])::before { content: "\21bb "; }
+[data-practice][data-state="error"] :is(.practice-check, [data-practice-check])::before { content: "! "; }
+
+/* A presenter gets slightly larger controls without ever constraining the
+   tool's height; focus rings and all controls remain available in this mode. */
+.presenting :is(.unit-lab, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) { font-size: 1.08rem; }
+.presenting :is(.unit-controls, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { min-height: 3rem; }
+
+@media (max-width: 36rem) {
+  .unit-lab,
+  [data-prefix-explorer],
+  [data-unit-converter],
+  [data-path-lab],
+  [data-acceleration-lab],
+  [data-cad-lab] { padding: 1rem; overflow: hidden; }
+  .unit-controls,
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) > fieldset,
+  .unit-results,
+  [data-practice] { grid-template-columns: minmax(0, 1fr); }
+  .unit-controls > *,
+  .unit-results > * { min-width: 0; }
+  .unit-controls :is(input, select, button),
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { max-width: 100%; }
+  .unit-table { min-width: 28rem; }
+  .velocity-bars > * { grid-template-columns: minmax(0, 1fr); gap: .35rem; }
+  :is(.path-track, .path-lab-track, [data-path-track])::after { font-size: .58rem; letter-spacing: 0; }
+}
+
+@media print {
+  .unit-lab,
+  [data-prefix-explorer],
+  [data-unit-converter],
+  [data-path-lab],
+  [data-acceleration-lab],
+  [data-cad-lab] {
+    break-inside: avoid;
+    background: #FFF !important;
+    border-color: #777 !important;
+    color: #111 !important;
+  }
+  .unit-lab :is(input, select),
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select) {
+    min-height: 0;
+    padding: .2rem .3rem;
+    border-color: #777;
+    background: #FFF;
+    color: #111;
+  }
+  .unit-lab :is(button, .practice-check, [data-practice-check]):not([data-print-keep]),
+  :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab], [data-practice]) :is(button, .practice-check, [data-practice-check]):not([data-print-keep]) { display: none; }
+  .unit-result,
+  .unit-equation,
+  [data-practice-feedback],
+  [data-practice-result],
+  .path-track,
+  .path-lab-track,
+  [data-path-track],
+  .unit-table,
+  .unit-table th { background: #FFF !important; color: #111 !important; }
+  .unit-result,
+  .unit-equation,
+  [data-practice-feedback],
+  [data-practice-result] { border-color: #555 !important; }
+  .path-track::before,
+  .path-lab-track::before,
+  [data-path-track]::before,
+  .path-track [data-path-marker]::after,
+  .path-track [data-path-start-marker]::after,
+  .path-track [data-path-turn-marker]::after,
+  .path-track [data-path-end-marker]::after,
+  .path-lab-track [data-path-marker]::after,
+  .path-lab-track [data-path-start-marker]::after,
+  .path-lab-track [data-path-turn-marker]::after,
+  .path-lab-track [data-path-end-marker]::after,
+  [data-path-track] [data-path-marker]::after,
+  [data-path-track] [data-path-start-marker]::after,
+  [data-path-track] [data-path-turn-marker]::after,
+  [data-path-track] [data-path-end-marker]::after { background: #111 !important; }
+  .path-track [data-path-marker],
+  .path-track [data-path-start-marker],
+  .path-track [data-path-turn-marker],
+  .path-track [data-path-end-marker],
+  .path-lab-track [data-path-marker],
+  .path-lab-track [data-path-start-marker],
+  .path-lab-track [data-path-turn-marker],
+  .path-lab-track [data-path-end-marker],
+  [data-path-track] [data-path-marker],
+  [data-path-track] [data-path-start-marker],
+  [data-path-track] [data-path-turn-marker],
+  [data-path-track] [data-path-end-marker] {
+    border-color: #111 !important;
+    background: #FFF !important;
+    color: #111 !important;
+  }
+  .velocity-bars [data-acceleration-initial-bar],
+  .velocity-bars [data-acceleration-final-bar],
+  .velocity-bars [data-acceleration-bar] { background: #333 !important; }
+}
+
 /* ---- aggregate: many pages stacked in one printable file --------------- */
 .aggregate main { padding: clamp(1.5rem, 4vw, 3rem); max-width: 52rem; margin: 0 auto; }
 .agg-head { margin-bottom: 3rem; }
@@ -1931,6 +2413,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><a href="#p-ppe">Personal Protective Equipment</a></li>
     <li><a href="#p-equipment-categories">Equipment Categories and Supervision</a></li>
     <li><a href="#p-metal-chips">Metal Chips and Swarf</a></li>
+    <li><a href="#p-acceleration-and-squared-time">Acceleration and Squared Time</a></li>
+    <li><a href="#p-dimensional-analysis">Dimensional Analysis</a></li>
+    <li><a href="#p-geometry-mass-and-force">Geometry, Mass, and Force</a></li>
+    <li><a href="#p-measurement-language">Measurement Language</a></li>
+    <li><a href="#p-motion-quantities">Motion Quantities</a></li>
     <li><a href="#p-5s-workplace-organization">5S Workplace Organization</a></li>
   </ol>
 </div>
@@ -3536,6 +4023,698 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 
 </article>
+<article class="article bundled" id="p-acceleration-and-squared-time">
+  <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span></div>
+  <h1>Acceleration and Squared Time</h1>
+  <p class="lede">Calculate change in velocity over time, distinguish average from instantaneous acceleration, and convert squared time units correctly.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard" id="acceleration-is-change-in-velocity-over-time" data-card="acceleration-is-change-in-velocity-over-time">
+    <summary>Acceleration is change in velocity over time<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Acceleration is change in velocity over time</h2>
+  <p class="lede">Acceleration is not simply &ldquo;speeding up.&rdquo; It is a change in velocity,
+  so it can describe speeding up, slowing down, or turning.</p>
+  <p><code>a<sub>avg</sub> = &Delta;v / &Delta;t = (v<sub>f</sub> &minus; v<sub>i</sub>) / (t<sub>f</sub> &minus; t<sub>i</sub>)</code></p>
+  <dl class="dims">
+    <div><dt>&Delta;v</dt><dd>Change in velocity. With one chosen positive direction,
+    <code>&Delta;v = v<sub>f</sub> &minus; v<sub>i</sub></code>.</dd></div>
+    <div><dt>m/s<sup>2</sup></dt><dd>Meters per second per second. Each second, velocity changes
+    by the stated number of meters per second.</dd></div>
+    <div><dt>ft/s<sup>2</sup></dt><dd>Feet per second per second. The coherent
+    foot&ndash;slug&ndash;second system uses this acceleration unit with slugs for mass.</dd></div>
+  </dl>
+  <div class="panel"><p>Write the sign. A final velocity lower than the initial velocity produces
+  negative acceleration in the selected direction; it is not an error just because the answer is
+  negative.</p></div>
+    </div>
+  </details>
+  <details class="xcard" id="average-is-an-interval-instantaneous-is-a-moment" data-card="average-is-an-interval-instantaneous-is-a-moment">
+    <summary>Average is an interval; instantaneous is a moment<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Average is an interval; instantaneous is a moment</h2>
+  <p>Average acceleration is calculated over stated start and end conditions. An accelerometer or
+  control system can report instantaneous acceleration at one moment. They match only when the
+  acceleration stays constant through the interval.</p>
+  <h3>Machine arm example</h3>
+  <p>A machine arm starts from rest and reaches 3 m/s in 4 s:</p>
+  <p><code>a<sub>avg</sub> = (3 m/s &minus; 0 m/s) / 4 s = 0.75 m/s<sup>2</sup></code>.</p>
+  <p>This is the average acceleration for the four-second move. If the drive ramps gently at the
+  start and end, its instantaneous acceleration changes during the move even though the average
+  remains 0.75 m/s<sup>2</sup>.</p>
+  <h3>Robot gripper example</h3>
+  <p>A SolidWorks motion study programs a gripper from 0 to 5 ft/s in 0.5 s to pick an electronic
+  component. Its average acceleration is <code>5 ft/s / 0.5 s = 10 ft/s<sup>2</sup></code>. In SI,
+  <code>10 ft/s<sup>2</sup> &times; (0.3048 m / 1 ft) = 3.048 m/s<sup>2</sup></code>.</p>
+    </div>
+  </details>
+  <details class="xcard is-gate" id="squared-time-needs-a-squared-factor" data-card="squared-time-needs-a-squared-factor">
+    <summary>Squared time needs a squared factor<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Squared time needs a squared factor</h2>
+  <p>Acceleration has time in the denominator twice. When converting an acceleration unit, convert
+  the entire squared time relationship, not just one <code>s</code>.</p>
+  <p><code>1 min = 60 s</code> means <code>1 min<sup>2</sup> = (60 s)<sup>2</sup> = 3,600 s<sup>2</sup></code>.</p>
+  <div class="gate">
+    <p><strong>Use the inverse relationship in the correct direction.</strong>
+    <code>1 ft/s<sup>2</sup> = 0.3048 m/s<sup>2</sup></code>, not
+    <code>0.3048<sup>2</sup> m/s<sup>2</sup></code>. The foot is the only unit being changed in
+    that expression; seconds are already seconds in both units.</p>
+  </div>
+  <p>By contrast, converting <code>m/min<sup>2</sup></code> to <code>m/s<sup>2</sup></code>
+  requires the full squared time factor. The unit cancellation shows why:</p>
+  <p><code>1 m/min<sup>2</sup> &times; (1 min / 60 s)<sup>2</sup> = 1/3,600 m/s<sup>2</sup></code>.</p>
+    </div>
+  </details>
+  <details class="xcard" id="acceleration-lab" data-card="acceleration-lab">
+    <summary>Acceleration lab<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Acceleration lab</h2>
+  <p class="lede">Change the initial and final velocities and the elapsed time. The last result
+  converts the calculated foot-per-second-squared value to SI.</p>
+  <div class="panel" data-acceleration-lab>
+    <fieldset>
+      <legend>Velocity change</legend>
+      <p><label for="accel-initial">Initial velocity (ft/s)</label>
+      <input id="accel-initial" data-accel-initial type="number" value="0" step="any" inputmode="decimal"></p>
+      <p><label for="accel-final">Final velocity (ft/s)</label>
+      <input id="accel-final" data-accel-final type="number" value="5" step="any" inputmode="decimal"></p>
+      <p><label for="accel-time">Elapsed time (s)</label>
+      <input id="accel-time" data-accel-time type="number" value="0.5" min="0" step="any" inputmode="decimal"></p>
+    </fieldset>
+    <dl class="dims">
+      <div><dt>Change in velocity</dt><dd><output data-accel-change aria-live="polite">5 ft/s</output></dd></div>
+      <div><dt>Average acceleration</dt><dd><output data-accel-average aria-live="polite">10 ft/s²</output></dd></div>
+      <div><dt>SI equivalent</dt><dd><output data-accel-si aria-live="polite">3.048 m/s²</output></dd></div>
+    </dl>
+    <noscript><p class="aside">JavaScript is off. The shown gripper case is solved above:
+    0 to 5 ft/s in 0.5 s gives 10 ft/s², or 3.048 m/s².</p></noscript>
+  </div>
+    </div>
+  </details>
+  <details class="xcard" id="practice-and-sources" data-card="practice-and-sources">
+    <summary>Practice and sources<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Practice and sources</h2>
+  <div class="panel" data-practice data-answer="0.75" data-tolerance="0.01" data-unit="m/s²">
+    <p><strong>Practice:</strong> A machine arm starts from rest and reaches 3 m/s in 4 s. What is
+    its average acceleration, assuming the stated interval?</p>
+    <label for="practice-arm-answer">Answer in m/s²</label>
+    <input id="practice-arm-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p><code>a<sub>avg</sub> = (v<sub>f</sub> &minus; v<sub>i</sub>) / &Delta;t =
+      (3 m/s &minus; 0 m/s) / 4 s = 0.75 m/s<sup>2</sup></code>. The assumption is that the
+      requested value is the average over the complete four-second interval.</p>
+    </details>
+  </div>
+  <p class="deeper-ref" id="deeper-ref-12">Supporting detail: <a href="#deeper-addendum-12"><strong>Addendum 12</strong></a> &mdash; Source note.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-dimensional-analysis">
+  <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span></div>
+  <h1>Dimensional Analysis</h1>
+  <p class="lede">Convert quantities by multiplying by named equalities, cancelling units, and treating squared and cubed units as powers.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard is-gate" id="convert-by-multiplying-by-one" data-card="convert-by-multiplying-by-one">
+    <summary>Convert by multiplying by one<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Convert by multiplying by one</h2>
+  <p class="lede">A conversion factor is a true equality written as a fraction. Because its numerator
+  and denominator name the same quantity, the factor equals one; it changes units without changing
+  the physical amount.</p>
+  <p>To convert 12 m to feet, choose a factor that puts meters on the bottom so meters cancel:</p>
+  <p><code>12 m &times; (3.280839895 ft / 1 m) = 39.37007874 ft</code></p>
+  <div class="gate">
+    <p><strong>Do not memorize an arrow.</strong> Write the desired unit, then arrange the factor so
+    the unwanted unit cancels. The units tell you whether the fraction is facing the correct way
+    before you calculate.</p>
+  </div>
+  <dl class="dims">
+    <div><dt>Exact, defined</dt><dd><code>1 in = 0.0254 m</code>, so
+    <code>1 ft = 0.3048 m</code> and <code>1 yd = 0.9144 m</code> exactly.</dd></div>
+    <div><dt>Keep guard digits</dt><dd>Use exact factors or sufficient digits while calculating;
+    round the displayed result only at the end and only as the task needs.</dd></div>
+    <div><dt>Match dimensions</dt><dd>Length converts to length, area to area, volume to volume,
+    and force to force. A calculator cannot make incompatible dimensions meaningful.</dd></div>
+  </dl>
+    </div>
+  </details>
+  <details class="xcard" id="powers-apply-to-the-whole-conversion" data-card="powers-apply-to-the-whole-conversion">
+    <summary>Powers apply to the whole conversion<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Powers apply to the whole conversion</h2>
+  <p>Area and volume are not lengths with decorative superscripts. The conversion factor itself
+  must be squared or cubed.</p>
+  <div class="unit-table-wrap">
+  <table class="unit-table">
+    <caption>Why a single linear factor is not enough.</caption>
+    <thead><tr><th scope="col">Quantity</th><th scope="col">Exact relationship</th><th scope="col">Useful result</th></tr></thead>
+    <tbody>
+      <tr><td>Length</td><td>1 ft = 0.3048 m</td><td>1 ft = 0.3048 m</td></tr>
+      <tr><td>Area</td><td>(1 ft)<sup>2</sup> = (0.3048 m)<sup>2</sup></td><td>1 ft<sup>2</sup> = 0.09290304 m<sup>2</sup></td></tr>
+      <tr><td>Volume</td><td>(1 ft)<sup>3</sup> = (0.3048 m)<sup>3</sup></td><td>1 ft<sup>3</sup> = 0.028316846592 m<sup>3</sup></td></tr>
+      <tr><td>Time squared</td><td>(1 min)<sup>2</sup> = (60 s)<sup>2</sup></td><td>1 min<sup>2</sup> = 3,600 s<sup>2</sup></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>For example, <code>4 m<sup>2</sup> &times; (1 ft / 0.3048 m)<sup>2</sup> =
+  43.0556 ft<sup>2</sup></code>, which is sensibly reported as <strong>43.1 ft<sup>2</sup></strong>.</p>
+  <p>For liquid capacity, <code>1 m<sup>3</sup> = 1,000 L</code> and
+  <code>1 U.S. gal = 3.785411784 L</code>. The converter labels this as a <strong>U.S. liquid
+  gallon</strong> so it cannot be mistaken for an Imperial gallon.</p>
+  <p class="deeper-ref" id="deeper-ref-13">Supporting detail: <a href="#deeper-addendum-13"><strong>Addendum 13</strong></a> &mdash; Dimensional analysis is also a design check.</p>
+    </div>
+  </details>
+  <details class="xcard" id="conversion-bench" data-card="conversion-bench">
+    <summary>Conversion bench<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Conversion bench</h2>
+  <p class="lede">This tool uses exact internal factors where standards define them. It only converts
+  within one quantity type; a length cannot become a speed without additional information.</p>
+  <div class="panel" data-unit-converter>
+    <fieldset>
+      <legend>Convert a quantity</legend>
+      <p><label for="convert-value">Value</label>
+      <input id="convert-value" data-convert-value type="number" value="12" step="any" inputmode="decimal"></p>
+      <p><label for="convert-from">From unit</label>
+      <select id="convert-from" data-convert-from>
+        <optgroup label="Time"><option value="s">second (s)</option><option value="min">minute (min)</option><option value="h">hour (h)</option><option value="d">day (d)</option></optgroup>
+        <optgroup label="Length"><option value="mm">millimeter (mm)</option><option value="cm">centimeter (cm)</option><option value="m" selected>meter (m)</option><option value="km">kilometer (km)</option><option value="in">inch (in)</option><option value="ft">foot (ft)</option><option value="yd">yard (yd)</option><option value="mi">mile (mi)</option></optgroup>
+        <optgroup label="Area"><option value="m2">square meter (m²)</option><option value="ft2">square foot (ft²)</option><option value="in2">square inch (in²)</option></optgroup>
+        <optgroup label="Volume"><option value="m3">cubic meter (m³)</option><option value="L">liter (L)</option><option value="ft3">cubic foot (ft³)</option><option value="in3">cubic inch (in³)</option><option value="usgal">U.S. liquid gallon (U.S. gal)</option></optgroup>
+        <optgroup label="Mass"><option value="kg">kilogram (kg)</option><option value="lbm">pound mass (lbm)</option><option value="slug">slug</option></optgroup>
+        <optgroup label="Speed"><option value="mps">meter per second (m/s)</option><option value="ftps">foot per second (ft/s)</option><option value="mph">mile per hour (mph)</option><option value="kmph">kilometer per hour (km/h)</option></optgroup>
+        <optgroup label="Acceleration"><option value="mps2">meter per second squared (m/s²)</option><option value="ftps2">foot per second squared (ft/s²)</option></optgroup>
+        <optgroup label="Force"><option value="N">newton (N)</option><option value="lbf">pound force (lbf)</option></optgroup>
+      </select></p>
+      <p><label for="convert-to">To unit</label>
+      <select id="convert-to" data-convert-to>
+        <optgroup label="Time"><option value="s">second (s)</option><option value="min">minute (min)</option><option value="h">hour (h)</option><option value="d">day (d)</option></optgroup>
+        <optgroup label="Length"><option value="mm">millimeter (mm)</option><option value="cm">centimeter (cm)</option><option value="m">meter (m)</option><option value="km">kilometer (km)</option><option value="in">inch (in)</option><option value="ft" selected>foot (ft)</option><option value="yd">yard (yd)</option><option value="mi">mile (mi)</option></optgroup>
+        <optgroup label="Area"><option value="m2">square meter (m²)</option><option value="ft2">square foot (ft²)</option><option value="in2">square inch (in²)</option></optgroup>
+        <optgroup label="Volume"><option value="m3">cubic meter (m³)</option><option value="L">liter (L)</option><option value="ft3">cubic foot (ft³)</option><option value="in3">cubic inch (in³)</option><option value="usgal">U.S. liquid gallon (U.S. gal)</option></optgroup>
+        <optgroup label="Mass"><option value="kg">kilogram (kg)</option><option value="lbm">pound mass (lbm)</option><option value="slug">slug</option></optgroup>
+        <optgroup label="Speed"><option value="mps">meter per second (m/s)</option><option value="ftps">foot per second (ft/s)</option><option value="mph">mile per hour (mph)</option><option value="kmph">kilometer per hour (km/h)</option></optgroup>
+        <optgroup label="Acceleration"><option value="mps2">meter per second squared (m/s²)</option><option value="ftps2">foot per second squared (ft/s²)</option></optgroup>
+        <optgroup label="Force"><option value="N">newton (N)</option><option value="lbf">pound force (lbf)</option></optgroup>
+      </select></p>
+    </fieldset>
+    <p><strong>Result:</strong> <output data-convert-result aria-live="polite">39.3701 ft</output></p>
+    <p data-convert-work>12 m &times; (3.280839895 ft / 1 m) = 39.3701 ft.</p>
+    <noscript><p class="aside">JavaScript is off. The shown 12 m to 39.3701 ft example and the
+    worked conversions on this page remain available.</p></noscript>
+  </div>
+    </div>
+  </details>
+  <details class="xcard is-gate" id="cnc-production-calculation" data-card="cnc-production-calculation">
+    <summary>CNC production calculation<span class="chev"></span></summary>
+    <div class="body">
+      <h2>CNC production calculation</h2>
+  <p>A CNC program estimates <strong>4 min 15 s</strong> per part. The operator uses 30 min of an
+  8 h shift for setup. How many <em>complete</em> parts fit in the shift?</p>
+  <ol>
+    <li>Convert the cycle: <code>4 min 15 s = 4.25 min</code>.</li>
+    <li>Find machine-running time: <code>8 h &times; (60 min / 1 h) &minus; 30 min = 450 min</code>.</li>
+    <li>Divide running time by cycle time: <code>450 min / 4.25 min per part = 105.882...</code>.</li>
+  </ol>
+  <div class="gate"><p><strong>105 complete parts.</strong> The fractional result is time into the
+  106th cycle, not a finished part. This assumes one machine, no unplanned stops, and that the
+  stated cycle time already includes every repeatable operation.</p></div>
+  <p class="deeper-ref" id="deeper-ref-14">Supporting detail: <a href="#deeper-addendum-14"><strong>Addendum 14</strong></a> &mdash; Two more conversion cases from the unit.</p>
+    </div>
+  </details>
+  <details class="xcard" id="practice-and-sources" data-card="practice-and-sources">
+    <summary>Practice and sources<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Practice and sources</h2>
+  <div class="panel" data-practice data-answer="0.23148148" data-tolerance="0.0001" data-unit="ft³">
+    <p><strong>Practice:</strong> A SolidWorks model reports 400 in<sup>3</sup>. What is the volume
+    in ft<sup>3</sup>?</p>
+    <label for="practice-volume-answer">Answer in ft³</label>
+    <input id="practice-volume-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>There are 12 in in 1 ft, so there are <code>12<sup>3</sup> = 1,728 in<sup>3</sup></code>
+      in 1 ft<sup>3</sup>. Therefore
+      <code>400 in<sup>3</sup> &times; (1 ft<sup>3</sup> / 1,728 in<sup>3</sup>) =
+      0.23148148 ft<sup>3</sup></code>. Rounded sensibly: <strong>0.2315 ft<sup>3</sup></strong>.</p>
+    </details>
+  </div>
+  <p class="deeper-ref" id="deeper-ref-15">Supporting detail: <a href="#deeper-addendum-15"><strong>Addendum 15</strong></a> &mdash; Sources and exact factors.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-geometry-mass-and-force">
+  <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span></div>
+  <h1>Geometry, Mass, and Force</h1>
+  <p class="lede">Scale CAD geometry correctly, connect volume and density to mass, and keep force and weight as separate quantities.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard is-gate" id="scale-changes-area-and-volume-by-powers" data-card="scale-changes-area-and-volume-by-powers">
+    <summary>Scale changes area and volume by powers<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Scale changes area and volume by powers</h2>
+  <p class="lede">If every linear dimension of a model is multiplied by a scale factor <code>s</code>,
+  area changes by <code>s<sup>2</sup></code> and volume changes by <code>s<sup>3</sup></code>. A
+  20% larger model is not 20% larger in area or volume.</p>
+  <dl class="dims">
+    <div><dt>Length</dt><dd><code>L<sub>new</sub> = sL<sub>old</sub></code></dd></div>
+    <div><dt>Area</dt><dd><code>A<sub>new</sub> = s<sup>2</sup>A<sub>old</sub></code></dd></div>
+    <div><dt>Volume</dt><dd><code>V<sub>new</sub> = s<sup>3</sup>V<sub>old</sub></code></dd></div>
+  </dl>
+  <p>For <code>s = 1.2</code>, area factor = <code>1.2<sup>2</sup> = 1.44</code> and volume factor
+  = <code>1.2<sup>3</sup> = 1.728</code>. This is why a modest scale change can matter to material
+  use, shipping mass, tank capacity, and actuator selection.</p>
+  <div class="gate"><p><strong>Never scale an area with a linear factor or a volume with an area
+  factor.</strong> The exponent belongs to the geometry, not to the number of decimal places.</p></div>
+    </div>
+  </details>
+  <details class="xcard" id="volume-is-capacity-only-after-you-name-the-unit" data-card="volume-is-capacity-only-after-you-name-the-unit">
+    <summary>Volume is capacity only after you name the unit<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Volume is capacity only after you name the unit</h2>
+  <p>CAD mass properties often report volume in a model&rsquo;s document units. Before treating that
+  number as a tank capacity or a material quantity, state the volume unit and convert it to the
+  form the drawing or specification requires.</p>
+  <div class="unit-table-wrap">
+  <table class="unit-table">
+    <caption>Volume relationships used in this unit.</caption>
+    <thead><tr><th scope="col">Relationship</th><th scope="col">Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>1 m<sup>3</sup> = 1,000 L</td><td>A cubic meter contains one thousand liters.</td></tr>
+      <tr><td>1 U.S. gal = 3.785411784 L</td><td>This is a U.S. liquid gallon, not an Imperial gallon.</td></tr>
+      <tr><td>1 ft<sup>3</sup> = 7.48051948 U.S. gal</td><td>Derived from the exact foot and U.S. gallon definitions.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <h3>Static solved reservoir example</h3>
+  <p>A SolidWorks model gives a hydraulic reservoir internal volume of 2.5 ft<sup>3</sup>. Its
+  capacity is <code>2.5 ft<sup>3</sup> &times; 7.48051948 U.S. gal/ft<sup>3</sup> =
+  18.7013 U.S. gal</code>, or <strong>18.7 U.S. gal</strong>. This assumes the reported CAD volume
+  is the usable internal volume and no design headspace has yet been subtracted.</p>
+    </div>
+  </details>
+  <details class="xcard" id="density-connects-volume-to-mass" data-card="density-connects-volume-to-mass">
+    <summary>Density connects volume to mass<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Density connects volume to mass</h2>
+  <p>Density is mass per volume. When material density and CAD volume use compatible units,
+  <code>m = &rho;V</code> produces mass.</p>
+  <p><code>(kg/m<sup>3</sup>) &times; (m<sup>3</sup>) = kg</code></p>
+  <p>For example, a volume of 0.13824 m<sup>3</sup> made of material with a density of
+  2,700 kg/m<sup>3</sup> has mass
+  <code>m = 2,700 kg/m<sup>3</sup> &times; 0.13824 m<sup>3</sup> = 373.248 kg</code>.</p>
+  <div class="panel"><p><strong>Mass does not change merely because an object is moved from one
+  planet to another.</strong> Weight can change because gravitational acceleration changes. CAD
+  models, material databases, and shipping specifications commonly need mass; lifting and support
+  calculations commonly need force or weight.</p></div>
+  <p class="deeper-ref" id="deeper-ref-16">Supporting detail: <a href="#deeper-addendum-16"><strong>Addendum 16</strong></a> &mdash; Check the CAD assumptions before trusting mass properties.</p>
+    </div>
+  </details>
+  <details class="xcard" id="force-and-weight-are-separate-quantities" data-card="force-and-weight-are-separate-quantities">
+    <summary>Force and weight are separate quantities<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Force and weight are separate quantities</h2>
+  <p><strong>Force</strong> is a push or pull. For constant mass, Newton&rsquo;s second law is
+  <code>F<sub>net</sub> = ma</code>. <strong>Weight</strong> is one particular force: the force due
+  to gravity, written <code>W = mg</code>.</p>
+  <dl class="dims">
+    <div><dt>F<sub>net</sub></dt><dd>Net force, in newtons (<code>N</code>) or pound force
+    (<code>lbf</code>). It is the combined force that produces acceleration.</dd></div>
+    <div><dt>W</dt><dd>Weight, a gravitational force. Near Earth&rsquo;s standard gravity,
+    <code>g<sub>0</sub> = 9.80665 m/s<sup>2</sup></code>; local gravity can differ slightly.</dd></div>
+    <div><dt>m</dt><dd>Mass, in kilograms, pound mass, or slugs. It is not measured in newtons or
+    pound force.</dd></div>
+  </dl>
+  <p>In coherent SI, <code>1 N = 1 kg &middot; m/s<sup>2</sup></code>. In the coherent
+  foot&ndash;slug&ndash;second system, <code>1 lbf = 1 slug &middot; ft/s<sup>2</sup></code>. Do not
+  silently replace <code>lbm</code> with <code>lbf</code>.</p>
+  <h3>Static solved weight example</h3>
+  <p>For a 1,570 kg mass at standard gravity, <code>W = mg = 1,570 kg &times;
+  9.80665 m/s<sup>2</sup> = 15,396.44 N</code>, or <strong>15.4 kN</strong>. This is a weight
+  calculation at standard gravity, not a claim that the mass is 15.4 kN.</p>
+    </div>
+  </details>
+  <details class="xcard" id="cad-scale-mass-and-weight-lab" data-card="cad-scale-mass-and-weight-lab">
+    <summary>CAD scale, mass, and weight lab<span class="chev"></span></summary>
+    <div class="body">
+      <h2>CAD scale, mass, and weight lab</h2>
+  <p class="lede">This model begins with an area and volume in SI units, scales them, then uses
+  density and gravitational acceleration to show the separate mass and weight results.</p>
+  <div class="panel" data-cad-lab>
+    <fieldset>
+      <legend>Model inputs</legend>
+      <p><label for="cad-scale">Linear scale factor</label>
+      <input id="cad-scale" data-cad-scale type="number" value="1.2" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="cad-area">Original area (m²)</label>
+      <input id="cad-area" data-cad-area type="number" value="1.25" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="cad-volume">Original volume (m³)</label>
+      <input id="cad-volume" data-cad-volume type="number" value="0.08" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="cad-density">Density (kg/m³)</label>
+      <input id="cad-density" data-cad-density type="number" value="2700" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="cad-gravity">Gravitational acceleration (m/s²)</label>
+      <input id="cad-gravity" data-cad-gravity type="number" value="9.80665" min="0" step="any" inputmode="decimal"></p>
+    </fieldset>
+    <dl class="dims">
+      <div><dt>Area factor</dt><dd><output data-cad-area-factor aria-live="polite">1.44</output></dd></div>
+      <div><dt>Volume factor</dt><dd><output data-cad-volume-factor aria-live="polite">1.728</output></dd></div>
+      <div><dt>Scaled area</dt><dd><output data-cad-area-result aria-live="polite">1.8 m²</output></dd></div>
+      <div><dt>Scaled volume</dt><dd><output data-cad-volume-result aria-live="polite">0.13824 m³</output></dd></div>
+      <div><dt>Mass</dt><dd><output data-cad-mass aria-live="polite">373.248 kg</output></dd></div>
+      <div><dt>Weight</dt><dd><output data-cad-weight aria-live="polite">3660.3 N</output></dd></div>
+      <div><dt>Weight</dt><dd><output data-cad-lbf aria-live="polite">822.9 lbf</output></dd></div>
+    </dl>
+    <noscript><p class="aside">JavaScript is off. The displayed case has area factor 1.44,
+    volume factor 1.728, scaled volume 0.13824 m³, mass 373.248 kg, and weight 3660.3 N
+    (822.9 lbf).</p></noscript>
+  </div>
+    </div>
+  </details>
+  <details class="xcard" id="practice-and-sources" data-card="practice-and-sources">
+    <summary>Practice and sources<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Practice and sources</h2>
+  <div class="panel" data-practice data-answer="40" data-tolerance="0.01" data-unit="complete enclosures">
+    <p><strong>Practice:</strong> A sheet-metal enclosure has 1,250 in<sup>2</sup> of external
+    surface area. A U.S. gallon of paint covers 350 ft<sup>2</sup>. Ignoring overspray, waste,
+    unpainted areas, and extra coats, how many complete enclosures can one gallon cover?</p>
+    <label for="practice-paint-answer">Answer in complete enclosures</label>
+    <input id="practice-paint-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>Convert the enclosure area using the squared relationship:
+      <code>1,250 in<sup>2</sup> &times; (1 ft<sup>2</sup> / 144 in<sup>2</sup>) =
+      8.68056 ft<sup>2</sup></code>. Then
+      <code>350 ft<sup>2</sup> / 8.68056 ft<sup>2</sup> per enclosure = 40.32</code> enclosures.
+      Only <strong>40 complete enclosures</strong> can be painted. The answer assumes the stated
+      coverage is for the required coat and all paint reaches the enclosure.</p>
+    </details>
+  </div>
+  <p class="deeper-ref" id="deeper-ref-17">Supporting detail: <a href="#deeper-addendum-17"><strong>Addendum 17</strong></a> &mdash; Sources and engineering context.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-measurement-language">
+  <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span></div>
+  <h1>Measurement Language</h1>
+  <p class="lede">Use quantities, units, symbols, and SI prefixes precisely before a drawing, program, or calculation has a chance to drift.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard" id="a-measurement-is-a-number-and-a-unit" data-card="a-measurement-is-a-number-and-a-unit">
+    <summary>A measurement is a number and a unit<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A measurement is a number and a unit</h2>
+  <p class="lede">A dimension on a drawing, a speed in a robot program, and a torque setting are all
+  <strong>quantities</strong>: a number paired with a unit. The number tells how many; the unit tells
+  what kind of thing and how large each part is.</p>
+  <dl class="dims">
+    <div><dt>25 mm</dt><dd>A length: twenty-five millimeters. Writing only <code>25</code> leaves
+    the measurement incomplete.</dd></div>
+    <div><dt>4.25 min</dt><dd>A CNC cycle time. It is not interchangeable with 4.25 seconds or
+    4.25 hours.</dd></div>
+    <div><dt>3.0 m/s</dt><dd>A speed or velocity magnitude. The slash means meters <em>per
+    second</em>.</dd></div>
+  </dl>
+  <div class="panel">
+    <p><strong>Carry units through every line of a calculation.</strong> They are an error check,
+    not decoration. If the last line needs a length and the units say seconds, stop before the
+    wrong number reaches a drawing or controller.</p>
+  </div>
+  <p>Use the unit symbol exactly as specified: <code>m</code> for meter, <code>s</code> for
+  second, <code>kg</code> for kilogram. Symbols are not pluralized and do not take a period:
+  <code>12 mm</code>, not <code>12 mms.</code></p>
+    </div>
+  </details>
+  <details class="xcard" id="two-systems-you-will-encounter" data-card="two-systems-you-will-encounter">
+    <summary>Two systems you will encounter<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Two systems you will encounter</h2>
+  <p>The International System of Units (<strong>SI</strong>) is the standard system for science and
+  much technical work. U.S. drawings, hardware, materials, and equipment also use
+  <strong>U.S. customary</strong> units. Neither system lets us skip the unit; the job is to state
+  which one is being used and convert deliberately when they meet.</p>
+  <dl class="dims">
+    <div><dt>SI base units used here</dt><dd>meter (<code>m</code>) for length, second
+    (<code>s</code>) for time, and kilogram (<code>kg</code>) for mass.</dd></div>
+    <div><dt>U.S. customary units used here</dt><dd>inch (<code>in</code>), foot (<code>ft</code>),
+    mile (<code>mi</code>), second (<code>s</code>), pound mass (<code>lbm</code>), and U.S.
+    liquid gallon (<code>U.S. gal</code>).</dd></div>
+    <div><dt>Coherent foot&ndash;slug&ndash;second system</dt><dd>When a U.S. engineering calculation
+    needs a coherent mass unit, use foot, slug, and second: <code>slug &middot; ft/s<sup>2</sup>
+    = lbf</code>. A pound force and a pound mass are not the same unit.</dd></div>
+  </dl>
+  <p class="aside">A gallon must be named. This unit set uses the <strong>U.S. liquid gallon</strong>
+  (<code>U.S. gal</code>), not an Imperial gallon.</p>
+  <p class="deeper-ref" id="deeper-ref-18">Supporting detail: <a href="#deeper-addendum-18"><strong>Addendum 18</strong></a> &mdash; Why technical writing cares about the space.</p>
+    </div>
+  </details>
+  <details class="xcard" id="si-prefixes-change-scale-not-quantity" data-card="si-prefixes-change-scale-not-quantity">
+    <summary>SI prefixes change scale, not quantity<span class="chev"></span></summary>
+    <div class="body">
+      <h2>SI prefixes change scale, not quantity</h2>
+  <p>A prefix is a power of ten attached to a unit. It makes a practical-sized number without
+  changing the physical quantity: 0.025 mm and 25 &micro;m describe the same length.</p>
+  <div class="unit-table-wrap">
+  <table class="unit-table">
+    <caption>All current SI prefixes, plus the unprefixed unit used between them.</caption>
+    <thead><tr><th scope="col">Name</th><th scope="col">Symbol</th><th scope="col">Factor</th></tr></thead>
+    <tbody>
+      <tr><td>quetta</td><td>Q</td><td>10<sup>30</sup></td></tr>
+      <tr><td>ronna</td><td>R</td><td>10<sup>27</sup></td></tr>
+      <tr><td>yotta</td><td>Y</td><td>10<sup>24</sup></td></tr>
+      <tr><td>zetta</td><td>Z</td><td>10<sup>21</sup></td></tr>
+      <tr><td>exa</td><td>E</td><td>10<sup>18</sup></td></tr>
+      <tr><td>peta</td><td>P</td><td>10<sup>15</sup></td></tr>
+      <tr><td>tera</td><td>T</td><td>10<sup>12</sup></td></tr>
+      <tr><td>giga</td><td>G</td><td>10<sup>9</sup></td></tr>
+      <tr><td>mega</td><td>M</td><td>10<sup>6</sup></td></tr>
+      <tr><td>kilo</td><td>k</td><td>10<sup>3</sup></td></tr>
+      <tr><td>hecto</td><td>h</td><td>10<sup>2</sup></td></tr>
+      <tr><td>deca</td><td>da</td><td>10<sup>1</sup></td></tr>
+      <tr><td>none</td><td>&mdash;</td><td>10<sup>0</sup></td></tr>
+      <tr><td>deci</td><td>d</td><td>10<sup>&minus;1</sup></td></tr>
+      <tr><td>centi</td><td>c</td><td>10<sup>&minus;2</sup></td></tr>
+      <tr><td>milli</td><td>m</td><td>10<sup>&minus;3</sup></td></tr>
+      <tr><td>micro</td><td>&micro;</td><td>10<sup>&minus;6</sup></td></tr>
+      <tr><td>nano</td><td>n</td><td>10<sup>&minus;9</sup></td></tr>
+      <tr><td>pico</td><td>p</td><td>10<sup>&minus;12</sup></td></tr>
+      <tr><td>femto</td><td>f</td><td>10<sup>&minus;15</sup></td></tr>
+      <tr><td>atto</td><td>a</td><td>10<sup>&minus;18</sup></td></tr>
+      <tr><td>zepto</td><td>z</td><td>10<sup>&minus;21</sup></td></tr>
+      <tr><td>yocto</td><td>y</td><td>10<sup>&minus;24</sup></td></tr>
+      <tr><td>ronto</td><td>r</td><td>10<sup>&minus;27</sup></td></tr>
+      <tr><td>quecto</td><td>q</td><td>10<sup>&minus;30</sup></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="aside"><strong>Case matters.</strong> <code>M</code> is mega (10<sup>6</sup>);
+  <code>m</code> is milli (10<sup>&minus;3</sup>). A wrong capital letter changes a result by a
+  billion.</p>
+    </div>
+  </details>
+  <details class="xcard" id="prefix-explorer" data-card="prefix-explorer">
+    <summary>Prefix explorer<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Prefix explorer</h2>
+  <p class="lede">Choose two prefixes for the same base unit. The calculation compares their powers
+  of ten; it does not change what is being measured.</p>
+  <div class="panel" data-prefix-explorer>
+    <fieldset>
+      <legend>Convert one prefixed meter value</legend>
+      <p><label for="prefix-value">Value</label>
+      <input id="prefix-value" data-prefix-value type="number" value="25" step="any" inputmode="decimal"></p>
+      <p><label for="prefix-from">From prefix</label>
+      <select id="prefix-from" data-prefix-from>
+        <option value="30" data-symbol="Q">quetta (Q), 10<sup>30</sup></option><option value="27" data-symbol="R">ronna (R), 10<sup>27</sup></option><option value="24" data-symbol="Y">yotta (Y), 10<sup>24</sup></option><option value="21" data-symbol="Z">zetta (Z), 10<sup>21</sup></option><option value="18" data-symbol="E">exa (E), 10<sup>18</sup></option><option value="15" data-symbol="P">peta (P), 10<sup>15</sup></option><option value="12" data-symbol="T">tera (T), 10<sup>12</sup></option><option value="9" data-symbol="G">giga (G), 10<sup>9</sup></option><option value="6" data-symbol="M">mega (M), 10<sup>6</sup></option><option value="3" data-symbol="k">kilo (k), 10<sup>3</sup></option><option value="2" data-symbol="h">hecto (h), 10<sup>2</sup></option><option value="1" data-symbol="da">deca (da), 10<sup>1</sup></option><option value="0" data-symbol="">no prefix, 10<sup>0</sup></option><option value="-1" data-symbol="d">deci (d), 10<sup>&minus;1</sup></option><option value="-2" data-symbol="c">centi (c), 10<sup>&minus;2</sup></option><option value="-3" data-symbol="m">milli (m), 10<sup>&minus;3</sup></option><option value="-6" data-symbol="&micro;" selected>micro (&micro;), 10<sup>&minus;6</sup></option><option value="-9" data-symbol="n">nano (n), 10<sup>&minus;9</sup></option><option value="-12" data-symbol="p">pico (p), 10<sup>&minus;12</sup></option><option value="-15" data-symbol="f">femto (f), 10<sup>&minus;15</sup></option><option value="-18" data-symbol="a">atto (a), 10<sup>&minus;18</sup></option><option value="-21" data-symbol="z">zepto (z), 10<sup>&minus;21</sup></option><option value="-24" data-symbol="y">yocto (y), 10<sup>&minus;24</sup></option><option value="-27" data-symbol="r">ronto (r), 10<sup>&minus;27</sup></option><option value="-30" data-symbol="q">quecto (q), 10<sup>&minus;30</sup></option>
+      </select></p>
+      <p><label for="prefix-to">To prefix</label>
+      <select id="prefix-to" data-prefix-to>
+        <option value="30" data-symbol="Q">quetta (Q), 10<sup>30</sup></option><option value="27" data-symbol="R">ronna (R), 10<sup>27</sup></option><option value="24" data-symbol="Y">yotta (Y), 10<sup>24</sup></option><option value="21" data-symbol="Z">zetta (Z), 10<sup>21</sup></option><option value="18" data-symbol="E">exa (E), 10<sup>18</sup></option><option value="15" data-symbol="P">peta (P), 10<sup>15</sup></option><option value="12" data-symbol="T">tera (T), 10<sup>12</sup></option><option value="9" data-symbol="G">giga (G), 10<sup>9</sup></option><option value="6" data-symbol="M">mega (M), 10<sup>6</sup></option><option value="3" data-symbol="k">kilo (k), 10<sup>3</sup></option><option value="2" data-symbol="h">hecto (h), 10<sup>2</sup></option><option value="1" data-symbol="da">deca (da), 10<sup>1</sup></option><option value="0" data-symbol="">no prefix, 10<sup>0</sup></option><option value="-1" data-symbol="d">deci (d), 10<sup>&minus;1</sup></option><option value="-2" data-symbol="c">centi (c), 10<sup>&minus;2</sup></option><option value="-3" data-symbol="m" selected>milli (m), 10<sup>&minus;3</sup></option><option value="-6" data-symbol="&micro;">micro (&micro;), 10<sup>&minus;6</sup></option><option value="-9" data-symbol="n">nano (n), 10<sup>&minus;9</sup></option><option value="-12" data-symbol="p">pico (p), 10<sup>&minus;12</sup></option><option value="-15" data-symbol="f">femto (f), 10<sup>&minus;15</sup></option><option value="-18" data-symbol="a">atto (a), 10<sup>&minus;18</sup></option><option value="-21" data-symbol="z">zepto (z), 10<sup>&minus;21</sup></option><option value="-24" data-symbol="y">yocto (y), 10<sup>&minus;24</sup></option><option value="-27" data-symbol="r">ronto (r), 10<sup>&minus;27</sup></option><option value="-30" data-symbol="q">quecto (q), 10<sup>&minus;30</sup></option>
+      </select></p>
+    </fieldset>
+    <p><strong>Result:</strong> <output data-prefix-result aria-live="polite">0.025 mm</output></p>
+    <p data-prefix-work>25 &micro;m = 25 &times; 10<sup>&minus;6</sup> m = 0.025 &times;
+    10<sup>&minus;3</sup> m = 0.025 mm.</p>
+    <noscript><p class="aside">JavaScript is off. The displayed 25 &micro;m to 0.025 mm example
+    and the prefix table are the static answer path.</p></noscript>
+  </div>
+    </div>
+  </details>
+  <details class="xcard" id="practice-and-sources" data-card="practice-and-sources">
+    <summary>Practice and sources<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Practice and sources</h2>
+  <div class="panel" data-practice data-answer="3.2" data-tolerance="0.01" data-unit="mm">
+    <p><strong>Practice:</strong> A feature is specified as 3,200 &micro;m. What is that length in
+    millimeters?</p>
+    <label for="practice-prefix-answer">Answer in mm</label>
+    <input id="practice-prefix-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>Micro means 10<sup>&minus;6</sup> and milli means 10<sup>&minus;3</sup>. Moving from
+      micrometers to millimeters divides by 1,000:
+      <code>3,200 &micro;m &times; (1 mm / 1,000 &micro;m) = 3.2 mm</code>.</p>
+    </details>
+  </div>
+  <p class="deeper-ref" id="deeper-ref-19">Supporting detail: <a href="#deeper-addendum-19"><strong>Addendum 19</strong></a> &mdash; Sources and definitions.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-motion-quantities">
+  <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span></div>
+  <h1>Motion Quantities</h1>
+  <p class="lede">Distinguish path length from displacement, and speed from velocity, before using time to describe a machine or vehicle in motion.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard" id="path-length-and-displacement-answer-different-questions" data-card="path-length-and-displacement-answer-different-questions">
+    <summary>Path length and displacement answer different questions<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Path length and displacement answer different questions</h2>
+  <p class="lede"><strong>Distance</strong> is how much path was traveled. <strong>Displacement</strong>
+  is the directed change from the starting position to the ending position. A return trip can add
+  distance while leaving displacement at zero.</p>
+  <dl class="dims">
+    <div><dt>Distance</dt><dd>A nonnegative scalar path length. A conveyor that moves a tote 12 m
+    out and 12 m back travels 24 m of distance.</dd></div>
+    <div><dt>Displacement</dt><dd>A change in position with direction. If the tote returns to its
+    start, its displacement is 0 m even though it moved.</dd></div>
+    <div><dt>Coordinate choice</dt><dd>Choose a positive direction before calculating. Along a
+    straight robot rail, right might be positive and left negative.</dd></div>
+  </dl>
+  <div class="panel"><p><strong>Distance tells what the machine did along its path; displacement
+  tells where it ended up relative to where it began.</strong> Do not substitute one for the other
+  just because both use meters or feet.</p></div>
+    </div>
+  </details>
+  <details class="xcard" id="speed-and-velocity-are-not-synonyms" data-card="speed-and-velocity-are-not-synonyms">
+    <summary>Speed and velocity are not synonyms<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Speed and velocity are not synonyms</h2>
+  <p><strong>Average speed</strong> is total distance divided by elapsed time. <strong>Average
+  velocity</strong> is displacement divided by elapsed time. Velocity includes direction; speed
+  does not.</p>
+  <p><code>average speed = total distance / elapsed time</code><br>
+  <code>average velocity = displacement / elapsed time</code></p>
+  <p>For the 12 m out-and-back path completed in 16 s, average speed is
+  <code>24 m / 16 s = 1.5 m/s</code>. Average velocity is
+  <code>0 m / 16 s = 0 m/s</code>. Both statements can be true at the same time.</p>
+  <h3>A production-line example</h3>
+  <p>A mechanism must carry a part 12 m in 8 s. Its required average <strong>speed</strong> is
+  <code>12 m / 8 s = 1.5 m/s</code>. Converting with exact factors gives
+  <code>1.5 m/s &times; (39.37007874 in / 1 m) = 59.055... in/s</code>, or
+  <strong>59.1 in/s</strong>. If the programmed direction is stated, its average velocity is
+  <strong>+59.1 in/s</strong> in that direction.</p>
+    </div>
+  </details>
+  <details class="xcard" id="average-and-instantaneous-readings" data-card="average-and-instantaneous-readings">
+    <summary>Average and instantaneous readings<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Average and instantaneous readings</h2>
+  <p>An average uses a time interval. An instantaneous reading describes one moment: a car
+  speedometer reports instantaneous speed; a robot controller&rsquo;s live velocity value is an
+  instantaneous velocity in its coordinate frame.</p>
+  <ul>
+    <li>Use <strong>average speed</strong> for throughput, travel-time, and trip planning.</li>
+    <li>Use <strong>average velocity</strong> for a net movement over a stated interval.</li>
+    <li>Use an <strong>instantaneous</strong> reading when clearance, collision avoidance, or a
+    machine limit depends on what is happening now.</li>
+  </ul>
+  <p class="deeper-ref" id="deeper-ref-20">Supporting detail: <a href="#deeper-addendum-20"><strong>Addendum 20</strong></a> &mdash; The calculus idea, after the practical one.</p>
+    </div>
+  </details>
+  <details class="xcard" id="out-and-back-path-lab" data-card="out-and-back-path-lab">
+    <summary>Out-and-back path lab<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Out-and-back path lab</h2>
+  <p class="lede">Set positions along a straight path and the outbound and return times. The text
+  results make the distance and displacement distinction visible even when the track is not used.</p>
+  <div class="panel" data-path-lab>
+    <fieldset>
+      <legend>Position and time inputs</legend>
+      <p><label for="path-start">Start position (m)</label>
+      <input id="path-start" data-path-start type="number" value="0" step="any" inputmode="decimal"></p>
+      <p><label for="path-turn">Turn position (m)</label>
+      <input id="path-turn" data-path-turn type="number" value="12" step="any" inputmode="decimal"></p>
+      <p><label for="path-end">End position (m)</label>
+      <input id="path-end" data-path-end type="number" value="0" step="any" inputmode="decimal"></p>
+      <p><label for="path-out-time">Outbound time (s)</label>
+      <input id="path-out-time" data-path-out-time type="number" value="8" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="path-return-time">Return time (s)</label>
+      <input id="path-return-time" data-path-return-time type="number" value="8" min="0" step="any" inputmode="decimal"></p>
+    </fieldset>
+    <div class="path-lab-track" role="img" aria-label="The path begins at zero meters, reaches twelve meters, then returns to zero meters.">
+      <span data-path-marker="start">Start: 0 m</span>
+      <span data-path-marker="turn">Turn: 12 m</span>
+      <span data-path-marker="end">End: 0 m</span>
+    </div>
+    <dl class="dims">
+      <div><dt>Distance</dt><dd><output data-path-distance aria-live="polite">24 m</output></dd></div>
+      <div><dt>Displacement</dt><dd><output data-path-displacement aria-live="polite">0 m</output></dd></div>
+      <div><dt>Average speed</dt><dd><output data-path-speed aria-live="polite">1.5 m/s</output></dd></div>
+      <div><dt>Average velocity</dt><dd><output data-path-velocity aria-live="polite">0 m/s</output></dd></div>
+    </dl>
+    <noscript><p class="aside">JavaScript is off. The displayed values are the solved 12 m out,
+    12 m back, 8 s each-way case: 24 m distance, 0 m displacement, 1.5 m/s average speed, and
+    0 m/s average velocity.</p></noscript>
+  </div>
+    </div>
+  </details>
+  <details class="xcard" id="practice-and-sources" data-card="practice-and-sources">
+    <summary>Practice and sources<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Practice and sources</h2>
+  <div class="panel" data-practice data-answer="6.13636" data-tolerance="0.01" data-unit="round trips">
+    <p><strong>Practice:</strong> A cart moves at a constant 4.5 ft/s between two areas 0.25 mi
+    apart. Ignoring loading and turnaround time, what is its idealized round-trip rate per hour?</p>
+    <label for="practice-trip-answer">Answer in round trips per hour</label>
+    <input id="practice-trip-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>One round trip is <code>2 &times; 0.25 mi = 0.50 mi</code>.
+      <code>0.50 mi &times; (5,280 ft / 1 mi) = 2,640 ft</code>. At 4.5 ft/s, one trip takes
+      <code>2,640 ft / (4.5 ft/s) = 586.667 s</code>. Therefore
+      <code>3,600 s / 586.667 s = 6.13636</code> round trips per hour, or about
+      <strong>6.14 round trips per hour</strong>. A plan that requires complete trips would schedule
+      6 and leave time for only part of a seventh.</p>
+    </details>
+  </div>
+  <p class="deeper-ref" id="deeper-ref-21">Supporting detail: <a href="#deeper-addendum-21"><strong>Addendum 21</strong></a> &mdash; Source note.</p>
+    </div>
+  </details>
+</div>
+
+</article>
 <article class="article bundled" id="p-5s-workplace-organization">
   <div class="crumb"><span>Lean and Quality</span><span class="sep">/</span><span>Lean and Organization</span></div>
   <h1>5S Workplace Organization</h1>
@@ -3994,6 +5173,121 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     otherwise rendered safe.&rdquo; The lock comes first, and then the energy already in the machine
     is dealt with. Both, in that order.</p>
         <p class="deeper-back"><a href="#deeper-ref-11">Back to reference 11</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-12" value="12">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-acceleration-and-squared-time">Acceleration and Squared Time</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 12.</span> Source note</h2>
+        <p><a href="https://www.nasa.gov/stem-content/force-equals-mass-times-acceleration-newtons-second-law/">NASA&rsquo;s
+    Newton&rsquo;s second-law resource</a> connects force, mass, and acceleration for grades 9&ndash;12.
+    The calculation here uses the average velocity-change form first; a real machine profile may
+    have changing instantaneous acceleration within the same interval.</p>
+        <p class="deeper-back"><a href="#deeper-ref-12">Back to reference 12</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-13" value="13">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-dimensional-analysis">Dimensional Analysis</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 13.</span> Dimensional analysis is also a design check</h2>
+        <p>If a mass density is in <code>kg/m<sup>3</sup></code> and a CAD model volume is in
+    <code>m<sup>3</sup></code>, the cubic meters cancel and the result is kilograms. That is why
+    CAD mass-property settings, material cards, and drawing units must be read together rather
+    than as separate menus.</p>
+        <p class="deeper-back"><a href="#deeper-ref-13">Back to reference 13</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-14" value="14">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-dimensional-analysis">Dimensional Analysis</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 14.</span> Two more conversion cases from the unit</h2>
+        <p><strong>Machine run time:</strong> an automated machine has operated for 15 years and
+    150 days. With the stated classroom assumption of 365 days per year,
+    <code>(15 &times; 365 + 150) d &times; (24 h / 1 d) = 135,000 h</code>. Real maintenance
+    records should use actual calendar dates and include leap days.</p>
+    <p><strong>Supply-chain fuel:</strong> a truck rated 15 mpg has
+    <code>15 mi/U.S. gal &times; (1.609344 km / 1 mi) &times;
+    (1 U.S. gal / 3.785411784 L) = 6.37716 km/L</code>. A 150 km one-way route is a 300 km
+    round trip, requiring <code>300 km / 6.37716 km/L = 47.0429 L</code>, or
+    <strong>47.0 L</strong>, assuming the quoted fuel economy holds for the trip.</p>
+        <p class="deeper-back"><a href="#deeper-ref-14">Back to reference 14</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-15" value="15">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-dimensional-analysis">Dimensional Analysis</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 15.</span> Sources and exact factors</h2>
+        <p>The <a href="https://www.nist.gov/pml/owm/metric-si/si-units">NIST SI Units reference</a>
+    documents SI base and derived units. The NIST conversion conventions define the inch as exactly
+    0.0254 m; this page derives square and cubic factors from that exact value. U.S. liquid gallon
+    values are explicitly labeled whenever they are used.</p>
+        <p class="deeper-back"><a href="#deeper-ref-15">Back to reference 15</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-16" value="16">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-geometry-mass-and-force">Geometry, Mass, and Force</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 16.</span> Check the CAD assumptions before trusting mass properties</h2>
+        <p>Confirm the assigned material, density, document unit, bodies included, and whether the
+    model represents solid material or an internal void. A precise calculation based on the wrong
+    material card is still wrong.</p>
+        <p class="deeper-back"><a href="#deeper-ref-16">Back to reference 16</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-17" value="17">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-geometry-mass-and-force">Geometry, Mass, and Force</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 17.</span> Sources and engineering context</h2>
+        <p><a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/weight-equation/">NASA Glenn&rsquo;s
+    weight-and-mass explanation</a> distinguishes <code>F = ma</code> from
+    <code>W = mg</code>. The <a href="https://www.nist.gov/pml/owm/metric-si/si-units">NIST SI
+    Units reference</a> lists kilograms as an SI base unit and newtons as a derived unit. Those
+    conventions are used here with <code>g<sub>0</sub> = 9.80665 m/s<sup>2</sup></code> for the
+    standard-gravity examples.</p>
+        <p class="deeper-back"><a href="#deeper-ref-17">Back to reference 17</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-18" value="18">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-measurement-language">Measurement Language</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 18.</span> Why technical writing cares about the space</h2>
+        <p>Leave a space between a numerical value and its unit symbol: <code>8 m</code>,
+    <code>15.0 kg</code>, and <code>0.50 s</code>. The degree Celsius and percent sign have their
+    own conventions, but those are not the quantities used in this unit. Consistent notation is a
+    low-cost way to keep a drawing, a spreadsheet, and a controller reading the same thing.</p>
+        <p class="deeper-back"><a href="#deeper-ref-18">Back to reference 18</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-19" value="19">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-measurement-language">Measurement Language</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 19.</span> Sources and definitions</h2>
+        <p>The <a href="https://www.bipm.org/en/measurement-units/si-prefixes">BIPM SI prefix
+    table</a> is the primary list used here, including the 2022 ronna, quetta, ronto, and quecto
+    additions. The <a href="https://www.nist.gov/pml/owm/metric-si/si-units">NIST SI Units
+    reference</a> explains SI base and derived units and their technical-writing role.</p>
+        <p class="deeper-back"><a href="#deeper-ref-19">Back to reference 19</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-20" value="20">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-motion-quantities">Motion Quantities</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 20.</span> The calculus idea, after the practical one</h2>
+        <p>Over a smaller and smaller time interval, average velocity approaches instantaneous
+    velocity. In calculus notation, velocity is the derivative of position with respect to time:
+    <code>v = dx/dt</code>. For this course, begin by naming the interval, position change, and
+    direction correctly; the derivative notation is a compact extension of the same idea.</p>
+        <p class="deeper-back"><a href="#deeper-ref-20">Back to reference 20</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-21" value="21">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-motion-quantities">Motion Quantities</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 21.</span> Source note</h2>
+        <p>The <a href="https://www.nist.gov/pml/owm/metric-si/si-units">NIST SI Units reference</a>
+    lists velocity as a derived unit example. Direction is an added physical requirement: two
+    motions may have the same speed but different velocities because their directions differ.</p>
+        <p class="deeper-back"><a href="#deeper-ref-21">Back to reference 21</a></p>
       </article>
     </li>
   </ol>
@@ -4740,6 +6034,564 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
         e.preventDefault(); input.focus();
       }
+    });
+  })();
+
+  /* ---- Unit 1: metric-prefix explorer ----------------------------------
+     These lesson tools deliberately live beside the site behavior instead of
+     in the authored pages. A page is still a complete reading experience
+     without JavaScript; the controls only make the worked relationship
+     immediate when a student has a browser available.                          */
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    function symbol(select, root) {
+      if (!select || !select.options || select.selectedIndex < 0) return '';
+      var option = select.options[select.selectedIndex];
+      var prefix = option.hasAttribute('data-symbol') ? option.getAttribute('data-symbol') : option.textContent.trim();
+      /* Prefix menus in Unit 1 describe meters. A future menu can name a
+         different base through data-prefix-base without changing the math. */
+      var base = root.getAttribute('data-prefix-base') || root.getAttribute('data-prefix-unit') || 'm';
+      return prefix + base;
+    }
+
+    document.querySelectorAll('[data-prefix-explorer]').forEach(function (root) {
+      if (root.hasAttribute('data-prefix-wired')) return;
+      root.setAttribute('data-prefix-wired', '');
+
+      var value = root.querySelector('[data-prefix-value]');
+      var from = root.querySelector('[data-prefix-from]');
+      var to = root.querySelector('[data-prefix-to]');
+      var result = root.querySelector('[data-prefix-result]');
+      var work = root.querySelector('[data-prefix-work]');
+
+      function setError(message) {
+        root.setAttribute('data-state', 'error');
+        if (result) result.textContent = message;
+        if (work) work.textContent = 'Use a finite number and choose both prefixes.';
+      }
+
+      function update() {
+        var amount = readNumber(value);
+        var fromExponent = readNumber(from);
+        var toExponent = readNumber(to);
+        if (amount === null || fromExponent === null || toExponent === null) {
+          setError('Enter a finite value to convert.');
+          return;
+        }
+
+        var exponentDifference = fromExponent - toExponent;
+        var factor = Math.pow(10, exponentDifference);
+        var converted = amount * factor;
+        if (!isFinite(factor) || !isFinite(converted)) {
+          setError('That conversion is outside the usable numeric range.');
+          return;
+        }
+
+        root.removeAttribute('data-state');
+        if (result) result.textContent = format(converted) + ' ' + symbol(to, root);
+        if (work) {
+          work.textContent = format(amount) + ' ' + symbol(from, root) + ' \u00d7 10^(' +
+            format(fromExponent) + ' \u2212 ' + format(toExponent) + ') = ' + format(converted) +
+            ' ' + symbol(to, root) + '. Moving from ' + symbol(from, root) + ' to ' + symbol(to, root) +
+            ' changes the number by a factor of ' + format(factor) + '.';
+        }
+      }
+
+      [value, from, to].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: dimension-aware converter ------------------------------
+     The exact values below reproduce the official NIST Special Publication
+     811, Appendix B relationships cited in the DET 403 Unit 1 materials.
+     Factors translate each listed unit to its canonical SI unit; the page
+     never fetches a conversion service or silently mixes dimensions.          */
+  (function () {
+    var units = {
+      s:     { factor: 1,                dimension: 'time',         symbol: 's',      factorLabel: '1 s = 1 s' },
+      min:   { factor: 60,               dimension: 'time',         symbol: 'min',    factorLabel: '1 min = 60 s' },
+      h:     { factor: 3600,             dimension: 'time',         symbol: 'h',      factorLabel: '1 h = 3,600 s' },
+      d:     { factor: 86400,            dimension: 'time',         symbol: 'd',      factorLabel: '1 d = 86,400 s' },
+      mm:    { factor: 0.001,            dimension: 'length',       symbol: 'mm',     factorLabel: '1 mm = 0.001 m' },
+      cm:    { factor: 0.01,             dimension: 'length',       symbol: 'cm',     factorLabel: '1 cm = 0.01 m' },
+      m:     { factor: 1,                dimension: 'length',       symbol: 'm',      factorLabel: '1 m = 1 m' },
+      km:    { factor: 1000,             dimension: 'length',       symbol: 'km',     factorLabel: '1 km = 1,000 m' },
+      in:    { factor: 0.0254,           dimension: 'length',       symbol: 'in',     factorLabel: '1 in = 0.0254 m' },
+      ft:    { factor: 0.3048,           dimension: 'length',       symbol: 'ft',     factorLabel: '1 ft = 0.3048 m' },
+      yd:    { factor: 0.9144,           dimension: 'length',       symbol: 'yd',     factorLabel: '1 yd = 0.9144 m' },
+      mi:    { factor: 1609.344,         dimension: 'length',       symbol: 'mi',     factorLabel: '1 mi = 1,609.344 m' },
+      m2:    { factor: 1,                dimension: 'area',         symbol: 'm\u00b2',     factorLabel: '1 m\u00b2 = 1 m\u00b2' },
+      ft2:   { factor: 0.09290304,       dimension: 'area',         symbol: 'ft\u00b2',    factorLabel: '1 ft\u00b2 = 0.09290304 m\u00b2' },
+      in2:   { factor: 0.00064516,       dimension: 'area',         symbol: 'in\u00b2',    factorLabel: '1 in\u00b2 = 0.00064516 m\u00b2' },
+      m3:    { factor: 1,                dimension: 'volume',       symbol: 'm\u00b3',     factorLabel: '1 m\u00b3 = 1 m\u00b3' },
+      L:     { factor: 0.001,            dimension: 'volume',       symbol: 'L',      factorLabel: '1 L = 0.001 m\u00b3' },
+      ft3:   { factor: 0.028316846592,   dimension: 'volume',       symbol: 'ft\u00b3',    factorLabel: '1 ft\u00b3 = 0.028316846592 m\u00b3' },
+      in3:   { factor: 0.000016387064,   dimension: 'volume',       symbol: 'in\u00b3',    factorLabel: '1 in\u00b3 = 0.000016387064 m\u00b3' },
+      usgal: { factor: 0.003785411784,   dimension: 'volume',       symbol: 'US gal', factorLabel: '1 US gal = 0.003785411784 m\u00b3' },
+      kg:    { factor: 1,                dimension: 'mass',         symbol: 'kg',     factorLabel: '1 kg = 1 kg' },
+      lbm:   { factor: 0.45359237,       dimension: 'mass',         symbol: 'lbm',    factorLabel: '1 lbm = 0.45359237 kg' },
+      slug:  { factor: 14.5939029372,    dimension: 'mass',         symbol: 'slug',   factorLabel: '1 slug = 14.5939029372 kg' },
+      mps:   { factor: 1,                dimension: 'speed',        symbol: 'm/s',    factorLabel: '1 m/s = 1 m/s' },
+      ftps:  { factor: 0.3048,           dimension: 'speed',        symbol: 'ft/s',   factorLabel: '1 ft/s = 0.3048 m/s' },
+      mph:   { factor: 0.44704,          dimension: 'speed',        symbol: 'mph',    factorLabel: '1 mph = 0.44704 m/s' },
+      kmph:  { factor: 0.2777777777777778, dimension: 'speed',      symbol: 'km/h',   factorLabel: '1 km/h = 0.2777777777777778 m/s' },
+      mps2:  { factor: 1,                dimension: 'acceleration', symbol: 'm/s\u00b2',   factorLabel: '1 m/s\u00b2 = 1 m/s\u00b2' },
+      ftps2: { factor: 0.3048,           dimension: 'acceleration', symbol: 'ft/s\u00b2',  factorLabel: '1 ft/s\u00b2 = 0.3048 m/s\u00b2' },
+      N:     { factor: 1,                dimension: 'force',        symbol: 'N',      factorLabel: '1 N = 1 N' },
+      lbf:   { factor: 4.4482216152605,  dimension: 'force',        symbol: 'lbf',    factorLabel: '1 lbf = 4.4482216152605 N' }
+    };
+
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    document.querySelectorAll('[data-unit-converter]').forEach(function (root) {
+      if (root.hasAttribute('data-unit-converter-wired')) return;
+      root.setAttribute('data-unit-converter-wired', '');
+
+      /* data-convert-* is the concise authored spelling in the first three
+         Unit 1 pages; data-unit-* remains the public hook contract for later
+         activities. Supporting both keeps one converter implementation. */
+      var value = root.querySelector('[data-unit-value], [data-convert-value]');
+      var from = root.querySelector('[data-unit-from], [data-convert-from]');
+      var to = root.querySelector('[data-unit-to], [data-convert-to]');
+      var result = root.querySelector('[data-unit-result], [data-convert-result]');
+      var work = root.querySelector('[data-unit-work], [data-convert-work]');
+
+      function showError(resultText, workText) {
+        root.setAttribute('data-state', 'error');
+        if (result) result.textContent = resultText;
+        if (work) work.textContent = workText;
+      }
+
+      function update() {
+        var amount = readNumber(value);
+        var fromUnit = from && units[from.value];
+        var toUnit = to && units[to.value];
+        if (amount === null || !fromUnit || !toUnit) {
+          showError('Enter a finite value and choose two supported units.', 'The converter needs a value, a starting unit, and a destination unit.');
+          return;
+        }
+        if (fromUnit.dimension !== toUnit.dimension) {
+          showError('Cannot convert ' + fromUnit.dimension + ' to ' + toUnit.dimension + '.', 'Choose two units from the same physical dimension.');
+          return;
+        }
+
+        var converted = amount * fromUnit.factor / toUnit.factor;
+        if (!isFinite(converted)) {
+          showError('That conversion is outside the usable numeric range.', 'Choose a smaller finite value and try again.');
+          return;
+        }
+
+        root.removeAttribute('data-state');
+        if (result) result.textContent = format(converted) + ' ' + toUnit.symbol;
+        if (work) {
+          work.textContent = fromUnit.factorLabel + '; ' + toUnit.factorLabel + '. ' +
+            format(amount) + ' ' + fromUnit.symbol + ' \u00d7 ' + format(fromUnit.factor) +
+            ' \u00f7 ' + format(toUnit.factor) + ' = ' + format(converted) + ' ' + toUnit.symbol + '.';
+        }
+      }
+
+      [value, from, to].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: position, distance, and velocity lab -------------------*/
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    function write(root, names, text) {
+      names.forEach(function (name) {
+        root.querySelectorAll('[data-path-' + name + '], [data-path-output="' + name + '"]').forEach(function (output) {
+          output.textContent = text;
+          if (!output.hasAttribute('aria-live')) output.setAttribute('aria-live', 'polite');
+        });
+      });
+    }
+
+    function markerName(marker) {
+      var named = marker.getAttribute('data-path-marker');
+      if (named) return named;
+      if (marker.hasAttribute('data-path-start-marker')) return 'start';
+      if (marker.hasAttribute('data-path-turn-marker')) return 'turn';
+      if (marker.hasAttribute('data-path-end-marker')) return 'end';
+      return '';
+    }
+
+    document.querySelectorAll('[data-path-lab]').forEach(function (root) {
+      if (root.hasAttribute('data-path-lab-wired')) return;
+      root.setAttribute('data-path-lab-wired', '');
+
+      var start = root.querySelector('[data-path-start]');
+      var turn = root.querySelector('[data-path-turn]');
+      var end = root.querySelector('[data-path-end]');
+      var outTime = root.querySelector('[data-path-out-time]');
+      var returnTime = root.querySelector('[data-path-return-time]');
+
+      function clearResults(message) {
+        root.setAttribute('data-state', 'error');
+        write(root, ['distance'], message);
+        write(root, ['displacement'], '\u2014');
+        write(root, ['time', 'total-time'], '\u2014');
+        write(root, ['speed', 'avg-speed', 'average-speed'], '\u2014');
+        write(root, ['velocity', 'avg-velocity', 'average-velocity'], '\u2014');
+      }
+
+      function update() {
+        var startValue = readNumber(start);
+        var turnValue = readNumber(turn);
+        var endValue = readNumber(end);
+        var outTimeValue = readNumber(outTime);
+        var returnTimeValue = readNumber(returnTime);
+        if (startValue === null || turnValue === null || endValue === null ||
+            outTimeValue === null || returnTimeValue === null || outTimeValue <= 0 || returnTimeValue <= 0) {
+          clearResults('Enter positions and positive travel times.');
+          return;
+        }
+
+        var distance = Math.abs(turnValue - startValue) + Math.abs(endValue - turnValue);
+        var displacement = endValue - startValue;
+        var totalTime = outTimeValue + returnTimeValue;
+        var averageSpeed = distance / totalTime;
+        var averageVelocity = displacement / totalTime;
+        root.removeAttribute('data-state');
+        write(root, ['distance'], format(distance) + ' m');
+        write(root, ['displacement'], format(displacement) + ' m');
+        write(root, ['time', 'total-time'], format(totalTime) + ' s');
+        write(root, ['speed', 'avg-speed', 'average-speed'], format(averageSpeed) + ' m/s');
+        write(root, ['velocity', 'avg-velocity', 'average-velocity'], format(averageVelocity) + ' m/s');
+
+        var positions = { start: startValue, turn: turnValue, end: endValue };
+        root.querySelectorAll('[data-path-marker], [data-path-start-marker], [data-path-turn-marker], [data-path-end-marker]').forEach(function (marker) {
+          var name = markerName(marker);
+          var position = positions[name];
+          if (position === undefined) return;
+          var percentage = Math.max(0, Math.min(100, ((position + 20) / 40) * 100));
+          marker.style.setProperty('--path-position', percentage + '%');
+          marker.style.left = percentage + '%';
+          if (name) marker.textContent = name.charAt(0).toUpperCase() + name.slice(1) + ': ' + format(position) + ' m';
+        });
+
+        var track = root.querySelector('.path-track, .path-lab-track, [data-path-track]');
+        if (track && track.hasAttribute('aria-label')) {
+          track.setAttribute('aria-label', 'The path starts at ' + format(startValue) + ' meters, reaches ' +
+            format(turnValue) + ' meters, and ends at ' + format(endValue) + ' meters.');
+        }
+      }
+
+      [start, turn, end, outTime, returnTime].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: average-acceleration lab -------------------------------*/
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    function signed(value) {
+      if (value > 0) return format(value);
+      if (value < 0) return '\u2212' + format(Math.abs(value));
+      return '0';
+    }
+
+    function write(root, names, text) {
+      names.forEach(function (name) {
+        var shortName = {
+          initial: 'initial', vi: 'initial', final: 'final', vf: 'final',
+          delta: 'change', change: 'change', average: 'average', avg: 'average',
+          si: 'si', metric: 'si'
+        }[name] || name;
+        root.querySelectorAll('[data-acceleration-' + name + '], [data-acceleration-output="' + name + '"]' +
+          ', [data-accel-' + shortName + ']').forEach(function (output) {
+          output.textContent = text;
+          if (!output.hasAttribute('aria-live')) output.setAttribute('aria-live', 'polite');
+        });
+      });
+    }
+
+    function setBar(root, names, width) {
+      names.forEach(function (name) {
+        root.querySelectorAll('[data-acceleration-' + name + '-bar], [data-acceleration-bar="' + name + '"]').forEach(function (bar) {
+          bar.style.setProperty('--velocity-width', width + '%');
+          bar.style.width = width + '%';
+        });
+      });
+    }
+
+    document.querySelectorAll('[data-acceleration-lab]').forEach(function (root) {
+      if (root.hasAttribute('data-acceleration-lab-wired')) return;
+      root.setAttribute('data-acceleration-lab-wired', '');
+
+      /* data-accel-* is the compact spelling used by the first authored
+         acceleration page; keep the data-acceleration-* contract available
+         for subsequent labs. */
+      var initial = root.querySelector('[data-acceleration-vi], [data-accel-initial]');
+      var final = root.querySelector('[data-acceleration-vf], [data-accel-final]');
+      var time = root.querySelector('[data-acceleration-time], [data-accel-time]');
+
+      function error(message) {
+        root.setAttribute('data-state', 'error');
+        write(root, ['delta', 'average', 'avg', 'si'], message);
+        setBar(root, ['initial', 'vi'], 0);
+        setBar(root, ['final', 'vf'], 0);
+      }
+
+      function update() {
+        var vi = readNumber(initial);
+        var vf = readNumber(final);
+        var seconds = readNumber(time);
+        if (vi === null || vf === null || seconds === null || seconds <= 0) {
+          error('Enter two velocities and a positive time.');
+          return;
+        }
+
+        var change = vf - vi;
+        var average = change / seconds;
+        var siAverage = average * 0.3048;
+        var scale = Math.max(Math.abs(vi), Math.abs(vf), 1);
+        root.removeAttribute('data-state');
+        write(root, ['initial', 'vi'], signed(vi) + ' ft/s');
+        write(root, ['final', 'vf'], signed(vf) + ' ft/s');
+        write(root, ['delta', 'change'], signed(change) + ' ft/s');
+        write(root, ['average', 'avg'], signed(average) + ' ft/s\u00b2');
+        write(root, ['si', 'metric'], signed(siAverage) + ' m/s\u00b2');
+        setBar(root, ['initial', 'vi'], Math.abs(vi) / scale * 100);
+        setBar(root, ['final', 'vf'], Math.abs(vf) / scale * 100);
+      }
+
+      [initial, final, time].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: CAD scale and material estimator -----------------------*/
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    function format(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 1e-12) value = 0;
+      if (value === 0) return '0';
+      var absolute = Math.abs(value);
+      var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
+      return text.replace(/(\.\d*?[1-9])0+(?=($|e))/i, '$1')
+        .replace(/\.0+(?=($|e))/i, '')
+        .replace('e+', 'e');
+    }
+
+    function formatForce(value) {
+      if (!isFinite(value)) return '\u2014';
+      if (Math.abs(value) < 0.05) value = 0;
+      return (Math.round(value * 10) / 10).toFixed(1).replace(/\.0$/, '');
+    }
+
+    function write(root, names, text) {
+      var directOutput = { 'area-factor': true, 'volume-factor': true, mass: true, weight: true, lbf: true, 'pounds-force': true };
+      names.forEach(function (name) {
+        var selector = '[data-cad-' + name + '-result], [data-cad-output="' + name + '"]';
+        if (directOutput[name]) selector += ', [data-cad-' + name + ']';
+        root.querySelectorAll(selector).forEach(function (output) {
+          output.textContent = text;
+          if (!output.hasAttribute('aria-live')) output.setAttribute('aria-live', 'polite');
+        });
+      });
+    }
+
+    document.querySelectorAll('[data-cad-lab]').forEach(function (root) {
+      if (root.hasAttribute('data-cad-lab-wired')) return;
+      root.setAttribute('data-cad-lab-wired', '');
+
+      var scale = root.querySelector('[data-cad-scale]');
+      var baseArea = root.querySelector('[data-cad-area]');
+      var baseVolume = root.querySelector('[data-cad-volume]');
+      var density = root.querySelector('[data-cad-density]');
+      var gravity = root.querySelector('[data-cad-gravity]');
+
+      function error(message) {
+        root.setAttribute('data-state', 'error');
+        write(root, ['area-factor', 'volume-factor', 'area', 'volume', 'mass', 'weight', 'lbf'], message);
+      }
+
+      function update() {
+        var k = readNumber(scale);
+        var area = readNumber(baseArea);
+        var volume = readNumber(baseVolume);
+        var materialDensity = readNumber(density);
+        var g = readNumber(gravity);
+        if (k === null || area === null || volume === null || materialDensity === null || g === null ||
+            k <= 0 || area < 0 || volume < 0 || materialDensity < 0 || g < 0) {
+          error('Use a positive scale and nonnegative dimensions, density, and gravity.');
+          return;
+        }
+
+        var scaledArea = area * k * k;
+        var scaledVolume = volume * k * k * k;
+        var mass = scaledVolume * materialDensity;
+        var weight = mass * g;
+        var poundsForce = weight / 4.4482216152605;
+        if (!isFinite(scaledArea) || !isFinite(scaledVolume) || !isFinite(mass) || !isFinite(weight) || !isFinite(poundsForce)) {
+          error('That scale is outside the usable numeric range.');
+          return;
+        }
+
+        root.removeAttribute('data-state');
+        write(root, ['area-factor'], format(k * k));
+        write(root, ['volume-factor'], format(k * k * k));
+        write(root, ['area', 'scaled-area'], format(scaledArea) + ' m\u00b2');
+        write(root, ['volume', 'scaled-volume'], format(scaledVolume) + ' m\u00b3');
+        write(root, ['mass'], format(mass) + ' kg');
+        write(root, ['weight'], formatForce(weight) + ' N');
+        write(root, ['lbf', 'pounds-force'], formatForce(poundsForce) + ' lbf');
+      }
+
+      [scale, baseArea, baseVolume, density, gravity].forEach(function (control) {
+        if (!control) return;
+        control.addEventListener('input', update);
+        control.addEventListener('change', update);
+      });
+      update();
+    });
+  })();
+
+  /* ---- Unit 1: small numerical practice checks ------------------------*/
+  (function () {
+    function readNumber(control) {
+      if (!control) return null;
+      var raw = String(control.value === undefined ? '' : control.value).trim();
+      if (!raw) return null;
+      var value = Number(raw);
+      return isFinite(value) ? value : null;
+    }
+
+    document.querySelectorAll('[data-practice]').forEach(function (root) {
+      if (root.hasAttribute('data-practice-wired')) return;
+      root.setAttribute('data-practice-wired', '');
+
+      var input = root.querySelector('[data-practice-input], input[type="number"], input[type="text"]');
+      var button = root.querySelector('[data-practice-check], .practice-check, button');
+      var feedback = root.querySelector('[data-practice-feedback], [data-practice-result], [aria-live]');
+      var answer = Number(root.getAttribute('data-answer'));
+      var tolerance = Number(root.getAttribute('data-tolerance'));
+      var unit = root.getAttribute('data-unit') || '';
+      if (feedback && !feedback.hasAttribute('aria-live')) feedback.setAttribute('aria-live', 'polite');
+
+      function say(message, state) {
+        root.setAttribute('data-state', state);
+        if (feedback) feedback.textContent = message;
+      }
+
+      function check() {
+        var attempt = readNumber(input);
+        if (attempt === null) {
+          say('Enter a number before checking your work.', 'error');
+          return;
+        }
+        if (!isFinite(answer) || !isFinite(tolerance) || tolerance < 0) {
+          say('This check is not configured yet. Keep your work and ask your instructor.', 'error');
+          return;
+        }
+        if (Math.abs(attempt - answer) <= tolerance) {
+          say('Correct \u2014 your ' + (unit ? unit + ' ' : '') + 'answer is within the accepted tolerance.', 'correct');
+        } else {
+          say('Not yet \u2014 check the units, conversion factor, and arithmetic, then try again.', 'incorrect');
+        }
+      }
+
+      if (button) button.addEventListener('click', function (event) { event.preventDefault(); check(); });
+      if (input) input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') { event.preventDefault(); check(); }
+      });
     });
   })();
 })();
