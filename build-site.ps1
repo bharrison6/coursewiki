@@ -351,17 +351,37 @@ foreach ($cid in $collOrder) {
 }
 
 # ----------------------------------------------------------------- tracks ----
-# A TRACK is an ordered selection of pages. Two levels are in use:
+# A TRACK is an ordered selection of pages. Three levels are in use, and each
+# one is an ordinary track - the level only says what it contains:
 #
-#   @@KIND: program   a programme - DET
-#   @@KIND: course    a class within it - DET 130 - declaring @@PARENT: det
-#   @@KIND: topic     a subject track that classes pull in, e.g. general-safety
+#   @@KIND: program   a programme - DET - which CONTAINS its courses
+#   @@KIND: course    a class within it - DET 130 - which CARRIES topic tracks
+#   @@KIND: topic     a subject a course carries, e.g. general-safety
 #
-# A manifest line beginning with '+' INCLUDES another track by reference. That
-# is how Safety appears in every class without being copied into any of them:
-# edit the safety track once and every course carrying it follows. Copying
-# would fork the content, which is the failure this whole system exists to
-# avoid.
+# TWO EDGES, and they are not the same relation:
+#
+#   @@PARENT: det       DOWNWARD. DET 130 is PART OF DET. Containment.
+#   + general-safety    SIDEWAYS. DET 130 CARRIES General Safety, which stays a
+#                       track of its own you can also read whole. That is how
+#                       Safety appears in every class without being copied into
+#                       any of them - edit it once and every course follows.
+#
+# CONTAINMENT IS DECLARED ONCE, AND CONTENT FLOWS UP IT. A track that has
+# children takes its page list FROM them - see Expand-Track. So det.track lists
+# nothing at all: DET is DET 130, DET 330 and DET 403 because those three say
+# @@PARENT: det, and when one of them diverges DET follows on the next build
+# with no edit anywhere.
+#
+# It used to restate its children's content with '+' lines of its own, and that
+# is precisely the fork this system exists to prevent: a hand-kept list one
+# level up goes silently wrong the moment a course changes. Nothing looked
+# broken either - all four tracks resolved to an identical eleven pages, which
+# is what a flat copy looks like when the courses have not diverged yet.
+#
+# A track with children therefore may not carry content lines of its own. That
+# is a build error rather than a merge, for the same reason: a '+' one level up
+# either restates a child (a fork) or hides content in the container where no
+# course carries it (invisible to every student who opens their own class).
 $rawTracks = [ordered]@{}
 foreach ($f in (Get-ChildItem -LiteralPath $trackDir -Filter '*.track' | Sort-Object Name)) {
   $dc = Read-Conf $f.FullName
@@ -389,12 +409,77 @@ foreach ($f in (Get-ChildItem -LiteralPath $trackDir -Filter '*.track' | Sort-Ob
   }
 }
 
-# Flatten '+' includes. A cycle would recurse forever, so the chain is carried
-# down and a repeat is a build error rather than a hang.
+# The hierarchy, read off @@PARENT. It is built from the RAW tracks because
+# expansion needs it - a parent's content comes from its children, so the tree
+# cannot wait until the tracks are expanded. One map, one order: the sidebar,
+# the track index and the derivation below all walk children through here, so
+# the order a reader sees IS the order a derived list is assembled in.
+$script:rawKids = @{}
+foreach ($rt in $rawTracks.Values) {
+  $k = if ($rt.Parent) { $rt.Parent } else { '' }
+  if (-not $script:rawKids.ContainsKey($k)) { $script:rawKids[$k] = @() }
+  $script:rawKids[$k] += $rt
+}
+function Get-RawKids([string]$name) {
+  if (-not $script:rawKids.ContainsKey($name)) { return @() }
+  @($script:rawKids[$name] | Sort-Object @{e={Get-TrackRank $_}}, Title)
+}
+
+# Structure checks, before anything is expanded - each one guards a step of the
+# expansion that would otherwise fail late, or not at all.
+foreach ($rt in $rawTracks.Values) {
+  if ($rt.Parent) {
+    if (-not $rawTracks.Contains($rt.Parent)) {
+      throw "$($rt.File): @@PARENT '$($rt.Parent)' is not a track"
+    }
+    # @@PARENT was validated for EXISTENCE only, which was enough while the
+    # tree was just a display order. It is a recursion path now, so a loop in
+    # it is a hang: walk up and refuse a repeat.
+    $chainP = @($rt.Name); $up = $rt.Parent
+    while ($up) {
+      if ($chainP -contains $up) { throw "$($rt.File): @@PARENT cycle: $(($chainP + $up) -join ' -> ')" }
+      $chainP += $up; $up = $rawTracks[$up].Parent
+    }
+  }
+  if ((Get-RawKids $rt.Name).Count -and $rt.Lines.Count) {
+    # Parenthesised because -f binds tighter than +: without them only the
+    # last literal is formatted and the message ships its own {0} to the user.
+    throw (("{0}: '{1}' has child tracks, so its pages come from them - remove the {2} content line(s) here. " +
+            "A '+' or a page id one level up either restates what a child already carries (a fork, silent the " +
+            "moment the child changes) or hides content where no course carries it.") -f $rt.File, $rt.Name, $rt.Lines.Count)
+  }
+}
+
+# Resolve a track to its ordered items. Two ways in, and the check above makes
+# them exclusive:
+#
+#   WITH children     the union of the children, in the order Get-RawKids gives
+#                     them - which is the order the sidebar draws them in.
+#   WITHOUT children  its own lines, with '+' includes flattened in place.
+#
+# Both edges travel in $chain, so a cycle by either route - or a mixture, a
+# course that '+' includes its own programme - is a build error, not a hang.
 function Expand-Track([string]$name, $chain) {
-  if ($chain -contains $name) { throw "track include cycle: $($chain -join ' -> ') -> $name" }
+  if ($chain -contains $name) { throw "track cycle: $($chain -join ' -> ') -> $name" }
   $rt = $rawTracks[$name]
   if (-not $rt) { throw "unknown track '$name'" }
+  $kids = Get-RawKids $name
+  if ($kids.Count) {
+    $out = @()
+    foreach ($k in $kids) {
+      $sub = @(Expand-Track $k.Name ($chain + @($name)))
+      # A child's own group headings travel up with its pages, so the
+      # programme reads as the courses do. A child that contributes pages
+      # under no heading of its own gets one carrying its title - without it
+      # those pages would sit under whichever heading the PREVIOUS child
+      # happened to end on, which is a claim about the wrong course.
+      if ($sub.Count -and $sub[0].Kind -ne 'divider') {
+        $out += [pscustomobject]@{ Kind = 'divider'; Value = $k.Title }
+      }
+      $out += $sub
+    }
+    return $out
+  }
   $out = @()
   foreach ($t in $rt.Lines) {
     if ($t.StartsWith('>')) {
@@ -414,20 +499,37 @@ function Expand-Track([string]$name, $chain) {
 $tracks = [ordered]@{}
 foreach ($name in $rawTracks.Keys) {
   $rt = $rawTracks[$name]
-  if ($rt.Parent -and -not $rawTracks.Contains($rt.Parent)) {
-    throw "$($rt.File): @@PARENT '$($rt.Parent)' is not a track"
-  }
   $items = @(Expand-Track $name @())
-  $ids = @($items | Where-Object Kind -eq 'page' | ForEach-Object Value)
-  # A page included twice (two topic tracks sharing a page) would be walked
-  # twice in the sequence. Keep the first occurrence and drop repeats.
+  # A page reached twice - two topic tracks sharing a page, or three courses
+  # carrying the same safety track - would be walked twice in the sequence.
+  # FIRST OCCURRENCE WINS, so a page sits where the reader first meets it.
   $seen = [System.Collections.Generic.HashSet[string]]::new()
   $dedup = @(); foreach ($it in $items) {
     if ($it.Kind -eq 'page') { if (-not $seen.Add($it.Value)) { continue } }
     $dedup += $it
   }
-  $items = $dedup
+  # A heading whose pages were ALL dropped as repeats would print as an empty
+  # group. Three courses carrying one safety track give the programme three
+  # copies of "The Universal Rules", two of them with nothing underneath.
+  $items = @(); $sawPage = $false
+  for ($i = $dedup.Count - 1; $i -ge 0; $i--) {
+    $it = $dedup[$i]
+    if ($it.Kind -eq 'divider') {
+      if (-not $sawPage) { continue }
+      $sawPage = $false
+    } else { $sawPage = $true }
+    $items = @($it) + $items
+  }
   $ids = @($items | Where-Object Kind -eq 'page' | ForEach-Object Value)
+  # An empty track is not a smaller track, it is a broken one: a hub tile, a
+  # sidebar entry and a #pl- section all get rendered for it, and the track
+  # index reads the FIRST page to build its two entry buttons. Say so here,
+  # where the file that caused it can be named.
+  if (-not $ids.Count) {
+    throw (("{0}: '{1}' resolves to no pages. List a page, '+' a track it carries, or give it child tracks " +
+            "that declare @@PARENT: {1} - as it stands it would render as a tile and a playlist with nothing " +
+            "behind them.") -f $rt.File, $name)
+  }
   foreach ($pid2 in $ids) { [void]$pages[$pid2].Decks.Add($name) }
 
   $tracks[$name] = [pscustomobject]@{
@@ -438,18 +540,16 @@ foreach ($name in $rawTracks.Keys) {
   }
 }
 
-# The hierarchy, as a lookup, built once. @@PARENT gives the tree; the '+'
-# includes give the sideways edges. Both are validated above, so anything in
-# here is known to resolve.
-$script:trackKids = @{}
-foreach ($t in $tracks.Values) {
-  $k = if ($t.Parent) { $t.Parent } else { '' }
-  if (-not $script:trackKids.ContainsKey($k)) { $script:trackKids[$k] = @() }
-  $script:trackKids[$k] += $t
-}
+# The two edges, as lookups the renderers share. @@PARENT gives the tree, the
+# '+' includes give the sideways edges, and both are validated above - so
+# anything returned here is known to resolve.
+#
+# Kids come off the SAME map the derivation used, mapped to the expanded
+# tracks. A second copy of the hierarchy could sort differently from the one
+# the pages were assembled in, and the sidebar would then disagree with the
+# playlist it links to.
 function Get-TrackKids([string]$name) {
-  if (-not $script:trackKids.ContainsKey($name)) { return @() }
-  @($script:trackKids[$name] | Sort-Object @{e={Get-TrackRank $_}}, Title)
+  @(Get-RawKids $name | ForEach-Object { $tracks[$_.Name] })
 }
 function Get-TrackIncludes($t) {
   @($t.Includes | Where-Object { $tracks.Contains($_) })
@@ -895,7 +995,7 @@ function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$m
   [void]$sb.AppendLine('  <div class="navsplit"></div>')
   [void]$sb.AppendLine('  <div class="nav-tracks">')
   [void]$sb.AppendLine('  <h2>Tracks</h2>')
-  [void]$sb.AppendLine('  <p class="navnote">Tracks built from the topics above. A course carries the topic tracks it needs; open one to see them.</p>')
+  [void]$sb.AppendLine('  <p class="navnote">Tracks built from the topics above. A course carries the topic tracks it needs; a programme is its courses, so it follows them.</p>')
   Add-TrackNodes (Get-TrackKids '') $plHref $sb '  ' 0
   [void]$sb.AppendLine('  </div>')
   [void]$sb.AppendLine('</aside>')
@@ -1266,9 +1366,21 @@ foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
   # for another class, because arriving in one unannounced is the surprise
   # this is meant to prevent.
   $incs = Get-TrackIncludes $d
+  $kids = Get-TrackKids $d.Name
   $sibs = if ($d.Parent) { @(Get-TrackKids $d.Parent | Where-Object { $_.Name -ne $d.Name }) } else { @() }
-  if ($incs.Count -or $sibs.Count) {
+  if ($kids.Count -or $incs.Count -or $sibs.Count) {
     [void]$pi.AppendLine('        <p class="pl-rel">')
+    # DOWN first, because for a programme it is the whole of what it is: DET's
+    # pages ARE its courses' pages. These are deliberately NOT marked as
+    # another class - one of the three is probably the reader's own, and
+    # inside DET's block there is no course context to be leaving.
+    if ($kids.Count) {
+      [void]$pi.AppendLine('          <span class="k">Contains</span>')
+      foreach ($k in $kids) {
+        [void]$pi.AppendLine('          <a class="chip" data-track="' + $k.Name + '" href="#pl-' + $k.Name + '">' +
+                             (ConvertTo-HtmlText $k.Title) + '</a>')
+      }
+    }
     if ($incs.Count) {
       [void]$pi.AppendLine('          <span class="k">Carries</span>')
       foreach ($i in $incs) {
