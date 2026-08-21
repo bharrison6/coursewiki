@@ -427,6 +427,9 @@
       h += '</ol>';
       h += '<div class="navsplit"></div>';
       h += '<ul class="navlist escape">' +
+           ((!presenting && Array.isArray(pl.practiceIds) && pl.practiceIds.length)
+             ? '<li><a data-practice-track="' + escHtml(pl.name) + '" href="' + base + 'practice.html">Add this track\'s practice</a></li>'
+             : '') +
            '<li><a href="' + base + 'index.html">Browse all topics</a></li>' +
            '<li><a href="' + base + 'presentations.html">All tracks</a></li>' +
            '<li><a href="' + base + 'print/track-' + pl.name + '.html">Print this track</a></li>' +
@@ -473,7 +476,7 @@
     /* ---- presentation mode: a view of this page, not a copy of it ------*/
     if (presenting) {
       document.body.classList.add('presenting');
-      var panels = $$('.xcard');
+      var panels = $$('.xcard:not(.deck-wiki-only)');
       panels.forEach(function (c) { c.open = true; });   // a collapsed panel is a blank slide
 
       var toggle = document.createElement('a');
@@ -757,7 +760,7 @@
 
     function format(value) {
       if (!isFinite(value)) return '\u2014';
-      if (Math.abs(value) < 1e-12) value = 0;
+      if (Object.is(value, -0)) value = 0;
       if (value === 0) return '0';
       var absolute = Math.abs(value);
       var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
@@ -785,6 +788,62 @@
       var to = root.querySelector('[data-prefix-to]');
       var result = root.querySelector('[data-prefix-result]');
       var work = root.querySelector('[data-prefix-work]');
+      var route = root.querySelector('[data-prefix-route]');
+      var routeSummary = root.querySelector('[data-prefix-route-summary]');
+      var routeBand = root.querySelector('[data-prefix-route-band]');
+      var routeFrom = root.querySelector('[data-prefix-route-from]');
+      var routeTo = root.querySelector('[data-prefix-route-to]');
+
+      function exponentText(exponent) {
+        return String(exponent).replace('-', '\u2212');
+      }
+
+      function positionFor(exponent) {
+        /* The rail spans the complete current SI prefix range, 10^-30 to
+           10^30, with a small inset so endpoint labels remain readable. */
+        return 4 + ((exponent + 30) / 60) * 92;
+      }
+
+      function placeRouteMarker(marker, exponent, label) {
+        if (!marker) return;
+        marker.style.setProperty('--prefix-position', positionFor(exponent) + '%');
+        marker.textContent = label + ' \u00b7 10^' + exponentText(exponent);
+        if (exponent <= -27) marker.setAttribute('data-prefix-edge', 'low');
+        else if (exponent >= 27) marker.setAttribute('data-prefix-edge', 'high');
+        else marker.removeAttribute('data-prefix-edge');
+      }
+
+      function updateRoute(fromExponent, toExponent) {
+        if (!route) return;
+        var fromPosition = positionFor(fromExponent);
+        var toPosition = positionFor(toExponent);
+        var low = Math.min(fromPosition, toPosition);
+        var width = Math.max(Math.abs(toPosition - fromPosition), 0.35);
+        var powers = Math.abs(toExponent - fromExponent);
+        var fromUnit = symbol(from, root);
+        var toUnit = symbol(to, root);
+
+        placeRouteMarker(routeFrom, fromExponent, 'From: ' + fromUnit);
+        placeRouteMarker(routeTo, toExponent, 'To: ' + toUnit);
+        if (routeBand) {
+          routeBand.style.left = low + '%';
+          routeBand.style.width = width + '%';
+        }
+
+        var message;
+        if (powers === 0) {
+          message = 'The prefixes are the same, so neither the unit size nor the numerical value changes.';
+        } else if (toExponent > fromExponent) {
+          message = 'Move ' + powers + ' power' + (powers === 1 ? '' : 's') +
+            ' toward larger units. The target unit is 10^' + powers +
+            ' times larger, so the numerical value is divided by 10^' + powers + '.';
+        } else {
+          message = 'Move ' + powers + ' power' + (powers === 1 ? '' : 's') +
+            ' toward smaller units. The target unit is 10^' + powers +
+            ' times smaller, so the numerical value is multiplied by 10^' + powers + '.';
+        }
+        if (routeSummary) routeSummary.textContent = message;
+      }
 
       function setError(message) {
         root.setAttribute('data-state', 'error');
@@ -796,6 +855,7 @@
         var amount = readNumber(value);
         var fromExponent = readNumber(from);
         var toExponent = readNumber(to);
+        if (fromExponent !== null && toExponent !== null) updateRoute(fromExponent, toExponent);
         if (amount === null || fromExponent === null || toExponent === null) {
           setError('Enter a finite value to convert.');
           return;
@@ -1289,8 +1349,22 @@
     });
   })();
 
-  /* ---- Unit 1: small numerical practice checks ------------------------*/
+  /* ---- Practice checks and the learner-built practice cart ------------
+     Authored question blocks keep working as normal teaching-page content
+     with JavaScript off. To opt a block into the cart, give [data-practice]
+     a stable data-practice-id, and place a native
+     button with [data-practice-add] inside it (or point that attribute at the
+     id). The standalone page supplies [data-practice-session].
+
+     The build renders every problem on /practice.html. The cart therefore
+     stores only stable IDs (never question HTML or answer content); JavaScript
+     filters that server-rendered catalog into a run while the no-JS page
+     remains a complete all-problems handout.                                */
   (function () {
+    var PRACTICE_KEY = 'det:practice-cart';
+    var PRACTICE_VERSION = 1;
+    var PRACTICE_MAX_IDS = 100;
+
     function readNumber(control) {
       if (!control) return null;
       var raw = String(control.value === undefined ? '' : control.value).trim();
@@ -1299,44 +1373,291 @@
       return isFinite(value) ? value : null;
     }
 
-    document.querySelectorAll('[data-practice]').forEach(function (root) {
-      if (root.hasAttribute('data-practice-wired')) return;
-      root.setAttribute('data-practice-wired', '');
+    function wirePracticeChecks(scope) {
+      $$('[data-practice]', scope).forEach(function (root) {
+        if (root.hasAttribute('data-practice-wired')) return;
+        root.setAttribute('data-practice-wired', '');
 
-      var input = root.querySelector('[data-practice-input], input[type="number"], input[type="text"]');
-      var button = root.querySelector('[data-practice-check], .practice-check, button');
-      var feedback = root.querySelector('[data-practice-feedback], [data-practice-result], [aria-live]');
-      var answer = Number(root.getAttribute('data-answer'));
-      var tolerance = Number(root.getAttribute('data-tolerance'));
-      var unit = root.getAttribute('data-unit') || '';
-      if (feedback && !feedback.hasAttribute('aria-live')) feedback.setAttribute('aria-live', 'polite');
+        var input = root.querySelector('[data-practice-input], input[type="number"], input[type="text"]');
+        var button = root.querySelector('[data-practice-check], .practice-check, button');
+        var feedback = root.querySelector('[data-practice-feedback], [data-practice-result], [aria-live]');
+        var answer = Number(root.getAttribute('data-answer'));
+        var tolerance = Number(root.getAttribute('data-tolerance'));
+        var unit = root.getAttribute('data-unit') || '';
+        if (feedback && !feedback.hasAttribute('aria-live')) feedback.setAttribute('aria-live', 'polite');
 
-      function say(message, state) {
-        root.setAttribute('data-state', state);
-        if (feedback) feedback.textContent = message;
-      }
-
-      function check() {
-        var attempt = readNumber(input);
-        if (attempt === null) {
-          say('Enter a number before checking your work.', 'error');
-          return;
+        function say(message, state) {
+          root.setAttribute('data-state', state);
+          if (feedback) feedback.textContent = message;
         }
-        if (!isFinite(answer) || !isFinite(tolerance) || tolerance < 0) {
-          say('This check is not configured yet. Keep your work and ask your instructor.', 'error');
-          return;
-        }
-        if (Math.abs(attempt - answer) <= tolerance) {
-          say('Correct \u2014 your ' + (unit ? unit + ' ' : '') + 'answer is within the accepted tolerance.', 'correct');
-        } else {
-          say('Not yet \u2014 check the units, conversion factor, and arithmetic, then try again.', 'incorrect');
-        }
-      }
 
-      if (button) button.addEventListener('click', function (event) { event.preventDefault(); check(); });
-      if (input) input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') { event.preventDefault(); check(); }
+        function check() {
+          var attempt = readNumber(input);
+          if (attempt === null) {
+            say('Enter a number before checking your work.', 'error');
+            return;
+          }
+          if (!isFinite(answer) || !isFinite(tolerance) || tolerance < 0) {
+            say('This check is not configured yet. Keep your work and ask your instructor.', 'error');
+            return;
+          }
+          if (Math.abs(attempt - answer) <= tolerance) {
+            say('Correct \u2014 your answer is within the accepted tolerance' + (unit ? ' in ' + unit : '') + '.', 'correct');
+          } else {
+            say('Not yet \u2014 check the units, conversion factor, and arithmetic, then try again.', 'incorrect');
+          }
+        }
+
+        if (button) button.addEventListener('click', function (event) { event.preventDefault(); check(); });
+        if (input) input.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') { event.preventDefault(); check(); }
+        });
       });
+    }
+
+    function text(value, limit) {
+      if (typeof value !== 'string') return '';
+      return value.replace(/\s+/g, ' ').trim().slice(0, limit || 12000);
+    }
+
+    function emptyCart() { return { version: PRACTICE_VERSION, ids: [] }; }
+
+    function publishedPracticeIds() {
+      var items = window.PRACTICE_ITEMS;
+      if (Array.isArray(items)) {
+        return items.map(function (item) {
+          return text(typeof item === 'string' ? item : item && item.id, 180);
+        }).filter(Boolean);
+      }
+      // The generated artifact may be a map keyed by ID. Treat any object as
+      // published metadata, but remain tolerant when the script is absent.
+      if (items && typeof items === 'object') {
+        return Object.keys(items).map(function (id) { return text(id, 180); }).filter(Boolean);
+      }
+      return null;
+    }
+
+    function reconcileCart(cart) {
+      var published = publishedPracticeIds();
+      if (published === null) return cart;
+      var ids = cart.ids.filter(function (id) { return published.indexOf(id) >= 0; });
+      if (ids.length !== cart.ids.length) {
+        cart.ids = ids;
+        writeCart(cart);
+      }
+      return cart;
+    }
+
+    function readCart() {
+      var raw;
+      try { raw = localStorage.getItem(PRACTICE_KEY); } catch (e) { return emptyCart(); }
+      if (raw === null) return emptyCart();
+      try { raw = JSON.parse(raw); } catch (e2) { raw = null; }
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw) || raw.version !== PRACTICE_VERSION || !Array.isArray(raw.ids) || raw.ids.length > PRACTICE_MAX_IDS) {
+        try { localStorage.removeItem(PRACTICE_KEY); } catch (e3) {}
+        return emptyCart();
+      }
+      var result = emptyCart();
+      for (var index = 0; index < raw.ids.length; index += 1) {
+        var id = text(raw.ids[index], 180);
+        if (!id || result.ids.indexOf(id) >= 0) {
+          var recovered = emptyCart();
+          writeCart(recovered);
+          return recovered;
+        }
+        result.ids.push(id);
+      }
+      return reconcileCart(result);
+    }
+
+    function writeCart(cart) {
+      try { localStorage.setItem(PRACTICE_KEY, JSON.stringify(cart)); return true; }
+      catch (e) { return false; }
+    }
+
+    function findBlock(button) {
+      var target = button.getAttribute('data-practice-add');
+      if (target) {
+        var byDomId = document.getElementById(target);
+        if (byDomId && byDomId.hasAttribute('data-practice')) return byDomId;
+        var byPracticeId = $$('[data-practice]').filter(function (root) {
+          return root.getAttribute('data-practice-id') === target;
+        })[0];
+        if (byPracticeId) return byPracticeId;
+      }
+      return button.closest ? button.closest('[data-practice]') : null;
+    }
+
+    function cartMessage(count) {
+      return count === 1 ? '1 problem in practice.' : count + ' problems in practice.';
+    }
+
+    function addStatus(button) {
+      var next = button.nextElementSibling;
+      if (next && next.hasAttribute('data-practice-cart-status')) return next;
+      var status = document.createElement('span');
+      status.className = 'practice-cart-status';
+      status.setAttribute('data-practice-cart-status', '');
+      status.setAttribute('role', 'status');
+      status.setAttribute('aria-live', 'polite');
+      button.insertAdjacentElement('afterend', status);
+      return status;
+    }
+
+    function updateAddControls(cart) {
+      var count = cart.ids.length;
+      $$('[data-practice-cart-count]').forEach(function (countNode) { countNode.textContent = String(count); });
+      $$('[data-practice-add]').forEach(function (button) {
+        var block = findBlock(button);
+        var id = text(button.getAttribute('data-practice-id') || (block && block.getAttribute('data-practice-id')) || button.getAttribute('data-practice-add'), 180);
+        var selected = id && cart.ids.indexOf(id) >= 0;
+        var label = button.getAttribute('data-practice-add-label');
+        if (label === null) {
+          label = text(button.textContent, 120) || 'Add to practice';
+          button.setAttribute('data-practice-add-label', label);
+        }
+        button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        button.textContent = selected ? 'Added to practice' : label;
+        addStatus(button).textContent = cartMessage(count);
+      });
+    }
+
+    function catalogId(control) {
+      var block = control.closest ? control.closest('[data-practice]') : null;
+      return text(control.getAttribute('data-practice-id') || control.value || (block && block.getAttribute('data-practice-id')), 180);
+    }
+
+    function trackIds(name) {
+      var tracks = Array.isArray(window.TRACKS) ? window.TRACKS : [];
+      var track = tracks.filter(function (candidate) { return candidate && candidate.name === name; })[0];
+      return track && Array.isArray(track.practiceIds) ? track.practiceIds.map(function (id) { return text(id, 180); }).filter(Boolean) : [];
+    }
+
+    function setIds(ids) {
+      var cart = emptyCart();
+      ids.forEach(function (id) {
+        id = text(id, 180);
+        if (id && cart.ids.indexOf(id) < 0 && cart.ids.length < PRACTICE_MAX_IDS) cart.ids.push(id);
+      });
+      writeCart(cart);
+      refresh();
+      return cart.ids.length;
+    }
+
+    function renderSessions(cart) {
+      $$('[data-practice-session]').forEach(function (session) {
+        var active = session.hasAttribute('data-practice-run-active');
+        var shown = 0;
+        $$('[data-practice][data-practice-id]', session).forEach(function (problem) {
+          var selected = cart.ids.indexOf(problem.getAttribute('data-practice-id')) >= 0;
+          var entry = problem.closest ? (problem.closest('.practice-entry') || problem) : problem;
+          entry.hidden = active && !selected;
+          if (!entry.hidden) shown += 1;
+        });
+        var status = $('[data-practice-session-status]', session);
+        if (status) status.textContent = active ? (cart.ids.length ? 'Running ' + cartMessage(cart.ids.length) : 'Choose one or more problems to begin a practice run.') : 'Catalog view: ' + shown + ' problems available.';
+        $$('[data-practice-run]', session).forEach(function (button) {
+          button.setAttribute('aria-pressed', active ? 'true' : 'false');
+          button.textContent = active ? 'Show full catalog' : 'Run selected practice';
+        });
+      });
+    }
+
+    function refresh() {
+      var cart = readCart();
+      updateAddControls(cart);
+      $$('[data-practice-select], [data-practice-catalog] input[type="checkbox"]').forEach(function (control) {
+        var id = catalogId(control);
+        if (id) control.checked = cart.ids.indexOf(id) >= 0;
+      });
+      renderSessions(cart);
+    }
+
+    function removeById(id) {
+      var cart = readCart();
+      var ids = cart.ids.filter(function (item) { return item !== id; });
+      if (ids.length === cart.ids.length) return;
+      cart.ids = ids;
+      writeCart(cart);
+      refresh();
+    }
+
+    function clearCart() {
+      writeCart(emptyCart());
+      $$('[data-practice-session]').forEach(function (session) {
+        session.removeAttribute('data-practice-run-active');
+      });
+      refresh();
+    }
+
+    document.addEventListener('click', function (event) {
+      var clear = event.target.closest ? event.target.closest('[data-practice-clear]') : null;
+      if (clear) {
+        event.preventDefault();
+        clearCart();
+        return;
+      }
+      var remove = event.target.closest ? event.target.closest('[data-practice-remove]') : null;
+      if (remove) {
+        event.preventDefault();
+        removeById(remove.getAttribute('data-practice-remove'));
+        return;
+      }
+      var add = event.target.closest ? event.target.closest('[data-practice-add]') : null;
+      if (add) {
+        event.preventDefault();
+        var block = findBlock(add);
+        var id = text(add.getAttribute('data-practice-id') || (block && block.getAttribute('data-practice-id')) || add.getAttribute('data-practice-add'), 180);
+        if (!id) return;
+        var cart = readCart();
+        if (cart.ids.indexOf(id) >= 0) cart.ids = cart.ids.filter(function (known) { return known !== id; });
+        else if (cart.ids.length < PRACTICE_MAX_IDS) cart.ids.push(id);
+        writeCart(cart);
+        refresh();
+        return;
+      }
+      var preset = event.target.closest ? event.target.closest('[data-practice-track]') : null;
+      if (preset && preset.tagName !== 'SELECT') {
+        event.preventDefault();
+        var presetCount = setIds(trackIds(preset.getAttribute('data-practice-track') || preset.value));
+        addStatus(preset).textContent = presetCount === 1
+          ? '1 problem added to practice.'
+          : presetCount + ' problems added to practice.';
+        return;
+      }
+      var run = event.target.closest ? event.target.closest('[data-practice-run]') : null;
+      if (run) {
+        event.preventDefault();
+        var session = run.closest ? run.closest('[data-practice-session]') : null;
+        if (!session) return;
+        var cart = readCart();
+        if (session.hasAttribute('data-practice-run-active')) session.removeAttribute('data-practice-run-active');
+        else if (cart.ids.length) session.setAttribute('data-practice-run-active', '');
+        renderSessions(cart);
+      }
     });
+
+    document.addEventListener('change', function (event) {
+      var catalog = event.target.matches && event.target.matches('[data-practice-select], [data-practice-catalog] input[type="checkbox"]') ? event.target : null;
+      if (catalog) {
+        var id = catalogId(catalog);
+        if (!id) return;
+        var cart = readCart();
+        if (catalog.checked && cart.ids.indexOf(id) < 0 && cart.ids.length < PRACTICE_MAX_IDS) cart.ids.push(id);
+        if (!catalog.checked) cart.ids = cart.ids.filter(function (known) { return known !== id; });
+        writeCart(cart);
+        refresh();
+        return;
+      }
+      var preset = event.target.matches && event.target.matches('select[data-practice-track]') ? event.target : null;
+      if (preset) setIds(trackIds(preset.value));
+    });
+
+    window.addEventListener('storage', function (event) {
+      if (event.key === PRACTICE_KEY) refresh();
+    });
+
+    wirePracticeChecks(document);
+    refresh();
   })();
 })();
