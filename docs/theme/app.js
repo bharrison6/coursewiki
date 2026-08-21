@@ -68,18 +68,53 @@
     if (bd) bd.addEventListener('click', function () { set(false); });
     addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
     // A tap on a link navigates; leaving the drawer open would cover the page.
-    $$('.sidebar a').forEach(function (a) { a.addEventListener('click', function () { set(false); }); });
+    // DELEGATED, not one listener per link: in track mode the sidebar is
+    // partly rebuilt after this runs, and per-link listeners bound here would
+    // not exist on any of the new links. That was already true of the
+    // playlist - on a phone, every track link left the drawer covering the
+    // page it had just opened.
+    sb.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t && t.closest && t.closest('a')) { set(false); }
+    });
   })();
 
-  /* ---- sidebar group memory --------------------------------------------
-     Keyed by group id so the tree looks the same on the next page.          */
-  $$('.sidebar .navgroup').forEach(function (d) {
-    var id = d.getAttribute('data-nav');
-    if (!id) return;
-    var stored = LS.get('det:nav:' + id, null);
-    if (stored !== null) { d.open = stored; }
-    d.addEventListener('toggle', function () { LS.set('det:nav:' + id, d.open); });
-  });
+  /* ---- sidebar wiring ---------------------------------------------------
+     Run over the whole sidebar at load, and again over anything the playlist
+     code inserts. Idempotent: an element already wired is skipped, so the
+     second pass cannot double-bind.                                         */
+  function wireSidebar(root) {
+    /* Group memory, keyed by group id so the tree looks the same on the next
+       page. The keys are stable across the track tree too - t-<track> - so a
+       branch the reader closed stays closed.                                */
+    $$('.navgroup', root).forEach(function (d) {
+      if (d.hasAttribute('data-wired')) return;
+      d.setAttribute('data-wired', '');
+      var id = d.getAttribute('data-nav');
+      if (!id) return;
+      var stored = LS.get('det:nav:' + id, null);
+      if (stored !== null) { d.open = stored; }
+      d.addEventListener('toggle', function () { LS.set('det:nav:' + id, d.open); });
+    });
+
+    /* A header is a link AND a toggle. The <summary> owns the toggle; the <a>
+       inside owns the navigation. Browsers do not agree about whether the
+       summary's toggle ALSO runs when the click lands on the link, and a
+       toggle nobody asked for would be written straight into the memory above
+       on the way out of the page. Put it back if it moved.                  */
+    $$('summary a', root).forEach(function (a) {
+      if (a.hasAttribute('data-wired')) return;
+      a.setAttribute('data-wired', '');
+      a.addEventListener('click', function () {
+        var d = a.parentNode;
+        while (d && d.tagName !== 'DETAILS') { d = d.parentNode; }
+        if (!d) return;
+        var was = d.open;
+        setTimeout(function () { if (d.open !== was) { d.open = was; } }, 0);
+      });
+    });
+  }
+  wireSidebar($('.sidebar'));
 
   /* ---- disclosure cards -------------------------------------------------
      Open by default. Safety copy should be readable at a glance; collapsing

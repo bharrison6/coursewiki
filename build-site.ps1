@@ -359,6 +359,11 @@ foreach ($f in (Get-ChildItem -LiteralPath $trackDir -Filter '*.track' | Sort-Ob
     Parent   = if ($dc.Meta.ContainsKey('PARENT'))   { $dc.Meta.PARENT }   else { '' }
     Subtitle = if ($dc.Meta.ContainsKey('SUBTITLE')) { $dc.Meta.SUBTITLE } else { '' }
     Footer   = if ($dc.Meta.ContainsKey('FOOTER'))   { $dc.Meta.FOOTER }   else { $site.FOOTER }
+    # The DIRECT '+' includes, kept as well as flattened. Flattening alone
+    # loses the fact that DET 130 carries General Safety BY REFERENCE, and
+    # that fact is the sideways link a reader needs: the course is where you
+    # are, the topic track is a thing of its own you can also read whole.
+    Includes = @($lines | Where-Object { $_.StartsWith('+') } | ForEach-Object { $_.Substring(1).Trim() })
     Lines = $lines; File = $f.Name
   }
 }
@@ -407,8 +412,26 @@ foreach ($name in $rawTracks.Keys) {
   $tracks[$name] = [pscustomobject]@{
     Name = $name; Title = $rt.Title; Kind = $rt.Kind; Parent = $rt.Parent
     Subtitle = $rt.Subtitle; Footer = $rt.Footer
+    Includes = $rt.Includes
     Items = $items; PageIds = $ids
   }
+}
+
+# The hierarchy, as a lookup, built once. @@PARENT gives the tree; the '+'
+# includes give the sideways edges. Both are validated above, so anything in
+# here is known to resolve.
+$script:trackKids = @{}
+foreach ($t in $tracks.Values) {
+  $k = if ($t.Parent) { $t.Parent } else { '' }
+  if (-not $script:trackKids.ContainsKey($k)) { $script:trackKids[$k] = @() }
+  $script:trackKids[$k] += $t
+}
+function Get-TrackKids([string]$name) {
+  if (-not $script:trackKids.ContainsKey($name)) { return @() }
+  @($script:trackKids[$name] | Sort-Object @{e={Get-TrackRank $_}}, Title)
+}
+function Get-TrackIncludes($t) {
+  @($t.Includes | Where-Object { $tracks.Contains($_) })
 }
 Write-Host ("tracks: {0}" -f $tracks.Count)
 foreach ($t in $tracks.Values) {
@@ -588,19 +611,91 @@ function New-AppBar([string]$up, [string]$flavour) {
   $sb.ToString()
 }
 
+# A tree header has to do BOTH jobs: expand its branch AND go to the thing it
+# names. Every collection and group header used to be a bare toggle, so
+# docs\safety\index.html - a real section landing page - was reachable from
+# nothing in the navigation.
+#
+# The shape: the <summary> owns the toggle (click anywhere on it, or Enter on
+# it when focused), and an <a> inside owns the navigation (Tab reaches it
+# separately, Enter follows it). Both actions are reachable by keyboard and
+# neither hides the other. app.js keeps the link's click from also toggling -
+# browsers disagree about that, and a stray toggle would be written into the
+# open/closed memory on the way out of the page.
+function New-NavSummary([string]$inner, [string]$href, [string]$after, [string]$linkAttrs) {
+  '<summary><span class="chev"></span>' +
+  $(if ($href) { '<a class="navself"' + $linkAttrs + ' href="' + $href + '">' + $inner + '</a>' }
+    else       { '<span class="navself">' + $inner + '</span>' }) +
+  $after + '</summary>'
+}
+
+# The Tracks tree, rendered from the SAME @@PARENT / @@KIND hierarchy the
+# build already validates - and with the same <details> markup the topic tree
+# uses, so the two blocks look and behave alike.
+#
+#   a node with children or includes -> <details>, like a collection
+#   a node with neither              -> <li>, like a page
+#
+# Includes are rendered as a marked sideways list rather than as children:
+# General Safety is not PART OF DET 130, it is a track of its own that DET 130
+# carries. Flattening that distinction is what made the old list flat.
+function Add-TrackNodes {
+  param($nodes, [string]$plHref, $sb, [string]$pad, [int]$depth)
+  $leaves = @()
+  foreach ($t in $nodes) {
+    $kids = Get-TrackKids $t.Name
+    $incs = Get-TrackIncludes $t
+    if (-not $kids.Count -and -not $incs.Count) { $leaves += $t; continue }
+    $count = '<span class="count">' + $t.PageIds.Count + '</span>'
+    [void]$sb.AppendLine($pad + '<details class="navgroup" data-nav="t-' + $t.Name + '"' +
+                         $(if ($depth -eq 0) { ' open' } else { '' }) + '>')
+    [void]$sb.AppendLine($pad + '  ' + (New-NavSummary (ConvertTo-HtmlText $t.Title) `
+                                        ($plHref + '#pl-' + $t.Name) $count (' data-track="' + $t.Name + '"')))
+    Add-TrackNodes $kids $plHref $sb ($pad + '  ') ($depth + 1)
+    if ($incs.Count) {
+      [void]$sb.AppendLine($pad + '  <ul class="navlist navinc">')
+      foreach ($i in $incs) {
+        $it = $tracks[$i]
+        [void]$sb.AppendLine($pad + '    <li><a data-track="' + $it.Name + '" href="' + $plHref + '#pl-' + $it.Name + '">' +
+                             (ConvertTo-HtmlText $it.Title) +
+                             '<span class="count">' + $it.PageIds.Count + '</span></a></li>')
+      }
+      [void]$sb.AppendLine($pad + '  </ul>')
+    }
+    [void]$sb.AppendLine($pad + '</details>')
+  }
+  if ($leaves.Count) {
+    [void]$sb.AppendLine($pad + '<ul class="navlist tracknav">')
+    foreach ($t in $leaves) {
+      [void]$sb.AppendLine($pad + '  <li><a data-track="' + $t.Name + '" href="' + $plHref + '#pl-' + $t.Name + '">' +
+                           (ConvertTo-HtmlText $t.Title) +
+                           '<span class="count">' + $t.PageIds.Count + '</span></a></li>')
+    }
+    [void]$sb.AppendLine($pad + '</ul>')
+  }
+}
+
 # The side navigation. Nested <details> so it works with JavaScript off; JS
 # only remembers which groups were left open.
 # $mode 'site' -> real page links. 'bundle' -> in-file anchors for $onlyColl,
 # absolute site links for everything else.
+#
+# Two blocks, each wrapped so the playlist code can address them: .nav-topics
+# is the topic tree, .nav-tracks is the track tree. In track mode app.js
+# swaps the topic tree for the playlist and KEEPS this same track tree as the
+# up-chain - the alternative was rendering the tree a second time in JS, which
+# is the parallel-renderer mistake the deck already taught this project.
 function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$mode, [string]$onlyColl) {
   $sb = New-Object System.Text.StringBuilder
   [void]$sb.AppendLine('<aside class="sidebar" id="sidebar">')
+  [void]$sb.AppendLine('  <div class="nav-topics">')
   [void]$sb.AppendLine('  <h2>Topics</h2>')
   foreach ($c in $collections.Values) {
     $isCur = ($c.Id -eq $curColl)
     $open  = if ($isCur -or $collections.Count -le 2) { ' open' } else { '' }
+    $cHref = if ($mode -eq 'bundle') { "$script:siteUrl/$($c.Id)/index.html" } else { "$up$($c.Id)/index.html" }
     [void]$sb.AppendLine('  <details class="navgroup" data-nav="c-' + $c.Id + '"' + $open + '>')
-    [void]$sb.AppendLine('    <summary><span class="chev"></span>' + (ConvertTo-HtmlText $c.Title) + '</summary>')
+    [void]$sb.AppendLine('    ' + (New-NavSummary (ConvertTo-HtmlText $c.Title) $cHref '' ''))
 
     $groupNames = if ($c.Groups.Count) { $c.Groups }
                   else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
@@ -608,8 +703,11 @@ function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$m
       $inGroup = @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
       if (-not $inGroup.Count) { continue }
       $gslug = ConvertTo-Slug "$($c.Id)-$g"
+      # A group has no page of its own, but it does have a place: the block of
+      # its topics on the collection index, which carries the same id.
+      $gHref = $cHref + '#g-' + $gslug
       [void]$sb.AppendLine('    <details class="navgroup" data-nav="g-' + $gslug + '" open>')
-      [void]$sb.AppendLine('      <summary><span class="chev"></span>' + (ConvertTo-HtmlText $g) + '</summary>')
+      [void]$sb.AppendLine('      ' + (New-NavSummary (ConvertTo-HtmlText $g) $gHref '' ''))
       [void]$sb.AppendLine('      <ul class="navlist">')
       foreach ($p in $inGroup) {
         if ($mode -eq 'bundle') {
@@ -627,6 +725,7 @@ function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$m
     }
     [void]$sb.AppendLine('  </details>')
   }
+  [void]$sb.AppendLine('  </div>')
 
   # Presentations are NOT topics, so they do not sit in the topic tree as a
   # peer of the collections. A presentation is a playlist - an ordered
@@ -635,15 +734,11 @@ function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$m
   # straight into the player.
   $plHref = if ($mode -eq 'bundle') { "$script:siteUrl/presentations.html" } else { "${up}presentations.html" }
   [void]$sb.AppendLine('  <div class="navsplit"></div>')
+  [void]$sb.AppendLine('  <div class="nav-tracks">')
   [void]$sb.AppendLine('  <h2>Tracks</h2>')
-  [void]$sb.AppendLine('  <p class="navnote">Tracks built from the topics above.</p>')
-  [void]$sb.AppendLine('  <ul class="navlist playlists">')
-  foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
-    [void]$sb.AppendLine('    <li><a href="' + $plHref + '#pl-' + $d.Name + '">' +
-                         (ConvertTo-HtmlText $d.Title) +
-                         '<span class="count">' + $d.PageIds.Count + '</span></a></li>')
-  }
-  [void]$sb.AppendLine('  </ul>')
+  [void]$sb.AppendLine('  <p class="navnote">Tracks built from the topics above. A course carries the topic tracks it needs; open one to see them.</p>')
+  Add-TrackNodes (Get-TrackKids '') $plHref $sb '  ' 0
+  [void]$sb.AppendLine('  </div>')
   [void]$sb.AppendLine('</aside>')
   [void]$sb.AppendLine('<div class="backdrop"></div>')
   $sb.ToString()
@@ -816,7 +911,8 @@ function New-PlaylistData {
         }
       }
     }
-    $rows += '{"name":"everything","title":"Everything","auto":true,"items":[' + ($allItems -join ',') + ']}'
+    $rows += '{"name":"everything","title":"Everything","auto":true,"kind":"all","parent":"","includes":[],"items":[' +
+             ($allItems -join ',') + ']}'
   }
 
   foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
@@ -831,9 +927,18 @@ function New-PlaylistData {
                 '","group":"' + (ConvertTo-Json1 $group) +
                 '","url":"' + (ConvertTo-Json1 ($p.Collection + '/' + $p.Id + '.html')) + '"}'
     }
+    # kind, parent and includes travel WITH the data. They were validated at
+    # build time and then dropped, so the browser saw a flat list of seven
+    # peers - DET, DET 130, DET 330, DET 403 - with the hierarchy that
+    # distinguishes them nowhere in reach. The sidebar tree, the up-chain in
+    # track mode and the another-class warning all read them from here.
+    $incs = @(Get-TrackIncludes $d | ForEach-Object { '"' + (ConvertTo-Json1 $_) + '"' })
     $rows += '{"name":"' + (ConvertTo-Json1 $d.Name) +
              '","title":"' + (ConvertTo-Json1 $d.Title) +
-             '","items":[' + ($items -join ',') + ']}'
+             '","kind":"' + (ConvertTo-Json1 $d.Kind) +
+             '","parent":"' + (ConvertTo-Json1 $d.Parent) +
+             '","includes":[' + ($incs -join ',') +
+             '],"items":[' + ($items -join ',') + ']}'
   }
   $js = "window.TRACKS = [`n" + ($rows -join ",`n") + "`n];`n"
   Write-Host ("    playlists: {0}, {1:n0} bytes" -f $rows.Count, $js.Length)
@@ -920,9 +1025,38 @@ foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
   [void]$pi.AppendLine('        <h2>' + (ConvertTo-HtmlText $d.Title) + '</h2>')
   if ($d.Subtitle) { [void]$pi.AppendLine('        <p class="aside">' + (ConvertTo-HtmlText $d.Subtitle) + '</p>') }
   [void]$pi.AppendLine('        <p class="pl-stat"><span class="kind">' + (Get-KindLabel $d.Kind) + '</span>' +
-                       $(if ($d.Parent) { ' in ' + (ConvertTo-HtmlText $tracks[$d.Parent].Title) } else { '' }) +
+                       $(if ($d.Parent) { ' in <a href="#pl-' + $d.Parent + '">' +
+                                          (ConvertTo-HtmlText $tracks[$d.Parent].Title) + '</a>' } else { '' }) +
                        ' &middot; ' + (Format-Count $d.PageIds.Count 'topic') + ' &middot; ' +
                        (Format-Count (Get-DeckSlideCount $d) 'panel') + '</p>')
+
+  # The sideways edges, made reachable. A course carries topic tracks by
+  # reference and each one is also readable on its own; sibling courses exist
+  # and were previously unreachable from here. A sibling is marked as leaving
+  # for another class, because arriving in one unannounced is the surprise
+  # this is meant to prevent.
+  $incs = Get-TrackIncludes $d
+  $sibs = if ($d.Parent) { @(Get-TrackKids $d.Parent | Where-Object { $_.Name -ne $d.Name }) } else { @() }
+  if ($incs.Count -or $sibs.Count) {
+    [void]$pi.AppendLine('        <p class="pl-rel">')
+    if ($incs.Count) {
+      [void]$pi.AppendLine('          <span class="k">Carries</span>')
+      foreach ($i in $incs) {
+        [void]$pi.AppendLine('          <a class="chip" href="#pl-' + $i + '">' +
+                             (ConvertTo-HtmlText $tracks[$i].Title) + '</a>')
+      }
+    }
+    if ($sibs.Count) {
+      [void]$pi.AppendLine('          <span class="k">Also in ' +
+                           (ConvertTo-HtmlText $tracks[$d.Parent].Title) + '</span>')
+      foreach ($s in $sibs) {
+        $xc = if ($d.Kind -eq 'course' -and $s.Kind -eq 'course') { ' is-xcourse' } else { '' }
+        [void]$pi.AppendLine('          <a class="chip' + $xc + '" href="#pl-' + $s.Name + '">' +
+                             (ConvertTo-HtmlText $s.Title) + '</a>')
+      }
+    }
+    [void]$pi.AppendLine('        </p>')
+  }
   [void]$pi.AppendLine('      </div>')
   # Both entry points land on the FIRST REAL PAGE of the playlist. There is no
   # separate deck document to open - presentation mode is a view of the page.
@@ -986,7 +1120,10 @@ foreach ($c in $collections.Values) {
   foreach ($g in $groupNames) {
     $inGroup = @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
     if (-not $inGroup.Count) { continue }
-    [void]$ci.AppendLine('  <h2 class="section-head">' + (ConvertTo-HtmlText $g) + '</h2>')
+    # Same slug the sidebar uses for this group's data-nav, so the group header
+    # in the tree has somewhere real to point: this block, on this index.
+    [void]$ci.AppendLine('  <h2 class="section-head" id="g-' + (ConvertTo-Slug "$($c.Id)-$g") + '">' +
+                         (ConvertTo-HtmlText $g) + '</h2>')
     [void]$ci.AppendLine((New-Tiles $inGroup '../' $c.Id 'site'))
   }
   [void]$ci.AppendLine('</div></main>')

@@ -224,17 +224,40 @@ main, .shell > * { min-width: 0; }
 }
 @media (min-width: 56.3125rem) { .backdrop { display: none; } }
 
-/* ---- sidebar: presentations block --------------------------------------
-   Deliberately NOT part of the topic tree above. A presentation is a playlist
-   over the topics, so it reads as a separate kind of thing. */
+/* ---- a tree header is a link AND a toggle ------------------------------
+   The <summary> toggles; the <a> inside it navigates to the section's own
+   page. Colour is inherited from the summary so the header still reads as a
+   header rather than as a link in a list - the underline on hover and the
+   focus ring are what say it is clickable. */
+.navgroup > summary .navself { color: inherit; text-decoration: none; }
+.navgroup > summary a.navself:hover {
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .18em;
+}
+.navgroup > summary .count { margin-left: auto; }
+
+/* ---- sidebar: tracks block ---------------------------------------------
+   Deliberately NOT part of the topic tree above. A track is a playlist over
+   the topics, so it reads as a separate kind of thing - but it is rendered
+   with the SAME <details> markup, because it has the same shape: a programme
+   holds courses the way a collection holds groups. */
 .navsplit { height: 1px; background: var(--rule); margin: 1.25rem .55rem .9rem; }
 .navnote { padding: 0 .55rem .5rem; font-size: .78rem; color: var(--ink-soft); line-height: 1.4; }
-.navlist.playlists a { display: flex; align-items: center; gap: .5rem; padding-left: .55rem; }
-.navlist.playlists .count {
+.navlist.tracknav a, .navlist.navinc a { display: flex; align-items: center; gap: .5rem; padding-left: 1.5rem; }
+.navlist.tracknav > li > a { padding-left: .55rem; }
+.navlist .count {
   margin-left: auto; font-family: var(--f-mono); font-size: .68rem;
   color: var(--ink-soft); background: var(--surface-2);
   border-radius: 999px; padding: .05rem .4rem;
 }
+
+/* A track this one CARRIES: it is not a child, it is a track of its own that
+   this one includes by reference. Marked the way an out-of-deck link is
+   marked, and for the same reason - following it leaves where you are. */
+.navlist.navinc a::before {
+  content: "\2197"; font-size: .78em; color: var(--ink-soft); flex: none;
+  margin-left: -.75rem; width: .75rem;
+}
+.navgroup .navlist.navinc { margin-left: .6rem; }
 
 /* ==========================================================================
    Playlist mode — a sequence applied to the real pages
@@ -270,6 +293,34 @@ main, .shell > * { min-width: 0; }
   letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
 }
 .navlist.escape a { padding-left: .55rem; font-weight: 600; }
+
+/* ---- arriving in another class's material ------------------------------
+   A banner on ARRIVAL rather than a confirm before the click. A confirm only
+   fires for a click made on this site - it does nothing for a link a student
+   was sent - and it is dismissed reflexively because it stands between the
+   reader and the thing they just asked for. A banner catches both routes in,
+   says where you are, and carries the way back.
+
+   Gold flag tokens, so the text inside is navy on a light ground and the
+   theme swap is already handled: gold is never set as type on white here. */
+.xcourse {
+  display: flex; align-items: baseline; gap: .6rem 1rem; flex-wrap: wrap;
+  margin: 0 0 1.6rem; padding: .8rem 1rem;
+  background: var(--flag-soft); border: 1px solid var(--flag);
+  border-radius: var(--radius-sm); color: var(--flag-ink);
+  font-size: .95rem; line-height: 1.45;
+}
+.xcourse .xc-body { flex: 1 1 18rem; min-width: 0; }
+.xcourse .xc-t { font-family: var(--f-display); font-weight: 700; }
+.xcourse a { color: inherit; font-weight: 600; text-underline-offset: .18em; }
+.xcourse .xc-x {
+  flex: none; background: transparent; border: 1px solid transparent;
+  color: inherit; cursor: pointer; font-size: 1.1rem; line-height: 1;
+  padding: .2rem .45rem; border-radius: var(--radius-xs);
+}
+.xcourse .xc-x:hover { border-color: var(--flag); }
+.presenting .xcourse { margin: 0; border-radius: 0; border-width: 0 0 1px; }
+@media print { .xcourse { display: none !important; } }
 
 /* ---- next / previous ---------------------------------------------------*/
 .seqbar {
@@ -409,6 +460,16 @@ body.presenting {
 .pl-stat {
   margin-top: .4rem; font-family: var(--f-mono); font-size: .74rem; color: var(--ink-soft);
 }
+/* The sideways edges: the topic tracks this one carries, and the courses
+   beside it. Both were unreachable from here. */
+.pl-rel {
+  margin-top: .7rem; display: flex; align-items: center; gap: .4rem; flex-wrap: wrap;
+}
+.pl-rel .k {
+  font-family: var(--f-display); font-weight: 700; font-size: .66rem;
+  letter-spacing: .09em; text-transform: uppercase; color: var(--ink-soft);
+}
+.pl-rel .k:not(:first-child) { margin-left: .6rem; }
 .btn-play {
   flex: none; display: inline-flex; align-items: center; gap: .45rem;
   padding: .6rem 1rem; border-radius: var(--radius-sm);
@@ -679,6 +740,21 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   border-radius: var(--radius-xs); text-decoration: none; color: var(--accent);
 }
 .chip:hover { border-color: var(--accent); }
+
+/* A link into ANOTHER CLASS. Marked before the click, the same way an
+   out-of-deck link is marked, so arriving in another course's material is
+   never a surprise. The arrival banner is the other half of this. */
+.chip.is-xcourse { border-style: dashed; }
+.chip.is-xcourse::after {
+  content: " \2197"; font-size: .82em; vertical-align: .12em; color: var(--ink-soft);
+}
+.navlist a.is-xcourse { border-left-color: var(--rule); border-left-style: dashed; }
+.navlist a.is-xcourse::after {
+  content: "\2197"; font-size: .78em; color: var(--ink-soft); margin-left: .2rem;
+}
+.navgroup > summary a.navself.is-xcourse::after {
+  content: "\2197"; font-size: .78em; color: var(--ink-soft); margin-left: .2rem;
+}
 
 /* ==========================================================================
    Print - the page is a handout again. Chrome goes, every card opens.
