@@ -250,6 +250,23 @@ main, .shell > * { min-width: 0; }
   border-radius: 999px; padding: .05rem .4rem;
 }
 
+/* The track you are currently inside, marked in the up-chain. Deliberately the
+   SAME marking the sidebar and the playlist already use for the current page -
+   accent, bold, an accent rule down the left - because it answers the same
+   question in the same place and a second visual language for "you are here"
+   is one the reader has to learn twice. aria-current="true", not "page": it is
+   the current track, and a screen reader announcing "current page" on a link
+   that is not this page would be a lie. */
+.navlist a[aria-current="true"] {
+  color: var(--accent); font-weight: 700;
+  border-left-color: var(--accent); background: var(--surface-2);
+}
+.nav-tracks .navgroup > summary:has(a.navself[aria-current="true"]) {
+  color: var(--accent); background: var(--surface-2);
+  box-shadow: inset 2px 0 0 var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
 /* A track this one CARRIES: it is not a child, it is a track of its own that
    this one includes by reference. Marked the way an out-of-deck link is
    marked, and for the same reason - following it leaves where you are. */

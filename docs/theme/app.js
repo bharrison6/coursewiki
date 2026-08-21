@@ -430,7 +430,27 @@
            '<li><a href="' + base + 'presentations.html">All tracks</a></li>' +
            '<li><a href="' + base + 'print/track-' + pl.name + '.html">Print this track</a></li>' +
            '</ul>';
-      sb.innerHTML = h;
+
+      /* Replace the TOPIC tree only. The TRACK tree below the split stays,
+         and it is the up-chain: inside a playlist the sidebar deliberately
+         becomes the playlist, which answers "what comes next" and leaves
+         "what is this part of" unanswered. The track tree is that answer, it
+         is already rendered by the generator, and re-rendering it here in
+         JavaScript would be the parallel-renderer mistake the deck already
+         taught this project.
+
+         The current track is MARKED, not force-opened: forcing a branch open
+         writes through the toggle listener into the open/closed memory, so
+         every visit would reopen a branch the reader had deliberately closed.
+         The generator already leaves the top of the tree open, so the marked
+         header is on screen without any help.                               */
+      var topics = sb.querySelector('.nav-topics');
+      if (topics) { topics.innerHTML = h; } else { sb.innerHTML = h; }
+      wireSidebar(sb);
+      $$('.nav-tracks [data-track]').forEach(function (a) {
+        if (a.getAttribute('data-track') === pl.name) { a.setAttribute('aria-current', 'true'); }
+        else { a.removeAttribute('aria-current'); }
+      });
     }
 
     /* ---- next / previous ----------------------------------------------*/

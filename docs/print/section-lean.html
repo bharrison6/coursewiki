@@ -627,6 +627,23 @@ main, .shell > * { min-width: 0; }
   border-radius: 999px; padding: .05rem .4rem;
 }
 
+/* The track you are currently inside, marked in the up-chain. Deliberately the
+   SAME marking the sidebar and the playlist already use for the current page -
+   accent, bold, an accent rule down the left - because it answers the same
+   question in the same place and a second visual language for "you are here"
+   is one the reader has to learn twice. aria-current="true", not "page": it is
+   the current track, and a screen reader announcing "current page" on a link
+   that is not this page would be a lie. */
+.navlist a[aria-current="true"] {
+  color: var(--accent); font-weight: 700;
+  border-left-color: var(--accent); background: var(--surface-2);
+}
+.nav-tracks .navgroup > summary:has(a.navself[aria-current="true"]) {
+  color: var(--accent); background: var(--surface-2);
+  box-shadow: inset 2px 0 0 var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
 /* A track this one CARRIES: it is not a child, it is a track of its own that
    this one includes by reference. Marked the way an out-of-deck link is
    marked, and for the same reason - following it leaves where you are. */
@@ -2005,7 +2022,27 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
            '<li><a href="' + base + 'presentations.html">All tracks</a></li>' +
            '<li><a href="' + base + 'print/track-' + pl.name + '.html">Print this track</a></li>' +
            '</ul>';
-      sb.innerHTML = h;
+
+      /* Replace the TOPIC tree only. The TRACK tree below the split stays,
+         and it is the up-chain: inside a playlist the sidebar deliberately
+         becomes the playlist, which answers "what comes next" and leaves
+         "what is this part of" unanswered. The track tree is that answer, it
+         is already rendered by the generator, and re-rendering it here in
+         JavaScript would be the parallel-renderer mistake the deck already
+         taught this project.
+
+         The current track is MARKED, not force-opened: forcing a branch open
+         writes through the toggle listener into the open/closed memory, so
+         every visit would reopen a branch the reader had deliberately closed.
+         The generator already leaves the top of the tree open, so the marked
+         header is on screen without any help.                               */
+      var topics = sb.querySelector('.nav-topics');
+      if (topics) { topics.innerHTML = h; } else { sb.innerHTML = h; }
+      wireSidebar(sb);
+      $$('.nav-tracks [data-track]').forEach(function (a) {
+        if (a.getAttribute('data-track') === pl.name) { a.setAttribute('aria-current', 'true'); }
+        else { a.removeAttribute('aria-current'); }
+      });
     }
 
     /* ---- next / previous ----------------------------------------------*/
