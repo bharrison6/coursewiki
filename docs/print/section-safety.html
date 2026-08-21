@@ -492,6 +492,9 @@ main, .shell > * { min-width: 0; }
 }
 @media (max-width: 34rem) {
   .appbar .brand .sub { display: none; }
+  /* The logo is the one non-negotiable item in this compact bar: let search
+     surrender width before clipping the official lockup. */
+  .appbar .brand { flex: none; }
   .appbar .brandmark { height: 1.5rem; }
 }
 
@@ -1106,8 +1109,8 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 
 .deeper > :not(summary) { margin: .8rem .85rem; }
 
-/* Print: beforeprint force-opens every <details>, so these arrive open.
-   Until the addendum lands, keep a block from splitting across a page. */
+/* Site-page printing still force-opens every <details>. Aggregate printing
+   extracts this tier into numbered addenda before this stylesheet is inlined. */
 @media print {
   .deeper { break-inside: avoid; background: none; }
 }
@@ -1267,6 +1270,49 @@ figure.graphic-slot:not(:has(img))::before {
   color: var(--ink-soft);
   border: 2px dashed var(--rule);
   border-radius: var(--radius-sm);
+}
+
+/* ---- GHS pictograms ----------------------------------------------------
+   These are regulatory marks, not an illustration in the site palette: the
+   diamond stays white, its symbol stays black, and its frame stays red in
+   either screen theme. The fixed fills are deliberate - using --paper for a
+   cutout would turn it dark in the dark skin and change the safety symbol. */
+.ghs-pictograms { margin: 1.25rem 0; }
+.ghs-pictograms > figcaption {
+  margin: 0 0 .65rem;
+  font-family: var(--f-display); font-weight: 700; font-size: .76rem;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--ink-soft);
+}
+.ghs-pictogram-list {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(5.25rem, 1fr));
+  gap: .8rem .75rem; margin: 0; padding: 0; list-style: none;
+}
+.ghs-pictogram-list li {
+  display: grid; justify-items: center; align-content: start; gap: .35rem;
+  min-width: 0; padding: 0; text-align: center;
+}
+.ghs-pictogram-list li::before { content: none; }
+.ghs-pictogram { display: block; width: min(100%, 5.25rem); height: auto; }
+.ghs-pictogram-list span {
+  min-height: 2.4em;
+  font-family: var(--f-display); font-weight: 700; font-size: .68rem;
+  line-height: 1.2; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--ink);
+}
+.ghs-diamond { fill: #fff; stroke: var(--msu-redorange); stroke-width: 7; }
+.ghs-symbol { fill: #000; }
+.ghs-symbol-stroke {
+  fill: none; stroke: #000; stroke-width: 5;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.ghs-cutout { fill: #fff; }
+@media print {
+  /* A printer can discard every background. Strokes and fills carry all of
+     the mark here, so a monochrome handout remains an unambiguous diamond. */
+  .ghs-diamond { fill: #fff; stroke: #000; }
+  .ghs-symbol { fill: #000; }
+  .ghs-symbol-stroke { stroke: #000; }
+  .ghs-cutout { fill: #fff; }
 }
 
 /* Both of these are build-error states that reach the page. The build already
@@ -1763,11 +1809,29 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 .agg-toc li::before { content: none; }
 .agg-toc a { font-family: var(--f-display); font-weight: 600; text-decoration: none; }
 .article.bundled { border-top: 3px solid var(--accent); padding-top: 2rem; margin-top: 3rem; }
+.deeper-ref {
+  margin: .35rem 0; padding: .65rem .85rem;
+  border-left: 3px solid var(--accent); background: var(--surface-2);
+  font-family: var(--f-display); font-size: .93rem;
+}
+.deeper-ref a { color: var(--accent); text-underline-offset: .16em; }
+.deeper-addenda { border-top: 3px solid var(--accent); margin-top: 4rem; padding-top: 2rem; }
+.deeper-addenda-head { margin-bottom: 2rem; }
+.deeper-addenda-list { margin: 0; padding-left: 2rem; }
+.deeper-addendum { padding-left: .5rem; margin-bottom: 3rem; }
+.deeper-addendum::marker { color: var(--accent); font-family: var(--f-display); font-weight: 700; }
+.deeper-addendum article { display: flex; flex-direction: column; gap: .8rem; }
+.deeper-addendum h2 { margin: 0; font-size: 1.35rem; }
+.deeper-addendum-number { color: var(--accent); }
+.deeper-back { font-family: var(--f-display); font-size: .85rem; }
 @media print {
   .aggregate main { padding: 0; max-width: none; }
   .article.bundled { break-before: page; border-top: 0; margin-top: 0; padding-top: 0; }
   .agg-head { break-after: page; }
   .aggregate .xcard[open] > summary, .aggregate .xcard > summary { border-bottom: 2px solid var(--ink); }
+  .deeper-addenda { break-before: page; border-top: 0; margin-top: 0; padding-top: 0; }
+  .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
+  .deeper-back { display: none; }
 }
 </style>
 </head>
@@ -1833,93 +1897,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>None of this is a local rule. OSHA requires a sheet for every hazardous chemical, and requires
   the sixteen sections and the order they come in &mdash; <strong>29 CFR 1910.1200(g)</strong>.</p>
 
-  <details class="deeper">
-    <summary>All sixteen sections, and the four OSHA does not enforce</summary>
-    <p>This is OSHA's own list, from <strong>Appendix D to 29 CFR 1910.1200</strong>. The numbers
-    and headings are fixed; a manufacturer cannot renumber them or reorder them.</p>
-    <dl class="dims">
-      <div><dt>Section 1</dt><dd>Identification &mdash; product identifier, recommended use and
-      restrictions on use, who made it, emergency phone number.</dd></div>
-      <div><dt>Section 2</dt><dd>Hazard(s) identification &mdash; classification, signal word,
-      hazard statement(s), symbol(s) and precautionary statement(s).</dd></div>
-      <div><dt>Section 3</dt><dd>Composition / information on ingredients &mdash; chemical name,
-      CAS number, and for a mixture, the ingredients classified as health hazards and how much of
-      each.</dd></div>
-      <div><dt>Section 4</dt><dd>First-aid measures &mdash; by route of exposure, plus the symptoms
-      that matter and when to get medical attention.</dd></div>
-      <div><dt>Section 5</dt><dd>Fire-fighting measures &mdash; suitable <em>and unsuitable</em>
-      extinguishing media, and what the chemical gives off when it burns.</dd></div>
-      <div><dt>Section 6</dt><dd>Accidental release measures &mdash; the spill response.</dd></div>
-      <div><dt>Section 7</dt><dd>Handling and storage &mdash; <em>"conditions for safe storage,
-      including any incompatibilities"</em>.</dd></div>
-      <div><dt>Section 8</dt><dd>Exposure controls / personal protection &mdash; the OSHA
-      permissible exposure limit, the ACGIH threshold limit value, engineering controls, PPE.</dd></div>
-      <div><dt>Section 9</dt><dd>Physical and chemical properties &mdash; physical state, odor,
-      flash point, auto-ignition temperature, density, pH and the rest.</dd></div>
-      <div><dt>Section 10</dt><dd>Stability and reactivity &mdash; reactivity, conditions to avoid,
-      <em>"incompatible materials"</em>, hazardous decomposition products.</dd></div>
-      <div><dt>Section 11</dt><dd>Toxicological information &mdash; the health effects and the data
-      behind them, including any carcinogen listings.</dd></div>
-      <div><dt>Section 12</dt><dd>Ecological information</dd></div>
-      <div><dt>Section 13</dt><dd>Disposal considerations</dd></div>
-      <div><dt>Section 14</dt><dd>Transport information</dd></div>
-      <div><dt>Section 15</dt><dd>Regulatory information</dd></div>
-      <div><dt>Section 16</dt><dd>Other information &mdash; <em>"the date of preparation of the SDS
-      or the last change to it"</em>.</dd></div>
-    </dl>
+  <p class="deeper-ref" id="deeper-ref-1">Supporting detail: <a href="#deeper-addendum-1"><strong>Addendum 1</strong></a> &mdash; All sixteen sections, and the four OSHA does not enforce.</p>
 
-    <p><strong>Twelve through fifteen are the odd ones out.</strong>
-    The headings have to be there: a note to the standard says an SDS <em>"must also include the
-    headings"</em> for those four, <em>"in order"</em>, to stay consistent with the international
-    system the format comes from. What goes <em>under</em> them is a different question. Appendix D
-    says <em>"Sections 12-15 may be included in the SDS, but are not mandatory"</em>, and a second
-    note to the same paragraph says <em>"OSHA will not be enforcing information requirements in
-    sections 12 through 15, as these areas are not under its jurisdiction."</em></p>
-
-    <p>Those four cover the environment, waste, shipping and other agencies' regulations &mdash;
-    EPA and DOT ground, not OSHA's. So Section 13 tells you what the manufacturer suggests doing
-    with the leftovers. It does not tell you what happens to them here. Ask.</p>
-
-    <p><strong>Two more things about the shape of the document.</strong> The section order is fixed
-    but the order <em>within</em> a section is not &mdash; preparers <em>"are not required to
-    present the information in any particular order within each section"</em>, so two sheets can
-    look different inside the same numbered box. And a heading with nothing under it is not an
-    oversight: where there is no relevant information, <em>"the SDS shall clearly indicate that no
-    applicable information is available."</em> Read that as nobody has the data &mdash; not as
-    nothing to worry about.</p>
-  </details>
-
-  <details class="deeper">
-    <summary>Signal words, pictograms and H-numbers &mdash; how Section 2 is written</summary>
-    <p>There are exactly <strong>two</strong> signal words, and OSHA defines them in
-    <strong>1910.1200(c)</strong>: a signal word indicates <em>"the relative level of severity of
-    hazard"</em>, and <em>"'Danger' is used for the more severe hazards, while 'warning' is used
-    for the less severe."</em></p>
-
-    <p>Severity is relative to <em>the same kind of hazard</em>, and that is the part that catches
-    people. Flammable liquids in OSHA's Appendix C are the clean example &mdash; all three
-    categories carry the same <strong>Flame</strong> pictogram, and the signal word is the only
-    thing separating them:</p>
-    <dl class="dims">
-      <div><dt>Category 1</dt><dd><strong>Danger</strong> &mdash; "Extremely flammable liquid and vapor"</dd></div>
-      <div><dt>Category 2</dt><dd><strong>Danger</strong> &mdash; "Highly flammable liquid and vapor"</dd></div>
-      <div><dt>Category 3</dt><dd><strong>Warning</strong> &mdash; "Flammable liquid and vapor"</dd></div>
-    </dl>
-    <p class="aside"><strong>So &ldquo;warning&rdquo; does not mean mild.</strong> A Category 3
-    flammable liquid still catches fire. The signal word ranks a hazard against others of its own
-    kind; it is not a statement that the chemical is safe.</p>
-
-    <p><strong>The pictograms are a fixed set of eight</strong> &mdash; a black symbol in a
-    red-bordered diamond standing on a point. OSHA names them: Flame, Flame Over Circle,
-    Exclamation Mark, Exploding Bomb, Corrosion, Gas Cylinder, Health Hazard, and Skull and
-    Crossbones.</p>
-
-    <p><strong>The H-numbers are an index, not the warning.</strong> Real sheets often print a code
-    such as <em>H225</em> beside a hazard statement. Those codes come from the international GHS
-    scheme this format is built on, which treats them as reference labels rather than as a
-    substitute for the statement itself. OSHA's Appendix C does not use them at all &mdash; it
-    specifies the sentence. Read the sentence.</p>
-  </details>
+  <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Signal words, pictograms and H-numbers &mdash; how Section 2 is written.</p>
     </div>
   </details>
   <details class="xcard is-gate" id="where-the-sheets-are-kept-and-what-readily-accessible-means" data-card="where-the-sheets-are-kept-and-what-readily-accessible-means">
@@ -1942,17 +1922,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     follow the proper handling procedures.</p>
   </div>
 
-  <details class="deeper">
-    <summary>Telling a current sheet from an old one</summary>
-    <p><strong>Section 16</strong> carries <em>"the date of preparation of the SDS or the last
-    change to it."</em> That is the only date on the document, and it is how you tell a live sheet
-    from one that has sat in a binder for a decade.</p>
-    <p>Keeping it current is the manufacturer's job, not yours. Under
-    <strong>1910.1200(g)(5)</strong>, when a manufacturer or importer <em>"becomes newly aware of
-    any significant information regarding the hazards of a chemical, or ways to protect against the
-    hazards, this new information shall be added to the safety data sheet within three
-    months."</em></p>
-  </details>
+  <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Telling a current sheet from an old one.</p>
     </div>
   </details>
   <details class="xcard" id="storage-and-incompatible-materials" data-card="storage-and-incompatible-materials">
@@ -1985,15 +1955,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="aside">Fumes and dust have a PPE requirement of their own &mdash; see
   <a class="xref-page" href="#p-ppe">respiratory protection</a>.</p>
 
-  <details class="deeper">
-    <summary>What makes a flammables cabinet &ldquo;approved&rdquo;, and how to spot one</summary>
-    <p>OSHA calls it a <strong>storage cabinet</strong> and defines it by a fire test rather than by
-    how solid it looks. <strong>29 CFR 1910.106(d)(3)</strong> requires cabinets to <em>"limit the
-    internal temperature to not more than 325 &deg;F. when subjected to a 10-minute fire test"</em>,
-    with all joints and seams staying tight and the door staying closed throughout.</p>
-    <p>The same paragraph requires the marking, which is the fastest way to recognise one:
-    <em>"Cabinets shall be labeled in conspicuous lettering, 'Flammable - Keep Fire Away.'"</em></p>
-  </details>
+  <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; What makes a flammables cabinet &ldquo;approved&rdquo;, and how to spot one.</p>
     </div>
   </details>
 </div>
@@ -2008,13 +1970,12 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard is-stop" id="voltage-in-this-lab" data-card="voltage-in-this-lab">
-    <summary>Voltage in this lab<span class="chev"></span></summary>
+  <details class="xcard is-stop" id="electrical-sources" data-card="electrical-sources">
+    <summary>Electrical Sources<span class="chev"></span></summary>
     <div class="body">
-      <h2>Voltage in this lab</h2>
-  <p class="lede">Electricity can shock you, and it can burn you. What hurts you at 5&nbsp;V is not
-  what hurts you at 240&nbsp;V &mdash; they are not the same hazard. A low voltage will not shock
-  you, but it can still burn you.</p>
+      <h2>Electrical Sources</h2>
+  <p class="lede">What hurts you at 5&nbsp;V is not what hurts you at 240&nbsp;V; one is a burn hazard
+  while the other is a shock hazard.</p>
   <dl class="dims">
     <div><dt>5&nbsp;V / 12&nbsp;V</dt><dd>The power supply on the bench, batteries, and the battery
     pack out of a cordless drill. <strong>Below the shock threshold.</strong> Not below the burn
@@ -2055,18 +2016,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     not to add burn or arc exposure (2024 edition, 110.2(B) Exception No.&nbsp;5).</li>
   </ul>
 
-  <details class="deeper">
-    <summary>&ldquo;It&rsquo;s not the voltage that gets you, it&rsquo;s the current&rdquo;</summary>
-    <p>The saying is true. What usually gets taken from it &mdash; that the voltage does not matter
-    &mdash; is not. Current is electricity actually moving through you, and it takes very little of
-    it to do real harm. Volts sitting on a wire nobody is touching do nothing at all.</p>
-    <p>Two things together decide how much current you get: how hard the electricity is being pushed,
-    which is what voltage measures, and how hard your body holds it back, which is called resistance.
-    Harder push, more current. More resistance, less.</p>
-    <p>Your resistance is not a fixed number &mdash; wet skin holds current back far less than dry
-    skin does, so the same push moves much more current through you. That half of it cannot be relied
-    on, which is why the line is drawn on the half that can be: the push.</p>
-  </details>
+  <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; &ldquo;It&rsquo;s not the voltage that gets you, it&rsquo;s the current&rdquo;.</p>
 
   <h3>The international standards are not one number</h3>
   <p>On datasheets you will meet a different set of figures, and there the <strong>AC and DC limits
@@ -2610,31 +2560,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <p><strong>Alarm, evacuate, report.</strong></p>
   </div>
 
-  <details class="deeper">
-    <summary>Why dry sand is on the list, and why it is probably not on yours</summary>
-    <p>Sand does work. The Aluminum Association&rsquo;s <em>Guidelines for Handling Aluminum
-    Fines</em> (F-1) lists fine dry sand, &ldquo;preferably finer than 20&nbsp;mesh,&rdquo; next to
-    approved dry powders as effective for <em>isolating</em> an aluminum fines fire. It also says
-    what has to be true first.</p>
-    <ul>
-      <li><strong>Dry.</strong> F-1 says <em>dry</em> sand. Damp sand is water, and water
-      &ldquo;will react with the aluminum fines to form flammable hydrogen gas.&rdquo;</li>
-      <li><strong>Already in the room.</strong> &ldquo;A plentiful supply should be easily available
-      in the operating area and stored in covered bins or drums.&rdquo; Sand fetched after the fire
-      starts is not that.</li>
-      <li><strong>With the right tool waiting beside it.</strong> &ldquo;Long handled shovels should
-      be available at each bin or drum, and should be constructed of non-sparking metal.&rdquo;</li>
-      <li><strong>Laid, not thrown.</strong> The shovels &ldquo;lay the sand or powder around the
-      edge or perimeter of the fire.&rdquo; You are walling it in. Anything thrown at the pile
-      raises the dust cloud that is the actual explosion.</li>
-      <li><strong>Decided before it started, by someone senior.</strong> &ldquo;Qualified
-      supervisory personnel should decide in advance whether it is better to attempt to fight the
-      fire or to withdraw to a safe location and allow it to burn itself out.&rdquo;</li>
-    </ul>
-    <p>Those are preconditions, not tips. <strong>If you cannot point at the covered sand bin and
-    the non-sparking shovel beside it right now, you do not have this option</strong> &mdash; and
-    the call to fight it was never yours to make on the spot. Alarm, evacuate, report.</p>
-  </details>
+  <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Why dry sand is on the list, and why it is probably not on yours.</p>
 
   <h3>What that means day to day</h3>
   <ul>
@@ -2915,34 +2841,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <figcaption>Contact happens where the belt is open. The injury happens where it closes.</figcaption>
   </figure>
 
-  <details class="deeper">
-    <summary>The word for this, and where it comes from</summary>
-    <p>&ldquo;Nip point&rdquo; is not shop slang. It is the term the machine-guarding standard uses.
-    <strong>29&nbsp;CFR&nbsp;1910.212(a)(1)</strong> requires guarding against &ldquo;hazards such as
-    those created by <strong>point of operation, ingoing nip points, rotating parts, flying chips and
-    sparks</strong>.&rdquo;</p>
-    <p>OSHA&rsquo;s Machine Guarding eTool puts it plainly: &ldquo;<strong>In-running nip point
-    hazards are caused by the rotating parts on machinery.</strong>&rdquo; Its longer treatment,
-    <em>Concepts and Techniques of Machine Safeguarding</em> (OSHA&nbsp;3067), gives three kinds:</p>
-    <ul>
-      <li>&ldquo;Parts can rotate in opposite directions while their axes are parallel to each other.
-      These parts may be in contact (producing a nip point) or in close proximity.&rdquo; &mdash;
-      meshing gears.</li>
-      <li>&ldquo;Nip points are also created between rotating and tangentially moving parts. Some
-      examples would be: the point of contact between a power transmission belt and its pulley, a
-      chain and a sprocket, and a rack and pinion.&rdquo;</li>
-      <li>&ldquo;Nip points can occur between rotating and fixed parts which create a shearing,
-      crushing, or abrading action.&rdquo;</li>
-    </ul>
-    <p>So belts, chains, sprockets and gears are <em>rotating</em> hazards by name. What makes them
-    dangerous is that they draw material in &mdash; not that two parts close on each other.</p>
-    <p>OSHA is just as direct about the plain shaft: &ldquo;Rotating motion can be dangerous; even
-    smooth, slowly rotating shafts can grip hair and clothing, and through minor contact force the
-    hand and arm into a dangerous position.&rdquo;</p>
-    <p>These parts are meant to be behind covers, and the standard is specific about it &mdash;
-    <strong>29&nbsp;CFR&nbsp;1910.219(f)(3)</strong>: &ldquo;All sprocket wheels and chains shall be
-    enclosed unless they are more than seven (7) feet above the floor or platform.&rdquo;</p>
-  </details>
+  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; The word for this, and where it comes from.</p>
 
   <h3>The rotating parts that have no cover</h3>
   <p>Belts, gears and chains belong behind covers. <strong>The working end of a machine does
@@ -2974,68 +2873,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="aside">None of this is a ranking. The mechanism is the same on every machine that turns,
   and the one that can catch you is whichever one you are standing at.</p>
 
-  <details class="deeper">
-    <summary>What the investigations actually describe</summary>
-    <p>Oregon&rsquo;s state fatality-investigation program, summarizing the record for this class of
-    machine: &ldquo;<strong>The most common causes of death and injury from metal lathes include
-    entanglement of clothing in moving parts</strong>, being hit by loose objects on the lathe (e.g.,
-    chuck keys, tools, metal shavings) and being struck by a part that has not been adequately
-    secured.&rdquo; (OR-FACE&nbsp;2012-18-1, <em>Experienced Journeyman Machinist Killed While
-    Operating an Engine Lathe</em>, 2014.)</p>
-
-    <p>Four investigated deaths, all the same event &mdash; something attached to a person touched
-    something turning, and the machine did the rest:</p>
-    <ul>
-      <li><strong>Smoothing a part while it turned.</strong> A 69-year-old machinist with over 30
-      years&rsquo; experience &ldquo;reached over the work piece to smooth out a radiused transition
-      with emery cloth and a file in hand&rdquo; and &ldquo;his loose clothing (left arm sleeve)
-      became entangled around the rotating work piece&rdquo;. A co-worker 30 feet away heard &ldquo;a
-      strange &lsquo;winding-up&rsquo; sound&rdquo;. Of that same part, the shop foreman had said that
-      &ldquo;the rough surface could grab clothing or gloves&rdquo;. (OR-FACE&nbsp;2012-18-1.)</li>
-
-      <li><strong>Stock sticking out the back of the spindle.</strong> A 52-year-old machinist was
-      set up on a 103-inch steel bar: &ldquo;Due to the length of the material, 24 inches were
-      sticking out the back of the lathe, unguarded, and held in place with a clamping device that
-      rotates as the lathe rotates.&rdquo; He reached across the running machine and &ldquo;the sleeve
-      of his shirt became entangled&rdquo;. (Kentucky&nbsp;FACE&nbsp;21KY002, 2021.)</li>
-
-      <li><strong>A burr on the end of the bar.</strong> A lathe operator in his twenties had a
-      1&nbsp;7/8-inch stub of 1-inch bar standing past the tailstock. &ldquo;The right pocket of his
-      shirt was caught by the rotating tailstock burr. His shirt wrapped around the stock and
-      tightened at the decedent&rsquo;s neck and chest.&rdquo; The listed contributing factor is
-      &ldquo;walking to and/or reaching over unguarded rotating bar stock&rdquo;. OSHA makes the same
-      point in general: the danger &ldquo;increases when projections such as set screws, bolts, nicks,
-      abrasions, and projecting keys&hellip; are exposed on rotating parts.&rdquo;
-      (Michigan&nbsp;FACE&nbsp;14MI034, 2014; OSHA Machine Guarding eTool.)</li>
-
-      <li><strong>A drill press.</strong> &ldquo;As Employee&nbsp;#1 reached into the unguarded point
-      of operation, his shirt sleeve or gloves became entangled in the drill bit. Employee&nbsp;#1 was
-      pulled toward the machine, entangling Employee&nbsp;#1&rsquo;s long hair. The drill press
-      continued to spin, completely pulling Employee&nbsp;#1 into the operating area.&rdquo; She died
-      of her injuries. The same report records that the spindle &ldquo;had speeds that ranged from 45
-      to 1115 rotations per minute&rdquo;. (OSHA accident 114097.015, 20&nbsp;February&nbsp;2019.)</li>
-    </ul>
-
-    <p><strong>Why abrasive cloth keeps appearing.</strong> The UK Health and Safety Executive
-    publishes a sheet on this one task: &ldquo;Every year there are serious accidents involving the
-    use of emery cloth on metalworking lathes. These accidents result in serious injuries such as
-    broken bones, dislocations, lacerations, amputations and occasionally death.&rdquo; The mechanism
-    it names is the one above: &ldquo;Accidents occur when hand-held emery cloth is entangled in the
-    rotating parts of the machine or where the emery cloth is snagged on the rotating component
-    <strong>dragging the operator into the danger zone</strong>.&rdquo; Its own rules are that emery
-    cloth &ldquo;should NEVER be applied directly by hand on manual metalworking lathes&rdquo;, and
-    that gloves &ldquo;increase the risk of entanglement and&rdquo; are &ldquo;never acceptable near
-    rotating parts of machinery&rdquo;. (HSE Engineering Information Sheet No&nbsp;2, rev&nbsp;1,
-    2015 &mdash; that is HSE&rsquo;s guidance; ask what the procedure is in the shop you are
-    standing in.)</p>
-
-    <p><strong>And the drill press is not the exception it looks like.</strong> OSHA&rsquo;s own
-    drill-press training script lists, among the ways accidents happen, &ldquo;getting dangling
-    jewelry, loose clothing, or hair caught in the drill chuck (rotational hazard)&rdquo;, and states:
-    &ldquo;The primary hazards of drill presses are contact at the point of operation and
-    <strong>rotational hazards</strong>. An operator can risk serious hand injury when working too
-    close to the drilling area, wearing gloves, loose clothing, loose hair, or jewelry.&rdquo;</p>
-  </details>
+  <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; What the investigations actually describe.</p>
     </div>
   </details>
   <details class="xcard is-gate" id="moving-machinery-and-pinch-points" data-card="moving-machinery-and-pinch-points">
@@ -3131,25 +2969,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <figcaption>A pinch point is a gap on its way to zero. It looks safe for most of the trip.</figcaption>
   </figure>
 
-  <details class="deeper">
-    <summary>Why belts and chains count as rotating, not pinching</summary>
-    <p>OSHA sorts machine hazards by the motion that causes them, and &ldquo;pinch point&rdquo; is
-    the vocabulary it attaches to parts that <em>travel</em>, not to parts that <em>turn</em>. From
-    <em>Concepts and Techniques of Machine Safeguarding</em> (OSHA&nbsp;3067):</p>
-    <ul>
-      <li><strong>Reciprocating motion</strong> &mdash; &ldquo;Reciprocating motions may be hazardous
-      because, during the back-and-forth or up-and-down motion, a worker may be struck by or caught
-      between a moving and a stationary part.&rdquo;</li>
-      <li><strong>Transverse motion</strong>, which means movement in a straight continuous line
-      &mdash; &ldquo;Transverse motion (movement in a straight, continuous line) creates a hazard
-      because a worker may be struck or caught in a <strong>pinch or shear point</strong> by the
-      moving part.&rdquo;</li>
-    </ul>
-    <p>A belt on a pulley is a rotating hazard that draws material in; a table running up against a
-    column is a moving hazard that closes on it. Both can take a hand, and the vocabulary is worth
-    keeping straight because <strong>the two do not have the same tell</strong>. You avoid the first
-    by giving it nothing to grip. You avoid the second by knowing where the gap is going.</p>
-  </details>
+  <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Why belts and chains count as rotating, not pinching.</p>
     </div>
   </details>
   <details class="xcard is-stop" id="lockout-tagout-before-anyone-works-on-a-machine" data-card="lockout-tagout-before-anyone-works-on-a-machine">
@@ -3184,29 +3004,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     gone. Energy already inside the machine is part of what the procedure has to deal with.</li>
   </ul>
 
-  <details class="deeper">
-    <summary>What the standard actually covers</summary>
-    <p><strong>29&nbsp;CFR&nbsp;1910.147(a)(1)(i)</strong>: &ldquo;This standard covers the servicing
-    and maintenance of machines and equipment in which the <em>unexpected</em> energization or start
-    up of the machines or equipment, <strong>or release of stored energy</strong> could cause injury
-    to employees.&rdquo;</p>
-    <p>Two things are worth reading twice. <strong>Unexpected</strong> is the whole point &mdash; the
-    hazard is not that the machine runs, it is that it runs while someone has a hand inside it. And
-    <strong>stored energy</strong> is named alongside energization, because a machine that has been
-    switched off and unplugged can still contain everything it needs to move once.</p>
-    <p>&ldquo;Servicing and maintenance&rdquo; is much broader than it sounds. The standard defines it
-    as &ldquo;<strong>constructing, installing, setting up, adjusting, inspecting, modifying, and
-    maintaining and/or servicing</strong> machines or equipment&rdquo;, and adds: &ldquo;These
-    activities include <strong>lubrication, cleaning or unjamming</strong> of machines or equipment
-    and making <strong>adjustments or tool changes</strong>, where the employee may be exposed to the
-    unexpected energization or startup of the equipment or release of hazardous energy.&rdquo; Setting
-    up, clearing a jam and changing a tool are all on that list.</p>
-    <p>Stored energy gets its own requirement &mdash; <strong>1910.147(d)(5)(i)</strong>:
-    &ldquo;Following the application of lockout or tagout devices to energy isolating devices, all
-    potentially hazardous stored or residual energy shall be relieved, disconnected, restrained, and
-    otherwise rendered safe.&rdquo; The lock comes first, and then the energy already in the machine
-    is dealt with. Both, in that order.</p>
-  </details>
+  <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; What the standard actually covers.</p>
     </div>
   </details>
   <details class="xcard" id="the-environment-around-the-machine" data-card="the-environment-around-the-machine">
@@ -3660,6 +3458,407 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 
 </article>
+<section class="deeper-addenda" id="deeper-addenda" aria-labelledby="deeper-addenda-title">
+  <header class="deeper-addenda-head">
+    <div class="eyebrow">Supporting detail</div>
+    <h1 id="deeper-addenda-title">Addendum</h1>
+    <p class="lede">Additional evidence, standards context, and background referenced from the main text.</p>
+  </header>
+  <ol class="deeper-addenda-list">
+    <li class="deeper-addendum" id="deeper-addendum-1" value="1">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 1.</span> All sixteen sections, and the four OSHA does not enforce</h2>
+        <p>This is OSHA's own list, from <strong>Appendix D to 29 CFR 1910.1200</strong>. The numbers
+    and headings are fixed; a manufacturer cannot renumber them or reorder them.</p>
+    <dl class="dims">
+      <div><dt>Section 1</dt><dd>Identification &mdash; product identifier, recommended use and
+      restrictions on use, who made it, emergency phone number.</dd></div>
+      <div><dt>Section 2</dt><dd>Hazard(s) identification &mdash; classification, signal word,
+      hazard statement(s), symbol(s) and precautionary statement(s).</dd></div>
+      <div><dt>Section 3</dt><dd>Composition / information on ingredients &mdash; chemical name,
+      CAS number, and for a mixture, the ingredients classified as health hazards and how much of
+      each.</dd></div>
+      <div><dt>Section 4</dt><dd>First-aid measures &mdash; by route of exposure, plus the symptoms
+      that matter and when to get medical attention.</dd></div>
+      <div><dt>Section 5</dt><dd>Fire-fighting measures &mdash; suitable <em>and unsuitable</em>
+      extinguishing media, and what the chemical gives off when it burns.</dd></div>
+      <div><dt>Section 6</dt><dd>Accidental release measures &mdash; the spill response.</dd></div>
+      <div><dt>Section 7</dt><dd>Handling and storage &mdash; <em>"conditions for safe storage,
+      including any incompatibilities"</em>.</dd></div>
+      <div><dt>Section 8</dt><dd>Exposure controls / personal protection &mdash; the OSHA
+      permissible exposure limit, the ACGIH threshold limit value, engineering controls, PPE.</dd></div>
+      <div><dt>Section 9</dt><dd>Physical and chemical properties &mdash; physical state, odor,
+      flash point, auto-ignition temperature, density, pH and the rest.</dd></div>
+      <div><dt>Section 10</dt><dd>Stability and reactivity &mdash; reactivity, conditions to avoid,
+      <em>"incompatible materials"</em>, hazardous decomposition products.</dd></div>
+      <div><dt>Section 11</dt><dd>Toxicological information &mdash; the health effects and the data
+      behind them, including any carcinogen listings.</dd></div>
+      <div><dt>Section 12</dt><dd>Ecological information</dd></div>
+      <div><dt>Section 13</dt><dd>Disposal considerations</dd></div>
+      <div><dt>Section 14</dt><dd>Transport information</dd></div>
+      <div><dt>Section 15</dt><dd>Regulatory information</dd></div>
+      <div><dt>Section 16</dt><dd>Other information &mdash; <em>"the date of preparation of the SDS
+      or the last change to it"</em>.</dd></div>
+    </dl>
+
+    <p><strong>Twelve through fifteen are the odd ones out.</strong>
+    The headings have to be there: a note to the standard says an SDS <em>"must also include the
+    headings"</em> for those four, <em>"in order"</em>, to stay consistent with the international
+    system the format comes from. What goes <em>under</em> them is a different question. Appendix D
+    says <em>"Sections 12-15 may be included in the SDS, but are not mandatory"</em>, and a second
+    note to the same paragraph says <em>"OSHA will not be enforcing information requirements in
+    sections 12 through 15, as these areas are not under its jurisdiction."</em></p>
+
+    <p>Those four cover the environment, waste, shipping and other agencies' regulations &mdash;
+    EPA and DOT ground, not OSHA's. So Section 13 tells you what the manufacturer suggests doing
+    with the leftovers. It does not tell you what happens to them here. Ask.</p>
+
+    <p><strong>Two more things about the shape of the document.</strong> The section order is fixed
+    but the order <em>within</em> a section is not &mdash; preparers <em>"are not required to
+    present the information in any particular order within each section"</em>, so two sheets can
+    look different inside the same numbered box. And a heading with nothing under it is not an
+    oversight: where there is no relevant information, <em>"the SDS shall clearly indicate that no
+    applicable information is available."</em> Read that as nobody has the data &mdash; not as
+    nothing to worry about.</p>
+        <p class="deeper-back"><a href="#deeper-ref-1">Back to reference 1</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-2" value="2">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 2.</span> Signal words, pictograms and H-numbers &mdash; how Section 2 is written</h2>
+        <p>There are exactly <strong>two</strong> signal words, and OSHA defines them in
+    <strong>1910.1200(c)</strong>: a signal word indicates <em>"the relative level of severity of
+    hazard"</em>, and <em>"'Danger' is used for the more severe hazards, while 'warning' is used
+    for the less severe."</em></p>
+
+    <p>Severity is relative to <em>the same kind of hazard</em>, and that is the part that catches
+    people. Flammable liquids in OSHA's Appendix C are the clean example &mdash; all three
+    categories carry the same <strong>Flame</strong> pictogram, and the signal word is the only
+    thing separating them:</p>
+    <dl class="dims">
+      <div><dt>Category 1</dt><dd><strong>Danger</strong> &mdash; "Extremely flammable liquid and vapor"</dd></div>
+      <div><dt>Category 2</dt><dd><strong>Danger</strong> &mdash; "Highly flammable liquid and vapor"</dd></div>
+      <div><dt>Category 3</dt><dd><strong>Warning</strong> &mdash; "Flammable liquid and vapor"</dd></div>
+    </dl>
+    <p class="aside"><strong>So &ldquo;warning&rdquo; does not mean mild.</strong> A Category 3
+    flammable liquid still catches fire. The signal word ranks a hazard against others of its own
+    kind; it is not a statement that the chemical is safe.</p>
+
+    <p><strong>The pictograms are a fixed set of eight</strong> &mdash; a black symbol in a
+    red-bordered diamond standing on a point. OSHA names them: Flame, Flame Over Circle,
+    Exclamation Mark, Exploding Bomb, Corrosion, Gas Cylinder, Health Hazard, and Skull and
+    Crossbones.</p>
+
+    <figure class="ghs-pictograms" aria-labelledby="ghs-pictograms-caption">
+      <figcaption id="ghs-pictograms-caption">The eight OSHA Hazard Communication pictograms</figcaption>
+      <ol class="ghs-pictogram-list">
+        <li>
+          <svg class="ghs-pictogram" viewBox="0 0 100 100" role="img" aria-labelledby="ghs-flame-title">
+            <title id="ghs-flame-title">Flame</title>
+            <rect class="ghs-diamond" x="19" y="19" width="62" height="62" transform="rotate(45 50 50)"/>
+            <path class="ghs-symbol" d="M51 81c-16 0-25-11-25-24 0-12 7-20 17-29-1 12 7 15 10 21 4-7 5-15 2-22 13 9 20 21 20 32 0 13-9 22-24 22Zm-5-7c-7-7-6-15-1-23 1 8 7 9 8 16 3-4 4-8 3-12 5 5 8 11 8 16 0 7-5 12-13 12-2 0-4-1-5-2Z"/>
+          </svg>
+          <span aria-hidden="true">Flame</span>
+        </li>
+        <li>
+          <svg class="ghs-pictogram" viewBox="0 0 100 100" role="img" aria-labelledby="ghs-flame-circle-title">
+            <title id="ghs-flame-circle-title">Flame Over Circle</title>
+            <rect class="ghs-diamond" x="19" y="19" width="62" height="62" transform="rotate(45 50 50)"/>
+            <circle class="ghs-symbol-stroke" cx="50" cy="65" r="14"/>
+            <path class="ghs-symbol" d="M50 54c-10 0-16-7-16-15 0-7 4-12 11-19-1 8 5 10 7 14 3-4 3-9 2-13 8 6 12 13 12 21 0 7-5 12-16 12Zm-4-6c-4-3-5-8-2-13 1 4 4 6 5 9 2-3 2-5 2-8 4 4 5 7 5 11 0 4-3 7-7 7-1 0-2 0-3-1Z"/>
+          </svg>
+          <span aria-hidden="true">Flame Over Circle</span>
+        </li>
+        <li>
+          <svg class="ghs-pictogram" viewBox="0 0 100 100" role="img" aria-labelledby="ghs-exclamation-title">
+            <title id="ghs-exclamation-title">Exclamation Mark</title>
+            <rect class="ghs-diamond" x="19" y="19" width="62" height="62" transform="rotate(45 50 50)"/>
+            <path class="ghs-symbol" d="M44 28h12l-2 34h-8l-2-34Zm6 42a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/>
+          </svg>
+          <span aria-hidden="true">Exclamation Mark</span>
+        </li>
+        <li>
+          <svg class="ghs-pictogram" viewBox="0 0 100 100" role="img" aria-labelledby="ghs-exploding-bomb-title">
+            <title id="ghs-exploding-bomb-title">Exploding Bomb</title>
+            <rect class="ghs-diamond" x="19" y="19" width="62" height="62" transform="rotate(45 50 50)"/>
+            <path class="ghs-symbol" d="m49 49 4-18 5 13 11-9-5 14 18-1-15 8 12 10-18-3 4 17-11-13-7 12-2-17-14 5 10-13-15-7 18 1-3-16 11 12 7-15 1 18 13-7-10 12 16 4-16 4 10 12-14-7-1 17-8-15-8 14 1-17-15 6 11-11-17-4 17-5-12-10 16 6 2-17 7 15 9-14-2 18 15-6-12 11 17 3-17 5 12 9-16-5-2 17-7-15-8 14Z"/>
+          </svg>
+          <span aria-hidden="true">Exploding Bomb</span>
+        </li>
+        <li>
+          <svg class="ghs-pictogram" viewBox="0 0 100 100" role="img" aria-labelledby="ghs-corrosion-title">
+            <title id="ghs-corrosion-title">Corrosion</title>
+            <rect class="ghs-diamond" x="19" y="19" width="62" height="62" transform="rotate(45 50 50)"/>
+            <path class="ghs-symbol" d="m29 31 25 10-3 7-25-10 3-7Zm30 12 16 7-3 7-16-7 3-7Zm-14 8 5 2-5 8-4-2 4-8Zm22 9 5 2-5 8-4-2 4-8ZM24 70h52v6H24v-6Zm11-14 19 7-3 8c-2 5-7 7-12 5l-8-3 4-17Zm24 10h16l-3 7H58l1-7Z"/>
+          </svg>
+          <span aria-hidden="true">Corrosion</span>
+        </li>
+        <li>
+          <svg class="ghs-pictogram" viewBox="0 0 100 100" role="img" aria-labelledby="ghs-gas-cylinder-title">
+            <title id="ghs-gas-cylinder-title">Gas Cylinder</title>
+            <rect class="ghs-diamond" x="19" y="19" width="62" height="62" transform="rotate(45 50 50)"/>
+            <path class="ghs-symbol" d="M23 58c0-5 4-9 9-9h5l3-5h11l3 5h14c5 0 9 4 9 9s-4 9-9 9H32c-5 0-9-4-9-9Zm18-9h11v-4H41v4Z"/>
+          </svg>
+          <span aria-hidden="true">Gas Cylinder</span>
+        </li>
+        <li>
+          <svg class="ghs-pictogram" viewBox="0 0 100 100" role="img" aria-labelledby="ghs-health-hazard-title">
+            <title id="ghs-health-hazard-title">Health Hazard</title>
+            <rect class="ghs-diamond" x="19" y="19" width="62" height="62" transform="rotate(45 50 50)"/>
+            <circle class="ghs-symbol" cx="50" cy="34" r="9"/>
+            <path class="ghs-symbol" d="M31 75c1-17 8-27 19-27s18 10 19 27H31Z"/>
+            <path class="ghs-cutout" d="m50 51 2 6 6-2-4 5 5 3-6 1 1 6-4-5-4 5 1-6-6-1 5-3-4-5 6 2 2-6Z"/>
+          </svg>
+          <span aria-hidden="true">Health Hazard</span>
+        </li>
+        <li>
+          <svg class="ghs-pictogram" viewBox="0 0 100 100" role="img" aria-labelledby="ghs-skull-title">
+            <title id="ghs-skull-title">Skull and Crossbones</title>
+            <rect class="ghs-diamond" x="19" y="19" width="62" height="62" transform="rotate(45 50 50)"/>
+            <path class="ghs-symbol-stroke" d="m30 72 36-23m-2 23L28 49"/>
+            <path class="ghs-symbol" d="M50 25c-11 0-19 8-19 19 0 7 4 13 10 16v10h18V60c6-3 10-9 10-16 0-11-8-19-19-19Z"/>
+            <circle class="ghs-cutout" cx="43" cy="43" r="4"/>
+            <circle class="ghs-cutout" cx="57" cy="43" r="4"/>
+            <path class="ghs-cutout" d="m50 48-4 8h8l-4-8Zm-6 14h12v5H44z"/>
+          </svg>
+          <span aria-hidden="true">Skull and Crossbones</span>
+        </li>
+      </ol>
+    </figure>
+
+    <p><strong>The H-numbers are an index, not the warning.</strong> Real sheets often print a code
+    such as <em>H225</em> beside a hazard statement. Those codes come from the international GHS
+    scheme this format is built on, which treats them as reference labels rather than as a
+    substitute for the statement itself. OSHA's Appendix C does not use them at all &mdash; it
+    specifies the sentence. Read the sentence.</p>
+        <p class="deeper-back"><a href="#deeper-ref-2">Back to reference 2</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-3" value="3">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 3.</span> Telling a current sheet from an old one</h2>
+        <p><strong>Section 16</strong> carries <em>"the date of preparation of the SDS or the last
+    change to it."</em> That is the only date on the document, and it is how you tell a live sheet
+    from one that has sat in a binder for a decade.</p>
+    <p>Keeping it current is the manufacturer's job, not yours. Under
+    <strong>1910.1200(g)(5)</strong>, when a manufacturer or importer <em>"becomes newly aware of
+    any significant information regarding the hazards of a chemical, or ways to protect against the
+    hazards, this new information shall be added to the safety data sheet within three
+    months."</em></p>
+        <p class="deeper-back"><a href="#deeper-ref-3">Back to reference 3</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-4" value="4">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 4.</span> What makes a flammables cabinet &ldquo;approved&rdquo;, and how to spot one</h2>
+        <p>OSHA calls it a <strong>storage cabinet</strong> and defines it by a fire test rather than by
+    how solid it looks. <strong>29 CFR 1910.106(d)(3)</strong> requires cabinets to <em>"limit the
+    internal temperature to not more than 325 &deg;F. when subjected to a 10-minute fire test"</em>,
+    with all joints and seams staying tight and the door staying closed throughout.</p>
+    <p>The same paragraph requires the marking, which is the fastest way to recognise one:
+    <em>"Cabinets shall be labeled in conspicuous lettering, 'Flammable - Keep Fire Away.'"</em></p>
+        <p class="deeper-back"><a href="#deeper-ref-4">Back to reference 4</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-5" value="5">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-electrical-safety">Electrical Safety</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 5.</span> &ldquo;It&rsquo;s not the voltage that gets you, it&rsquo;s the current&rdquo;</h2>
+        <p>The saying is true. What usually gets taken from it &mdash; that the voltage does not matter
+    &mdash; is not. Current is electricity actually moving through you, and it takes very little of
+    it to do real harm. Volts sitting on a wire nobody is touching do nothing at all.</p>
+    <p>Two things together decide how much current you get: how hard the electricity is being pushed,
+    which is what voltage measures, and how hard your body holds it back, which is called resistance.
+    Harder push, more current. More resistance, less.</p>
+    <p>Your resistance is not a fixed number &mdash; wet skin holds current back far less than dry
+    skin does, so the same push moves much more current through you. That half of it cannot be relied
+    on, which is why the line is drawn on the half that can be: the push.</p>
+        <p class="deeper-back"><a href="#deeper-ref-5">Back to reference 5</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-6" value="6">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-fire-safety">Fire Safety</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 6.</span> Why dry sand is on the list, and why it is probably not on yours</h2>
+        <p>Sand does work. The Aluminum Association&rsquo;s <em>Guidelines for Handling Aluminum
+    Fines</em> (F-1) lists fine dry sand, &ldquo;preferably finer than 20&nbsp;mesh,&rdquo; next to
+    approved dry powders as effective for <em>isolating</em> an aluminum fines fire. It also says
+    what has to be true first.</p>
+    <ul>
+      <li><strong>Dry.</strong> F-1 says <em>dry</em> sand. Damp sand is water, and water
+      &ldquo;will react with the aluminum fines to form flammable hydrogen gas.&rdquo;</li>
+      <li><strong>Already in the room.</strong> &ldquo;A plentiful supply should be easily available
+      in the operating area and stored in covered bins or drums.&rdquo; Sand fetched after the fire
+      starts is not that.</li>
+      <li><strong>With the right tool waiting beside it.</strong> &ldquo;Long handled shovels should
+      be available at each bin or drum, and should be constructed of non-sparking metal.&rdquo;</li>
+      <li><strong>Laid, not thrown.</strong> The shovels &ldquo;lay the sand or powder around the
+      edge or perimeter of the fire.&rdquo; You are walling it in. Anything thrown at the pile
+      raises the dust cloud that is the actual explosion.</li>
+      <li><strong>Decided before it started, by someone senior.</strong> &ldquo;Qualified
+      supervisory personnel should decide in advance whether it is better to attempt to fight the
+      fire or to withdraw to a safe location and allow it to burn itself out.&rdquo;</li>
+    </ul>
+    <p>Those are preconditions, not tips. <strong>If you cannot point at the covered sand bin and
+    the non-sparking shovel beside it right now, you do not have this option</strong> &mdash; and
+    the call to fight it was never yours to make on the spot. Alarm, evacuate, report.</p>
+        <p class="deeper-back"><a href="#deeper-ref-6">Back to reference 6</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-7" value="7">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-machine-hazards">Machine Hazards and Housekeeping</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 7.</span> The word for this, and where it comes from</h2>
+        <p>&ldquo;Nip point&rdquo; is not shop slang. It is the term the machine-guarding standard uses.
+    <strong>29&nbsp;CFR&nbsp;1910.212(a)(1)</strong> requires guarding against &ldquo;hazards such as
+    those created by <strong>point of operation, ingoing nip points, rotating parts, flying chips and
+    sparks</strong>.&rdquo;</p>
+    <p>OSHA&rsquo;s Machine Guarding eTool puts it plainly: &ldquo;<strong>In-running nip point
+    hazards are caused by the rotating parts on machinery.</strong>&rdquo; Its longer treatment,
+    <em>Concepts and Techniques of Machine Safeguarding</em> (OSHA&nbsp;3067), gives three kinds:</p>
+    <ul>
+      <li>&ldquo;Parts can rotate in opposite directions while their axes are parallel to each other.
+      These parts may be in contact (producing a nip point) or in close proximity.&rdquo; &mdash;
+      meshing gears.</li>
+      <li>&ldquo;Nip points are also created between rotating and tangentially moving parts. Some
+      examples would be: the point of contact between a power transmission belt and its pulley, a
+      chain and a sprocket, and a rack and pinion.&rdquo;</li>
+      <li>&ldquo;Nip points can occur between rotating and fixed parts which create a shearing,
+      crushing, or abrading action.&rdquo;</li>
+    </ul>
+    <p>So belts, chains, sprockets and gears are <em>rotating</em> hazards by name. What makes them
+    dangerous is that they draw material in &mdash; not that two parts close on each other.</p>
+    <p>OSHA is just as direct about the plain shaft: &ldquo;Rotating motion can be dangerous; even
+    smooth, slowly rotating shafts can grip hair and clothing, and through minor contact force the
+    hand and arm into a dangerous position.&rdquo;</p>
+    <p>These parts are meant to be behind covers, and the standard is specific about it &mdash;
+    <strong>29&nbsp;CFR&nbsp;1910.219(f)(3)</strong>: &ldquo;All sprocket wheels and chains shall be
+    enclosed unless they are more than seven (7) feet above the floor or platform.&rdquo;</p>
+        <p class="deeper-back"><a href="#deeper-ref-7">Back to reference 7</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-8" value="8">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-machine-hazards">Machine Hazards and Housekeeping</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 8.</span> What the investigations actually describe</h2>
+        <p>Oregon&rsquo;s state fatality-investigation program, summarizing the record for this class of
+    machine: &ldquo;<strong>The most common causes of death and injury from metal lathes include
+    entanglement of clothing in moving parts</strong>, being hit by loose objects on the lathe (e.g.,
+    chuck keys, tools, metal shavings) and being struck by a part that has not been adequately
+    secured.&rdquo; (OR-FACE&nbsp;2012-18-1, <em>Experienced Journeyman Machinist Killed While
+    Operating an Engine Lathe</em>, 2014.)</p>
+
+    <p>Four investigated deaths, all the same event &mdash; something attached to a person touched
+    something turning, and the machine did the rest:</p>
+    <ul>
+      <li><strong>Smoothing a part while it turned.</strong> A 69-year-old machinist with over 30
+      years&rsquo; experience &ldquo;reached over the work piece to smooth out a radiused transition
+      with emery cloth and a file in hand&rdquo; and &ldquo;his loose clothing (left arm sleeve)
+      became entangled around the rotating work piece&rdquo;. A co-worker 30 feet away heard &ldquo;a
+      strange &lsquo;winding-up&rsquo; sound&rdquo;. Of that same part, the shop foreman had said that
+      &ldquo;the rough surface could grab clothing or gloves&rdquo;. (OR-FACE&nbsp;2012-18-1.)</li>
+
+      <li><strong>Stock sticking out the back of the spindle.</strong> A 52-year-old machinist was
+      set up on a 103-inch steel bar: &ldquo;Due to the length of the material, 24 inches were
+      sticking out the back of the lathe, unguarded, and held in place with a clamping device that
+      rotates as the lathe rotates.&rdquo; He reached across the running machine and &ldquo;the sleeve
+      of his shirt became entangled&rdquo;. (Kentucky&nbsp;FACE&nbsp;21KY002, 2021.)</li>
+
+      <li><strong>A burr on the end of the bar.</strong> A lathe operator in his twenties had a
+      1&nbsp;7/8-inch stub of 1-inch bar standing past the tailstock. &ldquo;The right pocket of his
+      shirt was caught by the rotating tailstock burr. His shirt wrapped around the stock and
+      tightened at the decedent&rsquo;s neck and chest.&rdquo; The listed contributing factor is
+      &ldquo;walking to and/or reaching over unguarded rotating bar stock&rdquo;. OSHA makes the same
+      point in general: the danger &ldquo;increases when projections such as set screws, bolts, nicks,
+      abrasions, and projecting keys&hellip; are exposed on rotating parts.&rdquo;
+      (Michigan&nbsp;FACE&nbsp;14MI034, 2014; OSHA Machine Guarding eTool.)</li>
+
+      <li><strong>A drill press.</strong> &ldquo;As Employee&nbsp;#1 reached into the unguarded point
+      of operation, his shirt sleeve or gloves became entangled in the drill bit. Employee&nbsp;#1 was
+      pulled toward the machine, entangling Employee&nbsp;#1&rsquo;s long hair. The drill press
+      continued to spin, completely pulling Employee&nbsp;#1 into the operating area.&rdquo; She died
+      of her injuries. The same report records that the spindle &ldquo;had speeds that ranged from 45
+      to 1115 rotations per minute&rdquo;. (OSHA accident 114097.015, 20&nbsp;February&nbsp;2019.)</li>
+    </ul>
+
+    <p><strong>Why abrasive cloth keeps appearing.</strong> The UK Health and Safety Executive
+    publishes a sheet on this one task: &ldquo;Every year there are serious accidents involving the
+    use of emery cloth on metalworking lathes. These accidents result in serious injuries such as
+    broken bones, dislocations, lacerations, amputations and occasionally death.&rdquo; The mechanism
+    it names is the one above: &ldquo;Accidents occur when hand-held emery cloth is entangled in the
+    rotating parts of the machine or where the emery cloth is snagged on the rotating component
+    <strong>dragging the operator into the danger zone</strong>.&rdquo; Its own rules are that emery
+    cloth &ldquo;should NEVER be applied directly by hand on manual metalworking lathes&rdquo;, and
+    that gloves &ldquo;increase the risk of entanglement and&rdquo; are &ldquo;never acceptable near
+    rotating parts of machinery&rdquo;. (HSE Engineering Information Sheet No&nbsp;2, rev&nbsp;1,
+    2015 &mdash; that is HSE&rsquo;s guidance; ask what the procedure is in the shop you are
+    standing in.)</p>
+
+    <p><strong>And the drill press is not the exception it looks like.</strong> OSHA&rsquo;s own
+    drill-press training script lists, among the ways accidents happen, &ldquo;getting dangling
+    jewelry, loose clothing, or hair caught in the drill chuck (rotational hazard)&rdquo;, and states:
+    &ldquo;The primary hazards of drill presses are contact at the point of operation and
+    <strong>rotational hazards</strong>. An operator can risk serious hand injury when working too
+    close to the drilling area, wearing gloves, loose clothing, loose hair, or jewelry.&rdquo;</p>
+        <p class="deeper-back"><a href="#deeper-ref-8">Back to reference 8</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-9" value="9">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-machine-hazards">Machine Hazards and Housekeeping</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 9.</span> Why belts and chains count as rotating, not pinching</h2>
+        <p>OSHA sorts machine hazards by the motion that causes them, and &ldquo;pinch point&rdquo; is
+    the vocabulary it attaches to parts that <em>travel</em>, not to parts that <em>turn</em>. From
+    <em>Concepts and Techniques of Machine Safeguarding</em> (OSHA&nbsp;3067):</p>
+    <ul>
+      <li><strong>Reciprocating motion</strong> &mdash; &ldquo;Reciprocating motions may be hazardous
+      because, during the back-and-forth or up-and-down motion, a worker may be struck by or caught
+      between a moving and a stationary part.&rdquo;</li>
+      <li><strong>Transverse motion</strong>, which means movement in a straight continuous line
+      &mdash; &ldquo;Transverse motion (movement in a straight, continuous line) creates a hazard
+      because a worker may be struck or caught in a <strong>pinch or shear point</strong> by the
+      moving part.&rdquo;</li>
+    </ul>
+    <p>A belt on a pulley is a rotating hazard that draws material in; a table running up against a
+    column is a moving hazard that closes on it. Both can take a hand, and the vocabulary is worth
+    keeping straight because <strong>the two do not have the same tell</strong>. You avoid the first
+    by giving it nothing to grip. You avoid the second by knowing where the gap is going.</p>
+        <p class="deeper-back"><a href="#deeper-ref-9">Back to reference 9</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-10" value="10">
+      <article>
+        <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span><span class="sep">/</span><a href="#p-machine-hazards">Machine Hazards and Housekeeping</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 10.</span> What the standard actually covers</h2>
+        <p><strong>29&nbsp;CFR&nbsp;1910.147(a)(1)(i)</strong>: &ldquo;This standard covers the servicing
+    and maintenance of machines and equipment in which the <em>unexpected</em> energization or start
+    up of the machines or equipment, <strong>or release of stored energy</strong> could cause injury
+    to employees.&rdquo;</p>
+    <p>Two things are worth reading twice. <strong>Unexpected</strong> is the whole point &mdash; the
+    hazard is not that the machine runs, it is that it runs while someone has a hand inside it. And
+    <strong>stored energy</strong> is named alongside energization, because a machine that has been
+    switched off and unplugged can still contain everything it needs to move once.</p>
+    <p>&ldquo;Servicing and maintenance&rdquo; is much broader than it sounds. The standard defines it
+    as &ldquo;<strong>constructing, installing, setting up, adjusting, inspecting, modifying, and
+    maintaining and/or servicing</strong> machines or equipment&rdquo;, and adds: &ldquo;These
+    activities include <strong>lubrication, cleaning or unjamming</strong> of machines or equipment
+    and making <strong>adjustments or tool changes</strong>, where the employee may be exposed to the
+    unexpected energization or startup of the equipment or release of hazardous energy.&rdquo; Setting
+    up, clearing a jam and changing a tool are all on that list.</p>
+    <p>Stored energy gets its own requirement &mdash; <strong>1910.147(d)(5)(i)</strong>:
+    &ldquo;Following the application of lockout or tagout devices to energy isolating devices, all
+    potentially hazardous stored or residual energy shall be relieved, disconnected, restrained, and
+    otherwise rendered safe.&rdquo; The lock comes first, and then the energy already in the machine
+    is dealt with. Both, in that order.</p>
+        <p class="deeper-back"><a href="#deeper-ref-10">Back to reference 10</a></p>
+      </article>
+    </li>
+  </ol>
+</section>
 </main>
 <script>
 /* ============================================================================
