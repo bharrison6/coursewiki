@@ -1,18 +1,15 @@
-# Coursewiki
+# CourseWiki
 
 Course reference for the Design Engineering Technology program, School of Engineering,
 Murray State University.
 
-A page is authored once. It renders as a web page, as slides inside any number of
-presentations, and as a self-contained single file — from the same source.
+A topic is authored once. The generator publishes it as a normal web page; tracks select
+those real pages at runtime for reading or presentation mode; and the same pages are also
+assembled into self-contained printable files.
 
-**A presentation is a playlist**, not a page: an ordered selection *of* topics, not a copy of
-them. Edit a topic once and every playlist using it follows.
-
-**Name a page for its subject, not the shape of its content.** A title is read in search
-results, slide headers and track lists, where the section and group are not visible — it has to
-stand on its own. "Before, During and After" became "Equipment Operating Procedure" for exactly
-that reason.
+Name pages for their subject, not the shape of their content. Titles must make sense in
+search results, track lists, and presentation panels where collection and group context may
+not be visible.
 
 ## Layout
 
@@ -21,37 +18,42 @@ site.conf                      site title, footer, published URL, section order
 collections/<id>/
   collection.conf              section title, summary, page groups
   pages/<page-id>.html         one topic per file
-decks/<name>.deck              a playlist: an ordered list of page ids
-theme/*.css                    shared MSU token layer + the two skins
-assets/                        SoE lockups, light and reversed
+tracks/<name>.track            ordered page/track selections and track hierarchy
+theme/*.css                    shared MSU token layer and site behavior
+assets/                        SoE lockups and other static assets
+media/                         authored images referenced with [[img:...]]
 build-site.ps1                 the generator
 docs/                          GENERATED — the site. Never hand-edit.
-docs/print/                    GENERATED — one self-contained file per section
-                               and per playlist. Print these for PDF.
+docs/print/                    GENERATED — self-contained section and track aggregates
 ```
 
 ## Build
 
 ```powershell
-pwsh -File .\build-site.ps1              # the site, into docs\
-pwsh -File .\build-site.ps1 -Bundle      # also the single-file copies
-pwsh -File .\build-site.ps1 -WhatIf      # compare against disk, write nothing
+pwsh -File .\build-site.ps1                         # generate the site into docs\
+pwsh -File .\build-site.ps1 -Prune                 # also remove stale generated files
+pwsh -File .\build-site.ps1 -WhatIf                # report changes without writing
+pwsh -File .\build-site.ps1 -SiteUrl "https://example.org/coursewiki"
 ```
 
-The build fails loudly on a duplicate page id, a duplicate section slug, a `@@SECTION` not in the
-collection's `@@GROUPS`, a deck naming a page that does not exist, and a nested
-`<section>`. It reports dangling `[[links]]` and pages in no presentation without
-failing, because both are normal mid-authoring states.
+`-Prune`, `-SiteUrl`, and `-WhatIf` are the build script's supported parameters. Set the
+published URL in `site.conf` when it should be the default; `-SiteUrl` overrides it for one
+run. Edit source files, then regenerate `docs/`; do not hand-edit generated output.
+
+The build validates duplicate page IDs and section slugs, collection groups, track
+references, track cycles, empty tracks, malformed page sections, and image references. It
+reports dangling page links and other normal mid-authoring conditions without treating them
+as build failures.
 
 ## Authoring
 
-A page is an `@@FIELD:` header, `@@END`, then a stack of `<section>` blocks:
+A page starts with an `@@FIELD:` header, `@@END`, and a stack of `<section>` blocks:
 
 ```html
 @@ID: lifting-and-carrying
 @@TITLE: Lifting and Carrying
 @@SECTION: Universal Rules
-@@SUMMARY: One sentence for the card and the page standfirst.
+@@SUMMARY: One sentence for the card and page standfirst.
 @@STATUS: ready
 @@END
 
@@ -61,57 +63,51 @@ A page is an `@@FIELD:` header, `@@END`, then a stack of `<section>` blocks:
 </section>
 ```
 
-One `<section>` becomes one slide. Two attributes change that:
+Each authored `<section>` becomes one disclosure card on the web page, one panel in
+presentation mode, and one block in a printable aggregate. `data-deck="with-previous"`
+merges a section into the preceding card; `data-deck="wiki-only"` excludes it from
+presentation mode. `@@STATUS: pending` keeps a page visible while marking it unfinished.
 
-| Attribute | Effect |
-|---|---|
-| *(none)* | its own slide |
-| `data-deck="with-previous"` | merges onto the slide before it |
-| `data-deck="wiki-only"` | never appears in any presentation |
+Use `[[page-id]]` or `[[page-id|link text]]` for page links. Use
+`[[img:file.png|descriptive alt text]]` for images in `media/`; image files and alt text are
+validated during the build. A missing page link remains a visible pending link so authors
+can write cross-references before the target page exists.
 
-`@@STATUS: pending` marks a page as unfinished — it renders, and its card is
-dashed and greyed, but it is excluded from the section's page count.
+Tracks are playlists, not separate copies of page content. A topic track lists page IDs and
+may use `>` lines for group headings. A course track can include a topic track with `+`.
+Program tracks contain their child courses through `@@PARENT`; their page lists are derived
+from those children. This keeps shared content in one source of truth. See the existing
+files in `tracks/` for examples.
 
-### Links
+## Runtime tracks and presentation mode
 
-`[[page-id]]`, or `[[page-id|link text]]`. Ids are unique across the whole site.
-One authored link, five destinations, decided at build time:
+The generated site applies a track to an ordinary page with the `p` URL parameter:
 
-| Where it renders | Result |
-|---|---|
-| A page, same section | `ppe.html` |
-| A page, different section | `../lean/5s-workplace-organization.html` |
-| A presentation that **includes** the target | `#p-ppe` — jumps to the slide |
-| A presentation that **excludes** it | opens the page in a new tab |
-| Target does not exist | inert, visibly marked "page pending" |
+```text
+safety/ppe.html?p=general-safety
+safety/ppe.html?p=general-safety&present=1
+```
 
-That is the point of the system: a presentation can reference the whole corpus
-without dragging it in, and a page dropped from a presentation degrades to a
-link rather than a dead end.
+The first URL is reading mode. `&present=1` turns the same page DOM into full-screen panels;
+next/previous controls and arrow keys move through the track. No second presentation copy is
+generated, so topic edits automatically reach every track that uses them. The generated
+`presentations.html` index links to each track and its print file.
 
-## Deploying
+## Deploying and printing
 
-`docs/` is the whole site, with relative links throughout — it opens from disk,
-and GitHub Pages can serve it from `main` / `docs` with no CI. `.nojekyll` is
-emitted because nothing here needs Jekyll.
+`docs/` is the complete GitHub Pages site. It uses relative links, includes `.nojekyll`, and
+can be served from the repository's `main` branch and `/docs` folder without a separate CI
+pipeline.
 
-`docs/print/` holds one self-contained file per section and per playlist — CSS,
-script and logo inlined, no sibling files. Print one for a PDF; it is also what
-to upload where a folder cannot be hosted. Canvas rewrites the URL of
-every uploaded file, so relative links between separately-uploaded files break;
-one file has none to break. Set the published URL in `site.conf` (or pass
-`-SiteUrl`) so links *out* of it resolve.
+`docs/print/` contains self-contained HTML aggregates for each collection section and each
+track, including `track-everything.html`. CSS, script, and logos are inlined, so an aggregate
+can be printed to PDF or uploaded as a standalone document where a folder cannot be hosted.
+Links to pages outside the aggregate use the configured published URL.
 
 ## Design
 
-Palette, type scale and contrast rules come from the university Branding Toolkit
-and are recorded in the `official-document-branding` artifact. Three rules the
-stylesheet encodes, each of which has caused a real defect:
-
-- Gold `#ECAC00` and Red Orange `#FF4500` both fail contrast as text on white —
-  borders, rules and tinted fills only, with navy text inside.
-- Navy `#002144` is unreadable on dark; the dark theme switches the accent to the
-  official Lite Blue `#00A4E3` rather than inventing a lighter navy.
-- A heading never renders smaller than the text it heads.
-
-The logo is never recoloured. Both lockups ship and one is hidden by `display`.
+Palette, type scale, and contrast rules follow the university Branding Toolkit. Gold
+`#ECAC00` and Red Orange `#FF4500` are used for borders, rules, and tinted fills rather than
+small text on white; the dark theme uses Lite Blue `#00A4E3` instead of navy for contrast.
+The logo is not recoloured; the appropriate light or reversed lockup is selected by the
+theme.
