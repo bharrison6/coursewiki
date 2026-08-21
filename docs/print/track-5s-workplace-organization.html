@@ -1355,10 +1355,9 @@ figure.graphic-slot:not(:has(img, svg))::before {
 }
 
 /* ---- GHS pictograms ----------------------------------------------------
-   These are regulatory marks, not an illustration in the site palette: the
-   diamond stays white, its symbol stays black, and its frame stays red in
-   either screen theme. The fixed fills are deliberate - using --paper for a
-   cutout would turn it dark in the dark skin and change the safety symbol. */
+   These are the standard regulatory artwork, not an illustration in the site
+   palette. Their white field, black symbol, and red frame stay fixed in every
+   screen theme. */
 .ghs-pictograms { margin: 1.25rem 0; }
 .ghs-pictograms > figcaption {
   margin: 0 0 .65rem;
@@ -1374,27 +1373,23 @@ figure.graphic-slot:not(:has(img, svg))::before {
   min-width: 0; padding: 0; text-align: center;
 }
 .ghs-pictogram-list li::before { content: none; }
-.ghs-pictogram { display: block; width: min(100%, 5.25rem); height: auto; }
-.ghs-pictogram-list span {
+.ghs-pictogram { display: block; width: min(100%, 5.25rem); }
+.ghs-pictogram .content-img {
+  display: block; width: 100%; height: auto; border-radius: 0;
+}
+.ghs-pictogram-list li > span[aria-hidden="true"] {
   min-height: 2.4em;
   font-family: var(--f-display); font-weight: 700; font-size: .68rem;
   line-height: 1.2; letter-spacing: .04em; text-transform: uppercase;
   color: var(--ink);
 }
-.ghs-diamond { fill: #fff; stroke: var(--msu-redorange); stroke-width: 7; }
-.ghs-symbol { fill: #000; }
-.ghs-symbol-stroke {
-  fill: none; stroke: #000; stroke-width: 5;
-  stroke-linecap: round; stroke-linejoin: round;
-}
-.ghs-cutout { fill: #fff; }
 @media print {
-  /* A printer can discard every background. Strokes and fills carry all of
-     the mark here, so a monochrome handout remains an unambiguous diamond. */
-  .ghs-diamond { fill: #fff; stroke: #000; }
-  .ghs-symbol { fill: #000; }
-  .ghs-symbol-stroke { stroke: #000; }
-  .ghs-cutout { fill: #fff; }
+  /* Turn the regulatory red frame into a firm black outline for handouts;
+     the white field and black symbol remain unchanged. */
+  .ghs-pictogram .content-img {
+    print-color-adjust: exact; -webkit-print-color-adjust: exact;
+    filter: grayscale(1) contrast(3);
+  }
 }
 
 /* Both of these are build-error states that reach the page. The build already
