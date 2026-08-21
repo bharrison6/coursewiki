@@ -333,11 +333,31 @@ main, .shell > * { min-width: 0; }
 .xcourse .xc-x {
   flex: none; background: transparent; border: 1px solid transparent;
   color: inherit; cursor: pointer; font-size: 1.1rem; line-height: 1;
-  padding: .2rem .45rem; border-radius: var(--radius-xs);
+  /* Sized for a thumb, not for the glyph: this is the control a reader on a
+     phone reaches for first. */
+  padding: .55rem .7rem; min-width: 2.5rem; border-radius: var(--radius-xs);
 }
 .xcourse .xc-x:hover { border-color: var(--flag); }
+/* "DET 330 is my class" - the deliberate way out, as against the x, which is
+   only this browsing session. Outlined rather than filled: it must not read as
+   the primary action, because for most readers who see this banner it is the
+   wrong one. */
+.xcourse .xc-sw {
+  flex: none; cursor: pointer; font: inherit;
+  font-family: var(--f-display); font-weight: 700; font-size: .7rem;
+  letter-spacing: .05em; text-transform: uppercase;
+  padding: .4rem .7rem; border-radius: var(--radius-xs);
+  background: transparent; color: inherit; border: 1px solid var(--flag);
+}
+.xcourse .xc-sw:hover { background: var(--flag); color: var(--flag-soft); }
 .presenting .xcourse { margin: 0; border-radius: 0; border-width: 0 0 1px; }
 @media print { .xcourse { display: none !important; } }
+
+/* A sidebar link into another class. Dashed, the same way an out-of-deck link
+   and a cross-course chip are dashed, and layout-neutral: .navlist a already
+   carries a 2px transparent left border for the current-page marker, so this
+   only colours what is already reserved. */
+.navlist a.is-xcourse { border-left-style: dashed; border-left-color: var(--ink-soft); }
 
 /* ---- next / previous ---------------------------------------------------*/
 .seqbar {

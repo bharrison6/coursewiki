@@ -710,11 +710,31 @@ main, .shell > * { min-width: 0; }
 .xcourse .xc-x {
   flex: none; background: transparent; border: 1px solid transparent;
   color: inherit; cursor: pointer; font-size: 1.1rem; line-height: 1;
-  padding: .2rem .45rem; border-radius: var(--radius-xs);
+  /* Sized for a thumb, not for the glyph: this is the control a reader on a
+     phone reaches for first. */
+  padding: .55rem .7rem; min-width: 2.5rem; border-radius: var(--radius-xs);
 }
 .xcourse .xc-x:hover { border-color: var(--flag); }
+/* "DET 330 is my class" - the deliberate way out, as against the x, which is
+   only this browsing session. Outlined rather than filled: it must not read as
+   the primary action, because for most readers who see this banner it is the
+   wrong one. */
+.xcourse .xc-sw {
+  flex: none; cursor: pointer; font: inherit;
+  font-family: var(--f-display); font-weight: 700; font-size: .7rem;
+  letter-spacing: .05em; text-transform: uppercase;
+  padding: .4rem .7rem; border-radius: var(--radius-xs);
+  background: transparent; color: inherit; border: 1px solid var(--flag);
+}
+.xcourse .xc-sw:hover { background: var(--flag); color: var(--flag-soft); }
 .presenting .xcourse { margin: 0; border-radius: 0; border-width: 0 0 1px; }
 @media print { .xcourse { display: none !important; } }
+
+/* A sidebar link into another class. Dashed, the same way an out-of-deck link
+   and a cross-course chip are dashed, and layout-neutral: .navlist a already
+   carries a 2px transparent left border for the current-page marker, so this
+   only colours what is already reserved. */
+.navlist a.is-xcourse { border-left-style: dashed; border-left-color: var(--ink-soft); }
 
 /* ---- next / previous ---------------------------------------------------*/
 .seqbar {
@@ -3344,6 +3364,114 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         if (e.key === 'ArrowLeft'  && prev) { location.href = urlFor(prev, false); }
       });
     }
+  })();
+
+  /* ==========================================================================
+     Arriving in another class's material
+     ------------------------------------------------------------------------
+     The content here is deliberately class- and programme-neutral, which means
+     another course's page looks EXACTLY like your own. A student who lands in
+     one and studies it has done real work on the wrong thing and nothing on
+     the page would have told them. This is the only thing that tells them.
+
+     A BANNER ON ARRIVAL, not a confirm before the click. A confirm only fires
+     for a click made on this site, so it does nothing at all for the case that
+     actually happens - a link handed out in Canvas, or passed between students
+     - and it stands between the reader and the thing they just asked for,
+     which is how you train someone to dismiss it without reading. A banner
+     catches both routes in, says where you are, and carries the way back.
+
+     WHEN IT FIRES. "This view is DET 330 material" means the applied track is
+     a COURSE. A page with no ?p= makes no class claim - it is the neutral
+     topic, and there is nothing to warn about. Neither does the programme
+     track, nor a topic track a course carries: going from DET 130 into General
+     Safety is not leaving your class, it is opening a thing your class
+     contains, and that is why the test is on kind rather than on names.
+
+     So all three of these are silent, by construction:
+       * no ?p=, or ?p= naming a topic or the programme  -> no class claim
+       * no course seen yet                              -> no prior context,
+                                                            and this view is
+                                                            what sets it
+       * the same course                                 -> you are home
+
+     TWO WAYS OUT, and they are different on purpose. The x is one browsing
+     session, per course pair, because a banner that never comes back is a
+     banner nobody reads the second time. "is my class" is a deliberate
+     statement and it sticks - a student really can be in two of these, and
+     without that the only escape would be a dismissal they learn to fire on
+     reflex, which is the failure a confirm dialog has.
+     ========================================================================*/
+  (function () {
+    var lists = window.TRACKS || [];
+    function byName(n) {
+      for (var i = 0; i < lists.length; i++) { if (lists[i].name === n) return lists[i]; }
+      return null;
+    }
+    function isCourse(t) { return !!t && t.kind === 'course'; }
+
+    var KEY  = 'det:course';
+    var base = document.body.getAttribute('data-base') || '';
+    var here = byName(new URLSearchParams(location.search).get('p'));
+    var home = byName(LS.get(KEY, null));
+
+    /* Mark every link that leads into another CLASS, wherever it appears: the
+       track tree, the "Appears in" chips on a topic page, the track index.
+       Relative to the READER's own course, which is why it happens here and
+       not in the generator - the build has no idea whose class this is. The
+       generator's job was to put data-track on all of them so there is one
+       mechanism rather than one per surface. */
+    function mark() {
+      $$('a[data-track]').forEach(function (a) {
+        var t = byName(a.getAttribute('data-track'));
+        var x = isCourse(home) && isCourse(t) && t.name !== home.name;
+        if (x) { a.classList.add('is-xcourse'); a.setAttribute('title', 'Another class: ' + t.title); }
+        else   { a.classList.remove('is-xcourse'); a.removeAttribute('title'); }
+      });
+    }
+
+    if (!isCourse(here)) { mark(); return; }
+    if (!isCourse(home)) { LS.set(KEY, here.name); home = here; mark(); return; }
+    if (home.name === here.name) { mark(); return; }
+    mark();
+
+    var pair = 'det:xc:' + home.name + '>' + here.name;
+    try { if (sessionStorage.getItem(pair)) return; } catch (e) {}
+
+    /* The way back is the SAME TOPIC in the reader's own class where that
+       exists - they wanted this page, they were just in the wrong copy of the
+       course - and the track itself where it does not. */
+    var mine = null;
+    for (var i = 0; i < home.items.length; i++) {
+      if (home.items[i].id === PAGE) { mine = home.items[i]; break; }
+    }
+    var backHref = mine ? base + mine.url + '?p=' + encodeURIComponent(home.name)
+                        : base + 'presentations.html#pl-' + home.name;
+    var backText = mine ? 'Open this page in ' + home.title : 'Go to ' + home.title;
+
+    var el = document.createElement('aside');
+    el.className = 'xcourse';
+    el.setAttribute('role', 'status');
+    el.innerHTML =
+      '<div class="xc-body"><span class="xc-t">This is ' + escHtml(here.title) + ' material.</span> ' +
+      'You came from ' + escHtml(home.title) + ', and the pages look the same in every class. ' +
+      '<a href="' + backHref + '">' + escHtml(backText) + '</a>.</div>' +
+      '<button type="button" class="xc-sw">' + escHtml(here.title) + ' is my class</button>' +
+      '<button type="button" class="xc-x" aria-label="Dismiss this notice">&#215;</button>';
+
+    var main = $('main') || document.body;
+    main.insertBefore(el, main.firstChild);
+
+    $('.xc-x', el).addEventListener('click', function () {
+      try { sessionStorage.setItem(pair, '1'); } catch (e) {}
+      el.parentNode.removeChild(el);
+    });
+    $('.xc-sw', el).addEventListener('click', function () {
+      LS.set(KEY, here.name);
+      home = here;
+      mark();
+      el.parentNode.removeChild(el);
+    });
   })();
 
   function escHtml(s) {

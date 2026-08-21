@@ -1272,16 +1272,20 @@ foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
     if ($incs.Count) {
       [void]$pi.AppendLine('          <span class="k">Carries</span>')
       foreach ($i in $incs) {
-        [void]$pi.AppendLine('          <a class="chip" href="#pl-' + $i + '">' +
+        [void]$pi.AppendLine('          <a class="chip" data-track="' + $i + '" href="#pl-' + $i + '">' +
                              (ConvertTo-HtmlText $tracks[$i].Title) + '</a>')
       }
     }
     if ($sibs.Count) {
       [void]$pi.AppendLine('          <span class="k">Also in ' +
                            (ConvertTo-HtmlText $tracks[$d.Parent].Title) + '</span>')
+      # is-xcourse is stamped at BUILD time here because it is true relative to
+      # the block you are reading - inside DET 130's block, DET 330 is another
+      # class for anybody. app.js re-evaluates the same class relative to the
+      # READER on every a[data-track], which is the case the build cannot see.
       foreach ($s in $sibs) {
         $xc = if ($d.Kind -eq 'course' -and $s.Kind -eq 'course') { ' is-xcourse' } else { '' }
-        [void]$pi.AppendLine('          <a class="chip' + $xc + '" href="#pl-' + $s.Name + '">' +
+        [void]$pi.AppendLine('          <a class="chip' + $xc + '" data-track="' + $s.Name + '" href="#pl-' + $s.Name + '">' +
                              (ConvertTo-HtmlText $s.Title) + '</a>')
       }
     }
@@ -1382,8 +1386,13 @@ foreach ($c in $collections.Values) {
     if ($p.Decks.Count -gt 0) {
       [void]$sb.AppendLine('    <div class="k">Appears in</div>')
       [void]$sb.AppendLine('    <div class="chips">')
+      # data-track, so app.js can mark the ones that lead into ANOTHER CLASS.
+      # This is the likeliest place a student clicks sideways out of their own
+      # course - the page is class-neutral, so every chip here looks alike -
+      # and which of them is "another class" depends on who is reading, which
+      # the build cannot know.
       foreach ($dn in ($p.Decks | Select-Object -Unique)) {
-        [void]$sb.AppendLine('      <a class="chip" href="' + $p.Id + '.html?p=' + $dn + '">' +
+        [void]$sb.AppendLine('      <a class="chip" data-track="' + $dn + '" href="' + $p.Id + '.html?p=' + $dn + '">' +
                              (ConvertTo-HtmlText $tracks[$dn].Title) + '</a>')
       }
       [void]$sb.AppendLine('    </div>')
