@@ -1116,6 +1116,117 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 .xcard.is-stop { border-left: 3px solid var(--cat3); }
 .xcard.is-gate { border-left: 3px solid var(--flag); }
 
+/* ---- phase spine -------------------------------------------------------
+   BEFORE / DURING / AFTER, set sideways down the left edge of the three
+   cards on the equipment operating procedure.
+
+   Built for the CLOSED state first. Cards ship collapsed, so what a reader
+   arrives at is three shut headings with no sequence in them at all; three
+   rails make the phase legible before anything is opened. Open, the rail
+   becomes the header band of the same mark.
+
+   THE HOOK IS AUTHORED, NOT DERIVED - and that is the whole point.
+   The generator stamps data-card="<slug>" on every card, so these three are
+   addressable from here with no generator change. It was not used: the slug
+   comes from the <h2>, and a reworded heading would detach the styling in
+   silence. These three headings were reworded the day this was written.
+
+   Instead the page authors an empty <span class="phase" data-phase="Before">
+   as the first thing inside its <h2>. build-site.ps1 copies the h2's inner
+   HTML verbatim into the <summary>, so the span arrives in the summary of
+   the site page AND of the docs\print\ aggregate. Everything else derived
+   from that heading - the card slug and #anchor, the on-this-page label, the
+   search-index title - runs through ConvertTo-Plain, which replaces a tag
+   with a space and collapses runs of whitespace, so an EMPTY span changes
+   none of them. Verified: the three slugs are unchanged.
+
+   Reword a heading and the rail follows it. DELETE the span and the rail is
+   gone - which is a visible loss on the page you are editing, not a silent
+   one three files away.
+
+   The word lives in the markup rather than in this file for the same reason
+   it is not a per-slug `content` string: it is content. `aria-hidden` on the
+   span, because the summary already says "Before operating any equipment"
+   and Chrome folds ::before content into the accessible name.
+
+   COLOUR CARRIES ONE CLAIM: these three cards are one procedure, in order.
+   Deliberately NOT a hue per phase. This collection already teaches a
+   three-hue ramp - lite blue proceed, gold caution, red stop - on the
+   equipment category page, and a second unrelated three-hue scale beside it
+   would be read as that one. Nor is there an honest three-level scale here
+   to encode: before/during/after is a sequence, not an escalation, and
+   colouring AFTER as "low" would quietly undercut the cleanup rules that are
+   the point of the third card.
+
+   --accent on --paper is the pair .pass-steps already uses for its selected
+   badge, and for the same reason: it is the one that survives both skins.
+   Measured on the built page - navy #002144 on off-white #F2F1EE is 14.29:1
+   light; near-black #16181A on Lite Blue #00A4E3 is 6.29:1 dark. Print
+   drops the fill entirely, see below.
+   ========================================================================*/
+.phase {
+  flex: none; align-self: stretch;
+  display: grid; place-items: center;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  width: var(--phase-w, 1.95rem);
+  /* One height for all three rails. The words differ in set width, so
+     without this the closed stack is 89 / 87 / 77px - three sizes where the
+     reader is being asked to see one ladder. A longer word still grows it. */
+  min-height: var(--phase-min, 5.5rem);
+  padding: .7rem 0; margin-right: .35rem;
+  background: var(--accent); color: var(--paper);
+  font-family: var(--f-display); font-weight: 700;
+  font-size: var(--phase-fs, .78rem);
+  letter-spacing: .16em; text-transform: uppercase; line-height: 1;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+.phase::before { content: attr(data-phase); }
+
+/* The rail bleeds to the card edge; the summary's own left and block padding
+   is the only thing that would inset it. The .35rem margin above puts the
+   heading back at the 1.05rem it sat at before, via the summary's own gap.
+
+   :has() rather than a per-slug selector. If it ever fails to match, the
+   rail simply sits inset by the summary's padding - still a legible label,
+   not a broken layout. */
+.xcard > summary:has(> .phase) { padding-block: 0; padding-left: 0; }
+
+/* Open, the rail covers only the header, so the card edge carries the mark
+   on down the body. Invisible when closed: same colour, and the rail sits on
+   top of it. :not() keeps the danger edge - a card that is both a phase and
+   a hard stop shows 3px of red beside the rail rather than losing it, which
+   is two facts instead of one overwriting the other. */
+.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+  border-left: 3px solid var(--accent);
+}
+
+/* Presentation - a panel is read from across a room, so the rail scales with
+   the 2.6rem heading and drops its minimum. The card edge goes, exactly as
+   it does in print: the panel is full-bleed and a 3px line hard against the
+   projector edge reads as a rendering artefact. Both overrides outrank the
+   base on specificity rather than on source order. */
+.presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
+.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
+
+@media print {
+  .xcard > summary:has(> .phase) { padding: 0; }
+  /* On paper the heading underline does the separating - the print sheet
+     drops every card border, and the rail goes with them. */
+  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  /* NO FILL ON PAPER, and the doubled class rather than source order,
+     because this is a legibility invariant and not a preference: a printer
+     or a user setting that drops backgrounds would leave reversed type on a
+     vanished ground, i.e. nothing at all. Navy type on white is 16.14:1 and
+     cannot fail that way. Same reasoning as .pass-steps .k. */
+  .phase.phase {
+    --phase-w: 1.5rem; --phase-fs: .66rem; --phase-min: 4.3rem;
+    padding: .35rem 0; margin-right: .6rem;
+    background: transparent; color: var(--accent);
+    border-right: 1px solid var(--rule);
+  }
+}
+
 /* ---- authored images ---------------------------------------------------
    [[img:file.png|Alt text]]. On a site page this is a real file; in a
    docs\print\ aggregate the identical markup carries a data: URI, because
@@ -1773,9 +1884,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard" id="before-operating-any-equipment" data-card="before-operating-any-equipment">
-    <summary>Before operating any equipment<span class="chev"></span></summary>
+    <summary><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment<span class="chev"></span></summary>
     <div class="body">
-      <h2>Before operating any equipment</h2>
+      <h2><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment</h2>
   <ul class="boxes">
     <li><strong>Obtain permission</strong> to operate the equipment from the instructor.</li>
     <li><strong>Verify training</strong> &mdash; ensure ALL operators have received proper equipment training.</li>
@@ -1788,9 +1899,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard" id="during-equipment-operation" data-card="during-equipment-operation">
-    <summary>During equipment operation<span class="chev"></span></summary>
+    <summary><span class="phase" data-phase="During" aria-hidden="true"></span>During equipment operation<span class="chev"></span></summary>
     <div class="body">
-      <h2>During equipment operation</h2>
+      <h2><span class="phase" data-phase="During" aria-hidden="true"></span>During equipment operation</h2>
   <ul>
     <li><strong>Stay alert</strong> &mdash; maintain focus, and never leave equipment unattended while it is running.</li>
     <li><strong>Follow proper procedures</strong> &mdash; use equipment only as trained and as intended.</li>
@@ -1800,9 +1911,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard" id="after-operating-any-equipment" data-card="after-operating-any-equipment">
-    <summary>After operating any equipment<span class="chev"></span></summary>
+    <summary><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment<span class="chev"></span></summary>
     <div class="body">
-      <h2>After operating any equipment</h2>
+      <h2><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment</h2>
   <ul class="boxes">
     <li><strong>Power down safely</strong> &mdash; turn off and disconnect the equipment from its power source.</li>
     <li><strong>Report issues immediately</strong> &mdash; notify the instructor of any broken or malfunctioning equipment.</li>
@@ -2333,7 +2444,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
   <p class="aside">Chips travel further than you expect and they conduct &mdash; see
   <a class="xref-page" href="#p-metal-chips">Metal Chips and Swarf</a>. That is the direct line between the housekeeping rules and this one.</p>
-  <p class="aside">Lockout/Tagout for machinery with rotating parts is covered in
+  <p class="aside">Lockout/Tagout for machinery with moving or rotating parts is covered in
   <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
@@ -2666,7 +2777,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <article class="article bundled" id="p-machine-hazards">
   <div class="crumb"><span>Safety</span><span class="sep">/</span><span>Universal Rules</span></div>
   <h1>Machine Hazards and Housekeeping</h1>
-  <p class="lede">Rotating machinery, the environment around it, and the operating habits that keep both from hurting you.</p>
+  <p class="lede">The two ways a machine injures you - it catches hold and pulls you in, or it closes on you - plus the environment around it and the habits that keep both off you.</p>
 <div class="cardtools">
   <button type="button" data-act="expand">Expand all</button>
   <button type="button" data-act="collapse">Collapse all</button>
@@ -2676,15 +2787,277 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Rotating machinery<span class="chev"></span></summary>
     <div class="body">
       <h2>Rotating machinery</h2>
+  <p class="lede">Rotating machinery injures you by <strong>catching hold of something and pulling
+  it in</strong>. It does not have to catch your hand. It catches a sleeve, a glove, a lanyard or a
+  strand of hair, and your hand goes wherever that goes.</p>
+
   <div class="stop">
-    <p><strong>Gears, pulleys and belts, chains and sprockets are extremely dangerous pinch points.</strong></p>
-    <ul>
-      <li><strong>NEVER</strong> work on equipment with these features without first disconnecting power.</li>
-      <li><strong>Lockout/Tagout</strong> procedures must be followed for maintenance.</li>
-    </ul>
+    <p><strong>Gears, pulleys and belts, chains and sprockets are extremely dangerous.</strong>
+    Where a rotating part meets another surface there is a wedge that closes to nothing &mdash; an
+    <strong>in-running nip point</strong>, the place the machine feeds things into itself. It is
+    where the belt runs onto the pulley, where the chain runs onto the sprocket, where the gear
+    teeth mesh.</p>
   </div>
-  <p class="aside">Loose clothing, jewelry and unsecured hair are what these features catch &mdash;
-  see <a class="xref-page" href="#p-ppe">clothing, jewelry and hair</a>.</p>
+
+  <p>The contact and the injury happen in <strong>different places</strong>. You touch the belt out
+  in the open, where it looks like a moving strap; the belt carries you to the pulley, where there
+  is no gap at all. That distance is why staying clear of the nip point is not enough on its own
+  &mdash; anything the machine can grip is a handle it uses to bring you there.</p>
+
+  <h3>What gets caught</h3>
+  <ul>
+    <li>Loose clothing, jewelry and unsecured hair &mdash; see <a class="xref-page" href="#p-ppe">clothing, jewelry and hair</a>.</li>
+    <li><strong>Gloves.</strong> Gloves or rags are for handling sharp objects such as cutters, and
+    only once the machine is <strong>shut down</strong>. <strong>NEVER wear gloves at a running
+    machine</strong> &mdash; a glove catches where bare skin would pull free, and takes your hand
+    with it. See <a class="xref-page" href="#p-metal-chips">chips and gloves</a>.</li>
+    <li>A long stringy chip still connected to the cut &mdash; see <a class="xref-page" href="#p-metal-chips">Metal Chips and Swarf</a>.</li>
+  </ul>
+
+  <p class="aside">It does not take teeth, and it does not take speed. A plain smooth shaft turning
+  slowly will still wind hair or cloth onto itself, and once it has a turn or two it does not let
+  go.</p>
+
+  <figure class="graphic-slot">
+    <!-- GRAPHIC-SLOT: rotating-draw-in-at-a-nip-point
+         STATUS: awaiting artwork. Fill this figure; leave the figcaption text as written.
+         DEPICTS: a belt-and-pulley drive seen from the side, drawn three times, read left to
+         right, one caption. The subject is a DRIVE, not a person: keep the human element to a
+         sleeve cuff so the drawing stays about the machine.
+           1. THE GEOMETRY. Belt running onto a pulley. Mark the single wedge where belt and
+              pulley meet and the gap closes to zero, and label it "in-running nip point". The
+              point of this panel is that the nip is ONE SMALL PLACE, not the whole belt: the
+              open run is drawn plainly, with no hazard marking on it at all.
+           2. THE CATCH. A shirt cuff brushing the belt on its open run, as far from the pulley
+              as the panel allows. Light contact, nothing dramatic, nothing torn. This panel has
+              to look survivable or the sequence does not teach.
+           3. THE DRAW-IN. The same cuff now carried along by the belt into the wedge marked in
+              panel 1, wrist leading, hand following. Draw the arm straight and travelling, not
+              braced: there is nothing to brace against once the belt has the cloth.
+         INSET, small, alongside or below: a plain smooth round shaft with a strand of hair
+           wrapped twice around it, labelled "no teeth, no gap, no speed". This kills the
+           inference that only gears and belts are dangerous.
+         TEACHING POINT: contact and injury are in different places, and the belt is what carries
+           you between them. If a reader can point at the wedge in panel 1 and at the touch in
+           panel 2 and see that they are far apart, the graphic has done its job.
+         DO NOT: draw blood, a severed hand, or a face. The mechanism is the lesson; gore
+           replaces it with a flinch.
+         MEDIUM: draw this. Inline SVG, themed with the site tokens like the PASS stepper on the
+           fire page. This is geometry, not photography, and the browser can draw geometry.
+         CONSTRAINTS: must read in black and white for the printable aggregate, must read in
+           both light and dark theme, and must need no motion. Distinguish the belt's direction
+           of travel with an arrow, not with color alone. If the panels are numbered, number
+           them 1 2 3.
+         ALT (accessible description; on the SVG use role="img" plus a title/desc pair, or supply
+           it as the label if this ends up as an image file):
+           "Three panels of a belt running onto a pulley. First, the wedge where the belt meets
+           the pulley is marked as the in-running nip point. Second, a shirt cuff touches the
+           belt far from the pulley. Third, the belt has carried the cuff into the wedge and the
+           wrist and hand are following it in. An inset shows a strand of hair wound twice around
+           a plain smooth shaft."
+    -->
+    <figcaption>Contact happens where the belt is open. The injury happens where it closes.</figcaption>
+  </figure>
+
+  <details class="deeper">
+    <summary>The word for this, and where it comes from</summary>
+    <p>&ldquo;Nip point&rdquo; is not shop slang. It is the term the machine-guarding standard uses.
+    <strong>29&nbsp;CFR&nbsp;1910.212(a)(1)</strong> requires guarding against &ldquo;hazards such as
+    those created by <strong>point of operation, ingoing nip points, rotating parts, flying chips and
+    sparks</strong>.&rdquo;</p>
+    <p>OSHA&rsquo;s Machine Guarding eTool puts it plainly: &ldquo;<strong>In-running nip point
+    hazards are caused by the rotating parts on machinery.</strong>&rdquo; Its longer treatment,
+    <em>Concepts and Techniques of Machine Safeguarding</em> (OSHA&nbsp;3067), gives three kinds:</p>
+    <ul>
+      <li>&ldquo;Parts can rotate in opposite directions while their axes are parallel to each other.
+      These parts may be in contact (producing a nip point) or in close proximity.&rdquo; &mdash;
+      meshing gears.</li>
+      <li>&ldquo;Nip points are also created between rotating and tangentially moving parts. Some
+      examples would be: the point of contact between a power transmission belt and its pulley, a
+      chain and a sprocket, and a rack and pinion.&rdquo;</li>
+      <li>&ldquo;Nip points can occur between rotating and fixed parts which create a shearing,
+      crushing, or abrading action.&rdquo;</li>
+    </ul>
+    <p>So belts, chains, sprockets and gears are <em>rotating</em> hazards by name. What makes them
+    dangerous is that they draw material in &mdash; not that two parts close on each other.</p>
+    <p>OSHA is just as direct about the plain shaft: &ldquo;Rotating motion can be dangerous; even
+    smooth, slowly rotating shafts can grip hair and clothing, and through minor contact force the
+    hand and arm into a dangerous position.&rdquo;</p>
+    <p>These parts are meant to be behind covers, and the standard is specific about it &mdash;
+    <strong>29&nbsp;CFR&nbsp;1910.219(f)(3)</strong>: &ldquo;All sprocket wheels and chains shall be
+    enclosed unless they are more than seven (7) feet above the floor or platform.&rdquo;</p>
+  </details>
+    </div>
+  </details>
+  <details class="xcard is-gate" id="moving-machinery-and-pinch-points" data-card="moving-machinery-and-pinch-points">
+    <summary>Moving machinery and pinch points<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Moving machinery and pinch points</h2>
+  <p class="lede">Moving machinery injures you <strong>without ever catching hold of you</strong>.
+  Two surfaces close on each other with you in between. Nothing pulls you anywhere &mdash; you run
+  out of room.</p>
+
+  <h3>What makes a pinch point</h3>
+  <p>A <strong>pinch point</strong> is a gap that is closing: two parts, at least one of them
+  moving, with space between them that is on its way to nothing. That is the whole of it, and it is
+  why pinch points are hard to spot. There are no teeth, no edge and often no noise. A wide gap and
+  a narrow gap look the same until the last inch, and the gap does not care what is in it.</p>
+
+  <p>Two kinds of movement, and both make one:</p>
+  <dl class="dims">
+    <div><dt>Back and forth, up and down</dt><dd>A press ram, a drill head coming down, a saw guide
+    being lowered, a clamp closing. You are caught between the part that moves and the part that
+    does not.</dd></div>
+    <div><dt>Straight along</dt><dd>A table, a carriage or a saddle travelling. It closes the gap
+    against whatever waits at the end of its travel &mdash; a stop, a column, the machine&rsquo;s
+    own frame, or the hand resting there.</dd></div>
+  </dl>
+
+  <h3>Where they hide</h3>
+  <ul>
+    <li><strong>Between the work and whatever holds it.</strong> A vise jaw, a clamp, a fixture: the
+    hand steadying the workpiece is inside the gap that is closing on the workpiece.</li>
+    <li><strong>At the end of a table&rsquo;s travel.</strong> Wind it far enough and the space
+    between the table and the frame goes to zero, with whatever was resting there in between.</li>
+    <li><strong>Under anything that comes down.</strong> A head, a ram, a guard, a guide.</li>
+    <li><strong>On hinges.</strong> Covers, doors and lids close on their own frames &mdash; at the
+    free edge, where a hand is holding them, and again right at the hinge, where the gap closes over
+    almost no distance at all.</li>
+  </ul>
+
+  <div class="gate">
+    <p><strong>A pinch point needs no power, no speed and no noise.</strong> A vise turned by hand
+    multiplies what you put into the handle many times over, and it closes slowly and quietly enough
+    that nothing warns you. Switching a machine off removes the part that would have closed the gap
+    for you. It does not remove the gap.</p>
+  </div>
+
+  <h3>The question to ask</h3>
+  <p>Before moving anything &mdash; a handwheel, a lever, a clamp, a guard &mdash;
+  <strong>what closes, and what is in the way?</strong> Follow the moving part to the end of its
+  travel and find what it meets there. Then look at where your hands are, and where they will still
+  be once you are watching the cut instead of watching your hands.</p>
+
+  <figure class="graphic-slot">
+    <!-- GRAPHIC-SLOT: pinch-point-the-closing-gap
+         STATUS: awaiting artwork. Fill this figure; leave the figcaption text as written.
+         DEPICTS: two rows. The top row teaches the mechanism; the bottom row teaches that the
+         mechanism has one shape and shows up everywhere.
+           TOP ROW - one vise, drawn three times in section or plan, jaw closing left to
+           right. A workpiece between the jaws and a hand resting against the work to steady it.
+           The hand does not move between panels. Only the gap changes.
+             1. Gap wide. Dimension the gap with a witness line and an arrow. Nothing about this
+                panel should look hazardous, because to the reader it does not.
+             2. Gap half. Same hand, same pose, same dimension annotation, smaller number.
+             3. Gap zero. The dimension line has collapsed onto the hand. This is the only panel
+                where anything is wrong, and by then nothing has moved except the jaw.
+           BOTTOM ROW - the same closing gap in three other places, drawn small and plain
+           as two blocks and a direction arrow each, with the gap marked by the SAME annotation
+           used in the top row so the eye recognises the shape rather than the machine:
+             a. a table travelling toward a fixed column or stop;
+             b. a head or ram descending toward the table it will meet;
+             c. a hinged cover closing onto its frame.
+         TEACHING POINT: the gap is the hazard, and it looks harmless for almost the whole of its
+           travel. The annotation is what carries this: it must be identical in all six panels,
+           so the reader learns to look for a closing dimension, not for a scary-looking machine.
+         DO NOT: draw teeth, blades, sparks, motion lines or a warning-triangle icon. Every one
+           of those tells the reader that a pinch point announces itself, which is the exact
+           belief this figure exists to remove. Do not draw an injury either - panel 3 ends
+           at the moment the gap reaches the hand.
+         MEDIUM: draw this. Inline SVG, site tokens, same family as the PASS stepper and the
+           category ladder on the other safety pages. Flat orthographic views; perspective would
+           hide the gap, which is the whole subject.
+         CONSTRAINTS: must read in black and white for the printable aggregate and in both light
+           and dark theme, so the gap annotation must be distinguishable by line weight or style
+           and by its label, not by color. No motion required to read it. If the top row is
+           numbered, number it 1 2 3; label the bottom row a b c.
+         ALT (accessible description; on the SVG use role="img" plus a title/desc pair, or supply
+           it as the label if this ends up as an image file):
+           "Top row: a vise closing on a workpiece in three steps, with a hand resting against
+           the work. The gap between the jaw and the work is dimensioned in each step and gets
+           smaller until it is zero at the hand. Bottom row: the same closing gap marked the same
+           way in three other places - a table travelling toward a fixed column, a machine
+           head descending toward a table, and a hinged cover closing onto its frame."
+    -->
+    <figcaption>A pinch point is a gap on its way to zero. It looks safe for most of the trip.</figcaption>
+  </figure>
+
+  <details class="deeper">
+    <summary>Why belts and chains count as rotating, not pinching</summary>
+    <p>OSHA sorts machine hazards by the motion that causes them, and &ldquo;pinch point&rdquo; is
+    the vocabulary it attaches to parts that <em>travel</em>, not to parts that <em>turn</em>. From
+    <em>Concepts and Techniques of Machine Safeguarding</em> (OSHA&nbsp;3067):</p>
+    <ul>
+      <li><strong>Reciprocating motion</strong> &mdash; &ldquo;Reciprocating motions may be hazardous
+      because, during the back-and-forth or up-and-down motion, a worker may be struck by or caught
+      between a moving and a stationary part.&rdquo;</li>
+      <li><strong>Transverse motion</strong>, which means movement in a straight continuous line
+      &mdash; &ldquo;Transverse motion (movement in a straight, continuous line) creates a hazard
+      because a worker may be struck or caught in a <strong>pinch or shear point</strong> by the
+      moving part.&rdquo;</li>
+    </ul>
+    <p>A belt on a pulley is a rotating hazard that draws material in; a table running up against a
+    column is a moving hazard that closes on it. Both can take a hand, and the vocabulary is worth
+    keeping straight because <strong>the two do not have the same tell</strong>. You avoid the first
+    by giving it nothing to grip. You avoid the second by knowing where the gap is going.</p>
+  </details>
+    </div>
+  </details>
+  <details class="xcard is-stop" id="lockout-tagout-before-anyone-works-on-a-machine" data-card="lockout-tagout-before-anyone-works-on-a-machine">
+    <summary>Lockout/Tagout &mdash; before anyone works on a machine<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Lockout/Tagout &mdash; before anyone works on a machine</h2>
+  <p class="lede">Everything on a machine that turns or travels does so because something is
+  powering it. Lockout/Tagout is how that power is taken away and <em>kept</em> away while somebody
+  works on the machine.</p>
+
+  <div class="stop">
+    <p><strong>NEVER</strong> work on equipment with rotating or moving parts without first
+    disconnecting power.</p>
+    <p><strong>Lockout/Tagout</strong> procedures must be followed for maintenance.</p>
+  </div>
+
+  <h3>The two words</h3>
+  <dl class="dims">
+    <div><dt>Lockout</dt><dd>A lock on the device that isolates the energy &mdash; the disconnect,
+    the breaker, the valve &mdash; so it physically cannot be switched back on.</dd></div>
+    <div><dt>Tagout</dt><dd>A tag on that same device saying who put it there and why, so nobody
+    removes it wondering.</dd></div>
+  </dl>
+
+  <h3>Off is not disconnected, and disconnected is not still</h3>
+  <ul>
+    <li><strong>Off is not disconnected.</strong> A machine&rsquo;s own on/off switch is a control.
+    Someone can press it back on, and either way the machine is still connected to its supply. The
+    disconnect is the thing that gets locked.</li>
+    <li><strong>Disconnected is not still.</strong> A spindle coasts. A raised head or ram drops. A
+    spring, a charged capacitor or air still in a line will all move something after the power is
+    gone. Energy already inside the machine is part of what the procedure has to deal with.</li>
+  </ul>
+
+  <details class="deeper">
+    <summary>What the standard actually covers</summary>
+    <p><strong>29&nbsp;CFR&nbsp;1910.147(a)(1)(i)</strong>: &ldquo;This standard covers the servicing
+    and maintenance of machines and equipment in which the <em>unexpected</em> energization or start
+    up of the machines or equipment, <strong>or release of stored energy</strong> could cause injury
+    to employees.&rdquo;</p>
+    <p>Two things are worth reading twice. <strong>Unexpected</strong> is the whole point &mdash; the
+    hazard is not that the machine runs, it is that it runs while someone has a hand inside it. And
+    <strong>stored energy</strong> is named alongside energization, because a machine that has been
+    switched off and unplugged can still contain everything it needs to move once.</p>
+    <p>&ldquo;Servicing and maintenance&rdquo; is much broader than it sounds. The standard defines it
+    as &ldquo;<strong>constructing, installing, setting up, adjusting, inspecting, modifying, and
+    maintaining and/or servicing</strong> machines or equipment&rdquo;, and adds: &ldquo;These
+    activities include <strong>lubrication, cleaning or unjamming</strong> of machines or equipment
+    and making <strong>adjustments or tool changes</strong>, where the employee may be exposed to the
+    unexpected energization or startup of the equipment or release of hazardous energy.&rdquo; Setting
+    up, clearing a jam and changing a tool are all on that list.</p>
+    <p>Stored energy gets its own requirement &mdash; <strong>1910.147(d)(5)(i)</strong>:
+    &ldquo;Following the application of lockout or tagout devices to energy isolating devices, all
+    potentially hazardous stored or residual energy shall be relieved, disconnected, restrained, and
+    otherwise rendered safe.&rdquo; The lock comes first, and then the energy already in the machine
+    is dealt with. Both, in that order.</p>
+  </details>
     </div>
   </details>
   <details class="xcard" id="the-environment-around-the-machine" data-card="the-environment-around-the-machine">
@@ -2706,9 +3079,6 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><strong>Stop machines completely</strong> before taking measurements or making adjustments.</li>
     <li><strong>Secure all workpieces</strong> before operation &mdash; use clamps, vises or fixtures.</li>
     <li><strong>Never leave tools</strong> on or near operating machinery.</li>
-    <li><strong>Use proper tools</strong> &mdash; gloves or rags when handling sharp objects such as
-    cutters, and only once the machine is <strong>shut down</strong>. <strong>NEVER wear gloves at a
-    running machine</strong> &mdash; see <a class="xref-page" href="#p-metal-chips">chips and gloves</a>.</li>
   </ul>
   <p class="aside">The shutdown and cleaning steps that close every session are in
   <a class="xref-page" href="#p-equipment-operating-procedure">After operating any equipment</a>.</p>
