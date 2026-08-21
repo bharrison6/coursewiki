@@ -405,14 +405,16 @@ a.xref-out::after {
         TOC stops drifting a metre away from the text it indexes.
      3. THE ARTICLE IS CENTRED IN ITS COLUMN. This is what fixes 1280 and
         1440, where the cap does not bind and the void was 163 / 323px.
-     4. THE MEASURE WIDENS - a little, and on evidence. 68ch NAMED 68
-        characters and rendered 54-66, average 59, because `ch` is the width
-        of a zero and this body face is narrower than that. 80ch measures
-        ~71 characters per line, which is still inside the comfortable band
-        (66 ideal, 75 the usual ceiling). Do not push it further: past 75 the
-        eye loses the line return and the complaint stops being cosmetic.
-        This one knob also widens .dims, .pass and .firetable, which is why
-        there is no separate full-bleed lane - see "no bleed lane" below.
+     4. THE MEASURE WIDENS RESPONSIVELY. 68ch NAMED 68 characters and
+        rendered 54-66, average 59, because `ch` is the width of a zero and
+        this body face is narrower than that. The first desktop pass at 80ch
+        rendered only 664px here: 46% of a 1440px viewport and 35% of 1920px,
+        which still read as a phone column beside two rails. At the three-
+        column breakpoint it now grows to 96ch (~797px / ~85 characters in
+        this face), the upper end reserved for these short, scannable cards
+        and lists. Below 1200px it remains 80ch, so phone/tablet geometry is
+        unchanged. This one knob also widens .dims, .pass and .firetable;
+        there is still no separate full-bleed lane - see below.
    ==========================================================================*/
 
 :root {
@@ -435,6 +437,11 @@ a.xref-out::after {
   --bar-pad:   clamp(.75rem, 2vw, 1.25rem);
   --bar-inset: max(var(--bar-pad), (100% - var(--shell-max)) / 2);
 }
+
+/* A wider reading lane only where the TOC makes this a true desktop shell.
+   At narrower breakpoints the existing 80ch cap and all drawer behaviour are
+   byte-for-byte unchanged. */
+@media (min-width: 75rem) { :root { --prose: 96ch; } }
 
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
@@ -1260,7 +1267,7 @@ figure > figcaption {
   line-height: 1.45;
 }
 
-figure.graphic-slot:not(:has(img))::before {
+figure.graphic-slot:not(:has(img, svg))::before {
   content: "Artwork pending";
   display: block;
   padding: 1.75rem .75rem;
@@ -1270,6 +1277,81 @@ figure.graphic-slot:not(:has(img))::before {
   color: var(--ink-soft);
   border: 2px dashed var(--rule);
   border-radius: var(--radius-sm);
+}
+
+/* ---- electrical conductor sequence -------------------------------------
+   The gap is the lesson. The three panels stay complete without colour or
+   motion: panel labels, exposed blades, the falling chip path, and the flash
+   carry the sequence for print, reduced-motion, and assistive descriptions. */
+.electrical-plug-sequence { margin: 1.75rem 0; }
+.plug-sequence {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem;
+}
+.plug-sequence > li { min-width: 0; padding: 0; }
+.plug-sequence > li::before { content: none; }
+.plug-panel-art { display: block; width: 100%; height: auto; }
+.plug-sequence .plug-panel-box { fill: var(--surface); stroke: var(--rule); stroke-width: 2; }
+.plug-sequence .plug-panel-number { fill: var(--accent); stroke: var(--accent); }
+.plug-sequence .plug-panel-number-danger { fill: var(--cat3); stroke: var(--cat3); }
+.plug-sequence .plug-panel-number-text {
+  fill: var(--paper); font-family: var(--f-display); font-size: 22px; font-weight: 700;
+  text-anchor: middle;
+}
+.plug-sequence .plug-panel-title,
+.plug-sequence .plug-note {
+  fill: var(--ink); font-family: var(--f-display); font-weight: 700; letter-spacing: .8px;
+}
+.plug-sequence .plug-panel-title { font-size: 26px; }
+.plug-sequence .plug-note { font-size: 13px; }
+.plug-sequence .plug-wall { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 2; }
+.plug-sequence .plug-receptacle { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+.plug-sequence .plug-socket { fill: var(--ink); }
+.plug-sequence .plug-body { fill: var(--accent); stroke: var(--accent); }
+.plug-sequence .plug-grip { fill: none; stroke: var(--paper); stroke-width: 3; opacity: .75; }
+.plug-sequence .plug-cord { fill: none; stroke: var(--ink-soft); stroke-width: 13; stroke-linecap: round; }
+.plug-sequence .plug-cord-line { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; opacity: .4; }
+.plug-sequence .plug-blade { fill: var(--surface-2); stroke: var(--ink); stroke-width: 2; }
+.plug-sequence .plug-seated-mark { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.plug-sequence .plug-gap-mark { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 4 3; }
+.plug-sequence .plug-fall { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 5 5; }
+.plug-sequence .plug-chip { fill: var(--ink-soft); stroke: var(--ink); stroke-width: 2; }
+.plug-sequence .plug-flash { fill: var(--cat3-soft); stroke: var(--cat3); stroke-width: 3; stroke-linejoin: round; }
+
+@media (max-width: 36rem) {
+  .plug-sequence { grid-template-columns: minmax(0, 1fr); gap: .7rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .plug-sequence .plug-chip {
+    transform-box: fill-box; transform-origin: center;
+    animation: plug-chip-drop 4s cubic-bezier(.32, .72, .32, 1) infinite;
+  }
+  .plug-sequence .plug-flash { animation: plug-contact-flash 4s ease-out infinite; }
+}
+@keyframes plug-chip-drop {
+  0%, 42% { opacity: 0; transform: translateY(-42px); }
+  50% { opacity: 1; transform: translateY(-42px); }
+  66%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes plug-contact-flash {
+  0%, 62% { opacity: .35; }
+  68%, 76% { opacity: 1; }
+  84%, 100% { opacity: .7; }
+}
+@media print {
+  .plug-sequence { break-inside: avoid; gap: .45rem; }
+  .plug-sequence .plug-panel-box { fill: #fff; stroke: #000; }
+  .plug-sequence .plug-panel-number,
+  .plug-sequence .plug-panel-number-danger,
+  .plug-sequence .plug-body { fill: #fff; stroke: #000; }
+  .plug-sequence .plug-panel-number-text,
+  .plug-sequence .plug-panel-title,
+  .plug-sequence .plug-note { fill: #000; }
+  .plug-sequence .plug-grip { stroke: #000; }
+  .plug-sequence .plug-seated-mark,
+  .plug-sequence .plug-flash { stroke: #000; }
+  .plug-sequence .plug-flash { fill: #fff; }
 }
 
 /* ---- GHS pictograms ----------------------------------------------------

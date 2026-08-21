@@ -405,14 +405,16 @@ a.xref-out::after {
         TOC stops drifting a metre away from the text it indexes.
      3. THE ARTICLE IS CENTRED IN ITS COLUMN. This is what fixes 1280 and
         1440, where the cap does not bind and the void was 163 / 323px.
-     4. THE MEASURE WIDENS - a little, and on evidence. 68ch NAMED 68
-        characters and rendered 54-66, average 59, because `ch` is the width
-        of a zero and this body face is narrower than that. 80ch measures
-        ~71 characters per line, which is still inside the comfortable band
-        (66 ideal, 75 the usual ceiling). Do not push it further: past 75 the
-        eye loses the line return and the complaint stops being cosmetic.
-        This one knob also widens .dims, .pass and .firetable, which is why
-        there is no separate full-bleed lane - see "no bleed lane" below.
+     4. THE MEASURE WIDENS RESPONSIVELY. 68ch NAMED 68 characters and
+        rendered 54-66, average 59, because `ch` is the width of a zero and
+        this body face is narrower than that. The first desktop pass at 80ch
+        rendered only 664px here: 46% of a 1440px viewport and 35% of 1920px,
+        which still read as a phone column beside two rails. At the three-
+        column breakpoint it now grows to 96ch (~797px / ~85 characters in
+        this face), the upper end reserved for these short, scannable cards
+        and lists. Below 1200px it remains 80ch, so phone/tablet geometry is
+        unchanged. This one knob also widens .dims, .pass and .firetable;
+        there is still no separate full-bleed lane - see below.
    ==========================================================================*/
 
 :root {
@@ -435,6 +437,11 @@ a.xref-out::after {
   --bar-pad:   clamp(.75rem, 2vw, 1.25rem);
   --bar-inset: max(var(--bar-pad), (100% - var(--shell-max)) / 2);
 }
+
+/* A wider reading lane only where the TOC makes this a true desktop shell.
+   At narrower breakpoints the existing 80ch cap and all drawer behaviour are
+   byte-for-byte unchanged. */
+@media (min-width: 75rem) { :root { --prose: 96ch; } }
 
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
@@ -1260,7 +1267,7 @@ figure > figcaption {
   line-height: 1.45;
 }
 
-figure.graphic-slot:not(:has(img))::before {
+figure.graphic-slot:not(:has(img, svg))::before {
   content: "Artwork pending";
   display: block;
   padding: 1.75rem .75rem;
@@ -1270,6 +1277,81 @@ figure.graphic-slot:not(:has(img))::before {
   color: var(--ink-soft);
   border: 2px dashed var(--rule);
   border-radius: var(--radius-sm);
+}
+
+/* ---- electrical conductor sequence -------------------------------------
+   The gap is the lesson. The three panels stay complete without colour or
+   motion: panel labels, exposed blades, the falling chip path, and the flash
+   carry the sequence for print, reduced-motion, and assistive descriptions. */
+.electrical-plug-sequence { margin: 1.75rem 0; }
+.plug-sequence {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem;
+}
+.plug-sequence > li { min-width: 0; padding: 0; }
+.plug-sequence > li::before { content: none; }
+.plug-panel-art { display: block; width: 100%; height: auto; }
+.plug-sequence .plug-panel-box { fill: var(--surface); stroke: var(--rule); stroke-width: 2; }
+.plug-sequence .plug-panel-number { fill: var(--accent); stroke: var(--accent); }
+.plug-sequence .plug-panel-number-danger { fill: var(--cat3); stroke: var(--cat3); }
+.plug-sequence .plug-panel-number-text {
+  fill: var(--paper); font-family: var(--f-display); font-size: 22px; font-weight: 700;
+  text-anchor: middle;
+}
+.plug-sequence .plug-panel-title,
+.plug-sequence .plug-note {
+  fill: var(--ink); font-family: var(--f-display); font-weight: 700; letter-spacing: .8px;
+}
+.plug-sequence .plug-panel-title { font-size: 26px; }
+.plug-sequence .plug-note { font-size: 13px; }
+.plug-sequence .plug-wall { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 2; }
+.plug-sequence .plug-receptacle { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+.plug-sequence .plug-socket { fill: var(--ink); }
+.plug-sequence .plug-body { fill: var(--accent); stroke: var(--accent); }
+.plug-sequence .plug-grip { fill: none; stroke: var(--paper); stroke-width: 3; opacity: .75; }
+.plug-sequence .plug-cord { fill: none; stroke: var(--ink-soft); stroke-width: 13; stroke-linecap: round; }
+.plug-sequence .plug-cord-line { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; opacity: .4; }
+.plug-sequence .plug-blade { fill: var(--surface-2); stroke: var(--ink); stroke-width: 2; }
+.plug-sequence .plug-seated-mark { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.plug-sequence .plug-gap-mark { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 4 3; }
+.plug-sequence .plug-fall { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 5 5; }
+.plug-sequence .plug-chip { fill: var(--ink-soft); stroke: var(--ink); stroke-width: 2; }
+.plug-sequence .plug-flash { fill: var(--cat3-soft); stroke: var(--cat3); stroke-width: 3; stroke-linejoin: round; }
+
+@media (max-width: 36rem) {
+  .plug-sequence { grid-template-columns: minmax(0, 1fr); gap: .7rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .plug-sequence .plug-chip {
+    transform-box: fill-box; transform-origin: center;
+    animation: plug-chip-drop 4s cubic-bezier(.32, .72, .32, 1) infinite;
+  }
+  .plug-sequence .plug-flash { animation: plug-contact-flash 4s ease-out infinite; }
+}
+@keyframes plug-chip-drop {
+  0%, 42% { opacity: 0; transform: translateY(-42px); }
+  50% { opacity: 1; transform: translateY(-42px); }
+  66%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes plug-contact-flash {
+  0%, 62% { opacity: .35; }
+  68%, 76% { opacity: 1; }
+  84%, 100% { opacity: .7; }
+}
+@media print {
+  .plug-sequence { break-inside: avoid; gap: .45rem; }
+  .plug-sequence .plug-panel-box { fill: #fff; stroke: #000; }
+  .plug-sequence .plug-panel-number,
+  .plug-sequence .plug-panel-number-danger,
+  .plug-sequence .plug-body { fill: #fff; stroke: #000; }
+  .plug-sequence .plug-panel-number-text,
+  .plug-sequence .plug-panel-title,
+  .plug-sequence .plug-note { fill: #000; }
+  .plug-sequence .plug-grip { stroke: #000; }
+  .plug-sequence .plug-seated-mark,
+  .plug-sequence .plug-flash { stroke: #000; }
+  .plug-sequence .plug-flash { fill: #fff; }
 }
 
 /* ---- GHS pictograms ----------------------------------------------------
@@ -1865,10 +1947,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="what-a-safety-data-sheet-is-and-the-three-sections-you-open" data-card="what-a-safety-data-sheet-is-and-the-three-sections-you-open">
-    <summary>What a Safety Data Sheet is, and the three sections you open<span class="chev"></span></summary>
+  <details class="xcard" id="what-is-a-safety-data-sheet-sds" data-card="what-is-a-safety-data-sheet-sds">
+    <summary>What is a Safety Data Sheet (SDS)?<span class="chev"></span></summary>
     <div class="body">
-      <h2>What a Safety Data Sheet is, and the three sections you open</h2>
+      <h2>What is a Safety Data Sheet (SDS)?</h2>
   <p class="lede">A <strong>Safety Data Sheet</strong> is the manufacturer's written answer to
   <strong>what this can do to you, what to wear, and what to do when it goes wrong</strong>.</p>
 
@@ -1889,11 +1971,6 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     than the general one.</dd></div>
   </dl>
 
-  <p class="aside"><strong>Do not stop at Section 1.</strong> Section 1 is the product identifier
-  and who made it: it tells you the sheet is the right sheet, and nothing about what is in the
-  container. Match the product identifier on the sheet to the one printed on the container in your
-  hand, then go to Section 2.</p>
-
   <p>None of this is a local rule. OSHA requires a sheet for every hazardous chemical, and requires
   the sixteen sections and the order they come in &mdash; <strong>29 CFR 1910.1200(g)</strong>.</p>
 
@@ -1902,10 +1979,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Signal words, pictograms and H-numbers &mdash; how Section 2 is written.</p>
     </div>
   </details>
-  <details class="xcard is-gate" id="where-the-sheets-are-kept-and-what-readily-accessible-means" data-card="where-the-sheets-are-kept-and-what-readily-accessible-means">
-    <summary>Where the sheets are kept, and what &ldquo;readily accessible&rdquo; means<span class="chev"></span></summary>
+  <details class="xcard" id="where-is-sds-binder-located" data-card="where-is-sds-binder-located">
+    <summary>Where is SDS binder located?<span class="chev"></span></summary>
     <div class="body">
-      <h2>Where the sheets are kept, and what &ldquo;readily accessible&rdquo; means</h2>
+      <h2>Where is SDS binder located?</h2>
   <ul>
     <li>All Safety Data Sheets are organized in a <strong>designated binder</strong> for easy reference.</li>
     <li><strong>Review before use</strong> &mdash; check the sheet for any unfamiliar chemical or liquid.</li>
@@ -1917,7 +1994,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   electronic copies in place of paper <em>"as long as no barriers to immediate employee access in
   each workplace are created by such options."</em> Binder or screen, the test is the same: the
   sheet is something you can reach now, not something you have to go and ask for.</p>
-  <div class="gate">
+  <div class="panel">
     <p><strong>Your responsibility:</strong> know the hazards of any chemical you are using, and
     follow the proper handling procedures.</p>
   </div>
@@ -1925,10 +2002,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Telling a current sheet from an old one.</p>
     </div>
   </details>
-  <details class="xcard" id="storage-and-incompatible-materials" data-card="storage-and-incompatible-materials">
-    <summary>Storage and incompatible materials<span class="chev"></span></summary>
+  <details class="xcard" id="material-storage-and-incompatible-materials" data-card="material-storage-and-incompatible-materials">
+    <summary>Material Storage and incompatible materials<span class="chev"></span></summary>
     <div class="body">
-      <h2>Storage and incompatible materials</h2>
+      <h2>Material Storage and incompatible materials</h2>
   <ul>
     <li><strong>Flammable liquids</strong> must be stored in an approved flammables cabinet when not in use.</li>
     <li><strong>NEVER store incompatible chemicals together.</strong></li>
@@ -1970,7 +2047,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard is-stop" id="electrical-sources" data-card="electrical-sources">
+  <details class="xcard" id="electrical-sources" data-card="electrical-sources">
     <summary>Electrical Sources<span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical Sources</h2>
@@ -1985,7 +2062,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div><dt>240&nbsp;V / 480&nbsp;V</dt><dd>Industrial equipment. Extremely dangerous &mdash; often
     fatal.</dd></div>
   </dl>
-  <div class="stop">
+  <div class="panel">
     <p><strong>Voltage tells you whether a circuit can push current through <em>you</em>. It does
     not tell you what that circuit can do to a ring, a dropped tool or a shorted cell.</strong></p>
     <p>Those are two different hazards with two different thresholds. The next two sections are
@@ -1993,7 +2070,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard is-gate" id="electrical-shock-hazard" data-card="electrical-shock-hazard">
+  <details class="xcard is-stop" id="electrical-shock-hazard" data-card="electrical-shock-hazard">
     <summary>Electrical &mdash; Shock Hazard<span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical &mdash; Shock Hazard</h2>
@@ -2023,7 +2100,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; &ldquo;It&rsquo;s not the voltage that gets you, it&rsquo;s the current&rdquo;.</p>
 
   <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; The international standards are not one number.</p>
-  <div class="gate">
+  <div class="stop">
     <p><strong>In this lab, use 50&nbsp;V &mdash; AC or DC.</strong> It is the number OSHA enforces,
     it is the most conservative of the figures above, and it assumes nothing about your skin being
     dry or your hands being clean. If a circuit is at or above 50&nbsp;V, it is not something you
@@ -2104,10 +2181,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   not by the number printed on the front of the supply.</p>
     </div>
   </details>
-  <details class="xcard is-gate" id="electrical-conductor-inspection" data-card="electrical-conductor-inspection">
-    <summary>Electrical Conductor Inspection<span class="chev"></span></summary>
+  <details class="xcard is-stop" id="electrical-conductors" data-card="electrical-conductors">
+    <summary>Electrical Conductors<span class="chev"></span></summary>
     <div class="body">
-      <h2>Electrical Conductor Inspection</h2>
+      <h2>Electrical Conductors</h2>
   <p class="lede">Inspect every cord, every time, <strong>before it goes into the receptacle</strong>.
   Never run your hand along a cord while it is plugged in; that is a dangerous way to find fraying.
   It takes about five seconds, and it is the one check that catches most of this page before it
@@ -2139,12 +2216,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     be used to bring a worn or frayed flexible cord into compliance&rdquo; (interpretation letter,
     16&nbsp;December&nbsp;1998). If conductors or their insulation are showing, the cord is done.</p>
   </div>
-    </div>
-  </details>
-  <details class="xcard is-stop" id="plugs-cords-and-connections" data-card="plugs-cords-and-connections">
-    <summary>Plugs, cords and connections<span class="chev"></span></summary>
-    <div class="body">
-      <h2>Plugs, cords and connections</h2>
+  <h3>Connections and plugs</h3>
   <ul>
     <li>Always <strong>disconnect power</strong> before performing any maintenance or adjustment.</li>
     <li><strong>NEVER yank or pull a cord</strong> &mdash; grasp the plug, not the cord. Pulling by
@@ -2162,36 +2234,54 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
   <h3>A partly unplugged appliance is a short waiting for something to land on it</h3>
 
-  <figure class="graphic-slot">
-    <!-- GRAPHIC-SLOT: partly-unplugged-short
-         STATUS: awaiting artwork. Fill this figure; leave the figcaption text as written.
-         LAYOUT NOTE: see the damaged-cord-inspection slot above. app.css still has no
-           .graphic-slot rule and the figure is inset 40px each side until it does.
-         THIS IS A SEQUENCE, NOT A STILL. Three panels, read left to right, one caption:
-           1. NORMAL. Plug fully seated in a wall receptacle. Nothing visible but the plug face.
-           2. THE SETUP. Same plug pulled out roughly halfway, so both flat blades are bare
-              between the plug body and the receptacle face. Still energized, still working,
-              nothing looks wrong. This panel is the whole point: the hazard exists BEFORE
-              anything happens, and it looks like nothing.
-           3. THE EVENT. A metal chip (the instructor's example, and the thing that is actually
-              lying around in this building) falls and lands across both exposed blades.
-              Dead short across the supply: a bang, a hard flash, pitted blades.
-         TEACHING POINT: what makes this dangerous is the gap, not the appliance. Panel 2 has
-           to look boring or the sequence does not work.
-         MEDIUM: draw this. Inline SVG, three panels, themed with the site tokens like the
-           PASS stepper on the fire page. Per the media README, browser-drawn beats a flat
-           image where the browser can draw it, and this is geometry, not photography.
-           Do NOT stage and photograph a real energized short.
-         CONSTRAINTS: legible in black and white for the printable aggregate; legible in both
-           light and dark theme; no motion required to read it. If panel numbering is drawn,
-           number the panels 1 2 3.
-         ALT (accessible description; on the SVG use role="img" plus a title/desc pair, or
-           supply it as the label if this ends up as an image file):
-           "Three panels. First, a plug fully seated in a wall receptacle. Second, the same plug
-           pulled halfway out with both metal blades exposed in the gap. Third, a metal chip
-           falling across the two exposed blades and shorting them, with a flash at the contact
-           point."
-    -->
+  <figure class="graphic-slot electrical-plug-sequence">
+    <ol class="plug-sequence" aria-label="Why a plug must be fully seated">
+      <li class="plug-panel plug-state-seated">
+        <svg class="plug-panel-art" viewBox="0 0 280 260" role="img" aria-labelledby="plug-seated-title plug-seated-desc" xmlns="http://www.w3.org/2000/svg">
+          <title id="plug-seated-title">Plug fully seated</title>
+          <desc id="plug-seated-desc">A plug is fully seated in a wall receptacle. No metal blades are exposed.</desc>
+          <rect class="plug-panel-box" x="8" y="8" width="264" height="244" rx="8"/>
+          <circle class="plug-panel-number" cx="33" cy="34" r="15"/><text class="plug-panel-number-text" x="33" y="41">1</text>
+          <text class="plug-panel-title" x="59" y="41">FULLY IN</text>
+          <path class="plug-cord" d="M22 141 C47 141 43 135 65 135"/><path class="plug-cord-line" d="M22 141 C47 141 43 135 65 135"/>
+          <rect class="plug-wall" x="208" y="59" width="48" height="142" rx="4"/><rect class="plug-receptacle" x="217" y="87" width="30" height="87" rx="5"/>
+          <rect class="plug-socket" x="227" y="102" width="7" height="20" rx="2"/><rect class="plug-socket" x="227" y="141" width="7" height="20" rx="2"/>
+          <rect class="plug-body" x="65" y="88" width="156" height="88" rx="10"/><path class="plug-grip" d="M91 103 V161 M105 103 V161"/>
+          <path class="plug-seated-mark" d="M112 211 l13 13 28 -34"/><text class="plug-note" x="140" y="242" text-anchor="middle">NO EXPOSED BLADES</text>
+        </svg>
+      </li>
+      <li class="plug-panel plug-state-gap">
+        <svg class="plug-panel-art" viewBox="0 0 280 260" role="img" aria-labelledby="plug-gap-title plug-gap-desc" xmlns="http://www.w3.org/2000/svg">
+          <title id="plug-gap-title">Plug pulled partly out</title>
+          <desc id="plug-gap-desc">The same plug is pulled halfway out of the wall receptacle, leaving both metal blades exposed in the gap.</desc>
+          <rect class="plug-panel-box" x="8" y="8" width="264" height="244" rx="8"/>
+          <circle class="plug-panel-number" cx="33" cy="34" r="15"/><text class="plug-panel-number-text" x="33" y="41">2</text>
+          <text class="plug-panel-title" x="59" y="41">EXPOSED GAP</text>
+          <path class="plug-cord" d="M22 141 C47 141 43 135 65 135"/><path class="plug-cord-line" d="M22 141 C47 141 43 135 65 135"/>
+          <rect class="plug-wall" x="208" y="59" width="48" height="142" rx="4"/><rect class="plug-receptacle" x="217" y="87" width="30" height="87" rx="5"/>
+          <rect class="plug-socket" x="227" y="102" width="7" height="20" rx="2"/><rect class="plug-socket" x="227" y="141" width="7" height="20" rx="2"/>
+          <rect class="plug-body" x="65" y="88" width="91" height="88" rx="10"/><path class="plug-grip" d="M87 103 V161 M101 103 V161"/>
+          <rect class="plug-blade" x="156" y="103" width="62" height="16" rx="2"/><rect class="plug-blade" x="156" y="144" width="62" height="16" rx="2"/>
+          <path class="plug-gap-mark" d="M162 210 H202 M162 204 V216 M202 204 V216"/><text class="plug-note" x="140" y="242" text-anchor="middle">BLADES ARE LIVE</text>
+        </svg>
+      </li>
+      <li class="plug-panel plug-state-short">
+        <svg class="plug-panel-art" viewBox="0 0 280 260" role="img" aria-labelledby="plug-short-title plug-short-desc" xmlns="http://www.w3.org/2000/svg">
+          <title id="plug-short-title">Metal chip bridges exposed blades</title>
+          <desc id="plug-short-desc">A metal chip falls across the two exposed blades and short-circuits the supply. A flash marks the contact point.</desc>
+          <rect class="plug-panel-box" x="8" y="8" width="264" height="244" rx="8"/>
+          <circle class="plug-panel-number plug-panel-number-danger" cx="33" cy="34" r="15"/><text class="plug-panel-number-text" x="33" y="41">3</text>
+          <text class="plug-panel-title" x="59" y="41">CHIP BRIDGE</text>
+          <path class="plug-cord" d="M22 141 C47 141 43 135 65 135"/><path class="plug-cord-line" d="M22 141 C47 141 43 135 65 135"/>
+          <rect class="plug-wall" x="208" y="59" width="48" height="142" rx="4"/><rect class="plug-receptacle" x="217" y="87" width="30" height="87" rx="5"/>
+          <rect class="plug-socket" x="227" y="102" width="7" height="20" rx="2"/><rect class="plug-socket" x="227" y="141" width="7" height="20" rx="2"/>
+          <rect class="plug-body" x="65" y="88" width="91" height="88" rx="10"/><path class="plug-grip" d="M87 103 V161 M101 103 V161"/>
+          <rect class="plug-blade" x="156" y="103" width="62" height="16" rx="2"/><rect class="plug-blade" x="156" y="144" width="62" height="16" rx="2"/>
+          <path class="plug-fall" d="M184 61 V102"/><g class="plug-chip"><path d="M165 127 l34 -21 10 16 -34 21 z"/></g>
+          <path class="plug-flash" d="M184 118 l8 12 15 -2 -8 12 8 12 -15 -2 -8 12 -2 -16 -13 -7 13 -7 z"/><text class="plug-note" x="140" y="242" text-anchor="middle">DEAD SHORT</text>
+        </svg>
+      </li>
+    </ol>
     <figcaption>The hazard is the gap, and it is there before anything lands in it.</figcaption>
   </figure>
 
