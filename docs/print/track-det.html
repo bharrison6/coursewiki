@@ -303,6 +303,52 @@ a.xref-out::after {
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
 /* ==========================================================================
+   Paper is white. The dark skin must not reach print.
+
+   `@media print { :root { --paper: #FFF } }` lived in app.css and was
+   out-specified: `:root:not([data-theme="light"])` and `:root[data-theme=
+   "dark"]` are both (0,2,0) against its (0,1,0), so under a dark colour
+   scheme the print media computed --paper #16181A and --ink #ECEAE6.
+   Measured, both routes: OS `prefers-color-scheme: dark` and the theme
+   toggle's data-theme="dark" each printed a body background of
+   rgb(22,24,26). Under a light scheme the same probe correctly reported
+   rgb(255,255,255), which is what says the fault is the dark skin and not the
+   print block.
+
+   It lands on the PDF fallback, which is the entire offline story - and the
+   failure is not "a bit dim", it is a page of ink or white-on-white.
+
+   Same family as the logo swap below: a specificity fix only outranks the
+   rules that existed when it was written, and a skin added to a token layer
+   is exactly the rule that gets added later. "Paper is white" is an
+   invariant, so it is enforced as one rather than by out-climbing today's
+   selectors.
+
+   EVERY token the dark skin redefines is reset, not just the two that were
+   noticed. A partial reset is worse than none: white paper carrying the dark
+   --ink is invisible text.
+   ========================================================================*/
+@media print {
+  :root {
+    --paper:      #FFFFFF !important;
+    --surface:    #FFFFFF !important;
+    --surface-2:  #EDECE6 !important;
+    --ink:        #1F1E1C !important;
+    --ink-soft:   #565350 !important;
+    --rule:       #D8D5D0 !important;
+    --accent:     #002144 !important;
+    --band:       #002144 !important;
+    --band-ink:   #FFFFFF !important;
+    --flag-soft:  #FDF7E7 !important;
+    --flag-ink:   #002144 !important;
+    --cat1-soft:  #E8F6FC !important;
+    --cat2-soft:  #FDF7E7 !important;
+    --cat3-soft:  #FFEDE5 !important;
+    --cat-ink:    #002144 !important;
+  }
+}
+
+/* ==========================================================================
    Logo theme swap. The !important is deliberate and load-bearing.
 
    The mark is never recoloured, so both lockups ship and one is hidden with
@@ -1090,7 +1136,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
    Print - the page is a handout again. Chrome goes, every card opens.
    ========================================================================*/
 @media print {
-  :root { --paper: #FFF; --surface: #FFF; }
+  /* The paper palette is NOT redefined here. It lives in the token layer, in
+     one place, enforced with !important - because the version that lived here
+     was quietly out-specified by the dark skin. See msu-theme.css, "Paper is
+     white". Adding a second copy is how the two would drift. */
   .appbar, .sidebar, .backdrop, .toc, .cardtools, .usedin, .skip, .ck-reset { display: none !important; }
   .shell, .shell.has-toc { display: block; }
   main { padding: 0; }
