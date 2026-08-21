@@ -1886,6 +1886,52 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
    a quiet results area gives the current consequence, and any table stays a
    table. The content remains meaningful when the JavaScript is unavailable.
    ======================================================================== */
+.conversion-equation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  align-items: center;
+  margin: 1rem 0;
+  padding: .8rem .95rem;
+  border-inline-start: .25rem solid var(--accent);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .98rem;
+  font-weight: 700;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.conversion-factor {
+  display: inline-grid;
+  grid-template-rows: auto auto;
+  vertical-align: middle;
+  min-width: max-content;
+  text-align: center;
+  line-height: 1.15;
+}
+.conversion-factor > span {
+  display: block;
+  padding-inline: .18em;
+}
+.conversion-factor > span:first-child { border-bottom: 1px solid currentColor; padding-bottom: .14em; }
+.conversion-factor > span:last-child { padding-top: .14em; }
+.unit-cancel {
+  position: relative;
+  display: inline-block;
+  color: var(--ink-soft);
+}
+.unit-cancel::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset-inline: -.08em;
+  top: 52%;
+  height: 2px;
+  background: var(--cat3);
+  transform: rotate(-8deg);
+  transform-origin: center;
+}
 .unit-lab,
 [data-prefix-explorer],
 [data-unit-converter],
@@ -2092,35 +2138,36 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 }
 .unit-table tr:last-child :is(th, td) { border-bottom: 0; }
 
-/* A -20 m to +20 m axis stays deliberately literal. The marker's inline
-   --path-position / left is provided by app.js; labels are real text outside
-   the aria-hidden track so a position is never conveyed by a dot alone. */
+/* app.js derives the scale from the entered positions. The visible endpoint
+   labels and the track's accessible label always name that same scale. */
 .path-track,
 .path-lab-track,
 [data-path-track] {
   position: relative;
-  min-height: 4.5rem;
+  min-height: 6rem;
   margin: 1rem 0 0;
-  padding: .75rem .75rem 1.55rem;
+  padding: .75rem .75rem 1.8rem;
   border: 1px solid var(--rule);
   background: var(--surface-2);
   overflow: hidden;
+}
+[data-path-lab][data-path-label-rows="3"] :is(.path-track, .path-lab-track, [data-path-track]) { min-height: 7.5rem; }
+[data-path-lab][data-path-label-rows="3"] :is(.path-track, .path-lab-track, [data-path-track]) [data-path-marker]::after {
+  height: calc(3.8rem - var(--path-label-row, 0) * 1.3rem);
 }
 .path-track::before,
 .path-lab-track::before,
 [data-path-track]::before {
   content: "";
   position: absolute;
-  inset: auto .75rem 1.1rem;
+  inset: auto .75rem 1.3rem;
   height: 2px;
   background: var(--ink-soft);
 }
-.path-track::after,
-.path-lab-track::after,
-[data-path-track]::after {
-  content: "\2212 20 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 0 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 +20 m";
+.path-axis {
   position: absolute;
-  inset: auto .75rem .15rem;
+  z-index: 1;
+  inset: auto .75rem .2rem;
   display: flex;
   justify-content: space-between;
   color: var(--ink-soft);
@@ -2128,7 +2175,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   font-size: .66rem;
   font-weight: 700;
   letter-spacing: .025em;
-  white-space: pre;
+  pointer-events: none;
+}
+.path-axis > span { min-width: 0; overflow-wrap: anywhere; }
+.path-axis > span:last-child { text-align: end; }
+.path-lab-track [data-path-marker="start"] { --path-position: 16.6667%; --path-label-row: 0; }
+.path-lab-track [data-path-marker="turn"] { --path-position: 83.3333%; --path-label-row: 0; }
+.path-lab-track [data-path-marker="end"] { --path-position: 16.6667%; --path-label-row: 1; }
+.path-lab-track [data-path-marker] {
+  top: calc(.45rem + var(--path-label-row, 0) * 1.3rem);
+}
+.path-lab-track [data-path-marker][data-path-edge="low"] { transform: translateX(0); }
+.path-lab-track [data-path-marker][data-path-edge="high"] { transform: translateX(-100%); }
+.path-lab-track [data-path-marker][data-path-edge="low"]::after { left: .45rem; }
+.path-lab-track [data-path-marker][data-path-edge="high"]::after { right: .45rem; }
+.path-lab-track [data-path-marker]:not([data-path-edge])::after { left: 50%; transform: translateX(-50%); }
+.path-lab-track [data-path-marker][data-path-edge="low"]::after,
+.path-lab-track [data-path-marker][data-path-edge="high"]::after {
+  transform: none;
 }
 .path-track [data-path-marker],
 .path-track [data-path-start-marker],
@@ -2144,7 +2208,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 [data-path-track] [data-path-end-marker] {
   position: absolute;
   z-index: 1;
-  top: .45rem;
+  top: calc(.45rem + var(--path-label-row, 0) * 1.3rem);
   left: var(--path-position, 50%);
   display: block;
   width: max-content;
@@ -2177,12 +2241,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   position: absolute;
   top: 100%;
   width: 2px;
-  height: 1rem;
+  height: calc(2.3rem - var(--path-label-row, 0) * 1.3rem);
   background: var(--accent);
 }
-.path-track [data-path-marker="end"],
-.path-lab-track [data-path-marker="end"],
-[data-path-track] [data-path-marker="end"] { top: 1.85rem; }
 
 .velocity-bars {
   display: grid;
@@ -2268,6 +2329,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
    tool's height; focus rings and all controls remain available in this mode. */
 .presenting :is(.unit-lab, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) { font-size: 1.08rem; }
 .presenting :is(.unit-controls, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { min-height: 3rem; }
+.presenting .conversion-equation { font-size: 1.12em; padding: 1rem 1.1rem; }
 
 @media (max-width: 36rem) {
   .unit-lab,
@@ -2286,7 +2348,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { max-width: 100%; }
   .unit-table { min-width: 28rem; }
   .velocity-bars > * { grid-template-columns: minmax(0, 1fr); gap: .35rem; }
-  :is(.path-track, .path-lab-track, [data-path-track])::after { font-size: .58rem; letter-spacing: 0; }
+  .conversion-equation { gap: .3rem; padding: .7rem .75rem; font-size: .9rem; }
+  .path-axis { font-size: .58rem; letter-spacing: 0; }
 }
 
 @media print {
@@ -2320,6 +2383,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-path-track],
   .unit-table,
   .unit-table th { background: #FFF !important; color: #111 !important; }
+  .conversion-equation {
+    break-inside: avoid;
+    background: #FFF !important;
+    border-color: #111 !important;
+    color: #111 !important;
+  }
+  .conversion-equation .unit-cancel { color: #111 !important; }
+  .conversion-equation .unit-cancel::after { background: #111 !important; }
   .unit-result,
   .unit-equation,
   [data-practice-feedback],
@@ -2408,6 +2479,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><a href="#p-motion-quantities">Motion Quantities</a></li>
     <li><a href="#p-acceleration-and-squared-time">Acceleration and Squared Time</a></li>
     <li><a href="#p-geometry-mass-and-force">Geometry, Mass, and Force</a></li>
+    <li><a href="#p-unit-1-practice">Unit 1 Practice Lab</a></li>
   </ol>
 </div>
 <article class="article bundled" id="p-measurement-language">
@@ -2575,11 +2647,20 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Convert by multiplying by one<span class="chev"></span></summary>
     <div class="body">
       <h2>Convert by multiplying by one</h2>
-  <p class="lede">A conversion factor is a true equality written as a fraction. Because its numerator
-  and denominator name the same quantity, the factor equals one; it changes units without changing
-  the physical amount.</p>
-  <p>To convert 12 m to feet, choose a factor that puts meters on the bottom so meters cancel:</p>
-  <p><code>12 m &times; (3.280839895 ft / 1 m) = 39.37007874 ft</code></p>
+  <p class="lede">A conversion factor is a ratio of two <strong>exactly equal physical quantities</strong>
+  written as a fraction. For example, 1 ft and 0.3048 m name exactly the same length. Their ratio
+  therefore has the numerical value 1, so multiplying by it changes the unit expression without
+  changing the physical quantity.</p>
+  <p>Either orientation is valid: <code>1 ft / 0.3048 m</code> and
+  <code>0.3048 m / 1 ft</code> both equal 1. Choose the orientation that cancels the unwanted unit.
+  To convert 12 m to feet, put meters on the bottom:</p>
+  <p class="conversion-equation"><span>12 <span class="unit-cancel">m</span></span> &times;
+  <span class="conversion-factor" aria-label="1 foot divided by 0.3048 meters"><span aria-hidden="true">1 ft</span><span aria-hidden="true">0.3048 <span class="unit-cancel">m</span></span></span>
+  = 39.370078740&hellip; ft &asymp; 39.3701 ft.</p>
+  <p>For the reverse conversion, turn the same exact equality over so feet cancel:</p>
+  <p class="conversion-equation"><span>39.370078740&hellip; <span class="unit-cancel">ft</span></span> &times;
+  <span class="conversion-factor" aria-label="0.3048 meters divided by 1 foot"><span aria-hidden="true">0.3048 m</span><span aria-hidden="true">1 <span class="unit-cancel">ft</span></span></span>
+  = 12 m.</p>
   <div class="gate">
     <p><strong>Do not memorize an arrow.</strong> Write the desired unit, then arrange the factor so
     the unwanted unit cancels. The units tell you whether the fraction is facing the correct way
@@ -2639,7 +2720,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         <optgroup label="Area"><option value="m2">square meter (m²)</option><option value="ft2">square foot (ft²)</option><option value="in2">square inch (in²)</option></optgroup>
         <optgroup label="Volume"><option value="m3">cubic meter (m³)</option><option value="L">liter (L)</option><option value="ft3">cubic foot (ft³)</option><option value="in3">cubic inch (in³)</option><option value="usgal">U.S. liquid gallon (U.S. gal)</option></optgroup>
         <optgroup label="Mass"><option value="kg">kilogram (kg)</option><option value="lbm">pound mass (lbm)</option><option value="slug">slug</option></optgroup>
-        <optgroup label="Speed"><option value="mps">meter per second (m/s)</option><option value="ftps">foot per second (ft/s)</option><option value="mph">mile per hour (mph)</option><option value="kmph">kilometer per hour (km/h)</option></optgroup>
+        <optgroup label="Speed / signed velocity component"><option value="mps">meter per second (m/s)</option><option value="ftps">foot per second (ft/s)</option><option value="mph">mile per hour (mph)</option><option value="kmph">kilometer per hour (km/h)</option></optgroup>
         <optgroup label="Acceleration"><option value="mps2">meter per second squared (m/s²)</option><option value="ftps2">foot per second squared (ft/s²)</option></optgroup>
         <optgroup label="Force"><option value="N">newton (N)</option><option value="lbf">pound force (lbf)</option></optgroup>
       </select></p>
@@ -2650,13 +2731,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         <optgroup label="Area"><option value="m2">square meter (m²)</option><option value="ft2">square foot (ft²)</option><option value="in2">square inch (in²)</option></optgroup>
         <optgroup label="Volume"><option value="m3">cubic meter (m³)</option><option value="L">liter (L)</option><option value="ft3">cubic foot (ft³)</option><option value="in3">cubic inch (in³)</option><option value="usgal">U.S. liquid gallon (U.S. gal)</option></optgroup>
         <optgroup label="Mass"><option value="kg">kilogram (kg)</option><option value="lbm">pound mass (lbm)</option><option value="slug">slug</option></optgroup>
-        <optgroup label="Speed"><option value="mps">meter per second (m/s)</option><option value="ftps">foot per second (ft/s)</option><option value="mph">mile per hour (mph)</option><option value="kmph">kilometer per hour (km/h)</option></optgroup>
+        <optgroup label="Speed / signed velocity component"><option value="mps">meter per second (m/s)</option><option value="ftps">foot per second (ft/s)</option><option value="mph">mile per hour (mph)</option><option value="kmph">kilometer per hour (km/h)</option></optgroup>
         <optgroup label="Acceleration"><option value="mps2">meter per second squared (m/s²)</option><option value="ftps2">foot per second squared (ft/s²)</option></optgroup>
         <optgroup label="Force"><option value="N">newton (N)</option><option value="lbf">pound force (lbf)</option></optgroup>
       </select></p>
     </fieldset>
+    <p class="aside">Speed is a nonnegative magnitude and has no direction. A negative signed value
+    represents a velocity component opposite the chosen positive direction.</p>
     <p><strong>Result:</strong> <output data-convert-result aria-live="polite">39.3701 ft</output></p>
-    <p data-convert-work>12 m &times; (3.280839895 ft / 1 m) = 39.3701 ft.</p>
+    <p data-convert-work>12 m &times; (1 ft / 0.3048 m) = 39.370078740&hellip; ft &asymp; 39.3701 ft.</p>
     <noscript><p class="aside">JavaScript is off. The shown 12 m to 39.3701 ft example and the
     worked conversions on this page remain available.</p></noscript>
   </div>
@@ -2741,6 +2824,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   does not.</p>
   <p><code>average speed = total distance / elapsed time</code><br>
   <code>average velocity = displacement / elapsed time</code></p>
+  <div class="panel"><p><strong>Notation bridge:</strong> this site uses <code>x</code> for position
+  and <code>&Delta;x</code> for displacement. Some course materials use <code>s</code> for position
+  instead. For a stated interval, write average velocity as
+  <code>v<sub>avg</sub> = &Delta;x / &Delta;t</code>; the symbols differ, but the physical idea is
+  the same.</p></div>
   <p>For the 12 m out-and-back path completed in 16 s, average speed is
   <code>24 m / 16 s = 1.5 m/s</code>. Average velocity is
   <code>0 m / 16 s = 0 m/s</code>. Both statements can be true at the same time.</p>
@@ -2781,17 +2869,16 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <input id="path-start" data-path-start type="number" value="0" step="any" inputmode="decimal"></p>
       <p><label for="path-turn">Turn position (m)</label>
       <input id="path-turn" data-path-turn type="number" value="12" step="any" inputmode="decimal"></p>
-      <p><label for="path-end">End position (m)</label>
-      <input id="path-end" data-path-end type="number" value="0" step="any" inputmode="decimal"></p>
       <p><label for="path-out-time">Outbound time (s)</label>
       <input id="path-out-time" data-path-out-time type="number" value="8" min="0" step="any" inputmode="decimal"></p>
       <p><label for="path-return-time">Return time (s)</label>
       <input id="path-return-time" data-path-return-time type="number" value="8" min="0" step="any" inputmode="decimal"></p>
     </fieldset>
-    <div class="path-lab-track" role="img" aria-label="The path begins at zero meters, reaches twelve meters, then returns to zero meters.">
-      <span data-path-marker="start">Start: 0 m</span>
-      <span data-path-marker="turn">Turn: 12 m</span>
-      <span data-path-marker="end">End: 0 m</span>
+    <div class="path-lab-track" role="img" aria-label="The path begins at zero meters, reaches twelve meters, then returns to zero meters. The displayed scale runs from negative three meters to fifteen meters.">
+      <div class="path-axis" aria-hidden="true"><span data-path-axis-min>&minus;3 m</span><span data-path-axis-max>15 m</span></div>
+      <span data-path-marker="start" data-path-edge="low">Start: 0 m</span>
+      <span data-path-marker="turn" data-path-edge="high">Turn: 12 m</span>
+      <span data-path-marker="end" data-path-edge="low">End: 0 m</span>
     </div>
     <dl class="dims">
       <div><dt>Distance</dt><dd><output data-path-distance aria-live="polite">24 m</output></dd></div>
@@ -3066,8 +3153,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <div><dt>Scaled area</dt><dd><output data-cad-area-result aria-live="polite">1.8 m²</output></dd></div>
       <div><dt>Scaled volume</dt><dd><output data-cad-volume-result aria-live="polite">0.13824 m³</output></dd></div>
       <div><dt>Mass</dt><dd><output data-cad-mass aria-live="polite">373.248 kg</output></dd></div>
-      <div><dt>Weight</dt><dd><output data-cad-weight aria-live="polite">3660.3 N</output></dd></div>
-      <div><dt>Weight</dt><dd><output data-cad-lbf aria-live="polite">822.9 lbf</output></dd></div>
+      <div><dt>Weight force (N)</dt><dd><output data-cad-weight aria-live="polite">3660.3 N</output></dd></div>
+      <div><dt>Weight force (lbf)</dt><dd><output data-cad-lbf aria-live="polite">822.9 lbf</output></dd></div>
     </dl>
     <noscript><p class="aside">JavaScript is off. The displayed case has area factor 1.44,
     volume factor 1.728, scaled volume 0.13824 m³, mass 373.248 kg, and weight 3660.3 N
@@ -3097,6 +3184,248 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </details>
   </div>
   <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Sources and engineering context.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-unit-1-practice">
+  <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span></div>
+  <h1>Unit 1 Practice Lab</h1>
+  <p class="lede">Practice unit-aware engineering calculations for prefixes, conversions, rates, motion, powers, and production planning.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard is-gate" id="use-this-lab-as-a-calculation-check" data-card="use-this-lab-as-a-calculation-check">
+    <summary>Use this lab as a calculation check<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Use this lab as a calculation check</h2>
+  <p class="lede">Work every problem with units visible. Enter only the requested numerical value in a
+  checker, then use the worked solution to compare your factor orientation, cancellation, and rounding.</p>
+  <div class="gate">
+    <p><strong>Method:</strong> start with the given quantity, multiply by equal-quantity ratios, and
+    stop only when the requested unit remains. For example:</p>
+    <p class="conversion-equation"><span>20 <span class="unit-cancel">m</span></span> &times;
+    <span class="conversion-factor" aria-label="1 foot divided by 0.3048 meters"><span aria-hidden="true">1 ft</span><span aria-hidden="true">0.3048 <span class="unit-cancel">m</span></span></span>
+    = 65.6168 ft. The crossed-out meter shows why the factor faces this way.</p>
+  </div>
+  <p class="aside">Keep guard digits while calculating. Round only the final reported value, and state
+  the unit the problem asks for.</p>
+    </div>
+  </details>
+  <details class="xcard" id="line-rates-and-count-rates" data-card="line-rates-and-count-rates">
+    <summary>Line rates and count rates<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Line rates and count rates</h2>
+  <p>These problems combine a spacing or a count with a travel rate. Treat <code>part</code>,
+  <code>word</code>, and <code>key</code> as countable units that can cancel.</p>
+
+  <div class="panel" data-practice data-answer="246.063" data-tolerance="0.2" data-unit="s">
+    <p><strong>1. Assembly-line travel time:</strong> Two stations are 10 m apart. Parts enter a
+    conveyor 1 ft apart, and the line processes 2 parts every 15 s at a steady rate. How long does
+    one part take to travel from the first station to the second?</p>
+    <label for="unit1-lab-assembly-answer">Answer in s</label>
+    <input id="unit1-lab-assembly-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>The spacing supplies <code>1 part / 1 ft</code>, and the throughput supplies
+      <code>15 s / 2 parts</code>. Therefore
+      <code>10 m &times; (1 ft / 0.3048 m) &times; (1 part / 1 ft) &times; (15 s / 2 parts)
+      = 246.063 s</code>, or <strong>246 s</strong> (about 4.10 min). This assumes constant belt
+      speed and steady spacing.</p>
+    </details>
+  </div>
+
+  <div class="panel" data-practice data-answer="195590.551" data-tolerance="100" data-unit="lb/h">
+    <p><strong>2. Recycling-line loading:</strong> A recycling conveyor carries 72 lb of material
+    per linear foot. It moves continuously at 0.23 m/s. How many lb of material pass a point in one
+    hour?</p>
+    <label for="unit1-lab-recycling-answer">Answer in lb/h</label>
+    <input id="unit1-lab-recycling-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>Carry the line loading, speed, exact foot factor, and hour conversion together:
+      <code>0.23 m/s &times; (1 ft / 0.3048 m) &times; (72 lb / ft) &times; (3,600 s / 1 h)
+      = 195,590.551&hellip; lb/h</code>. The result is <strong>1.96 &times; 10<sup>5</sup> lb/h</strong>
+      (about 195,600 lb/h).</p>
+    </details>
+  </div>
+
+  <div class="panel" data-practice data-answer="15.25" data-tolerance="0.01" data-unit="keys/s">
+    <p><strong>3. Typing count rate:</strong> A typist produces 150 words/min. The average word has
+    5.1 letters, and one spacebar press follows each word, for 6.1 key presses/word. What is the
+    typist&rsquo;s key rate in keys/s?</p>
+    <label for="unit1-lab-typing-answer">Answer in keys/s</label>
+    <input id="unit1-lab-typing-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p><code>150 words/min &times; (6.1 keys / 1 word) &times; (1 min / 60 s) =
+      15.25 keys/s</code>. Words and minutes cancel, leaving <strong>15.25 keys/s</strong>.</p>
+    </details>
+  </div>
+    </div>
+  </details>
+  <details class="xcard" id="speed-and-exact-length-conversions" data-card="speed-and-exact-length-conversions">
+    <summary>Speed and exact-length conversions<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Speed and exact-length conversions</h2>
+  <p>Speed is a nonnegative magnitude. If a problem names a positive direction, a negative signed
+  result would instead describe a velocity component opposite that direction.</p>
+
+  <div class="panel" data-practice data-answer="14.775" data-tolerance="0.02" data-unit="mph">
+    <p><strong>4. Average running speed:</strong> A runner completes 5 km in 12 min 37 s. What is the
+    runner&rsquo;s average speed in mi/h?</p>
+    <label for="unit1-lab-run-answer">Answer in mph</label>
+    <input id="unit1-lab-run-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>First convert the distance and time: <code>5 km &times; (1 mi / 1.609344 km) =
+      3.10685596 mi</code> and <code>12 min 37 s = 757 s</code>. Then
+      <code>3.10685596 mi / 757 s &times; (3,600 s / 1 h) = 14.775&hellip; mi/h</code>, or
+      <strong>14.8 mph</strong>.</p>
+    </details>
+  </div>
+
+  <div class="panel" data-practice data-answer="5.46807" data-tolerance="0.01" data-unit="ft/s">
+    <p><strong>5. Conveyor setting:</strong> A packaging conveyor must cover 20 m in 12 s. What
+    speed setting is required in ft/s?</p>
+    <label for="unit1-lab-conveyor-answer">Answer in ft/s</label>
+    <input id="unit1-lab-conveyor-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p><code>20 m / 12 s &times; (1 ft / 0.3048 m) = 5.468066&hellip; ft/s</code>. The required
+      speed is <strong>5.47 ft/s</strong>.</p>
+    </details>
+  </div>
+
+  <div class="panel" data-practice data-answer="5.4864" data-tolerance="0.0001" data-unit="m">
+    <p><strong>6. Reverse exact-factor check:</strong> A guard is specified as 18 ft long. What is
+    its length in meters?</p>
+    <label for="unit1-lab-reverse-answer">Answer in m</label>
+    <input id="unit1-lab-reverse-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>Put feet on the bottom so they cancel: <code>18 ft &times; (0.3048 m / 1 ft) =
+      5.4864 m</code>. The exact relationship gives <strong>5.4864 m</strong>.</p>
+    </details>
+  </div>
+    </div>
+  </details>
+  <details class="xcard" id="prefixes-area-and-volume-powers" data-card="prefixes-area-and-volume-powers">
+    <summary>Prefixes, area, and volume powers<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Prefixes, area, and volume powers</h2>
+  <p>A prefix changes a scale by a power of ten. Squared and cubed units require the whole linear
+  conversion factor to be squared or cubed.</p>
+
+  <div class="panel" data-practice data-answer="4.8" data-tolerance="0.01" data-unit="mm">
+    <p><strong>7. Prefix scale:</strong> A feature is 0.0048 m long. What is its length in mm?</p>
+    <label for="unit1-lab-prefix-answer">Answer in mm</label>
+    <input id="unit1-lab-prefix-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p><code>0.0048 m &times; (1,000 mm / 1 m) = 4.8 mm</code>. The answer is
+      <strong>4.8 mm</strong>.</p>
+    </details>
+  </div>
+
+  <div class="panel" data-practice data-answer="396" data-tolerance="0.01" data-unit="in²">
+    <p><strong>8. Squared conversion:</strong> A panel has an area of 2.75 ft<sup>2</sup>. What is
+    its area in in<sup>2</sup>?</p>
+    <label for="unit1-lab-area-answer">Answer in in²</label>
+    <input id="unit1-lab-area-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>Because <code>1 ft = 12 in</code>, square the relationship:
+      <code>2.75 ft<sup>2</sup> &times; (12 in / 1 ft)<sup>2</sup> =
+      2.75 &times; 144 in<sup>2</sup> = 396 in<sup>2</sup></code>. The answer is
+      <strong>396 in²</strong>.</p>
+    </details>
+  </div>
+
+  <div class="panel" data-practice data-answer="864" data-tolerance="0.01" data-unit="in³">
+    <p><strong>9. Cubed conversion:</strong> A fixture has a volume of 0.50 ft<sup>3</sup>. What is
+    its volume in in<sup>3</sup>?</p>
+    <label for="unit1-lab-volume-answer">Answer in in³</label>
+    <input id="unit1-lab-volume-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>Cube the 12-in-per-foot relationship: <code>0.50 ft<sup>3</sup> &times;
+      (12 in / 1 ft)<sup>3</sup> = 0.50 &times; 1,728 in<sup>3</sup> = 864 in<sup>3</sup></code>.
+      The answer is <strong>864 in³</strong>.</p>
+    </details>
+  </div>
+    </div>
+  </details>
+  <details class="xcard" id="signed-velocity-and-acceleration" data-card="signed-velocity-and-acceleration">
+    <summary>Signed velocity and acceleration<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Signed velocity and acceleration</h2>
+  <p>Choose the positive direction before calculating. A negative result is meaningful: it says the
+  velocity component or acceleration points opposite that chosen direction.</p>
+
+  <div class="panel" data-practice data-answer="0.6" data-tolerance="0.01" data-unit="m/s²">
+    <p><strong>10. Conveyor acceleration:</strong> A conveyor accelerates from rest (0 m/s) to 3 m/s
+    in 5 s. What is its average acceleration?</p>
+    <label for="unit1-lab-conveyor-acceleration-answer">Answer in m/s²</label>
+    <input id="unit1-lab-conveyor-acceleration-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p><code>a<sub>avg</sub> = (v<sub>f</sub> &minus; v<sub>i</sub>) / &Delta;t =
+      (3 m/s &minus; 0 m/s) / 5 s = 0.6 m/s<sup>2</sup></code>. The answer is
+      <strong>+0.6 m/s²</strong> in the selected positive direction.</p>
+    </details>
+  </div>
+
+  <div class="panel" data-practice data-answer="-4" data-tolerance="0.01" data-unit="m/s²">
+    <p><strong>11. Direction reversal:</strong> Take motion to the right as positive. A cart changes
+    from +2 m/s to &minus;1 m/s in 0.75 s. What is its average acceleration?</p>
+    <label for="unit1-lab-signed-acceleration-answer">Answer in m/s²</label>
+    <input id="unit1-lab-signed-acceleration-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p><code>a<sub>avg</sub> = (&minus;1 m/s &minus; (+2 m/s)) / 0.75 s =
+      &minus;3 m/s / 0.75 s = &minus;4 m/s<sup>2</sup></code>. The negative sign means the
+      acceleration component points left, opposite the chosen positive direction.</p>
+    </details>
+  </div>
+    </div>
+  </details>
+  <details class="xcard" id="production-cycle-planning" data-card="production-cycle-planning">
+    <summary>Production-cycle planning<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Production-cycle planning</h2>
+  <p>Production planning combines a stated operating window with a repeatable cycle. A partial
+  cycle is not a complete part.</p>
+
+  <div class="panel" data-practice data-answer="119" data-tolerance="0.01" data-unit="complete parts">
+    <p><strong>12. Complete-part schedule:</strong> A cell runs for 7.5 h. Setup takes 20 min, and
+    each repeatable cycle takes 3.6 min per part. How many complete parts fit in the run?</p>
+    <label for="unit1-lab-production-answer">Answer in complete parts</label>
+    <input id="unit1-lab-production-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>The running window is <code>7.5 h &times; (60 min / 1 h) &minus; 20 min = 430 min</code>.
+      Then <code>430 min / (3.6 min / part) = 119.444&hellip; parts</code>. Only
+      <strong>119 complete parts</strong> fit; the fraction is time into the next cycle.</p>
+    </details>
+  </div>
+
+  <p class="deeper-ref" id="deeper-ref-11">Supporting detail: <a href="#deeper-addendum-11"><strong>Addendum 11</strong></a> &mdash; Scope and assumptions.</p>
     </div>
   </details>
 </div>
@@ -3222,6 +3551,16 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     conventions are used here with <code>g<sub>0</sub> = 9.80665 m/s<sup>2</sup></code> for the
     standard-gravity examples.</p>
         <p class="deeper-back"><a href="#deeper-ref-10">Back to reference 10</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-11" value="11">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-unit-1-practice">Unit 1 Practice Lab</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 11.</span> Scope and assumptions</h2>
+        <p>These are idealized calculation checks. They assume the stated spacing, speed, cycle time,
+    and throughput remain constant; real production plans also account for startup, pauses, quality
+    checks, material availability, and safety constraints.</p>
+        <p class="deeper-back"><a href="#deeper-ref-11">Back to reference 11</a></p>
       </article>
     </li>
   </ol>
@@ -4234,10 +4573,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       function update() {
         var startValue = readNumber(start);
         var turnValue = readNumber(turn);
-        var endValue = readNumber(end);
+        /* An out-and-back path ends where it starts. Older authored markup may
+           still contain an end control, so mirror it rather than trusting a
+           separate value. */
+        var endValue = startValue;
+        if (end && startValue !== null) end.value = String(startValue);
         var outTimeValue = readNumber(outTime);
         var returnTimeValue = readNumber(returnTime);
-        if (startValue === null || turnValue === null || endValue === null ||
+        if (startValue === null || turnValue === null ||
             outTimeValue === null || returnTimeValue === null || outTimeValue <= 0 || returnTimeValue <= 0) {
           clearResults('Enter positions and positive travel times.');
           return;
@@ -4256,20 +4599,57 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         write(root, ['velocity', 'avg-velocity', 'average-velocity'], format(averageVelocity) + ' m/s');
 
         var positions = { start: startValue, turn: turnValue, end: endValue };
+        var positionValues = [startValue, turnValue, endValue];
+        var lowestPosition = Math.min.apply(Math, positionValues);
+        var highestPosition = Math.max.apply(Math, positionValues);
+        var pathRange = highestPosition - lowestPosition;
+        /* Leave a truthful margin around the actual extrema so the labels do
+           not fall off the track. A zero-length path still gets a real scale. */
+        var scalePadding = Math.max(pathRange * 0.25, 1);
+        var scaleMinimum = lowestPosition - scalePadding;
+        var scaleMaximum = highestPosition + scalePadding;
+        var scaleRange = scaleMaximum - scaleMinimum;
+        var markerRows = {};
+
+        ['start', 'turn', 'end'].forEach(function (name) {
+          var samePosition = ['start', 'turn', 'end'].filter(function (other) {
+            return other !== name && positions[other] === positions[name];
+          });
+          markerRows[name] = samePosition.length ? ['start', 'turn', 'end'].slice(0, ['start', 'turn', 'end'].indexOf(name)).filter(function (earlier) {
+            return positions[earlier] === positions[name];
+          }).length : 0;
+        });
+        var requiredRows = Math.max(markerRows.start, markerRows.turn, markerRows.end) + 1;
+        root.setAttribute('data-path-label-rows', String(requiredRows));
+
+        root.querySelectorAll('[data-path-axis-min]').forEach(function (label) {
+          label.textContent = format(scaleMinimum) + ' m';
+        });
+        root.querySelectorAll('[data-path-axis-max]').forEach(function (label) {
+          label.textContent = format(scaleMaximum) + ' m';
+        });
+
         root.querySelectorAll('[data-path-marker], [data-path-start-marker], [data-path-turn-marker], [data-path-end-marker]').forEach(function (marker) {
           var name = markerName(marker);
           var position = positions[name];
           if (position === undefined) return;
-          var percentage = Math.max(0, Math.min(100, ((position + 20) / 40) * 100));
+          var percentage = ((position - scaleMinimum) / scaleRange) * 100;
+          var isLowest = position === lowestPosition && lowestPosition !== highestPosition;
+          var isHighest = position === highestPosition && lowestPosition !== highestPosition;
           marker.style.setProperty('--path-position', percentage + '%');
+          marker.style.setProperty('--path-label-row', String(markerRows[name] || 0));
           marker.style.left = percentage + '%';
+          if (isLowest) marker.setAttribute('data-path-edge', 'low');
+          else if (isHighest) marker.setAttribute('data-path-edge', 'high');
+          else marker.removeAttribute('data-path-edge');
           if (name) marker.textContent = name.charAt(0).toUpperCase() + name.slice(1) + ': ' + format(position) + ' m';
         });
 
         var track = root.querySelector('.path-track, .path-lab-track, [data-path-track]');
         if (track && track.hasAttribute('aria-label')) {
           track.setAttribute('aria-label', 'The path starts at ' + format(startValue) + ' meters, reaches ' +
-            format(turnValue) + ' meters, and ends at ' + format(endValue) + ' meters.');
+            format(turnValue) + ' meters, and returns to ' + format(endValue) + ' meters. The displayed scale runs from ' +
+            format(scaleMinimum) + ' meters to ' + format(scaleMaximum) + ' meters.');
         }
       }
 

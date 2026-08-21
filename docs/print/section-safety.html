@@ -1886,6 +1886,52 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
    a quiet results area gives the current consequence, and any table stays a
    table. The content remains meaningful when the JavaScript is unavailable.
    ======================================================================== */
+.conversion-equation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  align-items: center;
+  margin: 1rem 0;
+  padding: .8rem .95rem;
+  border-inline-start: .25rem solid var(--accent);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: .98rem;
+  font-weight: 700;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.conversion-factor {
+  display: inline-grid;
+  grid-template-rows: auto auto;
+  vertical-align: middle;
+  min-width: max-content;
+  text-align: center;
+  line-height: 1.15;
+}
+.conversion-factor > span {
+  display: block;
+  padding-inline: .18em;
+}
+.conversion-factor > span:first-child { border-bottom: 1px solid currentColor; padding-bottom: .14em; }
+.conversion-factor > span:last-child { padding-top: .14em; }
+.unit-cancel {
+  position: relative;
+  display: inline-block;
+  color: var(--ink-soft);
+}
+.unit-cancel::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset-inline: -.08em;
+  top: 52%;
+  height: 2px;
+  background: var(--cat3);
+  transform: rotate(-8deg);
+  transform-origin: center;
+}
 .unit-lab,
 [data-prefix-explorer],
 [data-unit-converter],
@@ -2092,35 +2138,36 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 }
 .unit-table tr:last-child :is(th, td) { border-bottom: 0; }
 
-/* A -20 m to +20 m axis stays deliberately literal. The marker's inline
-   --path-position / left is provided by app.js; labels are real text outside
-   the aria-hidden track so a position is never conveyed by a dot alone. */
+/* app.js derives the scale from the entered positions. The visible endpoint
+   labels and the track's accessible label always name that same scale. */
 .path-track,
 .path-lab-track,
 [data-path-track] {
   position: relative;
-  min-height: 4.5rem;
+  min-height: 6rem;
   margin: 1rem 0 0;
-  padding: .75rem .75rem 1.55rem;
+  padding: .75rem .75rem 1.8rem;
   border: 1px solid var(--rule);
   background: var(--surface-2);
   overflow: hidden;
+}
+[data-path-lab][data-path-label-rows="3"] :is(.path-track, .path-lab-track, [data-path-track]) { min-height: 7.5rem; }
+[data-path-lab][data-path-label-rows="3"] :is(.path-track, .path-lab-track, [data-path-track]) [data-path-marker]::after {
+  height: calc(3.8rem - var(--path-label-row, 0) * 1.3rem);
 }
 .path-track::before,
 .path-lab-track::before,
 [data-path-track]::before {
   content: "";
   position: absolute;
-  inset: auto .75rem 1.1rem;
+  inset: auto .75rem 1.3rem;
   height: 2px;
   background: var(--ink-soft);
 }
-.path-track::after,
-.path-lab-track::after,
-[data-path-track]::after {
-  content: "\2212 20 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 0 m\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 +20 m";
+.path-axis {
   position: absolute;
-  inset: auto .75rem .15rem;
+  z-index: 1;
+  inset: auto .75rem .2rem;
   display: flex;
   justify-content: space-between;
   color: var(--ink-soft);
@@ -2128,7 +2175,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   font-size: .66rem;
   font-weight: 700;
   letter-spacing: .025em;
-  white-space: pre;
+  pointer-events: none;
+}
+.path-axis > span { min-width: 0; overflow-wrap: anywhere; }
+.path-axis > span:last-child { text-align: end; }
+.path-lab-track [data-path-marker="start"] { --path-position: 16.6667%; --path-label-row: 0; }
+.path-lab-track [data-path-marker="turn"] { --path-position: 83.3333%; --path-label-row: 0; }
+.path-lab-track [data-path-marker="end"] { --path-position: 16.6667%; --path-label-row: 1; }
+.path-lab-track [data-path-marker] {
+  top: calc(.45rem + var(--path-label-row, 0) * 1.3rem);
+}
+.path-lab-track [data-path-marker][data-path-edge="low"] { transform: translateX(0); }
+.path-lab-track [data-path-marker][data-path-edge="high"] { transform: translateX(-100%); }
+.path-lab-track [data-path-marker][data-path-edge="low"]::after { left: .45rem; }
+.path-lab-track [data-path-marker][data-path-edge="high"]::after { right: .45rem; }
+.path-lab-track [data-path-marker]:not([data-path-edge])::after { left: 50%; transform: translateX(-50%); }
+.path-lab-track [data-path-marker][data-path-edge="low"]::after,
+.path-lab-track [data-path-marker][data-path-edge="high"]::after {
+  transform: none;
 }
 .path-track [data-path-marker],
 .path-track [data-path-start-marker],
@@ -2144,7 +2208,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 [data-path-track] [data-path-end-marker] {
   position: absolute;
   z-index: 1;
-  top: .45rem;
+  top: calc(.45rem + var(--path-label-row, 0) * 1.3rem);
   left: var(--path-position, 50%);
   display: block;
   width: max-content;
@@ -2177,12 +2241,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   position: absolute;
   top: 100%;
   width: 2px;
-  height: 1rem;
+  height: calc(2.3rem - var(--path-label-row, 0) * 1.3rem);
   background: var(--accent);
 }
-.path-track [data-path-marker="end"],
-.path-lab-track [data-path-marker="end"],
-[data-path-track] [data-path-marker="end"] { top: 1.85rem; }
 
 .velocity-bars {
   display: grid;
@@ -2268,6 +2329,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
    tool's height; focus rings and all controls remain available in this mode. */
 .presenting :is(.unit-lab, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) { font-size: 1.08rem; }
 .presenting :is(.unit-controls, [data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { min-height: 3rem; }
+.presenting .conversion-equation { font-size: 1.12em; padding: 1rem 1.1rem; }
 
 @media (max-width: 36rem) {
   .unit-lab,
@@ -2286,7 +2348,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   :is([data-prefix-explorer], [data-unit-converter], [data-path-lab], [data-acceleration-lab], [data-cad-lab]) :is(input, select, button) { max-width: 100%; }
   .unit-table { min-width: 28rem; }
   .velocity-bars > * { grid-template-columns: minmax(0, 1fr); gap: .35rem; }
-  :is(.path-track, .path-lab-track, [data-path-track])::after { font-size: .58rem; letter-spacing: 0; }
+  .conversion-equation { gap: .3rem; padding: .7rem .75rem; font-size: .9rem; }
+  .path-axis { font-size: .58rem; letter-spacing: 0; }
 }
 
 @media print {
@@ -2320,6 +2383,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-path-track],
   .unit-table,
   .unit-table th { background: #FFF !important; color: #111 !important; }
+  .conversion-equation {
+    break-inside: avoid;
+    background: #FFF !important;
+    border-color: #111 !important;
+    color: #111 !important;
+  }
+  .conversion-equation .unit-cancel { color: #111 !important; }
+  .conversion-equation .unit-cancel::after { background: #111 !important; }
   .unit-result,
   .unit-equation,
   [data-practice-feedback],
@@ -5405,10 +5476,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       function update() {
         var startValue = readNumber(start);
         var turnValue = readNumber(turn);
-        var endValue = readNumber(end);
+        /* An out-and-back path ends where it starts. Older authored markup may
+           still contain an end control, so mirror it rather than trusting a
+           separate value. */
+        var endValue = startValue;
+        if (end && startValue !== null) end.value = String(startValue);
         var outTimeValue = readNumber(outTime);
         var returnTimeValue = readNumber(returnTime);
-        if (startValue === null || turnValue === null || endValue === null ||
+        if (startValue === null || turnValue === null ||
             outTimeValue === null || returnTimeValue === null || outTimeValue <= 0 || returnTimeValue <= 0) {
           clearResults('Enter positions and positive travel times.');
           return;
@@ -5427,20 +5502,57 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         write(root, ['velocity', 'avg-velocity', 'average-velocity'], format(averageVelocity) + ' m/s');
 
         var positions = { start: startValue, turn: turnValue, end: endValue };
+        var positionValues = [startValue, turnValue, endValue];
+        var lowestPosition = Math.min.apply(Math, positionValues);
+        var highestPosition = Math.max.apply(Math, positionValues);
+        var pathRange = highestPosition - lowestPosition;
+        /* Leave a truthful margin around the actual extrema so the labels do
+           not fall off the track. A zero-length path still gets a real scale. */
+        var scalePadding = Math.max(pathRange * 0.25, 1);
+        var scaleMinimum = lowestPosition - scalePadding;
+        var scaleMaximum = highestPosition + scalePadding;
+        var scaleRange = scaleMaximum - scaleMinimum;
+        var markerRows = {};
+
+        ['start', 'turn', 'end'].forEach(function (name) {
+          var samePosition = ['start', 'turn', 'end'].filter(function (other) {
+            return other !== name && positions[other] === positions[name];
+          });
+          markerRows[name] = samePosition.length ? ['start', 'turn', 'end'].slice(0, ['start', 'turn', 'end'].indexOf(name)).filter(function (earlier) {
+            return positions[earlier] === positions[name];
+          }).length : 0;
+        });
+        var requiredRows = Math.max(markerRows.start, markerRows.turn, markerRows.end) + 1;
+        root.setAttribute('data-path-label-rows', String(requiredRows));
+
+        root.querySelectorAll('[data-path-axis-min]').forEach(function (label) {
+          label.textContent = format(scaleMinimum) + ' m';
+        });
+        root.querySelectorAll('[data-path-axis-max]').forEach(function (label) {
+          label.textContent = format(scaleMaximum) + ' m';
+        });
+
         root.querySelectorAll('[data-path-marker], [data-path-start-marker], [data-path-turn-marker], [data-path-end-marker]').forEach(function (marker) {
           var name = markerName(marker);
           var position = positions[name];
           if (position === undefined) return;
-          var percentage = Math.max(0, Math.min(100, ((position + 20) / 40) * 100));
+          var percentage = ((position - scaleMinimum) / scaleRange) * 100;
+          var isLowest = position === lowestPosition && lowestPosition !== highestPosition;
+          var isHighest = position === highestPosition && lowestPosition !== highestPosition;
           marker.style.setProperty('--path-position', percentage + '%');
+          marker.style.setProperty('--path-label-row', String(markerRows[name] || 0));
           marker.style.left = percentage + '%';
+          if (isLowest) marker.setAttribute('data-path-edge', 'low');
+          else if (isHighest) marker.setAttribute('data-path-edge', 'high');
+          else marker.removeAttribute('data-path-edge');
           if (name) marker.textContent = name.charAt(0).toUpperCase() + name.slice(1) + ': ' + format(position) + ' m';
         });
 
         var track = root.querySelector('.path-track, .path-lab-track, [data-path-track]');
         if (track && track.hasAttribute('aria-label')) {
           track.setAttribute('aria-label', 'The path starts at ' + format(startValue) + ' meters, reaches ' +
-            format(turnValue) + ' meters, and ends at ' + format(endValue) + ' meters.');
+            format(turnValue) + ' meters, and returns to ' + format(endValue) + ' meters. The displayed scale runs from ' +
+            format(scaleMinimum) + ' meters to ' + format(scaleMaximum) + ' meters.');
         }
       }
 
