@@ -52,6 +52,7 @@ $ErrorActionPreference = 'Stop'
 $root     = $PSScriptRoot
 $collDir  = Join-Path $root 'collections'
 $trackDir = Join-Path $root 'tracks'
+$practiceDir = Join-Path $root 'practice'
 $themeDir = Join-Path $root 'theme'
 $mediaDir = Join-Path $root 'media'
 $docsDir  = Join-Path $root 'docs'
@@ -354,6 +355,114 @@ foreach ($cid in $collOrder) {
   Write-Host ("collection {0,-10} {1} pages" -f $cid, $ids.Count)
 }
 
+# ----------------------------------------------------------- practice banks --
+# Practice problems are deliberately NOT collection pages. A teaching page is
+# still the canonical explanation, while practice\ is a bank of small,
+# reusable problems that a reader can collect into a session. Keeping the bank
+# outside collections prevents a problem from becoming a normal track item
+# merely because the page that explains it is in a track.
+#
+# A bank is a normal @@ header followed by HTML. Each root problem needs:
+#   data-practice data-practice-id data-practice-title data-practice-source
+# The source is a PAGE id, not a collection or track id. The authored root may
+# have any ordinary HTML tag and may be nested in section groups.
+function Get-HtmlAttribute([string]$attrs, [string]$name) {
+  $rx = '(?is)(?:^|\s)' + [regex]::Escape($name) +
+        '(?=\s|=|/|$)(?:\s*=\s*(?:"(?<dq>[^"]*)"|''(?<sq>[^'']*)''|(?<bare>[^\s"''=<>]+)))?'
+  $m = [regex]::Match($attrs, $rx)
+  if (-not $m.Success) { return $null }
+  if ($m.Groups['dq'].Success) { return $m.Groups['dq'].Value }
+  if ($m.Groups['sq'].Success) { return $m.Groups['sq'].Value }
+  if ($m.Groups['bare'].Success) { return $m.Groups['bare'].Value }
+  ''
+}
+
+# This is a small tag balancer, rather than a <div>...</div> regex: bank items
+# naturally contain panels and answer rows nested in the same kind of tag as
+# their root. Regex alone would stop at the first inner close and silently cut
+# off the problem that gets rendered and indexed.
+function Find-HtmlElementEnd([string]$html, [int]$start, [string]$tag) {
+  $rx = [regex]::new($script:commentRx + '|</?' + [regex]::Escape($tag) + '\b[^>]*>')
+  $depth = 0
+  foreach ($m in $rx.Matches($html, $start)) {
+    $text = $m.Value
+    if ($text.StartsWith('<!--', [StringComparison]::Ordinal)) { continue }
+    if ($text -match '^</') {
+      $depth--
+      if ($depth -eq 0) { return $m.Index + $m.Length }
+      continue
+    }
+    if ($text -notmatch '/\s*>$') { $depth++ }
+  }
+  -1
+}
+
+$practiceItems = @()
+$practiceIds = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+$practiceDomIds = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+if (Test-Path -LiteralPath $practiceDir) {
+  $bankIds = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+  foreach ($f in (Get-ChildItem -LiteralPath $practiceDir -Filter '*.html' | Sort-Object Name)) {
+    $bank = Read-Conf $f.FullName
+    foreach ($req in 'ID','TITLE') {
+      if (-not $bank.Meta.ContainsKey($req) -or -not $bank.Meta[$req]) { throw "$($f.Name): missing @@$req" }
+    }
+    if ($bank.Meta.ID -ne [IO.Path]::GetFileNameWithoutExtension($f.Name)) {
+      throw "$($f.Name): @@ID '$($bank.Meta.ID)' does not match the filename"
+    }
+    if (-not $bankIds.Add($bank.Meta.ID)) { throw "duplicate practice bank id '$($bank.Meta.ID)'" }
+
+    # Consume comments whole before looking for tags so an author can comment
+    # out a draft problem without publishing or validating its inner markup.
+    $openRx = [regex]::new($script:commentRx + '|<(?<tag>[A-Za-z][A-Za-z0-9:-]*)\b(?<attrs>[^<>]*)>')
+    foreach ($open in $openRx.Matches($bank.Body)) {
+      if ($open.Value.StartsWith('<!--', [StringComparison]::Ordinal)) { continue }
+      $attrs = $open.Groups['attrs'].Value
+      if ($null -eq (Get-HtmlAttribute $attrs 'data-practice')) { continue }
+      $id = Get-HtmlAttribute $attrs 'data-practice-id'
+      $title = Get-HtmlAttribute $attrs 'data-practice-title'
+      $source = Get-HtmlAttribute $attrs 'data-practice-source'
+      foreach ($pair in @(@{ Name = 'data-practice-id'; Value = $id },
+                             @{ Name = 'data-practice-title'; Value = $title },
+                             @{ Name = 'data-practice-source'; Value = $source })) {
+        if (-not $pair.Value -or -not $pair.Value.Trim()) { throw "$($f.Name): [data-practice] is missing $($pair.Name)" }
+      }
+      $id = $id.Trim(); $title = $title.Trim(); $source = $source.Trim()
+      if ($id -match '\s') { throw "$($f.Name): practice id '$id' may not contain whitespace" }
+      if (-not $practiceIds.Add($id)) { throw "duplicate practice id '$id' - practice ids must be unique site-wide" }
+      if (-not $pages.Contains($source)) { throw "$($f.Name): practice '$id' names unknown data-practice-source page '$source'" }
+      if ($pages[$source].Id -cne $source) {
+        throw "$($f.Name): practice '$id' has data-practice-source '$source' with the wrong case; use '$($pages[$source].Id)' for GitHub Pages"
+      }
+
+      $end = Find-HtmlElementEnd $bank.Body $open.Index $open.Groups['tag'].Value
+      if ($end -lt 0) { throw "$($f.Name): [data-practice] '$id' has no closing </$($open.Groups['tag'].Value)>" }
+      $markup = $bank.Body.Substring($open.Index, $end - $open.Index).Trim()
+      $domId = Get-HtmlAttribute $attrs 'id'
+      foreach ($tagMatch in $openRx.Matches($markup)) {
+        if ($tagMatch.Value.StartsWith('<!--', [StringComparison]::Ordinal)) { continue }
+        $markupDomId = Get-HtmlAttribute $tagMatch.Groups['attrs'].Value 'id'
+        if ($null -eq $markupDomId) { continue }
+        if (-not $markupDomId.Trim()) { throw "$($f.Name): practice '$id' contains an empty id attribute" }
+        if (-not $practiceDomIds.Add($markupDomId)) {
+          throw "duplicate practice DOM id '$markupDomId' - labels and fragment links would be ambiguous"
+        }
+      }
+      # If the authored root does not already carry the stable practice id,
+      # New-PracticeItemMarkup emits a neighboring fragment anchor with it.
+      # Reserve that generated id in the same global set now.
+      if ($domId -ne $id -and -not $practiceDomIds.Add($id)) {
+        throw "practice '$id' cannot create its fragment anchor because that DOM id is already in use"
+      }
+      $practiceItems += [pscustomobject]@{
+        Id = $id; Title = $title; Source = $source; Bank = $bank.Meta.ID
+        BankTitle = $bank.Meta.TITLE; DomId = $domId; Html = $markup; File = $f.Name
+      }
+    }
+  }
+}
+Write-Host ("practice: {0} item{1}" -f $practiceItems.Count, $(if ($practiceItems.Count -eq 1) { '' } else { 's' }))
+
 # ----------------------------------------------------------------- tracks ----
 # A TRACK is an ordered selection of pages. Three levels are in use, and each
 # one is an ordinary track - the level only says what it contains:
@@ -541,6 +650,10 @@ foreach ($name in $rawTracks.Keys) {
     Subtitle = $rt.Subtitle; Footer = $rt.Footer
     Includes = $rt.Includes
     Items = $items; PageIds = $ids
+    # Practice is a separate collection relation. These ids are a union over
+    # the teaching pages in this track, not synthetic `items`, so the reader's
+    # normal topic sequence and presentation panels cannot acquire problems.
+    PracticeIds = @($practiceItems | Where-Object { $ids -contains $_.Source } | ForEach-Object Id)
   }
 }
 
@@ -624,6 +737,7 @@ function New-ImageTag([string]$ref, [string]$alt, $ctx, [string]$mode) {
   }
   switch ($mode) {
     'site-page' { $src = $ctx.Up + 'media/' + $rec.Rel + '?v=' + $script:stamp }
+    'practice-page' { $src = $ctx.Up + 'media/' + $rec.Rel + '?v=' + $script:stamp }
     'aggregate' {
       if (-not $rec.DataUri) {
         $rec.DataUri = "data:$($rec.Mime);base64," +
@@ -664,6 +778,9 @@ function Resolve-Links([string]$html, $ctx, [string]$mode) {
       'site-page' {
         $href = if ($tp.Collection -eq $ctx.Coll) { "$id.html" } else { "../$($tp.Collection)/$id.html" }
         return '<a class="xref-page" href="' + $href + '">' + $text + '</a>'
+      }
+      'practice-page' {
+        return '<a class="xref-page" href="' + $tp.Collection + '/' + $id + '.html">' + $text + '</a>'
       }
       # An aggregate holds a set of pages in one file. A link to a page inside
       # the same file is an anchor; anything outside it has to leave for the
@@ -1002,6 +1119,12 @@ function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$m
   [void]$sb.AppendLine('  <p class="navnote">Tracks built from the topics above. A course carries the topic tracks it needs; a programme is its courses, so it follows them.</p>')
   Add-TrackNodes (Get-TrackKids '') $plHref $sb '  ' 0
   [void]$sb.AppendLine('  </div>')
+  # Practice is a first-class site surface, but it is not a topic collection
+  # or a track: it draws from both without changing either relation.
+  [void]$sb.AppendLine('  <div class="navsplit"></div>')
+  [void]$sb.AppendLine('  <div class="nav-practice"><h2>Practice</h2>')
+  [void]$sb.AppendLine('    <ul class="navlist"><li><a href="' + $up + 'practice.html">Practice catalog</a></li></ul>')
+  [void]$sb.AppendLine('  </div>')
   [void]$sb.AppendLine('</aside>')
   [void]$sb.AppendLine('<div class="backdrop"></div>')
   $sb.ToString()
@@ -1056,6 +1179,7 @@ $(New-FaviconLinks $up)
 $siteScripts = { param($up) @"
 <script src="${up}search-index.js?v=$script:stamp"></script>
 <script src="${up}playlists.js?v=$script:stamp"></script>
+<script src="${up}practice-index.js?v=$script:stamp"></script>
 <script src="${up}theme/app.js?v=$script:stamp"></script>
 "@ }
 
@@ -1085,6 +1209,10 @@ function New-Cards($p, $ctx, [string]$mode) {
   [void]$sb.AppendLine('<div class="cards">')
   foreach ($s in $p.Sections) {
     $cls = 'xcard'
+    # The runtime can select deck modes without re-parsing authored sections.
+    # In particular deck-wiki-only is visible on the topic page but excluded
+    # from a presentation surface by its presentation rules.
+    if ($s.Mode) { $cls += ' deck-' + $s.Mode }
     if ($s.Flag) { $cls += ' ' + $s.Flag }
     $head = if ($s.Head) { $s.Head } else { ConvertTo-HtmlText $p.Title }
     [void]$sb.AppendLine('  <details class="' + $cls + '" id="' + $s.Slug + '" data-card="' + $s.Slug + '">')
@@ -1352,6 +1480,14 @@ function New-SearchIndex([string]$mode) {
                '","text":"' + (ConvertTo-Json1 (ConvertTo-IndexText $s.Html)) + '"}'
     }
   }
+  # Practice lives outside collections, but it is still reader-visible
+  # teaching content. Each problem has a stable fragment URL in the catalog.
+  foreach ($item in $practiceItems) {
+    $rows += '{"title":"' + (ConvertTo-Json1 $item.Title) +
+             '","page":"Practice","summary":"' + (ConvertTo-Json1 $pages[$item.Source].Title) +
+             '","collection":"Practice","url":"practice.html#' + (ConvertTo-Json1 $item.Id) +
+             '","text":"' + (ConvertTo-Json1 (ConvertTo-IndexText $item.Html)) + '"}'
+  }
   $js = "window.SEARCH_INDEX = [`n" + ($rows -join ",`n") + "`n];`n"
   Write-Host ("    search index: {0} sections, {1:n0} bytes" -f $rows.Count, $js.Length)
   $js
@@ -1388,8 +1524,9 @@ function New-PlaylistData {
         }
       }
     }
+    $allPracticeIds = @($practiceItems | ForEach-Object { '"' + (ConvertTo-Json1 $_.Id) + '"' })
     $rows += '{"name":"everything","title":"Everything","auto":true,"kind":"all","parent":"","includes":[],"items":[' +
-             ($allItems -join ',') + ']}'
+             ($allItems -join ',') + '],"practiceIds":[' + ($allPracticeIds -join ',') + ']}'
   }
 
   foreach ($d in ($tracks.Values | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
@@ -1410,25 +1547,68 @@ function New-PlaylistData {
     # distinguishes them nowhere in reach. The sidebar tree, the up-chain in
     # track mode and the another-class warning all read them from here.
     $incs = @(Get-TrackIncludes $d | ForEach-Object { '"' + (ConvertTo-Json1 $_) + '"' })
+    $practiceIds = @($d.PracticeIds | ForEach-Object { '"' + (ConvertTo-Json1 $_) + '"' })
     $rows += '{"name":"' + (ConvertTo-Json1 $d.Name) +
              '","title":"' + (ConvertTo-Json1 $d.Title) +
              '","kind":"' + (ConvertTo-Json1 $d.Kind) +
              '","parent":"' + (ConvertTo-Json1 $d.Parent) +
              '","includes":[' + ($incs -join ',') +
-             '],"items":[' + ($items -join ',') + ']}'
+             '],"items":[' + ($items -join ',') + '],"practiceIds":[' + ($practiceIds -join ',') + ']}'
   }
   $js = "window.TRACKS = [`n" + ($rows -join ",`n") + "`n];`n"
   Write-Host ("    playlists: {0}, {1:n0} bytes" -f $rows.Count, $js.Length)
   $js
 }
 
+# Metadata is a classic script rather than fetched JSON: file:// blocks fetch
+# even for a neighboring file, while a script works both locally and on Pages.
+# Markup remains server-rendered in practice.html so the catalog is useful
+# without JavaScript and no parallel markup renderer can drift from it.
+function New-PracticeData {
+  $rows = @()
+  foreach ($item in $practiceItems) {
+    $rows += '{"id":"' + (ConvertTo-Json1 $item.Id) +
+             '","title":"' + (ConvertTo-Json1 $item.Title) +
+             '","source":"' + (ConvertTo-Json1 $item.Source) +
+             '","sourceTitle":"' + (ConvertTo-Json1 $pages[$item.Source].Title) +
+             '","bank":"' + (ConvertTo-Json1 $item.Bank) +
+             '","url":"practice.html#' + (ConvertTo-Json1 $item.Id) + '"}'
+  }
+  $js = "window.PRACTICE_ITEMS = [`n" + ($rows -join ",`n") + "`n];`n"
+  Write-Host ("    practice index: {0} items, {1:n0} bytes" -f $rows.Count, $js.Length)
+  $js
+}
+
+function New-PracticeItemMarkup($item) {
+  $id = ConvertTo-HtmlText $item.Id
+  $title = ConvertTo-HtmlText $item.Title
+  $source = $pages[$item.Source]
+  $sourceLink = '<a class="xref-page" href="' + $source.Collection + '/' + $source.Id + '.html">' +
+                (ConvertTo-HtmlText $source.Title) + '</a>'
+  $select = '<label class="practice-catalog-select"><input type="checkbox" data-practice-select value="' + $id + '"> ' +
+            'Add <span class="sr-only">' + $title + '</span> to practice</label>'
+  # The selector belongs inside [data-practice], which keeps the runtime's
+  # generic closest() lookup valid without a catalog-only special case.
+  $resolved = Resolve-Links $item.Html ([pscustomobject]@{ Coll = ''; Up = '' }) 'practice-page'
+  $html = [regex]::Replace($resolved, '^(?s)(<[^>]+>)', {
+    param($m)
+    $m.Value + "`n  " + $select
+  })
+  # Banks commonly set id to the stable practice id. If they do not, preserve
+  # their DOM id and provide a harmless neighboring fragment target instead.
+  $anchor = if ($item.DomId -eq $item.Id) { '' } else { '<span id="' + $id + '" aria-hidden="true"></span>' }
+  $anchor + '<div class="practice-entry"><p class="practice-source">From ' + $sourceLink + '</p>' + "`n" + $html + "`n" + '</div>'
+}
+
 # ------------------------------------------------------------ landing page ---
 Write-Host 'site'
 $searchJs   = New-SearchIndex 'site'
 $playlistJs = New-PlaylistData
+$practiceJs = New-PracticeData
 $script:stamp = Get-BuildStamp @(
   $searchJs
   $playlistJs
+  $practiceJs
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'msu-theme.css'))
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.css'))
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.js'))
@@ -1480,11 +1660,53 @@ Write-Out (Join-Path $docsDir 'index.html') `
 Write-Out (Join-Path $docsDir '.nojekyll') ''
 Write-Out (Join-Path $docsDir 'search-index.js') $searchJs
 Write-Out (Join-Path $docsDir 'playlists.js') $playlistJs
+Write-Out (Join-Path $docsDir 'practice-index.js') $practiceJs
 # Both at the site root: the .svg because it is what a browser will use, the
 # .ico because /favicon.ico is the request a browser makes without being told
 # to - and that request was returning 404 on every single page load.
 Write-Out (Join-Path $docsDir 'favicon.svg') $script:faviconSvg
 Write-OutBytes (Join-Path $docsDir 'favicon.ico') (New-FaviconIcoBytes)
+
+# ------------------------------------------------------ practice catalog ----
+# This is intentionally a real document rather than an empty shell the client
+# fills in. With scripts disabled, every problem, its prompt, and its teaching
+# source remain readable; JavaScript only narrows the already-present catalog
+# to a saved selection.
+$practicePage = New-Object System.Text.StringBuilder
+[void]$practicePage.AppendLine('<a class="skip" href="#main">Skip to content</a>')
+[void]$practicePage.AppendLine((New-AppBar ''))
+[void]$practicePage.AppendLine('<div class="shell">')
+[void]$practicePage.AppendLine((New-Sidebar '' '' '' 'site' ''))
+[void]$practicePage.AppendLine('<main id="main"><div class="article wide">')
+[void]$practicePage.AppendLine('  <div class="crumb"><a href="index.html">' + (ConvertTo-HtmlText $site.TITLE) +
+                              '</a><span class="sep">/</span><span>Practice</span></div>')
+[void]$practicePage.AppendLine('  <h1>Practice</h1>')
+[void]$practicePage.AppendLine('  <p class="lede">Build a practice session from problems tied to the topics you are studying.</p>')
+[void]$practicePage.AppendLine('  <div class="practice-catalog" data-practice-catalog>')
+if ($practiceItems.Count) {
+  [void]$practicePage.AppendLine('    <div class="practice-session-tools">')
+  [void]$practicePage.AppendLine('      <label>Start from a track <select data-practice-track><option value="">Choose a track</option>')
+  foreach ($track in ($tracks.Values | Where-Object { $_.PracticeIds.Count } | Sort-Object @{e={Get-TrackRank $_}}, Title)) {
+    [void]$practicePage.AppendLine('        <option value="' + (ConvertTo-HtmlText $track.Name) + '">' +
+                                  (ConvertTo-HtmlText $track.Title) + '</option>')
+  }
+  [void]$practicePage.AppendLine('      </select></label>')
+  [void]$practicePage.AppendLine('    </div>')
+  [void]$practicePage.AppendLine('    <section class="practice-session" data-practice-session aria-labelledby="practice-session-title">')
+  [void]$practicePage.AppendLine('      <div class="practice-session-head"><div><h2 id="practice-session-title">Practice session</h2>')
+  [void]$practicePage.AppendLine('        <p data-practice-session-status aria-live="polite">Catalog view: ' + $practiceItems.Count + ' problems available.</p></div>')
+  [void]$practicePage.AppendLine('        <div class="practice-session-actions"><button type="button" data-practice-run aria-pressed="false">Run selected practice</button>')
+  [void]$practicePage.AppendLine('          <button type="button" data-practice-clear>Clear practice</button></div></div>')
+  foreach ($item in $practiceItems) { [void]$practicePage.AppendLine((New-PracticeItemMarkup $item)) }
+  [void]$practicePage.AppendLine('    </section>')
+} else {
+  [void]$practicePage.AppendLine('    <p>No practice problems have been published yet.</p>')
+}
+[void]$practicePage.AppendLine('  </div>')
+[void]$practicePage.AppendLine('</div></main>')
+[void]$practicePage.AppendLine('</div>')
+Write-Out (Join-Path $docsDir 'practice.html') `
+          (New-Document ("Practice - " + $site.TITLE) 'app skin-app' $practicePage.ToString() '' 'practice' (& $siteHead '') (& $siteScripts ''))
 
 # ------------------------------------------------------- presentations ------
 # A playlist view, not a page of content. Each presentation shows its ordered

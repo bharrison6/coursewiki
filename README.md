@@ -19,6 +19,7 @@ collections/<id>/
   collection.conf              section title, summary, page groups
   pages/<page-id>.html         one topic per file
 tracks/<name>.track            ordered page/track selections and track hierarchy
+practice/<bank-id>.html        reusable problems for the learner-built practice track
 theme/*.css                    shared MSU token layer and site behavior
 assets/                        SoE lockups and other static assets
 media/                         authored images referenced with [[img:...]]
@@ -40,10 +41,10 @@ pwsh -File .\build-site.ps1 -SiteUrl "https://example.org/coursewiki"
 published URL in `site.conf` when it should be the default; `-SiteUrl` overrides it for one
 run. Edit source files, then regenerate `docs/`; do not hand-edit generated output.
 
-The build validates duplicate page IDs and section slugs, collection groups, track
-references, track cycles, empty tracks, malformed page sections, and image references. It
-reports dangling page links and other normal mid-authoring conditions without treating them
-as build failures.
+The build validates duplicate page and practice IDs, section slugs, practice source pages,
+collection groups, track references, track cycles, empty tracks, malformed page sections,
+and image references. It reports dangling page links and other normal mid-authoring
+conditions without treating them as build failures.
 
 ## Authoring
 
@@ -78,6 +79,36 @@ may use `>` lines for group headings. A course track can include a topic track w
 Program tracks contain their child courses through `@@PARENT`; their page lists are derived
 from those children. This keeps shared content in one source of truth. See the existing
 files in `tracks/` for examples.
+
+## Practice banks
+
+Practice problems are authored separately from teaching pages in `practice/*.html`. A bank
+has an `@@ID`, `@@TITLE`, and `@@END` header. Every problem root must have a stable ID, a
+short catalog title, and the page that teaches the method:
+
+```html
+<div class="panel" id="measurement-prefix-conversion"
+  data-practice data-practice-id="measurement-prefix-conversion"
+  data-practice-title="Micrometers to millimeters"
+  data-practice-source="measurement-language"
+  data-answer="3.2" data-tolerance="0.01" data-unit="mm">
+  ...
+</div>
+```
+
+The generator publishes every problem in `practice.html`, adds it to search, and gives each
+track a separate `practiceIds` preset derived from its teaching pages. Practice IDs never
+become normal track pages or presentation panels. A teaching page can offer a native
+fallback link that JavaScript upgrades into a persistent add/remove control:
+
+```html
+<a class="button" data-practice-add="measurement-prefix-conversion"
+  href="../practice.html#measurement-prefix-conversion">Add to practice</a>
+```
+
+Selections are stored by ID in that browser. The catalog remains a complete readable and
+printable problem set without JavaScript; with JavaScript, a reader can check individual
+problems, start from a track preset, and run only the selected set.
 
 ## Runtime tracks and presentation mode
 
