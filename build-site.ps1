@@ -1,16 +1,18 @@
 <#
-    build-site.ps1 - render the Coursewiki site: landing page, collections, decks.
+    build-site.ps1 - render the CourseWiki site: landing page, collections, and tracks.
 
     THE MODEL
       A PAGE is one topic, authored once, as an @@FIELD: header plus a stack of
       <section> blocks. It lives in collections\<coll>\pages\<id>.html.
 
       A COLLECTION is a section of the site. It gets its own folder, its own
-      index, its own URL, and its own single-file bundle.
+      index, and its own URL.
 
-      A DECK is a manifest in decks\<name>.deck naming pages in order. Decks are
-      SITE-level: a presentation may pull from any collection. Every <section>
-      becomes one slide.
+      A TRACK is a playlist in tracks\<name>.track. It is an ordered selection of
+      real pages, with topic, course, and program tracks composed through includes
+      and @@PARENT. The generated site applies a track at runtime with ?p=<track>;
+      &present=1 presents the same page DOM as full-screen panels. Every <section>
+      becomes one web card and one presentation panel.
 
       A LINK is [[page-id]] or [[page-id|text]]. Ids are unique site-wide, and
       one authored link resolves to five destinations - see Resolve-Links.
@@ -22,17 +24,19 @@
     WHAT THE GENERATOR ADDS THAT THE SOURCE DOES NOT CARRY
       Each authored <section> is wrapped in <details class="xcard"> for the web
       render. That is done HERE, not in the sources, so that:
-        - the deck renderer keeps splitting on <section> and needs no change,
-        - the same source stays printable and slide-able,
+        - runtime playlist and presentation mode need no second copy,
+        - the same source stays printable and presentation-ready,
         - disclosure works with JavaScript off, because <details> is native.
 
     OUTPUT
-      docs\    the site. GitHub Pages serves it from main/docs with no CI.
-      bundle\  self-contained single files, CSS and JS inlined, no siblings.
+      docs\         the site. GitHub Pages serves it from main/docs with no CI.
+      docs\print\  self-contained section and track aggregates, with CSS, JS, and
+                    logos inlined. Print these for PDF or upload them standalone.
 
     Usage
       pwsh -File .\build-site.ps1
-      pwsh -File .\build-site.ps1 -Bundle -SiteUrl "https://example.org/det"
+      pwsh -File .\build-site.ps1 -Prune
+      pwsh -File .\build-site.ps1 -SiteUrl "https://example.org/coursewiki"
       pwsh -File .\build-site.ps1 -WhatIf
 #>
 [CmdletBinding()]
@@ -1094,6 +1098,157 @@ function New-Cards($p, $ctx, [string]$mode) {
   $sb.ToString()
 }
 
+# ------------------------------------------------ aggregate deeper addenda ----
+# A `deeper` disclosure is useful on the web because it keeps supporting detail
+# one click away from the main path. In a printable aggregate that same block
+# belongs at the back of the document: leave a numbered pointer where the
+# disclosure stood, then collect the resolved content in a matching addendum.
+#
+# This transforms the OUTPUT of New-Cards, after Resolve-Links has already done
+# its container-dependent work. It therefore reuses the existing card renderer,
+# aggregate anchors and data-URI image path rather than growing a second render
+# path. The function is called only by New-Aggregate; site pages (including the
+# presentation DOM layered over them) never pass through it.
+function Convert-DeeperForAggregate([string]$html, $page, [System.Collections.ArrayList]$entries) {
+  # Match comments first for the same reason Resolve-Links does: markup sketched
+  # inside an authoring comment is not part of the document tree. Balance every
+  # <details>, not just `.deeper`, because each deeper block is nested inside the
+  # xcard that New-Cards generated and a non-greedy regex would stop at the wrong
+  # closing tag as soon as another disclosure were nested inside it.
+  $tagRx = [regex]::new(
+    $script:commentRx + '|<details\b[^>]*>|</details\s*>',
+    [Text.RegularExpressions.RegexOptions]::IgnoreCase
+  )
+  $stack  = [System.Collections.Stack]::new()
+  $blocks = [System.Collections.ArrayList]::new()
+
+  foreach ($tag in $tagRx.Matches($html)) {
+    if ($tag.Value.StartsWith('<!--', [StringComparison]::Ordinal)) { continue }
+
+    if ($tag.Value.StartsWith('</', [StringComparison]::Ordinal)) {
+      if ($stack.Count -eq 0) {
+        throw "aggregate deeper transform: unmatched </details> on page '$($page.Id)'"
+      }
+      $open = $stack.Pop()
+      if ($open.IsDeeper) {
+        [void]$blocks.Add([pscustomobject]@{
+          Start      = $open.Start
+          OpenEnd    = $open.End
+          CloseStart = $tag.Index
+          End        = $tag.Index + $tag.Length
+        })
+      }
+      continue
+    }
+
+    $classMatch = [regex]::Match(
+      $tag.Value,
+      '(?is)\bclass\s*=\s*(?:"(?<dq>[^"]*)"|''(?<sq>[^'']*)'')'
+    )
+    $classes = if ($classMatch.Groups['dq'].Success) { $classMatch.Groups['dq'].Value }
+               elseif ($classMatch.Groups['sq'].Success) { $classMatch.Groups['sq'].Value }
+               else { '' }
+    $isDeeper = [regex]::IsMatch($classes, '(?:^|\s)deeper(?:\s|$)')
+
+    if ($isDeeper) {
+      foreach ($ancestor in $stack) {
+        if ($ancestor.IsDeeper) {
+          throw "aggregate deeper transform: nested .deeper block on page '$($page.Id)'"
+        }
+      }
+    }
+    $stack.Push([pscustomobject]@{
+      Start = $tag.Index
+      End = $tag.Index + $tag.Length
+      IsDeeper = $isDeeper
+    })
+  }
+
+  if ($stack.Count -ne 0) {
+    throw "aggregate deeper transform: unclosed <details> on page '$($page.Id)'"
+  }
+
+  # Closing tags discover nested blocks inside-out. Sort by the opening offset
+  # before numbering so addenda always follow authored document order.
+  $replacements = [System.Collections.ArrayList]::new()
+  foreach ($block in ($blocks | Sort-Object Start)) {
+    $inner = $html.Substring($block.OpenEnd, $block.CloseStart - $block.OpenEnd)
+    $summary = [regex]::Match($inner, '(?is)<summary\b[^>]*>(?<text>.*?)</summary\s*>')
+    if (-not $summary.Success) {
+      throw "aggregate deeper transform: .deeper block without <summary> on page '$($page.Id)'"
+    }
+
+    $body = $inner.Remove($summary.Index, $summary.Length).Trim()
+    $number = $entries.Count + 1
+    $refId = "deeper-ref-$number"
+    $addendumId = "deeper-addendum-$number"
+    $summaryHtml = $summary.Groups['text'].Value.Trim()
+
+    [void]$entries.Add([pscustomobject]@{
+      Number          = $number
+      RefId           = $refId
+      AddendumId      = $addendumId
+      PageId          = $page.Id
+      PageTitle       = $page.Title
+      CollectionTitle = $collections[$page.Collection].Title
+      GroupTitle      = $page.Section
+      SummaryHtml     = $summaryHtml
+      BodyHtml        = $body
+    })
+
+    # Keep the authored summary outside the pointer link. A summary may itself
+    # contain a resolved page link, and wrapping it would create nested anchors.
+    $pointer = '<p class="deeper-ref" id="' + $refId + '">Supporting detail: ' +
+               '<a href="#' + $addendumId + '"><strong>Addendum ' + $number +
+               '</strong></a> &mdash; ' + $summaryHtml + '.</p>'
+    [void]$replacements.Add([pscustomobject]@{
+      Start = $block.Start
+      End = $block.End
+      Html = $pointer
+    })
+  }
+
+  # Replace from the end so source offsets remain valid. No blocks is a normal,
+  # explicit no-work result; the caller reports its zero alongside positive
+  # aggregate counts rather than treating it as an error or a skipped state.
+  foreach ($replacement in ($replacements | Sort-Object Start -Descending)) {
+    $html = $html.Substring(0, $replacement.Start) + $replacement.Html +
+            $html.Substring($replacement.End)
+  }
+  $html
+}
+
+function New-DeeperAddenda([System.Collections.ArrayList]$entries) {
+  if ($entries.Count -eq 0) { return '' }
+
+  $sb = New-Object System.Text.StringBuilder
+  [void]$sb.AppendLine('<section class="deeper-addenda" id="deeper-addenda" aria-labelledby="deeper-addenda-title">')
+  [void]$sb.AppendLine('  <header class="deeper-addenda-head">')
+  [void]$sb.AppendLine('    <div class="eyebrow">Supporting detail</div>')
+  [void]$sb.AppendLine('    <h1 id="deeper-addenda-title">Addendum</h1>')
+  [void]$sb.AppendLine('    <p class="lede">Additional evidence, standards context, and background referenced from the main text.</p>')
+  [void]$sb.AppendLine('  </header>')
+  [void]$sb.AppendLine('  <ol class="deeper-addenda-list">')
+  foreach ($entry in $entries) {
+    [void]$sb.AppendLine('    <li class="deeper-addendum" id="' + $entry.AddendumId + '" value="' + $entry.Number + '">')
+    [void]$sb.AppendLine('      <article>')
+    [void]$sb.AppendLine('        <div class="crumb"><span>' + (ConvertTo-HtmlText $entry.CollectionTitle) +
+                         '</span><span class="sep">/</span><span>' + (ConvertTo-HtmlText $entry.GroupTitle) +
+                         '</span><span class="sep">/</span><a href="#p-' + $entry.PageId + '">' +
+                         (ConvertTo-HtmlText $entry.PageTitle) + '</a></div>')
+    [void]$sb.AppendLine('        <h2><span class="deeper-addendum-number">Addendum ' + $entry.Number + '.</span> ' +
+                         $entry.SummaryHtml + '</h2>')
+    [void]$sb.AppendLine('        ' + $entry.BodyHtml)
+    [void]$sb.AppendLine('        <p class="deeper-back"><a href="#' + $entry.RefId + '">Back to reference ' +
+                         $entry.Number + '</a></p>')
+    [void]$sb.AppendLine('      </article>')
+    [void]$sb.AppendLine('    </li>')
+  }
+  [void]$sb.AppendLine('  </ol>')
+  [void]$sb.AppendLine('</section>')
+  $sb.ToString()
+}
+
 function New-Toc($p) {
   $sb = New-Object System.Text.StringBuilder
   [void]$sb.AppendLine('<aside class="toc">')
@@ -1555,6 +1710,7 @@ function New-Aggregate {
   $ids = [System.Collections.Generic.HashSet[string]]::new()
   foreach ($p in $pageList) { [void]$ids.Add($p.Id) }
   $ctx = [pscustomobject]@{ Ids = $ids }
+  $deeperEntries = [System.Collections.ArrayList]::new()
 
   $b = New-Object System.Text.StringBuilder
   [void]$b.AppendLine('<div class="agg-head" id="top">')
@@ -1577,8 +1733,12 @@ function New-Aggregate {
     [void]$b.AppendLine('  <h1>' + (ConvertTo-HtmlText $p.Title) +
                         $(if ($p.Status -ne 'ready') { ' <span class="pill">' + (ConvertTo-HtmlText $p.Status) + '</span>' } else { '' }) + '</h1>')
     [void]$b.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $p.Summary) + '</p>')
-    [void]$b.AppendLine((New-Cards $p $ctx 'aggregate'))
+    $cards = New-Cards $p $ctx 'aggregate'
+    [void]$b.AppendLine((Convert-DeeperForAggregate $cards $p $deeperEntries))
     [void]$b.AppendLine('</article>')
+  }
+  if ($deeperEntries.Count) {
+    [void]$b.AppendLine((New-DeeperAddenda $deeperEntries))
   }
 
   $sb = New-Object System.Text.StringBuilder
@@ -1606,6 +1766,10 @@ function New-Aggregate {
   [void]$sb.AppendLine('</script>')
   [void]$sb.AppendLine('</body>')
   [void]$sb.AppendLine('</html>')
+  Write-Host ('    {0}: {1} source deeper block{2} -> {1} inline ref{2} + {1} addendum entr{3}' -f
+              $slug, $deeperEntries.Count,
+              $(if ($deeperEntries.Count -eq 1) { '' } else { 's' }),
+              $(if ($deeperEntries.Count -eq 1) { 'y' } else { 'ies' }))
   Write-Out (Join-Path $docsDir ('print\' + $slug + '.html')) $sb.ToString()
 }
 
@@ -1623,11 +1787,29 @@ $script:aggCss   = @'
 .agg-toc li::before { content: none; }
 .agg-toc a { font-family: var(--f-display); font-weight: 600; text-decoration: none; }
 .article.bundled { border-top: 3px solid var(--accent); padding-top: 2rem; margin-top: 3rem; }
+.deeper-ref {
+  margin: .35rem 0; padding: .65rem .85rem;
+  border-left: 3px solid var(--accent); background: var(--surface-2);
+  font-family: var(--f-display); font-size: .93rem;
+}
+.deeper-ref a { color: var(--accent); text-underline-offset: .16em; }
+.deeper-addenda { border-top: 3px solid var(--accent); margin-top: 4rem; padding-top: 2rem; }
+.deeper-addenda-head { margin-bottom: 2rem; }
+.deeper-addenda-list { margin: 0; padding-left: 2rem; }
+.deeper-addendum { padding-left: .5rem; margin-bottom: 3rem; }
+.deeper-addendum::marker { color: var(--accent); font-family: var(--f-display); font-weight: 700; }
+.deeper-addendum article { display: flex; flex-direction: column; gap: .8rem; }
+.deeper-addendum h2 { margin: 0; font-size: 1.35rem; }
+.deeper-addendum-number { color: var(--accent); }
+.deeper-back { font-family: var(--f-display); font-size: .85rem; }
 @media print {
   .aggregate main { padding: 0; max-width: none; }
   .article.bundled { break-before: page; border-top: 0; margin-top: 0; padding-top: 0; }
   .agg-head { break-after: page; }
   .aggregate .xcard[open] > summary, .aggregate .xcard > summary { border-bottom: 2px solid var(--ink); }
+  .deeper-addenda { break-before: page; border-top: 0; margin-top: 0; padding-top: 0; }
+  .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
+  .deeper-back { display: none; }
 }
 '@
 
