@@ -1,0 +1,124 @@
+@@ID: motion-quantities
+@@TITLE: Motion Quantities
+@@SECTION: Units and Measurement
+@@SUMMARY: Distinguish path length from displacement, and speed from velocity, before using time to describe a machine or vehicle in motion.
+@@STATUS: ready
+@@TAGS: distance, displacement, speed, velocity, average, instantaneous, motion, robotics, manufacturing
+@@END
+
+<section>
+  <h2>Path length and displacement answer different questions</h2>
+  <p class="lede"><strong>Distance</strong> is how much path was traveled. <strong>Displacement</strong>
+  is the directed change from the starting position to the ending position. A return trip can add
+  distance while leaving displacement at zero.</p>
+  <dl class="dims">
+    <div><dt>Distance</dt><dd>A nonnegative scalar path length. A conveyor that moves a tote 12 m
+    out and 12 m back travels 24 m of distance.</dd></div>
+    <div><dt>Displacement</dt><dd>A change in position with direction. If the tote returns to its
+    start, its displacement is 0 m even though it moved.</dd></div>
+    <div><dt>Coordinate choice</dt><dd>Choose a positive direction before calculating. Along a
+    straight robot rail, right might be positive and left negative.</dd></div>
+  </dl>
+  <div class="panel"><p><strong>Distance tells what the machine did along its path; displacement
+  tells where it ended up relative to where it began.</strong> Do not substitute one for the other
+  just because both use meters or feet.</p></div>
+</section>
+
+<section>
+  <h2>Speed and velocity are not synonyms</h2>
+  <p><strong>Average speed</strong> is total distance divided by elapsed time. <strong>Average
+  velocity</strong> is displacement divided by elapsed time. Velocity includes direction; speed
+  does not.</p>
+  <p><code>average speed = total distance / elapsed time</code><br>
+  <code>average velocity = displacement / elapsed time</code></p>
+  <p>For the 12 m out-and-back path completed in 16 s, average speed is
+  <code>24 m / 16 s = 1.5 m/s</code>. Average velocity is
+  <code>0 m / 16 s = 0 m/s</code>. Both statements can be true at the same time.</p>
+  <h3>A production-line example</h3>
+  <p>A mechanism must carry a part 12 m in 8 s. Its required average <strong>speed</strong> is
+  <code>12 m / 8 s = 1.5 m/s</code>. Converting with exact factors gives
+  <code>1.5 m/s &times; (39.37007874 in / 1 m) = 59.055... in/s</code>, or
+  <strong>59.1 in/s</strong>. If the programmed direction is stated, its average velocity is
+  <strong>+59.1 in/s</strong> in that direction.</p>
+</section>
+
+<section>
+  <h2>Average and instantaneous readings</h2>
+  <p>An average uses a time interval. An instantaneous reading describes one moment: a car
+  speedometer reports instantaneous speed; a robot controller&rsquo;s live velocity value is an
+  instantaneous velocity in its coordinate frame.</p>
+  <ul>
+    <li>Use <strong>average speed</strong> for throughput, travel-time, and trip planning.</li>
+    <li>Use <strong>average velocity</strong> for a net movement over a stated interval.</li>
+    <li>Use an <strong>instantaneous</strong> reading when clearance, collision avoidance, or a
+    machine limit depends on what is happening now.</li>
+  </ul>
+  <details class="deeper">
+    <summary>The calculus idea, after the practical one</summary>
+    <p>Over a smaller and smaller time interval, average velocity approaches instantaneous
+    velocity. In calculus notation, velocity is the derivative of position with respect to time:
+    <code>v = dx/dt</code>. For this course, begin by naming the interval, position change, and
+    direction correctly; the derivative notation is a compact extension of the same idea.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Out-and-back path lab</h2>
+  <p class="lede">Set positions along a straight path and the outbound and return times. The text
+  results make the distance and displacement distinction visible even when the track is not used.</p>
+  <div class="panel" data-path-lab>
+    <fieldset>
+      <legend>Position and time inputs</legend>
+      <p><label for="path-start">Start position (m)</label>
+      <input id="path-start" data-path-start type="number" value="0" step="any" inputmode="decimal"></p>
+      <p><label for="path-turn">Turn position (m)</label>
+      <input id="path-turn" data-path-turn type="number" value="12" step="any" inputmode="decimal"></p>
+      <p><label for="path-end">End position (m)</label>
+      <input id="path-end" data-path-end type="number" value="0" step="any" inputmode="decimal"></p>
+      <p><label for="path-out-time">Outbound time (s)</label>
+      <input id="path-out-time" data-path-out-time type="number" value="8" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="path-return-time">Return time (s)</label>
+      <input id="path-return-time" data-path-return-time type="number" value="8" min="0" step="any" inputmode="decimal"></p>
+    </fieldset>
+    <div class="path-lab-track" role="img" aria-label="The path begins at zero meters, reaches twelve meters, then returns to zero meters.">
+      <span data-path-marker="start">Start: 0 m</span>
+      <span data-path-marker="turn">Turn: 12 m</span>
+      <span data-path-marker="end">End: 0 m</span>
+    </div>
+    <dl class="dims">
+      <div><dt>Distance</dt><dd><output data-path-distance aria-live="polite">24 m</output></dd></div>
+      <div><dt>Displacement</dt><dd><output data-path-displacement aria-live="polite">0 m</output></dd></div>
+      <div><dt>Average speed</dt><dd><output data-path-speed aria-live="polite">1.5 m/s</output></dd></div>
+      <div><dt>Average velocity</dt><dd><output data-path-velocity aria-live="polite">0 m/s</output></dd></div>
+    </dl>
+    <noscript><p class="aside">JavaScript is off. The displayed values are the solved 12 m out,
+    12 m back, 8 s each-way case: 24 m distance, 0 m displacement, 1.5 m/s average speed, and
+    0 m/s average velocity.</p></noscript>
+  </div>
+</section>
+
+<section>
+  <h2>Practice and sources</h2>
+  <div class="panel" data-practice data-answer="6.13636" data-tolerance="0.01" data-unit="round trips">
+    <p><strong>Practice:</strong> A cart moves at a constant 4.5 ft/s between two areas 0.25 mi
+    apart. Ignoring loading and turnaround time, what is its idealized round-trip rate per hour?</p>
+    <label for="practice-trip-answer">Answer in round trips per hour</label>
+    <input id="practice-trip-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>One round trip is <code>2 &times; 0.25 mi = 0.50 mi</code>.
+      <code>0.50 mi &times; (5,280 ft / 1 mi) = 2,640 ft</code>. At 4.5 ft/s, one trip takes
+      <code>2,640 ft / (4.5 ft/s) = 586.667 s</code>. Therefore
+      <code>3,600 s / 586.667 s = 6.13636</code> round trips per hour, or about
+      <strong>6.14 round trips per hour</strong>. A plan that requires complete trips would schedule
+      6 and leave time for only part of a seventh.</p>
+    </details>
+  </div>
+  <details class="deeper">
+    <summary>Source note</summary>
+    <p>The <a href="https://www.nist.gov/pml/owm/metric-si/si-units">NIST SI Units reference</a>
+    lists velocity as a derived unit example. Direction is an added physical requirement: two
+    motions may have the same speed but different velocities because their directions differ.</p>
+  </details>
+</section>

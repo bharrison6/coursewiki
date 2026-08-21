@@ -1,0 +1,152 @@
+@@ID: geometry-mass-and-force
+@@TITLE: Geometry, Mass, and Force
+@@SECTION: Units and Measurement
+@@SUMMARY: Scale CAD geometry correctly, connect volume and density to mass, and keep force and weight as separate quantities.
+@@STATUS: ready
+@@TAGS: geometry, CAD, SolidWorks, area, volume, density, mass, force, weight, newton, pound force
+@@END
+
+<section>
+  <h2>Scale changes area and volume by powers</h2>
+  <p class="lede">If every linear dimension of a model is multiplied by a scale factor <code>s</code>,
+  area changes by <code>s<sup>2</sup></code> and volume changes by <code>s<sup>3</sup></code>. A
+  20% larger model is not 20% larger in area or volume.</p>
+  <dl class="dims">
+    <div><dt>Length</dt><dd><code>L<sub>new</sub> = sL<sub>old</sub></code></dd></div>
+    <div><dt>Area</dt><dd><code>A<sub>new</sub> = s<sup>2</sup>A<sub>old</sub></code></dd></div>
+    <div><dt>Volume</dt><dd><code>V<sub>new</sub> = s<sup>3</sup>V<sub>old</sub></code></dd></div>
+  </dl>
+  <p>For <code>s = 1.2</code>, area factor = <code>1.2<sup>2</sup> = 1.44</code> and volume factor
+  = <code>1.2<sup>3</sup> = 1.728</code>. This is why a modest scale change can matter to material
+  use, shipping mass, tank capacity, and actuator selection.</p>
+  <div class="gate"><p><strong>Never scale an area with a linear factor or a volume with an area
+  factor.</strong> The exponent belongs to the geometry, not to the number of decimal places.</p></div>
+</section>
+
+<section>
+  <h2>Volume is capacity only after you name the unit</h2>
+  <p>CAD mass properties often report volume in a model&rsquo;s document units. Before treating that
+  number as a tank capacity or a material quantity, state the volume unit and convert it to the
+  form the drawing or specification requires.</p>
+  <div class="unit-table-wrap">
+  <table class="unit-table">
+    <caption>Volume relationships used in this unit.</caption>
+    <thead><tr><th scope="col">Relationship</th><th scope="col">Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>1 m<sup>3</sup> = 1,000 L</td><td>A cubic meter contains one thousand liters.</td></tr>
+      <tr><td>1 U.S. gal = 3.785411784 L</td><td>This is a U.S. liquid gallon, not an Imperial gallon.</td></tr>
+      <tr><td>1 ft<sup>3</sup> = 7.48051948 U.S. gal</td><td>Derived from the exact foot and U.S. gallon definitions.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <h3>Static solved reservoir example</h3>
+  <p>A SolidWorks model gives a hydraulic reservoir internal volume of 2.5 ft<sup>3</sup>. Its
+  capacity is <code>2.5 ft<sup>3</sup> &times; 7.48051948 U.S. gal/ft<sup>3</sup> =
+  18.7013 U.S. gal</code>, or <strong>18.7 U.S. gal</strong>. This assumes the reported CAD volume
+  is the usable internal volume and no design headspace has yet been subtracted.</p>
+</section>
+
+<section>
+  <h2>Density connects volume to mass</h2>
+  <p>Density is mass per volume. When material density and CAD volume use compatible units,
+  <code>m = &rho;V</code> produces mass.</p>
+  <p><code>(kg/m<sup>3</sup>) &times; (m<sup>3</sup>) = kg</code></p>
+  <p>For example, a volume of 0.13824 m<sup>3</sup> made of material with a density of
+  2,700 kg/m<sup>3</sup> has mass
+  <code>m = 2,700 kg/m<sup>3</sup> &times; 0.13824 m<sup>3</sup> = 373.248 kg</code>.</p>
+  <div class="panel"><p><strong>Mass does not change merely because an object is moved from one
+  planet to another.</strong> Weight can change because gravitational acceleration changes. CAD
+  models, material databases, and shipping specifications commonly need mass; lifting and support
+  calculations commonly need force or weight.</p></div>
+  <details class="deeper">
+    <summary>Check the CAD assumptions before trusting mass properties</summary>
+    <p>Confirm the assigned material, density, document unit, bodies included, and whether the
+    model represents solid material or an internal void. A precise calculation based on the wrong
+    material card is still wrong.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Force and weight are separate quantities</h2>
+  <p><strong>Force</strong> is a push or pull. For constant mass, Newton&rsquo;s second law is
+  <code>F<sub>net</sub> = ma</code>. <strong>Weight</strong> is one particular force: the force due
+  to gravity, written <code>W = mg</code>.</p>
+  <dl class="dims">
+    <div><dt>F<sub>net</sub></dt><dd>Net force, in newtons (<code>N</code>) or pound force
+    (<code>lbf</code>). It is the combined force that produces acceleration.</dd></div>
+    <div><dt>W</dt><dd>Weight, a gravitational force. Near Earth&rsquo;s standard gravity,
+    <code>g<sub>0</sub> = 9.80665 m/s<sup>2</sup></code>; local gravity can differ slightly.</dd></div>
+    <div><dt>m</dt><dd>Mass, in kilograms, pound mass, or slugs. It is not measured in newtons or
+    pound force.</dd></div>
+  </dl>
+  <p>In coherent SI, <code>1 N = 1 kg &middot; m/s<sup>2</sup></code>. In the coherent
+  foot&ndash;slug&ndash;second system, <code>1 lbf = 1 slug &middot; ft/s<sup>2</sup></code>. Do not
+  silently replace <code>lbm</code> with <code>lbf</code>.</p>
+  <h3>Static solved weight example</h3>
+  <p>For a 1,570 kg mass at standard gravity, <code>W = mg = 1,570 kg &times;
+  9.80665 m/s<sup>2</sup> = 15,396.44 N</code>, or <strong>15.4 kN</strong>. This is a weight
+  calculation at standard gravity, not a claim that the mass is 15.4 kN.</p>
+</section>
+
+<section>
+  <h2>CAD scale, mass, and weight lab</h2>
+  <p class="lede">This model begins with an area and volume in SI units, scales them, then uses
+  density and gravitational acceleration to show the separate mass and weight results.</p>
+  <div class="panel" data-cad-lab>
+    <fieldset>
+      <legend>Model inputs</legend>
+      <p><label for="cad-scale">Linear scale factor</label>
+      <input id="cad-scale" data-cad-scale type="number" value="1.2" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="cad-area">Original area (m²)</label>
+      <input id="cad-area" data-cad-area type="number" value="1.25" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="cad-volume">Original volume (m³)</label>
+      <input id="cad-volume" data-cad-volume type="number" value="0.08" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="cad-density">Density (kg/m³)</label>
+      <input id="cad-density" data-cad-density type="number" value="2700" min="0" step="any" inputmode="decimal"></p>
+      <p><label for="cad-gravity">Gravitational acceleration (m/s²)</label>
+      <input id="cad-gravity" data-cad-gravity type="number" value="9.80665" min="0" step="any" inputmode="decimal"></p>
+    </fieldset>
+    <dl class="dims">
+      <div><dt>Area factor</dt><dd><output data-cad-area-factor aria-live="polite">1.44</output></dd></div>
+      <div><dt>Volume factor</dt><dd><output data-cad-volume-factor aria-live="polite">1.728</output></dd></div>
+      <div><dt>Scaled area</dt><dd><output data-cad-area-result aria-live="polite">1.8 m²</output></dd></div>
+      <div><dt>Scaled volume</dt><dd><output data-cad-volume-result aria-live="polite">0.13824 m³</output></dd></div>
+      <div><dt>Mass</dt><dd><output data-cad-mass aria-live="polite">373.248 kg</output></dd></div>
+      <div><dt>Weight</dt><dd><output data-cad-weight aria-live="polite">3660.3 N</output></dd></div>
+      <div><dt>Weight</dt><dd><output data-cad-lbf aria-live="polite">822.9 lbf</output></dd></div>
+    </dl>
+    <noscript><p class="aside">JavaScript is off. The displayed case has area factor 1.44,
+    volume factor 1.728, scaled volume 0.13824 m³, mass 373.248 kg, and weight 3660.3 N
+    (822.9 lbf).</p></noscript>
+  </div>
+</section>
+
+<section>
+  <h2>Practice and sources</h2>
+  <div class="panel" data-practice data-answer="40" data-tolerance="0.01" data-unit="complete enclosures">
+    <p><strong>Practice:</strong> A sheet-metal enclosure has 1,250 in<sup>2</sup> of external
+    surface area. A U.S. gallon of paint covers 350 ft<sup>2</sup>. Ignoring overspray, waste,
+    unpainted areas, and extra coats, how many complete enclosures can one gallon cover?</p>
+    <label for="practice-paint-answer">Answer in complete enclosures</label>
+    <input id="practice-paint-answer" data-practice-input type="number" step="any" inputmode="decimal">
+    <button type="button" data-practice-check>Check answer</button>
+    <output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+    <details class="solution"><summary>Show worked solution</summary>
+      <p>Convert the enclosure area using the squared relationship:
+      <code>1,250 in<sup>2</sup> &times; (1 ft<sup>2</sup> / 144 in<sup>2</sup>) =
+      8.68056 ft<sup>2</sup></code>. Then
+      <code>350 ft<sup>2</sup> / 8.68056 ft<sup>2</sup> per enclosure = 40.32</code> enclosures.
+      Only <strong>40 complete enclosures</strong> can be painted. The answer assumes the stated
+      coverage is for the required coat and all paint reaches the enclosure.</p>
+    </details>
+  </div>
+  <details class="deeper">
+    <summary>Sources and engineering context</summary>
+    <p><a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/weight-equation/">NASA Glenn&rsquo;s
+    weight-and-mass explanation</a> distinguishes <code>F = ma</code> from
+    <code>W = mg</code>. The <a href="https://www.nist.gov/pml/owm/metric-si/si-units">NIST SI
+    Units reference</a> lists kilograms as an SI base unit and newtons as a derived unit. Those
+    conventions are used here with <code>g<sub>0</sub> = 9.80665 m/s<sup>2</sup></code> for the
+    standard-gravity examples.</p>
+  </details>
+</section>
