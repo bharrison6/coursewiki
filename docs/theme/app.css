@@ -9,13 +9,54 @@
      >= 1200px   sidebar | article | on-this-page
      >= 900px    sidebar | article
      <  900px    article, with the sidebar as an off-canvas drawer
+
+   HOW THE WIDTH IS SPENT - measured, 2026-08-21, because the page did not
+   fill a desktop screen and the emptiness was all on one side.
+
+   At 1920 the centre column was 1416px with a 565px article LEFT-ALIGNED in
+   it: 803px of void, entirely on the right. 1443px at 2560. That reads as a
+   broken layout rather than as margin, and the one-sidedness is the reason.
+
+   Four separate levers, none of which is "make the line longer":
+
+     1. THE RAILS GROW. At a fixed 17.5rem, five of the eleven page titles
+        wrapped to two lines in the sidebar and every entry in this page's
+        TOC wrapped. The rails were the part of the layout actually short of
+        room, so they take width first - that is width spent on content.
+     2. THE SHELL IS CAPPED AND CENTRED. Past --shell-max the extra width
+        becomes a symmetric page margin instead of a one-sided hole, and the
+        TOC stops drifting a metre away from the text it indexes.
+     3. THE ARTICLE IS CENTRED IN ITS COLUMN. This is what fixes 1280 and
+        1440, where the cap does not bind and the void was 163 / 323px.
+     4. THE MEASURE WIDENS - a little, and on evidence. 68ch NAMED 68
+        characters and rendered 54-66, average 59, because `ch` is the width
+        of a zero and this body face is narrower than that. 80ch measures
+        ~71 characters per line, which is still inside the comfortable band
+        (66 ideal, 75 the usual ceiling). Do not push it further: past 75 the
+        eye loses the line return and the complaint stops being cosmetic.
+        This one knob also widens .dims, .pass and .firetable, which is why
+        there is no separate full-bleed lane - see "no bleed lane" below.
    ==========================================================================*/
 
 :root {
   --appbar-h: 3.5rem;
-  --sidebar-w: 17.5rem;
-  --toc-w: 14rem;
-  --prose: 68ch;
+  --sidebar-w: clamp(17.5rem, 17vw, 21rem);
+  --toc-w: clamp(14rem, 13vw, 17rem);
+  --prose: 80ch;
+  --shell-max: 100rem;
+
+  /* The inset that keeps a full-bleed bar aligned with the capped shell, so
+     the brand sits over the sidebar's left edge instead of floating off in
+     the page margin. It carries a PERCENTAGE, which is resolved where the
+     token is USED, not here - so it is only correct on an element whose
+     containing block is the viewport. That is true of .appbar (a sticky
+     child of body) and .seqbar (position: fixed), and it is why this is not
+     spelled `--gutter` and dropped into arbitrary components.
+
+     --bar-pad is the floor, kept separate because presentation mode needs to
+     drop back to exactly it. One value, three bars, no drift. */
+  --bar-pad:   clamp(.75rem, 2vw, 1.25rem);
+  --bar-inset: max(var(--bar-pad), (100% - var(--shell-max)) / 2);
 }
 
 html { scroll-behavior: smooth; }
@@ -53,7 +94,7 @@ main, .shell > * { min-width: 0; }
   position: sticky; top: 0; z-index: 40;
   height: var(--appbar-h);
   display: flex; align-items: center; gap: .75rem;
-  padding: 0 clamp(.75rem, 2vw, 1.25rem);
+  padding: 0 var(--bar-inset);
   background: color-mix(in srgb, var(--paper) 90%, transparent);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--rule);
@@ -141,6 +182,9 @@ main, .shell > * { min-width: 0; }
   display: grid;
   grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
   align-items: start;
+  /* Lever 2. Inert below 1600px, so every laptop width is untouched. */
+  max-width: var(--shell-max);
+  margin-inline: auto;
 }
 @media (min-width: 75rem) {
   .shell.has-toc { grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--toc-w); }
@@ -363,7 +407,7 @@ main, .shell > * { min-width: 0; }
 .seqbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 42;
   display: flex; align-items: stretch; gap: .5rem;
-  padding: .5rem clamp(.6rem, 2vw, 1rem);
+  padding: .5rem var(--bar-inset);
   background: color-mix(in srgb, var(--paper) 94%, transparent);
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--rule);
@@ -427,7 +471,12 @@ body.presenting {
 .presenting .crumb,
 .presenting .backdrop { display: none !important; }
 
-.presenting .shell, .presenting .shell.has-toc { display: block; }
+/* A panel is read from across a room, so it takes the whole projector: the
+   shell cap that gives a desktop READER balanced margins would just throw
+   320px of slide away at 1920. --bar-inset drops back to its floor with it,
+   or the next/previous bar would sit inset under a full-bleed panel. */
+.presenting .shell, .presenting .shell.has-toc { display: block; max-width: none; }
+body.presenting { --bar-inset: var(--bar-pad); }
 .presenting main { padding: 0; }
 .presenting .article { max-width: none; }
 
@@ -468,7 +517,9 @@ body.presenting {
 .presenting .xcard .body ul { gap: .7em; }
 
 .present-exit {
-  position: fixed; right: clamp(.6rem, 2vw, 1rem);
+  /* Fixed, so --bar-inset resolves against the viewport - the same value the
+     seqbar it sits above is using, which is the point. */
+  position: fixed; right: var(--bar-inset);
   bottom: calc(4.6rem + .5rem); z-index: 43;
   font-family: var(--f-display); font-size: .68rem;
   letter-spacing: .08em; text-transform: uppercase;
@@ -550,7 +601,26 @@ body.presenting {
 
 /* ---- article -----------------------------------------------------------*/
 main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem) 6rem; }
-.article { max-width: var(--prose); }
+
+/* Lever 3. `margin-inline: auto` is the whole fix for the one-sided void, and
+   it is the half that works at EVERY width - the shell cap only bites past
+   1600px, while the article was left-aligned in a column wider than itself
+   from about 1150px up.
+
+   No bleed lane, and that is a decision rather than an omission. The obvious
+   alternative was to widen .article past the measure and let .dims / .pass /
+   .firetable break out of a centred text column. It was rejected because the
+   width has to come from somewhere: either every card grows a one-sided inner
+   gutter - the same complaint, moved inside the border - or only the cards
+   holding a wide widget grow, and a column of cards with ragged edges reads
+   as a bug. There is no <table> on this site; the three widgets that wanted
+   room get it from --prose instead, and they all get it equally.
+
+   max-width: none in presentation mode and in print both still win: this rule
+   is (0,1,0) and earlier in the source than the print block, and .presenting
+   .article is (0,2,0). Auto margins against no max-width are a no-op, so
+   neither mode is touched. */
+.article { max-width: var(--prose); margin-inline: auto; }
 .article.wide { max-width: 72rem; }
 
 .crumb {
@@ -609,6 +679,61 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 /* The authored h2 is the summary text, so the copy inside starts at h3. */
 .xcard .body > h2 { display: none; }
+
+/* ---- the `deeper` tier -------------------------------------------------
+   A second disclosure INSIDE a card: the rule stays on the main path, the
+   reason to believe it goes behind a click. It has to read as obviously
+   openable, which plain <details> does not -- the instructor's report was
+   that it looked like a stray line of text.
+
+   Deliberately unlike .xcard > summary, because it is not a card header:
+   accent-coloured rather than ink, smaller than body type, and its marker
+   sits on the LEFT where a disclosure triangle is expected, while a card's
+   chevron sits far right. Two different affordances, told apart at a glance.
+
+   .xcard's summary rules all use the child combinator, so none of them
+   reach in here. Keep it that way -- a single descendant selector would
+   make every one of these render as a card header.                        */
+.deeper {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  margin: .35rem 0;
+}
+.deeper > summary {
+  display: flex; align-items: center; gap: .55rem;
+  padding: .6rem .85rem;
+  cursor: pointer; list-style: none;
+  font-family: var(--f-display); font-weight: 600; font-size: .93rem;
+  color: var(--accent);
+}
+.deeper > summary::-webkit-details-marker { display: none; }
+
+/* A solid triangle, not the card's outline chevron. currentColor ties it to
+   the accent so the two never drift apart. */
+.deeper > summary::before {
+  content: ""; flex: none; width: 0; height: 0;
+  border-left: .4rem solid currentColor;
+  border-top: .3rem solid transparent;
+  border-bottom: .3rem solid transparent;
+  transition: transform .16s ease;
+}
+.deeper[open] > summary::before { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) {
+  .deeper > summary::before { transition: none; }
+}
+.deeper > summary:hover { text-decoration: underline; text-underline-offset: .18em; }
+.deeper > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.deeper[open] > summary { border-bottom: 1px solid var(--rule); }
+
+.deeper > :not(summary) { margin: .8rem .85rem; }
+
+/* Print: beforeprint force-opens every <details>, so these arrive open.
+   Until the addendum lands, keep a block from splitting across a page. */
+@media print {
+  .deeper { break-inside: avoid; background: none; }
+}
 
 /* a card whose content is a hard stop gets the danger edge */
 .xcard.is-stop { border-left: 3px solid var(--cat3); }
@@ -802,7 +927,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
      was quietly out-specified by the dark skin. See msu-theme.css, "Paper is
      white". Adding a second copy is how the two would drift. */
   .appbar, .sidebar, .backdrop, .toc, .cardtools, .usedin, .skip, .ck-reset { display: none !important; }
-  .shell, .shell.has-toc { display: block; }
+  /* max-width: none is currently inert - --shell-max is 1600px and a Letter
+     content box is ~720px - and it is here anyway, because the day someone
+     lowers --shell-max to something a page box can reach, the printed sheet
+     would silently narrow and nothing on screen would say so. */
+  .shell, .shell.has-toc { display: block; max-width: none; }
   main { padding: 0; }
   .article { max-width: none; }
   body.app { font-size: 11.2pt; }
