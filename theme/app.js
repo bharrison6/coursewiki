@@ -1004,10 +1004,14 @@
       function update() {
         var startValue = readNumber(start);
         var turnValue = readNumber(turn);
-        var endValue = readNumber(end);
+        /* An out-and-back path ends where it starts. Older authored markup may
+           still contain an end control, so mirror it rather than trusting a
+           separate value. */
+        var endValue = startValue;
+        if (end && startValue !== null) end.value = String(startValue);
         var outTimeValue = readNumber(outTime);
         var returnTimeValue = readNumber(returnTime);
-        if (startValue === null || turnValue === null || endValue === null ||
+        if (startValue === null || turnValue === null ||
             outTimeValue === null || returnTimeValue === null || outTimeValue <= 0 || returnTimeValue <= 0) {
           clearResults('Enter positions and positive travel times.');
           return;
@@ -1026,20 +1030,57 @@
         write(root, ['velocity', 'avg-velocity', 'average-velocity'], format(averageVelocity) + ' m/s');
 
         var positions = { start: startValue, turn: turnValue, end: endValue };
+        var positionValues = [startValue, turnValue, endValue];
+        var lowestPosition = Math.min.apply(Math, positionValues);
+        var highestPosition = Math.max.apply(Math, positionValues);
+        var pathRange = highestPosition - lowestPosition;
+        /* Leave a truthful margin around the actual extrema so the labels do
+           not fall off the track. A zero-length path still gets a real scale. */
+        var scalePadding = Math.max(pathRange * 0.25, 1);
+        var scaleMinimum = lowestPosition - scalePadding;
+        var scaleMaximum = highestPosition + scalePadding;
+        var scaleRange = scaleMaximum - scaleMinimum;
+        var markerRows = {};
+
+        ['start', 'turn', 'end'].forEach(function (name) {
+          var samePosition = ['start', 'turn', 'end'].filter(function (other) {
+            return other !== name && positions[other] === positions[name];
+          });
+          markerRows[name] = samePosition.length ? ['start', 'turn', 'end'].slice(0, ['start', 'turn', 'end'].indexOf(name)).filter(function (earlier) {
+            return positions[earlier] === positions[name];
+          }).length : 0;
+        });
+        var requiredRows = Math.max(markerRows.start, markerRows.turn, markerRows.end) + 1;
+        root.setAttribute('data-path-label-rows', String(requiredRows));
+
+        root.querySelectorAll('[data-path-axis-min]').forEach(function (label) {
+          label.textContent = format(scaleMinimum) + ' m';
+        });
+        root.querySelectorAll('[data-path-axis-max]').forEach(function (label) {
+          label.textContent = format(scaleMaximum) + ' m';
+        });
+
         root.querySelectorAll('[data-path-marker], [data-path-start-marker], [data-path-turn-marker], [data-path-end-marker]').forEach(function (marker) {
           var name = markerName(marker);
           var position = positions[name];
           if (position === undefined) return;
-          var percentage = Math.max(0, Math.min(100, ((position + 20) / 40) * 100));
+          var percentage = ((position - scaleMinimum) / scaleRange) * 100;
+          var isLowest = position === lowestPosition && lowestPosition !== highestPosition;
+          var isHighest = position === highestPosition && lowestPosition !== highestPosition;
           marker.style.setProperty('--path-position', percentage + '%');
+          marker.style.setProperty('--path-label-row', String(markerRows[name] || 0));
           marker.style.left = percentage + '%';
+          if (isLowest) marker.setAttribute('data-path-edge', 'low');
+          else if (isHighest) marker.setAttribute('data-path-edge', 'high');
+          else marker.removeAttribute('data-path-edge');
           if (name) marker.textContent = name.charAt(0).toUpperCase() + name.slice(1) + ': ' + format(position) + ' m';
         });
 
         var track = root.querySelector('.path-track, .path-lab-track, [data-path-track]');
         if (track && track.hasAttribute('aria-label')) {
           track.setAttribute('aria-label', 'The path starts at ' + format(startValue) + ' meters, reaches ' +
-            format(turnValue) + ' meters, and ends at ' + format(endValue) + ' meters.');
+            format(turnValue) + ' meters, and returns to ' + format(endValue) + ' meters. The displayed scale runs from ' +
+            format(scaleMinimum) + ' meters to ' + format(scaleMaximum) + ' meters.');
         }
       }
 
