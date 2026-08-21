@@ -877,18 +877,64 @@ function New-Tiles($pageList, [string]$up, [string]$fromColl, [string]$mode) {
 # a PROHIBITED material returned nothing at all. Sections are naturally short,
 # so nothing is truncated now, and a hit deep-links to the card that holds it
 # rather than dropping the reader at the top of a long page.
+#
+# WHAT THE INDEX STORES IS WHAT THE READER SEES, which is not what the source
+# says. The source carries [[tokens]]; the page carries resolved text. Indexing
+# the source shipped 31 raw tokens into student-facing result snippets - a
+# search for "personal protective" returned "...all required personal
+# protective equipment. See [[ppe]]." - and made a page id matchable as a
+# string that appears on no page anywhere.
+#
+# The SAME token and the SAME two regexes as the renderer, on purpose: a second
+# pattern here would be free to drift from what is actually rendered, and this
+# file already carries that rule for the resolver. Different question, though -
+# the renderer asks where a link POINTS, this asks what it READS AS - so this
+# is a substitution, not a second copy of Resolve-Links:
+#
+#   [[id|label]]          -> label. The author's own prose, and exactly the
+#                            text the page shows.
+#   [[id]]                -> the target page's TITLE, again exactly what the
+#                            page shows. The slug is never text.
+#   [[id]], no such page  -> dropped. It renders as "page pending"; the slug of
+#                            a page that does not exist is not something a
+#                            student should be able to match on.
+#   [[img:file|alt]]      -> alt. It is a real description, it is what a screen
+#                            reader reads, and on a picture it is often the
+#                            only words about what is in the frame. The
+#                            filename goes.
+#   <!-- ... -->          -> dropped whole, contents included - a comment is a
+#                            placeholder and not content, which is the rule the
+#                            renderer already follows. Keeps a GRAPHIC-SLOT
+#                            marker and the token inside it out of the index.
+function ConvertTo-IndexText([string]$html) {
+  $t = [regex]::Replace($html, $script:commentRx + '|' + $script:linkRx, {
+    param($m)
+    if ($m.Value.StartsWith('<!--', [StringComparison]::Ordinal)) { return ' ' }
+    $id    = $m.Groups[1].Value.Trim()
+    $label = if ($m.Groups[2].Success) { $m.Groups[2].Value.Trim() } else { '' }
+    if ($id.StartsWith($script:imgPrefix, [StringComparison]::Ordinal)) { return ' ' + $label + ' ' }
+    if ($label) { return ' ' + $label + ' ' }
+    if ($script:allPages.Contains($id)) { return ' ' + $script:allPages[$id].Title + ' ' }
+    return ' '
+  })
+  # Stripping a tag or a token leaves a space where none belongs: "See
+  # Personal Protective Equipment ." A snippet is read as a sentence, so close
+  # the gap. 89 of these were already in the index from tag stripping alone.
+  (ConvertTo-Plain $t) -replace '\s+([,.;:!?])', '$1'
+}
+
 function New-SearchIndex([string]$mode) {
   $rows = @()
   foreach ($p in $pages.Values) {
     foreach ($s in $p.Sections) {
-      $head = if ($s.Head) { ConvertTo-Plain $s.Head } else { $p.Title }
+      $head = if ($s.Head) { ConvertTo-IndexText $s.Head } else { $p.Title }
       $url  = if ($mode -eq 'bundle') { '#p-' + $p.Id } else { "$($p.Collection)/$($p.Id).html#$($s.Slug)" }
       $rows += '{"title":"' + (ConvertTo-Json1 $head) +
                '","page":"' + (ConvertTo-Json1 $p.Title) +
                '","summary":"' + (ConvertTo-Json1 $p.Summary) +
                '","collection":"' + (ConvertTo-Json1 $collections[$p.Collection].Title) +
                '","url":"' + (ConvertTo-Json1 $url) +
-               '","text":"' + (ConvertTo-Json1 (ConvertTo-Plain $s.Html)) + '"}'
+               '","text":"' + (ConvertTo-Json1 (ConvertTo-IndexText $s.Html)) + '"}'
     }
   }
   $js = "window.SEARCH_INDEX = [`n" + ($rows -join ",`n") + "`n];`n"
