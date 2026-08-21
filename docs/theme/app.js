@@ -568,13 +568,31 @@
        Relative to the READER's own course, which is why it happens here and
        not in the generator - the build has no idea whose class this is. The
        generator's job was to put data-track on all of them so there is one
-       mechanism rather than one per surface. */
+       mechanism rather than one per surface.
+
+       TWO SOURCES OF TRUTH, and the reader's wins where it exists. The build
+       already stamps is-xcourse on a sibling course inside another course's
+       block on the track index, and there it is true for anybody - so it is
+       the right answer for a reader with no class yet. Once we know the
+       reader's class it is the WORSE answer: it would flag a chip pointing at
+       their own course. Which links the build marked is captured once, before
+       the first pass, because the pass has to be able to clear its own marks
+       when the reader switches class and the first version of this cleared
+       the build's on the way - measured as the sibling chips on
+       presentations.html losing their dashes for a reader with no class. */
+    var buildMarked = $$('a[data-track]').filter(function (a) {
+      return a.classList.contains('is-xcourse');
+    });
     function mark() {
       $$('a[data-track]').forEach(function (a) {
         var t = byName(a.getAttribute('data-track'));
-        var x = isCourse(home) && isCourse(t) && t.name !== home.name;
-        if (x) { a.classList.add('is-xcourse'); a.setAttribute('title', 'Another class: ' + t.title); }
-        else   { a.classList.remove('is-xcourse'); a.removeAttribute('title'); }
+        var x = isCourse(home) ? (isCourse(t) && t.name !== home.name)
+                               : buildMarked.indexOf(a) >= 0;
+        if (x) { a.classList.add('is-xcourse'); } else { a.classList.remove('is-xcourse'); }
+        // The title is reader-relative only: on a build-marked chip it would
+        // claim "another class" about a course that might be the reader's own.
+        if (x && isCourse(home)) { a.setAttribute('title', 'Another class: ' + t.title); }
+        else { a.removeAttribute('title'); }
       });
     }
 

@@ -1219,7 +1219,17 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   letter-spacing: .05em; text-transform: uppercase; text-decoration: none;
 }
 .btn-alt:hover { border-color: var(--accent); }
-@media (max-width: 34rem) { .pl-actions { flex-direction: row; flex-wrap: wrap; } }
+/* On a phone the three entry points lie in a row - but `flex: none` above
+   means the row is sized by its contents and never shrinks, so it ran 466px
+   wide inside a 375px viewport and pushed the whole page sideways by 130.
+   `flex-wrap` on the row cannot help while the row itself is free to be as
+   wide as it likes: it has to be given a width first. `1 1 100%` makes it take
+   a full line of .pl-head, which already wraps, and the buttons then wrap
+   inside that line. Found at 375px, measured per element; the document-level
+   check saw it because the offender is outside a .xcard. */
+@media (max-width: 34rem) {
+  .pl-actions { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; }
+}
 
 /* ==========================================================================
    Collection intro — hero, hazard stripes, category ladder
@@ -2715,10 +2725,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="five-reasons-a-chip-is-dangerous" data-card="five-reasons-a-chip-is-dangerous">
-    <summary>Five reasons a chip is dangerous<span class="chev"></span></summary>
+  <details class="xcard" id="four-reasons-a-chip-is-dangerous" data-card="four-reasons-a-chip-is-dangerous">
+    <summary>Four reasons a chip is dangerous<span class="chev"></span></summary>
     <div class="body">
-      <h2>Five reasons a chip is dangerous</h2>
+      <h2>Four reasons a chip is dangerous</h2>
   <p class="lede">A chip is not scrap until it has cooled and stopped moving. Straight off the
   tool it is every one of these at once.</p>
   <dl class="dims">
@@ -2726,8 +2736,6 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     are cut. They do not look it.</dd></div>
     <div><dt>Sharp</dt><dd>The leading edge of a chip is <strong>always razor sharp</strong>. It is
     a freshly cut edge and it will open a hand.</dd></div>
-    <div><dt>Fast</dt><dd>Chips leaving a machine can travel at <strong>over 250&nbsp;mph</strong>.
-    That is why eye protection is not negotiable &mdash; see <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>.</dd></div>
     <div><dt>Strong</dt><dd>A long continuous chip is a steel ribbon. If it wraps a sleeve or a
     limb it can <strong>pull you into the machine</strong>.</dd></div>
     <div><dt>Slippery</dt><dd>Chips on the floor roll underfoot. This is one of the most common
@@ -3420,13 +3428,31 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
        Relative to the READER's own course, which is why it happens here and
        not in the generator - the build has no idea whose class this is. The
        generator's job was to put data-track on all of them so there is one
-       mechanism rather than one per surface. */
+       mechanism rather than one per surface.
+
+       TWO SOURCES OF TRUTH, and the reader's wins where it exists. The build
+       already stamps is-xcourse on a sibling course inside another course's
+       block on the track index, and there it is true for anybody - so it is
+       the right answer for a reader with no class yet. Once we know the
+       reader's class it is the WORSE answer: it would flag a chip pointing at
+       their own course. Which links the build marked is captured once, before
+       the first pass, because the pass has to be able to clear its own marks
+       when the reader switches class and the first version of this cleared
+       the build's on the way - measured as the sibling chips on
+       presentations.html losing their dashes for a reader with no class. */
+    var buildMarked = $$('a[data-track]').filter(function (a) {
+      return a.classList.contains('is-xcourse');
+    });
     function mark() {
       $$('a[data-track]').forEach(function (a) {
         var t = byName(a.getAttribute('data-track'));
-        var x = isCourse(home) && isCourse(t) && t.name !== home.name;
-        if (x) { a.classList.add('is-xcourse'); a.setAttribute('title', 'Another class: ' + t.title); }
-        else   { a.classList.remove('is-xcourse'); a.removeAttribute('title'); }
+        var x = isCourse(home) ? (isCourse(t) && t.name !== home.name)
+                               : buildMarked.indexOf(a) >= 0;
+        if (x) { a.classList.add('is-xcourse'); } else { a.classList.remove('is-xcourse'); }
+        // The title is reader-relative only: on a build-marked chip it would
+        // claim "another class" about a course that might be the reader's own.
+        if (x && isCourse(home)) { a.setAttribute('title', 'Another class: ' + t.title); }
+        else { a.removeAttribute('title'); }
       });
     }
 

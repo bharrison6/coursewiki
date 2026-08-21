@@ -842,7 +842,17 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   letter-spacing: .05em; text-transform: uppercase; text-decoration: none;
 }
 .btn-alt:hover { border-color: var(--accent); }
-@media (max-width: 34rem) { .pl-actions { flex-direction: row; flex-wrap: wrap; } }
+/* On a phone the three entry points lie in a row - but `flex: none` above
+   means the row is sized by its contents and never shrinks, so it ran 466px
+   wide inside a 375px viewport and pushed the whole page sideways by 130.
+   `flex-wrap` on the row cannot help while the row itself is free to be as
+   wide as it likes: it has to be given a width first. `1 1 100%` makes it take
+   a full line of .pl-head, which already wraps, and the buttons then wrap
+   inside that line. Found at 375px, measured per element; the document-level
+   check saw it because the offender is outside a .xcard. */
+@media (max-width: 34rem) {
+  .pl-actions { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; }
+}
 
 /* ==========================================================================
    Collection intro — hero, hazard stripes, category ladder
