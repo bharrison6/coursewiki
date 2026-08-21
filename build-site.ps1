@@ -118,6 +118,27 @@ $script:commentRx = '(?s)<!--.*?-->'
 
 $script:written = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 
+# The binary sibling of Write-Out. Registering in $script:written is the whole
+# reason it exists rather than a bare WriteAllBytes: an unregistered file is
+# reported as an orphan and -Prune deletes it on the next run.
+function Write-OutBytes([string]$path, [byte[]]$bytes) {
+  [void]$script:written.Add($path)
+  $dir = Split-Path $path -Parent
+  if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+  $name = $path.Substring($root.Length).TrimStart('\')
+  if ($WhatIf) {
+    $same = (Test-Path -LiteralPath $path) -and
+            ([System.IO.File]::ReadAllBytes($path).Length -eq $bytes.Length) -and
+            (-not (Compare-Object ([System.IO.File]::ReadAllBytes($path)) $bytes -SyncWindow 0))
+    $state = if (-not (Test-Path -LiteralPath $path)) { 'would CREATE' }
+             elseif ($same) { 'unchanged' } else { 'would CHANGE' }
+    Write-Host ("  {0,-46} {1}" -f $name, $state)
+    return
+  }
+  [System.IO.File]::WriteAllBytes($path, $bytes)
+  Write-Host ("  {0,-46} {1:n0} bytes" -f $name, $bytes.Length)
+}
+
 function Write-Out([string]$path, [string]$text) {
   [void]$script:written.Add($path)
   $dir = Split-Path $path -Parent
@@ -578,6 +599,144 @@ $fontLink = @'
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 '@
 
+# ------------------------------------------------------------- favicon -------
+# Every page load was requesting /favicon.ico and getting a 404.
+#
+# THE DESIGN, and why it is not a letter. A favicon is read at 16 CSS pixels in
+# a strip of other 16-pixel icons, and its whole job there is to be told apart.
+# Letterforms at that size are a few pixels wide and all resolve to the same
+# grey smudge; "CW" would be about three pixels per letter. The site already
+# owns a signature graphic that is nothing BUT bold shape - the hazard stripe
+# in the collection hero - and three thick diagonals survive any downscale.
+# Two official colours, no third: Navy #002144 ground, Gold #ECAC00 bands.
+# Gold on navy measures 7.6:1, and gold is never being asked to be type here,
+# which is the rule it usually breaks.
+#
+# ONE geometry, expressed twice. The constants below are in a 32-unit square
+# and every size scales them, so the .ico frames and the .svg are the same
+# drawing rather than two drawings that can drift.
+$script:favNavy   = @(0x00, 0x21, 0x44)   # R,G,B
+$script:favGold   = @(0xEC, 0xAC, 0x00)
+$script:favPeriod = 11.0                  # band pitch along (x+y), per 32 units
+$script:favDuty   = 0.5                   # half gold, half navy - the hazard ratio
+$script:favInset  = 2.0                   # navy frame, so the bands stop cleanly
+                                          # instead of bleeding into a dark tab strip
+
+# Is this sample point gold? Shared by both renderers, in 32-unit space.
+function Test-FavGold([double]$x, [double]$y) {
+  if ($x -lt $script:favInset -or $y -lt $script:favInset -or
+      $x -gt (32 - $script:favInset) -or $y -gt (32 - $script:favInset)) { return $false }
+  $t = ($x + $y) % $script:favPeriod
+  if ($t -lt 0) { $t += $script:favPeriod }
+  $t -lt ($script:favPeriod * $script:favDuty)
+}
+
+# The .svg is what a modern browser actually uses, at any size. Bands are
+# strokes on constant-(x+y) lines, clipped to the inset square: stroke width is
+# the band's (x+y) width divided by root 2, because the band is measured along
+# the diagonal and the stroke across it.
+function New-FaviconSvg {
+  $w  = [Math]::Round($script:favPeriod * $script:favDuty / [Math]::Sqrt(2), 3)
+  $sb = New-Object System.Text.StringBuilder
+  [void]$sb.AppendLine('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="CourseWiki">')
+  [void]$sb.AppendLine('  <title>CourseWiki</title>')
+  [void]$sb.AppendLine('  <rect width="32" height="32" fill="#002144"/>')
+  [void]$sb.AppendLine('  <clipPath id="f"><rect x="2" y="2" width="28" height="28"/></clipPath>')
+  [void]$sb.AppendLine('  <g clip-path="url(#f)" stroke="#ECAC00" stroke-width="' + $w + '">')
+  for ($k = 0; $k -lt 7; $k++) {
+    $c = $script:favPeriod * $k + $script:favPeriod * $script:favDuty / 2
+    [void]$sb.AppendLine('    <line x1="' + [Math]::Round($c - 40, 3) + '" y1="40" x2="40" y2="' +
+                         [Math]::Round($c - 40, 3) + '"/>')
+  }
+  [void]$sb.AppendLine('  </g>')
+  [void]$sb.AppendLine('</svg>')
+  $sb.ToString()
+}
+
+# The .ico exists for the request the browser makes on its own. Written by
+# hand rather than pulled from a library: an ICO holding uncompressed 32-bit
+# BGRA is a 6-byte directory, a 16-byte entry per frame, and a BMP header -
+# no dependency, and the generator really emits it rather than the repo
+# carrying a binary nobody can regenerate.
+#
+# Both 16 and 32 ship as NATIVE frames. Letting the browser scale 32 down to 16
+# is what turns a diagonal into mud; each frame is drawn at its own size, and
+# each pixel is 4x4 supersampled so the diagonals get real antialiasing.
+function New-FaviconIcoBytes {
+  $sizes  = @(16, 32)
+  $images = @()
+  foreach ($size in $sizes) {
+    $rows = New-Object System.Collections.Generic.List[byte]
+    # BMP pixel data is bottom-up.
+    for ($py = $size - 1; $py -ge 0; $py--) {
+      for ($px = 0; $px -lt $size; $px++) {
+        $hits = 0
+        for ($i = 0; $i -lt 4; $i++) {
+          for ($j = 0; $j -lt 4; $j++) {
+            $sx = ($px + ($i + 0.5) / 4.0) * 32.0 / $size
+            $sy = ($py + ($j + 0.5) / 4.0) * 32.0 / $size
+            if (Test-FavGold $sx $sy) { $hits++ }
+          }
+        }
+        $a = $hits / 16.0
+        # BGRA, opaque.
+        $rows.Add([byte][Math]::Round($script:favNavy[2] * (1 - $a) + $script:favGold[2] * $a))
+        $rows.Add([byte][Math]::Round($script:favNavy[1] * (1 - $a) + $script:favGold[1] * $a))
+        $rows.Add([byte][Math]::Round($script:favNavy[0] * (1 - $a) + $script:favGold[0] * $a))
+        $rows.Add([byte]255)
+      }
+    }
+    # BITMAPINFOHEADER. Height is DOUBLED - the format still expects an AND
+    # mask below the colour data even at 32bpp, and parsers that read the
+    # header literally get a half-height image without it.
+    $hdr = New-Object System.Collections.Generic.List[byte]
+    $hdr.AddRange([BitConverter]::GetBytes([int]40))
+    $hdr.AddRange([BitConverter]::GetBytes([int]$size))
+    $hdr.AddRange([BitConverter]::GetBytes([int]($size * 2)))
+    $hdr.AddRange([BitConverter]::GetBytes([int16]1))
+    $hdr.AddRange([BitConverter]::GetBytes([int16]32))
+    $hdr.AddRange([BitConverter]::GetBytes([int]0))            # BI_RGB
+    $hdr.AddRange([BitConverter]::GetBytes([int]$rows.Count))
+    0..3 | ForEach-Object { $hdr.AddRange([BitConverter]::GetBytes([int]0)) }
+
+    $mask = New-Object System.Collections.Generic.List[byte]
+    $maskRow = [Math]::Ceiling($size / 32.0) * 4          # rows padded to 32 bits
+    for ($r = 0; $r -lt ($size * $maskRow); $r++) { $mask.Add([byte]0) }
+
+    $img = New-Object System.Collections.Generic.List[byte]
+    $img.AddRange($hdr); $img.AddRange($rows); $img.AddRange($mask)
+    $images += ,@{ Size = $size; Bytes = $img.ToArray() }
+  }
+
+  $out = New-Object System.Collections.Generic.List[byte]
+  $out.AddRange([BitConverter]::GetBytes([int16]0))            # reserved
+  $out.AddRange([BitConverter]::GetBytes([int16]1))            # 1 = icon
+  $out.AddRange([BitConverter]::GetBytes([int16]$images.Count))
+  $offset = 6 + 16 * $images.Count
+  foreach ($im in $images) {
+    $out.Add([byte]$im.Size); $out.Add([byte]$im.Size)
+    $out.Add([byte]0); $out.Add([byte]0)                       # palette, reserved
+    $out.AddRange([BitConverter]::GetBytes([int16]1))          # planes
+    $out.AddRange([BitConverter]::GetBytes([int16]32))         # bpp
+    $out.AddRange([BitConverter]::GetBytes([int]$im.Bytes.Length))
+    $out.AddRange([BitConverter]::GetBytes([int]$offset))
+    $offset += $im.Bytes.Length
+  }
+  foreach ($im in $images) { $out.AddRange($im.Bytes) }
+  $out.ToArray()
+}
+
+# On the SITE the icon is two real files; the .ico is there for the request the
+# browser makes without being asked. In a BUNDLE there are no sibling files, so
+# it is inlined - the same rule the lockup and the stylesheets already follow.
+function New-FaviconLinks([string]$up) {
+  '<link rel="icon" href="' + $up + 'favicon.ico" sizes="32x32">' + "`n" +
+  '<link rel="icon" href="' + $up + 'favicon.svg?v=' + $script:stamp + '" type="image/svg+xml">'
+}
+$script:faviconSvg = New-FaviconSvg
+$script:faviconInline = '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,' +
+  [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($script:faviconSvg)) + '">'
+
 # Applied before first paint so a stored dark choice does not flash light.
 $themeBoot = @'
 <script>
@@ -786,6 +945,7 @@ function Get-BuildStamp([string[]]$parts) {
 }
 
 $siteHead = { param($up) @"
+$(New-FaviconLinks $up)
 <link rel="stylesheet" href="${up}theme/msu-theme.css?v=$script:stamp">
 <link rel="stylesheet" href="${up}theme/app.css?v=$script:stamp">
 "@ }
@@ -1017,6 +1177,9 @@ $script:stamp = Get-BuildStamp @(
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'msu-theme.css'))
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.css'))
   [System.IO.File]::ReadAllText((Join-Path $themeDir 'app.js'))
+  # The favicon is generated from one set of constants, so the SVG moving is
+  # the same thing as the design moving - the .ico cannot change without it.
+  $script:faviconSvg
   # Content hashes, not names: an image replaced in place must move the stamp,
   # or the page updates and the picture does not.
   ($mediaStampParts -join "`n")
@@ -1062,6 +1225,11 @@ Write-Out (Join-Path $docsDir 'index.html') `
 Write-Out (Join-Path $docsDir '.nojekyll') ''
 Write-Out (Join-Path $docsDir 'search-index.js') $searchJs
 Write-Out (Join-Path $docsDir 'playlists.js') $playlistJs
+# Both at the site root: the .svg because it is what a browser will use, the
+# .ico because /favicon.ico is the request a browser makes without being told
+# to - and that request was returning 404 on every single page load.
+Write-Out (Join-Path $docsDir 'favicon.svg') $script:faviconSvg
+Write-OutBytes (Join-Path $docsDir 'favicon.ico') (New-FaviconIcoBytes)
 
 # ------------------------------------------------------- presentations ------
 # A playlist view, not a page of content. Each presentation shows its ordered
@@ -1299,6 +1467,7 @@ function New-Aggregate {
   [void]$sb.AppendLine('<meta charset="utf-8">')
   [void]$sb.AppendLine('<meta name="viewport" content="width=device-width, initial-scale=1">')
   [void]$sb.AppendLine('<title>' + (ConvertTo-HtmlText "$title - $($site.TITLE)") + '</title>')
+  [void]$sb.AppendLine($script:faviconInline)
   [void]$sb.AppendLine($fontLink.Trim())
   [void]$sb.AppendLine($themeBoot.Trim())
   [void]$sb.AppendLine('<style>')
