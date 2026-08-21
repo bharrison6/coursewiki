@@ -1116,6 +1116,117 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 .xcard.is-stop { border-left: 3px solid var(--cat3); }
 .xcard.is-gate { border-left: 3px solid var(--flag); }
 
+/* ---- phase spine -------------------------------------------------------
+   BEFORE / DURING / AFTER, set sideways down the left edge of the three
+   cards on the equipment operating procedure.
+
+   Built for the CLOSED state first. Cards ship collapsed, so what a reader
+   arrives at is three shut headings with no sequence in them at all; three
+   rails make the phase legible before anything is opened. Open, the rail
+   becomes the header band of the same mark.
+
+   THE HOOK IS AUTHORED, NOT DERIVED - and that is the whole point.
+   The generator stamps data-card="<slug>" on every card, so these three are
+   addressable from here with no generator change. It was not used: the slug
+   comes from the <h2>, and a reworded heading would detach the styling in
+   silence. These three headings were reworded the day this was written.
+
+   Instead the page authors an empty <span class="phase" data-phase="Before">
+   as the first thing inside its <h2>. build-site.ps1 copies the h2's inner
+   HTML verbatim into the <summary>, so the span arrives in the summary of
+   the site page AND of the docs\print\ aggregate. Everything else derived
+   from that heading - the card slug and #anchor, the on-this-page label, the
+   search-index title - runs through ConvertTo-Plain, which replaces a tag
+   with a space and collapses runs of whitespace, so an EMPTY span changes
+   none of them. Verified: the three slugs are unchanged.
+
+   Reword a heading and the rail follows it. DELETE the span and the rail is
+   gone - which is a visible loss on the page you are editing, not a silent
+   one three files away.
+
+   The word lives in the markup rather than in this file for the same reason
+   it is not a per-slug `content` string: it is content. `aria-hidden` on the
+   span, because the summary already says "Before operating any equipment"
+   and Chrome folds ::before content into the accessible name.
+
+   COLOUR CARRIES ONE CLAIM: these three cards are one procedure, in order.
+   Deliberately NOT a hue per phase. This collection already teaches a
+   three-hue ramp - lite blue proceed, gold caution, red stop - on the
+   equipment category page, and a second unrelated three-hue scale beside it
+   would be read as that one. Nor is there an honest three-level scale here
+   to encode: before/during/after is a sequence, not an escalation, and
+   colouring AFTER as "low" would quietly undercut the cleanup rules that are
+   the point of the third card.
+
+   --accent on --paper is the pair .pass-steps already uses for its selected
+   badge, and for the same reason: it is the one that survives both skins.
+   Measured on the built page - navy #002144 on off-white #F2F1EE is 14.29:1
+   light; near-black #16181A on Lite Blue #00A4E3 is 6.29:1 dark. Print
+   drops the fill entirely, see below.
+   ========================================================================*/
+.phase {
+  flex: none; align-self: stretch;
+  display: grid; place-items: center;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  width: var(--phase-w, 1.95rem);
+  /* One height for all three rails. The words differ in set width, so
+     without this the closed stack is 89 / 87 / 77px - three sizes where the
+     reader is being asked to see one ladder. A longer word still grows it. */
+  min-height: var(--phase-min, 5.5rem);
+  padding: .7rem 0; margin-right: .35rem;
+  background: var(--accent); color: var(--paper);
+  font-family: var(--f-display); font-weight: 700;
+  font-size: var(--phase-fs, .78rem);
+  letter-spacing: .16em; text-transform: uppercase; line-height: 1;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+.phase::before { content: attr(data-phase); }
+
+/* The rail bleeds to the card edge; the summary's own left and block padding
+   is the only thing that would inset it. The .35rem margin above puts the
+   heading back at the 1.05rem it sat at before, via the summary's own gap.
+
+   :has() rather than a per-slug selector. If it ever fails to match, the
+   rail simply sits inset by the summary's padding - still a legible label,
+   not a broken layout. */
+.xcard > summary:has(> .phase) { padding-block: 0; padding-left: 0; }
+
+/* Open, the rail covers only the header, so the card edge carries the mark
+   on down the body. Invisible when closed: same colour, and the rail sits on
+   top of it. :not() keeps the danger edge - a card that is both a phase and
+   a hard stop shows 3px of red beside the rail rather than losing it, which
+   is two facts instead of one overwriting the other. */
+.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+  border-left: 3px solid var(--accent);
+}
+
+/* Presentation - a panel is read from across a room, so the rail scales with
+   the 2.6rem heading and drops its minimum. The card edge goes, exactly as
+   it does in print: the panel is full-bleed and a 3px line hard against the
+   projector edge reads as a rendering artefact. Both overrides outrank the
+   base on specificity rather than on source order. */
+.presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
+.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
+
+@media print {
+  .xcard > summary:has(> .phase) { padding: 0; }
+  /* On paper the heading underline does the separating - the print sheet
+     drops every card border, and the rail goes with them. */
+  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  /* NO FILL ON PAPER, and the doubled class rather than source order,
+     because this is a legibility invariant and not a preference: a printer
+     or a user setting that drops backgrounds would leave reversed type on a
+     vanished ground, i.e. nothing at all. Navy type on white is 16.14:1 and
+     cannot fail that way. Same reasoning as .pass-steps .k. */
+  .phase.phase {
+    --phase-w: 1.5rem; --phase-fs: .66rem; --phase-min: 4.3rem;
+    padding: .35rem 0; margin-right: .6rem;
+    background: transparent; color: var(--accent);
+    border-right: 1px solid var(--rule);
+  }
+}
+
 /* ---- authored images ---------------------------------------------------
    [[img:file.png|Alt text]]. On a site page this is a real file; in a
    docs\print\ aggregate the identical markup carries a data: URI, because
