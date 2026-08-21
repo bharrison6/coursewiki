@@ -766,9 +766,23 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   main { padding: 0; }
   .article { max-width: none; }
   body.app { font-size: 11.2pt; }
-  /* A collapsed card must still print. app.js forces every <details> open on
-     beforeprint and restores it after; this is the belt to that braces, for
-     headless renderers that may not fire the event. */
+  /* A collapsed card must still print - now that cards SHIP collapsed this is
+     the difference between a handout and a list of headings. Two mechanisms,
+     because the one that was here was inert:
+       * app.js forces every <details> open on beforeprint and restores after.
+         Measured: 36 printed pages of the General Safety track with it, 12
+         without.
+       * ::details-content is the CSS half, for a renderer that never fires
+         the event. The rule below it - display on the light-DOM children -
+         CANNOT work in Chrome: a closed <details> hides its content through
+         the UA shadow slot, and no light-DOM rule reaches inside that. It was
+         measured at identical PDF bytes with the rule present and with the
+         rule deleted. ::details-content addresses the slot itself: 31 pages
+         with JavaScript off, against 12. The old rule is kept because it is
+         free and does work on engines that hide the children directly.
+     "Printing never loses a card" is an invariant, so it is enforced as one -
+     the same reason the logo swap carries !important. */
+  .xcard::details-content { content-visibility: visible !important; }
   details:not([open]) > *:not(summary) { display: revert !important; }
   .xcard { break-inside: avoid; border: 0; border-radius: 0; }
   .xcard > summary { padding: 0; border-bottom: 2px solid var(--ink); font-size: 14pt; }

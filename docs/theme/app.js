@@ -117,11 +117,22 @@
   wireSidebar($('.sidebar'));
 
   /* ---- disclosure cards -------------------------------------------------
-     Open by default. Safety copy should be readable at a glance; collapsing
-     is the reader's choice, and the choice is remembered per page.          */
+     CLOSED by default - the generator no longer emits `open`. The summaries
+     are the page's table of contents; the reader opens what they want, and
+     the choice is remembered per page.
+
+     THE STORAGE KEY IS VERSIONED, and that is the whole migration. Under the
+     old default every card was open, and `save` writes the state of EVERY
+     card on any toggle - so a reader who had ever collapsed one card carries a
+     stored map of mostly `true`. Reusing the key would have restored those
+     cards open and the new default would never have reached anyone who had
+     used the site before. A stored preference from a different default is not
+     a preference, it is a fossil: the v1 key is dropped rather than migrated,
+     because there is nothing in it the new default wants.                   */
   var cards = $$('.xcard');
   if (cards.length) {
-    var key = 'det:cards:' + PAGE;
+    var key = 'det:cards:v2:' + PAGE;
+    try { localStorage.removeItem('det:cards:' + PAGE); } catch (e) {}
     var stored = LS.get(key, null);
     if (stored) {
       cards.forEach(function (c) {
@@ -139,9 +150,15 @@
     }
     cards.forEach(function (c) { c.addEventListener('toggle', save); });
 
-    var ex = $('[data-act="expand"]'), co = $('[data-act="collapse"]');
-    if (ex) ex.addEventListener('click', function () { cards.forEach(function (c) { c.open = true; }); save(); });
-    if (co) co.addEventListener('click', function () { cards.forEach(function (c) { c.open = false; }); save(); });
+    /* Every pair, not the first pair. A printable aggregate stacks eleven
+       pages in one document and each carries its own set of these buttons;
+       binding $('[data-act=...]') left ten of them dead. Harmless while cards
+       shipped open, visible now that they do not.                           */
+    function setAll(open) {
+      return function () { cards.forEach(function (c) { c.open = open; }); save(); };
+    }
+    $$('[data-act="expand"]').forEach(function (b) { b.addEventListener('click', setAll(true)); });
+    $$('[data-act="collapse"]').forEach(function (b) { b.addEventListener('click', setAll(false)); });
   }
 
   /* ---- printing must never lose a collapsed card ------------------------

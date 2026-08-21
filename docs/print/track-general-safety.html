@@ -1096,9 +1096,23 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   main { padding: 0; }
   .article { max-width: none; }
   body.app { font-size: 11.2pt; }
-  /* A collapsed card must still print. app.js forces every <details> open on
-     beforeprint and restores it after; this is the belt to that braces, for
-     headless renderers that may not fire the event. */
+  /* A collapsed card must still print - now that cards SHIP collapsed this is
+     the difference between a handout and a list of headings. Two mechanisms,
+     because the one that was here was inert:
+       * app.js forces every <details> open on beforeprint and restores after.
+         Measured: 36 printed pages of the General Safety track with it, 12
+         without.
+       * ::details-content is the CSS half, for a renderer that never fires
+         the event. The rule below it - display on the light-DOM children -
+         CANNOT work in Chrome: a closed <details> hides its content through
+         the UA shadow slot, and no light-DOM rule reaches inside that. It was
+         measured at identical PDF bytes with the rule present and with the
+         rule deleted. ::details-content addresses the slot itself: 31 pages
+         with JavaScript off, against 12. The old rule is kept because it is
+         free and does work on engines that hide the children directly.
+     "Printing never loses a card" is an invariant, so it is enforced as one -
+     the same reason the logo swap carries !important. */
+  .xcard::details-content { content-visibility: visible !important; }
   details:not([open]) > *:not(summary) { display: revert !important; }
   .xcard { break-inside: avoid; border: 0; border-radius: 0; }
   .xcard > summary { padding: 0; border-bottom: 2px solid var(--ink); font-size: 14pt; }
@@ -1444,7 +1458,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="three-categories-one-question" data-card="three-categories-one-question" open>
+  <details class="xcard" id="three-categories-one-question" data-card="three-categories-one-question">
     <summary>Three categories, one question<span class="chev"></span></summary>
     <div class="body">
       <h2>Three categories, one question</h2>
@@ -1461,7 +1475,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   to every category, to every person present &mdash; see <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a> and <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>.</p>
     </div>
   </details>
-  <details class="xcard" id="category-1" data-card="category-1" open>
+  <details class="xcard" id="category-1" data-card="category-1">
     <summary><span class="cat cat-1">Category 1</span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="cat cat-1">Category 1</span></h2>
@@ -1472,7 +1486,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="category-2" data-card="category-2" open>
+  <details class="xcard" id="category-2" data-card="category-2">
     <summary><span class="cat cat-2">Category 2</span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="cat cat-2">Category 2</span></h2>
@@ -1484,7 +1498,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard is-stop" id="category-3" data-card="category-3" open>
+  <details class="xcard is-stop" id="category-3" data-card="category-3">
     <summary><span class="cat cat-3">Category 3</span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="cat cat-3">Category 3</span></h2>
@@ -1498,7 +1512,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard" id="which-category-is-my-machine" data-card="which-category-is-my-machine" open>
+  <details class="xcard" id="which-category-is-my-machine" data-card="which-category-is-my-machine">
     <summary>Which category is my machine?<span class="chev"></span></summary>
     <div class="body">
       <h2>Which category is my machine?</h2>
@@ -1525,7 +1539,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="before-operating-any-equipment" data-card="before-operating-any-equipment" open>
+  <details class="xcard" id="before-operating-any-equipment" data-card="before-operating-any-equipment">
     <summary>Before operating any equipment<span class="chev"></span></summary>
     <div class="body">
       <h2>Before operating any equipment</h2>
@@ -1540,7 +1554,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="during-equipment-operation" data-card="during-equipment-operation" open>
+  <details class="xcard" id="during-equipment-operation" data-card="during-equipment-operation">
     <summary>During equipment operation<span class="chev"></span></summary>
     <div class="body">
       <h2>During equipment operation</h2>
@@ -1552,7 +1566,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   are covered in <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard" id="after-operating-any-equipment" data-card="after-operating-any-equipment" open>
+  <details class="xcard" id="after-operating-any-equipment" data-card="after-operating-any-equipment">
     <summary>After operating any equipment<span class="chev"></span></summary>
     <div class="body">
       <h2>After operating any equipment</h2>
@@ -1579,7 +1593,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="personal-protective-equipment" data-card="personal-protective-equipment" open>
+  <details class="xcard" id="personal-protective-equipment" data-card="personal-protective-equipment">
     <summary>Personal Protective Equipment<span class="chev"></span></summary>
     <div class="body">
       <h2>Personal Protective Equipment</h2>
@@ -1594,7 +1608,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
     </div>
   </details>
-  <details class="xcard is-gate" id="eye-protection" data-card="eye-protection" open>
+  <details class="xcard is-gate" id="eye-protection" data-card="eye-protection">
     <summary>Eye protection<span class="chev"></span></summary>
     <div class="body">
       <h2>Eye protection</h2>
@@ -1615,13 +1629,13 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard is-gate" id="hearing-protection" data-card="hearing-protection" open>
+  <details class="xcard is-gate" id="hearing-protection" data-card="hearing-protection">
     <summary>Hearing protection<span class="chev"></span></summary>
     <div class="body">
       <h2>Hearing protection</h2>
   <p><strong>Industry standard:</strong> shop tools nearly always require hearing protection in
-  professional settings. In this lab the exposure is typically shorter than in industry, but the
-  protection still matters.</p>
+  professional settings. In a teaching lab the exposure is typically shorter than in production
+  work, but the protection still matters.</p>
   <h3>When to use it</h3>
   <ul>
     <li>Required for prolonged exposure to loud equipment &mdash; grinders, sanders, planers and similar.</li>
@@ -1660,7 +1674,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="aside">Both types significantly reduce harmful noise levels.</p>
     </div>
   </details>
-  <details class="xcard" id="foot-protection" data-card="foot-protection" open>
+  <details class="xcard" id="foot-protection" data-card="foot-protection">
     <summary>Foot protection<span class="chev"></span></summary>
     <div class="body">
       <h2>Foot protection</h2>
@@ -1683,7 +1697,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   supportive and comfortable.</p>
     </div>
   </details>
-  <details class="xcard is-stop" id="respiratory-protection" data-card="respiratory-protection" open>
+  <details class="xcard is-stop" id="respiratory-protection" data-card="respiratory-protection">
     <summary>Respiratory protection<span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection</h2>
@@ -1702,7 +1716,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   same protection. The next section is the one that decides which you need.</p>
     </div>
   </details>
-  <details class="xcard is-stop" id="respiratory-protection-what-to-wear" data-card="respiratory-protection-what-to-wear" open>
+  <details class="xcard is-stop" id="respiratory-protection-what-to-wear" data-card="respiratory-protection-what-to-wear">
     <summary>Respiratory protection &mdash; what to wear<span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection &mdash; what to wear</h2>
@@ -1733,7 +1747,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   see <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
-  <details class="xcard is-stop" id="clothing-and-jewelry" data-card="clothing-and-jewelry" open>
+  <details class="xcard is-stop" id="clothing-and-jewelry" data-card="clothing-and-jewelry">
     <summary>Clothing and jewelry<span class="chev"></span></summary>
     <div class="body">
       <h2>Clothing and jewelry</h2>
@@ -1750,7 +1764,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="hair-and-what-to-wear-instead" data-card="hair-and-what-to-wear-instead" open>
+  <details class="xcard" id="hair-and-what-to-wear-instead" data-card="hair-and-what-to-wear-instead">
     <summary>Hair, and what to wear instead<span class="chev"></span></summary>
     <div class="body">
       <h2>Hair, and what to wear instead</h2>
@@ -1779,15 +1793,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard is-gate" id="safe-manual-handling" data-card="safe-manual-handling" open>
+  <details class="xcard is-gate" id="safe-manual-handling" data-card="safe-manual-handling">
     <summary>Safe manual handling<span class="chev"></span></summary>
     <div class="body">
       <h2>Safe manual handling</h2>
   <div class="gate">
     <p><strong>Poor technique injures people at weights they thought were safe.</strong> At the
-    loads handled here, how you lift matters more than what it weighs.</p>
+    loads handled in a lab like this one, how you lift matters more than what it weighs.</p>
   </div>
-  <p>The problem here is rarely that something is <em>heavy</em>. It is that it is <strong>big for
+  <p>The problem is rarely that something is <em>heavy</em>. It is that it is <strong>big for
   its weight</strong>. Sheet goods, tube, extrusion and aluminum stock are all low density, so a
   40&nbsp;lb load is a large object &mdash; and a large object is one you cannot keep close to your
   body, cannot see past, and cannot get both hands near the middle of. Every rule below assumes
@@ -1806,7 +1820,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   and your back straight, it is too heavy for you to lift alone &mdash; whatever the number says.</p>
     </div>
   </details>
-  <details class="xcard" id="proper-lifting-technique" data-card="proper-lifting-technique" open>
+  <details class="xcard" id="proper-lifting-technique" data-card="proper-lifting-technique">
     <summary>Proper lifting technique<span class="chev"></span></summary>
     <div class="body">
       <h2>Proper lifting technique</h2>
@@ -1837,16 +1851,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard is-stop" id="voltage-in-this-lab" data-card="voltage-in-this-lab" open>
+  <details class="xcard is-stop" id="voltage-in-this-lab" data-card="voltage-in-this-lab">
     <summary>Voltage in this lab<span class="chev"></span></summary>
     <div class="body">
       <h2>Voltage in this lab</h2>
-  <p class="lede">You will work at both ends of this range in the same week &mdash; a 5&nbsp;V
-  microcontroller on the bench in the morning, a 240&nbsp;V machine in the afternoon. They are not
-  the same hazard, and treating them as one thing does not make you safer. It makes the warning
-  easy to ignore.</p>
+  <p class="lede">One warning does not cover this range. What can hurt you at 5&nbsp;V is not what
+  can hurt you at 240&nbsp;V &mdash; they are not the same hazard, and treating them as one thing
+  does not make you safer. It makes the warning easy to ignore.</p>
   <dl class="dims">
-    <div><dt>5&nbsp;V / 12&nbsp;V DC</dt><dd>Benchtop electronics &mdash; supplies, controllers,
+    <div><dt>5&nbsp;V / 12&nbsp;V DC</dt><dd>Low-voltage DC &mdash; bench supplies, cells and
     battery packs. <strong>Below the shock threshold.</strong> Not below the burn threshold.</dd></div>
     <div><dt>120&nbsp;V</dt><dd>Standard receptacles. Dangerous &mdash; can cause serious injury or
     death.</dd></div>
@@ -1861,7 +1874,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard is-gate" id="where-the-shock-hazard-starts" data-card="where-the-shock-hazard-starts" open>
+  <details class="xcard is-gate" id="where-the-shock-hazard-starts" data-card="where-the-shock-hazard-starts">
     <summary>Where the shock hazard starts<span class="chev"></span></summary>
     <div class="body">
       <h2>Where the shock hazard starts</h2>
@@ -1911,13 +1924,13 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   engineers built in order to stay below it.</strong></p>
     </div>
   </details>
-  <details class="xcard is-stop" id="low-voltage-is-not-low-energy" data-card="low-voltage-is-not-low-energy" open>
+  <details class="xcard is-stop" id="low-voltage-is-not-low-energy" data-card="low-voltage-is-not-low-energy">
     <summary>Low voltage is not low energy<span class="chev"></span></summary>
     <div class="body">
       <h2>Low voltage is not low energy</h2>
   <p class="lede">Below 50&nbsp;V, shock stops being the hazard and <strong>short-circuit current
-  becomes it</strong>. This is the section that matters most on the bench, because 5&nbsp;V and
-  12&nbsp;V is where most of you spend most of your time.</p>
+  becomes it</strong>. This is the half of the page people get wrong, because the voltage that
+  cannot shock you is the one nobody is careful with.</p>
   <p>Look at what the exemption above is actually conditioned on. Not shock &mdash; <strong>burns
   and arcs</strong>. NFPA&nbsp;70E names the same condition as <em>the capacity of the source</em>.
   Both standards are telling you that once you are under the shock line, the question changes from
@@ -1982,7 +1995,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   not by the number printed on the front of the supply.</p>
     </div>
   </details>
-  <details class="xcard is-gate" id="inspection-mandatory-before-each-use" data-card="inspection-mandatory-before-each-use" open>
+  <details class="xcard is-gate" id="inspection-mandatory-before-each-use" data-card="inspection-mandatory-before-each-use">
     <summary>Inspection &mdash; mandatory before each use<span class="chev"></span></summary>
     <div class="body">
       <h2>Inspection &mdash; mandatory before each use</h2>
@@ -2017,7 +2030,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard is-stop" id="plugs-cords-and-connections" data-card="plugs-cords-and-connections" open>
+  <details class="xcard is-stop" id="plugs-cords-and-connections" data-card="plugs-cords-and-connections">
     <summary>Plugs, cords and connections<span class="chev"></span></summary>
     <div class="body">
       <h2>Plugs, cords and connections</h2>
@@ -2074,7 +2087,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <div class="stop">
     <p>Exposed blades sit at full line voltage with nothing between them but air. Anything
     conductive that falls across them completes the circuit straight across the supply &mdash; and
-    in this building, the thing that falls is a <strong>metal chip</strong>. What follows is not a
+    in a shop, the thing that falls is a <strong>metal chip</strong>. What follows is not a
     shock. It is an arc, at whatever fault current a 120&nbsp;V branch circuit can deliver, throwing
     molten metal. The breaker will clear it; <strong>a breaker protects the wiring, not your
     face</strong>, and it does not act until after the arc.</p>
@@ -2087,11 +2100,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard is-stop" id="cords-on-the-floor-the-one-most-likely-to-get-you" data-card="cords-on-the-floor-the-one-most-likely-to-get-you" open>
+  <details class="xcard is-stop" id="cords-on-the-floor-the-one-most-likely-to-get-you" data-card="cords-on-the-floor-the-one-most-likely-to-get-you">
     <summary>Cords on the floor &mdash; the one most likely to get you<span class="chev"></span></summary>
     <div class="body">
       <h2>Cords on the floor &mdash; the one most likely to get you</h2>
-  <p class="lede">Nothing else on this page is as likely to actually injure someone here as a cord
+  <p class="lede">Nothing else on this page is as likely to actually injure someone as a cord
   lying across a walkway. It is not a shock hazard at all. It is a <strong>trip hazard</strong>
   &mdash; and a trip in a shop is not a trip onto carpet. It is a fall into a machine, onto hot
   metal, or with a running tool still in your hand.</p>
@@ -2179,7 +2192,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-5s-workplace-organization">5S</a>. The safety case and the lean case are the same case.</p>
     </div>
   </details>
-  <details class="xcard is-stop" id="if-someone-is-shocked" data-card="if-someone-is-shocked" open>
+  <details class="xcard is-stop" id="if-someone-is-shocked" data-card="if-someone-is-shocked">
     <summary>If someone is shocked<span class="chev"></span></summary>
     <div class="body">
       <h2>If someone is shocked</h2>
@@ -2216,7 +2229,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="what-an-sds-is" data-card="what-an-sds-is" open>
+  <details class="xcard" id="what-an-sds-is" data-card="what-an-sds-is">
     <summary>What an SDS is<span class="chev"></span></summary>
     <div class="body">
       <h2>What an SDS is</h2>
@@ -2229,7 +2242,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard is-gate" id="finding-one" data-card="finding-one" open>
+  <details class="xcard is-gate" id="finding-one" data-card="finding-one">
     <summary>Finding one<span class="chev"></span></summary>
     <div class="body">
       <h2>Finding one</h2>
@@ -2244,7 +2257,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard" id="storage" data-card="storage" open>
+  <details class="xcard" id="storage" data-card="storage">
     <summary>Storage<span class="chev"></span></summary>
     <div class="body">
       <h2>Storage</h2>
@@ -2269,7 +2282,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard is-stop" id="rotating-machinery" data-card="rotating-machinery" open>
+  <details class="xcard is-stop" id="rotating-machinery" data-card="rotating-machinery">
     <summary>Rotating machinery<span class="chev"></span></summary>
     <div class="body">
       <h2>Rotating machinery</h2>
@@ -2284,7 +2297,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   see <a class="xref-page" href="#p-ppe">clothing, jewelry and hair</a>.</p>
     </div>
   </details>
-  <details class="xcard" id="the-environment-around-the-machine" data-card="the-environment-around-the-machine" open>
+  <details class="xcard" id="the-environment-around-the-machine" data-card="the-environment-around-the-machine">
     <summary>The environment around the machine<span class="chev"></span></summary>
     <div class="body">
       <h2>The environment around the machine</h2>
@@ -2295,7 +2308,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
     </div>
   </details>
-  <details class="xcard" id="operating-habits" data-card="operating-habits" open>
+  <details class="xcard" id="operating-habits" data-card="operating-habits">
     <summary>Operating habits<span class="chev"></span></summary>
     <div class="body">
       <h2>Operating habits</h2>
@@ -2321,7 +2334,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard is-stop" id="decide-before-you-reach-for-anything" data-card="decide-before-you-reach-for-anything" open>
+  <details class="xcard is-stop" id="decide-before-you-reach-for-anything" data-card="decide-before-you-reach-for-anything">
     <summary>Decide before you reach for anything<span class="chev"></span></summary>
     <div class="body">
       <h2>Decide before you reach for anything</h2>
@@ -2341,7 +2354,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard" id="using-an-extinguisher-pass" data-card="using-an-extinguisher-pass" open>
+  <details class="xcard" id="using-an-extinguisher-pass" data-card="using-an-extinguisher-pass">
     <summary>Using an extinguisher &mdash; PASS<span class="chev"></span></summary>
     <div class="body">
       <h2>Using an extinguisher &mdash; PASS</h2>
@@ -2380,7 +2393,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   you. Do not assume it is over &mdash; a knocked-down fire can reignite.</p>
     </div>
   </details>
-  <details class="xcard" id="fire-classes-and-what-puts-them-out" data-card="fire-classes-and-what-puts-them-out" open>
+  <details class="xcard" id="fire-classes-and-what-puts-them-out" data-card="fire-classes-and-what-puts-them-out">
     <summary>Fire classes, and what puts them out<span class="chev"></span></summary>
     <div class="body">
       <h2>Fire classes, and what puts them out</h2>
@@ -2406,7 +2419,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   on it.</p>
     </div>
   </details>
-  <details class="xcard is-stop" id="metal-fires-and-what-it-takes-to-start-one" data-card="metal-fires-and-what-it-takes-to-start-one" open>
+  <details class="xcard is-stop" id="metal-fires-and-what-it-takes-to-start-one" data-card="metal-fires-and-what-it-takes-to-start-one">
     <summary>Metal fires, and what it takes to start one<span class="chev"></span></summary>
     <div class="body">
       <h2>Metal fires, and what it takes to start one</h2>
@@ -2491,7 +2504,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="hot-work-and-the-things-that-start-fires" data-card="hot-work-and-the-things-that-start-fires" open>
+  <details class="xcard" id="hot-work-and-the-things-that-start-fires" data-card="hot-work-and-the-things-that-start-fires">
     <summary>Hot work and the things that start fires<span class="chev"></span></summary>
     <div class="body">
       <h2>Hot work and the things that start fires</h2>
@@ -2517,7 +2530,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="know-these-before-you-need-them" data-card="know-these-before-you-need-them" open>
+  <details class="xcard" id="know-these-before-you-need-them" data-card="know-these-before-you-need-them">
     <summary>Know these before you need them<span class="chev"></span></summary>
     <div class="body">
       <h2>Know these before you need them</h2>
@@ -2545,7 +2558,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="five-reasons-a-chip-is-dangerous" data-card="five-reasons-a-chip-is-dangerous" open>
+  <details class="xcard" id="five-reasons-a-chip-is-dangerous" data-card="five-reasons-a-chip-is-dangerous">
     <summary>Five reasons a chip is dangerous<span class="chev"></span></summary>
     <div class="body">
       <h2>Five reasons a chip is dangerous</h2>
@@ -2565,7 +2578,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
     </div>
   </details>
-  <details class="xcard is-stop" id="never-clear-chips-with-your-hands" data-card="never-clear-chips-with-your-hands" open>
+  <details class="xcard is-stop" id="never-clear-chips-with-your-hands" data-card="never-clear-chips-with-your-hands">
     <summary>Never clear chips with your hands<span class="chev"></span></summary>
     <div class="body">
       <h2>Never clear chips with your hands</h2>
@@ -2589,7 +2602,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard is-gate" id="compressed-air-there-are-limits-on-this" data-card="compressed-air-there-are-limits-on-this" open>
+  <details class="xcard is-gate" id="compressed-air-there-are-limits-on-this" data-card="compressed-air-there-are-limits-on-this">
     <summary>Compressed air &mdash; there are limits on this<span class="chev"></span></summary>
     <div class="body">
       <h2>Compressed air &mdash; there are limits on this</h2>
@@ -2617,7 +2630,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard is-stop" id="cleaning-up" data-card="cleaning-up" open>
+  <details class="xcard is-stop" id="cleaning-up" data-card="cleaning-up">
     <summary>Cleaning up<span class="chev"></span></summary>
     <div class="body">
       <h2>Cleaning up</h2>
@@ -2645,10 +2658,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     actually in the bin, not what you meant to put there. Fines pick iron up: off a shared belt or
     wheel, off steel work at the next bench, out of the vacuum. Fine material is a deduction in its
     own right as well. Iron in the fines is the reason fines do not go in.</li>
-    <li><strong>The recycling container is emptied about once a semester. The trash goes out every
-    day.</strong> Fines belong in the stream that leaves the building, not the one that stands in
-    the corner for months quietly collecting more of them. <strong>Anything whose problem is
-    accumulation does not go in the container designed to accumulate.</strong></li>
+    <li><strong>Compare how often each container actually leaves the building.</strong> A chip
+    recycling container fills slowly and can stand most of a semester between pickups; the trash
+    goes out daily. Fines belong in the stream that leaves, not the one that stands in the corner
+    for months quietly collecting more of them. <strong>Anything whose problem is accumulation does
+    not go in the container designed to accumulate.</strong></li>
   </ul>
 
   <p class="aside"><strong>Two thresholds, same observation.</strong> &ldquo;There is iron in the
@@ -2686,7 +2700,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard is-stop" id="prohibited-behavior" data-card="prohibited-behavior" open>
+  <details class="xcard is-stop" id="prohibited-behavior" data-card="prohibited-behavior">
     <summary>Prohibited behavior<span class="chev"></span></summary>
     <div class="body">
       <h2>Prohibited behavior</h2>
@@ -2700,7 +2714,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard" id="staying-alert" data-card="staying-alert" open>
+  <details class="xcard" id="staying-alert" data-card="staying-alert">
     <summary>Staying alert<span class="chev"></span></summary>
     <div class="body">
       <h2>Staying alert</h2>
@@ -2712,7 +2726,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="emergency-procedures" data-card="emergency-procedures" open>
+  <details class="xcard" id="emergency-procedures" data-card="emergency-procedures">
     <summary>Emergency procedures<span class="chev"></span></summary>
     <div class="body">
       <h2>Emergency procedures</h2>
@@ -2726,7 +2740,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-electrical-safety">If someone is shocked</a>.</p>
     </div>
   </details>
-  <details class="xcard" id="workspace-responsibility" data-card="workspace-responsibility" open>
+  <details class="xcard" id="workspace-responsibility" data-card="workspace-responsibility">
     <summary>Workspace responsibility<span class="chev"></span></summary>
     <div class="body">
       <h2>Workspace responsibility</h2>
@@ -2736,7 +2750,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="section-5" data-card="section-5" open>
+  <details class="xcard" id="section-5" data-card="section-5">
     <summary>Lab Conduct and Emergencies<span class="chev"></span></summary>
     <div class="body">
       <div class="footerband">
@@ -2757,7 +2771,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="why-5s-sits-in-a-safety-module" data-card="why-5s-sits-in-a-safety-module" open>
+  <details class="xcard" id="why-5s-sits-in-a-safety-module" data-card="why-5s-sits-in-a-safety-module">
     <summary>Why 5S sits in a safety module<span class="chev"></span></summary>
     <div class="body">
       <h2>Why 5S sits in a safety module</h2>
@@ -2770,7 +2784,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="aside">This page is the basics. 5S will get its own expanded treatment later.</p>
     </div>
   </details>
-  <details class="xcard" id="sort-seiri" data-card="sort-seiri" open>
+  <details class="xcard" id="sort-seiri" data-card="sort-seiri">
     <summary>Sort &mdash; <em>Seiri</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Sort &mdash; <em>Seiri</em></h2>
@@ -2781,7 +2795,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="set-in-order-seiton" data-card="set-in-order-seiton" open>
+  <details class="xcard" id="set-in-order-seiton" data-card="set-in-order-seiton">
     <summary>Set in Order &mdash; <em>Seiton</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Set in Order &mdash; <em>Seiton</em></h2>
@@ -2792,7 +2806,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="shine-seiso" data-card="shine-seiso" open>
+  <details class="xcard" id="shine-seiso" data-card="shine-seiso">
     <summary>Shine &mdash; <em>Seiso</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Shine &mdash; <em>Seiso</em></h2>
@@ -2805,7 +2819,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-machine-hazards">the environment around the machine</a>.</p>
     </div>
   </details>
-  <details class="xcard" id="standardize-seiketsu" data-card="standardize-seiketsu" open>
+  <details class="xcard" id="standardize-seiketsu" data-card="standardize-seiketsu">
     <summary>Standardize &mdash; <em>Seiketsu</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Standardize &mdash; <em>Seiketsu</em></h2>
@@ -2816,7 +2830,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="sustain-shitsuke" data-card="sustain-shitsuke" open>
+  <details class="xcard" id="sustain-shitsuke" data-card="sustain-shitsuke">
     <summary>Sustain &mdash; <em>Shitsuke</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Sustain &mdash; <em>Shitsuke</em></h2>
@@ -2951,11 +2965,22 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   wireSidebar($('.sidebar'));
 
   /* ---- disclosure cards -------------------------------------------------
-     Open by default. Safety copy should be readable at a glance; collapsing
-     is the reader's choice, and the choice is remembered per page.          */
+     CLOSED by default - the generator no longer emits `open`. The summaries
+     are the page's table of contents; the reader opens what they want, and
+     the choice is remembered per page.
+
+     THE STORAGE KEY IS VERSIONED, and that is the whole migration. Under the
+     old default every card was open, and `save` writes the state of EVERY
+     card on any toggle - so a reader who had ever collapsed one card carries a
+     stored map of mostly `true`. Reusing the key would have restored those
+     cards open and the new default would never have reached anyone who had
+     used the site before. A stored preference from a different default is not
+     a preference, it is a fossil: the v1 key is dropped rather than migrated,
+     because there is nothing in it the new default wants.                   */
   var cards = $$('.xcard');
   if (cards.length) {
-    var key = 'det:cards:' + PAGE;
+    var key = 'det:cards:v2:' + PAGE;
+    try { localStorage.removeItem('det:cards:' + PAGE); } catch (e) {}
     var stored = LS.get(key, null);
     if (stored) {
       cards.forEach(function (c) {
@@ -2973,9 +2998,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     }
     cards.forEach(function (c) { c.addEventListener('toggle', save); });
 
-    var ex = $('[data-act="expand"]'), co = $('[data-act="collapse"]');
-    if (ex) ex.addEventListener('click', function () { cards.forEach(function (c) { c.open = true; }); save(); });
-    if (co) co.addEventListener('click', function () { cards.forEach(function (c) { c.open = false; }); save(); });
+    /* Every pair, not the first pair. A printable aggregate stacks eleven
+       pages in one document and each carries its own set of these buttons;
+       binding $('[data-act=...]') left ten of them dead. Harmless while cards
+       shipped open, visible now that they do not.                           */
+    function setAll(open) {
+      return function () { cards.forEach(function (c) { c.open = open; }); save(); };
+    }
+    $$('[data-act="expand"]').forEach(function (b) { b.addEventListener('click', setAll(true)); });
+    $$('[data-act="collapse"]').forEach(function (b) { b.addEventListener('click', setAll(false)); });
   }
 
   /* ---- printing must never lose a collapsed card ------------------------

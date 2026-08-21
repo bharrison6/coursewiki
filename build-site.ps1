@@ -796,6 +796,22 @@ $siteScripts = { param($up) @"
 "@ }
 
 # ---------------------------------------------------- section -> card --------
+# Cards ship CLOSED. The instructor's reason is the whole decision: "we are
+# going to add a lot of content, it will fill up quick." Open-by-default is
+# comfortable on a page a reader deliberately chose and a wall of text on a
+# page that is one of eighty; closed turns the summaries into a table of
+# contents, which is what a reference page should open as.
+#
+# Three things depend on being able to force them open again, and all three
+# already existed - this change is what makes them load-bearing rather than
+# belt-and-braces:
+#
+#   * beforeprint in app.js, plus a CSS fallback for renderers that do not
+#     fire it. A closed <details> prints its summary and NOTHING ELSE, and the
+#     print output is the PDF safety fallback.
+#   * presentation mode, where a closed panel is a blank slide.
+#   * the hash reveal, which the search results depend on - every hit
+#     deep-links to the card that holds it.
 function New-Cards($p, $ctx, [string]$mode) {
   $sb = New-Object System.Text.StringBuilder
   [void]$sb.AppendLine('<div class="cardtools">')
@@ -807,7 +823,7 @@ function New-Cards($p, $ctx, [string]$mode) {
     $cls = 'xcard'
     if ($s.Flag) { $cls += ' ' + $s.Flag }
     $head = if ($s.Head) { $s.Head } else { ConvertTo-HtmlText $p.Title }
-    [void]$sb.AppendLine('  <details class="' + $cls + '" id="' + $s.Slug + '" data-card="' + $s.Slug + '" open>')
+    [void]$sb.AppendLine('  <details class="' + $cls + '" id="' + $s.Slug + '" data-card="' + $s.Slug + '">')
     [void]$sb.AppendLine('    <summary>' + $head + '<span class="chev"></span></summary>')
     [void]$sb.AppendLine('    <div class="body">')
     [void]$sb.AppendLine('      ' + (Resolve-Links $s.Html $ctx $mode))

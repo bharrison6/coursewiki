@@ -1096,9 +1096,23 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   main { padding: 0; }
   .article { max-width: none; }
   body.app { font-size: 11.2pt; }
-  /* A collapsed card must still print. app.js forces every <details> open on
-     beforeprint and restores it after; this is the belt to that braces, for
-     headless renderers that may not fire the event. */
+  /* A collapsed card must still print - now that cards SHIP collapsed this is
+     the difference between a handout and a list of headings. Two mechanisms,
+     because the one that was here was inert:
+       * app.js forces every <details> open on beforeprint and restores after.
+         Measured: 36 printed pages of the General Safety track with it, 12
+         without.
+       * ::details-content is the CSS half, for a renderer that never fires
+         the event. The rule below it - display on the light-DOM children -
+         CANNOT work in Chrome: a closed <details> hides its content through
+         the UA shadow slot, and no light-DOM rule reaches inside that. It was
+         measured at identical PDF bytes with the rule present and with the
+         rule deleted. ::details-content addresses the slot itself: 31 pages
+         with JavaScript off, against 12. The old rule is kept because it is
+         free and does work on engines that hide the children directly.
+     "Printing never loses a card" is an invariant, so it is enforced as one -
+     the same reason the logo swap carries !important. */
+  .xcard::details-content { content-visibility: visible !important; }
   details:not([open]) > *:not(summary) { display: revert !important; }
   .xcard { break-inside: avoid; border: 0; border-radius: 0; }
   .xcard > summary { padding: 0; border-bottom: 2px solid var(--ink); font-size: 14pt; }
@@ -1434,7 +1448,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard" id="why-5s-sits-in-a-safety-module" data-card="why-5s-sits-in-a-safety-module" open>
+  <details class="xcard" id="why-5s-sits-in-a-safety-module" data-card="why-5s-sits-in-a-safety-module">
     <summary>Why 5S sits in a safety module<span class="chev"></span></summary>
     <div class="body">
       <h2>Why 5S sits in a safety module</h2>
@@ -1447,7 +1461,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="aside">This page is the basics. 5S will get its own expanded treatment later.</p>
     </div>
   </details>
-  <details class="xcard" id="sort-seiri" data-card="sort-seiri" open>
+  <details class="xcard" id="sort-seiri" data-card="sort-seiri">
     <summary>Sort &mdash; <em>Seiri</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Sort &mdash; <em>Seiri</em></h2>
@@ -1458,7 +1472,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="set-in-order-seiton" data-card="set-in-order-seiton" open>
+  <details class="xcard" id="set-in-order-seiton" data-card="set-in-order-seiton">
     <summary>Set in Order &mdash; <em>Seiton</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Set in Order &mdash; <em>Seiton</em></h2>
@@ -1469,7 +1483,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="shine-seiso" data-card="shine-seiso" open>
+  <details class="xcard" id="shine-seiso" data-card="shine-seiso">
     <summary>Shine &mdash; <em>Seiso</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Shine &mdash; <em>Seiso</em></h2>
@@ -1482,7 +1496,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">the environment around the machine</a>.</p>
     </div>
   </details>
-  <details class="xcard" id="standardize-seiketsu" data-card="standardize-seiketsu" open>
+  <details class="xcard" id="standardize-seiketsu" data-card="standardize-seiketsu">
     <summary>Standardize &mdash; <em>Seiketsu</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Standardize &mdash; <em>Seiketsu</em></h2>
@@ -1493,7 +1507,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard" id="sustain-shitsuke" data-card="sustain-shitsuke" open>
+  <details class="xcard" id="sustain-shitsuke" data-card="sustain-shitsuke">
     <summary>Sustain &mdash; <em>Shitsuke</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Sustain &mdash; <em>Shitsuke</em></h2>
@@ -1628,11 +1642,22 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   wireSidebar($('.sidebar'));
 
   /* ---- disclosure cards -------------------------------------------------
-     Open by default. Safety copy should be readable at a glance; collapsing
-     is the reader's choice, and the choice is remembered per page.          */
+     CLOSED by default - the generator no longer emits `open`. The summaries
+     are the page's table of contents; the reader opens what they want, and
+     the choice is remembered per page.
+
+     THE STORAGE KEY IS VERSIONED, and that is the whole migration. Under the
+     old default every card was open, and `save` writes the state of EVERY
+     card on any toggle - so a reader who had ever collapsed one card carries a
+     stored map of mostly `true`. Reusing the key would have restored those
+     cards open and the new default would never have reached anyone who had
+     used the site before. A stored preference from a different default is not
+     a preference, it is a fossil: the v1 key is dropped rather than migrated,
+     because there is nothing in it the new default wants.                   */
   var cards = $$('.xcard');
   if (cards.length) {
-    var key = 'det:cards:' + PAGE;
+    var key = 'det:cards:v2:' + PAGE;
+    try { localStorage.removeItem('det:cards:' + PAGE); } catch (e) {}
     var stored = LS.get(key, null);
     if (stored) {
       cards.forEach(function (c) {
@@ -1650,9 +1675,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     }
     cards.forEach(function (c) { c.addEventListener('toggle', save); });
 
-    var ex = $('[data-act="expand"]'), co = $('[data-act="collapse"]');
-    if (ex) ex.addEventListener('click', function () { cards.forEach(function (c) { c.open = true; }); save(); });
-    if (co) co.addEventListener('click', function () { cards.forEach(function (c) { c.open = false; }); save(); });
+    /* Every pair, not the first pair. A printable aggregate stacks eleven
+       pages in one document and each carries its own set of these buttons;
+       binding $('[data-act=...]') left ten of them dead. Harmless while cards
+       shipped open, visible now that they do not.                           */
+    function setAll(open) {
+      return function () { cards.forEach(function (c) { c.open = open; }); save(); };
+    }
+    $$('[data-act="expand"]').forEach(function (b) { b.addEventListener('click', setAll(true)); });
+    $$('[data-act="collapse"]').forEach(function (b) { b.addEventListener('click', setAll(false)); });
   }
 
   /* ---- printing must never lose a collapsed card ------------------------
