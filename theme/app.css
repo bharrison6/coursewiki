@@ -115,6 +115,9 @@ main, .shell > * { min-width: 0; }
 }
 @media (max-width: 34rem) {
   .appbar .brand .sub { display: none; }
+  /* The logo is the one non-negotiable item in this compact bar: let search
+     surrender width before clipping the official lockup. */
+  .appbar .brand { flex: none; }
   .appbar .brandmark { height: 1.5rem; }
 }
 
@@ -729,8 +732,8 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 
 .deeper > :not(summary) { margin: .8rem .85rem; }
 
-/* Print: beforeprint force-opens every <details>, so these arrive open.
-   Until the addendum lands, keep a block from splitting across a page. */
+/* Site-page printing still force-opens every <details>. Aggregate printing
+   extracts this tier into numbered addenda before this stylesheet is inlined. */
 @media print {
   .deeper { break-inside: avoid; background: none; }
 }
@@ -890,6 +893,49 @@ figure.graphic-slot:not(:has(img))::before {
   color: var(--ink-soft);
   border: 2px dashed var(--rule);
   border-radius: var(--radius-sm);
+}
+
+/* ---- GHS pictograms ----------------------------------------------------
+   These are regulatory marks, not an illustration in the site palette: the
+   diamond stays white, its symbol stays black, and its frame stays red in
+   either screen theme. The fixed fills are deliberate - using --paper for a
+   cutout would turn it dark in the dark skin and change the safety symbol. */
+.ghs-pictograms { margin: 1.25rem 0; }
+.ghs-pictograms > figcaption {
+  margin: 0 0 .65rem;
+  font-family: var(--f-display); font-weight: 700; font-size: .76rem;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--ink-soft);
+}
+.ghs-pictogram-list {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(5.25rem, 1fr));
+  gap: .8rem .75rem; margin: 0; padding: 0; list-style: none;
+}
+.ghs-pictogram-list li {
+  display: grid; justify-items: center; align-content: start; gap: .35rem;
+  min-width: 0; padding: 0; text-align: center;
+}
+.ghs-pictogram-list li::before { content: none; }
+.ghs-pictogram { display: block; width: min(100%, 5.25rem); height: auto; }
+.ghs-pictogram-list span {
+  min-height: 2.4em;
+  font-family: var(--f-display); font-weight: 700; font-size: .68rem;
+  line-height: 1.2; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--ink);
+}
+.ghs-diamond { fill: #fff; stroke: var(--msu-redorange); stroke-width: 7; }
+.ghs-symbol { fill: #000; }
+.ghs-symbol-stroke {
+  fill: none; stroke: #000; stroke-width: 5;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.ghs-cutout { fill: #fff; }
+@media print {
+  /* A printer can discard every background. Strokes and fills carry all of
+     the mark here, so a monochrome handout remains an unambiguous diamond. */
+  .ghs-diamond { fill: #fff; stroke: #000; }
+  .ghs-symbol { fill: #000; }
+  .ghs-symbol-stroke { stroke: #000; }
+  .ghs-cutout { fill: #fff; }
 }
 
 /* Both of these are build-error states that reach the page. The build already
