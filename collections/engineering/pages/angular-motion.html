@@ -1,0 +1,152 @@
+@@ID: angular-motion
+@@TITLE: Angular Motion
+@@SECTION: Motion and Rotation
+@@SUMMARY: Measure rotation in degrees, radians, and revolutions, then use angular velocity and angular acceleration to describe a turning shaft.
+@@STATUS: ready
+@@TAGS: angular displacement, radian, degree, revolution, rpm, angular velocity, angular acceleration, omega, alpha, theta, rotation
+@@END
+
+<section>
+  <h2>Rotation is measured three ways</h2>
+  <p class="lede">Angular displacement is how far something has turned. Its symbol is
+  <strong>&theta;</strong> (theta), and there are three units in everyday use for it. They measure
+  the same rotation; they differ only in how much turning counts as one unit.</p>
+  <dl class="dims">
+    <div><dt>Revolution (r)</dt><dd>One complete turn. This is what a machine nameplate counts.</dd></div>
+    <div><dt>Degree (&deg;)</dt><dd>One revolution cut into 360 parts. This is what a drawing and a
+    protractor use.</dd></div>
+    <div><dt>Radian (rad)</dt><dd>The angle whose arc is exactly as long as the radius. This is the
+    SI unit, and it is the one every rotation formula expects.</dd></div>
+  </dl>
+  <figure>
+    <svg viewBox="0 0 330 250" width="330" role="img" aria-labelledby="radian-title radian-desc"
+      style="max-width:100%;height:auto" fill="none" stroke="currentColor" stroke-width="2">
+      <title id="radian-title">One radian</title>
+      <desc id="radian-desc">A sector drawn from the centre of a circle. Two radii of equal length
+      open out from the centre, and the curved arc between their tips is drawn the same length as
+      one radius. The angle enclosed at the centre is labelled one radian.</desc>
+      <path d="M 220 205 A 150 150 0 0 0 141 78.8" stroke-width="5"/>
+      <path d="M 70 205 L 220 205"/>
+      <path d="M 70 205 L 141 78.8"/>
+      <path d="M 115 205 A 45 45 0 0 0 90.7 167.1" stroke-width="1.5"/>
+      <text x="145" y="228" fill="currentColor" stroke="none" font-size="15" text-anchor="middle">radius r</text>
+      <text x="86" y="140" fill="currentColor" stroke="none" font-size="15" text-anchor="middle" transform="rotate(-60 86 140)">radius r</text>
+      <text x="222" y="60" fill="currentColor" stroke="none" font-size="15" text-anchor="middle">arc length = r</text>
+      <text x="130" y="190" fill="currentColor" stroke="none" font-size="14">1 rad</text>
+    </svg>
+    <figcaption>A radian is defined by the circle itself, not by a count somebody picked. Swing the
+    radius around the rim until the arc it traces is as long as the radius, and the angle you have
+    opened is one radian.</figcaption>
+  </figure>
+  <div class="unit-table-wrap">
+  <table class="unit-table">
+    <caption>The three units, describing one and the same rotation.</caption>
+    <thead><tr><th scope="col">In revolutions</th><th scope="col">In degrees</th><th scope="col">In radians</th></tr></thead>
+    <tbody>
+      <tr><td>1 r</td><td>360&deg;</td><td>2&pi; rad = 6.283185 rad</td></tr>
+      <tr><td>0.5 r</td><td>180&deg;</td><td>&pi; rad = 3.141593 rad</td></tr>
+      <tr><td>0.25 r</td><td>90&deg;</td><td>&pi;/2 rad = 1.570796 rad</td></tr>
+      <tr><td>&asymp; 0.159 r</td><td>&asymp; 57.29578&deg;</td><td>1 rad</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>The two factors worth keeping to hand: <code>1&deg; = 0.01745329 rad</code> and
+  <code>1 rad = 180&deg;/&pi; = 57.29578&deg;</code>.</p>
+  <p class="aside"><strong>The degree sign sits tight against the number</strong> &mdash;
+  <code>90&deg;</code>, not <code>90 &deg;</code>. Every other unit symbol takes a space:
+  <code>1.57 rad</code>, <code>45 r/min</code>. The degree, minute, and second of plane angle are
+  the only exceptions to that rule.</p>
+  <details class="deeper">
+    <summary>Why a radian is barely a unit at all</summary>
+    <p>A radian is an arc length divided by a radius &mdash; a length over a length. The two cancel,
+    so NIST gives the base-unit expression for the radian as <code>m/m</code> and its value as
+    simply <code>1</code>: the radian and steradian are &ldquo;special names for the number one that
+    may be used to convey information about the quantity concerned.&rdquo;</p>
+    <p>That is not trivia. It is why a torque in <code>N&middot;m</code> multiplied by an angle in
+    <code>rad</code> comes out as energy in joules with no conversion factor anywhere, and why a
+    formula that mixes rotation with straight-line motion works only when the angle is in radians.
+    Degrees and revolutions are counts somebody picked; the radian is the ratio the geometry
+    already contains.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Angular velocity is how fast it turns</h2>
+  <p><strong>Angular velocity</strong> uses the symbol <strong>&omega;</strong> (omega), and it is
+  angle divided by time:</p>
+  <p><code>&omega; = &theta; / t</code></p>
+  <dl class="dims">
+    <div><dt>rad/s</dt><dd>Radian per second. The SI unit, and the form every formula on
+    [[rotation-and-linear-speed]] needs.</dd></div>
+    <div><dt>r/min, or rpm</dt><dd>Revolutions per minute. What a motor nameplate, a spindle
+    display, and a speed chart are marked in.</dd></div>
+  </dl>
+  <div class="gate">
+    <p><strong>Nameplates speak rpm; formulas speak rad/s.</strong> Convert before you calculate,
+    and convert back before you set a machine.</p>
+  </div>
+  <p>The exact pair, either way round:</p>
+  <p><code>1 r/min = 0.1047198 rad/s</code> &nbsp;&middot;&nbsp;
+  <code>1 rad/s = 9.549297 r/min</code></p>
+  <h3>Worked example</h3>
+  <p>Convert 12.5 rpm to rad/s. Put revolutions per minute on the bottom so they cancel:</p>
+  <p class="conversion-equation"><span>12.5 <span class="unit-cancel">r/min</span></span> &times;
+  <span class="conversion-factor" aria-label="0.1047198 radians per second divided by 1 revolution per minute"><span aria-hidden="true">0.1047198 rad/s</span><span aria-hidden="true">1 <span class="unit-cancel">r/min</span></span></span>
+  = 1.309 rad/s.</p>
+  <details class="deeper">
+    <summary>Where 0.1047198 comes from</summary>
+    <p>One revolution is <code>2&pi;</code> radians and one minute is 60 seconds, so one revolution
+    per minute is <code>2&pi;/60 = 0.104719755&hellip;</code> radians per second. It is not a
+    measured constant; it falls straight out of the two definitions. Turning it over gives
+    <code>60/2&pi; = 9.5492966&hellip;</code> revolutions per minute in one radian per second.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Angular acceleration is how fast the turning changes</h2>
+  <p><strong>Angular acceleration</strong> uses the symbol <strong>&alpha;</strong> (alpha), and it
+  is change in angular velocity divided by the time it took:</p>
+  <p><code>&alpha; = &Delta;&omega; / &Delta;t</code></p>
+  <p>Its SI unit is <code>rad/s<sup>2</sup></code>. Everything true of straight-line acceleration on
+  [[acceleration-and-squared-time]] is true here as well: it is a <em>change</em>, so a shaft
+  slowing down has a negative angular acceleration in whichever direction you called positive, and
+  the squared second means a squared factor whenever the time unit changes.</p>
+  <h3>Worked example: a motor speeding up</h3>
+  <p>A motor shaft is turning at 17 rpm. Power to the motor is increased, and 1.1 s later it is
+  turning 8 rpm faster. What is the angular acceleration in <code>rad/s<sup>2</sup></code>?</p>
+  <ol>
+    <li>Only the <em>change</em> matters, so convert the 8 rpm increase:
+    <code>8 r/min &times; 0.1047198 rad/s per r/min = 0.837758 rad/s</code>.</li>
+    <li>Divide by the time: <code>0.837758 rad/s &divide; 1.1 s = 0.7616 rad/s<sup>2</sup></code>.</li>
+  </ol>
+  <div class="gate"><p><strong>0.76 rad/s<sup>2</sup></strong>, as an average over those 1.1 s. The
+  starting 17 rpm never enters the calculation &mdash; acceleration is built out of the change, not
+  out of the speed.</p></div>
+  <h3>Worked example: a spindle running up</h3>
+  <p>A machining-centre spindle goes from rest to 8,000 rpm in 2.5 s.</p>
+  <ol>
+    <li><code>8,000 r/min &times; 0.1047198 rad/s per r/min = 837.758 rad/s</code>.</li>
+    <li><code>(837.758 rad/s &minus; 0 rad/s) &divide; 2.5 s = 335.10 rad/s<sup>2</sup></code>.</li>
+  </ol>
+  <p>That is the <strong>average</strong> over the run-up. A drive that ramps gently at each end has
+  a changing instantaneous angular acceleration inside the same interval, exactly as a linear drive
+  does.</p>
+</section>
+
+<section data-deck="wiki-only">
+  <h2>Sources</h2>
+  <details class="deeper">
+    <summary>Where these values were checked</summary>
+    <p><a href="https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9">NIST
+    SP 811, Appendix B</a> gives revolution per minute to radian per second as
+    <code>1.047 198 E&minus;01</code>, revolution to radian as <code>6.283 185 E+00</code>, and
+    degree to radian as <code>1.745 329 E&minus;02</code>. The 9.549297 r/min in one rad/s is the
+    reciprocal of the first of those.</p>
+    <p><a href="https://www.nist.gov/pml/special-publication-811/nist-guide-si-chapter-4-two-classes-si-units-and-si-prefixes">NIST
+    SP 811, Chapter 4</a>, Table 3, lists the radian with symbol <code>rad</code>, value
+    <code>1</code>, and base-unit expression <code>m/m</code>. The rule that every unit symbol takes
+    a space except the degree, minute, and second of plane angle is
+    <a href="https://www.nist.gov/pml/special-publication-811/nist-guide-si-chapter-7-rules-and-style-conventions-expressing-values">NIST
+    SP 811, section 7.2</a>.</p>
+  </details>
+</section>

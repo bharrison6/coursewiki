@@ -1,0 +1,140 @@
+@@ID: rotation-and-linear-speed
+@@TITLE: Rotation and Linear Speed
+@@SECTION: Motion and Rotation
+@@SUMMARY: Turn a shaft speed into the speed of what it drives, and back again, using the radius - belts, rollers, wheels, and grinding wheels.
+@@STATUS: ready
+@@TAGS: tangential velocity, rim speed, surface speed, conveyor, drive roller, feed rate, grinding wheel, radius, diameter, rpm, angular velocity
+@@END
+
+<section>
+  <h2>The radius is what links turning to travelling</h2>
+  <p class="lede">A roller turns; the belt on it travels. A wheel turns; the vehicle moves. The two
+  speeds are not the same number, and the thing that converts one into the other is the
+  <strong>radius</strong>.</p>
+  <p><code>v = &omega;r</code> &nbsp;&middot;&nbsp; <code>a = &alpha;r</code></p>
+  <dl class="dims">
+    <div><dt>v</dt><dd>The straight-line speed of a point on the rim &mdash; the speed of the belt,
+    the sheet, the vehicle.</dd></div>
+    <div><dt>&omega;</dt><dd>Angular velocity, <strong>in radians per second</strong>. See
+    [[angular-motion]] for the conversion from rpm.</dd></div>
+    <div><dt>r</dt><dd>The <strong>radius</strong>, in the same length unit you want the answer in.
+    Rollers and wheels are almost always specified by <em>diameter</em>, so halve it first.</dd></div>
+  </dl>
+  <div class="gate">
+    <p><strong>Both of these formulas are only true when the angle is in radians.</strong> Feed
+    them rpm and the answer is wrong by a factor of about 9.55; feed them degrees per second and it
+    is wrong by a factor of about 57.3. Convert to rad/s first, every time.</p>
+  </div>
+  <p class="aside">Two mistakes account for nearly every wrong answer here: using the diameter where
+  the radius belongs, and leaving the speed in rpm. Both are worth a deliberate check before the
+  arithmetic starts.</p>
+  <details class="deeper">
+    <summary>Why the radian is the only angle unit that works</summary>
+    <p>A radian is defined as arc length divided by radius. Multiply an angle in radians by a radius
+    and you get the arc length back &mdash; which is exactly the distance the rim travelled. Do the
+    same thing per second and you have the rim speed. Degrees and revolutions carry an extra
+    arbitrary count inside them, so they need a conversion factor first. The radian does not,
+    because it was built out of the same geometry the formula describes.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Worked example: a conveyor drive roller</h2>
+  <p>A conveyor belt runs over a drive roller 200 mm in diameter, turning at 45 rpm. What is the
+  belt speed, and how long does a package take to travel 15 m?</p>
+  <ol>
+    <li>Halve the diameter: <code>r = 100 mm = 0.100 m</code>.</li>
+    <li>Convert the speed: <code>45 r/min &times; 0.1047198 rad/s per r/min = 4.712389 rad/s</code>.</li>
+    <li>Multiply: <code>v = 4.712389 rad/s &times; 0.100 m = 0.4712 m/s</code>.</li>
+    <li>Divide the distance by the speed:
+    <code>15 m &divide; 0.4712389 m/s = 31.83 s</code>.</li>
+  </ol>
+  <div class="gate"><p><strong>0.47 m/s, and about 32 s for 15 m.</strong> That assumes the belt
+  does not slip on the roller, which is the assumption a real drive is designed to make true.</p></div>
+</section>
+
+<section>
+  <h2>Worked example: a roll-forming feed rate</h2>
+  <p>Forming rolls 150 mm in diameter rotate at 25 rpm. What is the feed rate of the sheet in
+  m/min, and how long does 20 m of sheet take?</p>
+  <ol>
+    <li><code>r = 75 mm = 0.075 m</code>.</li>
+    <li><code>25 r/min &times; 0.1047198 rad/s per r/min = 2.617994 rad/s</code>.</li>
+    <li><code>v = 2.617994 rad/s &times; 0.075 m = 0.19635 m/s</code>.</li>
+    <li>The question asks for metres per minute, so convert the time unit:
+    <code>0.19635 m/s &times; 60 s/min = 11.78 m/min</code>.</li>
+    <li><code>20 m &divide; 11.78 m/min = 1.70 min</code>, which is about 1 min 42 s.</li>
+  </ol>
+  <p>Note what step 4 did and did not do. Changing seconds to minutes in a <em>speed</em> takes one
+  factor of 60. If the quantity had been an acceleration, the same change would take
+  60<sup>2</sup> &mdash; see [[acceleration-and-squared-time]].</p>
+</section>
+
+<section>
+  <h2>Worked example: running the conversion backwards</h2>
+  <p>Sometimes the linear quantity is what you know. The formulas simply rearrange:
+  <code>&omega; = v/r</code> and <code>&alpha; = a/r</code>.</p>
+  <h3>A wheel, from angular to linear</h3>
+  <p>A tyre 28 in in diameter turns at 3.5 rad/s. How fast is the vehicle moving, in miles per hour?</p>
+  <ol>
+    <li><code>r = 14 in &times; 0.0254 m/in = 0.3556 m</code>.</li>
+    <li><code>v = 3.5 rad/s &times; 0.3556 m = 1.2446 m/s</code>.</li>
+    <li><code>1.2446 m/s &divide; 0.44704 m/s per mph = 2.78 mph</code>.</li>
+  </ol>
+  <h3>A wheel, from linear to angular</h3>
+  <p>A vehicle accelerates at 5 m/s<sup>2</sup> on tyres 78 cm in diameter. What is the angular
+  acceleration of a wheel?</p>
+  <ol>
+    <li><code>r = 39 cm = 0.39 m</code>.</li>
+    <li><code>&alpha; = 5 m/s<sup>2</sup> &divide; 0.39 m = 12.8 rad/s<sup>2</sup></code>.</li>
+  </ol>
+  <p class="aside">Check the unit on the answer, not just the number. Dividing
+  <code>m/s<sup>2</sup></code> by <code>m</code> leaves <code>1/s<sup>2</sup></code>, and because
+  the radian is a ratio of two lengths, <code>rad/s<sup>2</sup></code> is the same thing named for
+  what it describes.</p>
+</section>
+
+<section>
+  <h2>Rim speed is why wheel size changes the safe rpm</h2>
+  <p>A grinding wheel is limited by how fast its <em>rim</em> moves, not by how fast its centre
+  turns. Put a bigger wheel on the same spindle at the same rpm and the rim goes faster, because
+  every point on it travels a longer circle in the same time.</p>
+  <p>Take a wheel whose rim speed must stay at or below 35 m/s:</p>
+  <div class="unit-table-wrap">
+  <table class="unit-table">
+    <caption>Same 35 m/s rim-speed limit, two wheel sizes.</caption>
+    <thead><tr><th scope="col">Wheel diameter</th><th scope="col">Radius</th><th scope="col">&omega; = v/r</th><th scope="col">Same speed in rpm</th></tr></thead>
+    <tbody>
+      <tr><td>200 mm</td><td>0.100 m</td><td>350 rad/s</td><td>3,342 rpm</td></tr>
+      <tr><td>250 mm</td><td>0.125 m</td><td>280 rad/s</td><td>2,674 rpm</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>The larger wheel has to run <strong>slower</strong>, by about 670 rpm, to keep the same rim
+  speed. Nothing about the machine changed; only the radius did.</p>
+  <div class="stop">
+    <p><strong>Do not calculate your way to a grinding-wheel speed.</strong> The number that governs
+    is the <strong>maximum operating speed marked on the wheel</strong>, and OSHA requires that the
+    spindle speed of the machine be checked <em>before</em> a wheel is mounted, to be certain it
+    does not exceed that marking (<code>29&nbsp;CFR&nbsp;1910.215(d)(1)</code>). The arithmetic
+    above explains <em>why</em> a bigger wheel is marked slower. It does not authorise a wheel, and
+    it is not a substitute for reading the wheel. See [[machine-hazards]].</p>
+  </div>
+</section>
+
+<section data-deck="wiki-only">
+  <h2>Sources</h2>
+  <details class="deeper">
+    <summary>Where these values were checked</summary>
+    <p>Conversion factors from
+    <a href="https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9">NIST
+    SP 811, Appendix B</a>: revolution per minute to radian per second <code>1.047 198
+    E&minus;01</code>, inch to meter <code>2.54 E&minus;02</code> (exact), and mile per hour to
+    meter per second <code>4.4704 E&minus;01</code> (exact).</p>
+    <p>The grinding-wheel requirement is quoted from
+    <a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.215">29 CFR
+    1910.215(d)(1)</a>: &ldquo;The spindle speed of the machine shall be checked before mounting of
+    the wheel to be certain that it does not exceed the maximum operating speed marked on the
+    wheel.&rdquo;</p>
+  </details>
+</section>
