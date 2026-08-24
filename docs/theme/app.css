@@ -631,7 +631,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    .article is (0,2,0). Auto margins against no max-width are a no-op, so
    neither mode is touched. */
 .article { max-width: var(--prose); margin-inline: auto; }
-.article.wide { max-width: 72rem; }
+.article.wide { max-width: none; }
+
+/* .wide is for card and tile grids -- the track index, the collection hubs --
+   not for prose. A grid reflows to whatever width it is given, so the 72rem
+   cap it used to carry was pure waste: on a wide monitor the shell centred at
+   100rem and the grid then stopped 450px short inside it, blank on both sides.
+   Reported from a 4K screen as "the window fixes to a certain size".
+   The shell cap is what bounds these now, which is the rule that should own it. */
 
 .crumb {
   display: flex; align-items: center; gap: .45rem; flex-wrap: wrap;
