@@ -98,8 +98,21 @@ short catalog title, and the page that teaches the method:
 
 The generator publishes every problem in `practice.html`, adds it to search, and gives each
 track a separate `practiceIds` preset derived from its teaching pages. Practice IDs never
-become normal track pages or presentation panels. A teaching page can offer a native
-fallback link that JavaScript upgrades into a persistent add/remove control:
+become normal track pages or presentation panels.
+
+Two things about a bank file are easy to get wrong:
+
+- **Only the `[data-practice]` element is published.** A bank's `<section>` wrappers, its
+  `<h2>` group headings, and any prose between problems are read by the build, validated,
+  and then dropped. They organise the source file and reach no output, so anything a
+  learner must see belongs inside a problem.
+- **`data-tolerance` is an absolute window, and it must admit the answer the solution
+  prints.** If the worked solution bolds `14.8 mph`, a key of `14.775` with a tolerance of
+  `0.02` tells a student who typed the printed answer that they are wrong. Size it from the
+  rounding you advertise, then confirm a wrong-method value still falls outside.
+
+A teaching page can offer a native fallback link that JavaScript upgrades into a persistent
+add/remove control:
 
 ```html
 <a class="button" data-practice-add="measurement-prefix-conversion"
