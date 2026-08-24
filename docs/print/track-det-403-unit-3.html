@@ -1267,6 +1267,15 @@ figure > figcaption {
   line-height: 1.45;
 }
 
+/* An image with no width set renders at its intrinsic size, capped by the
+   column -- so a near-square illustration at the full prose measure comes out
+   taller than the paragraph it supports, and inside a card that ships
+   collapsed the picture becomes the card. Cap the FIGURE rather than the
+   image, so the caption wraps to the picture it belongs to instead of running
+   the full column away from it. Below the cap this is inert, which is what
+   keeps it safe at 375px. */
+figure.fig-narrow { max-width: 27rem; }
+
 figure.graphic-slot:not(:has(img, svg))::before {
   content: "Artwork pending";
   display: block;
