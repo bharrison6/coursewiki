@@ -201,6 +201,25 @@ main, .shell > * { min-width: 0; }
 }
 @media (max-width: 56.25rem) { .shell { grid-template-columns: minmax(0, 1fr); } }
 
+/* ---- catalog pages span the display ------------------------------------
+   The shell cap exists so a prose page does not stretch its grid across a
+   very wide display. A catalog page is the opposite case: index, practice
+   and the track list are card grids whose whole job is to show as many
+   cards at once as the screen allows, and .article.wide already removes
+   the prose cap on them. Capping the shell around them left most of a wide
+   monitor blank -- reported from the track index at 1600px on a display
+   much wider than that.
+
+   Overriding the VARIABLE rather than max-width matters: --bar-inset is
+   derived from --shell-max, so the app bar and the seqbar re-align to the
+   new width on their own. Setting `max-width: none` on .shell alone would
+   have left the bar inset against flush content.
+
+   100vw makes the (100% - --shell-max) / 2 term go negative, so --bar-inset
+   falls back to its --bar-pad floor, which is exactly what a full-width
+   page wants.                                                             */
+html:has(.article.wide) { --shell-max: 100vw; }
+
 /* ---- sidebar -----------------------------------------------------------*/
 .sidebar {
   position: sticky; top: var(--appbar-h);
