@@ -1,10 +1,3 @@
-
-
-# Working notes. This repo is PUBLIC and holds only the website, so the scope's
-# artifacts use the gitignored-in-tree class: OneDrive syncs and backs them up,
-# git does not publish them.
-.artifacts/
-
 # Local render/verification scratch
 docs/**/_*.html
 
@@ -13,16 +6,30 @@ Thumbs.db
 desktop.ini
 .DS_Store
 
-# Working notes, same storage class as .artifacts/ -- see the header in the file itself.
+# >>> ACC surface — IGNORED. Basis: commit 0db2a19 (2026-08-20). >>>
+#
+# "This repo is PUBLIC and holds only the website, so the scope's artifacts use the
+# gitignored-in-tree class": OneDrive syncs and backs them up, git does not publish them. Of the
+# workspace's exclusion rules this is the only one guarding a LIVE public remote — the other repos
+# with the same posture have no remote configured at all — so this is the one where a mistaken
+# `git add` actually publishes.
+#
+# Search still reaches these files — see _Projects\GitHub\.ignore, which ripgrep and fd read and
+# which outranks .gitignore.
+#
+# IGNORE THE WHOLE SURFACE, NOT THE FOLDERS KNOWN WHEN THE RULE WAS WRITTEN. This rule named
+# `.aia/.artifacts/` only, and ACC later wrote `.aia/focus-proposals.ndjson` beside it — untracked
+# AND unignored in a public repo, one `git add -A` away from publishing working state (caught
+# 2026-09-12). Nothing under `.aia/` is part of the website, so cover the next file ACC invents
+# before it exists rather than after. Six other repos still have that exact exposure.
+#
+# `.artifacts/` is kept alongside it: with no leading slash it matches at ANY depth, which is why it
+# survived the August 2026 move to `.aia/.artifacts/` untouched. Never write `/.artifacts/` — the
+# leading slash pins the rule to the repo root and it silently stops matching the day the folder
+# moves — and never rely on a `!` negation under a `*/` blanket. Every gitignore breakage observed
+# in this workspace has been one of those two shapes.
+.aia/
+.artifacts/
 .changelog.md
 .research/
-# B3: same posture as the .artifacts rule above — the agent surface moved, the
-# decision to keep it out of git did not.
-#
-# Ignore the WHOLE surface, not just the folders known when the rule was written.
-# This named `.aia/.artifacts/` only, and ACC later wrote
-# `.aia/focus-proposals.ndjson` beside it — untracked AND unignored in a public
-# repo, one `git add -A` away from publishing working state (caught 2026-09-12).
-# Nothing under `.aia/` is part of the website, so cover the next file ACC adds
-# there before it exists rather than after.
-.aia/
+# <<< ACC surface <<<
