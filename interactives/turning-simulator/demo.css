@@ -104,6 +104,7 @@
 }
 .ts-lab button:not(:disabled):hover { border-color: var(--accent); background: var(--surface-2); }
 .ts-lab button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--paper); }
+.ts-lab button[aria-pressed="true"]:not(:disabled):hover { border-color: var(--accent); background: var(--accent); color: var(--paper); }
 .ts-lab button:disabled { cursor: not-allowed; opacity: .45; }
 .ts-lab :is(button, input, select, summary):focus-visible,
 .ts-view-wrap:focus-visible { outline: 3px solid var(--cat2); outline-offset: 2px; }
@@ -250,6 +251,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
 .ts-run { display: flex; flex-wrap: wrap; gap: .4rem; }
 .ts-lab .ts-spindle { border-color: var(--accent); }
 .ts-lab .ts-spindle[aria-pressed="true"] { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
+.ts-lab .ts-spindle[aria-pressed="true"]:not(:disabled):hover { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
 
 .ts-jog { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
 .ts-steps { display: flex; flex-wrap: wrap; align-items: center; gap: .2rem .9rem; font-family: var(--f-mono); }
@@ -344,6 +346,10 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
 
 /* ---- print: the drawing, the work as it stands and the inspection; no controls ---*/
 @media print {
+  .ts-lab:not(.ts-measured) { display: none !important; }
+  .ts-static-parts { grid-template-columns: minmax(0, 1fr); }
+  .ts-static-parts .ts-static-fig { break-inside: avoid; }
+  .ts-static-parts svg { max-width: 36rem; }
   .ts-workbench { display: block; height: auto; }
   .ts-workbench > .ts-machine { position: static; }
   .ts-view-wrap svg { max-height: none; }

@@ -50,6 +50,11 @@ test('the printed figures in the page are the renderer\'s output', () => {
   assert.ok(Math.abs(st.work.ro[M.colAt(st.work, -1.0)] - 0.375) < 1e-9, 'body turned to 0.750');
 });
 
+test('static target captions retain the same descriptions as the live targets', () => {
+  const page = fs.readFileSync(PAGE, 'utf8');
+  for (const T of M.TARGETS) assert.ok(page.includes('<strong>' + T.title + '.</strong> ' + T.summary), T.id + ' static caption matches its target');
+});
+
 test('the drawn cutting edge is the model\'s edge, and the drawn tool is the tool that collides', () => {
   for (const id of M.TOOL_ORDER) {
     const t = M.TOOLS[id];

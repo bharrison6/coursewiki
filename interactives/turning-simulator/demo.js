@@ -416,7 +416,10 @@
           var len = Math.min(dist, speed * dt);
           var nz = len >= dist ? target.z : cz + dz / dist * len, nx = len >= dist ? target.x : 2 * (cr + dr / dist * len);
           var res = M.move(st, nz, nx);
-          if (res.contact) { contact = true; cutAny += res.cut; formed = formed || res.formed; speed = SPEED.feed; chips(res); }
+          if (res.contact) {
+            contact = true; cutAny += res.cut; formed = formed || res.formed; speed = SPEED.feed; chips(res);
+            if (cur.measured && !cur.stale) { cur.stale = true; renderInspection(); }
+          }
           else { speed = SPEED.rapid; }
           draw();
           if (res.stop) { done(res); return; }
@@ -548,6 +551,7 @@
     function renderInspection() {
       var spec = specCache[T.id] || (specCache[T.id] = M.evaluate(M.create(T.id)).items);
       var ev = cur.measured;
+      lab.classList.toggle('ts-measured', !!ev && !cur.stale);
       var by = {};
       if (ev) { ev.items.forEach(function (it) { by[it.id] = it; }); }
       el.items.innerHTML = spec.map(function (s) {
