@@ -59,17 +59,8 @@ $docsDir  = Join-Path $root 'docs'
 $enc      = New-Object System.Text.UTF8Encoding($false)
 
 # ---------------------------------------------------------------- helpers ----
-function Read-Conf([string]$path) {
-  if (-not (Test-Path -LiteralPath $path)) { throw "missing conf: $path" }
-  $raw   = [System.IO.File]::ReadAllText($path)
-  $split = $raw -split '(?m)^@@END\s*$', 2
-  if ($split.Count -ne 2) { throw "$path : no @@END line closing the header" }
-  $meta = @{}
-  foreach ($line in ($split[0] -split "`r?`n")) {
-    if ($line -match '^@@([A-Z]+):\s*(.*)$') { $meta[$Matches[1]] = $Matches[2].Trim() }
-  }
-  [pscustomobject]@{ Meta = $meta; Body = $split[1] }
-}
+. (Join-Path $root 'scripts/read-conf.ps1')
+. (Join-Path $root 'scripts/interactive-assets.ps1')
 
 # The image formats this site will inline. The MIME type has to be right per
 # extension: a data: URI carrying the wrong type is not decoded, and the
@@ -1145,10 +1136,12 @@ function New-Document {
   [void]$sb.AppendLine($fontLink.Trim())
   [void]$sb.AppendLine($themeBoot.Trim())
   if ($extraHead) { [void]$sb.AppendLine($extraHead.TrimEnd()) }
+  foreach ($asset in @(Get-InteractiveWebAssets $content $up 'CSS')) { [void]$sb.AppendLine($asset) }
   [void]$sb.AppendLine('</head>')
   [void]$sb.AppendLine('<body class="' + $bodyClass + '" data-page="' + $pageKey + '" data-base="' + $up + '">')
   [void]$sb.AppendLine($content.TrimEnd())
   if ($scripts) { [void]$sb.AppendLine($scripts.TrimEnd()) }
+  foreach ($asset in @(Get-InteractiveWebAssets $content $up 'JS')) { [void]$sb.AppendLine($asset) }
   [void]$sb.AppendLine('</body>')
   [void]$sb.AppendLine('</html>')
   $sb.ToString()
@@ -1602,6 +1595,8 @@ function New-PracticeItemMarkup($item) {
 
 # ------------------------------------------------------------ landing page ---
 Write-Host 'site'
+Initialize-InteractiveAssets $root
+foreach ($page in $allPages.Values) { $null = @(Get-InteractiveIds $page.Body) }
 $searchJs   = New-SearchIndex 'site'
 $playlistJs = New-PlaylistData
 $practiceJs = New-PracticeData
@@ -1618,6 +1613,7 @@ $script:stamp = Get-BuildStamp @(
   # Content hashes, not names: an image replaced in place must move the stamp,
   # or the page updates and the picture does not.
   ($mediaStampParts -join "`n")
+  ($script:interactiveStampParts -join "`n")
 )
 Write-Host ("    build stamp: {0}" -f $script:stamp)
 $hub = New-Object System.Text.StringBuilder
@@ -1907,6 +1903,7 @@ foreach ($f in (Get-ChildItem -LiteralPath $themeDir -File)) {
 # check would report every one of them and -Prune would delete them.
 Copy-StaticTree (Join-Path $root 'assets') (Join-Path $docsDir 'assets') 'docs\assets' @()
 Copy-StaticTree $mediaDir (Join-Path $docsDir 'media') 'docs\media' @($script:mediaMime.Keys)
+Copy-InteractiveAssets $docsDir
 if ($script:mediaSkipped.Count) {
   Write-Host ("  media\ files ignored - unsupported type ({0}): {1}" -f
               $script:mediaSkipped.Count, ($script:mediaSkipped -join ', '))
@@ -1977,6 +1974,7 @@ function New-Aggregate {
   [void]$sb.AppendLine($script:themeCss.TrimEnd())
   [void]$sb.AppendLine($script:appCss.TrimEnd())
   [void]$sb.AppendLine($script:aggCss.TrimEnd())
+  foreach ($asset in @(Get-InteractiveInlineAssets $b.ToString() 'CSS')) { [void]$sb.AppendLine($asset) }
   [void]$sb.AppendLine('</style>')
   [void]$sb.AppendLine('</head>')
   [void]$sb.AppendLine('<body class="app skin-app aggregate" data-page="agg-' + $slug + '" data-base="">')
@@ -1985,6 +1983,7 @@ function New-Aggregate {
   [void]$sb.AppendLine('</main>')
   [void]$sb.AppendLine('<script>')
   [void]$sb.AppendLine($script:appJs.TrimEnd())
+  foreach ($asset in @(Get-InteractiveInlineAssets $b.ToString() 'JS')) { [void]$sb.AppendLine($asset) }
   [void]$sb.AppendLine('</script>')
   [void]$sb.AppendLine('</body>')
   [void]$sb.AppendLine('</html>')

@@ -80,6 +80,34 @@ Program tracks contain their child courses through `@@PARENT`; their page lists 
 from those children. This keeps shared content in one source of truth. See the existing
 files in `tracks/` for examples.
 
+## Interactive topic modules
+
+Keep each simulation in `interactives/<topic>/`, with its calculations in `model.js`,
+browser interaction in `demo.js`, and scoped styling in `demo.css`. Topic page HTML stays
+in `collections/<collection>/pages/` and uses a root such as
+`<div data-interactive="milling-direction">`. Derive styling from the shared theme tokens
+and existing CourseWiki components; include a useful static explanation and print view.
+
+Each module declares its assets in `interactive.conf`:
+
+```text
+@@ID: milling-direction
+@@CSS: demo.css
+@@JS: model.js, demo.js
+@@END
+```
+
+The folder and ID must match exactly. Assets are module-relative filenames; JavaScript
+order is significant. The generator loads each module once per page, copies declared
+assets into `docs/interactives/`, includes their content in the cache stamp, and inlines
+the same assets in standalone print aggregates. Modules initialize every matching root
+independently and must work alongside other modules in an aggregate. Unknown module IDs,
+wrong-case filenames, and missing assets fail the build.
+
+Run the loader checks with `pwsh -File tests/build/interactive-assets.test.ps1`.
+Calculation tests live beside their topic peers under `tests/interactives/` and run with
+`node --test --test-concurrency=2 tests/interactives/*.test.cjs`.
+
 ## Practice banks
 
 Practice problems are authored separately from teaching pages in `practice/*.html`. A bank
