@@ -326,7 +326,7 @@
     var uid = 'mill' + Math.random().toString(36).slice(2, 8);
     var reduce = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
 
-    var state = { view: 'compare', aeOverD: 0.25, fz: 18, T: 0, playing: false, speed: 1 };
+    var state = { view: 'compare', aeOverD: 0.25, fz: 18, T: 0, manualExit: false, playing: false, speed: 1 };
     var REST_PROGRESS = 0.35;
     state.T = M.timeAtProgress(state, 0, REST_PROGRESS);
 
@@ -475,6 +475,7 @@
       bPlay.setAttribute('aria-pressed', String(on));
       cancelAnimationFrame(raf); clearTimeout(stepTimer); last = null;
       if (on) {
+        state.manualExit = false;
         if (reduce.matches) stepTimer = setTimeout(stepReduced, 300);
         else raf = requestAnimationFrame(tick);
       } else {
@@ -483,17 +484,20 @@
     }
     function step(dir) {
       play(false);
-      var sp = span(), c = state.T - Math.floor(state.T);
+      var sp = span(), c = M.frame('climb', state, state.T).cycle;
+      var base = Math.floor(state.T) - (state.manualExit ? 1 : 0);
       if (c > sp) c = dir > 0 ? 1 : sp;           // between teeth: jump to the next cut
       var p = Math.round((c / sp) * 12 + dir) / 12;
-      if (p > 1) { state.T = Math.floor(state.T) + 1; }
-      else if (p < 0) { state.T = Math.floor(state.T) - 1 + sp; }
-      else state.T = Math.floor(state.T) + p * sp;
+      state.manualExit = false;
+      if (p > 1) { state.T = base + 1; }
+      else if (p < 0) { state.T = base - 1 + sp; state.manualExit = sp === 1; }
+      else { state.T = base + p * sp; state.manualExit = p === 1 && sp === 1; }
       draw(true);
     }
     function reset() {
       play(false);
       state.aeOverD = 0.25; state.fz = 18;
+      state.manualExit = false;
       cAe.input.value = '25'; cFz.input.value = '18';
       state.T = M.timeAtProgress(state, 0, REST_PROGRESS);
       draw(true);
@@ -504,19 +508,28 @@
     bFwd.addEventListener('click', function () { step(1); });
     bReset.addEventListener('click', reset);
     cPos.input.addEventListener('input', function () {
+      var requested = Number(cPos.input.value) / 100;
       play(false);
-      state.T = M.timeAtProgress(state, state.T, Number(cPos.input.value) / 100);
+      state.T = M.timeAtProgress(state, state.T, requested);
+      state.manualExit = requested === 1 && span() === 1;
       draw(false);
     });
     cPos.input.addEventListener('change', function () { draw(true); });
     cAe.input.addEventListener('input', function () {
-      var c = state.T - Math.floor(state.T), sp = span(), p = c <= sp ? c / sp : 1;
+      var c = M.frame('climb', state, state.T).cycle, sp = span(), p = c <= sp ? c / sp : 1;
       state.aeOverD = Number(cAe.input.value) / 100;
       state.T = M.timeAtProgress(state, state.T, p);
+      state.manualExit = p === 1 && span() === 1;
       draw(!state.playing);
     });
     cFz.input.addEventListener('input', function () { state.fz = Number(cFz.input.value); draw(!state.playing); });
     speed.addEventListener('change', function () { state.speed = Number(speed.value); });
+
+    rootEl.addEventListener('keydown', function (e) {
+      if (e.metaKey || e.ctrlKey || e.altKey || e.key === 'Escape') return;
+      if (e.target.closest('button,input,select,textarea,summary') &&
+          [' ', 'Spacebar', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].indexOf(e.key) >= 0) e.stopPropagation();
+    });
 
     // Keys are taken only while the drawing has focus, and stopped here so
     // the page's own arrow-key and Space navigation never fires as well.

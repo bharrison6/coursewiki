@@ -49,6 +49,15 @@ test('the worked example on the page is what the model computes', () => {
   assert.equal(M.format(c.requestedRpm / c.rpm, 'feed', 'in'), '2.3');
 });
 
+test('small chip-load operands retain useful precision', () => {
+  for (const v of [0.0005, 0.0508, 0.00001, 0.00254]) {
+    const displayed = Number(M.format(v, 'chip', 'mm').replace(/,/g, ''));
+    rel(displayed, v, v * 0.0005, 'display retains the input rather than doubling a half step');
+  }
+  const c = M.setupToCanon('mm', { diameter: 12, speed: 90, teeth: 4, chip: 0.0005, maxRpm: null });
+  assert.match(D.workedLines(c, 'mm').join('\n'), /× 4 × 0\.0005 ≈ 4\.8 mm\/min/);
+});
+
 test('unit switching keeps the physical setup and its results', () => {
   for (const ex of M.EXAMPLES.in.concat(M.EXAMPLES.mm)) {
     const canon = M.setupToCanon(ex.unit, ex);

@@ -212,7 +212,7 @@
         d += 'M' + n(x) + ' ' + (by - 4) + 'L' + n(x) + ' ' + (by + 18);
       }
       out.push('<path class="fs-pass" d="' + d + '"/>');
-      out.push(txt('fs-t fs-t-small', tipX - travel * s - 6, by + 12, passes + ' passes', 'end'));
+      out.push(txt('fs-t fs-t-small', tipX - travel * s + 6, by + 12, passes + ' passes', 'start'));
     });
     var ly = top + H * rows.length + 12;
     out.push('<path class="fs-pass" d="M' + x0 + ' ' + (ly - 9) + 'L' + x0 + ' ' + (ly + 5) + '"/>');

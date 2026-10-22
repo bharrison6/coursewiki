@@ -175,6 +175,9 @@
     var feed = feedDirection(mode);
     var t = typeof T === 'number' && isFinite(T) ? T : 0;
     var cycle = mod(t, 1);
+    // Manual selection may hold the preceding tooth's exact exit at a
+    // cycle boundary; ordinary playback keeps the periodic entry frame.
+    if (params && params.manualExit && cycle === 0) cycle = 1;
     var psiEntry = entryPsi(mode, kappa);
     // The tooth that entered at the start of this cycle; clockwise, so its
     // angle falls as time runs.
@@ -237,6 +240,7 @@
     var psiNow = engaged ? psiLead : null;
     var contact = engaged ? { x: R * Math.cos(psiNow), y: R * Math.sin(psiNow) } : null;
 
+    if (params && params.manualExit) q.manualExit = true;
     return {
       mode: mode, T: t, params: q,
       R: R, fz: fz, teeth: teeth, pitch: pitch,
@@ -296,6 +300,7 @@
     var q = normalise(params);
     var span = engagementAngle(q.aeOverD) / (2 * Math.PI / q.teeth);
     var base = Math.floor(typeof T === 'number' && isFinite(T) ? T : 0);
+    if (params && params.manualExit && mod(T, 1) === 0) base -= 1;
     return base + clamp(progress, 0, 1) * span;
   }
 
@@ -450,7 +455,7 @@
     var q = normalise(params);
     var t = typeof T === 'number' && isFinite(T) ? T : 0;
     var fit = chipFit(mode, q);
-    var f = frame(mode, q, t);
+    var f = frame(mode, params, t);
     var place = function (c, psi) { return c ? c.points.map(function (p) { return rotate(p, psi); }) : null; };
     var out = { attached: null, released: [] };
     if (f.engaged) {

@@ -16,6 +16,19 @@ const deg = (r) => r * 180 / Math.PI;
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} vs ${b} (tol ${tol})`);
 const progressPoints = [0.02, 0.1, 0.25, 0.5, 0.75, 0.9, 0.98];
 
+test('manual half-width exit is distinct from periodic playback entry', () => {
+  const p = { aeOverD: 0.5, fz: 18, manualExit: true };
+  for (const mode of M.MODES) {
+    const exit = M.frame(mode, p, 1);
+    assert.equal(exit.progress, 1);
+    assert.equal(M.frame(mode, { aeOverD: 0.5 }, 1).progress, 0);
+    near(exit.contact.x, exit.exit.x, 1e-10, 'held exit x');
+    near(exit.contact.y, exit.exit.y, 1e-10, 'held exit y');
+    assert.ok(M.chips(mode, exit.params, exit.T).attached, 'completed chip remains at the selected exit');
+    near(M.timeAtProgress(p, 1, 0.5), 0.5, 1e-12, 'scrub stays in the held cycle');
+  }
+});
+
 test('engagement angle and chip thinning match the geometry', () => {
   near(deg(M.engagementAngle(0.5)), 90, 1e-9, 'half-diameter cut sweeps a quarter turn');
   near(deg(M.engagementAngle(0.1)), 36.8699, 1e-3, '10% cut');
