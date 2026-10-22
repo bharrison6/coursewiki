@@ -1,0 +1,171 @@
+@@ID: feeds-and-speeds
+@@TITLE: Feeds and Speeds
+@@SECTION: Milling
+@@SUMMARY: How a cutting speed and a cutter diameter set the spindle speed, how the spindle speed, flute count and chip load set the table feed, and what changes when only the spindle speed does.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Two numbers come from cutting data; two go into the machine</h2>
+  <p class="lede">A milling setup is described by four numbers. Two describe what each cutting edge
+  goes through, and they come from <strong>cutting data</strong> for the tool and the material. The
+  other two are what you actually <strong>set on the machine</strong>, and you work them out from
+  the first two.</p>
+  <dl class="dims">
+    <div><dt>Cutting speed</dt><dd>How fast the cutting edge moves through the material: the speed
+    at the outside of the cutter. Written in <strong>surface feet per minute (SFM)</strong> or
+    <strong>metres per minute (m/min)</strong>. Also called <em>surface speed</em>. Comes from cutting
+    data.</dd></div>
+    <div><dt>Feed per tooth</dt><dd>How far the work moves while the cutter turns from one tooth to
+    the next, in inches or millimetres per tooth. Also called <em>chip load</em>, because it sets the
+    size of the bite each tooth takes. Comes from cutting data.</dd></div>
+    <div><dt>Spindle speed</dt><dd>How many turns the cutter makes each minute, in revolutions per
+    minute (<strong>rev/min</strong>, usually said <em>RPM</em>). Set on the machine.</dd></div>
+    <div><dt>Table feed</dt><dd>How fast the work moves past the cutter, in inches or millimetres per
+    minute. Also called the <em>feed rate</em>. On a machine that moves the cutter instead, it is how
+    fast the cutter travels. Set on the machine.</dd></div>
+  </dl>
+  <div class="panel">
+    <p><strong>"Speeds" are the cutter turning; "feeds" are the work moving.</strong> That is all
+    the phrase <em>feeds and speeds</em> means. The two are set separately on the machine, and the
+    rest of this page is about how they depend on each other.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Spindle speed: the turns it takes to reach the cutting speed</h2>
+  <p>Cutting speed is a distance per minute, measured at the edge of the cutter. In one turn, a point
+  on that edge travels once around the cutter: its circumference, <strong>&pi; &times; D</strong>.
+  So the spindle speed is the cutting speed divided by the distance one turn covers, once the two
+  are in the same units.</p>
+  <figure class="fs-figure">
+    <div class="fs-static-fig"><svg class="fs-circ-svg" viewBox="0 0 560 196" role="img" aria-label="A cutter of diameter 0.5 in. In one turn a point on its cutting edge travels the circumference, pi times the diameter: 1.571 in." focusable="false"><circle class="fs-circ" cx="92" cy="92" r="58"/><path class="fs-dim" d="M34 92L150 92"/><text class="fs-t fs-t-small" x="92" y="84" text-anchor="middle">D = 0.5 in</text><circle class="fs-dot" cx="92" cy="150" r="6"/><path class="fs-unroll" d="M92 150L456.4 150"/><path class="fs-dim" d="M92 164L456.4 164M92 157L92 171M456.4 157L456.4 171"/><circle class="fs-dot" cx="456.4" cy="150" r="6"/><text class="fs-t fs-t-small" x="274.2" y="184" text-anchor="middle">one turn = π × D = 1.571 in</text><text class="fs-t fs-t-small fs-t-soft" x="174" y="70" text-anchor="start">Roll the cutter one full turn and a point</text><text class="fs-t fs-t-small fs-t-soft" x="174" y="90" text-anchor="start">on its edge travels its circumference.</text></svg></div>
+    <figcaption>One turn of a 0.5 in cutter carries its edge 1.571 in. A cutting speed of 300 SFM
+    asks the edge to cover 300 ft, which is 3,600 in, every minute.</figcaption>
+  </figure>
+  <p class="conversion-equation">Spindle speed (rev/min) = 12 &times; cutting speed (SFM) &divide;
+  (&pi; &times; cutter diameter in inches)</p>
+  <p>The <strong>12</strong> is there because cutting speed is in feet and the diameter is in inches:
+  12 inches to the foot. In metric units the same idea needs a <strong>1000</strong>, millimetres to
+  the metre:</p>
+  <p class="conversion-equation">Spindle speed (rev/min) = 1000 &times; cutting speed (m/min) &divide;
+  (&pi; &times; cutter diameter in mm)</p>
+  <p><strong>Worked example, with illustrative numbers.</strong> A 0.5 in cutter, with cutting data
+  that calls for 300 SFM: 12 &times; 300 &divide; (&pi; &times; 0.5) = <strong>2,292 rev/min</strong>.
+  The 300 SFM is there to make the arithmetic concrete. It is not a recommendation for any tool or
+  any material.</p>
+  <p>Look at where the diameter sits: underneath. <strong>Halve the diameter and the spindle speed
+  doubles.</strong> A small cutter has to turn faster to give its edge the same cutting speed, which
+  is why small cutters so often ask for more speed than a machine has. That case has its own card
+  below.</p>
+</section>
+
+<section>
+  <h2>Table feed: each tooth takes one chip load as it passes</h2>
+  <p>Each time a tooth passes, the work should have moved one feed per tooth. The number of teeth
+  passing each minute is the spindle speed times the number of flutes, so:</p>
+  <p class="conversion-equation">Table feed = spindle speed &times; flutes &times; feed per tooth</p>
+  <p><strong>Worked example, continued.</strong> A 4-flute cutter at 2,292 rev/min, with a feed per
+  tooth of 0.002 in: 2,292 &times; 4 &times; 0.002 = <strong>18.3 in/min</strong>. The units work out
+  on their own: turns per minute, times teeth per turn, times inches per tooth, leaves inches per
+  minute.</p>
+  <p>Turned around, the same relation tells you what chip load a feed gives. That is the way to check
+  a feed someone else has set:</p>
+  <p class="conversion-equation">Feed per tooth = table feed &divide; (spindle speed &times; flutes)</p>
+  <p><strong>Flutes</strong> here means the teeth that actually take a chip in each turn. For an
+  ordinary end mill that is simply the number of flutes.</p>
+</section>
+
+<section>
+  <h2>Calculator: work out a setup, then change only the spindle speed</h2>
+  <p class="lede">Enter a cutter and its cutting data, or start from one of the illustrative
+  examples. The calculator works out the two machine settings and shows the arithmetic. Then move the
+  spindle speed on its own, choose what to hold steady, and watch what has to give.</p>
+  <div class="panel">
+    <p><strong>How to read the drawings.</strong> You are looking down the cutter&rsquo;s axis at a
+    slot being cut. The cutter turns <strong>clockwise</strong> in place, and the work is fed to the
+    left, so the slot trails behind it. The main drawing is to scale. The magnified box shows the
+    front of the cut: the uncut work creeps across the path of the tooth tips, and each tooth that
+    passes takes off what has crossed (the gold sliver) and leaves a mark. <strong>The gap between
+    marks is the feed per tooth.</strong></p>
+    <p>Everything runs in slow motion, and the turning and the feed are slowed by the same amount, so
+    what you see between them is the real ratio. The time scale is written under the drawing.</p>
+  </div>
+  <div data-interactive="feeds-and-speeds">
+    <figure class="fs-static">
+      <div class="fs-static-fig"><svg class="fs-compare-svg" viewBox="0 0 560 342" role="img" aria-label="Three rows over the same two turns of the setup cutter. Setup: 8 tooth passes. Doubling the spindle speed and holding the table feed: twice the passes over the same table travel, so each tooth takes half the chip. Doubling the spindle speed and holding the chip load: twice the passes, each the same size, so the table travels twice as far." focusable="false"><path class="fs-tipline" d="M520 16L520 302"/><text class="fs-t fs-t-small fs-t-soft" x="516" y="16" text-anchor="end">front of the cut</text><text class="fs-t fs-t-tag" x="24" y="46" text-anchor="start">Setup</text><text class="fs-t fs-t-soft" x="24" y="66" text-anchor="start">2,292 rev/min · 18.3 in/min · 0.0020 in/tooth</text><rect class="fs-travel" x="272" y="80" width="248" height="14"/><path class="fs-pass" d="M520 76L520 98M489 76L489 98M458 76L458 98M427 76L427 98M396 76L396 98M365 76L365 98M334 76L334 98M303 76L303 98"/><text class="fs-t fs-t-small" x="266" y="92" text-anchor="end">8 passes</text><text class="fs-t fs-t-tag" x="24" y="142" text-anchor="start">Spindle ×2, table feed held</text><text class="fs-t fs-t-soft" x="24" y="162" text-anchor="start">4,584 rev/min · 18.3 in/min · 0.0010 in/tooth</text><rect class="fs-travel" x="272" y="176" width="248" height="14"/><path class="fs-pass" d="M520 172L520 194M504.5 172L504.5 194M489 172L489 194M473.5 172L473.5 194M458 172L458 194M442.5 172L442.5 194M427 172L427 194M411.5 172L411.5 194M396 172L396 194M380.5 172L380.5 194M365 172L365 194M349.5 172L349.5 194M334 172L334 194M318.5 172L318.5 194M303 172L303 194M287.5 172L287.5 194"/><text class="fs-t fs-t-small" x="266" y="188" text-anchor="end">16 passes</text><text class="fs-t fs-t-tag" x="24" y="238" text-anchor="start">Spindle ×2, chip load held</text><text class="fs-t fs-t-soft" x="24" y="258" text-anchor="start">4,584 rev/min · 36.7 in/min · 0.0020 in/tooth</text><rect class="fs-travel" x="24" y="272" width="496" height="14"/><path class="fs-pass" d="M520 268L520 290M489 268L489 290M458 268L458 290M427 268L427 290M396 268L396 290M365 268L365 290M334 268L334 290M303 268L303 290M272 268L272 290M241 268L241 290M210 268L210 290M179 268L179 290M148 268L148 290M117 268L117 290M86 268L86 290M55 268L55 290"/><text class="fs-t fs-t-small" x="18" y="284" text-anchor="end">16 passes</text><path class="fs-pass" d="M24 315L24 329"/><text class="fs-t fs-t-small" x="32" y="326" text-anchor="start">one tooth pass</text><rect class="fs-travel" x="174" y="317" width="26" height="10"/><text class="fs-t fs-t-small" x="208" y="326" text-anchor="start">table travel in the same time</text></svg></div>
+      <figcaption>The same setup three ways, over the same stretch of time: two turns of the setup
+      cutter. Each tick is one tooth passing the front of the cut; the bar is how far the table moved
+      meanwhile. Doubling the spindle speed with the table feed held gives twice the passes over the
+      same travel, so <strong>each chip is half as thick</strong>. Doubling it with the chip load held
+      gives twice the passes at the same spacing, so <strong>the table has to move twice as
+      far</strong>. Numbers are from the illustrative 0.5 in, 4-flute example.</figcaption>
+    </figure>
+    <div data-fs-live></div>
+    <noscript><p class="aside">JavaScript is off, so the calculator is not running. The formulas and
+    the worked example above are everything it calculates.</p></noscript>
+  </div>
+</section>
+
+<section>
+  <h2>Six things to try in the calculator</h2>
+  <ul class="boxes">
+    <li>Load the <strong>half-inch cutter</strong> example and check each worked line against the
+    formulas on this page.</li>
+    <li>Switch to <strong>metric</strong> and back. The lengths and speeds change units, but the
+    cutter and the cut do not: 0.5 in becomes 12.7 mm, and the spindle speed stays exactly the same.</li>
+    <li>Hold <strong>the table feed</strong> and drag the spindle speed to 200%. The chip load halves.
+    In the magnified box the marks crowd together and the gold sliver gets thinner.</li>
+    <li>Now hold <strong>the chip load</strong> and do the same. The table feed doubles instead: the
+    marks keep their spacing but arrive twice as often.</li>
+    <li>Press <strong>Play</strong> and count how many times the cutter turns while the work, in the
+    main drawing, barely seems to move. Then look at the magnified box to see that it does.</li>
+    <li>Load the <strong>eighth-inch cutter on a 4,000 rev/min machine</strong>. Compare the speed
+    the cutting data asks for with the speed the machine can reach.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>When the machine cannot turn as fast as the formula asks</h2>
+  <p>Because small cutters ask for high spindle speeds, the formula can easily give more than a
+  machine&rsquo;s top speed. A 0.125 in cutter at 300 SFM asks for 9,167 rev/min. On a machine that
+  stops at 4,000, it runs at 4,000.</p>
+  <ul>
+    <li><strong>Work the feed from the speed the spindle really turns.</strong> At 4,000 rev/min, with
+    2 flutes and 0.0008 in per tooth, that is 4,000 &times; 2 &times; 0.0008 = 6.4 in/min. Each tooth
+    then takes the chip load you meant it to.</li>
+    <li><strong>The cutting speed is what you give up.</strong> At 4,000 rev/min the edge of a 0.125 in
+    cutter moves at &pi; &times; 0.125 &times; 4,000 &divide; 12 = 131 SFM, not the 300 the data
+    asked for.</li>
+  </ul>
+  <p>Working the feed from the speed that was asked for, rather than the one the spindle is turning,
+  gets the chip load wrong by the same ratio. A feed worked from 9,167 rev/min would give each tooth
+  9,167 &divide; 4,000 = <strong>2.3 times</strong> the chip load intended.</p>
+  <p>The same applies to a machine that offers only certain speeds, through belts or gears: set the
+  nearest speed it has, and work the feed from that one. The calculator&rsquo;s <em>machine top
+  speed</em> box does this for a top speed.</p>
+</section>
+
+<section>
+  <h2>A calculator is not cutting data</h2>
+  <div class="gate">
+    <p><strong>The arithmetic on this page is exact. Its inputs are the part that takes
+    judgement.</strong> The cutting speed and feed per tooth come from cutting data, normally the
+    toolmaker&rsquo;s for that tool, that material and that kind of cut, or from the person
+    responsible for the machine. This page does not supply them, and its example numbers exist only
+    to make the arithmetic concrete.</p>
+  </div>
+  <p>Cutting data accounts for things these formulas cannot see: the material being cut, what the tool
+  is made of, how much of the cutter is in the work, and how the setup is held. A calculator turns
+  data into machine settings. It cannot tell you whether the data suit your cut.</p>
+  <details class="deeper">
+    <summary>Feed per tooth is not always the thickness of the chip</summary>
+    <p>Feed per tooth is how far the work moves between teeth. The chip a tooth actually cuts is only
+    that thick when the cutter is at least half buried across its diameter. In a narrower cut, each
+    tooth meets the work at a slant and the chip comes out thinner. [[climb-and-conventional-milling]]
+    shows this: at a width of cut of 10% of the diameter, the thickest part of the chip is 60% of the
+    feed per tooth.</p>
+    <p>Some cutting data raises the feed per tooth for narrow cuts to make up for this. Read what your
+    data assumes before using its numbers, and ask if it does not say.</p>
+  </details>
+</section>
