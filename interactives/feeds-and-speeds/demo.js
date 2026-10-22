@@ -554,7 +554,7 @@
         var r = rows[k], c = cells[k];
         r.a.textContent = c[0]; r.b.textContent = c[1];
         var held = (k === 'feed' && t.hold === 'feed') || (k === 'chip' && t.hold === 'chip');
-        r.c.textContent = held ? 'held' : M.ratioText(c[2]);
+        r.c.textContent = held ? 'held' : M.ratioText(c[2]).replace('unchanged', 'same');
         r.tr.setAttribute('data-held', String(held));
         r.tr.setAttribute('data-moved', String(!held && Math.abs(c[2] - 1) > 5e-4));
       });

@@ -144,7 +144,7 @@
   var COS = Math.cos(Math.PI / 6), SIN = Math.sin(Math.PI / 6);
   var LAYOUT = {
     wide:    { w: 640, maxH: 250, left: 74, right: 16, top: 16, bottom: 58 },
-    compact: { w: 400, maxH: 230, left: 70, right: 10, top: 14, bottom: 58 }
+    compact: { w: 320, maxH: 220, left: 66, right: 8, top: 14, bottom: 62 }
   };
 
   function n(v) { return (Math.round(v * 10) / 10).toString(); }
