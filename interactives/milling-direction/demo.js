@@ -526,9 +526,7 @@
     speed.addEventListener('change', function () { state.speed = Number(speed.value); });
 
     rootEl.addEventListener('keydown', function (e) {
-      if (e.metaKey || e.ctrlKey || e.altKey || e.key === 'Escape') return;
-      if (e.target.closest('button,input,select,textarea,summary') &&
-          [' ', 'Spacebar', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].indexOf(e.key) >= 0) e.stopPropagation();
+      if (e.target.closest('button,input,select,textarea,summary')) isolateNavigation(e);
     });
 
     // Keys are taken only while the drawing has focus, and stopped here so
@@ -551,10 +549,20 @@
     setView('compare');
   }
 
+  function isolateNavigation(e) {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.key === 'Escape') return;
+    if ([' ', 'Spacebar', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].indexOf(e.key) >= 0) e.stopPropagation();
+  }
+
   function boot() {
     if (typeof document === 'undefined') return;
     var go = function () {
       document.querySelectorAll('[data-interactive="milling-direction"]').forEach(wire);
+      document.querySelectorAll('.mill-story-figure').forEach(function (region) {
+        if (region.hasAttribute('data-mill-scroll-wired')) return;
+        region.setAttribute('data-mill-scroll-wired', '');
+        region.addEventListener('keydown', isolateNavigation);
+      });
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
     else go();
