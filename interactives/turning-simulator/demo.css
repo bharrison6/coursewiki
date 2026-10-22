@@ -107,6 +107,7 @@
 .ts-lab button:disabled { cursor: not-allowed; opacity: .45; }
 .ts-lab :is(button, input, select, summary):focus-visible,
 .ts-view-wrap:focus-visible { outline: 3px solid var(--cat2); outline-offset: 2px; }
+.ts-drawing-scroll:focus-visible { outline: 3px solid var(--cat2); outline-offset: -3px; }
 
 .ts-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1.25rem; }
 .ts-parts { display: flex; flex-direction: column; gap: .4rem; min-width: 0; flex: 1 1 24rem; }
@@ -114,12 +115,45 @@
 
 /* the drawing of the part to make */
 .ts-drawing { margin: 0; display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.ts-drawing-scroll { max-width: 100%; overflow-x: auto; padding-bottom: .3rem; }
 .ts-drawing svg { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm); max-width: 40rem; }
+.ts-drawing-scroll svg { display: block; width: 100%; min-width: 34rem; }
+.ts-drawing-hint { display: block; margin-top: .35rem; font-size: .85rem; color: var(--ink-soft); }
 .ts-drawing figcaption { font-size: .95rem; color: var(--ink); }
 .ts-teaches { display: block; color: var(--ink-soft); font-size: .9rem; }
 
 /* the machine: readout over the view */
-.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+/* The work and the active controls share one viewport-sized workspace.
+   Only the controls scroll, so they cannot disappear behind the work. */
+.ts-workbench {
+  min-width: 0; height: min(54rem, calc(100svh - var(--appbar-h, 3.5rem) - 7rem));
+  display: flex; flex-direction: column; gap: .8rem;
+}
+.ts-workbench > .ts-machine {
+  flex: 0 0 auto; background: var(--surface);
+}
+.ts-workbench .ts-controls {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; gap: .8rem; padding: .65rem;
+  margin: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm);
+}
+.ts-controls > * { flex-shrink: 0; }
+.ts-controls-hint { margin: 0; font-size: .8rem; order: -1; }
+.ts-run { order: 0; } .ts-feed { order: 1; } .ts-jog { order: 2; }
+.ts-tools { order: 3; } .ts-toolinfo { order: 4; }
+.ts-view-wrap svg { max-height: min(30svh, 24rem); }
+.ts-machine .ts-msg { max-height: 4.5rem; overflow-y: auto; }
+.ts-view-help { grid-column: 1 / -1; order: 10; font-size: .9rem; }
+.ts-view-help summary { cursor: pointer; font-family: var(--f-display); min-height: 2.75rem; }
+.ts-view-help .ts-legend, .ts-view-help .ts-keys { margin: .5rem 0; }
+@container (min-width: 40rem) {
+  .ts-workbench { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 1fr); gap: 1.2rem; align-items: start; }
+  .ts-workbench .ts-controls { height: 100%; }
+}
+@container (max-width: 30rem) {
+  .ts-dro-tool { display: none; }
+}
 .ts-dro {
   display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem 1.1rem;
   padding: .55rem .8rem;
@@ -310,6 +344,12 @@
 
 /* ---- print: the drawing, the work as it stands and the inspection; no controls ---*/
 @media print {
+  .ts-workbench { display: block; height: auto; }
+  .ts-workbench > .ts-machine { position: static; }
+  .ts-view-wrap svg { max-height: none; }
+  .ts-view-help { display: none !important; }
+  .ts-drawing-scroll { overflow: visible; }
+  .ts-drawing-scroll svg { min-width: 0; max-width: 100%; }
   .ts-bar, .ts-controls, .ts-view-opts, .ts-keys, .ts-log, .ts-hold { display: none !important; }
   .ts-lab { border-color: #777; }
   .ts-drawing, .ts-machine, .ts-inspect, .ts-static-fig { break-inside: avoid; }

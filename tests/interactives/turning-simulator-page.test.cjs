@@ -126,7 +126,7 @@ test('every view the parts pass through draws without gaps', () => {
 test('the drawing table lists every feature before anything is measured', () => {
   for (const T of M.TARGETS) {
     const items = M.evaluate(M.create(T.id)).items.map((x) => x.id);
-    const want = ['face', ...T.outside.map((_, k) => 'od-' + k), ...T.shoulders.map((_, k) => 'sh-' + k), ...T.inside.map((_, k) => 'id-' + k), ...T.chamfers.map((_, k) => 'ch-' + k), 'len'];
+    const want = ['face', ...(!T.inside.length ? ['core'] : []), ...T.outside.map((_, k) => 'od-' + k), ...T.shoulders.map((_, k) => 'sh-' + k), ...T.inside.map((_, k) => 'id-' + k), ...T.chamfers.map((_, k) => 'ch-' + k), 'len'];
     assert.deepEqual(items, want, T.id);
   }
 });

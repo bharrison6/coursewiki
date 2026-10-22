@@ -117,6 +117,10 @@ the geometry determines solid volume per time, while the material-energy assumpt
 estimated cutting power.
 
 Run the loader checks with `pwsh -File tests/build/interactive-assets.test.ps1`.
+Modules that draw their own figures can keep a pure renderer beside the model, as
+`turning-simulator/render.js` does. Use the same renderer for live and static figures,
+and keep instance IDs and browser state independent when several roots share an aggregate.
+Target assessment should check the remaining geometry and surviving features after later cuts.
 Calculation tests live beside their topic peers under `tests/interactives/` and run with
 `node --test --test-concurrency=2 tests/interactives/*.test.cjs`.
 

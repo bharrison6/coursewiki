@@ -239,7 +239,7 @@
     },
     {
       id: 'bushing', title: 'Bushing',
-      summary: 'A turned sleeve with a bored hole through it and every edge broken.',
+      summary: 'A turned sleeve with a through bore, two outside chamfers and a chamfer at the bore mouth.',
       teaches: 'Center drilling, drilling, boring, countersinking and chamfering a back edge before parting.',
       stock: { dia: 1.250, zEnd: 0.060, zJaw: -1.900 },
       length: { L: 1.000, tol: 0.005 },
@@ -969,6 +969,17 @@
     })();
     var lenNote = Math.abs(zF) > 0.0015 ? ' Lengths are measured from this face.' : '';
 
+    // A target without an internal feature requires solid material, too.
+    // Requested diameters alone cannot distinguish a pin from a hollow tube.
+    if (!T.inside.length) {
+      var coreCols = columnsBetween(piece, zF, 0, L);
+      var hole = 0;
+      coreCols.forEach(function (i) { hole = Math.max(hole, 2 * piece.ri[i]); });
+      add({ id: 'core', label: 'Solid core', spec: 'Solid material: no hole',
+        made: hole > EPS ? 'An unintended hole, up to ' + dia(hole) : 'Solid',
+        status: hole > EPS ? 'under' : 'ok',
+        hint: hole > EPS ? 'The drawing has no hole. That material is gone: undo the drilling or boring, or start new stock.' : '' });
+    }
     // --- outside segments
     T.outside.forEach(function (sg, idx) {
       var isFirst = idx === 0, isLast = idx === T.outside.length - 1;
@@ -1069,7 +1080,7 @@
       add(it);
     })();
     var notes = [];
-    if (st.notes.noCenter) { notes.push('The hole was started without a center-drilled start. A drill pushed against a flat face can wander off center before it bites. This simulator still drills it on center, so the inspection cannot see it; on a real lathe, center drill first.'); }
+    if (st.notes.noCenter) { notes.push('You drilled without using the simulated starting tool. This model keeps the hole on center and does not predict drill wandering. On a real machine, the starting method depends on the drill geometry and its manufacturer\'s guidance; a center drill is not a universal spotting tool.'); }
     var ok = items.filter(function (x) { return x.status === 'ok'; }).length;
     return { items: items, parted: parted, accepted: parted && ok === items.length, okCount: ok, total: items.length, zFace: zF, notes: notes };
   }
@@ -1110,13 +1121,16 @@
 
   function threadCheck(it, p, cols, sg, inside) {
     if (!cols.length) { return; }
-    var pitch = 1 / sg.tpi, tags = {}, tagged = 0, mixed = false;
+    var pitch = 1 / sg.tpi, tags = {}, tagged = 0, mixed = false, periods = {};
     var crest = inside ? Infinity : -Infinity, rootv = inside ? -Infinity : Infinity;
     cols.forEach(function (i) {
       var t = inside ? p.thI[i] : p.thO[i];
       if (t < 0) { mixed = true; }
       if (t !== 0) { tagged++; tags[round(t, 6)] = true; }
       var v = inside ? 2 * p.ri[i] : 2 * p.ro[i];
+      var period = Math.round(zc(p, i) / pitch);
+      var local = periods[period] || (periods[period] = { min: Infinity, max: -Infinity });
+      local.min = Math.min(local.min, v); local.max = Math.max(local.max, v);
       if (inside) { crest = Math.min(crest, v); rootv = Math.max(rootv, v); }
       else { crest = Math.max(crest, v); rootv = Math.min(rootv, v); }
     });
@@ -1164,6 +1178,35 @@
       it.status = inside ? (crest > crestHi ? 'under' : 'over') : (crest > crestHi ? 'over' : 'under');
       it.hint = inside ? 'The inside crests are set by the drilled hole: ' + dia(crestLo) + ' to ' + fmt(crestHi) + '.' : 'The crests are the diameter turned before threading: ' + dia(crestLo) + ' to ' + fmt(crestHi) + '.';
       return;
+    }
+    // One completed turn cannot supply the root depth for the whole thread.
+    // Check each pitch whose root center lies in the inspected clean length.
+    var zMin = zc(p, cols[0]), zMax = zc(p, cols[cols.length - 1]);
+    var roots = [], crests = [];
+    Object.keys(periods).forEach(function (key) {
+      var z = Number(key) * pitch;
+      if (z < zMin - COL || z > zMax + COL) { return; }
+      var local = periods[key];
+      roots.push(inside ? local.max : local.min);
+      crests.push(inside ? local.min : local.max);
+    });
+    if (roots.length) {
+      var rMin = Math.min.apply(null, roots), rMax = Math.max.apply(null, roots);
+      var cMin = Math.min.apply(null, crests), cMax = Math.max.apply(null, crests);
+      if (rMin < rootLo - MTOL || rMax > rootHi + MTOL) {
+        var tooDeep = inside ? rMax > rootHi + MTOL : rMin < rootLo - MTOL;
+        it.made = 'Roots ' + dia(rMin) + ' to ' + fmt(rMax) + ' along the thread';
+        it.status = tooDeep ? 'under' : 'over';
+        it.hint = tooDeep ? 'At least one turn is cut too deep. Undo back before that pass.' : 'Some turns are still too shallow. Take the next infeed pass over the full required thread length.';
+        return;
+      }
+      if (cMin < crestLo - MTOL || cMax > crestHi + MTOL) {
+        var removedCrests = inside ? cMax > crestHi + MTOL : cMin < crestLo - MTOL;
+        it.made = 'Crests ' + dia(cMin) + ' to ' + fmt(cMax) + ' along the thread';
+        it.status = removedCrests ? 'under' : 'over';
+        it.hint = removedCrests ? 'The crests have been cut away in part of the thread. Undo back before that cut.' : 'The crest size must meet the drawing along the full thread, not just one region.';
+        return;
+      }
     }
     it.status = 'ok';
   }
@@ -1230,7 +1273,9 @@
       var cntB = 0;
       for (i = frontIdx; i >= 0 && has(p, i) && envIn(p, i) > base + 0.0003; i--) { cntB++; }
       legZ = cntB * COL;
-      return legVerdict(it, legZ, legR, lo, hi, 'Feed the countersink in further, about ' + inch(Math.max(0.001, c.c - Math.min(legR, legZ))) + ' more.');
+      legVerdict(it, legZ, legR, lo, hi, 'Feed the countersink in further, about ' + inch(Math.max(0.001, c.c - Math.min(legR, legZ))) + ' more.');
+      if (it.status === 'ok') { chamferProfile(it, p, frontIdx, -1, base, legR, hi, true); }
+      return;
     }
     var front = c.edge === 'front-od';
     sg = front ? T.outside[0] : T.outside[T.outside.length - 1];
@@ -1243,7 +1288,9 @@
       var cnt = 0;
       for (i = edgeIdx; i >= 0 && i < p.n && has(p, i) && p.ro[i] < base - 0.0003; i += dir) { cnt++; }
       legZ = cnt * COL;
-      return legVerdict(it, legZ, legR, lo, hi, null);
+      legVerdict(it, legZ, legR, lo, hi, null);
+      if (it.status === 'ok') { chamferProfile(it, p, edgeIdx, dir, base, legR, hi, false); }
+      return;
     }
     /* A threaded or knurled end: its teeth break up the chamfer's line, so
        test the band. Nothing may stand above the 45 degree line a chamfer at
@@ -1269,6 +1316,21 @@
     it.made = est.length ? 'About ' + inch(est[Math.floor(est.length / 2)]) + ' × 45°' : 'Chamfered';
     if (below > 0.0015) { it.status = 'under'; it.hint = 'Bigger than the drawing allows. Undo back before that cut.'; return; }
     it.status = 'ok';
+  }
+  // Equal leg extents can also describe a cylindrical step. Inspect the
+  // sloping surface itself, allowing two columns for sampled edge location.
+  function chamferProfile(it, p, edgeIdx, dir, base, depth, maxDepth, inside) {
+    var error = 0, unrecoverable = false, tolerance = 2 * COL + MTOL;
+    for (var k = 0, i = edgeIdx; i >= 0 && i < p.n && has(p, i) && k * COL <= maxDepth + COL; k++, i += dir) {
+      var s = (k + 0.5) * COL;
+      var removed = inside ? p.ri[i] - base : base - p.ro[i];
+      error = Math.max(error, Math.abs(removed - Math.max(0, depth - s)));
+      if (removed > Math.max(0, maxDepth - s) + tolerance) { unrecoverable = true; }
+    }
+    if (error <= tolerance) { return; }
+    it.made += ', but the surface is not a 45° chamfer';
+    it.status = unrecoverable ? 'under' : 'over';
+    it.hint = unrecoverable ? 'The stepped or curved cut removed material below the allowed chamfer. Undo this edge cut and make the sloping chamfer.' : 'The edge needs a sloping 45° surface, not a cylindrical step. Finish it with the chamfer tool or countersink.';
   }
   function legVerdict(it, legZ, legR, lo, hi, smallHint) {
     it.made = legR < 0.004 && legZ < 0.004 ? 'Sharp edge' : inch(legZ) + ' long × ' + inch(legR) + ' deep';

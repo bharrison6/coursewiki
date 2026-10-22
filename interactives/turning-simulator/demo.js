@@ -76,7 +76,7 @@
 
         '<figure class="ts-drawing" data-ts-drawing></figure>' +
 
-        '<div class="ts-machine">' +
+        '<div class="ts-workbench"><div class="ts-machine">' +
           '<div class="ts-dro" aria-hidden="true">' +
             '<span class="ts-dro-v"><span class="ts-k">X&nbsp;Ø</span><b data-ts-x></b></span>' +
             '<span class="ts-dro-v"><span class="ts-k">Z</span><b data-ts-z></b></span>' +
@@ -85,6 +85,10 @@
           '</div>' +
           '<div class="ts-view-wrap" data-ts-viewwrap tabindex="0" aria-describedby="' + id + '-keys"></div>' +
           '<div class="ts-msg" data-ts-msg role="status" aria-live="polite"></div>' +
+        '</div>' +
+        '<div class="ts-controls">' +
+          '<p class="ts-controls-hint aside">Scroll this panel for tools and movement controls.</p>' +
+          '<details class="ts-view-help"><summary>View and keyboard help</summary>' +
           '<div class="ts-view-opts">' +
             '<label><input type="checkbox" data-ts-opt="ghost" checked> Drawing outline and metal to remove</label>' +
             '<label><input type="checkbox" data-ts-opt="zoom"> Close up on the tool</label>' +
@@ -97,9 +101,7 @@
             '<span class="ts-key ts-key-ref" aria-hidden="true"></span> the point the readout follows' +
           '</p>' +
           '<p class="ts-keys aside" id="' + id + '-keys">Drag the tool, one slide at a time. Or select the view and use the arrow keys: left and right move along Z, up and down move X. Keys 1, 2 and 3 set the step; S starts or stops the spindle; U undoes; M measures.</p>' +
-        '</div>' +
-
-        '<div class="ts-controls">' +
+          '</details>' +
           '<div class="ts-run">' +
             '<button type="button" class="ts-spindle" data-ts-act="spindle" aria-pressed="false">Start spindle</button>' +
             '<button type="button" data-ts-act="measure">Measure the part</button>' +
@@ -139,7 +141,7 @@
           '</div>' +
         '</div>' +
 
-        '<div class="ts-inspect">' +
+        '</div><div class="ts-inspect">' +
           '<div class="ts-inspect-head">' +
             '<span class="ts-k">The drawing and your part</span>' +
             '<p class="ts-verdict" data-ts-verdict></p>' +
@@ -189,9 +191,9 @@
       if (busy) { return; }
       cur = partState(pid); st = cur.st; T = M.target(pid); f = R.frame(T);
       $$(lab, '[data-ts-part]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ts-part') === pid)); });
-      el.drawing.innerHTML = R.drawing(T, { idPrefix: id + '-d-' + pid }) +
+      el.drawing.innerHTML = '<div class="ts-drawing-scroll" tabindex="0" role="region" aria-label="Dimensioned part drawing; scroll horizontally if needed">' + R.drawing(T, { idPrefix: id + '-d-' + pid }) + '</div>' +
         '<figcaption><strong>' + esc(T.title) + '.</strong> ' + esc(T.summary) + ' Starts from ' + M.fmt(T.stock.dia) + ' in round bar. ' +
-        '<span class="ts-teaches">' + esc(T.teaches) + '</span></figcaption>';
+        '<span class="ts-teaches">' + esc(T.teaches) + '</span><span class="ts-drawing-hint">Dimensions in inches. Scroll the drawing sideways on a narrow screen.</span></figcaption>';
       buildView();
       toolUI();
       renderLog();
@@ -433,10 +435,20 @@
       pushUndo(snap, 'the threading pass');
       var label = 'Threading pass at ' + st.tpi + ' per inch, X ' + M.fmt(st.tr * 2) + ' to Z ' + M.fmt(res.to);
       var after = st.work, zEnd = st.tz;
-      function finish() {
+      function finish(interrupted) {
         busy = null; setBusy(false);
-        st.tz = zEnd; draw(); syncInputs();
-        log(label + (res.crashed ? ', stopped early' : ''));
+        if (interrupted) {
+          // The completed pass was only an animation plan. Rebuild the real
+          // work up to the last displayed position, preserving a spindle stop.
+          var running = st.spindle;
+          M.restore(st, snap);
+          res = M.threadPass(st, zt);
+          st.tz = zt;
+          M.setSpindle(st, running);
+        } else { st.tz = zEnd; }
+        draw(); syncInputs();
+        log(label + (interrupted ? ', interrupted at Z ' + M.fmt(st.tz) : (res.crashed ? ', stopped early' : '')));
+        if (interrupted) { say('stop', 'Feed stopped.', 'The tool is at Z ' + M.fmt(st.tz) + '. Only the portion reached before the stop has been applied. Retract before returning.'); return; }
         if (res.stop) { say(res.crashed ? 'stop' : 'info', res.crashed ? 'Stopped.' : 'Nothing cut.', res.stop.text); }
         else { say('cut', 'Threading pass done.', 'The tool followed one helix from Z ' + M.fmt(z0) + ' to Z ' + M.fmt(zEnd) + ', ' + res.notches + ' turns. Back it out past the crests before you bring the carriage back.'); }
       }
@@ -446,9 +458,9 @@
       setBusy(true);
       (function tick() {
         requestAnimationFrame(function () {
+          if (stopped || !st.spindle) { finish(true); return; }
           var t = now(), dt = Math.min(0.05, (t - last) / 1000); last = t;
           zt = Math.max(zEnd, zt - SPEED.thread * dt);
-          if (stopped) { zt = zEnd; }
           st.tz = zt;
           draw(mix(before, after, zt));
           chips({ cut: 1 });
@@ -459,10 +471,10 @@
     }
     /* The work as the pass leaves it: cut behind the tool, untouched ahead. */
     function mix(a, b, zt) {
-      var m = { zL: a.zL, n: a.n, ro: new Float64Array(a.n), ri: new Float64Array(a.n), kB: b.kB, kP: b.kP, thO: new Float64Array(a.n), thI: new Float64Array(a.n) };
+      var m = { zL: a.zL, n: a.n, ro: new Float64Array(a.n), ri: new Float64Array(a.n), kB: new Float64Array(a.n), kP: new Float64Array(a.n), thO: new Float64Array(a.n), thI: new Float64Array(a.n) };
       for (var i = 0; i < a.n; i++) {
         var src = M.zc(a, i) >= zt ? b : a;
-        m.ro[i] = src.ro[i]; m.ri[i] = src.ri[i]; m.thO[i] = src.thO[i]; m.thI[i] = src.thI[i];
+        m.ro[i] = src.ro[i]; m.ri[i] = src.ri[i]; m.kB[i] = src.kB[i]; m.kP[i] = src.kP[i]; m.thO[i] = src.thO[i]; m.thI[i] = src.thI[i];
       }
       return m;
     }
@@ -551,6 +563,8 @@
       }).join('');
       if (!ev) {
         el.verdict.textContent = 'Not measured yet. Stop the spindle and press Measure the part.';
+      } else if (cur.stale) {
+        el.verdict.innerHTML = '<strong>Measurement out of date.</strong> The work changed after these readings. Stop the spindle and measure again before judging the current part.';
       } else if (ev.accepted) {
         el.verdict.innerHTML = '<strong>The part meets the drawing.</strong> All ' + ev.total + ' features are within their limits.';
       } else {

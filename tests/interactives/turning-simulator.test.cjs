@@ -244,7 +244,8 @@ test('tailstock tools stay on the centerline; the drill is pecked; a hole withou
   assert.equal(st.notes.noCenter, true);
   M.move(st, 0.5, 0);                    // out of the hole: the chips clear
   assert.equal(M.move(st, -1.8, 0).stop, null, 'after a peck it can go deeper');
-  assert.match(M.evaluate(st).notes.join(' '), /center-drilled start/);
+  assert.match(M.evaluate(st).notes.join(' '), /does not predict drill wandering/);
+  assert.match(M.evaluate(st).notes.join(' '), /not a universal spotting tool/);
   // Center drilled first: no note. And the center drill goes only as deep as its cone.
   const c = M.create('bushing');
   drive(c, [...FACE, ...tool('center')]);
@@ -486,6 +487,47 @@ test('the engine is deterministic and every message is complete', () => {
     const ev = M.evaluate(M.create(T.id));
     for (const it of ev.items) assert.ok(!/undefined|NaN/.test(JSON.stringify(it)), JSON.stringify(it));
   }
+});
+
+test('a solid target rejects an unintended through-bore made with the drill', () => {
+  const ops = SEQ['stepped-pin'], st = M.create('stepped-pin');
+  const extra = [['sp', false], ['tool', 'drill'], ['drill', '0.2500'], ['sp', true],
+    ['z', -0.6], ['z', 0.6], ['z', -1.2], ['z', 0.6], ['z', -1.7], ['z', 0.6]];
+  const log = drive(st, [...ops.slice(0, -5), ...extra, ...ops.slice(-5)]);
+  assert.deepEqual(stops(log), []);
+  assert.equal(2 * st.part.ri[M.colAt(st.part, -0.3)], 0.25);
+  const ev = M.evaluate(st);
+  assert.equal(ev.accepted, false);
+  assert.equal(ev.items.find(x => x.id === 'core').status, 'under');
+});
+
+test('every external thread turn needs full depth, not just one finished region', () => {
+  const st = M.create('thumb-screw'); let pass = 0;
+  const ops = SEQ['thumb-screw'].map(op => op[0] === 'th' && ++pass > 1 ? ['th', -0.25] : op);
+  assert.deepEqual(stops(drive(st, ops)), []);
+  assert.equal(2 * st.part.ro[M.colAt(st.part, -0.5)], 0.345);
+  const ev = M.evaluate(st);
+  assert.equal(ev.accepted, false);
+  assert.equal(ev.items.find(x => x.id === 'od-0').status, 'over');
+});
+
+test('every internal thread turn needs full depth too', () => {
+  const st = M.create('knurled-nut'); let pass = 0;
+  const ops = SEQ['knurled-nut'].map(op => op[0] === 'th' && ++pass > 1 ? ['th', -0.25] : op);
+  assert.deepEqual(stops(drive(st, ops)), []);
+  const ev = M.evaluate(st);
+  assert.equal(ev.accepted, false);
+  assert.equal(ev.items.find(x => x.id === 'id-0').status, 'over');
+});
+
+test('equal axial and radial extents do not turn a cylindrical nose into a chamfer', () => {
+  const ops = SEQ['stepped-pin'], st = M.create('stepped-pin');
+  assert.deepEqual(stops(drive(st, [...ops.slice(0, -11), ['mv', 0.1, 0.440], ['z', -0.030], ['x', 0.800], ...ops.slice(-5)])), []);
+  const ev = M.evaluate(st);
+  assert.equal(ev.accepted, false);
+  const chamfer = ev.items.find(x => x.id === 'ch-0');
+  assert.notEqual(chamfer.status, 'ok');
+  assert.match(chamfer.made, /not a 45° chamfer/);
 });
 
 test('the drawing data agree with themselves', () => {
