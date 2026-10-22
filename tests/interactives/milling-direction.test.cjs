@@ -125,9 +125,131 @@ test('the printed figure in the page is the renderer output for its stated momen
   const page = fs.readFileSync(PAGE, 'utf8');
   const P = { aeOverD: 0.25, fz: 18 };
   const T = M.timeAtProgress(P, 0, 0.35);
-  assert.ok(page.includes(D.renderPanel(M.frame('climb', P, T), {})), 'climb figure current');
-  assert.ok(page.includes(D.renderPanel(M.frame('conventional', P, T), {})), 'conventional figure current');
+  assert.ok(page.includes(D.renderPanel(M.frame('climb', P, T), { idPrefix: 'mill-static-climb' })), 'climb figure current');
+  assert.ok(page.includes(D.renderPanel(M.frame('conventional', P, T), { idPrefix: 'mill-static-conventional' })), 'conventional figure current');
+  assert.ok(page.includes(D.renderGraph(0.25, M.MODES.map((mode) => ({ mode, progress: 0.35 })))), 'graph current');
   assert.ok(page.includes(D.renderBacklash()), 'backlash figure current');
+  assert.ok(page.includes(D.renderChipStory(P, { idPrefix: 'mill-story' })), 'chip story current');
+  const ids = [...page.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]);
+  assert.equal(new Set(ids).size, ids.length, 'every SVG definition id on the page is unique');
+  for (const m of page.matchAll(/(?:url\(#|href="#)([^)"]+)/g)) assert.ok(ids.includes(m[1]), 'reference resolves: ' + m[1]);
+});
+
+/* ---- the cutter is the shared one --------------------------------------*/
+
+test('panels draw the shared cutter, with its tips where the model puts the teeth', () => {
+  const C = require(path.join(ROOT, 'interactives', 'cutter-geometry', 'cutter.js'));
+  const P = { aeOverD: 0.25, fz: 18 };
+  for (const mode of M.MODES) {
+    const f = M.frame(mode, P, 0.3);
+    const svg = D.renderPanel(f, { idPrefix: 'probe-' + mode });
+    assert.ok(svg.includes(C.render({ radius: f.R, teeth: f.teeth, idPrefix: 'probe-' + mode })), 'shared cutter fragment, unchanged');
+    assert.ok(!/mill-tooth|mill-hub/.test(svg), 'no leftover private cutter');
+    assert.equal((svg.match(/cw-cutter-edge is-engaged/g) || []).length, 1, 'one cutting edge marked');
+  }
+  const src = fs.readFileSync(path.join(MOD, 'demo.js'), 'utf8') + fs.readFileSync(path.join(MOD, 'model.js'), 'utf8');
+  assert.ok(!/mill-tooth|mill-hub/.test(src), 'no forked cutter drawing in the module');
+  assert.match(src, /CourseWikiCutter/, 'browser path reads the shared global');
+});
+
+/* ---- chips --------------------------------------------------------------*/
+
+const SETTINGS = [];
+for (const ae of [0.05, 0.25, 0.5]) for (const fz of [6, 18, 30]) SETTINGS.push({ aeOverD: ae, fz });
+const span = (P) => M.engagementAngle(M.normalise(P).aeOverD) / (2 * Math.PI / M.normalise(P).teeth);
+
+test('a chip grows from the cutting edge while the tooth cuts, and only then', () => {
+  for (const mode of M.MODES) {
+    const P = { aeOverD: 0.25, fz: 18 };
+    let last = 0;
+    for (const p of [0.05, 0.2, 0.4, 0.6, 0.8, 1]) {
+      const T = Math.min(M.timeAtProgress(P, 0, p), span(P) * (1 - 1e-9));
+      const f = M.frame(mode, P, T), c = M.chips(mode, P, T).attached;
+      assert.ok(c, `${mode} has a chip at ${p}`);
+      // The chip's root is the edge itself.
+      near(Math.hypot(c.points[0].x - f.contact.x, c.points[0].y - f.contact.y), 0, 1e-6, 'root on the edge');
+      const n = c.points.length / 2;
+      let length = 0;
+      for (let i = 1; i < n; i++) length += Math.hypot(c.points[i].x - c.points[i - 1].x, c.points[i].y - c.points[i - 1].y);
+      assert.ok(length > last, 'longer as the cut goes on');
+      last = length;
+    }
+    const between = M.frame(mode, { aeOverD: 0.1 }, span({ aeOverD: 0.1 }) + 0.05);
+    assert.equal(between.engaged, false);
+    assert.equal(M.chips(mode, { aeOverD: 0.1 }, between.T).attached, null, 'no chip forming between teeth');
+  }
+});
+
+test('the chip carries the slice thickness: climb thick end curled furthest, conventional thick end on the edge', () => {
+  const q = M.normalise({ aeOverD: 0.25, fz: 18 });
+  for (const mode of M.MODES) {
+    const fit = M.chipFit(mode, q);
+    const c = M.chipLocal(mode, q, 1, fit.curl, fit.thin);
+    const n = c.points.length / 2, thick = (i) => Math.hypot(c.points[i].x - c.points[c.points.length - 1 - i].x,
+      c.points[i].y - c.points[c.points.length - 1 - i].y);
+    const root = thick(0), end = thick(n - 1);
+    if (mode === 'climb') { near(root, 0, 1e-9, 'climb root thins to nothing'); assert.ok(end > 5, 'climb free end thick'); }
+    else { near(end, 0, 1e-9, 'conventional free end began at nothing'); assert.ok(root > 5, 'conventional root thick'); }
+  }
+});
+
+test('release is seamless: the chip let go is the finished chip, in the same place', () => {
+  for (const P of SETTINGS) for (const mode of M.MODES) {
+    const s = span(P);
+    const before = M.chips(mode, P, s * (1 - 1e-9)).attached;
+    const after = M.chips(mode, P, s + 1e-9).released[0];
+    assert.ok(before && after, `${mode} ${JSON.stringify(P)}: chip on both sides of the exit`);
+    assert.equal(after.points.length, before.points.length);
+    before.points.forEach((p, i) => near(Math.hypot(p.x - after.points[i].x, p.y - after.points[i].y), 0, 1e-4, 'no jump'));
+    // Small steps stay small: no jump anywhere in flight either.
+    let prev = after.points;
+    for (let tau = 0.01; tau < M.CHIP.flight - 0.01; tau += 0.01) {
+      const r = M.chips(mode, P, s + tau).released.find((c) => Math.abs(c.age - tau / M.CHIP.flight) < 1e-9);
+      assert.ok(r, 'same chip still in view');
+      const moved = Math.max(...r.points.map((p, i) => Math.hypot(p.x - prev[i].x, p.y - prev[i].y)));
+      assert.ok(moved < 0.05 * M.normalise(P).R, `${mode} moves smoothly at tau ${tau.toFixed(2)} (${moved})`);
+      prev = r.points;
+    }
+    assert.equal(M.chips(mode, P, s + M.CHIP.flight + 1e-6).released.filter((c) => c.age > 1).length, 0, 'gone after its flight');
+  }
+});
+
+test('no chip passes through the work or the turning cutter', () => {
+  const C = require(path.join(ROOT, 'interactives', 'cutter-geometry', 'cutter.js'));
+  // Control: the depth probe does see a point well inside.
+  assert.ok(M.depthInside({ x: 0, y: -150 }, M.workOutline(M.frame('climb', {}, 0), 300, 100)) > 10);
+  for (const P of SETTINGS) for (const mode of M.MODES) {
+    const q = M.normalise(P), tol = 0.01 * q.R;
+    for (let T = 0; T < 2.2; T += 0.02) {
+      const f = M.frame(mode, q, T), ch = M.chips(mode, q, T);
+      const work = M.workOutline(f, 1000, 300), body = C.geometry({ radius: q.R, teeth: f.teeth }).outline;
+      const where = `${mode} ${JSON.stringify(P)} T=${T.toFixed(2)}`;
+      for (const r of ch.released) for (const p of r.points) {
+        assert.ok(M.depthInside(p, work) <= tol, 'released chip in the work: ' + where);
+        assert.ok(M.depthInside(p, body) <= tol, 'released chip in the cutter: ' + where);
+      }
+      if (ch.attached) {
+        // Only the root may overlap the work: that is where it is being sheared off.
+        const rootZone = f.ratio * q.fz * 1.15 + 0.02 * q.R + 1e-6;
+        for (const p of ch.attached.points) {
+          assert.ok(M.depthInside(p, body) <= tol, 'forming chip in the cutter: ' + where);
+          if (Math.hypot(p.x - f.contact.x, p.y - f.contact.y) > rootZone) {
+            assert.ok(M.depthInside(p, work) <= tol, 'forming chip in the work: ' + where);
+          }
+        }
+      }
+    }
+  }
+});
+
+test('chips are a pure function of time and settings', () => {
+  assert.deepEqual(M.chips('climb', { fz: 12 }, 2.37), M.chips('climb', { fz: 12 }, 2.37));
+  assert.deepEqual(M.chips('conventional', {}, NaN), M.chips('conventional', {}, 0));
+  assert.throws(() => M.chips('down', {}, 0), /climb or conventional/);
+  const story = D.storyMoments({ aeOverD: 0.25, fz: 18 });
+  assert.equal(story.length, 4);
+  for (let i = 1; i < 4; i++) assert.ok(story[i].T > story[i - 1].T, 'story runs forward in time');
+  assert.ok(!/NaN|undefined|Infinity/.test(D.renderChipStory({ aeOverD: 0.5, fz: 30 })));
 });
 
 test('page and manifest follow the module contract', () => {

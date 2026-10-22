@@ -112,8 +112,8 @@
     // Relief: a quick primary drop, then a slow fall to the heel, so the
     // back of the tooth stays clear of the circle the edge cuts.
     var heelA = a + P.heel * g, span = heelA - a - m;
-    for (i = 1; i <= 16; i++) {
-      var x = i / 16, th = a + m + span * x, ang = th - a - m;
+    for (i = 1; i <= 10; i++) {
+      var x = i / 10, th = a + m + span * x, ang = th - a - m;
       var drop = P.primaryDrop * Math.min(1, ang / (p - m)) + (P.heelDrop - P.primaryDrop) * Math.max(0, (ang - (p - m)) / (span - (p - m)));
       pts.push(pol(R * (1 - drop), th));
     }
@@ -122,15 +122,15 @@
     // meets the relief and the gullet without a kink.
     var rh = len(heel), rf = len(fl.floor);
     var fa = heelA + mod(Math.atan2(fl.floor.y, fl.floor.x) - heelA, TAU);
-    for (i = 1; i <= 16; i++) {
-      var t = i / 16, e = t * t * (3 - 2 * t);
+    for (i = 1; i <= 12; i++) {
+      var t = i / 12, e = t * t * (3 - 2 * t);
       pts.push(pol(rh + (rf - rh) * e, heelA + (fa - heelA) * t));
     }
     // Up the gullet arc to the foot of the rake face.
     var C = fl.gullet, b0 = Math.atan2(fl.floor.y - C.y, fl.floor.x - C.x);
     var b1 = Math.atan2(fl.face.y - C.y, fl.face.x - C.x);
     var db = mod(b1 - b0 + Math.PI, TAU) - Math.PI;
-    for (i = 1; i <= 14; i++) pts.push(add(C, pol(C.r, b0 + db * i / 14), 1));
+    for (i = 1; i <= 10; i++) pts.push(add(C, pol(C.r, b0 + db * i / 10), 1));
     return pts;                                                  // the face runs straight on to B
   }
 
@@ -179,9 +179,11 @@
       '<stop offset="0" class="cw-cutter-steel-hi"/><stop offset="1" class="cw-cutter-steel-lo"/></radialGradient>' +
       '<pattern id="' + id + '-hatch" patternUnits="userSpaceOnUse" width="' + num(hatch) + '" height="' + num(hatch) +
       '" patternTransform="rotate(45)"><path class="cw-cutter-hatch-line" d="M0 0V' + num(hatch) + '"/></pattern>' +
+      '<path id="' + id + '-outline" d="' + body + '"/>' +
       '</defs>');
-    out.push('<path class="cw-cutter-body" fill="url(#' + id + '-steel)" d="' + body + '"/>');
-    out.push('<path class="cw-cutter-hatch" fill="url(#' + id + '-hatch)" d="' + body + '"/>');
+    // One outline, filled twice: steel, then section hatching over it.
+    out.push('<use href="#' + id + '-outline" class="cw-cutter-body" fill="url(#' + id + '-steel)"/>');
+    out.push('<use href="#' + id + '-outline" class="cw-cutter-hatch" fill="url(#' + id + '-hatch)"/>');
     // The cutting edge of each tooth: down the rake face, round the tip and
     // along the margin.
     G.flutes.forEach(function (fl, i) {
