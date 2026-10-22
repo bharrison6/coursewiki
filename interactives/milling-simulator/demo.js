@@ -97,11 +97,12 @@
     var parts = [];
     if (sum.volume > 0.05) {
       var v = sum.volume >= 1000 ? fmt(sum.volume / 1000, 2) + ' cm³' : fmt(sum.volume, sum.volume < 10 ? 1 : 0) + ' mm³';
-      parts.push('Removed ' + v + '.');
+      parts.push('Removed approximately ' + v + ' (grid estimate).');
       if (sum.side === 'climb') parts.push('A side cut with the metal on the right of the cutter: climb milling.');
       else if (sum.side === 'conventional') parts.push('A side cut with the metal on the left of the cutter: conventional milling.');
       else if (sum.side === 'both') parts.push('The cutter had metal on both sides, like a slot.');
     }
+    if (sum.subGridCut) parts.push('A small cut changed the surface between display samples; the volume grid cannot resolve all of this removal. Inspect for its marked location.');
     sum.notes.forEach(function (n) { parts.push(n); });
     if (!parts.length) parts.push('Moved to X ' + fmtSigned(sim.pos.x, 2) + ', Y ' + fmtSigned(sim.pos.y, 2) + ', Z ' + fmtSigned(sim.pos.z, 2) + '.');
     return { text: parts.join(' '), warn: false };
@@ -312,7 +313,13 @@
     var record = el('div', { class: 'ms-record', 'aria-hidden': 'true' });
 
     app.appendChild(jobBar); app.appendChild(brief); app.appendChild(drawing);
-    app.appendChild(views); app.appendChild(probe); app.appendChild(status); app.appendChild(panel); app.appendChild(keysNote);
+    var workbench = el('div', {class:'ms-workbench'});
+    var machine = el('div', {class:'ms-machine'});
+    machine.appendChild(views); machine.appendChild(probe); machine.appendChild(status);
+    var panelHint = el('p', {class:'ms-under'}, 'Scroll this panel for tools, coordinates and handwheels.');
+    panel.insertBefore(panelHint, panel.firstChild);
+    workbench.appendChild(machine); workbench.appendChild(panel);
+    app.appendChild(workbench); app.appendChild(keysNote);
     app.appendChild(inspect);
     host.appendChild(app);
     rootEl.appendChild(record);
@@ -548,7 +555,7 @@
       var s = sim(), job = state.job;
       if (job.free) {
         state.report = null;
-        inspSummary.textContent = 'Free practice has no drawing to check against. Metal removed so far: ' + fmt(s.removed / 1000, 2) + ' cm³.';
+        inspSummary.textContent = 'Free practice has no drawing to check against. Approximate grid volume removed: ' + fmt(s.removed / 1000, 2) + ' cm³; very small cuts may fall between samples.';
         inspRows.innerHTML = '';
         inspect.classList.remove('is-complete', 'is-over');
         return;
@@ -633,12 +640,14 @@
     function stepMotion(dist) {
       var s = sim(), run = state.running;
       var budget = dist;
-      while (run && run.k < run.legs.length && budget > 0) {
+      while (run && run.k < run.legs.length && budget > M.EPS) {
         var leg = run.legs[run.k], before = leg.done;
         var r = s.advance(leg, budget);
-        budget -= Math.max(0, leg.done - before);
+        var progressed = Math.max(0, leg.done - before);
+        budget -= progressed;
         if (r.blocked) { run.k = run.legs.length; break; }
         if (r.done) run.k++;
+        else if (progressed <= M.EPS) break;
         if (!isFinite(dist)) budget = Infinity;
       }
       if (run && run.k >= run.legs.length) finishMove();
@@ -770,7 +779,7 @@
         var u = vb.x + (ev.clientX - r.left) / r.width * vb.width, z = sectionZ(hostEl, ev);
         var tu = idx === 0 ? s.pos.x : s.pos.y;
         if (Math.abs(u - tu) > Math.max(s.tool.dia / 2, 5) + 3 || z < s.pos.z - 4 || z > s.pos.z + 70) return;
-        if (!startDrag('z', { x: s.pos.x, y: s.pos.y, z: snap(z) })) return;
+        if (!startDrag('z', { x: s.pos.x, y: s.pos.y, z: s.pos.z })) return;
         state.drag.offset = z - s.pos.z;
         hostEl.setPointerCapture(ev.pointerId);
         ev.preventDefault();

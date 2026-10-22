@@ -79,7 +79,7 @@
     {
       id: 'tapped', n: 3, title: 'A slot and two tapped holes',
       short: 'Slot and tapped holes',
-      brief: 'Face the top, mill a slot 10 wide with full-round ends, and make two countersunk M6×1 threaded holes with at least 10 mm of full thread.',
+      brief: 'Face the top, mill a slot 10 wide with full-round ends, and make two countersunk M6×1 holes whose full thread reaches Z −10 or deeper, measured from the finished face.',
       top: 0, bottom: -20, section: 30,
       features: [
         { type: 'slot', id: 'slot', label: 'Slot 10 wide, 5 deep, full-round ends', ax: 35, ay: 30, bx: 65, by: 30, width: 10, floor: -5 },
@@ -103,7 +103,7 @@
         'Work out each depth from Z 0.00, the finished top: the slot floor is Z −5.00 and full thread must reach Z −10.00. Then the order you face, drill and tap in does not change the part.',
         'A slot with full-round ends is exactly what a cutter of the slot’s width leaves when it moves in a straight line.',
         'An M6×1 thread goes into a Ø5.0 hole: the outside diameter of the thread minus its pitch.',
-        'The first 4 threads of the tap are tapered to help it start, so its tip has to go 4 mm deeper than the full thread you need. The drilled hole has to be deeper again, past the drill’s point.',
+        'This simulated tap has a 4-pitch cutting chamfer, so its tip has to go 4 mm deeper than the required full-thread endpoint. Real taps have different chamfer lengths. The drilled hole needs further clearance for the drill point.',
         'The spot and chamfer tool has a 90° point. With its tip 3.5 mm below the top it cuts a Ø7 countersink round a hole.'
       ]
     },

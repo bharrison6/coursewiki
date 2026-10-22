@@ -13,12 +13,14 @@
       a region and the band of heights the top surface may have there, with
       a sideways tolerance band at every edge where either height is fine.
       Every raster cell is then "fine", "still to remove" or "cut too far".
-      This drives the colour overlay and catches stray cuts anywhere.
+      This drives the colour overlay. Geometry-derived probes supplement
+      the grid at cut apices, endpoints, footprints and feature boundaries.
 
    2. The MEASUREMENTS say HOW MUCH. Walls are found by walking the exact
       surface out from inside a feature, holes by fitting a circle to the
       hole wall, threads by checking that the metal they were cut in is still
-      there. These are exact to the hundredth, so they decide pass or fail.
+      there. Displayed values are rounded to the hundredth. These sampled
+      teaching checks do not certify every point of a manufactured surface.
    ==========================================================================*/
 (function (root, factory) {
   var node = typeof module === 'object' && module.exports;
@@ -132,6 +134,28 @@
         }
       }
     }
+    function witness(x, y) {
+      if (!sim.inStock(x, y)) return;
+      envAt(job, x, y, env);
+      var h = sim.heightAt(x, y), hv = h <= bottom + 1e-9 ? -Infinity : h;
+      if (hv >= env.lo - 1e-9) return;
+      var i = Math.min(nx - 1, Math.max(0, Math.floor((x - sim.stock.x0) / M.CELL)));
+      var j = Math.min(ny - 1, Math.max(0, Math.floor((y - sim.stock.y0) / M.CELL))), idx = i + j * nx;
+      if (status[idx] !== 2) { over++; status[idx] = 2; }
+      var o = tally(env.owner);
+      o.over++; o.ov = grow(o.ov, x, y);
+      o.deepest = Math.max(o.deepest, env.lo - Math.max(h, bottom));
+    }
+    sim.prims.forEach(function (p) { M.cutWitnesses(p, witness); });
+    // Drawing boundaries need their own probes: they rarely align with
+    // cell centres. Check just inside and outside each tolerance band.
+    job.features.forEach(function (f) {
+      var t = tolXY(f), xs = [], ys = [];
+      if (f.x0 != null) xs = [f.x0-t-1e-5, f.x0+t+1e-5, f.x1-t-1e-5, f.x1+t+1e-5];
+      if (f.y0 != null) ys = [f.y0-t-1e-5, f.y0+t+1e-5, f.y1-t-1e-5, f.y1+t+1e-5];
+      xs.forEach(function (x) { for (var y=sim.stock.y0; y<=sim.stock.y1; y+=M.CELL) witness(x,y); });
+      ys.forEach(function (y) { for (var x=sim.stock.x0; x<=sim.stock.x1; x+=M.CELL) witness(x,y); });
+    });
     return { status: status, excess: excess, over: over, owners: owners };
   }
 
@@ -397,9 +421,11 @@
       }
       // depth
       var throughNow = true;
-      [0, 0.8].forEach(function (k) {
-        for (var a = 0; a < 8; a++) {
-          var ang = a * Math.PI / 4, h = sim.heightAt(f.cx + k * r * Math.cos(ang), f.cy + k * r * Math.sin(ang));
+      // Breakthrough at the centre is not a full-diameter through hole.
+      var exitR = Math.max(0, (f.d - tD) / 2 - 1e-7);
+      [0, exitR].forEach(function (rr) {
+        for (var a = 0; a < 24; a++) {
+          var ang = a * Math.PI / 12, h = sim.heightAt(cFit.x + rr * Math.cos(ang), cFit.y + rr * Math.sin(ang));
           if (h > bottom + 1e-6) throughNow = false;
         }
       });
@@ -411,7 +437,7 @@
         if (hh > zf) zf = hh;
       }
       if (f.through) {
-        if (throughNow) row.checks.push(check(true, 'Goes right through.'));
+        if (throughNow) row.checks.push(check(true, 'Through at the minimum allowed diameter.'));
         else row.checks.push(check(false, 'Not through yet: full size only to Z ' + fmtSigned(zf, 2) + '.'));
         row.measured = (row.measured || '') + (throughNow ? ' through' : '');
       } else if (throughNow) {
@@ -452,7 +478,7 @@
     if (rec.quality === 'tight') {
       row.overcut = true;
       row.checks.push(check(false, 'Tapped in a Ø' + mm(rec.hole) + ' hole, under the ' + fmt(spec.minorMin, 3) + ' minimum minor diameter for ' + spec.label + '-6H. ' +
-        'Too much metal was left for the tap to cut, and the thread would not pass a gauge.'));
+        'The pilot is outside this model’s minor-diameter band; this simplified check does not establish functional thread fit.'));
     } else if (rec.quality === 'shallow') {
       row.overcut = true;
       row.checks.push(check(false, 'Tapped in a Ø' + mm(rec.hole) + ' hole, over the ' + fmt(spec.minorMax, 3) + ' maximum minor diameter for ' + spec.label + '-6H: the threads are too shallow.'));
@@ -481,7 +507,7 @@
     return {
       rows: rows, done: done, total: rows.length, complete: complete, overcut: overcut,
       started: started, status: cmp.status, excessCells: cmp.excess, overCells: cmp.over,
-      summary: complete ? 'The part matches the drawing.'
+      summary: complete ? 'The part passes the modeled drawing checks.'
         : overcut ? 'Metal has been cut where the drawing keeps it. Cutting more cannot put it back: undo to before the mistake.'
         : !started ? 'Nothing cut yet.'
         : done + ' of ' + rows.length + ' callouts match the drawing.'

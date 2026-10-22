@@ -297,6 +297,18 @@ function job1EndMill(s) {
   go(s, { z: 20 });
 }
 
+test('geometry-derived inspection catches tiny translated cone apices between display cells', () => {
+  for(const [x,y,z] of [[10,10,-.15],[10.125,10.125,-.15],[10.017,10.043,-.051],[74.8,10.021,-.1]]) {
+    const s=M.create(); job1EndMill(s); assert.ok(report(s,'shoulder').complete,'nominal control');
+    load(s,'sp12'); go(s,{x,y,z:2}); const cut=go(s,{z});
+    assert.ok(s.heightAt(x,y)<-.05);
+    const rep=report(s,'shoulder'); assert.equal(rep.complete,false,`${x},${y},${z}`);
+    assert.ok(rep.overCells>0); assert.equal(row(rep,'top').status,'over');
+    if(cut.volume===0) assert.equal(cut.subGridCut,true,'unresolved removal is explicit');
+    s.undo(); assert.ok(report(s,'shoulder').complete,'undo control');
+  }
+});
+
 test('job 1 made with a face mill and an end mill', () => {
   const s = M.create();
   let rep = report(s, 'shoulder');
@@ -348,6 +360,43 @@ function throughHoles(s, id) {
   load(s, id);
   for (const x of [15, 85]) { go(s, { x, y: 30, z: 5 }); go(s, { z: -23 }); go(s, { z: 5 }); }
 }
+
+test('a tap obeys the same parallels as the drill, using its own larger diameter', () => {
+  const s = M.create(); faceTop(s);
+  load(s, 'dr5'); go(s, {x:15,y:10.6,z:2}); go(s,{z:-23}); go(s,{z:2});
+  load(s,'tapM6'); go(s,{x:15,y:10.6,z:2});
+  go(s,{z:-25},'parallel');
+  near(s.pos.z,-20,1e-4,'tap stops at the parallel top');
+});
+
+test('committing an interrupted tapping move keeps only the reached thread and undo removes it', () => {
+  const s=M.create(); faceTop(s);
+  load(s,'dr5'); go(s,{x:15,y:30,z:2}); go(s,{z:-16}); go(s,{z:2});
+  load(s,'tapM6'); go(s,{x:15,y:30,z:2});
+  const pl=s.plan({z:-14}); s.begin('move','Interrupted tap');
+  s.advance(pl.legs[0],10); s.commit();
+  assert.equal(s.threads.length,1); near(s.threads[0].zTip,-8,1e-8,'reached tip');
+  near(s.threadState(s.threads[0]).length,4,1e-8,'four mm full thread');
+  s.undo(); assert.equal(s.threads.length,0);
+});
+
+test('retapping a corrected pilot updates its quality even at the same depth', () => {
+  const s=M.create(); faceTop(s);
+  for(const id of ['dr6.6','tapM8','dr6.8','tapM8']) {
+    load(s,id); go(s,{x:15,y:30,z:2}); go(s,{z:id.startsWith('tap')?-10:-16}); go(s,{z:2});
+  }
+  assert.equal(s.threads.length,1); assert.equal(s.threads[0].quality,'ok');
+  near(s.threads[0].hole,6.8,.001,'current pilot diameter');
+});
+
+test('a through drill must open the minimum allowed diameter at the bottom', () => {
+  const s=M.create(); faceTop(s); pocket(s,'em8',4);
+  load(s,'dr6.6');
+  for(const x of [15,85]) {go(s,{x,y:30,z:2});go(s,{z:-21.94});go(s,{z:2});}
+  const bad=report(s,'pocket'); assert.equal(bad.complete,false);
+  assert.ok(row(bad,'hole-left').checks.some(c=>!c.ok&&/Not through/.test(c.text)));
+  throughHoles(s,'dr6.6'); assert.ok(report(s,'pocket').complete);
+});
 
 test('job 2 made with the 8 mm end mill, and again with the 6 mm', () => {
   for (const [tool, r] of [['em8', 4], ['em6', 3]]) {

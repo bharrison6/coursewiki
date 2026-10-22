@@ -107,8 +107,9 @@
      Minor-diameter limits of the internal thread, tolerance class 6H. The
      simulator accepts a tapped hole whose drilled size falls inside them.
      Basic minor diameter = D - 1.082532 P; 6H adds nothing below it and the
-     grade-6 tolerance above it. SOURCE CHECK PENDING (see the page's sources
-     note): values recalled from ISO 965-1 tables, not read in this lane. */
+     grade-6 tolerance above it. Verified against Gühring's technical table,
+     printed page46; public source link is on the topic page. These are
+     finished minor limits, used as a pilot-quality proxy, not a fit gauge. */
   var THREADS = {
     'M6x1':    { id: 'M6x1', label: 'M6×1', major: 6, pitch: 1, minorMin: 4.917, minorMax: 5.153, tapDrill: 5.0 },
     'M8x1.25': { id: 'M8x1.25', label: 'M8×1.25', major: 8, pitch: 1.25, minorMin: 6.647, minorMax: 6.912, tapDrill: 6.8 }
@@ -245,6 +246,24 @@
     return p.z + p.cone * d;
   }
 
+  // Geometry-derived probes supplement the display grid. A cone's apex
+  // survives at every size and translation, even between display samples.
+  function cutWitnesses(p, visit) {
+    var length = Math.hypot(p.bx - p.ax, p.by - p.ay);
+    var steps = Math.max(1, Math.min(64, Math.ceil(length / CELL)));
+    var radii = p.cone ? [0, 0.125, 0.25, 0.5, 0.75, 1 - 1e-7] : [0, 0.5, 1 - 1e-7];
+    for (var i = 0; i <= steps; i++) {
+      var x = p.ax + (p.bx - p.ax) * i / steps, y = p.ay + (p.by - p.ay) * i / steps;
+      for (var j = 0; j < radii.length; j++) {
+        var n = radii[j] ? 16 : 1;
+        for (var k = 0; k < n; k++) {
+          var a = k * 2 * Math.PI / n;
+          visit(x + p.r * radii[j] * Math.cos(a), y + p.r * radii[j] * Math.sin(a));
+        }
+      }
+    }
+  }
+
   /* Top of the metal at (x, y), or -Infinity where there is no stock. A
      column cut right through reads as the stock bottom. */
   Sim.prototype.heightAt = function (x, y) {
@@ -293,6 +312,20 @@
     if (ul > 0) { ux /= ul; uy /= ul; }
     var e = this.entry, raster = this.raster, mark = this.mark, serial = this.serial;
     var changed = 0;
+    // Evidence of removal below the raster's resolution, not a second
+    // volume estimator. Do not report such a cut as a mere air move.
+    var fineCut = false;
+    if (e && k > 0) {
+      var self = this;
+      cutWitnesses(p, function (x, y) {
+        if (fineCut || !self.inStock(x, y)) return;
+        var oldH = st.rawTop;
+        for (var w = 0; w < self.prims.length; w++) {
+          if (self.prims[w] !== p) oldH = Math.min(oldH, primFloor(self.prims[w], x, y));
+        }
+        if (Math.max(oldH, st.bottom) > Math.max(primFloor(p, x, y), st.bottom) + EPS) fineCut = true;
+      });
+    }
     for (var j = R.j0; j <= R.j1; j++) {
       var y = st.y0 + (j + 0.5) * CELL;
       for (var i = R.i0; i <= R.i1; i++) {
@@ -316,6 +349,7 @@
     }
     this.removed += changed;
     if (tally) tally.volume += changed;
+    if (e && changed === 0 && fineCut) e.subGridCut = true;
     if (changed > 0) this.grow(R.i0, R.i1, R.j0, R.j1);
     return changed;
   };
@@ -386,6 +420,8 @@
   Sim.prototype.commit = function () {
     var e = this.entry;
     if (!e) return null;
+    // A learner can stop between frames, before a tapping leg reaches its end.
+    if (e.tapLeg) this.finishTap(e.tapLeg);
     this.entry = null;
     var moved = e.before.pos.x !== this.pos.x || e.before.pos.y !== this.pos.y || e.before.pos.z !== this.pos.z;
     var changed = e.prims.length || e.cellIdx.length || e.before.tool !== this.tool ||
@@ -403,13 +439,15 @@
       var l = t.left / tot;
       side = l > 0.85 ? 'conventional' : l < 0.15 ? 'climb' : 'both';
     }
-    return { kind: e.kind, label: e.label, volume: t.volume, side: side, blocked: e.blocked, notes: e.notes.slice() };
+    return { kind: e.kind, label: e.label, volume: t.volume, subGridCut: !!e.subGridCut,
+      side: side, blocked: e.blocked, notes: e.notes.slice() };
   }
   function cloneThread(t) { var c = {}; for (var k in t) c[k] = t[k]; return c; }
   function sameThreads(a, b) {
     if (a.length !== b.length) return false;
     for (var i = 0; i < a.length; i++) {
-      if (a[i].zTip !== b[i].zTip || a[i].cx !== b[i].cx || a[i].cy !== b[i].cy) return false;
+      if (a[i].zTip !== b[i].zTip || a[i].cx !== b[i].cx || a[i].cy !== b[i].cy ||
+          a[i].hole !== b[i].hole || a[i].quality !== b[i].quality) return false;
     }
     return true;
   }
@@ -688,6 +726,7 @@
     leg.serial = this.entry.legSerial;
     if (leg.axis === 'z' && leg.to.z < leg.from.z && this.tool && this.tool.kind === 'tap') {
       leg.tap = this.planTap(leg.from, leg.to.z);
+      this.entry.tapLeg = leg;
     }
   };
 
@@ -719,6 +758,14 @@
       if (res.engaged) this.entry.xy += Math.hypot(b.x - a.x, b.y - a.y);
     } else if (b.z < a.z) {
       if (leg.tap) {
+        // Tapping has its own hole rules, but shares the physical fixture.
+        var fx = this.checkZ(a, a.z, b.z);
+        if (!fx.ok) {
+          var ft = this.furthest(function (t) { return self.checkZ(a, a.z, a.z + (b.z - a.z) * t); }, a.z - b.z);
+          this.pos = { x: a.x, y: a.y, z: a.z + (b.z - a.z) * ft.t };
+          this.finishTap(leg);
+          return this.block(leg, ft.refusal);
+        }
         var stopZ = leg.tap.stopZ;
         if (b.z < stopZ - EPS) {
           this.pos = { x: a.x, y: a.y, z: Math.min(a.z, stopZ) };
@@ -900,6 +947,8 @@
     }
     if (ex) {
       if (zTip < ex.zTip) { ex.zTip = zTip; ex.fullBottom = zTip + T.lead * P; }
+      ex.hole = rec.hole;
+      ex.quality = rec.quality;
     } else {
       this.threads.push({ spec: rec.spec, cx: rec.cx, cy: rec.cy, zTop: rec.zSurf, zTip: zTip,
         fullBottom: zTip + T.lead * P, hole: rec.hole, quality: rec.quality });
@@ -991,6 +1040,6 @@
     Sim: Sim, create: function (o) { return new Sim(o); },
     toolLabel: toolLabel, toolNoun: toolNoun, fmt: fmt, fmtSigned: fmtSigned, parseNum: parseNum, q4: q4,
     segDist: segDist, sdBox: sdBox, sdCircle: sdCircle, sdCapsule: sdCapsule, fitCircle: fitCircle,
-    segRectDist: segRectDist
+    segRectDist: segRectDist, cutWitnesses: cutWitnesses
   };
 });

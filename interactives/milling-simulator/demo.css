@@ -29,8 +29,9 @@
   min-width: 0;
 }
 .msd-scroll:focus-visible { outline: 3px solid var(--cat2); outline-offset: 2px; }
-.msd-svg { display: block; width: 100%; min-width: 34rem; height: auto; }
-.msd-rack { min-width: 30rem; }
+.msd-svg { display: block; width: 100%; min-width: 42rem; height: auto; }
+.msd-setup { min-width: 60rem; }
+.msd-rack { min-width: 60rem; }
 .msd-figures { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); }
 
 .msd-vis      { fill: none; stroke: var(--ink); stroke-width: .45; stroke-linejoin: round; stroke-linecap: round; }
@@ -149,7 +150,7 @@
 .ms-zero        { stroke: var(--accent); stroke-width: .3; stroke-dasharray: 2 1; }
 .ms-jawtop      { stroke: var(--ink-soft); stroke-width: .25; stroke-dasharray: 1 1; }
 .ms-t           { font-family: var(--f-display); font-size: 3.2px; font-weight: 600; fill: var(--ink); }
-.ms-t-axis      { font-size: 2.8px; fill: var(--ink-soft); }
+.ms-t-axis      { font-size: 7px; fill: var(--ink-soft); }
 .ms-t-soft      { fill: var(--ink-soft); }
 .ms-probe, .ms-keys { font-size: .86rem; color: var(--ink-soft); margin: 0; }
 .ms-probe { min-height: 1.4em; font-variant-numeric: tabular-nums; }
@@ -166,13 +167,24 @@
 
 /* the panel */
 .ms-panel { display: grid; gap: .65rem; grid-template-columns: minmax(0, 1fr); }
-@container (min-width: 40rem) {
-  .ms-panel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .ms-toolbox { grid-column: 1 / -1; }
+/* Reuse the lathe lab's bounded work/controls arrangement. Controls scroll
+   in their own column instead of taking the moving cut off the screen. */
+.ms-workbench { min-width: 0; height: min(56rem, calc(100svh - var(--appbar-h, 3.5rem) - 6rem)); display: flex; flex-direction: column; gap: .7rem; }
+.ms-machine { min-width: 0; flex: 0 0 auto; }
+.ms-workbench .ms-panel { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: .5rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); }
+.ms-panel > * { flex-shrink: 0; }
+.ms-status { max-height: 4.5rem; overflow-y: auto; margin: .3rem 0 0; }
+@container (min-width: 42rem) {
+  .ms-workbench { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 1fr); align-items: start; }
+  .ms-workbench .ms-panel { height: 100%; }
 }
-@container (min-width: 64rem) {
-  .ms-panel { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); }
-  .ms-toolbox { grid-column: auto; }
+@container (max-width: 41.99rem) {
+  .ms-views { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ms-view-iso, .ms-view-side { display: none; }
+  .ms-view-top, .ms-view-front { grid-column: 1 / -1; }
+  .ms-top-canvas { width: min(100%, calc(19svh * 190 / 120)); margin-inline: auto; }
+  .ms-section-svg { max-height: 15svh; }
+  .ms-workbench .ms-panel { display: flex; flex-direction: column; }
 }
 .ms-box {
   background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm);
@@ -261,6 +273,7 @@
 .presenting [data-interactive="milling-simulator"] .ms-dro-val { font-size: 1.5rem; }
 
 @media print {
+  .ms-workbench { display: block; height: auto; }
   [data-interactive="milling-simulator"] {
     background: #FFF !important; border-color: #777 !important; color: #111 !important;
   }
