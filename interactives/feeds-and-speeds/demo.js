@@ -659,6 +659,7 @@
         if (!unitRadios[u].checked || u === state.unit) return;
         var before = {}, oldUnit = state.unit;
         M.FIELDS.forEach(function (k) {
+          if (['teeth', 'maxRpm', 'eta'].indexOf(k) >= 0) return;
           var text = inputs[k].value.trim(), exact = state.exact[k], number = M.parseNumber(text);
           if (number !== null) before[k] = exact && exact.text === text ? exact.canon : M.toCanon(oldUnit, k, number);
         });
