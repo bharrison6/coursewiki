@@ -62,7 +62,7 @@ test('limits are inclusive: a part on a limit passes inspection', () => {
 });
 
 test('the reveal: two in-spec parts that still interfere', () => {
-  const trap = M.PRESETS.in.find((p) => p.id === 'trap');
+  const trap = { spec: M.PRESETS.in.find((p) => p.id === 'either').spec, actual: { hole: 7502, shaft: 7505 } };
   const r = M.evaluate(trap.spec, trap.actual.hole, trap.actual.shaft);
   assert.equal(r.hole.inSpec, true);
   assert.equal(r.shaft.inSpec, true);
@@ -135,7 +135,7 @@ test('validation refuses drawings the lab cannot honestly draw', () => {
 test('every preset is valid and its starting parts say what its title says', () => {
   for (const unit of ['in', 'mm']) {
     const byId = Object.fromEntries(M.PRESETS[unit].map((p) => [p.id, p]));
-    assert.deepEqual(Object.keys(byId).sort(), ['either', 'pressed', 'slides', 'trap', 'zero']);
+    assert.deepEqual(Object.keys(byId).sort(), ['either', 'pressed', 'slides']);
     for (const p of M.PRESETS[unit]) {
       assert.equal(p.spec.unit, unit);
       assert.equal(M.validateSpec(p.spec).ok, true, `${unit}/${p.id}`);
@@ -149,9 +149,6 @@ test('every preset is valid and its starting parts say what its title says', () 
     assert.equal(M.envelope(byId.either.spec).kind, 'transition');
     assert.equal(M.evaluate(byId.either.spec, byId.either.actual.hole, byId.either.actual.shaft).kind, 'clearance');
     assert.equal(M.envelope(byId.pressed.spec).kind, 'interference');
-    assert.equal(M.evaluate(byId.trap.spec, byId.trap.actual.hole, byId.trap.actual.shaft).inSpecButInterferes, true);
-    assert.equal(M.envelope(byId.zero.spec).min, 0);
-    assert.equal(M.evaluate(byId.zero.spec, byId.zero.actual.hole, byId.zero.actual.shaft).kind, 'line-to-line');
   }
 });
 
@@ -204,6 +201,41 @@ test('pair share is an exact count over the legal grid', () => {
   }
   assert.equal(M.pairShare(spec('in', 7500, 10, 0, -10, -20)).interfere, 0);
   assert.equal(M.pairShare(spec('in', 7500, 10, 0, 25, 15)).clear, 0);
+});
+
+test('constant-time pair counts match independent enumeration across interval arrangements', () => {
+  for (let hl = -3; hl <= 3; hl++) for (let hw = 1; hw <= 3; hw++) {
+    for (let sl = -3; sl <= 3; sl++) for (let sw = 1; sw <= 3; sw++) {
+      const s = spec('in', 7500, hl + hw, hl, sl + sw, sl);
+      let clear = 0, interfere = 0, lineToLine = 0;
+      for (let h = hl; h <= hl + hw; h++) for (let shaft = sl; shaft <= sl + sw; shaft++) {
+        if (h > shaft) clear++; else if (h < shaft) interfere++; else lineToLine++;
+      }
+      assert.deepEqual(M.pairShare(s), { total: (hw + 1) * (sw + 1), interfere, lineToLine, clear });
+    }
+  }
+});
+
+test('large accepted pair grids retain exact integer counts', () => {
+  const half = 47453132;
+  const s = spec('mm', 1000000000, half, -half, half, -half);
+  assert.equal(M.validateSpec(s).ok, true);
+  const n = BigInt(2 * half + 1);
+  const expectedSide = n * (n - 1n) / 2n;
+  const got = M.pairShare(s);
+  assert.equal(BigInt(got.total), n * n);
+  assert.equal(BigInt(got.interfere), expectedSide);
+  assert.equal(BigInt(got.clear), expectedSide);
+  assert.equal(got.lineToLine, Number(n));
+});
+
+test('unsafe pair-grid counts are refused rather than rounded or enumerated', () => {
+  const s = spec('mm', 1000000000, 250000000, -250000000, 250000000, -250000000);
+  const validation = M.validateSpec(s);
+  assert.equal(validation.ok, false);
+  assert.match(validation.errors.join(' '), /count exactly/);
+  assert.throws(() => M.pairShare(s), RangeError);
+  assert.throws(() => M.format(Number.MAX_SAFE_INTEGER + 1, 'in'));
 });
 
 test('sampling is seeded, in spec, and counted correctly', () => {
