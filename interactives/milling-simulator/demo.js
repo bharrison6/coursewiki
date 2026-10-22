@@ -319,6 +319,17 @@
     var panelHint = el('p', {class:'ms-under'}, 'Scroll this panel for tools, coordinates and handwheels.');
     panel.insertBefore(panelHint, panel.firstChild);
     workbench.appendChild(machine); workbench.appendChild(panel);
+    function keepWorkspaceVisible() {
+      var r = workbench.getBoundingClientRect();
+      var bar = document.querySelector('.appbar'), top = (bar ? bar.getBoundingClientRect().bottom : 0) + 8;
+      if (r.height <= window.innerHeight - top - 8 && (r.top < top || r.bottom > window.innerHeight - 8)) {
+        window.scrollBy({top:r.top-top, behavior:'instant'});
+      }
+    }
+    // Align after activation: moving a button between pointerdown/up would
+    // swallow the click. Keyboard activation has no pointer coordinates.
+    panel.addEventListener('click', keepWorkspaceVisible);
+    panel.addEventListener('keyup', keepWorkspaceVisible);
     app.appendChild(workbench); app.appendChild(keysNote);
     app.appendChild(inspect);
     host.appendChild(app);

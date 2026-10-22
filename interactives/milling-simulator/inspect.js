@@ -245,7 +245,7 @@
         : 'About ' + pct + '% of the top is still above Z ' + fmtSigned(job.top, 2) + regionNote(o) + '.'));
     }
     if (o.over) { row.overcut = true; row.checks.push(check(false, 'The top has been cut below Z ' + fmtSigned(job.top, 2) + ', up to ' + fmt(o.deepest, 2) + ' mm too deep (red on the view).')); }
-    if (!row.checks.length) row.checks.push(check(true, 'Flat at Z ' + fmtSigned(job.top, 2) + ' everywhere the drawing leaves the top.'));
+    if (!row.checks.length) row.checks.push(check(true, 'Top-face probes are within tolerance at Z ' + fmtSigned(job.top, 2) + '.'));
     return verdict(row);
   };
 
