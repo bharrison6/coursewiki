@@ -318,7 +318,9 @@ test('without a relief groove the threading tool cannot run up to the head', () 
   assert.deepEqual(stops(drive(st, [...FACE, ['mv', 0.1, 0.800], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.600], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.400], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.375], ['z', -0.75], ['x', 1.0], ['sp', false], ['tool', 'thread'], ['tpi', 16], ['sp', true], ['mv', 0.1, 0.350]])), []);
   const r = M.threadPass(st, -0.75);
   assert.equal(r.crashed, true);
-  assert.ok(['holder', 'body'].includes(r.stop.code), r.stop.code);
+  assert.equal(r.stop.code, 'threadstop');
+  assert.match(r.stop.text, /relief groove/);
+  assert.ok(['holder', 'body'].includes(r.crash), r.crash);
   assert.ok(st.tz > -0.75 + 0.03, 'the pass ended before the shoulder');
 });
 
@@ -474,7 +476,7 @@ test('the engine is deterministic and every message is complete', () => {
   const st = M.create('bushing');
   for (const id of M.TOOL_ORDER) {
     M.setSpindle(st, false); M.selectTool(st, id);
-    for (const code of ['spindle', 'engage', 'body', 'holder', 'side', 'jaws', 'chuck', 'chuck-body', 'nohole', 'bar', 'bottom', 'farwall', 'fulldepth', 'shoulder', 'peck', 'retract', 'infeed', 'limit', 'axis', 'parted', 'nopass', 'notthread', 'air']) {
+    for (const code of ['spindle', 'engage', 'body', 'holder', 'side', 'jaws', 'chuck', 'chuck-body', 'nohole', 'bar', 'bottom', 'farwall', 'fulldepth', 'shoulder', 'peck', 'retract', 'infeed', 'limit', 'axis', 'parted', 'nopass', 'notthread', 'air', 'threadstop']) {
       const t = M.explain(st, code, { engage: 0.12, depth: 1.5, infeed: 0.02, clear: 0.4 });
       assert.ok(t && !/undefined|NaN|null/.test(t), id + '/' + code + ': ' + t);
     }

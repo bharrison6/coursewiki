@@ -61,6 +61,7 @@
   var TAN30 = Math.tan(30 * Math.PI / 180);
   var TAN59 = Math.tan(59 * Math.PI / 180);
   var SAWN = 0.02;      // axial depth of the uneven sawn end
+  var MTOL = 0.00005;   // inspection tolerance: half the last digit any readout shows
 
   /* ---- tool edge shapes ----------------------------------------------------*/
   /* An insert corner with a vertical leading edge at dz = 0, a nose radius, and
@@ -73,6 +74,9 @@
     var tr = nose * (1 - Math.cos(s));
     return function (dz) {
       if (dz < 0) { return Infinity; }
+      // A land 0.0012 in long at the lowest point, so a turned diameter is exactly
+      // the readout wherever the column grid happens to fall under the nose.
+      if (Math.abs(dz - nose) <= 0.0006) { return 0; }
       if (dz <= tz) { var u = dz - nose; return nose - Math.sqrt(Math.max(0, nose * nose - u * u)); }
       return tr + (dz - tz) * slope;
     };
@@ -438,7 +442,7 @@
           if (crest - b > limit) { out.code = 'shoulder'; return out; }
           if (b < blank - pen - EPS) {
             var np = blank - b;
-            if (np > tool.penFull + 1e-6) { out.code = 'fulldepth'; return out; }
+            if (np > tool.penFull + 0.00005) { out.code = 'fulldepth'; return out; }
             out.formed = true;
             if (apply) { p.kB[i] = blank; p.kP[i] = np; p.ro[i] = blank + np; }
           }
@@ -583,6 +587,7 @@
       case 'infeed': return 'That pass would feed ' + inch(data.infeed || 0) + ' deeper than the last one. The ' + t.name.toLowerCase() + (t.maxInfeed ? ' takes at most ' + inch(t.maxInfeed) + ' per pass.' : ' is not a threading tool.');
       case 'limit': return 'That is the end of the slide\'s travel.';
       case 'axis': return 'Tailstock tools ride on the centerline. They move only along Z.';
+      case 'threadstop': return 'The threading tool would have run into a shoulder before the end of the pass, so the pass stopped at the last full turn short of it. Stop the pass sooner, or cut a relief groove for the tool to run into.';
       case 'parted': return 'Parted off. The finished part has dropped clear: see the inspection below.';
       case 'nopass': return 'A threading pass runs toward the chuck: set a stop Z to the left of the tool.';
       case 'notthread': return 'Choose a threading tool to take a threading pass.';
@@ -740,7 +745,7 @@
     res.moved = true; res.cut = area; res.to = st.tz; res.infeed = worst;
     st.win = { a: [], l: [] };
     st.version++;
-    if (crash) { res.stop = stopObj(st, crash); res.crashed = true; }
+    if (crash) { res.stop = stopObj(st, (crash === 'jaws' || crash === 'chuck') ? crash : 'threadstop'); res.crashed = true; res.crash = crash; }
     else if (!any || area <= EPS) { res.stop = stopObj(st, 'air'); }
     return res;
   }
@@ -1088,7 +1093,7 @@
       return;
     }
     it.made = Math.abs(mx - mn) < 0.0006 ? dia(mx) : dia(mn) + ' to ' + fmt(mx);
-    var badLo = mn < lo - 1e-6, badHi = mx > hi + 1e-6;
+    var badLo = mn < lo - MTOL, badHi = mx > hi + MTOL;
     if (!badLo && !badHi) { it.status = 'ok'; return; }
     if (inside) {
       if (badHi) { it.status = 'under'; it.hint = inch(mx - hi) + ' over the largest size. That metal is gone: undo back before that cut, or start new stock.'; return; }
@@ -1120,13 +1125,13 @@
     if (!tagged) {
       it.made = 'Not threaded' + (inside ? ', hole ' + dia(crest) : ', ' + dia(crest));
       it.status = 'missing';
-      if (!inside && crest > crestHi + 1e-6) { it.hint = 'Turn it to the crest size first, then thread it at ' + sg.tpi + ' per inch.'; }
-      else if (inside && crest < crestLo - 1e-6) { it.hint = 'The hole is under the thread\'s inside size. Open it to ' + dia(sg.crest[0]) + ' to ' + fmt(sg.crest[1]) + ', then thread it.'; }
+      if (!inside && crest > crestHi + MTOL) { it.hint = 'Turn it to the crest size first, then thread it at ' + sg.tpi + ' per inch.'; }
+      else if (inside && crest < crestLo - MTOL) { it.hint = 'The hole is under the thread\'s inside size. Open it to ' + dia(sg.crest[0]) + ' to ' + fmt(sg.crest[1]) + ', then thread it.'; }
       else { it.hint = 'Thread it at ' + sg.tpi + ' per inch with the ' + (inside ? 'threading bar' : 'outside threading tool') + '.'; }
       return;
     }
     var keys = Object.keys(tags).map(Number);
-    var wrong = keys.filter(function (k) { return k > 0 && Math.abs(k - pitch) > 1e-6; });
+    var wrong = keys.filter(function (k) { return k > 0 && Math.abs(k - pitch) > MTOL; });
     it.made = sg.tpi + ' per inch? ';
     if (mixed || (wrong.length && keys.length > 1)) {
       it.made = 'Crossed: passes at two different pitches';
@@ -1146,13 +1151,13 @@
       it.hint = 'The thread does not run the full length. Start each pass clear of the front and run it to the end of the thread.';
       return;
     }
-    var crestBad = inside ? (crest < crestLo - 1e-6 || crest > crestHi + 1e-6) : (crest < crestLo - 1e-6 || crest > crestHi + 1e-6);
+    var crestBad = inside ? (crest < crestLo - MTOL || crest > crestHi + MTOL) : (crest < crestLo - MTOL || crest > crestHi + MTOL);
     if (inside) {
-      if (rootv < rootLo - 1e-6) { it.status = 'over'; it.hint = 'Not deep enough yet. Feed the bar out ' + inch(Math.min(0.012, (rootLo - rootv) / 2 + 0.0015)) + ' and take another pass (X ' + fmt(Math.min(rootv + 2 * TOOLS.ithread.maxInfeed, (rootLo + rootHi) / 2)) + ').'; return; }
-      if (rootv > rootHi + 1e-6) { it.status = 'under'; it.hint = 'Cut too deep: the teeth are thin. Undo back before that pass.'; return; }
+      if (rootv < rootLo - MTOL) { it.status = 'over'; it.hint = 'Not deep enough yet. Feed the bar out ' + inch(Math.min(0.012, (rootLo - rootv) / 2 + 0.0015)) + ' and take another pass (X ' + fmt(Math.min(rootv + 2 * TOOLS.ithread.maxInfeed, (rootLo + rootHi) / 2)) + ').'; return; }
+      if (rootv > rootHi + MTOL) { it.status = 'under'; it.hint = 'Cut too deep: the teeth are thin. Undo back before that pass.'; return; }
     } else {
-      if (rootv > rootHi + 1e-6) { it.status = 'over'; it.hint = 'Not deep enough yet. Take another pass at X ' + fmt(Math.max(rootv - 2 * TOOLS.thread.maxInfeed, (rootLo + rootHi) / 2)) + '.'; return; }
-      if (rootv < rootLo - 1e-6) { it.status = 'under'; it.hint = 'Cut too deep: the teeth are thin and weak. Undo back before that pass.'; return; }
+      if (rootv > rootHi + MTOL) { it.status = 'over'; it.hint = 'Not deep enough yet. Take another pass at X ' + fmt(Math.max(rootv - 2 * TOOLS.thread.maxInfeed, (rootLo + rootHi) / 2)) + '.'; return; }
+      if (rootv < rootLo - MTOL) { it.status = 'under'; it.hint = 'Cut too deep: the teeth are thin and weak. Undo back before that pass.'; return; }
     }
     if (crestBad) {
       it.status = inside ? (crest > crestHi ? 'under' : 'over') : (crest > crestHi ? 'over' : 'under');
@@ -1199,7 +1204,7 @@
       it.hint = 'Press the knurl in further, to X ' + fmt(blank - 2 * penFull) + ', and run it along again.';
       return;
     }
-    if (mn < sg.crest[0] - 1e-6 || mx > sg.crest[1] + 1e-6) {
+    if (mn < sg.crest[0] - MTOL || mx > sg.crest[1] + MTOL) {
       it.status = mx > sg.crest[1] ? 'over' : 'under';
       it.hint = 'A full knurl adds 0.020 in to the blank diameter, so the blank decides this size. ' +
         (mx > sg.crest[1] ? 'Undo back before knurling and turn the blank smaller, to about ' + dia(sg.blank) + '.' : 'The blank was too small: about ' + dia(sg.blank) + ' gives ' + dia(sg.blank + 0.02) + '.');
@@ -1267,14 +1272,38 @@
   function legVerdict(it, legZ, legR, lo, hi, smallHint) {
     it.made = legR < 0.004 && legZ < 0.004 ? 'Sharp edge' : inch(legZ) + ' long × ' + inch(legR) + ' deep';
     var big = Math.max(legR, legZ), small = Math.min(legR, legZ);
-    if (small >= lo - 1e-6 && big <= hi + 1e-6) { it.status = 'ok'; return; }
-    if (big > hi + 1e-6) { it.status = 'under'; it.hint = 'Bigger than the drawing allows. Undo back before that cut.'; return; }
+    if (small >= lo - MTOL && big <= hi + MTOL) { it.status = 'ok'; return; }
+    if (big > hi + MTOL) { it.status = 'under'; it.hint = 'Bigger than the drawing allows. Undo back before that cut.'; return; }
     it.status = 'over';
     it.hint = smallHint || (legR < 0.004 && legZ < 0.004 ? 'Break the edge with the chamfer tool: put its point at the corner and plunge.' : 'Plunge the chamfer tool about ' + inch(Math.max(0.001, (lo + hi) / 2 - small)) + ' further.');
   }
 
+  /* Replay a list of learner actions: the tests and the page's printed
+     figures use it, so a figure is a state the simulator can actually reach.
+       ['sp', on]  ['tool', id]  ['drill', id]  ['tpi', n]
+       ['mv', z, x]  ['z', z]  ['x', x]  ['th', zStop]                      */
+  function play(st, ops) {
+    var log = [];
+    for (var k = 0; k < ops.length; k++) {
+      var op = ops[k], r = null;
+      switch (op[0]) {
+        case 'sp': setSpindle(st, op[1]); break;
+        case 'tool': r = selectTool(st, op[1]); break;
+        case 'drill': r = setDrill(st, op[1]); break;
+        case 'tpi': r = setPitch(st, op[1]); break;
+        case 'mv': r = move(st, op[1], op[2]); break;
+        case 'z': r = move(st, op[1], st.tr * 2); break;
+        case 'x': r = move(st, st.tz, op[1]); break;
+        case 'th': r = threadPass(st, op[1]); break;
+        default: throw new Error('unknown action: ' + op[0]);
+      }
+      log.push({ op: op, r: r });
+    }
+    return log;
+  }
+
   return {
-    COL: COL, STEP: STEP, WINDOW: WINDOW, SLACK: SLACK,
+    COL: COL, STEP: STEP, WINDOW: WINDOW, SLACK: SLACK, play: play,
     TOOLS: TOOLS, TOOL_ORDER: TOOL_ORDER, DRILLS: DRILLS, PITCHES: PITCHES, TARGETS: TARGETS,
     target: target, minBore: minBore, drillSize: drillSize,
     create: create, snapshot: snapshot, restore: restore, position: position, limits: limits,

@@ -2,6 +2,318 @@
    turning-simulator / demo.css - the lathe simulator's surface.
 
    Loaded after msu-theme.css and app.css. Every colour is a theme token, so
-   both skins and print come for free.
+   both skins and print come for free; nothing here defines a colour of its
+   own outside the print block.
+
+   The theme's contrast rules hold here too:
+     - gold (--flag, --cat2) and red orange (--cat3) are fills, strokes and
+       hatching, never text on a light ground;
+     - meaning is never carried by colour alone. Metal still to come off is a
+       tint AND is named in the legend; work smaller than the drawing is a
+       heavy dashed line AND an inspection line; a refused move is a message
+       with a heading, not only a red border.
    ========================================================================== */
+
 [data-interactive="turning-simulator"] { min-width: 0; }
+.ts-live > .ts-static { display: none; }
+
+/* ---- shared drawing classes (view, drawings, icons) ------------------------*/
+.ts-view, .ts-drawing-svg { display: block; width: 100%; height: auto; }
+.ts-view text, .ts-drawing-svg text { font-family: var(--f-display); }
+.ts-hatch-bg { fill: var(--surface); }
+.ts-hatch-line { stroke: var(--ink-soft); stroke-width: 1.1; }
+.ts-sec { stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+.ts-ext { fill: var(--surface-2); stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+.ts-edge, .ts-thread, .ts-knurl { fill: none; stroke: var(--ink-soft); stroke-width: 1; }
+.ts-knurl { stroke-width: .8; }
+.ts-axis { fill: none; stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 18 4 3 4; }
+.ts-z0 path { fill: none; stroke: var(--accent); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.ts-lbl { fill: var(--ink-soft); font-size: 13px; font-weight: 700; letter-spacing: .04em; }
+.ts-chuck { fill: var(--surface-2); stroke: var(--rule); stroke-width: 1.4; }
+.ts-jaw { fill: var(--rule); stroke: var(--ink-soft); stroke-width: 1.4; }
+.ts-spin path { fill: none; stroke: var(--ink-soft); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ts-spin { opacity: .35; }
+.ts-ghost { fill: none; stroke: var(--cat1); stroke-width: 1.6; stroke-dasharray: 6 4; stroke-linejoin: round; }
+.ts-ghost-root { fill: none; stroke: var(--cat1); stroke-width: 1; stroke-dasharray: 2 3; }
+.ts-excess { fill: var(--cat2); fill-opacity: .42; stroke: none; }
+.ts-under { fill: none; stroke: var(--cat3); stroke-width: 3.2; stroke-dasharray: 5 2; stroke-linecap: butt; }
+.ts-tool-body { fill: var(--surface); stroke: var(--ink); stroke-width: 1.3; stroke-linejoin: round; }
+.ts-tool-bar { fill: var(--surface); stroke: var(--ink); stroke-width: 1.3; }
+.ts-tool-insert { fill: var(--ink-soft); stroke: var(--ink); stroke-width: 1.2; stroke-linejoin: round; }
+.ts-tool-wheel { fill: var(--rule); }
+.ts-tool-knurl, .ts-tool-flute { fill: none; stroke: var(--paper); stroke-width: 1.1; opacity: .8; }
+.ts-tool-knurl { stroke: var(--ink-soft); }
+.ts-tool-edge { fill: none; stroke: var(--cat2); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.ts-tool-edge.is-forming { stroke: var(--cat1); }
+.ts-ref circle { fill: var(--paper); stroke: var(--cat3); stroke-width: 1.6; }
+.ts-ref path { stroke: var(--cat3); stroke-width: 1.4; }
+.ts-icon { display: block; width: 2.6rem; height: 1.8rem; flex: none; }
+.ts-icon .ts-tool-edge { stroke-width: 6; }
+.ts-icon .ts-tool-body, .ts-icon .ts-tool-insert, .ts-icon .ts-tool-bar { stroke-width: 3; }
+
+/* drawing (dimensioned target) */
+.ts-dline, .ts-dext, .ts-dleader { fill: none; stroke: var(--ink); stroke-width: 1; }
+.ts-dext { stroke: var(--ink-soft); }
+.ts-dthin { fill: none; stroke: var(--ink); stroke-width: .9; }
+.ts-arrowhead { fill: var(--ink); }
+.ts-dtxt { fill: var(--ink); font-size: 14px; font-weight: 600; }
+.ts-dlbl { fill: var(--ink-soft); font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.ts-halo { paint-order: stroke; stroke: var(--paper); stroke-width: 5px; stroke-linejoin: round; }
+.ts-bore { fill: var(--surface-2); stroke: none; }
+
+/* ---- the lab surface -----------------------------------------------------*/
+.ts-lab {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.15rem;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.ts-k, .ts-k2 {
+  font-family: var(--f-display);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.ts-k2 { font-size: .66rem; letter-spacing: .06em; }
+
+/* buttons: the fire-table tab look, at a 44 px tap height */
+.ts-lab button {
+  cursor: pointer;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: .45rem .8rem;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-family: var(--f-display);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.ts-lab button:not(:disabled):hover { border-color: var(--accent); background: var(--surface-2); }
+.ts-lab button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--paper); }
+.ts-lab button:disabled { cursor: not-allowed; opacity: .45; }
+.ts-lab :is(button, input, select, summary):focus-visible,
+.ts-view-wrap:focus-visible { outline: 3px solid var(--cat2); outline-offset: 2px; }
+
+.ts-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1.25rem; }
+.ts-parts { display: flex; flex-direction: column; gap: .4rem; min-width: 0; flex: 1 1 24rem; }
+.ts-row { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+/* the drawing of the part to make */
+.ts-drawing { margin: 0; display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.ts-drawing svg { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm); max-width: 40rem; }
+.ts-drawing figcaption { font-size: .95rem; color: var(--ink); }
+.ts-teaches { display: block; color: var(--ink-soft); font-size: .9rem; }
+
+/* the machine: readout over the view */
+.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.ts-dro {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem 1.1rem;
+  padding: .55rem .8rem;
+  background: var(--band); color: var(--band-ink);
+  border-radius: var(--radius-sm);
+}
+.ts-dro .ts-k { color: var(--band-ink); opacity: .75; margin-right: .35rem; }
+.ts-dro b { font-family: var(--f-mono); font-size: 1.15rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ts-dro-v { white-space: nowrap; }
+.ts-dro-v b { display: inline-block; min-width: 4.6rem; text-align: right; }
+.ts-dro-tool, .ts-dro-spin { font-family: var(--f-display); font-size: .8rem; font-weight: 600; letter-spacing: .03em; }
+.ts-dro-spin { margin-left: auto; padding: .1rem .5rem; border: 1px solid currentColor; border-radius: var(--radius-xs); }
+.is-running .ts-dro-spin { background: var(--flag); color: var(--flag-ink); border-color: var(--flag); }
+.ts-view-wrap { min-width: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--paper); overflow: hidden; }
+.ts-view-wrap svg { border-radius: var(--radius-sm); }
+.ts-view-opts { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; font-family: var(--f-display); font-size: .85rem; font-weight: 600; }
+.ts-view-opts label { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.25rem; cursor: pointer; }
+.ts-view-opts input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.ts-legend { margin: 0; font-size: .85rem; color: var(--ink-soft); line-height: 1.9; }
+.ts-key { display: inline-block; width: 1.4rem; height: .8rem; margin: 0 .25rem 0 .6rem; vertical-align: -.05rem; border-radius: 2px; }
+.ts-key:first-child { margin-left: 0; }
+.ts-key-ghost { border: 2px dashed var(--cat1); }
+.ts-key-excess { background: var(--cat2); opacity: .55; }
+.ts-key-under { border-top: 3px dashed var(--cat3); height: 0; }
+.ts-key-edge { border-top: 3px solid var(--cat2); height: 0; }
+.ts-key-ref { width: .8rem; border: 2px solid var(--cat3); border-radius: 50%; }
+.ts-keys { margin: 0; }
+
+/* the tool, draggable */
+.ts-tool { cursor: grab; touch-action: none; }
+.is-dragging .ts-tool { cursor: grabbing; }
+.ts-handle { fill: transparent; stroke: none; }
+.is-busy .ts-tool { cursor: progress; }
+
+/* spindle running: the chuck's arrow turns */
+.ts-spin { transform-box: fill-box; transform-origin: center; }
+.is-running .ts-spin { opacity: .9; animation: ts-spin .7s linear infinite; }
+@keyframes ts-spin { to { transform: rotate(360deg); } }
+.is-running .ts-spin path { stroke: var(--accent); }
+
+/* chips: only where the model removed metal */
+.ts-chip { fill: none; stroke: var(--ink-soft); stroke-width: 1.6; stroke-linecap: round; pointer-events: none;
+  animation: ts-chip .65s ease-out forwards; }
+@keyframes ts-chip {
+  from { transform: translate(var(--x), var(--y)); opacity: 1; }
+  to { transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) rotate(220deg); opacity: 0; }
+}
+
+/* ---- controls --------------------------------------------------------------*/
+.ts-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  min-width: 0;
+}
+@container (min-width: 36rem) {
+  .ts-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  .ts-run, .ts-tools, .ts-toolinfo { grid-column: 1 / -1; }
+}
+.ts-tools { margin: 0; padding: 0; border: 0; min-width: 0; display: flex; flex-direction: column; gap: .5rem; }
+.ts-tools legend { padding: 0; margin-bottom: .4rem; }
+.ts-tool-group { display: flex; flex-direction: column; gap: .3rem; }
+.ts-tool-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(4.7rem, 1fr)); gap: .35rem; }
+.ts-lab .ts-toolbtn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25rem;
+  padding: .3rem .3rem; text-transform: none; letter-spacing: 0; font-size: .74rem; line-height: 1.15;
+}
+.ts-toolbtn .ts-icon { width: 2.6rem; height: 1.7rem; }
+.ts-toolbtn[aria-pressed="true"] .ts-tool-body, .ts-toolbtn[aria-pressed="true"] .ts-tool-bar { fill: var(--paper); stroke: var(--paper); }
+.ts-toolbtn[aria-pressed="true"] .ts-tool-insert { fill: var(--surface-2); stroke: var(--paper); }
+
+.ts-toolinfo {
+  display: flex; flex-direction: column; gap: .35rem;
+  padding: .7rem .9rem;
+  background: var(--surface-2);
+  border-inline-start: .3rem solid var(--accent);
+  border-radius: var(--radius-xs);
+}
+.ts-toolinfo p { margin: 0; }
+.ts-tool-name { font-family: var(--f-display); }
+.ts-tag { display: inline-block; margin-left: .4rem; padding: .05rem .45rem; border: 1px solid var(--cat1); background: var(--cat1-soft); color: var(--cat-ink);
+  font-size: .72rem; font-weight: 700; letter-spacing: .04em; border-radius: var(--radius-xs); }
+.ts-cannot { color: var(--ink-soft); font-size: .93em; }
+.ts-cannot::before { content: "Cannot: "; font-family: var(--f-display); font-weight: 700; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; }
+.ts-opts { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; }
+.ts-opts label { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--f-display); font-weight: 600; font-size: .9rem; }
+.ts-opts [hidden] { display: none; }
+.ts-lab select, .ts-lab input[type="text"] {
+  min-height: 2.75rem; padding: .35rem .6rem;
+  border: 1.5px solid var(--rule); border-radius: var(--radius-xs);
+  background: var(--paper); color: var(--ink);
+  font-family: var(--f-mono); font-size: 1rem;
+}
+.ts-run { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ts-lab .ts-spindle { border-color: var(--accent); }
+.ts-lab .ts-spindle[aria-pressed="true"] { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
+
+.ts-jog { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.ts-steps { display: flex; flex-wrap: wrap; align-items: center; gap: .2rem .9rem; font-family: var(--f-mono); }
+.ts-steps label { display: inline-flex; align-items: center; gap: .35rem; min-height: 2.5rem; cursor: pointer; }
+.ts-steps input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.ts-pad {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas: "up up" "left right" "down down";
+  gap: .4rem;
+  max-width: 24rem;
+}
+.ts-up { grid-area: up; } .ts-left { grid-area: left; } .ts-right { grid-area: right; } .ts-down { grid-area: down; }
+.ts-lab .ts-jogbtn { min-height: 3rem; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.ts-jog-sub { display: block; font-size: .68rem; font-weight: 600; letter-spacing: .03em; text-transform: none; color: var(--ink-soft); }
+.ts-jogbtn:disabled .ts-jog-sub { color: inherit; }
+
+.ts-feed { display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
+.ts-feed-row { display: grid; grid-template-columns: 4.6rem minmax(0, 7rem) auto; align-items: center; gap: .45rem; }
+.ts-feed-row[hidden] { display: none; }
+.ts-feed-row label { font-family: var(--f-display); font-weight: 700; font-size: .85rem; }
+.ts-feed-row input { width: 100%; min-width: 0; }
+.ts-lab .ts-hold { border-color: var(--cat3); background: var(--cat3-soft); color: var(--cat-ink); }
+
+/* messages: a heading word always, not only a border */
+.ts-msg {
+  min-height: 2.9rem;
+  padding: .6rem .85rem;
+  border: 1px solid var(--rule);
+  border-inline-start-width: .3rem;
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+}
+.ts-msg strong { font-family: var(--f-display); margin-right: .25rem; }
+.ts-msg.is-stop { border-color: var(--cat3); background: var(--cat3-soft); }
+.ts-msg.is-cut { border-color: var(--cat2); }
+.ts-msg.is-form { border-color: var(--cat1); background: var(--cat1-soft); }
+.ts-msg.is-done { border-color: var(--accent); background: var(--surface-2); }
+
+/* ---- inspection --------------------------------------------------------------*/
+.ts-inspect { display: flex; flex-direction: column; gap: .6rem; min-width: 0; }
+.ts-inspect-head { display: flex; flex-direction: column; gap: .2rem; }
+.ts-verdict { margin: 0; }
+.ts-inspect-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; }
+@container (min-width: 46rem) {
+  .ts-inspect-body:has(.ts-partfig:not([hidden])) { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); align-items: start; }
+}
+.ts-partfig { margin: 0; }
+.ts-partfig[hidden] { display: none; }
+.ts-partfig svg { display: block; width: 100%; height: auto; max-height: 12rem; background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm); }
+.ts-partfig .aside { margin: .3rem 0 0; }
+.ts-items { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: .5rem; }
+.ts-item {
+  display: flex; flex-direction: column; gap: .2rem;
+  padding: .55rem .75rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-inline-start: .3rem solid var(--rule);
+  border-radius: var(--radius-xs);
+  font-size: .93rem;
+}
+.ts-item-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .3rem; }
+.ts-item-label { font-family: var(--f-display); font-weight: 700; }
+.ts-item-row { display: grid; grid-template-columns: 5.6rem minmax(0, 1fr); gap: .4rem; align-items: baseline; }
+.ts-item-hint { margin: .15rem 0 0; color: var(--ink); font-size: .9rem; }
+.ts-badge { font-family: var(--f-display); font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  padding: .08rem .45rem; border: 1.5px solid var(--rule); border-radius: var(--radius-xs); color: var(--cat-ink); }
+.ts-item.is-ok { border-inline-start-color: var(--cat1); }
+.ts-item.is-ok .ts-badge { border-color: var(--cat1); background: var(--cat1-soft); }
+.ts-item.is-over { border-inline-start-color: var(--cat2); }
+.ts-item.is-over .ts-badge { border-color: var(--cat2); background: var(--cat2-soft); }
+.ts-item.is-under { border-inline-start-color: var(--cat3); border-inline-start-style: dashed; }
+.ts-item.is-under .ts-badge { border-color: var(--cat3); background: var(--cat3-soft); }
+.ts-item.is-missing .ts-badge, .ts-item.is-pending .ts-badge { border-style: dashed; }
+.ts-notes { margin: 0; padding-left: 1.1rem; font-size: .93rem; }
+.ts-notes:empty { display: none; }
+
+.ts-log summary { cursor: pointer; font-family: var(--f-display); font-weight: 700; font-size: .85rem; min-height: 2.5rem; display: flex; align-items: center; }
+.ts-log ol { margin: .3rem 0 0; padding-left: 1.6rem; font-size: .88rem; max-height: 14rem; overflow-y: auto; }
+
+/* ---- the static version (no JavaScript, and paper) ------------------------------*/
+.ts-static { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+.ts-static-fig { margin: 0; display: flex; flex-direction: column; gap: .5rem; }
+.ts-static-fig svg { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm); }
+.ts-static-fig figcaption { font-size: .93rem; color: var(--ink-soft); }
+.ts-static-parts { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
+
+/* ---- presentation mode: bigger targets and numbers ------------------------------*/
+.presenting .ts-lab button { min-height: 3rem; font-size: .9rem; }
+.presenting .ts-dro b { font-size: 1.45rem; }
+.presenting .ts-msg { font-size: 1.1rem; }
+
+/* ---- print: the drawing, the work as it stands and the inspection; no controls ---*/
+@media print {
+  .ts-bar, .ts-controls, .ts-view-opts, .ts-keys, .ts-log, .ts-hold { display: none !important; }
+  .ts-lab { border-color: #777; }
+  .ts-drawing, .ts-machine, .ts-inspect, .ts-static-fig { break-inside: avoid; }
+  .ts-view, .ts-drawing-svg, .ts-part-svg, .ts-dro, .ts-item, .ts-msg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .ts-live > .ts-static { display: flex; }
+  .ts-chips { display: none; }
+}
