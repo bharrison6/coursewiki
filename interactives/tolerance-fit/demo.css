@@ -1,0 +1,391 @@
+/* ============================================================================
+   tolerance-fit / demo.css - the shaft-and-hole fit lab.
+
+   Loaded after msu-theme.css and app.css. Every colour is a token from the
+   theme layer, so both skins and print come for free; nothing here defines a
+   colour of its own.
+
+   The theme's contrast rules hold here too:
+     - gold (--flag) and red orange (--cat3) are borders, fills and hatching,
+       never text on a light ground;
+     - meaning is never carried by colour alone. Gap versus overlap is also
+       hatching and a word; a rejected part is also a dashed border, a cross
+       and the word "Rejected"; a sample's kind is also its shape.
+   ========================================================================== */
+
+[data-interactive="tolerance-fit"] { min-width: 0; }
+.tf-live > .tf-static { display: none; }
+
+.tf-lab,
+.tf-challenge {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.15rem;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.tf-k {
+  font-family: var(--f-display);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* ---- buttons: the fire-table tab look, at a 44 px tap height ------------*/
+.tf-lab button,
+.tf-challenge button {
+  cursor: pointer;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: .45rem .8rem;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-family: var(--f-display);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.tf-lab button:hover,
+.tf-challenge button:not(:disabled):hover { border-color: var(--accent); background: var(--surface-2); }
+.tf-lab button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--paper); }
+.tf-lab :is(button, input, summary):focus-visible,
+.tf-challenge :is(button, [tabindex]):focus-visible,
+.tf-map:focus-visible {
+  outline: 3px solid var(--cat2);
+  outline-offset: 2px;
+}
+
+/* ---- top bar: example drawings and units --------------------------------*/
+.tf-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: .75rem 1.25rem;
+}
+.tf-presets { display: flex; flex-direction: column; gap: .4rem; min-width: 0; flex: 1 1 24rem; }
+.tf-preset-row { display: flex; flex-wrap: wrap; gap: .4rem; }
+.tf-units { margin: 0; padding: 0; border: 0; min-width: 0; }
+.tf-units legend { float: left; margin: 0 .6rem 0 0; padding: 0; line-height: 2.75rem; }
+.tf-units label {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  min-height: 2.75rem;
+  margin-right: .6rem;
+  font-family: var(--f-display);
+  font-weight: 600;
+  cursor: pointer;
+}
+.tf-units input { width: 1.1rem; height: 1.1rem; margin: 0; accent-color: var(--accent); }
+
+/* ---- the drawing callout, ruled like a title-block entry ----------------*/
+.tf-drawing {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: .6rem;
+  margin: 0;
+}
+.tf-callout {
+  min-width: 0;
+  padding: .6rem .8rem;
+  background: var(--surface-2);
+  border-inline-start: .3rem solid var(--accent);
+  border-radius: var(--radius-xs);
+}
+.tf-callout-hole  { border-inline-start-color: var(--flag); }
+.tf-callout-shaft { border-inline-start-color: var(--cat1); }
+.tf-callout dt {
+  font-family: var(--f-display); font-size: .7rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft);
+}
+.tf-callout dd {
+  margin: .15rem 0 0;
+  font-family: var(--f-mono);
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.tf-lim { display: block; font-family: var(--f-body); font-size: .86rem; font-weight: 400; color: var(--ink-soft); }
+.tf-lim::before { content: "limits "; }
+.tf-badge { font-family: var(--f-display); font-weight: 700; }
+
+/* ---- the two figures ------------------------------------------------------*/
+.tf-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+@container (min-width: 44rem) {
+  .tf-stage { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
+}
+.tf-fig { display: flex; flex-direction: column; gap: .5rem; min-width: 0; margin: 0; }
+.tf-fig svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+}
+.tf-fig figcaption { font-size: .86rem; line-height: 1.45; color: var(--ink-soft); }
+.tf-fig figcaption strong { color: var(--ink); }
+.tf-fig-map { max-width: 26rem; width: 100%; margin-inline: auto; }
+.tf-map { cursor: crosshair; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+
+/* SVG type. Sizes are in viewBox units, so they scale with the figure. */
+.tf-svg-label { font-family: var(--f-display); font-size: 12.5px; font-weight: 700; letter-spacing: .06em; fill: var(--ink); }
+.tf-svg-mag   { font-size: 17px; }
+.tf-svg-small { font-family: var(--f-display); font-size: 11.5px; fill: var(--ink-soft); }
+.tf-svg-tick  { font-family: var(--f-mono); font-size: 10.5px; fill: var(--ink); }
+.tf-svg-tag   { font-family: var(--f-display); font-size: 12px; font-weight: 700; letter-spacing: .1em; fill: var(--accent); }
+.tf-on-hatch  { fill: var(--ink); paint-order: stroke; stroke: var(--surface-2); stroke-width: 5px; stroke-linejoin: round; }
+
+/* section view */
+.tf-block      { fill: var(--surface-2); stroke: var(--ink); stroke-width: 1.5; }
+.tf-hatch      { pointer-events: none; }
+.tf-hatch-line { stroke: var(--ink-soft); stroke-width: 1.1; }
+.tf-shaft      { fill: color-mix(in srgb, var(--accent) 16%, var(--paper)); stroke: var(--accent); stroke-width: 2; }
+.tf-center     { stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 16 4 3 4; }
+.tf-nominal    { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 5 4; }
+.tf-wall       { stroke: var(--ink); stroke-width: 2.5; }
+.tf-zone       { stroke-width: 1.5; stroke-dasharray: 4 3; }
+.tf-zone-hole  { fill: color-mix(in srgb, var(--flag) 32%, transparent); stroke: var(--flag); }
+.tf-zone-shaft { fill: color-mix(in srgb, var(--cat1) 28%, transparent); stroke: var(--cat1); }
+.tf-overlap    { stroke: var(--cat3); stroke-width: 1.5; }
+.tf-xhatch-bg  { fill: var(--cat3-soft); }
+.tf-xhatch-line { stroke: var(--cat3); stroke-width: 1.4; }
+.tf-leader     { fill: none; stroke: var(--ink-soft); stroke-width: 1; }
+.tf-dim        { stroke: var(--ink); stroke-width: 1.5; }
+.tf-arrowhead  { fill: var(--ink); }
+
+/* pair map */
+.tf-mz-clear      { fill: color-mix(in srgb, var(--cat1) 10%, var(--paper)); }
+.tf-mz-over       { fill: var(--cat3-soft); }
+.tf-mz-over-hatch { opacity: .5; }
+.tf-mframe        { fill: none; stroke: var(--rule); }
+.tf-mdiag         { stroke: var(--ink); stroke-width: 1.5; }
+.tf-mbox          { fill: color-mix(in srgb, var(--accent) 9%, transparent); stroke: var(--accent); stroke-width: 2; }
+.tf-mbox-text     { fill: var(--accent); font-weight: 700; }
+.tf-mcorner       { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+.tf-mcross        { stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 3 3; }
+.tf-mtick         { stroke: var(--ink); }
+.tf-mdot-ring     { fill: var(--accent); stroke: var(--paper); stroke-width: 2.5; }
+.tf-mdot-x        { display: none; fill: none; stroke-width: 2.2; stroke-linecap: round; }
+.tf-mdot[data-pass="no"] .tf-mdot-ring { fill: var(--paper); stroke: var(--ink); }
+.tf-mdot[data-pass="no"] .tf-mdot-x    { display: inline; stroke: var(--ink); }
+.tf-sample-clear  { fill: var(--accent); opacity: .7; }
+.tf-sample-touch  { fill: none; stroke: var(--ink); stroke-width: 1.3; }
+.tf-sample-over   { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; }
+
+/* ---- the two parts as made --------------------------------------------------*/
+.tf-parts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: .75rem;
+}
+.tf-part {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  min-width: 0;
+  padding: .7rem .85rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-inline-start: .3rem solid var(--flag);
+  border-radius: var(--radius-sm);
+}
+.tf-part-shaft { border-inline-start-color: var(--cat1); }
+.tf-part[data-pass="no"] { border-style: dashed; border-color: var(--cat3); }
+.tf-part-row { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.tf-part input[type="range"] { flex: 1 1 auto; min-width: 0; min-height: 2.75rem; margin: 0; accent-color: var(--accent); }
+.tf-size {
+  flex: none;
+  min-width: 8.5ch;
+  font-family: var(--f-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: end;
+  color: var(--ink);
+}
+.tf-inspect { font-size: .9rem; line-height: 1.4; color: var(--ink); }
+.tf-inspect[data-pass="no"] { font-weight: 600; }
+
+.tf-jumps { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+/* ---- results: same shape as the site's unit-result tiles -------------------*/
+.tf-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: .75rem;
+}
+.tf-result {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  min-width: 0;
+  padding: .8rem .9rem;
+  background: var(--surface-2);
+  border-inline-start: .3rem solid var(--accent);
+  border-radius: var(--radius-xs);
+}
+.tf-result[data-kind="clearance"]    { border-inline-start-color: var(--cat1); }
+.tf-result[data-kind="line-to-line"] { border-inline-start-color: var(--flag); border-inline-start-style: double; border-inline-start-width: .45rem; }
+.tf-result[data-kind="transition"]   { border-inline-start-color: var(--flag); }
+.tf-result[data-kind="interference"] { border-inline-start-color: var(--cat3); background: var(--cat3-soft); }
+.tf-v { font-family: var(--f-display); font-size: 1.22rem; font-weight: 700; line-height: 1.25; color: var(--ink); overflow-wrap: anywhere; }
+.tf-s { font-size: .92rem; line-height: 1.45; color: var(--ink-soft); }
+.tf-result[data-kind="interference"] .tf-s { color: var(--cat-ink); }
+
+.tf-mission {
+  padding: .75rem .9rem;
+  border: 1.5px dashed var(--rule);
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+}
+.tf-mission[data-state="found"]  { background: var(--flag-soft); border: 1.5px solid var(--flag); color: var(--ink); }
+.tf-mission[data-state="reject"] { border-color: var(--cat3); }
+.tf-run { font-size: .94rem; line-height: 1.5; }
+.tf-aside { display: block; margin-top: .3rem; font-size: .86rem; color: var(--ink-soft); }
+
+/* ---- the arithmetic, in the site's worked-step style -------------------------*/
+.tf-work {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  padding: .75rem .9rem;
+  background: var(--surface-2);
+  border-inline-start: 2px solid var(--rule);
+  color: var(--ink-soft);
+  font-size: .94rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.tf-work .tf-k { display: block; }
+.tf-work strong { color: var(--ink); }
+
+/* ---- write your own drawing ---------------------------------------------------*/
+.tf-edit { border-top: 1px solid var(--rule); padding-top: .4rem; }
+.tf-edit > summary {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 2.75rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--f-display);
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.tf-edit > summary::-webkit-details-marker { display: none; }
+.tf-edit > summary::before { content: "+"; font-size: 1.1rem; width: 1rem; text-align: center; }
+.tf-edit[open] > summary::before { content: "\2212"; }
+.tf-edit-form { display: flex; flex-direction: column; gap: .8rem; padding-top: .4rem; }
+.tf-edit-note { font-size: .9rem; color: var(--ink-soft); }
+.tf-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: .75rem;
+}
+.tf-edit-grid p { display: grid; gap: .35rem; margin: 0; min-width: 0; }
+.tf-edit-grid label {
+  font-family: var(--f-display); font-size: .74rem; font-weight: 700;
+  letter-spacing: .045em; line-height: 1.25; text-transform: uppercase; color: var(--ink);
+}
+.tf-edit-grid input {
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: .55rem .65rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-mono);
+  font-size: 1rem;
+}
+.tf-edit-grid input:hover { border-color: var(--ink-soft); }
+.tf-edit-grid input[aria-invalid="true"] { border-color: var(--cat3); border-width: 2px; }
+.tf-edit-actions button { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.tf-edit-actions button:hover { background: var(--accent); filter: brightness(1.08); }
+.tf-errors { gap: .35rem; }
+.tf-errors:empty { display: none; }
+.tf-errors li { padding: .35rem .6rem; border-inline-start: 3px solid var(--cat3); font-size: .9rem; }
+.tf-errors li::before { content: none; }
+.tf-errors li.tf-note { border-inline-start-color: var(--rule); color: var(--ink-soft); }
+
+/* ---- call the fit ---------------------------------------------------------*/
+.tf-ch-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; }
+.tf-ch-answers { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.tf-ch-q { flex: 1 1 100%; font-family: var(--f-display); font-size: 1.05rem; font-weight: 700; }
+.tf-ch-answers button { flex: 1 1 9rem; }
+.tf-ch-answers button:disabled { cursor: default; opacity: .55; }
+.tf-ch-answers button[data-answer="true"] { opacity: 1; border-color: var(--accent); background: var(--accent); color: var(--paper); }
+.tf-ch-answers button[data-answer="true"]::after { content: " \2713"; }
+.tf-ch-answers button[data-picked="wrong"] { opacity: 1; border-style: dashed; border-color: var(--cat3); color: var(--ink); text-decoration: line-through; }
+.tf-ch-reveal { display: flex; flex-direction: column; gap: .75rem; padding-top: .9rem; border-top: 1px solid var(--rule); }
+.tf-ch-reveal:focus { outline: none; }
+.tf-ch-reveal:focus-visible { outline: 3px solid var(--cat2); outline-offset: 2px; }
+.tf-ch-verdict { font-size: 1.02rem; line-height: 1.5; }
+.tf-ch-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+/* ---- the authored static figures (no JavaScript, and paper) ----------------*/
+.tf-static { display: flex; flex-direction: column; gap: .8rem; }
+.tf-static-fig { margin: 0; display: flex; flex-direction: column; gap: .5rem; }
+.tf-static-fig svg { display: block; width: 100%; height: auto; max-width: 40rem; }
+.tf-static-fig figcaption { font-size: .86rem; color: var(--ink-soft); line-height: 1.45; }
+.tf-static-fig figcaption strong { color: var(--ink); }
+/* The static drawings carry light-theme presentation attributes so they still
+   read if this stylesheet never arrives; these rules take over when it does,
+   which is what lets them follow the dark theme. */
+.tf-static-fig .tf-svg-label,
+.tf-static-fig .tf-svg-small { font-size: 15px; }
+.tf-static-fig .tf-svg-tick  { font-size: 13px; }
+.tf-gapmark { stroke: var(--accent); stroke-width: 4; }
+
+/* ---- narrow: the section view is a third of its drawn size on a phone, so its
+   labels grow in viewBox units to stay readable --------------------------------*/
+@container (max-width: 34rem) {
+  .tf-lab, .tf-challenge { padding: .85rem; }
+  .tf-section .tf-svg-label { font-size: 21px; }
+  .tf-section .tf-svg-mag   { font-size: 24px; }
+  .tf-section .tf-svg-small { font-size: 19px; }
+  .tf-section .tf-svg-tag   { font-size: 18px; }
+  .tf-section [data-tf-nominal-label] { display: none; }
+  .tf-preset-row button { flex: 1 1 auto; }
+}
+@media (max-width: 36rem) {
+  .tf-lab, .tf-challenge { padding: .85rem; }
+}
+
+/* ---- presentation: read from across the room ------------------------------*/
+.presenting .tf-lab button,
+.presenting .tf-challenge button { min-height: 3rem; font-size: .9rem; }
+.presenting .tf-v { font-size: 1.45rem; }
+.presenting .tf-callout dd { font-size: 1.15rem; }
+
+/* ---- print: the current state, without controls ---------------------------*/
+@media print {
+  .tf-bar, .tf-jumps, .tf-edit, .tf-ch-answers button, .tf-ch-actions,
+  .tf-part input[type="range"] { display: none !important; }
+  .tf-lab, .tf-challenge { border-color: #777; }
+  .tf-fig, .tf-static-fig, .tf-results, .tf-work { break-inside: avoid; }
+  .tf-fig svg, .tf-callout, .tf-part, .tf-result, .tf-mission, .tf-static-fig svg {
+    print-color-adjust: exact; -webkit-print-color-adjust: exact;
+  }
+  .tf-stage { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); }
+  .tf-map { cursor: auto; }
+}
