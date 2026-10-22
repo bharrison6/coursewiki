@@ -218,7 +218,7 @@
     var Y = function (r) { return y0 - (y0 - y1) * r; };
     var peak = M.peakChipRatio(aeOverD);
     out.push('<svg class="mill-graph-svg" viewBox="0 0 560 222" role="img" aria-label="' +
-      esc('Chip thickness through the cut. Climb starts at its peak, ' + pct(peak) +
+      esc('Uncut slice thickness through the cut. Climb starts at its peak, ' + pct(peak) +
         ' of the feed per tooth, and falls to zero. Conventional rises from zero to the same peak.') + '" focusable="false">');
     out.push('<path class="mill-axis" d="M' + x0 + ' ' + y1 + 'L' + x0 + ' ' + y0 + 'L' + x1 + ' ' + y0 + '"/>');
     out.push('<path class="mill-peak" d="M' + x0 + ' ' + n(Y(peak)) + 'L' + x1 + ' ' + n(Y(peak)) + '"/>');
@@ -237,7 +237,7 @@
     out.push('<text class="mill-t mill-t-soft" x="' + x0 + '" y="198" text-anchor="start">tooth enters</text>');
     out.push('<text class="mill-t mill-t-soft" x="' + x1 + '" y="198" text-anchor="end">tooth leaves</text>');
     out.push('<text class="mill-t mill-t-soft" x="' + ((x0 + x1) / 2) + '" y="214" text-anchor="middle">position through the cut</text>');
-    out.push('<text class="mill-t mill-t-soft" x="' + (x0 - 10) + '" y="' + (y1 + 4) + '" text-anchor="end">chip</text>');
+    out.push('<text class="mill-t mill-t-soft" x="' + (x0 - 10) + '" y="' + (y1 + 4) + '" text-anchor="end">slice</text>');
     out.push('<text class="mill-t mill-t-soft" x="' + (x0 - 10) + '" y="' + (y0 + 4) + '" text-anchor="end">0</text>');
     out.push('<path class="mill-curve mill-curve-climb" d="M' + (x0 + 14) + ' 12L' + (x0 + 44) + ' 12"/>');
     out.push('<text class="mill-t" x="' + (x0 + 52) + '" y="17">Climb</text>');
@@ -303,7 +303,7 @@
     var along = f.force.along === 'with-feed' ? 'with the feed' : 'against the feed';
     var vert = { down: 'pressing it down', up: 'lifting it', level: 'level' }[f.force.vertical];
     return {
-      now: 'Chip ' + pct(f.ratio) + ' of feed per tooth',
+      now: 'Uncut thickness ' + pct(f.ratio) + ' of feed per tooth',
       trend: trend,
       pull: 'Pull on the work: ' + along + ', ' + vert
     };
