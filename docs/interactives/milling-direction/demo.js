@@ -10,13 +10,12 @@
    text and the static figure - never a row of dead buttons.
    ==========================================================================*/
 (function (root, factory) {
-  var model = (typeof module === 'object' && module.exports)
-    ? require('./model.js')
-    : root.CourseWikiMillingDirection;
-  var api = factory(model);
-  if (typeof module === 'object' && module.exports) module.exports = api;
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiMillingDirection,
+    node ? require('../cutter-geometry/cutter.js') : root.CourseWikiCutter);
+  if (node) module.exports = api;
   else api.boot();
-})(typeof self !== 'undefined' ? self : this, function (M) {
+})(typeof self !== 'undefined' ? self : this, function (M, Cutter) {
   'use strict';
 
   var VIEW = { minX: -238, minY: -162, w: 476, h: 338 };
@@ -47,25 +46,65 @@
       (anchor || 'middle') + '">' + esc(text) + '</text>';
   }
 
-  /* One cutter and its work. `f` is a model frame; opts.flying is an
-     optional list of detached chips {points, age 0..1}. */
+  /* A small side view of the cutter with a drafting section line across
+     its flutes: the arrows say the big drawing is that slice, seen from
+     the spindle end. Screen coordinates. */
+  function orientationCue(x, y) {
+    var out = ['<g class="mill-cue" transform="translate(' + x + ' ' + y + ')">'];
+    out.push('<rect class="mill-cue-tool" x="-8" y="0" width="16" height="22" rx="1"/>');
+    out.push('<path class="mill-cue-tool" d="M-10 22H10V60L7 63H-7L-10 60Z"/>');
+    out.push('<path class="mill-cue-helix" d="M-10 30L10 22M-10 41L10 33M-10 52L10 44M-10 62L10 55"/>');
+    out.push('<path class="mill-cue-cut" d="M-22 42H22"/>');
+    out.push('<path class="mill-cue-arrow" d="M-22 42V30M22 42V30"/>');
+    out.push('<path class="mill-cue-head" d="M-22 46L-26 38H-18ZM22 46L18 38H26Z"/>');
+    out.push('<text class="mill-t mill-t-cue" x="0" y="80" text-anchor="middle">slice seen</text>');
+    out.push('<text class="mill-t mill-t-cue" x="0" y="96" text-anchor="middle">from spindle</text>');
+    out.push('</g>');
+    return out.join('');
+  }
+
+  /* The work as drawn: block, uncut layer, finished surface. */
+  function ground(f, W) {
+    var s = f.side, b = f.boundary, bottom = b[0], crest = b[b.length - 1];
+    var layer = [{ x: s * W, y: f.stockTop }, crest].concat(b.slice().reverse()).concat([{ x: s * W, y: f.finished }]);
+    return '<path class="mill-work" d="' + path(M.workOutline(f, W, BLOCK_DEPTH), true) + '"/>' +
+      '<path class="mill-stock" d="' + path(layer, true) + '"/>' +
+      '<path class="mill-surface" d="' + path([bottom, { x: s * W, y: f.finished }]) + '"/>';
+  }
+
+  /* The slice swept so far, the cutter, and the model's chips for the
+     frame's own time - the part every view of a moment shares. `only`
+     narrows the chips to one story: 'forming' (the chip on the edge) or
+     'leaving' (the one most recently let go). */
+  function scene(f, idPrefix, only) {
+    var out = [];
+    if (f.engaged && f.chip && only !== 'leaving') out.push('<path class="mill-slice" d="' + path(f.chip, true) + '"/>');
+    out.push(Cutter.render({ radius: f.R, teeth: f.teeth, idPrefix: idPrefix }));
+    var ch = M.chips(f.mode, f.params, f.T);
+    if (only === 'forming') ch.released = [];
+    if (only === 'leaving') { ch.attached = null; ch.released = ch.released.slice(0, 1); }
+    ch.released.forEach(function (c) {
+      out.push('<path class="mill-chip is-free" style="opacity:' + n(Math.max(0, 1 - c.age * c.age)) +
+        '" d="' + path(c.points, true) + '"/>');
+    });
+    if (ch.attached) out.push('<path class="mill-chip" d="' + path(ch.attached.points, true) + '"/>');
+    return out.join('');
+  }
+
+  /* One cutter and its work. `f` is a model frame. The chips drawn are
+     the model's for the frame's own time, so the paper figure, a paused
+     frame and playback can never disagree. */
   function renderPanel(f, opts) {
     var o = opts || {};
     var R = f.R, s = f.side, W = VIEW.w / 2;
     var out = [];
-    var top = f.stockTop, fin = f.finished, base = fin - BLOCK_DEPTH;
+    var top = f.stockTop, fin = f.finished;
 
     out.push('<svg class="mill-svg" viewBox="' + VIEW.minX + ' ' + VIEW.minY + ' ' + VIEW.w + ' ' + VIEW.h +
       '" role="img" aria-label="' + esc(o.ariaLabel || LABEL[f.mode]) + '" focusable="false">');
 
     // ---- the work: one block, the uncut layer on the side it comes from
-    var b = f.boundary, bottom = b[0], crest = b[b.length - 1];
-    var block = [{ x: s * W, y: top }, crest].concat(b.slice().reverse())
-      .concat([bottom, { x: -s * W, y: fin }, { x: -s * W, y: base }, { x: s * W, y: base }]);
-    out.push('<path class="mill-work" d="' + path(block, true) + '"/>');
-    var layer = [{ x: s * W, y: top }, crest].concat(b.slice().reverse()).concat([{ x: s * W, y: fin }]);
-    out.push('<path class="mill-stock" d="' + path(layer, true) + '"/>');
-    out.push('<path class="mill-surface" d="' + path([bottom, { x: s * W, y: fin }]) + '"/>');
+    out.push(ground(f, W));
 
     // ---- texture marks that ride with the work, so the feed is visible
     var L = 36, shift = ((f.workAdvance * f.feed.x) % L + L) % L, marks = '';
@@ -81,28 +120,9 @@
     out.push('<path class="mill-feed-head" d="' + arrowHead({ x: ax1 + f.feed.x * 12, y: ay }, f.feed, 16) + '"/>');
     out.push(label(ax0 - f.feed.x * 12, ay - 5, 'Work feed', 'mill-t mill-t-feed', f.feed.x > 0 ? 'end' : 'start'));
 
-    // ---- flying chips from earlier teeth
-    (o.flying || []).forEach(function (c) {
-      var a = c.age, v = c.dir || { x: 0, y: 1 };
-      var dx = v.x * (30 + 160 * a), dy = v.y * (30 + 160 * a) + 90 * a * a;
-      var moved = c.points.map(function (p) { return { x: p.x + dx, y: p.y + dy }; });
-      out.push('<path class="mill-chip mill-chip-fly" style="opacity:' + n(Math.max(0, 1 - a)) +
-        '" d="' + path(moved, true) + '"/>');
-    });
-
-    // ---- the cutter: a body and its teeth, turning clockwise
-    out.push('<circle class="mill-body" cx="0" cy="0" r="' + n(R * 0.72) + '"/>');
-    f.teeth.forEach(function (t) {
-      var a = t.psi;
-      var tooth = [
-        { x: R * Math.cos(a), y: R * Math.sin(a) },
-        { x: R * 0.94 * Math.cos(a + 0.2), y: R * 0.94 * Math.sin(a + 0.2) },
-        { x: R * 0.7 * Math.cos(a + 0.42), y: R * 0.7 * Math.sin(a + 0.42) },
-        { x: R * 0.66 * Math.cos(a - 0.04), y: R * 0.66 * Math.sin(a - 0.04) }
-      ];
-      out.push('<path class="mill-tooth' + (t.engaged ? ' is-cutting' : '') + '" d="' + path(tooth, true) + '"/>');
-    });
-    out.push('<circle class="mill-hub" cx="0" cy="0" r="' + n(R * 0.16) + '"/>');
+    // ---- the slice swept so far, the shared cutter turning clockwise, and
+    //      the chips: the one forming on the edge and those already let go
+    out.push(scene(f, o.idPrefix || ('mill-' + f.mode)));
 
     // ---- rotation arrow over the cutter, the same in both modes
     var r = R + 22, a0 = 1.45, a1 = 0.62, arc = [];
@@ -111,14 +131,14 @@
     out.push('<path class="mill-spin-head" d="' + arrowHead({ x: r * Math.cos(a1 - 0.08), y: r * Math.sin(a1 - 0.08) },
       { x: Math.sin(a1), y: -Math.cos(a1) }, 14) + '"/>');
     out.push(label(30, r + 22, 'turns clockwise', 'mill-t mill-t-soft', 'start'));
+    out.push(orientationCue(194, -152));
 
-    // ---- this tooth's chip, and where its edge still has to go
+    // ---- where the cutting edge still has to go
     if (f.engaged) {
       var psiT = f.teeth[0].psi;
       var exitPsi = f.exitPsi, rest = [];
       for (var e = 0; e <= 20; e++) { var pe = psiT + (exitPsi - psiT) * e / 20; rest.push({ x: R * Math.cos(pe), y: R * Math.sin(pe) }); }
       out.push('<path class="mill-edgepath" d="' + path(rest) + '"/>');
-      if (f.chip) out.push('<path class="mill-chip" d="' + path(f.chip, true) + '"/>');
       var c = f.contact, v = f.velocity, tip = { x: c.x + v.x * 58, y: c.y + v.y * 58 };
       out.push('<path class="mill-force" d="M' + pt(c) + 'L' + pt({ x: c.x + v.x * 44, y: c.y + v.y * 44 }) + '"/>');
       out.push('<path class="mill-force-head" d="' + arrowHead(tip, v, 15) + '"/>');
@@ -149,6 +169,48 @@
     return out.join('');
   }
 
+  /* The life of one chip, four moments per mode, for paper: the same
+     model frames and the same scene() the live panels draw, cropped to
+     the corner of the cut where the chip forms and leaves. */
+  var STORY = { x: -215, y: -130, w: 340, h: 260, gap: 18, caption: 46, head: 40 };
+  function storyMoments(params) {
+    var q = M.normalise(params);
+    var span = M.engagementAngle(q.aeOverD) / (2 * Math.PI / q.teeth);
+    return [
+      { T: M.timeAtProgress(q, 0, 0.5), only: 'forming', text: '1  Forms on the edge' },
+      { T: span * (1 - 1e-6), only: 'forming', text: '2  Finished as it leaves' },
+      { T: span + 0.3, only: 'leaving', text: '3  Carried out' },
+      { T: span + 0.75, only: 'leaving', text: '4  Thrown clear' }
+    ];
+  }
+  function renderChipStory(params, opts) {
+    var o = opts || {}, S = STORY, moments = storyMoments(params);
+    var rowH = S.head + S.h + S.caption, W = 4 * S.w + 3 * S.gap, H = 2 * rowH;
+    var out = ['<svg class="mill-svg mill-story-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' +
+      esc('The life of one chip in four moments, for each direction. 1, the chip forms on the cutting edge and ' +
+        'curls into the flute while the slice it comes from is cut. 2, the chip is complete as the tooth leaves the work: ' +
+        'in climb milling at the finished surface, with the thick end curled furthest; in conventional milling at the ' +
+        'top of the cut, with the thick end at the edge. 3, the flute carries the chip round as it slides out. 4, ' +
+        'it is thrown clear: behind the cutter in climb milling, up and away in conventional milling.') +
+      '" focusable="false">'];
+    M.MODES.forEach(function (mode, row) {
+      var y0 = row * rowH;
+      out.push('<text class="mill-t mill-t-title" x="0" y="' + (y0 + 30) + '">' + esc(LABEL[mode]) + '</text>');
+      moments.forEach(function (m, i) {
+        var x0 = i * (S.w + S.gap), f = M.frame(mode, params, m.T);
+        out.push('<svg x="' + x0 + '" y="' + (y0 + S.head) + '" width="' + S.w + '" height="' + S.h +
+          '" viewBox="' + S.x + ' ' + S.y + ' ' + S.w + ' ' + S.h + '">');
+        out.push('<rect class="mill-story-cell" x="' + S.x + '" y="' + S.y + '" width="' + S.w + '" height="' + S.h + '"/>');
+        out.push(ground(f, S.w * 2));
+        out.push(scene(f, (o.idPrefix || 'mill-story') + '-' + mode + '-' + (i + 1), m.only));
+        out.push('</svg>');
+        out.push('<text class="mill-t mill-t-tag" x="' + (x0 + 6) + '" y="' + (y0 + S.head + S.h + 32) + '">' + esc(m.text) + '</text>');
+      });
+    });
+    out.push('</svg>');
+    return out.join('');
+  }
+
   /* Chip thickness across one tooth's cut, both modes on one axis. */
   function renderGraph(aeOverD, marks, opts) {
     var o = opts || {}, x0 = 64, x1 = 540, y0 = 172, y1 = 26, out = [];
@@ -156,7 +218,7 @@
     var Y = function (r) { return y0 - (y0 - y1) * r; };
     var peak = M.peakChipRatio(aeOverD);
     out.push('<svg class="mill-graph-svg" viewBox="0 0 560 222" role="img" aria-label="' +
-      esc('Chip thickness through the cut. Climb starts at its peak, ' + pct(peak) +
+      esc('Uncut slice thickness through the cut. Climb starts at its peak, ' + pct(peak) +
         ' of the feed per tooth, and falls to zero. Conventional rises from zero to the same peak.') + '" focusable="false">');
     out.push('<path class="mill-axis" d="M' + x0 + ' ' + y1 + 'L' + x0 + ' ' + y0 + 'L' + x1 + ' ' + y0 + '"/>');
     out.push('<path class="mill-peak" d="M' + x0 + ' ' + n(Y(peak)) + 'L' + x1 + ' ' + n(Y(peak)) + '"/>');
@@ -175,7 +237,7 @@
     out.push('<text class="mill-t mill-t-soft" x="' + x0 + '" y="198" text-anchor="start">tooth enters</text>');
     out.push('<text class="mill-t mill-t-soft" x="' + x1 + '" y="198" text-anchor="end">tooth leaves</text>');
     out.push('<text class="mill-t mill-t-soft" x="' + ((x0 + x1) / 2) + '" y="214" text-anchor="middle">position through the cut</text>');
-    out.push('<text class="mill-t mill-t-soft" x="' + (x0 - 10) + '" y="' + (y1 + 4) + '" text-anchor="end">chip</text>');
+    out.push('<text class="mill-t mill-t-soft" x="' + (x0 - 10) + '" y="' + (y1 + 4) + '" text-anchor="end">slice</text>');
     out.push('<text class="mill-t mill-t-soft" x="' + (x0 - 10) + '" y="' + (y0 + 4) + '" text-anchor="end">0</text>');
     out.push('<path class="mill-curve mill-curve-climb" d="M' + (x0 + 14) + ' 12L' + (x0 + 44) + ' 12"/>');
     out.push('<text class="mill-t" x="' + (x0 + 52) + '" y="17">Climb</text>');
@@ -234,14 +296,14 @@
 
   /* Plain-language account of one frame, for the readout and screen readers. */
   function describe(f) {
-    if (!f.engaged) return { now: 'Between teeth - no chip', trend: '', pull: '' };
+    if (!f.engaged) return { now: 'Between teeth - not cutting', trend: 'the last chip is leaving the flute', pull: '' };
     var trend = f.mode === 'climb'
       ? (f.progress < 0.1 ? 'biting in at full thickness' : (f.ratio < 0.15 ? 'thinning out to nothing' : 'thinning'))
       : (f.progress < 0.1 || f.ratio < 0.15 ? 'too thin to cut cleanly - the edge rubs' : 'thickening');
     var along = f.force.along === 'with-feed' ? 'with the feed' : 'against the feed';
     var vert = { down: 'pressing it down', up: 'lifting it', level: 'level' }[f.force.vertical];
     return {
-      now: 'Chip ' + pct(f.ratio) + ' of feed per tooth',
+      now: 'Uncut thickness ' + pct(f.ratio) + ' of feed per tooth',
       trend: trend,
       pull: 'Pull on the work: ' + along + ', ' + vert
     };
@@ -264,10 +326,9 @@
     var uid = 'mill' + Math.random().toString(36).slice(2, 8);
     var reduce = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
 
-    var state = { view: 'compare', aeOverD: 0.25, fz: 18, T: 0, playing: false, speed: 1 };
+    var state = { view: 'compare', aeOverD: 0.25, fz: 18, T: 0, manualExit: false, playing: false, speed: 1 };
     var REST_PROGRESS = 0.35;
     state.T = M.timeAtProgress(state, 0, REST_PROGRESS);
-    var flying = { climb: [], conventional: [] };
 
     // ---- toolbar
     var bar = el('div', { class: 'mill-toolbar' });
@@ -352,7 +413,7 @@
       visible().forEach(function (mode) {
         var f = M.frame(mode, state, state.T);
         frames[mode] = f;
-        panels[mode].innerHTML = renderPanel(f, { flying: flying[mode], ariaLabel: LABEL[mode] + ', ' + describe(f).now });
+        panels[mode].innerHTML = renderPanel(f, { idPrefix: uid + '-' + mode, ariaLabel: LABEL[mode] + ', ' + describe(f).now });
         var d = describe(f);
         readEls[mode].v.textContent = d.now;
         readEls[mode].t.textContent = d.trend;
@@ -389,28 +450,14 @@
       draw(true);
     }
 
+    // Chips are part of the model's frame, so playback only moves time on;
+    // a paused, stepped or dragged frame shows exactly what playback would.
     var last = null, raf = 0, stepTimer = 0;
-    function trackExits(prevT, nextT) {
-      // A tooth that left the work between two frames throws its chip.
-      if (reduce.matches) return;
-      var sp = span(), base = Math.floor(prevT), pc = prevT - base;
-      var left = pc <= sp && (Math.floor(nextT) > base || nextT - base > sp);
-      if (!left) return;
-      visible().forEach(function (mode) {
-        var f = M.frame(mode, state, base + sp * 0.999);
-        if (f.chip) flying[mode].push({ points: f.chip, age: 0, dir: f.velocity });
-      });
-    }
     function tick(ts) {
       if (!state.playing) return;
       var dt = last === null ? 0 : Math.min(0.1, (ts - last) / 1000);
       last = ts;
-      var prev = state.T;
       state.T += dt * state.speed / 1.8;
-      trackExits(prev, state.T);
-      M.MODES.forEach(function (m) {
-        flying[m] = flying[m].filter(function (c) { c.age += dt * 1.4 * state.speed; return c.age < 1; });
-      });
       draw(false);
       raf = requestAnimationFrame(tick);
     }
@@ -428,26 +475,29 @@
       bPlay.setAttribute('aria-pressed', String(on));
       cancelAnimationFrame(raf); clearTimeout(stepTimer); last = null;
       if (on) {
+        state.manualExit = false;
         if (reduce.matches) stepTimer = setTimeout(stepReduced, 300);
         else raf = requestAnimationFrame(tick);
       } else {
-        flying = { climb: [], conventional: [] };
         draw(true);
       }
     }
     function step(dir) {
       play(false);
-      var sp = span(), c = state.T - Math.floor(state.T);
+      var sp = span(), c = M.frame('climb', state, state.T).cycle;
+      var base = Math.floor(state.T) - (state.manualExit ? 1 : 0);
       if (c > sp) c = dir > 0 ? 1 : sp;           // between teeth: jump to the next cut
       var p = Math.round((c / sp) * 12 + dir) / 12;
-      if (p > 1) { state.T = Math.floor(state.T) + 1; }
-      else if (p < 0) { state.T = Math.floor(state.T) - 1 + sp; }
-      else state.T = Math.floor(state.T) + p * sp;
+      state.manualExit = false;
+      if (p > 1) { state.T = base + 1; }
+      else if (p < 0) { state.T = base - 1 + sp; state.manualExit = sp === 1; }
+      else { state.T = base + p * sp; state.manualExit = p === 1 && sp === 1; }
       draw(true);
     }
     function reset() {
       play(false);
       state.aeOverD = 0.25; state.fz = 18;
+      state.manualExit = false;
       cAe.input.value = '25'; cFz.input.value = '18';
       state.T = M.timeAtProgress(state, 0, REST_PROGRESS);
       draw(true);
@@ -458,19 +508,26 @@
     bFwd.addEventListener('click', function () { step(1); });
     bReset.addEventListener('click', reset);
     cPos.input.addEventListener('input', function () {
+      var requested = Number(cPos.input.value) / 100;
       play(false);
-      state.T = M.timeAtProgress(state, state.T, Number(cPos.input.value) / 100);
+      state.T = M.timeAtProgress(state, state.T, requested);
+      state.manualExit = requested === 1 && span() === 1;
       draw(false);
     });
     cPos.input.addEventListener('change', function () { draw(true); });
     cAe.input.addEventListener('input', function () {
-      var c = state.T - Math.floor(state.T), sp = span(), p = c <= sp ? c / sp : 1;
+      var c = M.frame('climb', state, state.T).cycle, sp = span(), p = c <= sp ? c / sp : 1;
       state.aeOverD = Number(cAe.input.value) / 100;
       state.T = M.timeAtProgress(state, state.T, p);
+      state.manualExit = p === 1 && span() === 1;
       draw(!state.playing);
     });
     cFz.input.addEventListener('input', function () { state.fz = Number(cFz.input.value); draw(!state.playing); });
     speed.addEventListener('change', function () { state.speed = Number(speed.value); });
+
+    rootEl.addEventListener('keydown', function (e) {
+      if (e.target.closest('button,input,select,textarea,summary')) isolateNavigation(e);
+    });
 
     // Keys are taken only while the drawing has focus, and stopped here so
     // the page's own arrow-key and Space navigation never fires as well.
@@ -492,15 +549,26 @@
     setView('compare');
   }
 
+  function isolateNavigation(e) {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.key === 'Escape') return;
+    if ([' ', 'Spacebar', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].indexOf(e.key) >= 0) e.stopPropagation();
+  }
+
   function boot() {
     if (typeof document === 'undefined') return;
     var go = function () {
       document.querySelectorAll('[data-interactive="milling-direction"]').forEach(wire);
+      document.querySelectorAll('.mill-story-figure').forEach(function (region) {
+        if (region.hasAttribute('data-mill-scroll-wired')) return;
+        region.setAttribute('data-mill-scroll-wired', '');
+        region.addEventListener('keydown', isolateNavigation);
+      });
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
     else go();
   }
 
   return { renderPanel: renderPanel, renderGraph: renderGraph, renderBacklash: renderBacklash,
+    renderChipStory: renderChipStory, storyMoments: storyMoments,
     describe: describe, boot: boot, VIEW: VIEW };
 });

@@ -518,10 +518,10 @@
       var pv = $(lab, '[data-tf-pair-v]'), ps = $(lab, '[data-tf-pair-s]');
       if (r.kind === 'clearance') {
         pv.textContent = fmtU(r.clearance, u, true) + ' clearance';
-        ps.textContent = 'A gap: the shaft slides in, with ' + halfU(r.clearance, u) + ' of room on each side.';
+        ps.textContent = 'A gap: ' + halfU(r.clearance, u) + ' on each side when the shaft is centred. Actual assembly also depends on shape and surface condition.';
       } else if (r.kind === 'interference') {
         pv.textContent = fmtU(r.clearance, u, true) + ' interference';
-        ps.textContent = 'An overlap: the shaft is bigger than the hole by ' + fmtU(-r.clearance, u) + ' (' + halfU(-r.clearance, u) + ' each side). It has to be pressed in, or it does not go.';
+        ps.textContent = 'An overlap: the shaft is bigger than the hole by ' + fmtU(-r.clearance, u) + ' (' + halfU(-r.clearance, u) + ' each side). Assembly method and force are not calculated.';
       } else {
         pv.textContent = fmtU(0, u) + ' — line-to-line';
         ps.textContent = 'Exactly the same size: no gap and no overlap. Whether that assembles depends on things this model leaves out.';
@@ -564,20 +564,23 @@
 
     function missionHtml(r, env, u) {
       if (!r.bothInSpec) {
-        return '<strong>This pair never reaches assembly.</strong> A part that fails inspection is rejected before anyone tries to fit it.';
+        return '<strong>A diameter is outside its limits.</strong> Bring both diameters inside this drawing\'s limits to compare permitted pairs.';
       }
-      if (r.inSpecButInterferes) {
+      if (r.inSpecButInterferes && env.kind === 'transition') {
         return '<strong>Found it.</strong> Both parts pass inspection on their own, and together they overlap by ' + fmtU(-r.clearance, u) +
           '. Inspection checks one part at a time; whether two parts go together is decided by the drawing.';
       }
       if (env.kind === 'transition') {
-        return '<strong>Challenge:</strong> make two parts that both pass inspection but will not slide together. On this drawing it can be done: the tightest legal pair overlaps by ' + fmtU(-env.min, u) + '.';
+        return '<strong>Challenge:</strong> choose two in-tolerance diameters that overlap. The tightest permitted pair overlaps by ' + fmtU(-env.min, u) + '.';
       }
       if (env.kind === 'clearance') {
-        return '<strong>Challenge:</strong> make two parts that both pass inspection but will not slide together. On this drawing it cannot be done: ' +
-          (env.boundary ? 'at worst the two meet exactly, size to size.' : 'even the tightest legal pair keeps a ' + fmtU(env.min, u) + ' gap.');
+        return env.boundary
+          ? '<strong>No overlap is permitted.</strong> The tightest pair is line-to-line: no gap and no overlap. Diameter alone does not decide whether that pair assembles.'
+          : '<strong>Every permitted pair has a gap.</strong> Even the tightest pair keeps ' + fmtU(env.min, u) + ' of diametral clearance. An overlap would require a diameter outside its limits.';
       }
-      return '<strong>Every legal pair overlaps.</strong> This drawing is meant to be pressed together; a gap here would mean a part was made wrong.';
+      return env.boundary
+        ? '<strong>Overlap or line-to-line contact.</strong> The loosest pair meets exactly; other permitted pairs overlap. No permitted pair has a positive gap.'
+        : '<strong>Every permitted pair overlaps.</strong> Even the loosest pair has ' + fmtU(-env.max, u) + ' of diametral interference. Assembly method and force are outside this model.';
     }
 
     function announce() {

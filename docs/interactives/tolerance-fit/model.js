@@ -44,7 +44,7 @@
     return u;
   }
 
-  function isInt(n) { return typeof n === 'number' && isFinite(n) && Math.floor(n) === n; }
+  function isInt(n) { return typeof n === 'number' && Number.isSafeInteger(n); }
 
   /* ---- formatting --------------------------------------------------------
      `n` is an integer and the value is n / 10^decimals. Built from integer
@@ -128,6 +128,13 @@
         errors.push(name + ': deviations over a quarter of the nominal size are outside what this lab draws.');
       }
     });
+    if (!errors.length) {
+      var holeN = spec.hole.upper - spec.hole.lower + 1;
+      var shaftN = spec.shaft.upper - spec.shaft.lower + 1;
+      if (!Number.isSafeInteger(holeN * shaftN)) {
+        errors.push('These tolerance bands contain too many distinct size pairs to count exactly. Narrow the bands.');
+      }
+    }
     return { ok: errors.length === 0, errors: errors };
   }
 
@@ -239,14 +246,16 @@
     var s = limits(spec, 'shaft');
     var holeN = h.max - h.min + 1;
     var shaftN = s.max - s.min + 1;
-    var interfere = 0, touch = 0;
-    for (var hole = h.min; hole <= h.max; hole++) {
-      // shafts strictly larger than this hole
-      var bigger = s.max - Math.max(s.min, hole + 1) + 1;
-      if (bigger > 0) { interfere += bigger; }
-      if (hole >= s.min && hole <= s.max) { touch += 1; }
-    }
     var total = holeN * shaftN;
+    if (!Number.isSafeInteger(total) || total <= 0) {
+      throw new RangeError('The size-pair count must fit exact safe-integer arithmetic.');
+    }
+    // Sum the arithmetic progression instead of visiting every hole size.
+    var fullN = Math.max(0, Math.min(h.max, s.min - 1) - h.min + 1);
+    var lo = Math.max(h.min, s.min), hi = Math.min(h.max, s.max - 1);
+    var middleN = Math.max(0, hi - lo + 1);
+    var interfere = fullN * shaftN + middleN * (s.max - lo) - middleN * (middleN - 1) / 2;
+    var touch = Math.max(0, Math.min(h.max, s.max) - Math.max(h.min, s.min) + 1);
     return { total: total, interfere: interfere, lineToLine: touch, clear: total - interfere - touch };
   }
 
@@ -282,7 +291,7 @@
   }
 
   /* ---- teaching content: presets and the call-the-fit challenge ----------
-     Same five drawings in each unit system. The mm set is NOT a conversion of
+     Three fit-type drawings in each unit system. The mm set is NOT a conversion of
      the inch set (0.0001 in is 2.54 um, not a whole count); it is a parallel
      set with the same lessons. */
   function spec(unit, nominal, hu, hl, su, sl) {
@@ -293,16 +302,12 @@
     'in': [
       { id: 'slides', title: 'Slides freely',          spec: spec('in', 7500, 10, 0, -10, -20), actual: { hole: 7504, shaft: 7486 } },
       { id: 'either', title: 'Could go either way',    spec: spec('in', 7500, 10, 0, 6, -2),    actual: { hole: 7506, shaft: 7501 } },
-      { id: 'pressed', title: 'Pressed together',      spec: spec('in', 7500, 10, 0, 25, 15),   actual: { hole: 7505, shaft: 7520 } },
-      { id: 'trap', title: 'Both pass, still stuck',   spec: spec('in', 7500, 10, 0, 6, -2),    actual: { hole: 7502, shaft: 7505 } },
-      { id: 'zero', title: 'Zero at the worst case',   spec: spec('in', 7500, 10, 0, 0, -8),    actual: { hole: 7500, shaft: 7500 } }
+      { id: 'pressed', title: 'Pressed together',      spec: spec('in', 7500, 10, 0, 25, 15),   actual: { hole: 7505, shaft: 7520 } }
     ],
     'mm': [
       { id: 'slides', title: 'Slides freely',          spec: spec('mm', 20000, 25, 0, -25, -50), actual: { hole: 20010, shaft: 19963 } },
       { id: 'either', title: 'Could go either way',    spec: spec('mm', 20000, 25, 0, 15, -5),   actual: { hole: 20015, shaft: 20003 } },
-      { id: 'pressed', title: 'Pressed together',      spec: spec('mm', 20000, 25, 0, 60, 35),   actual: { hole: 20012, shaft: 20048 } },
-      { id: 'trap', title: 'Both pass, still stuck',   spec: spec('mm', 20000, 25, 0, 15, -5),   actual: { hole: 20005, shaft: 20012 } },
-      { id: 'zero', title: 'Zero at the worst case',   spec: spec('mm', 20000, 25, 0, 0, -20),   actual: { hole: 20000, shaft: 20000 } }
+      { id: 'pressed', title: 'Pressed together',      spec: spec('mm', 20000, 25, 0, 60, 35),   actual: { hole: 20012, shaft: 20048 } }
     ]
   };
 
