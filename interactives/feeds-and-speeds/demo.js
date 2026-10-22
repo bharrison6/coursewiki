@@ -43,7 +43,7 @@
 
   /* ------------------------------------------------------------------------
      The live panel: the cutter seen down its axis, cutting a slot, and a
-     magnified inset of the front of the cut. One panel per run.
+     schematic distance record of successive tooth passes. One panel per run.
 
      run    - { rpm, feed (mm/min), chip (mm/tooth), teeth, diameter (mm) }
      tReal  - real seconds since the clock started
@@ -55,10 +55,13 @@
 
   function renderPanel(run, tReal, o) {
     var opt = o || {}, P = PANEL, I = INSET, unit = opt.unit || 'in';
+    var compact = !!opt.compact;
+    if (compact) I = { x: 20, y: 390, w: 320, h: 168 };
+    opt = Object.assign({}, opt, { insetPosition: I });
     var cx = P.cx, cy = P.cy, R = P.R;
     var mot = M.motion(run, tReal);
     var out = [];
-    out.push('<svg class="fs-svg" viewBox="0 0 ' + P.w + ' ' + P.h + '" role="img" aria-label="' +
+    out.push('<svg class="fs-svg' + (compact ? ' fs-svg-compact' : '') + '" viewBox="0 0 ' + (compact ? 360 : P.w) + ' ' + (compact ? 580 : P.h) + '" role="img" aria-label="' +
       esc(opt.ariaLabel || opt.title || 'Cutter and work') + '" focusable="false">');
 
     // ---- the work: a plate with the slot the cutter has already cut. Seen
@@ -86,7 +89,7 @@
     var ay = 312;
     out.push('<path class="fs-feed" d="M' + (cx + 40) + ' ' + ay + 'L' + (cx - 30) + ' ' + ay + '"/>');
     out.push('<path class="fs-feed-head" d="' + arrowHead(cx - 44, ay, -1, 0, 15) + '"/>');
-    out.push(txt('fs-t fs-t-feed', cx + 52, ay + 5, 'Work feed ' + M.show(run.feed, 'feed', unit), 'start'));
+    out.push(txt('fs-t fs-t-feed', compact ? cx : cx + 52, compact ? ay + 28 : ay + 5, 'Work feed ' + M.show(run.feed, 'feed', unit), compact ? 'middle' : 'start'));
 
     // ---- the cutter, from the shared primitive
     var C = opt.cutter || findCutter();
@@ -109,12 +112,6 @@
     out.push('<path class="fs-spin-head" d="' + arrowHead(cx + r * Math.cos(ae), cy - r * Math.sin(ae),
       Math.sin(a1), Math.cos(a1), 13) + '"/>');
 
-    // ---- where the inset looks: the front of the cut
-    var fx = cx + R, fy = cy;
-    out.push('<rect class="fs-lens" x="' + (fx - 9) + '" y="' + (fy - 9) + '" width="18" height="18"/>');
-    out.push('<path class="fs-lens-line" d="M' + (fx + 9) + ' ' + (fy - 9) + 'L' + I.x + ' ' + I.y +
-      'M' + (fx + 9) + ' ' + (fy + 9) + 'L' + I.x + ' ' + (I.y + I.h) + '"/>');
-
     out.push(renderInset(run, tReal, opt, pxPerMm));
 
     // ---- title and the two numbers the machine is set to
@@ -124,12 +121,10 @@
     return out.join('');
   }
 
-  /* The inset: the front of the cut, magnified. The uncut work creeps in
-     from the right; every tooth that sweeps past the tip line shaves off what
-     has crossed it - one feed per tooth - and leaves a mark on the cut
-     surface, which the work then carries away. */
+  /* A schematic distance record, not a machined surface. Ticks record
+     successive tooth passes; gold is travel since the most recent pass. */
   function renderInset(run, tReal, opt, mainPxPerMm) {
-    var I = INSET, unit = opt.unit || 'in', s = opt.insetPxPerMm || 28 / run.chip;
+    var I = opt.insetPosition || INSET, unit = opt.unit || 'in', s = opt.insetPxPerMm || 28 / run.chip;
     var id = (opt.idPrefix || 'fs') + '-inset';
     var tipX = I.x + I.w * 0.62, yU = I.y + 46, yC = I.y + 92, yB = I.y + I.h - 30;
     var out = [];
@@ -137,11 +132,9 @@
     out.push('<rect class="fs-inset" x="' + I.x + '" y="' + I.y + '" width="' + I.w + '" height="' + I.h + '"/>');
     out.push('<g clip-path="url(#' + id + ')">');
 
-    // the cut surface (lower) and the uncut work (taller), meeting at the
-    // tip line; the uncut face has crept `sliver` past it since the last pass
+    // A distance strip carried left at the same feed; no surface geometry.
     var sliver = M.uncutSliver(run, tReal), faceX = tipX - sliver * s;
-    out.push('<path class="fs-stock" d="M' + I.x + ' ' + yC + 'L' + n(faceX) + ' ' + yC + 'L' + n(faceX) + ' ' + yU +
-      'L' + (I.x + I.w) + ' ' + yU + 'L' + (I.x + I.w) + ' ' + yB + 'L' + I.x + ' ' + yB + 'Z"/>');
+    out.push('<rect class="fs-travel" x="' + I.x + '" y="' + yC + '" width="' + I.w + '" height="' + (yB - yC) + '"/>');
     if (faceX < tipX - 0.05) {
       out.push('<rect class="fs-chip" x="' + n(faceX) + '" y="' + yU + '" width="' + n(tipX - faceX) + '" height="' + (yC - yU) + '"/>');
     }
@@ -167,11 +160,10 @@
       'L' + n(bx + barPx) + ' ' + (by - 5) + '"/>');
     out.push(txt('fs-t fs-t-small', bx + barPx + 6, by + 1, M.format(bar, 'chip', unit).replace(/0+$/, '').replace(/\.$/, '') + ' ' + M.UNITS[unit].diameter, 'start'));
     var mag = s / mainPxPerMm;
-    out.push(txt('fs-t fs-t-small', I.x + 2, I.y - 22, 'Front of the cut', 'start'));
-    out.push(txt('fs-t fs-t-small fs-t-soft', I.x + 2, I.y - 6, 'magnified ×' + roundSig(mag, 2), 'start'));
-    out.push(txt('fs-t fs-t-small fs-t-soft', tipX - 4, I.y + 16, 'tooth tips', 'end'));
-    out.push(txt('fs-t fs-t-small', I.x + I.w - 5, yU + 18, 'uncut', 'end'));
-    out.push(txt('fs-t fs-t-small', I.x + 5, yC + 30, 'cut surface', 'start'));
+    out.push(txt('fs-t fs-t-small', I.x + 2, I.y - 22, 'Tooth-pass record', 'start'));
+    out.push(txt('fs-t fs-t-small fs-t-soft', I.x + 2, I.y - 6, 'distance ×' + roundSig(mag, 2) + ' · schematic', 'start'));
+    out.push(txt('fs-t fs-t-small fs-t-soft', tipX - 4, I.y + 22, 'pass here', 'end'));
+    out.push(txt('fs-t fs-t-small', I.x + 5, yC + 30, 'table travel', 'start'));
     return out.join('');
   }
 
@@ -246,7 +238,7 @@
       'M' + cx + ' ' + (cy + R + 7) + 'L' + cx + ' ' + (cy + R + 21) + 'M' + n(x1) + ' ' + (cy + R + 7) + 'L' + n(x1) + ' ' + (cy + R + 21) + '"/>');
     out.push('<circle class="fs-dot" cx="' + n(x1) + '" cy="' + (cy + R) + '" r="6"/>');
     out.push(txt('fs-t fs-t-small', (cx + x1) / 2, cy + R + 34, 'one turn = π × D = ' + circumferenceText, 'middle'));
-    out.push(txt('fs-t fs-t-small fs-t-soft', cx + R + 24, cy - 22, 'Roll the cutter one full turn and a point', 'start'));
+    out.push(txt('fs-t fs-t-small fs-t-soft', cx + R + 24, cy - 22, 'In one rotation about its center, a point', 'start'));
     out.push(txt('fs-t fs-t-small fs-t-soft', cx + R + 24, cy - 2, 'on its edge travels its circumference.', 'start'));
     out.push('</svg>');
     return out.join('');
@@ -261,20 +253,20 @@
     var fz = M.format(M.fromCanon(unit, 'chip', canon.chip), 'chip', unit);
     var rpmReq = M.format(s.requestedRpm, 'rpm', unit), rpm = M.format(s.rpm, 'rpm', unit);
     if (unit === 'in') {
-      lines.push('Spindle speed = 12 × cutting speed ÷ (π × diameter) = 12 × ' + V + ' ÷ (π × ' + D + ') = ' + rpmReq + ' rev/min');
+      lines.push('Spindle speed = 12 × cutting speed ÷ (π × diameter) = 12 × ' + V + ' ÷ (π × ' + D + ') ≈ ' + rpmReq + ' rev/min');
     } else {
-      lines.push('Spindle speed = 1000 × cutting speed ÷ (π × diameter) = 1000 × ' + V + ' ÷ (π × ' + D + ') = ' + rpmReq + ' rev/min');
+      lines.push('Spindle speed = 1000 × cutting speed ÷ (π × diameter) = 1000 × ' + V + ' ÷ (π × ' + D + ') ≈ ' + rpmReq + ' rev/min');
     }
     if (s.capped) {
       lines.push('The machine tops out at ' + rpm + ' rev/min, so that is the speed it runs. Everything below uses ' + rpm + '.');
     }
     lines.push('Table feed = spindle speed × flutes × feed per tooth = ' + rpm + ' × ' + canon.teeth + ' × ' + fz +
-      ' = ' + M.show(s.feed, 'feed', unit));
+      ' ≈ ' + M.show(s.feed, 'feed', unit));
     if (s.capped) {
       var back = unit === 'in'
         ? 'π × ' + D + ' × ' + rpm + ' ÷ 12'
         : 'π × ' + D + ' × ' + rpm + ' ÷ 1000';
-      lines.push('Cutting speed actually reached = ' + back + ' = ' + M.show(s.speed, 'speed', unit) +
+      lines.push('Cutting speed actually reached = ' + back + ' ≈ ' + M.show(s.speed, 'speed', unit) +
         ', not the ' + V + ' ' + u.speedShort + ' asked for.');
     }
     return lines;
@@ -481,6 +473,7 @@
           state.canon = M.setupToCanon(ex.unit, ex);
           state.exampleId = ex.id;
           state.scale = insetScale(state.canon);
+          rootEl.removeAttribute('data-stale');
           fillInputs(); renderExamples(); update(true);
           status.textContent = ex.title + ' loaded. ' + summary();
         });
@@ -512,7 +505,7 @@
       work.textContent = '';
       workedLines(c, u).forEach(function (line) { work.appendChild(el('span', { class: 'fs-line' }, line)); });
 
-      spOut.textContent = M.ratioText(state.factor).replace('unchanged', 'as set') + ' · ' + M.show(t.rpm, 'rpm', u) + (t.capped ? ' (top speed)' : '');
+      spOut.textContent = 'requested ' + M.ratioText(state.factor).replace('unchanged', 'as set') + ' · ' + M.show(t.rpm, 'rpm', u) + (t.capped ? ' (top speed)' : '');
       var keysOrder = ['rpm', 'feed', 'chip', 'speed'];
       keysOrder.forEach(function (k) {
         var r = rows[k];
@@ -531,12 +524,14 @@
       var c = state.canon, s = M.solve(c), t = trialRun(), u = state.unit;
       var tReal = M.realTime(state.tScreen, state.slowdown);
       var cut = findCutter();
+      var compact = panelA.clientWidth < 480;
       panelA.innerHTML = renderPanel(s, tReal, { unit: u, title: 'Setup', insetPxPerMm: state.scale,
-        slowdown: state.slowdown, idPrefix: uid + 'a', cutter: cut, ariaLabel: 'Setup: ' + summary() });
-      var title = Math.abs(state.factor - 1) < 1e-9 ? 'Changed (same as setup)'
-        : 'Spindle ' + M.ratioText(state.factor) + ', ' + (state.hold === 'chip' ? 'chip load held' : 'table feed held');
+        compact: compact, slowdown: state.slowdown, idPrefix: uid + 'a', cutter: cut, ariaLabel: 'Setup: ' + summary() });
+      var achieved = t.rpm / s.rpm;
+      var title = Math.abs(achieved - 1) < 1e-9 ? (t.capped ? 'Changed · capped at setup RPM' : 'Changed (same as setup)')
+        : 'Spindle ' + M.ratioText(achieved) + (t.capped ? ' · capped' : '');
       panelB.innerHTML = renderPanel(t, tReal, { unit: u, title: title, insetPxPerMm: state.scale,
-        slowdown: state.slowdown, idPrefix: uid + 'b', cutter: cut, ariaLabel: title + ': ' + describeTrial(c, t, u) });
+        compact: compact, slowdown: state.slowdown, idPrefix: uid + 'b', cutter: cut, ariaLabel: title + ': ' + describeTrial(c, t, u) });
       var rs = M.screenRates(s, state.slowdown), rt = M.screenRates(t, state.slowdown);
       clock.textContent = 'Shown at 1/' + M.format(state.slowdown, 'rpm', 'in') + ' of real speed, the same for the turning and the feed. ' +
         'In one real second the setup cutter turns ' + M.format(rs.realTurnsPerSecond, 'feed', 'in') + ' times while the work moves ' +
@@ -656,6 +651,12 @@
     addEventListener('beforeprint', function () { if (state.playing) play(false); });
 
     fillInputs(); renderExamples(); update(false);
+    if (typeof ResizeObserver === 'function') {
+      var lastWidth = panelA.clientWidth;
+      new ResizeObserver(function () {
+        if (panelA.clientWidth !== lastWidth) { lastWidth = panelA.clientWidth; draw(); }
+      }).observe(panelA);
+    }
   }
 
   function boot() {

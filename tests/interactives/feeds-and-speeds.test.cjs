@@ -81,7 +81,7 @@ test('a machine top speed separates requested from actual, and recomputes from a
   // The worked lines say so.
   const lines = D.workedLines(c, 'in').join('\n');
   assert.match(lines, /tops out at 4,000 rev\/min/);
-  assert.match(lines, /4,000 × 2 × 0\.0008 = 6\.4 in\/min/);
+  assert.match(lines, /4,000 × 2 × 0\.0008 ≈ 6\.4 in\/min/);
   assert.match(lines, /131 SFM, not the 300 SFM asked for/);
   assert.ok(!/tops out/.test(D.workedLines(half(), 'in').join('\n')), 'no cap line when uncapped');
 });
@@ -159,7 +159,8 @@ test('the panel renderer uses the shared cutter API exactly as contracted', () =
   assert.ok(svg.includes('<g class="fs-cutter" transform="translate(' + D.PANEL.cx + ' ' + D.PANEL.cy + ')"><g data-stub="cutter"></g></g>'));
   assert.ok(svg.startsWith('<svg') && svg.endsWith('</svg>'));
   assert.ok(!/NaN|undefined|Infinity/.test(svg), 'no bad numbers');
-  assert.match(svg, /Work feed 18\.3 in\/min/); assert.match(svg, /magnified ×\d/);
+  assert.match(svg, /Work feed 18\.3 in\/min/); assert.match(svg, /distance ×\d/);
+  assert.match(svg, /schematic/); assert.doesNotMatch(svg, /cut surface|fs-lens/);
   // Two panels on one page need distinct clip-path ids.
   const other = D.renderPanel(s, 0.0123, { unit: 'in', idPrefix: 'tB', cutter: rec });
   assert.match(svg, /id="tA-inset"/); assert.match(other, /id="tB-inset"/);

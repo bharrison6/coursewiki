@@ -332,6 +332,7 @@
      slow cut does not read as a round number. */
   function format(value, kind, unit) {
     var places = PLACES[unit][kind];
+    if (kind === 'chip' && value > 0) places = Math.max(places, 3 - Math.floor(Math.log10(value)));
     if (kind === 'speed' && value < 100) places = 1;
     if (kind === 'feed' && unit === 'mm' && value < 100) places = 1;
     if (kind === 'feed' && unit === 'in' && value >= 100) places = 0;
