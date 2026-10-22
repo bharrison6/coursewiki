@@ -1,7 +1,7 @@
 @@ID: feeds-and-speeds
 @@TITLE: Feeds and Speeds
 @@SECTION: Milling
-@@SUMMARY: How a cutting speed and a cutter diameter set the spindle speed, how the spindle speed, flute count and chip load set the table feed, and what changes when only the spindle speed does.
+@@SUMMARY: How a cutting speed and a cutter diameter set the spindle speed, how the spindle speed, flute count and chip load set the table feed, how width, depth and feed set the volume of metal removed, and how that volume and the material set the cutting power.
 @@STATUS: ready
 @@END
 
@@ -28,7 +28,8 @@
   <div class="panel">
     <p><strong>"Speeds" are the cutter turning; "feeds" are the work moving.</strong> That is all
     the phrase <em>feeds and speeds</em> means. The two are set separately on the machine, and the
-    rest of this page is about how they depend on each other.</p>
+    rest of this page is about how they depend on each other, how much metal they remove, and the
+    power that takes.</p>
   </div>
 </section>
 
@@ -77,30 +78,90 @@
 </section>
 
 <section>
-  <h2>Calculator: work out a setup, then change only the spindle speed</h2>
-  <p class="lede">Enter a cutter and its cutting data, or start from one of the illustrative
-  examples. The calculator works out the two machine settings and shows the arithmetic. Then move the
-  spindle speed on its own, choose what to hold steady, and watch what has to give.</p>
+  <h2>Removal rate: width &times; depth &times; table feed</h2>
+  <p>Two more numbers describe the cut itself. The <strong>width of cut</strong> is how far the
+  cutter reaches sideways into the work, across the direction of feed. The <strong>depth of
+  cut</strong> is how far down its side the cutter is buried, along its axis. A side cut can be no
+  wider than the cutter; a wider path takes more than one pass.</p>
+  <p>While the table feeds, the cutter sweeps through the work and leaves a channel behind it. In a
+  stretch of time the cutter travels <strong>table feed &times; time</strong>, and the solid metal it
+  takes out in that stretch is a slab as wide as the cut, as deep as the cut, and as long as that
+  travel. Per minute, that is the <strong>material removal rate</strong>:</p>
+  <p class="conversion-equation">Removal rate (in&sup3;/min) = width of cut (in) &times; depth of cut
+  (in) &times; table feed (in/min)</p>
+  <p>The front of the cut is curved, because it is the cutter&rsquo;s own shape. The slab&rsquo;s
+  two ends are the same curve, one travel apart, so whatever the curve, the slab holds exactly
+  width &times; depth &times; travel.</p>
+  <p><strong>Worked example, continued.</strong> The same cutter, 0.1 in wide (20% of its diameter)
+  and 0.5 in deep, at 18.3 in/min: 0.1 &times; 0.5 &times; 18.3 &asymp; <strong>0.917
+  in&sup3;/min</strong>, or 15.0 cm&sup3;/min. In 5 seconds the cutter travels 1.53 in and removes
+  0.0764 in&sup3;.</p>
+  <p>That is the volume of <strong>solid metal</strong>. Once it is chips, the same metal lies loose
+  and takes up far more space, so the removal rate is not the size of the chip pile.</p>
+</section>
+
+<section>
+  <h2>Cutting power: removal rate times the energy each cubic inch takes</h2>
+  <p>Cutting a cubic inch of a given material takes roughly a given amount of energy. That is its
+  <strong>specific cutting energy</strong>, and it is why the same cut needs more power in steel than
+  in aluminum. Written as power per unit of removal rate, it turns a removal rate straight into
+  power:</p>
+  <p class="conversion-equation">Cutting power (hp) = removal rate (in&sup3;/min) &times; unit power
+  (hp per in&sup3;/min)</p>
+  <p class="conversion-equation">Cutting power (W) = removal rate (mm&sup3;/min) &times; specific
+  energy (J/mm&sup3;) &divide; 60</p>
+  <p>The <strong>60</strong> turns minutes into seconds, because a watt is a joule per second. One
+  mechanical horsepower is 745.7 W.</p>
+  <p><strong>Worked example, continued.</strong> For 6061-T6 aluminum the guide in the calculator
+  gives a band of 0.16 to 0.30 hp per in&sup3;/min. At 0.917 in&sup3;/min that is about
+  <strong>0.15 to 0.28 hp</strong>, or 110 to 210 W. The same cut in 304 stainless steel, whose band
+  is 0.65 to 1.3 hp per in&sup3;/min, needs about 0.60 to 1.2 hp.</p>
+  <p><strong>The answer is a band, not a number,</strong> because the energy is. Published factors
+  cover a family of materials over a range of hardness, and the energy a real cut takes also rises
+  as the chip gets thinner and as the tool wears. Treat the band as the size of the job, not a
+  prediction to the watt.</p>
+  <p>Three different powers get called &ldquo;the power&rdquo;, and they are not the same:</p>
+  <ul>
+    <li><strong>Cutting power</strong> is what the cutting edge spends. That is the estimate
+    above.</li>
+    <li><strong>Motor shaft power</strong> is more, because the belts, gears and bearings between the
+    motor and the cutter lose some on the way. If the drivetrain passes on 80% of what the motor
+    delivers, the motor must deliver the cutting power &divide; 0.8.</li>
+    <li><strong>Electrical power</strong> drawn from the supply is more again, because the motor and
+    its drive lose some too.</li>
+  </ul>
+  <p>None of these tells you whether a machine can take the cut. A spindle motor&rsquo;s rating is
+  not necessarily available at every speed, and power is only one limit: the tool, the holding and
+  the machine&rsquo;s stiffness are others. Use the estimate to compare cuts and to see why a cut
+  is heavy, not to approve one.</p>
+</section>
+
+<section>
+  <h2>Calculator: from material guidance to removal and power</h2>
+  <p class="lede">Choose a material to see generic carbide starting ranges for it, then enter the
+  cutter, the cutting data and the cut. Nothing is filled in for you. Each result appears as soon as
+  the fields it needs are filled, and says what it is still waiting for until then. <em>Use the middle
+  of these ranges</em> fills in only the cutting speed and feed per tooth.</p>
   <div class="panel">
-    <p><strong>How to read the drawings.</strong> You are looking down the cutter&rsquo;s axis at a
-    slot being cut. The cutter turns <strong>clockwise</strong> in place, and the work is fed to the
-    left, so the slot trails behind it. The main drawing is to scale. The separate box is a
-    <strong>schematic distance record</strong>: each tick records a tooth passing the front of the
-    cut. Gold shows how far the table has moved since the last pass. <strong>The gap between ticks
-    is the feed per tooth.</strong> These ticks record motion; they are not marks left on a machined
-    surface. Distance in this box is enlarged by the stated factor.</p>
-    <p>Everything runs in slow motion, and the turning and the feed are slowed by the same amount, so
-    what you see between them is the real ratio. The time scale is written under the drawing.</p>
+    <p><strong>How to read the drawings.</strong> You are looking at a block of work from the front,
+    a little above and to the right. The cutter feeds to the right along the front top edge.
+    <strong>Gold is the solid metal removed in the time shown</strong>, drawn where it was before the
+    cutter took it. The dashed blue curve is where the front of the cut stood when that time began;
+    the outlined cylinder is the cutter now. Every direction is drawn to the same scale, and the
+    drawings in one comparison share that scale, so a slab twice as long is twice the volume. The
+    block around the cut is there only to hold it; its size means nothing.</p>
+    <p>The comparison below the drawings prices the setup&rsquo;s removal rate in every material.
+    The cut is the same in every row; only the energy per cubic inch changes.</p>
   </div>
   <div data-interactive="feeds-and-speeds">
     <figure class="fs-static">
-      <div class="fs-static-fig"><svg class="fs-compare-svg" viewBox="0 0 560 342" role="img" aria-label="Three rows over the same two turns of the setup cutter. Setup: 8 tooth passes. Doubling the spindle speed and holding the table feed: twice the passes over the same table travel, so each tooth takes half the chip. Doubling the spindle speed and holding the chip load: twice the passes, each the same size, so the table travels twice as far." focusable="false"><path class="fs-tipline" d="M520 16L520 302"/><text class="fs-t fs-t-small fs-t-soft" x="516" y="16" text-anchor="end">front of the cut</text><text class="fs-t fs-t-tag" x="24" y="46" text-anchor="start">Setup</text><text class="fs-t fs-t-soft" x="24" y="66" text-anchor="start">2,292 rev/min · 18.3 in/min · 0.0020 in/tooth</text><rect class="fs-travel" x="272" y="80" width="248" height="14"/><path class="fs-pass" d="M520 76L520 98M489 76L489 98M458 76L458 98M427 76L427 98M396 76L396 98M365 76L365 98M334 76L334 98M303 76L303 98"/><text class="fs-t fs-t-small" x="278" y="112" text-anchor="start">8 passes</text><text class="fs-t fs-t-tag" x="24" y="142" text-anchor="start">Spindle ×2, table feed held</text><text class="fs-t fs-t-soft" x="24" y="162" text-anchor="start">4,584 rev/min · 18.3 in/min · 0.0010 in/tooth</text><rect class="fs-travel" x="272" y="176" width="248" height="14"/><path class="fs-pass" d="M520 172L520 194M504.5 172L504.5 194M489 172L489 194M473.5 172L473.5 194M458 172L458 194M442.5 172L442.5 194M427 172L427 194M411.5 172L411.5 194M396 172L396 194M380.5 172L380.5 194M365 172L365 194M349.5 172L349.5 194M334 172L334 194M318.5 172L318.5 194M303 172L303 194M287.5 172L287.5 194"/><text class="fs-t fs-t-small" x="278" y="208" text-anchor="start">16 passes</text><text class="fs-t fs-t-tag" x="24" y="238" text-anchor="start">Spindle ×2, chip load held</text><text class="fs-t fs-t-soft" x="24" y="258" text-anchor="start">4,584 rev/min · 36.7 in/min · 0.0020 in/tooth</text><rect class="fs-travel" x="24" y="272" width="496" height="14"/><path class="fs-pass" d="M520 268L520 290M489 268L489 290M458 268L458 290M427 268L427 290M396 268L396 290M365 268L365 290M334 268L334 290M303 268L303 290M272 268L272 290M241 268L241 290M210 268L210 290M179 268L179 290M148 268L148 290M117 268L117 290M86 268L86 290M55 268L55 290"/><text class="fs-t fs-t-small" x="30" y="304" text-anchor="start">16 passes</text><path class="fs-pass" d="M24 315L24 329"/><text class="fs-t fs-t-small" x="32" y="326" text-anchor="start">one tooth pass</text><rect class="fs-travel" x="174" y="317" width="26" height="10"/><text class="fs-t fs-t-small" x="208" y="326" text-anchor="start">table travel in the same time</text></svg></div>
-      <figcaption>The same setup three ways, over the same stretch of time: two turns of the setup
-      cutter. Each tick is one tooth passing the front of the cut; the bar is how far the table moved
-      meanwhile. Doubling the spindle speed with the table feed held gives twice the passes over the
-      same travel, so <strong>each chip is half as thick</strong>. Doubling it with the chip load held
-      gives twice the passes at the same spacing, so <strong>the table has to move twice as
-      far</strong>. Numbers are from the illustrative 0.5 in, 4-flute example.</figcaption>
+      <div class="fs-sweeps"><div class="fs-sweep" data-run="setup"><p class="fs-sweep-head"><span class="fs-sweep-title">Setup</span><span class="fs-sweep-sub">2,292 rev/min · 18.3 in/min</span></p><svg class="mr-svg" viewBox="0 0 640 226" role="img" aria-label="After 5.00 s the cutter has travelled 1.53 in and removed a solid 0.100 in wide by 0.500 in deep: 0.0764 in³." focusable="false"><path class="mr-stock-side" d="M582.1 167L624 142.9L624 46.2L582.1 70.4Z"/><path class="mr-cut-wall" d="M84.5 124.7L347.6 124.7L347.6 64.3L84.5 64.3Z"/><path class="mr-cut-floor" d="M74 130.8L361.3 130.8L361.3 130.8L361.4 130.4L361.4 130L361.4 129.6L361.3 129.3L361.2 128.9L361 128.5L360.8 128.1L360.5 127.8L360.1 127.4L359.6 127L359 126.6L358.1 126.2L357.1 125.9L355.7 125.5L353.7 125.1L347.6 124.7L84.5 124.7Z"/><path class="mr-cut-wall" d="M361.3 70.4L361.4 70L361.4 69.6L361.4 69.2L361.3 68.9L361.2 68.5L361 68.1L360.8 67.7L360.5 67.3L360.1 67L359.6 66.6L359 66.2L358.1 65.8L357.1 65.5L355.7 65.1L353.7 64.7L347.6 64.3L347.6 124.7L353.7 125.1L355.7 125.5L357.1 125.9L358.1 126.2L359 126.6L359.6 127L360.1 127.4L360.5 127.8L360.8 128.1L361 128.5L361.2 128.9L361.3 129.3L361.4 129.6L361.4 130L361.4 130.4L361.3 130.8Z"/><path class="mr-stock-top" d="M84.5 64.3L347.6 64.3L353.7 64.7L355.7 65.1L357.1 65.5L358.1 65.8L359 66.2L359.6 66.6L360.1 67L360.5 67.3L360.8 67.7L361 68.1L361.2 68.5L361.3 68.9L361.4 69.2L361.4 69.6L361.4 70L361.3 70.4L582.1 70.4L624 46.2L115.9 46.2Z"/><path class="mr-stock-front" d="M74 167L582.1 167L582.1 70.4L361.3 70.4L361.3 130.8L74 130.8Z"/><path class="mr-removed-hidden" d="M176.7 130.8L176.8 130.4L176.8 130L176.8 129.6L176.7 129.3L176.6 128.9L176.4 128.5L176.2 128.1L175.9 127.8L175.5 127.4L175 127L174.4 126.6L173.5 126.2L172.5 125.9L171.1 125.5L169.1 125.1L163 124.7L347.6 124.7"/><path class="mr-removed" d="M347.6 64.3L353.7 64.7L355.7 65.1L357.1 65.5L358.1 65.8L359 66.2L359.6 66.6L360.1 67L360.5 67.3L360.8 67.7L361 68.1L361.2 68.5L361.3 68.9L361.4 69.2L361.4 69.6L361.4 70L361.3 70.4L176.7 70.4L176.8 70L176.8 69.6L176.8 69.2L176.7 68.9L176.6 68.5L176.4 68.1L176.2 67.7L175.9 67.3L175.5 67L175 66.6L174.4 66.2L173.5 65.8L172.5 65.5L171.1 65.1L169.1 64.7L163 64.3Z"/><path class="mr-removed mr-removed-front" d="M176.7 130.8L361.3 130.8L361.3 70.4L176.7 70.4Z"/><path class="mr-start" d="M163 64.3L169.1 64.7L171.1 65.1L172.5 65.5L173.5 65.8L174.4 66.2L175 66.6L175.5 67L175.9 67.3L176.2 67.7L176.4 68.1L176.6 68.5L176.7 68.9L176.8 69.2L176.8 69.6L176.8 70L176.7 70.4L176.7 130.8"/><path class="mr-cutter" d="M281.6 40.3L282.2 38.7L283.5 36.9L285.5 35L288.1 33.1L291.2 31.1L294.9 29.1L299 27.2L303.5 25.3L308.4 23.6L313.4 21.9L318.6 20.4L323.8 19.1L329 18L334 17.1L338.9 16.5L343.4 16.1L347.6 16L351.3 16.1L354.5 16.5L357.2 17.1L359.2 18L360.6 19.1L361.3 20.4L361.3 21.9L361.3 130.6L360.7 132.3L359.4 134.1L357.4 135.9L354.8 137.9L351.6 139.8L348 141.8L343.8 143.8L339.3 145.6L334.5 147.4L329.5 149L324.3 150.5L319.1 151.8L313.9 152.9L308.8 153.8L304 154.4L299.4 154.8L295.3 154.9L291.6 154.8L288.4 154.4L285.7 153.8L283.7 152.9L282.3 151.8L281.6 150.5L281.6 149Z"/><path class="mr-cutter-top" d="M351.6 31.1L354.8 29.1L357.4 27.2L359.4 25.3L360.7 23.6L361.3 21.9L361.3 20.4L360.6 19.1L359.2 18L357.2 17.1L354.5 16.5L351.3 16.1L347.6 16L343.4 16.1L338.9 16.5L334 17.1L329 18L323.8 19.1L318.6 20.4L313.4 21.9L308.4 23.6L303.5 25.3L299 27.2L294.9 29.1L291.2 31.1L288.1 33.1L285.5 35L283.5 36.9L282.2 38.7L281.6 40.3L281.6 41.8L282.3 43.1L283.7 44.2L285.7 45.1L288.4 45.7L291.6 46.1L295.3 46.2L299.4 46.1L304 45.7L308.8 45.1L313.9 44.2L319.1 43.1L324.3 41.8L329.5 40.3L334.5 38.7L339.3 36.9L343.8 35L348 33.1Z"/><path class="mr-feed" d="M119.9 32.2L167.9 32.2"/><path class="mr-feed-head" d="M175.9 32.2L164.9 38.3L164.9 26.2Z"/><text class="mr-t mr-t-small" x="181.9" y="37.2" text-anchor="start">feed</text><path class="mr-dim" d="M62 130.8L62 70.4M57 130.8L72 130.8M57 70.4L72 70.4"/><text class="mr-t mr-t-small" x="56" y="105.6" text-anchor="end">depth</text><path class="mr-dim" d="M62 62.4L72.5 56.3"/><text class="mr-t mr-t-small" x="61.2" y="55.3" text-anchor="end">width</text><path class="mr-dim" d="M152.5 179L152.5 191M152.5 185L337.1 185M337.1 179L337.1 191"/><text class="mr-t mr-t-small" x="152.5" y="205" text-anchor="start">travel in 5.00 s</text><path class="mr-scale" d="M563.6 209L563.6 214L624 214L624 209"/><text class="mr-t mr-t-small" x="557.6" y="214" text-anchor="end">0.500 in</text></svg><p class="fs-sweep-read"><span>In 5.00 s: travel <strong>1.53 in</strong>, removed <strong>0.0764 in³</strong></span><span>Removal rate <strong>0.917 in³/min</strong> · power ≈ <strong>0.15–0.28 hp</strong></span></p></div><div class="fs-sweep" data-run="feed"><p class="fs-sweep-head"><span class="fs-sweep-title">Spindle ×2, table feed held</span><span class="fs-sweep-sub">4,584 rev/min · 18.3 in/min</span></p><svg class="mr-svg" viewBox="0 0 640 226" role="img" aria-label="After 5.00 s the cutter has travelled 1.53 in and removed a solid 0.100 in wide by 0.500 in deep: 0.0764 in³." focusable="false"><path class="mr-stock-side" d="M582.1 167L624 142.9L624 46.2L582.1 70.4Z"/><path class="mr-cut-wall" d="M84.5 124.7L347.6 124.7L347.6 64.3L84.5 64.3Z"/><path class="mr-cut-floor" d="M74 130.8L361.3 130.8L361.3 130.8L361.4 130.4L361.4 130L361.4 129.6L361.3 129.3L361.2 128.9L361 128.5L360.8 128.1L360.5 127.8L360.1 127.4L359.6 127L359 126.6L358.1 126.2L357.1 125.9L355.7 125.5L353.7 125.1L347.6 124.7L84.5 124.7Z"/><path class="mr-cut-wall" d="M361.3 70.4L361.4 70L361.4 69.6L361.4 69.2L361.3 68.9L361.2 68.5L361 68.1L360.8 67.7L360.5 67.3L360.1 67L359.6 66.6L359 66.2L358.1 65.8L357.1 65.5L355.7 65.1L353.7 64.7L347.6 64.3L347.6 124.7L353.7 125.1L355.7 125.5L357.1 125.9L358.1 126.2L359 126.6L359.6 127L360.1 127.4L360.5 127.8L360.8 128.1L361 128.5L361.2 128.9L361.3 129.3L361.4 129.6L361.4 130L361.4 130.4L361.3 130.8Z"/><path class="mr-stock-top" d="M84.5 64.3L347.6 64.3L353.7 64.7L355.7 65.1L357.1 65.5L358.1 65.8L359 66.2L359.6 66.6L360.1 67L360.5 67.3L360.8 67.7L361 68.1L361.2 68.5L361.3 68.9L361.4 69.2L361.4 69.6L361.4 70L361.3 70.4L582.1 70.4L624 46.2L115.9 46.2Z"/><path class="mr-stock-front" d="M74 167L582.1 167L582.1 70.4L361.3 70.4L361.3 130.8L74 130.8Z"/><path class="mr-removed-hidden" d="M176.7 130.8L176.8 130.4L176.8 130L176.8 129.6L176.7 129.3L176.6 128.9L176.4 128.5L176.2 128.1L175.9 127.8L175.5 127.4L175 127L174.4 126.6L173.5 126.2L172.5 125.9L171.1 125.5L169.1 125.1L163 124.7L347.6 124.7"/><path class="mr-removed" d="M347.6 64.3L353.7 64.7L355.7 65.1L357.1 65.5L358.1 65.8L359 66.2L359.6 66.6L360.1 67L360.5 67.3L360.8 67.7L361 68.1L361.2 68.5L361.3 68.9L361.4 69.2L361.4 69.6L361.4 70L361.3 70.4L176.7 70.4L176.8 70L176.8 69.6L176.8 69.2L176.7 68.9L176.6 68.5L176.4 68.1L176.2 67.7L175.9 67.3L175.5 67L175 66.6L174.4 66.2L173.5 65.8L172.5 65.5L171.1 65.1L169.1 64.7L163 64.3Z"/><path class="mr-removed mr-removed-front" d="M176.7 130.8L361.3 130.8L361.3 70.4L176.7 70.4Z"/><path class="mr-start" d="M163 64.3L169.1 64.7L171.1 65.1L172.5 65.5L173.5 65.8L174.4 66.2L175 66.6L175.5 67L175.9 67.3L176.2 67.7L176.4 68.1L176.6 68.5L176.7 68.9L176.8 69.2L176.8 69.6L176.8 70L176.7 70.4L176.7 130.8"/><path class="mr-cutter" d="M281.6 40.3L282.2 38.7L283.5 36.9L285.5 35L288.1 33.1L291.2 31.1L294.9 29.1L299 27.2L303.5 25.3L308.4 23.6L313.4 21.9L318.6 20.4L323.8 19.1L329 18L334 17.1L338.9 16.5L343.4 16.1L347.6 16L351.3 16.1L354.5 16.5L357.2 17.1L359.2 18L360.6 19.1L361.3 20.4L361.3 21.9L361.3 130.6L360.7 132.3L359.4 134.1L357.4 135.9L354.8 137.9L351.6 139.8L348 141.8L343.8 143.8L339.3 145.6L334.5 147.4L329.5 149L324.3 150.5L319.1 151.8L313.9 152.9L308.8 153.8L304 154.4L299.4 154.8L295.3 154.9L291.6 154.8L288.4 154.4L285.7 153.8L283.7 152.9L282.3 151.8L281.6 150.5L281.6 149Z"/><path class="mr-cutter-top" d="M351.6 31.1L354.8 29.1L357.4 27.2L359.4 25.3L360.7 23.6L361.3 21.9L361.3 20.4L360.6 19.1L359.2 18L357.2 17.1L354.5 16.5L351.3 16.1L347.6 16L343.4 16.1L338.9 16.5L334 17.1L329 18L323.8 19.1L318.6 20.4L313.4 21.9L308.4 23.6L303.5 25.3L299 27.2L294.9 29.1L291.2 31.1L288.1 33.1L285.5 35L283.5 36.9L282.2 38.7L281.6 40.3L281.6 41.8L282.3 43.1L283.7 44.2L285.7 45.1L288.4 45.7L291.6 46.1L295.3 46.2L299.4 46.1L304 45.7L308.8 45.1L313.9 44.2L319.1 43.1L324.3 41.8L329.5 40.3L334.5 38.7L339.3 36.9L343.8 35L348 33.1Z"/><path class="mr-feed" d="M119.9 32.2L167.9 32.2"/><path class="mr-feed-head" d="M175.9 32.2L164.9 38.3L164.9 26.2Z"/><text class="mr-t mr-t-small" x="181.9" y="37.2" text-anchor="start">feed</text><path class="mr-dim" d="M62 130.8L62 70.4M57 130.8L72 130.8M57 70.4L72 70.4"/><text class="mr-t mr-t-small" x="56" y="105.6" text-anchor="end">depth</text><path class="mr-dim" d="M62 62.4L72.5 56.3"/><text class="mr-t mr-t-small" x="61.2" y="55.3" text-anchor="end">width</text><path class="mr-dim" d="M152.5 179L152.5 191M152.5 185L337.1 185M337.1 179L337.1 191"/><text class="mr-t mr-t-small" x="152.5" y="205" text-anchor="start">travel in 5.00 s</text><path class="mr-scale" d="M563.6 209L563.6 214L624 214L624 209"/><text class="mr-t mr-t-small" x="557.6" y="214" text-anchor="end">0.500 in</text></svg><p class="fs-sweep-read"><span>In 5.00 s: travel <strong>1.53 in</strong>, removed <strong>0.0764 in³</strong></span><span>Removal rate <strong>0.917 in³/min</strong> · power ≈ <strong>0.15–0.28 hp</strong></span></p></div><div class="fs-sweep" data-run="chip"><p class="fs-sweep-head"><span class="fs-sweep-title">Spindle ×2, chip load held</span><span class="fs-sweep-sub">4,584 rev/min · 36.7 in/min</span></p><svg class="mr-svg" viewBox="0 0 640 226" role="img" aria-label="After 5.00 s the cutter has travelled 3.06 in and removed a solid 0.100 in wide by 0.500 in deep: 0.153 in³." focusable="false"><path class="mr-stock-side" d="M582.1 167L624 142.9L624 46.2L582.1 70.4Z"/><path class="mr-cut-wall" d="M84.5 124.7L532.2 124.7L532.2 64.3L84.5 64.3Z"/><path class="mr-cut-floor" d="M74 130.8L545.9 130.8L545.9 130.8L546 130.4L546 130L546 129.6L545.9 129.3L545.8 128.9L545.6 128.5L545.4 128.1L545.1 127.8L544.7 127.4L544.2 127L543.6 126.6L542.7 126.2L541.7 125.9L540.3 125.5L538.3 125.1L532.2 124.7L84.5 124.7Z"/><path class="mr-cut-wall" d="M545.9 70.4L546 70L546 69.6L546 69.2L545.9 68.9L545.8 68.5L545.6 68.1L545.4 67.7L545.1 67.3L544.7 67L544.2 66.6L543.6 66.2L542.7 65.8L541.7 65.5L540.3 65.1L538.3 64.7L532.2 64.3L532.2 124.7L538.3 125.1L540.3 125.5L541.7 125.9L542.7 126.2L543.6 126.6L544.2 127L544.7 127.4L545.1 127.8L545.4 128.1L545.6 128.5L545.8 128.9L545.9 129.3L546 129.6L546 130L546 130.4L545.9 130.8Z"/><path class="mr-stock-top" d="M84.5 64.3L532.2 64.3L538.3 64.7L540.3 65.1L541.7 65.5L542.7 65.8L543.6 66.2L544.2 66.6L544.7 67L545.1 67.3L545.4 67.7L545.6 68.1L545.8 68.5L545.9 68.9L546 69.2L546 69.6L546 70L545.9 70.4L582.1 70.4L624 46.2L115.9 46.2Z"/><path class="mr-stock-front" d="M74 167L582.1 167L582.1 70.4L545.9 70.4L545.9 130.8L74 130.8Z"/><path class="mr-removed-hidden" d="M176.7 130.8L176.8 130.4L176.8 130L176.8 129.6L176.7 129.3L176.6 128.9L176.4 128.5L176.2 128.1L175.9 127.8L175.5 127.4L175 127L174.4 126.6L173.5 126.2L172.5 125.9L171.1 125.5L169.1 125.1L163 124.7L532.2 124.7"/><path class="mr-removed" d="M532.2 64.3L538.3 64.7L540.3 65.1L541.7 65.5L542.7 65.8L543.6 66.2L544.2 66.6L544.7 67L545.1 67.3L545.4 67.7L545.6 68.1L545.8 68.5L545.9 68.9L546 69.2L546 69.6L546 70L545.9 70.4L176.7 70.4L176.8 70L176.8 69.6L176.8 69.2L176.7 68.9L176.6 68.5L176.4 68.1L176.2 67.7L175.9 67.3L175.5 67L175 66.6L174.4 66.2L173.5 65.8L172.5 65.5L171.1 65.1L169.1 64.7L163 64.3Z"/><path class="mr-removed mr-removed-front" d="M176.7 130.8L545.9 130.8L545.9 70.4L176.7 70.4Z"/><path class="mr-start" d="M163 64.3L169.1 64.7L171.1 65.1L172.5 65.5L173.5 65.8L174.4 66.2L175 66.6L175.5 67L175.9 67.3L176.2 67.7L176.4 68.1L176.6 68.5L176.7 68.9L176.8 69.2L176.8 69.6L176.8 70L176.7 70.4L176.7 130.8"/><path class="mr-cutter" d="M466.2 40.3L466.8 38.7L468.1 36.9L470.1 35L472.7 33.1L475.8 31.1L479.5 29.1L483.6 27.2L488.1 25.3L493 23.6L498 21.9L503.2 20.4L508.4 19.1L513.6 18L518.6 17.1L523.5 16.5L528 16.1L532.2 16L535.9 16.1L539.1 16.5L541.8 17.1L543.8 18L545.2 19.1L545.9 20.4L545.9 21.9L545.9 130.6L545.3 132.3L544 134.1L542 135.9L539.4 137.9L536.2 139.8L532.6 141.8L528.4 143.8L523.9 145.6L519.1 147.4L514.1 149L508.9 150.5L503.7 151.8L498.5 152.9L493.4 153.8L488.6 154.4L484 154.8L479.9 154.9L476.2 154.8L473 154.4L470.3 153.8L468.3 152.9L466.9 151.8L466.2 150.5L466.2 149Z"/><path class="mr-cutter-top" d="M536.2 31.1L539.4 29.1L542 27.2L544 25.3L545.3 23.6L545.9 21.9L545.9 20.4L545.2 19.1L543.8 18L541.8 17.1L539.1 16.5L535.9 16.1L532.2 16L528 16.1L523.5 16.5L518.6 17.1L513.6 18L508.4 19.1L503.2 20.4L498 21.9L493 23.6L488.1 25.3L483.6 27.2L479.5 29.1L475.8 31.1L472.7 33.1L470.1 35L468.1 36.9L466.8 38.7L466.2 40.3L466.2 41.8L466.9 43.1L468.3 44.2L470.3 45.1L473 45.7L476.2 46.1L479.9 46.2L484 46.1L488.6 45.7L493.4 45.1L498.5 44.2L503.7 43.1L508.9 41.8L514.1 40.3L519.1 38.7L523.9 36.9L528.4 35L532.6 33.1Z"/><path class="mr-feed" d="M119.9 32.2L167.9 32.2"/><path class="mr-feed-head" d="M175.9 32.2L164.9 38.3L164.9 26.2Z"/><text class="mr-t mr-t-small" x="181.9" y="37.2" text-anchor="start">feed</text><path class="mr-dim" d="M62 130.8L62 70.4M57 130.8L72 130.8M57 70.4L72 70.4"/><text class="mr-t mr-t-small" x="56" y="105.6" text-anchor="end">depth</text><path class="mr-dim" d="M62 62.4L72.5 56.3"/><text class="mr-t mr-t-small" x="61.2" y="55.3" text-anchor="end">width</text><path class="mr-dim" d="M152.5 179L152.5 191M152.5 185L521.7 185M521.7 179L521.7 191"/><text class="mr-t mr-t-small" x="152.5" y="205" text-anchor="start">travel in 5.00 s</text><path class="mr-scale" d="M563.6 209L563.6 214L624 214L624 209"/><text class="mr-t mr-t-small" x="557.6" y="214" text-anchor="end">0.500 in</text></svg><p class="fs-sweep-read"><span>In 5.00 s: travel <strong>3.06 in</strong>, removed <strong>0.153 in³</strong></span><span>Removal rate <strong>1.83 in³/min</strong> · power ≈ <strong>0.29–0.55 hp</strong></span></p></div></div><div class="mr-chart" role="group" aria-label="Estimated cutting power for each material at 0.917 in³/min, the same cut in every row"><p class="mr-chart-head"><span>Material</span><span>Estimated cutting power at 0.917 in³/min</span></p><ul class="mr-rows"><li class="mr-row is-current" data-material="al-6061-t6" aria-current="true"><span class="mr-name">6061-T6 aluminum</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:7.3%;width:6.4%"></span></span><span class="mr-val">0.15–0.28 hp</span></li><li class="mr-row" data-material="al-7075-t6"><span class="mr-name">7075-T6 aluminum</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:7.3%;width:6.4%"></span></span><span class="mr-val">0.15–0.28 hp</span></li><li class="mr-row" data-material="steel-1018"><span class="mr-name">1018 mild steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band is-single" style="left:27.9%;width:0%"></span></span><span class="mr-val">0.56 hp <span class="mr-note">one factor</span></span></li><li class="mr-row" data-material="steel-1045"><span class="mr-name">1045 steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:27.9%;width:1.4%"></span></span><span class="mr-val">0.56–0.59 hp</span></li><li class="mr-row" data-material="steel-4140"><span class="mr-name">4140 prehard steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:35.8%;width:5.9%"></span></span><span class="mr-val">0.72–0.83 hp</span></li><li class="mr-row" data-material="stainless-304"><span class="mr-name">304 stainless steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:29.8%;width:30.5%"></span></span><span class="mr-val">0.60–1.2 hp</span></li><li class="mr-row" data-material="stainless-316"><span class="mr-name">316 stainless steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:29.8%;width:30.5%"></span></span><span class="mr-val">0.60–1.2 hp</span></li><li class="mr-row" data-material="iron-gray-30"><span class="mr-name">Class 30 gray cast iron</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:20.2%;width:10%"></span></span><span class="mr-val">0.40–0.60 hp</span></li><li class="mr-row" data-material="brass-c360"><span class="mr-name">C360 brass</span><span class="mr-track" aria-hidden="true"><span class="mr-band is-single" style="left:13.8%;width:0%"></span></span><span class="mr-val">0.28 hp <span class="mr-note">one factor</span></span></li><li class="mr-row" data-material="ti-6al-4v"><span class="mr-name">Ti-6Al-4V titanium</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:34.5%;width:18.2%"></span></span><span class="mr-val">0.69–1.1 hp</span></li></ul><p class="mr-row mr-axis-row" aria-hidden="true"><span></span><span class="mr-axis"><span style="left:0%">0</span><span style="left:50%">1.0</span><span style="left:100%">2.0 hp</span></span><span></span></p></div>
+      <figcaption>The worked example, 0.5 in cutter, 0.1 in wide and 0.5 in deep, three ways over
+      the same 5 seconds and at one scale. Doubling the spindle speed with the table feed held leaves
+      the slab unchanged: the same metal is removed, in chips half as thick. Doubling it with the chip
+      load held doubles the table feed, so the slab is <strong>twice as long</strong> and the removal
+      rate and power estimate double. Below, the setup&rsquo;s 0.917 in&sup3;/min priced in each
+      material, from the guide&rsquo;s cutting-energy bands.</figcaption>
     </figure>
     <div data-fs-live></div>
     <noscript><p class="aside">JavaScript is off, so the calculator is not running. The formulas and
@@ -109,20 +170,29 @@
 </section>
 
 <section>
-  <h2>Six things to try in the calculator</h2>
+  <h2>Things to try in the calculator</h2>
   <ul class="boxes">
-    <li>Load the <strong>half-inch cutter</strong> example and check each worked line against the
-    formulas on this page.</li>
-    <li>Switch to <strong>metric</strong> and back. The lengths and speeds change units, but the
-    cutter and the cut do not: 0.5 in becomes 12.7 mm, and the spindle speed stays exactly the same.</li>
-    <li>Hold <strong>the table feed</strong> and drag the spindle speed to 200%. The chip load halves.
-    In the distance record the ticks crowd together and the gold travel bar gets narrower.</li>
-    <li>Now hold <strong>the chip load</strong> and do the same. The table feed doubles instead: the
-    ticks keep their spacing but arrive twice as often.</li>
-    <li>Press <strong>Play</strong> and count how many times the cutter turns while the work, in the
-    main drawing, barely seems to move. Then look at the enlarged distance record to see that it does.</li>
-    <li>Load the <strong>eighth-inch cutter on a 4,000 rev/min machine</strong>. Compare the speed
-    the cutting data asks for with the speed the machine can reach.</li>
+    <li>Before typing anything, read the results. Each one names the fields it is waiting for.</li>
+    <li>With <strong>6061-T6 aluminum</strong> chosen, enter a <strong>0.5 in</strong> diameter and
+    <strong>4</strong> flutes, then press <em>Use the middle of these ranges</em>. Cutting speed and
+    feed per tooth fill in at 400 SFM and 0.00415 in/tooth. Nothing else changes.</li>
+    <li>Enter a width of <strong>0.1 in</strong> and a depth of <strong>0.5 in</strong>. Check the
+    removal rate against width &times; depth &times; table feed in the arithmetic.</li>
+    <li>Change the material to <strong>304 stainless steel</strong>. The drawings, the table feed and
+    the removal rate stay exactly as they were; only the power estimate moves. The guide now marks
+    your cutting speed as above its range for stainless, but the calculator leaves your entries
+    alone.</li>
+    <li>Hold <strong>the table feed</strong> and drag the spindle speed to 200%. The slab does not
+    change and nor does the removal rate: the same metal comes off, in chips half as thick.</li>
+    <li>Now hold <strong>the chip load</strong> and do the same. The table feed doubles, the slab
+    grows twice as long in the same time, and the removal rate and power estimate double.</li>
+    <li>Switch to <strong>metric</strong> and back. The cut and every result stay the same, written
+    in other units, and any field you left empty stays empty.</li>
+    <li>Try a width larger than the diameter. The calculator refuses it: that is more than one
+    pass.</li>
+    <li>Enter a <strong>0.125 in</strong> cutter with a <strong>4,000 rev/min</strong> machine top
+    speed. Compare the speed the cutting speed asks for with the speed the machine can reach, and
+    where the cutting speed actually reached sits against the guide.</li>
   </ul>
 </section>
 
@@ -148,17 +218,19 @@
 </section>
 
 <section>
-  <h2>A calculator is not cutting data</h2>
+  <h2>Generic ranges are a starting point, not your tool&rsquo;s data</h2>
   <div class="gate">
     <p><strong>The arithmetic on this page is exact. Its inputs are the part that takes
-    judgement.</strong> The cutting speed and feed per tooth come from cutting data, normally the
-    toolmaker&rsquo;s for that tool, that material and that kind of cut, or from the person
-    responsible for the machine. This page does not supply them, and its example numbers exist only
-    to make the arithmetic concrete.</p>
+    judgement.</strong> The ranges in the calculator are generic starting bands for solid-carbide end
+    mills, by material family, from published toolmaker tables. The cutting data for <em>your</em>
+    tool comes first: normally the toolmaker&rsquo;s for that tool, that material and that kind of
+    cut, or the person responsible for the machine.</p>
   </div>
-  <p>Cutting data accounts for things these formulas cannot see: the material being cut, what the tool
-  is made of, how much of the cutter is in the work, and how the setup is held. A calculator turns
-  data into machine settings. It cannot tell you whether the data suit your cut.</p>
+  <p>Cutting data accounts for things these formulas cannot see: the exact grade and hardness of the
+  material, the tool&rsquo;s coating and geometry, how far it reaches out of the holder, coolant, and
+  how the setup is held. The guide&rsquo;s feed-per-tooth ranges assume a side cut about 20% of the
+  cutter&rsquo;s diameter wide; a full-width slot or a long reach needs the tool&rsquo;s own data. A
+  calculator turns data into machine settings. It cannot tell you whether the data suit your cut.</p>
   <details class="deeper">
     <summary>Feed per tooth is not always the thickness of the chip</summary>
     <p>Feed per tooth is how far the work moves between teeth. The chip a tooth actually cuts is only
@@ -167,11 +239,13 @@
     shows this: at a width of cut of 10% of the diameter, the thickest part of the chip is 60% of the
     feed per tooth.</p>
     <p>Some cutting data raises the feed per tooth for narrow cuts to make up for this. Read what your
-    data assumes before using its numbers, and ask if it does not say.</p>
+    data assumes before using its numbers, and ask if it does not say. Thinner chips also take more
+    energy per cubic inch, which is one reason a power estimate is a band.</p>
     <p>The spindle-speed, table-feed and feed-per-tooth relations follow
     <a href="https://www.sandvik.coromant.com/en-us/knowledge/machining-formulas-definitions/milling-formulas-definitions">Sandvik Coromant&rsquo;s milling formulas and definitions</a>.
-    The drawings use an idealized cutter section; see
-    <a href="https://www.harveyperformance.com/in-the-loupe/end-mill-anatomy/">Harvey Performance&rsquo;s end mill anatomy</a>
-    for the flutes, core and cutting edges of a real end mill.</p>
+    The calculator&rsquo;s cutting-speed and feed-per-tooth ranges are from
+    <a href="https://www.garrtool.com/wp-content/uploads/2018/11/TECHNICAL.pdf#page=8">GARR TOOL&rsquo;s general purpose milling guide</a>,
+    and its cutting-energy bands are converted from
+    <a href="https://www1.mscdirect.com/images/solutions/kennametal/millingTechInfoFormulas.pdf#page=2">Kennametal&rsquo;s milling power factors</a>.</p>
   </details>
 </section>

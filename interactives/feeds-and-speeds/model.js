@@ -1,5 +1,5 @@
 /* ============================================================================
-   feeds-and-speeds / model.js - the arithmetic and the motion, nothing drawn.
+   feeds-and-speeds / model.js - the arithmetic, nothing drawn.
 
    Every quantity is held in one canonical set of units - millimetres,
    metres per minute, millimetres per tooth, millimetres per minute - and
@@ -14,7 +14,11 @@
      cutting speed  Vc = pi * D * n / 1000              m/min
 
    z is the number of teeth that take a chip in each turn. For an ordinary
-   end mill that is the flute count.
+   end mill that is the flute count. What the cut removes, and the power
+   that takes, belong to the material-removal module.
+
+   Nothing here holds a starting setup. A blank field is a blank field, and
+   each result is worked out as soon as the fields it needs are valid.
 
    Pure UMD: browser global CourseWikiFeedsSpeeds, CommonJS the same object.
    ==========================================================================*/
@@ -29,15 +33,16 @@
   var M_PER_FT = 0.3048;
 
   /* Display units. `toCanon` multiplies a displayed number into canonical
-     units; dividing reverses it. */
+     units; dividing reverses it. Width and depth of cut are lengths, like
+     the diameter. */
   var UNITS = {
     in: {
       name: 'inch', diameter: 'in', speed: 'ft/min', speedShort: 'SFM', feed: 'in/min', chip: 'in/tooth',
-      toCanon: { diameter: MM_PER_IN, speed: M_PER_FT, feed: MM_PER_IN, chip: MM_PER_IN }
+      toCanon: { diameter: MM_PER_IN, width: MM_PER_IN, depth: MM_PER_IN, speed: M_PER_FT, feed: MM_PER_IN, chip: MM_PER_IN }
     },
     mm: {
       name: 'metric', diameter: 'mm', speed: 'm/min', speedShort: 'm/min', feed: 'mm/min', chip: 'mm/tooth',
-      toCanon: { diameter: 1, speed: 1, feed: 1, chip: 1 }
+      toCanon: { diameter: 1, width: 1, depth: 1, speed: 1, feed: 1, chip: 1 }
     }
   };
 
@@ -48,24 +53,23 @@
     speed:    { min: 1, max: 3000 },         // m/min
     teeth:    { min: 1, max: 16 },           // whole teeth
     chip:     { min: 0.0005, max: 3 },       // mm/tooth
-    maxRpm:   { min: 10, max: 200000 }       // rev/min, optional
+    maxRpm:   { min: 10, max: 200000 },      // rev/min, optional
+    width:    { min: 0.01, max: 300 },       // mm
+    depth:    { min: 0.01, max: 300 },       // mm
+    eta:      { min: 1, max: 100 }           // percent, optional
   };
 
-  /* Illustrative setups. They are arithmetic examples, not cutting data:
-     the page says so wherever they appear. Each exists in both unit
-     systems so the button row reads naturally in either. */
-  var EXAMPLES = {
-    in: [
-      { id: 'half-inch', title: 'Half-inch cutter', unit: 'in', diameter: 0.5, speed: 300, teeth: 4, chip: 0.002, maxRpm: null },
-      { id: 'eighth-inch-capped', title: 'Eighth-inch cutter, 4,000 rev/min machine', unit: 'in', diameter: 0.125, speed: 300, teeth: 2, chip: 0.0008, maxRpm: 4000 }
-    ],
-    mm: [
-      { id: 'twelve-mm', title: '12 mm cutter', unit: 'mm', diameter: 12, speed: 90, teeth: 4, chip: 0.05, maxRpm: null },
-      { id: 'three-mm-capped', title: '3 mm cutter, 4,000 rev/min machine', unit: 'mm', diameter: 3, speed: 90, teeth: 2, chip: 0.02, maxRpm: 4000 }
-    ]
+  var FIELD_NAMES = {
+    diameter: 'Cutter diameter', speed: 'Cutting speed', teeth: 'Flutes', chip: 'Feed per tooth',
+    maxRpm: 'Machine top speed', width: 'Width of cut', depth: 'Depth of cut', eta: 'Drivetrain efficiency'
   };
+  var REQUIRED = ['diameter', 'speed', 'teeth', 'chip', 'width', 'depth'];
+  var OPTIONAL = ['maxRpm', 'eta'];
+  var FIELDS = ['diameter', 'teeth', 'maxRpm', 'speed', 'chip', 'width', 'depth', 'eta'];
 
   function finite(v) { return typeof v === 'number' && isFinite(v); }
+  function lengthKind(kind) { return kind === 'width' || kind === 'depth' || kind === 'travel' ? 'diameter' : kind; }
+  function unitless(kind) { return kind === 'teeth' || kind === 'maxRpm' || kind === 'rpm' || kind === 'eta'; }
 
   /* ---- the four relations -------------------------------------------------*/
   function spindleSpeed(speedMPerMin, diameterMm) { return 1000 * speedMPerMin / (Math.PI * diameterMm); }
@@ -75,34 +79,24 @@
   function chipLoad(feed, rpm, teeth) { return feed / (rpm * teeth); }
 
   /* ---- unit conversion ----------------------------------------------------*/
-  function toCanon(unit, kind, value) { return value * UNITS[unit].toCanon[kind]; }
-  function fromCanon(unit, kind, value) { return value / UNITS[unit].toCanon[kind]; }
+  function toCanon(unit, kind, value) { return unitless(kind) ? value : value * UNITS[unit].toCanon[lengthKind(kind)]; }
+  function fromCanon(unit, kind, value) { return unitless(kind) ? value : value / UNITS[unit].toCanon[lengthKind(kind)]; }
 
-  /* A setup in display units -> canonical, and back. Teeth and rev/min have
-     no unit system. */
+  /* A setup in display units -> canonical, and back. Missing fields stay
+     missing; optional ones are null. */
   function setupToCanon(unit, s) {
-    return {
-      diameter: toCanon(unit, 'diameter', s.diameter),
-      speed: toCanon(unit, 'speed', s.speed),
-      teeth: s.teeth,
-      chip: toCanon(unit, 'chip', s.chip),
-      maxRpm: s.maxRpm === null || s.maxRpm === undefined ? null : s.maxRpm
-    };
+    var c = {};
+    FIELDS.forEach(function (k) {
+      var v = s[k];
+      c[k] = v === null || v === undefined ? (OPTIONAL.indexOf(k) >= 0 ? null : undefined) : toCanon(unit, k, v);
+      if (c[k] === undefined) delete c[k];
+    });
+    return c;
   }
   function setupFromCanon(unit, c) {
-    return {
-      diameter: fromCanon(unit, 'diameter', c.diameter),
-      speed: fromCanon(unit, 'speed', c.speed),
-      teeth: c.teeth,
-      chip: fromCanon(unit, 'chip', c.chip),
-      maxRpm: c.maxRpm
-    };
-  }
-
-  function example(unit, id) {
-    var list = EXAMPLES[unit] || [];
-    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
-    return null;
+    var s = {};
+    Object.keys(c).forEach(function (k) { s[k] = c[k] === null ? null : fromCanon(unit, k, c[k]); });
+    return s;
   }
 
   /* ---- reading what a student typed ---------------------------------------
@@ -115,48 +109,41 @@
     var v = Number(s);
     return finite(v) ? v : null;
   }
+  function blank(t) { return t === undefined || t === null || String(t).trim() === ''; }
 
-  var FIELD_NAMES = {
-    diameter: 'Cutter diameter', speed: 'Cutting speed', teeth: 'Flutes',
-    chip: 'Feed per tooth', maxRpm: 'Machine top speed'
-  };
-
-  /* Validate one complete form. `raw` holds strings keyed like LIMITS.
-     Returns { ok, canon, errors: [{field, message}] }. */
-  function validate(unit, raw) {
-    var errors = [], disp = {};
-    ['diameter', 'speed', 'teeth', 'chip'].forEach(function (k) {
-      var v = parseNumber(raw[k]);
-      if (v === null) { errors.push({ field: k, message: FIELD_NAMES[k] + ' needs a number.' }); return; }
+  /* Read each field on its own. `raw` holds strings keyed like LIMITS.
+     Returns { values (canonical, valid fields only), errors, missing }:
+     a blank required field is missing, not wrong; a blank optional field
+     is null. Width is checked against the diameter when both are valid. */
+  function readFields(unit, raw) {
+    var values = {}, errors = [], missing = [];
+    FIELDS.forEach(function (k) {
+      var optional = OPTIONAL.indexOf(k) >= 0, t = raw[k];
+      if (blank(t)) { if (optional) values[k] = null; else missing.push(k); return; }
+      var v = parseNumber(t);
+      if (v === null) { errors.push({ field: k, message: FIELD_NAMES[k] + ' needs a number' + (optional ? ', or leave it empty.' : '.') }); return; }
       if (v <= 0) { errors.push({ field: k, message: FIELD_NAMES[k] + ' must be more than zero.' }); return; }
       if (k === 'teeth' && Math.round(v) !== v) { errors.push({ field: k, message: 'Flutes is a whole number of teeth.' }); return; }
-      disp[k] = v;
+      var c = toCanon(unit, k, v), L = LIMITS[k];
+      if (c < L.min - 1e-9 || c > L.max + 1e-9) {
+        errors.push({ field: k, message: FIELD_NAMES[k] + ' is outside what this calculator handles: ' +
+          show(L.min, k, unit) + ' to ' + show(L.max, k, unit) + '.' });
+        return;
+      }
+      values[k] = c;
     });
-    var blank = raw.maxRpm === undefined || raw.maxRpm === null || String(raw.maxRpm).trim() === '';
-    if (blank) disp.maxRpm = null;
-    else {
-      var m = parseNumber(raw.maxRpm);
-      if (m === null) errors.push({ field: 'maxRpm', message: 'Machine top speed needs a number, or leave it empty.' });
-      else if (m <= 0) errors.push({ field: 'maxRpm', message: 'Machine top speed must be more than zero.' });
-      else disp.maxRpm = m;
+    if (finite(values.width) && finite(values.diameter) && values.width > values.diameter * (1 + 1e-9)) {
+      errors.push({ field: 'width', message: 'Width of cut cannot be more than the cutter diameter. A wider path takes more than one pass.' });
+      delete values.width;
     }
-    var canon = null;
-    if (!errors.length) {
-      canon = setupToCanon(unit, disp);
-      Object.keys(LIMITS).forEach(function (k) {
-        var v = canon[k];
-        if (v === null || v === undefined) return;
-        var L = LIMITS[k];
-        if (v < L.min - 1e-9 || v > L.max + 1e-9) {
-          var lo = k === 'teeth' || k === 'maxRpm' ? L.min : fromCanon(unit, k, L.min);
-          var hi = k === 'teeth' || k === 'maxRpm' ? L.max : fromCanon(unit, k, L.max);
-          errors.push({ field: k, message: FIELD_NAMES[k] + ' is outside what this calculator draws: ' +
-            format(lo, k, unit) + ' to ' + format(hi, k, unit) + '.' });
-        }
-      });
-      if (errors.length) canon = null;
-    }
-    return { ok: !errors.length, canon: canon, errors: errors };
+    return { values: values, errors: errors, missing: missing };
+  }
+
+  /* The whole form at once: ok only when nothing is missing or wrong. */
+  function validate(unit, raw) {
+    var r = readFields(unit, raw);
+    var errors = r.errors.concat(r.missing.map(function (k) { return { field: k, message: FIELD_NAMES[k] + ' needs a number.' }; }));
+    return { ok: !errors.length, canon: errors.length ? null : r.values, errors: errors, values: r.values, missing: r.missing };
   }
 
   /* ---- the calculation -----------------------------------------------------
@@ -180,6 +167,34 @@
       teeth: c.teeth,
       diameter: c.diameter
     };
+  }
+
+  /* As much of `solve` as the valid fields allow. Each result is present
+     or absent, and `needs` names what an absent one is waiting for. */
+  var NEEDS = {
+    rpm: ['diameter', 'speed'],
+    feed: ['diameter', 'speed', 'teeth', 'chip'],
+    rate: ['diameter', 'speed', 'teeth', 'chip', 'width', 'depth']
+  };
+  function partial(values) {
+    var out = { needs: {} };
+    Object.keys(NEEDS).forEach(function (k) {
+      out.needs[k] = NEEDS[k].filter(function (f) { return !finite(values[f]); });
+    });
+    if (!out.needs.rpm.length) {
+      var requested = spindleSpeed(values.speed, values.diameter);
+      var capped = finite(values.maxRpm) && requested > values.maxRpm;
+      out.requestedRpm = requested;
+      out.capped = capped;
+      out.rpm = capped ? values.maxRpm : requested;
+      out.speed = cuttingSpeed(out.rpm, values.diameter);
+    }
+    if (!out.needs.feed.length) {
+      out.full = solve(values);
+      out.feed = out.full.feed;
+      out.chip = values.chip;
+    }
+    return out;
   }
 
   /* The experiment: change only the spindle speed, by `factor` of what the
@@ -210,106 +225,20 @@
     return out;
   }
 
-  /* ---- motion, on one disclosed time scale ---------------------------------
-     The drawing runs `slowdown` times slower than the machine would. Both the
-     cutter's turning and the work's travel are worked from the same real
-     time, so the ratio between them is the real one.
-
-     The cutter turns clockwise; seen down its axis, the work is fed to the
-     LEFT, so the uncut material is on the right and the front of the cut is
-     at psi = 0 (math angle, x right, y up). A tooth is engaged while it is
-     on the front half, cos(psi) > 0, as in a full-width slot.             */
-  var SLOWDOWNS = [50, 200, 1000, 5000];
-
-  function realTime(screenSeconds, slowdown) { return screenSeconds / slowdown; }
-
-  /* Tooth angle at real time t, radians, normalised to (-pi, pi]. Tooth 0
-     sits at psi0 when t = 0. */
-  function wrap(a) {
-    var t = a % (2 * Math.PI);
-    if (t <= -Math.PI) t += 2 * Math.PI;
-    if (t > Math.PI) t -= 2 * Math.PI;
-    return t;
-  }
-
-  /* `run` is any object with rpm, feed (canonical mm/min), teeth. */
-  function motion(run, tReal, psi0) {
-    var z = run.teeth, omega = 2 * Math.PI * run.rpm / 60;     // rad per real second
-    var p0 = finite(psi0) ? psi0 : Math.PI / 2;
-    var turned = omega * tReal;
-    var teeth = [];
-    for (var k = 0; k < z; k++) {
-      var psi = wrap(p0 - turned - 2 * Math.PI * k / z);
-      teeth.push({ psi: psi, engaged: Math.cos(psi) > 1e-9 });
-    }
-    return {
-      teeth: teeth,
-      turns: turned / (2 * Math.PI),
-      workTravel: run.feed / 60 * tReal,                   // mm the work has moved, to the left
-      passPeriod: 60 / (run.rpm * z),                      // real seconds between tooth passes
-      passes: passesBefore(run, tReal, p0)
-    };
-  }
-
-  /* Real times at which a tooth crosses the front of the cut (psi = 0),
-     counted from t = 0. With psi0 in (0, 2pi/z], the first crossing is at
-     psi0 / omega and they follow every 60 / (n z) seconds. */
-  function firstPass(run, psi0) {
-    var omega = 2 * Math.PI * run.rpm / 60, pitch = 2 * Math.PI / run.teeth;
-    var lead = ((psi0 % pitch) + pitch) % pitch;
-    if (lead < 1e-12) lead = pitch;
-    return lead / omega;
-  }
-  function passesBefore(run, tReal, psi0) {
-    if (!(tReal >= 0)) return 0;
-    var t1 = firstPass(run, finite(psi0) ? psi0 : Math.PI / 2);
-    if (tReal < t1) return 0;
-    return 1 + Math.floor((tReal - t1) / (60 / (run.rpm * run.teeth)) + 1e-9);
-  }
-
-  /* Where the marks left by each pass sit on the work, measured back from
-     the front of the cut, in mm, newest first. Each tooth pass lays one; the
-     work carries them away. Their spacing is the feed per tooth - the
-     whole point of the inset. The cut is taken to be already under way at
-     t = 0, so passes before the clock started count too. */
-  function marks(run, tReal, psi0, count) {
-    var p0 = finite(psi0) ? psi0 : Math.PI / 2;
-    var t1 = firstPass(run, p0), period = 60 / (run.rpm * run.teeth), out = [];
-    var j = Math.floor((tReal - t1) / period + 1e-9);
-    for (; out.length < (count || 12); j--) {
-      var tj = t1 + j * period;
-      out.push({ index: j, age: tReal - tj, offset: run.feed / 60 * (tReal - tj) });
-    }
-    return out;
-  }
-
-  /* How far the uncut face has crept past the path of the tooth tips since
-     the last pass, mm. It grows from zero to one feed per tooth, and the
-     next tooth takes exactly that as its chip. */
-  function uncutSliver(run, tReal, psi0) {
-    var p0 = finite(psi0) ? psi0 : Math.PI / 2;
-    var t1 = firstPass(run, p0), period = 60 / (run.rpm * run.teeth);
-    if (tReal < t1) return run.feed / 60 * (tReal + (period - t1));
-    var since = (tReal - t1) % period;
-    return run.feed / 60 * since;
-  }
-
-  /* On-screen rates, for the "too quick to follow" note and the caption. */
-  function screenRates(run, slowdown) {
-    return {
-      turnsPerSecond: run.rpm / 60 / slowdown,
-      passesPerSecond: run.rpm * run.teeth / 60 / slowdown,
-      realTurnsPerSecond: run.rpm / 60,
-      realTravelPerSecond: run.feed / 60
-    };
+  /* Where a value sits against a guide band [low, high]. */
+  function bandPosition(value, band) {
+    if (!finite(value) || !band) return null;
+    if (value < band[0] * (1 - 1e-9)) return 'below';
+    if (value > band[1] * (1 + 1e-9)) return 'above';
+    return 'inside';
   }
 
   /* ---- display formatting --------------------------------------------------
      Decimal places per quantity and unit. Rev/min are whole numbers;
      everything else carries enough places to read a typical value. */
   var PLACES = {
-    in: { diameter: 4, speed: 0, feed: 1, chip: 4, rpm: 0, maxRpm: 0, teeth: 0, travel: 4 },
-    mm: { diameter: 3, speed: 0, feed: 0, chip: 3, rpm: 0, maxRpm: 0, teeth: 0, travel: 2 }
+    in: { diameter: 4, speed: 0, feed: 1, chip: 4, rpm: 0, maxRpm: 0, teeth: 0, eta: 0 },
+    mm: { diameter: 3, speed: 0, feed: 0, chip: 3, rpm: 0, maxRpm: 0, teeth: 0, eta: 0 }
   };
 
   function group(intPart) { return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
@@ -327,60 +256,52 @@
     return (v < 0 ? '-' : '') + group(parts[0]) + (frac ? '.' + frac : '');
   }
 
-  /* `kind` is diameter | speed | feed | chip | rpm | maxRpm | teeth | travel,
-     `value` already in display units. Speed under 100 gets one place so a
-     slow cut does not read as a round number. */
+  /* `kind` is a field or result name, `value` already in display units.
+     Speed under 100 gets one place so a slow cut does not read as a round
+     number. Efficiency may carry one place. */
   function format(value, kind, unit) {
-    var places = PLACES[unit][kind];
-    if (kind === 'chip' && value > 0) places = Math.max(places, 3 - Math.floor(Math.log10(value)));
-    if (kind === 'speed' && value < 100) places = 1;
-    if (kind === 'feed' && unit === 'mm' && value < 100) places = 1;
-    if (kind === 'feed' && unit === 'in' && value >= 100) places = 0;
-    var min = kind === 'chip' ? (unit === 'in' ? 4 : 3) : 0;
+    var k = lengthKind(kind);
+    var places = PLACES[unit][k];
+    if (k === 'chip' && value > 0) places = Math.max(places, 3 - Math.floor(Math.log10(value)));
+    if (k === 'speed' && value < 100) places = 1;
+    if (k === 'feed' && unit === 'mm' && value < 100) places = 1;
+    if (k === 'feed' && unit === 'in' && value >= 100) places = 0;
+    if (k === 'eta') places = 1;
+    var min = k === 'chip' ? (unit === 'in' ? 4 : 3) : 0;
     return fixed(value, places, min);
   }
 
   function unitLabel(kind, unit) {
     if (kind === 'rpm' || kind === 'maxRpm') return 'rev/min';
     if (kind === 'teeth') return 'flutes';
-    if (kind === 'travel') return UNITS[unit].diameter;
-    return kind === 'speed' ? UNITS[unit].speedShort : UNITS[unit][kind];
+    if (kind === 'eta') return '%';
+    var k = lengthKind(kind);
+    return k === 'speed' ? UNITS[unit].speedShort : UNITS[unit][k];
   }
 
   /* Canonical value -> "2,292 rev/min" in the chosen unit system. */
   function show(canonValue, kind, unit) {
-    var v = (kind === 'rpm' || kind === 'maxRpm' || kind === 'teeth') ? canonValue
-      : fromCanon(unit, kind === 'travel' ? 'diameter' : kind, canonValue);
-    return format(v, kind, unit) + ' ' + unitLabel(kind, unit);
+    var lab = unitLabel(kind, unit);
+    return format(fromCanon(unit, kind, canonValue), kind, unit) + (lab === '%' ? '%' : ' ' + lab);
   }
 
-  /* "x2", "x0.5", "held" - how a trial value compares with the setup. */
+  /* "x2", "x0.5", "unchanged" - how a trial value compares with the setup. */
   function ratioText(r) {
     if (!finite(r)) return '-';
     if (Math.abs(r - 1) < 5e-4) return 'unchanged';
-    var s = r >= 10 ? r.toFixed(0) : (r >= 1 ? r.toFixed(2) : r.toFixed(2));
+    var s = r >= 10 ? r.toFixed(0) : r.toFixed(2);
     s = s.replace(/\.?0+$/, '');
     return '×' + s;
   }
 
-  /* A "nice" scale-bar length (1, 2 or 5 x 10^k) close to `target`. */
-  function niceLength(target) {
-    if (!(target > 0)) return 1;
-    var e = Math.floor(Math.log10(target)), base = Math.pow(10, e), m = target / base;
-    var nice = m < 1.5 ? 1 : (m < 3.5 ? 2 : (m < 7.5 ? 5 : 10));
-    return nice * base;
-  }
-
   return {
-    UNITS: UNITS, LIMITS: LIMITS, EXAMPLES: EXAMPLES, HOLDS: HOLDS, SLOWDOWNS: SLOWDOWNS,
-    MM_PER_IN: MM_PER_IN, M_PER_FT: M_PER_FT,
+    UNITS: UNITS, LIMITS: LIMITS, HOLDS: HOLDS, FIELDS: FIELDS, REQUIRED: REQUIRED, OPTIONAL: OPTIONAL,
+    FIELD_NAMES: FIELD_NAMES, NEEDS: NEEDS, MM_PER_IN: MM_PER_IN, M_PER_FT: M_PER_FT,
     spindleSpeed: spindleSpeed, spindleSpeedInch: spindleSpeedInch, cuttingSpeed: cuttingSpeed,
     tableFeed: tableFeed, chipLoad: chipLoad,
     toCanon: toCanon, fromCanon: fromCanon, setupToCanon: setupToCanon, setupFromCanon: setupFromCanon,
-    example: example, parseNumber: parseNumber, validate: validate,
-    solve: solve, trial: trial,
-    realTime: realTime, motion: motion, marks: marks, uncutSliver: uncutSliver,
-    passesBefore: passesBefore, firstPass: firstPass, screenRates: screenRates, wrap: wrap,
-    format: format, show: show, unitLabel: unitLabel, ratioText: ratioText, niceLength: niceLength
+    parseNumber: parseNumber, readFields: readFields, validate: validate,
+    solve: solve, partial: partial, trial: trial, bandPosition: bandPosition,
+    format: format, show: show, unitLabel: unitLabel, ratioText: ratioText
   };
 });
