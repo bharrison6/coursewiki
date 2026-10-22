@@ -222,7 +222,16 @@
     this.pos = { x: SETUP.home.x, y: SETUP.home.y, z: SETUP.home.z };
     this.version = 0;
     this.removed = 0;          // mm^3 of metal removed, from the raster
+    this.dirty = { i0: 0, i1: this.nx - 1, j0: 0, j1: this.ny - 1 };
   };
+
+  /* The raster cells changed since the last call, for a view to repaint. */
+  Sim.prototype.grow = function (i0, i1, j0, j1) {
+    var d = this.dirty;
+    if (!d) this.dirty = { i0: i0, i1: i1, j0: j0, j1: j1 };
+    else { d.i0 = Math.min(d.i0, i0); d.i1 = Math.max(d.i1, i1); d.j0 = Math.min(d.j0, j0); d.j1 = Math.max(d.j1, j1); }
+  };
+  Sim.prototype.takeDirty = function () { var d = this.dirty; this.dirty = null; return d; };
 
   /* ---- exact height ------------------------------------------------------*/
   Sim.prototype.inStock = function (x, y) {
@@ -307,11 +316,13 @@
     }
     this.removed += changed;
     if (tally) tally.volume += changed;
+    if (changed > 0) this.grow(R.i0, R.i1, R.j0, R.j1);
     return changed;
   };
 
   Sim.prototype.rebuildRaster = function () {
     this.raster.fill(this.stock.rawTop);
+    this.grow(0, this.nx - 1, 0, this.ny - 1);
     var keep = this.entry; this.entry = null;
     var saveRemoved = this.removed;
     for (var k = 0; k < this.prims.length; k++) this.stamp(this.prims[k]);
@@ -407,7 +418,11 @@
     if (this.entry) this.commit();
     var e = this.history.pop();
     if (!e) return null;
-    for (var k = e.cellIdx.length - 1; k >= 0; k--) this.raster[e.cellIdx[k]] = e.cellOld[k];
+    for (var k = e.cellIdx.length - 1; k >= 0; k--) {
+      var idx = e.cellIdx[k], ci = idx % this.nx, cj = (idx - ci) / this.nx;
+      this.raster[idx] = e.cellOld[k];
+      this.grow(ci, ci, cj, cj);
+    }
     for (var m = e.prims.length - 1; m >= 0; m--) {
       var p = e.prims[m];
       this.unindex(p);

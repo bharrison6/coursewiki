@@ -488,5 +488,38 @@
     };
   }
 
-  return { compare: compare, inspect: inspect, CLASSIFY: CLASSIFY, MEASURE: MEASURE };
+  /* ---- the nominal part, for drawings and the target outline ---------------
+     The drawing's own geometry with no tolerances: pocket corners at their
+     largest allowed radius, a drill point under blind holes. A tapped blind
+     hole is drawn drilled 4 pitches plus a drill point past its thread, the
+     usual way a drawing shows one; that depth is illustrative, not a spec. */
+  var NOMINAL = {
+    recess: function (f, x, y, z) {
+      var s = M.sdBox(x, y, (f.x0 + f.x1) / 2, (f.y0 + f.y1) / 2, (f.x1 - f.x0) / 2, (f.y1 - f.y0) / 2, f.rMax || 0);
+      return s < 0 ? Math.min(z, f.floor) : z;
+    },
+    slot: function (f, x, y, z) { return M.sdCapsule(x, y, f.ax, f.ay, f.bx, f.by, f.width / 2) < 0 ? Math.min(z, f.floor) : z; },
+    boss: function (f, x, y, z) {
+      return M.sdBox(x, y, (f.x0 + f.x1) / 2, (f.y0 + f.y1) / 2, (f.x1 - f.x0) / 2, (f.y1 - f.y0) / 2, 0) > 0 ? Math.min(z, f.floor) : z;
+    },
+    chamfer: function (f, x, y, z, job) {
+      var b = f.boss, sb = M.sdBox(x, y, (b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, (b.x1 - b.x0) / 2, (b.y1 - b.y0) / 2, 0);
+      return sb < 0 && -sb < f.size ? Math.min(z, job.top - f.size - sb) : z;
+    },
+    hole: function (f, x, y, z, job) {
+      var d0 = Math.hypot(x - f.cx, y - f.cy), r = f.d / 2, top = f.top == null ? job.top : f.top;
+      if (f.csk && d0 < f.csk.d / 2) z = Math.min(z, top - (f.csk.d / 2 - d0) * cot(f.csk.angle));
+      if (d0 >= r) return z;
+      if (f.through) return job.bottom;
+      var full = f.thread ? top - f.thread.depth - 4 * M.THREADS[f.thread.spec].pitch : top - f.depth;
+      return Math.min(z, full - DRILL_CONE * (r - d0));
+    }
+  };
+  function nominalAt(job, x, y) {
+    var z = job.top;
+    for (var k = 0; k < job.features.length; k++) z = NOMINAL[job.features[k].type](job.features[k], x, y, z, job);
+    return Math.max(z, job.bottom);
+  }
+
+  return { compare: compare, inspect: inspect, nominalAt: nominalAt, envAt: envAt, CLASSIFY: CLASSIFY, MEASURE: MEASURE };
 });

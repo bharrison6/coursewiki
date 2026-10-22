@@ -33,7 +33,7 @@
         { view: 'top', axis: 'x', from: 0, to: 75, at: -10 },
         { view: 'top', axis: 'x', from: 75, to: 100, at: -10 },
         { view: 'top', axis: 'y', from: 0, to: 60, at: -8 },
-        { view: 'front', axis: 'z', from: -6, to: 0, at: 106 },
+        { view: 'front', axis: 'z', from: -6, to: 0, at: 106, ext: [100, 75] },
         { view: 'front', axis: 'z', from: -20, to: 0, at: -8 }
       ],
       notes: [],
@@ -57,18 +57,17 @@
         { type: 'hole', id: 'hole-right', label: 'Ø6.6 through at X 85, Y 30', cx: 85, cy: 30, d: 6.6, through: true }
       ],
       dims: [
-        { view: 'top', axis: 'x', from: 0, to: 15, at: -10 },
-        { view: 'top', axis: 'x', from: 0, to: 30, at: -18 },
-        { view: 'top', axis: 'x', from: 30, to: 70, at: -10 },
-        { view: 'top', axis: 'x', from: 85, to: 100, at: -10 },
-        { view: 'top', axis: 'y', from: 0, to: 18, at: -8 },
-        { view: 'top', axis: 'y', from: 18, to: 42, at: -8 },
-        { view: 'top', axis: 'y', from: 0, to: 30, at: 108 },
-        { view: 'front', axis: 'z', from: -6, to: 0, at: 76 }
+        { view: 'top', axis: 'x', from: 0, to: 15, at: -10, ext: [0, 30] },
+        { view: 'top', axis: 'x', from: 0, to: 30, at: -18, ext: [0, 18] },
+        { view: 'top', axis: 'x', from: 30, to: 70, at: -10, ext: 18 },
+        { view: 'top', axis: 'x', from: 85, to: 100, at: -10, ext: [30, 0] },
+        { view: 'top', axis: 'y', from: 0, to: 18, at: -8, ext: [0, 30] },
+        { view: 'top', axis: 'y', from: 18, to: 42, at: -8, ext: 30 },
+        { view: 'top', axis: 'y', from: 0, to: 30, at: 108, ext: [100, 85] }
       ],
       notes: [
-        { view: 'top', at: [33, 39], text: 'R4 MAX', dx: 10, dy: 14 },
-        { view: 'top', at: [15, 30], text: '2× Ø6.6 THRU', dx: -2, dy: 22, r: 3.3 }
+        { view: 'top', at: [31.17, 40.83], to: [44, 70], lines: ['POCKET 6 DEEP', '4× R4 MAX'] },
+        { view: 'top', at: [15, 30], to: [8, 70], r: 3.3, align: 'right', lines: ['2× Ø6.6 THRU'] }
       ],
       hints: [
         'Depths are measured from the finished top at Z 0.00, so the pocket floor is at Z −6.00 whether or not the top has been faced yet.',
@@ -90,18 +89,15 @@
           cx: 85, cy: 30, d: 5.035, tolD: 0.118, thread: { spec: 'M6x1', depth: 10 }, csk: { d: 7, angle: 90 }, minWall: 1 }
       ],
       dims: [
-        { view: 'top', axis: 'x', from: 0, to: 15, at: -10 },
-        { view: 'top', axis: 'x', from: 0, to: 30, at: -18 },
-        { view: 'top', axis: 'x', from: 30, to: 70, at: -10 },
-        { view: 'top', axis: 'x', from: 85, to: 100, at: -10 },
-        { view: 'top', axis: 'y', from: 25, to: 35, at: -8 },
-        { view: 'top', axis: 'y', from: 0, to: 30, at: 108 },
-        { view: 'front', axis: 'z', from: -5, to: 0, at: 108 }
+        { view: 'top', axis: 'x', from: 0, to: 15, at: -10, ext: [0, 30] },
+        { view: 'top', axis: 'x', from: 0, to: 30, at: -18, ext: [0, 30] },
+        { view: 'top', axis: 'x', from: 30, to: 70, at: -10, ext: 30 },
+        { view: 'top', axis: 'x', from: 85, to: 100, at: -10, ext: [30, 0] },
+        { view: 'top', axis: 'y', from: 0, to: 30, at: 108, ext: [100, 85] }
       ],
       notes: [
-        { view: 'top', at: [65, 30], text: 'R5 ENDS', dx: 12, dy: 16, r: 5 },
-        { view: 'top', at: [15, 30], text: '2× M6×1-6H, FULL THREAD 10 DEEP', dx: -2, dy: 22, r: 3 },
-        { view: 'top', at: [15, 30], text: 'CSK Ø7 × 90°', dx: -2, dy: 30, hidden: true }
+        { view: 'top', at: [68.54, 33.54], to: [76, 70], lines: ['SLOT 10 WIDE, 5 DEEP', 'FULL ROUND ENDS'] },
+        { view: 'top', at: [15, 30], to: [8, 74], r: 3.5, align: 'right', lines: ['2× M6×1-6H', 'FULL THREAD 10 DEEP', 'CSK Ø7 × 90°'] }
       ],
       hints: [
         'Work out each depth from Z 0.00, the finished top: the slot floor is Z −5.00 and full thread must reach Z −10.00. Then the order you face, drill and tap in does not change the part.',
@@ -122,20 +118,20 @@
         { type: 'hole', id: 'bore', label: 'Bore Ø20.00 ±0.05 through', cx: 50, cy: 30, d: 20, through: true, tolD: 0.05, tolPos: 0.05 }
       ],
       dims: [
-        { view: 'top', axis: 'x', from: 0, to: 25, at: -10 },
-        { view: 'top', axis: 'x', from: 25, to: 75, at: -10 },
-        { view: 'top', axis: 'y', from: 0, to: 15, at: -8 },
-        { view: 'top', axis: 'y', from: 15, to: 45, at: -8 },
-        { view: 'top', axis: 'y', from: 0, to: 30, at: 108 },
-        { view: 'front', axis: 'z', from: -5, to: 0, at: 106 }
+        { view: 'top', axis: 'x', from: 0, to: 25, at: -10, ext: [0, 15] },
+        { view: 'top', axis: 'x', from: 25, to: 75, at: -10, ext: 15 },
+        { view: 'top', axis: 'y', from: 0, to: 15, at: -8, ext: [0, 25] },
+        { view: 'top', axis: 'y', from: 15, to: 45, at: -8, ext: 25 },
+        { view: 'top', axis: 'y', from: 0, to: 30, at: 108, ext: [100, 60] },
+        { view: 'front', axis: 'z', from: -5, to: 0, at: 106, ext: [100, 75] }
       ],
       notes: [
-        { view: 'top', at: [50, 30], text: 'Ø20.00 ±0.05 THRU', dx: 24, dy: 22, r: 10 },
-        { view: 'top', at: [75, 45], text: '1 × 45°', dx: 10, dy: 10 }
+        { view: 'top', at: [50, 30], to: [30, 70], r: 10, align: 'right', lines: ['Ø20.00 ±0.05 THRU'] },
+        { view: 'top', at: [74.5, 44.5], to: [84, 66], lines: ['1 × 45°', '4 EDGES'] }
       ],
       hints: [
         'The boss top is the finished top, Z 0.00, and the floor round it is Z −5.00.',
-        'Round the boss the metal comes down 5 mm everywhere. The face mill can clear the open ends in two passes; an end mill finishes along the boss’s faces.',
+        'Round the boss the metal comes down 5 mm everywhere. The face mill can take it in two passes of no more than 4 mm, and the edge of its circle leaves each face of the boss as it goes past; an end mill can do the same in more passes.',
         'Outside corners stay sharp when a cutter goes round them. Only inside corners take the cutter’s radius.',
         'A boring head has no cutting edge at its centre, so it needs a hole to start in. Drill Ø10 through first, then set the head to Ø20.00 and feed it through.',
         'For a 1 mm chamfer with the 90° tool, put its axis right on the edge line with its tip at Z −1.00, then run it along each edge.'

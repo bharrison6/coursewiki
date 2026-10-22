@@ -3,7 +3,8 @@
 
    Every colour is a token from msu-theme.css; nothing here defines one.
    Gold and red-orange are fills and strokes only, never text (contrast
-   rules 1 and 2 in the token layer).
+   rules 1 and 2 in the token layer). Control shapes follow the other
+   machining labs, so this reads as one of them.
    ==========================================================================*/
 
 [data-interactive="milling-simulator"] {
@@ -14,4 +15,260 @@
   border-radius: var(--radius);
   min-width: 0;
   display: flex; flex-direction: column; gap: 1rem;
+}
+
+/* ---- drawings (static figures and the live drawing panel) ---------------*/
+.msd-figure { margin: 0; display: flex; flex-direction: column; gap: .6rem; min-width: 0; }
+.msd-figure figcaption { color: var(--ink-soft); font-size: .92rem; }
+/* A drawing is read at its own scale; on a phone it scrolls sideways
+   rather than shrinking its lettering below legibility. */
+.msd-scroll {
+  overflow-x: auto; overscroll-behavior-x: contain;
+  background: var(--paper);
+  border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  min-width: 0;
+}
+.msd-scroll:focus-visible { outline: 3px solid var(--cat2); outline-offset: 2px; }
+.msd-svg { display: block; width: 100%; min-width: 34rem; height: auto; }
+.msd-rack { min-width: 30rem; }
+.msd-figures { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); }
+
+.msd-vis      { fill: none; stroke: var(--ink); stroke-width: .45; stroke-linejoin: round; stroke-linecap: round; }
+.msd-thin     { fill: none; stroke: var(--ink); stroke-width: .22; }
+.msd-center   { fill: none; stroke: var(--ink-soft); stroke-width: .2; stroke-dasharray: 3 .8 .6 .8; }
+.msd-hidden   { fill: none; stroke: var(--ink-soft); stroke-width: .28; stroke-dasharray: 1.4 .9; }
+.msd-section  { stroke: none; }
+.msd-hatch-line { stroke: var(--ink-soft); stroke-width: .18; }
+.msd-cut      { fill: none; stroke: var(--ink); stroke-width: .25; stroke-dasharray: 5 1 1 1; }
+.msd-cut-end  { fill: none; stroke: var(--ink); stroke-width: .7; }
+.msd-arrow    { fill: var(--ink); }
+.msd-ext, .msd-dim { fill: none; stroke: var(--ink); stroke-width: .2; }
+.msd-jaw      { fill: color-mix(in srgb, var(--ink-soft) 16%, transparent); stroke: var(--ink-soft); stroke-width: .3; }
+.msd-parallel { fill: color-mix(in srgb, var(--ink-soft) 10%, transparent); stroke: var(--ink-soft); stroke-width: .3; }
+.msd-axis     { fill: none; stroke: var(--accent); stroke-width: .5; }
+.msd-origin   { fill: var(--msu-gold); stroke: var(--ink); stroke-width: .3; }
+.msd-zero     { fill: none; stroke: var(--accent); stroke-width: .3; stroke-dasharray: 2 1; }
+.msd-t        { font-family: var(--f-display); font-size: 3.4px; fill: var(--ink); }
+.msd-t-dim    { font-size: 3.2px; }
+.msd-t-label  { font-size: 3.6px; font-weight: 700; letter-spacing: .04em; }
+.msd-t-note   { font-size: 3.1px; }
+.msd-t-small  { font-size: 2.6px; fill: var(--ink-soft); }
+
+/* ---- tools, side on -------------------------------------------------------*/
+.ms-tool-cut    { fill: color-mix(in srgb, var(--ink-soft) 58%, var(--surface)); stroke: var(--ink); stroke-width: .4; stroke-linejoin: round; }
+.ms-tool-body   { fill: color-mix(in srgb, var(--ink-soft) 36%, var(--surface)); stroke: var(--ink); stroke-width: .4; }
+.ms-tool-holder { fill: color-mix(in srgb, var(--ink-soft) 18%, var(--surface)); stroke: var(--ink-soft); stroke-width: .4; }
+.ms-tool-insert { fill: var(--msu-gold); stroke: var(--ink); stroke-width: .3; }
+.ms-tool-helix  { fill: none; stroke: var(--surface); stroke-width: .5; opacity: .75; }
+.ms-tool-axis   { fill: none; stroke: var(--ink-soft); stroke-width: .25; stroke-dasharray: 3 1 .6 1; }
+.ms-tool-icon   { display: block; overflow: visible; }
+
+/* ---- the live simulator --------------------------------------------------*/
+/* The printed figures step aside on screen once the machine is running. */
+[data-interactive="milling-simulator"].is-live .ms-static { display: none; }
+[data-ms-live]:empty { display: none; }
+.ms-app { display: flex; flex-direction: column; gap: .9rem; min-width: 0; container-type: inline-size; }
+
+[data-interactive="milling-simulator"] button {
+  min-height: 2.75rem;
+  padding: .5rem .8rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-display); font-weight: 700; font-size: .9rem;
+  letter-spacing: .02em; line-height: 1.2;
+  cursor: pointer;
+}
+[data-interactive="milling-simulator"] button:hover:not(:disabled) { background: var(--surface-2); }
+[data-interactive="milling-simulator"] button:disabled { opacity: .5; cursor: default; }
+[data-interactive="milling-simulator"] button[aria-pressed="true"] {
+  border-color: var(--accent); color: var(--accent); background: var(--surface-2);
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+[data-interactive="milling-simulator"] .ms-primary { border-color: var(--accent); background: var(--accent); color: var(--paper); }
+[data-interactive="milling-simulator"] .ms-primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.08); }
+[data-interactive="milling-simulator"] :is(button, input, canvas, .msd-scroll, summary):focus-visible {
+  outline: 3px solid var(--cat2); outline-offset: 2px;
+}
+[data-interactive="milling-simulator"] input {
+  min-height: 2.75rem; min-width: 0;
+  padding: .35rem .5rem;
+  border: 1px solid var(--rule); border-radius: var(--radius-xs);
+  background: var(--surface); color: var(--ink);
+  font-family: var(--f-mono); font-size: 1rem;
+}
+.ms-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* job and brief */
+.ms-jobs { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ms-brief { display: flex; flex-direction: column; gap: .45rem; }
+.ms-brief-title { font-family: var(--f-display); font-weight: 700; font-size: 1.08rem; }
+.ms-brief-tools { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ms-hints { margin: 0; padding-left: 1.4rem; display: flex; flex-direction: column; gap: .35rem; }
+.ms-hints:empty { display: none; }
+.ms-hints li { padding-left: .2rem; }
+.ms-drawing > summary {
+  cursor: pointer; min-height: 2.75rem; display: flex; align-items: center;
+  font-family: var(--f-display); font-weight: 700; font-size: .95rem;
+}
+.ms-drawing[open] > summary { margin-bottom: .4rem; }
+
+/* The views: third-angle, one scale. The left column holds 190 mm of X and
+   the right 120 mm of Y, so the top view and the part view, and the two
+   sections, come out the same height. */
+.ms-views { display: grid; gap: .55rem; grid-template-columns: 190fr 120fr; }
+@container (max-width: 34rem) { .ms-views { grid-template-columns: minmax(0, 1fr); } }
+.ms-view {
+  margin: 0; min-width: 0; display: flex; flex-direction: column;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm); overflow: hidden;
+}
+.ms-view-cap {
+  display: flex; align-items: center; justify-content: space-between; gap: .4rem;
+  min-height: 2.1rem; padding: .15rem .3rem .15rem .55rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--f-display); font-size: .7rem; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft);
+}
+.ms-turn { display: flex; gap: .25rem; }
+[data-interactive="milling-simulator"] .ms-mini { min-height: 2.75rem; min-width: 2.75rem; padding: 0 .5rem; font-size: 1.1rem; }
+.ms-canvas { display: block; width: 100%; height: auto; touch-action: none; }
+.ms-top-canvas { aspect-ratio: 190 / 120; cursor: grab; }
+.ms-iso-canvas { aspect-ratio: 1; touch-action: auto; }
+.ms-section-host { touch-action: none; cursor: ns-resize; }
+.ms-section-svg { display: block; width: 100%; height: auto; }
+.ms-metal       { fill: color-mix(in srgb, var(--ink) 20%, var(--surface)); }
+.ms-hatch-line  { stroke: var(--ink-soft); stroke-width: .3; }
+.ms-metal-edge  { fill: none; stroke: var(--ink); stroke-width: .45; stroke-linejoin: round; }
+.ms-target-line { fill: none; stroke: var(--accent); stroke-width: .55; stroke-dasharray: 1.6 1.1; }
+.ms-jaw-cut     { fill: color-mix(in srgb, var(--ink-soft) 32%, var(--paper)); stroke: var(--ink-soft); stroke-width: .3; }
+.ms-jaw-behind  { fill: color-mix(in srgb, var(--ink-soft) 12%, var(--paper)); stroke: var(--ink-soft); stroke-width: .25; }
+.ms-parallel    { fill: color-mix(in srgb, var(--ink-soft) 42%, var(--paper)); stroke: var(--ink-soft); stroke-width: .3; }
+.ms-parallel-behind { fill: color-mix(in srgb, var(--ink-soft) 18%, var(--paper)); stroke: var(--ink-soft); stroke-width: .25; }
+.ms-floor       { stroke: var(--ink-soft); stroke-width: .5; }
+.ms-zero        { stroke: var(--accent); stroke-width: .3; stroke-dasharray: 2 1; }
+.ms-jawtop      { stroke: var(--ink-soft); stroke-width: .25; stroke-dasharray: 1 1; }
+.ms-t           { font-family: var(--f-display); font-size: 3.2px; font-weight: 600; fill: var(--ink); }
+.ms-t-axis      { font-size: 2.8px; fill: var(--ink-soft); }
+.ms-t-soft      { fill: var(--ink-soft); }
+.ms-probe, .ms-keys { font-size: .86rem; color: var(--ink-soft); margin: 0; }
+.ms-probe { min-height: 1.4em; font-variant-numeric: tabular-nums; }
+
+/* status: what the last move did, or why it stopped */
+.ms-status {
+  padding: .6rem .8rem;
+  border-inline-start: .3rem solid var(--accent);
+  background: var(--surface-2);
+  font-size: .97rem;
+}
+.ms-status:empty { display: none; }
+.ms-status.is-warn { border-inline-start-color: var(--cat3); background: var(--cat3-soft); }
+
+/* the panel */
+.ms-panel { display: grid; gap: .65rem; grid-template-columns: minmax(0, 1fr); }
+@container (min-width: 40rem) {
+  .ms-panel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ms-toolbox { grid-column: 1 / -1; }
+}
+@container (min-width: 64rem) {
+  .ms-panel { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); }
+  .ms-toolbox { grid-column: auto; }
+}
+.ms-box {
+  background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  padding: .7rem .8rem; display: flex; flex-direction: column; gap: .55rem; min-width: 0;
+}
+.ms-box-title {
+  font-family: var(--f-display); font-size: .7rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft);
+}
+.ms-toolhead { display: flex; gap: .75rem; align-items: center; }
+.ms-toolicon { flex: none; width: 4.25rem; min-height: 64px; display: flex; justify-content: center; }
+.ms-toolicon svg { height: 64px; width: auto; }
+.ms-toolname { font-family: var(--f-display); font-weight: 700; }
+.ms-toolnote { font-size: .9rem; color: var(--ink-soft); }
+.ms-bore { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.ms-bore[hidden] { display: none; }
+.ms-bore input { width: 6.5rem; }
+.ms-rack { display: flex; flex-wrap: wrap; gap: .5rem .9rem; }
+.ms-rack-group { display: flex; flex-direction: column; gap: .25rem; }
+.ms-rack-name { font-family: var(--f-display); font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+.ms-rack-row { display: flex; flex-wrap: wrap; gap: .3rem; }
+[data-interactive="milling-simulator"] .ms-rack-tool {
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: .2rem;
+  min-width: 3.1rem; padding: .3rem .35rem; font-size: .76rem; font-variant-numeric: tabular-nums;
+}
+.ms-rack-tool svg { height: 38px; width: auto; }
+
+.ms-dro { display: flex; flex-direction: column; gap: .35rem; }
+.ms-dro-row { display: grid; grid-template-columns: 1.3rem minmax(6.2rem, 1fr) auto minmax(4.6rem, 6rem); align-items: center; gap: .4rem; }
+.ms-dro-axis { font-family: var(--f-display); font-weight: 800; color: var(--accent); }
+.ms-dro-val {
+  font-family: var(--f-mono); font-size: 1.2rem; font-weight: 600; font-variant-numeric: tabular-nums;
+  background: var(--band); color: var(--band-ink);
+  padding: .2rem .55rem; border-radius: var(--radius-xs); text-align: right;
+}
+.ms-go-label { font-size: .76rem; color: var(--ink-soft); white-space: nowrap; }
+.ms-under, .ms-go-help { font-size: .86rem; color: var(--ink-soft); }
+.ms-go-row, .ms-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+.ms-jog {
+  display: grid; gap: .3rem;
+  grid-template-columns: repeat(3, minmax(2.75rem, 1fr)) minmax(4.4rem, 1.3fr);
+  grid-template-areas: ". yp . zp" "xm . xp ." ". ym . zm";
+}
+.ms-j-yp { grid-area: yp; } .ms-j-xm { grid-area: xm; } .ms-j-xp { grid-area: xp; }
+.ms-j-ym { grid-area: ym; } .ms-j-zp { grid-area: zp; } .ms-j-zm { grid-area: zm; }
+.ms-small-label { font-size: .76rem; color: var(--ink-soft); margin-bottom: -.3rem; }
+.ms-seg { display: flex; flex-wrap: wrap; gap: .3rem; }
+
+/* inspection */
+.ms-inspect {
+  display: flex; flex-direction: column; gap: .55rem;
+  padding: .8rem .9rem; background: var(--paper);
+  border: 1px solid var(--rule); border-inline-start: .3rem solid var(--rule); border-radius: var(--radius-sm);
+}
+.ms-inspect.is-complete { border-color: var(--cat1); background: var(--cat1-soft); }
+.ms-inspect.is-over { border-inline-start-color: var(--cat3); }
+.ms-inspect-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+.ms-inspect-summary { font-family: var(--f-display); font-weight: 700; }
+.ms-legend { font-size: .86rem; color: var(--ink-soft); display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; }
+.ms-legend[hidden] { display: none; }
+.ms-key { display: inline-block; width: .9rem; height: .9rem; border: 1px solid var(--ink-soft); border-radius: 2px; }
+.ms-key-excess { background: var(--msu-gold); }
+.ms-key-over { background: var(--msu-redorange); margin-left: .6rem; }
+.ms-rows { gap: .45rem; }
+.ms-rows > li, .ms-checks > li { padding-left: 0; }
+.ms-rows > li::before, .ms-checks > li::before { display: none; }
+.ms-row { padding: .5rem .65rem; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); display: flex; flex-direction: column; gap: .3rem; }
+.ms-row-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; }
+.ms-row-label { font-weight: 600; }
+.ms-row-measured { font-size: .9rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.ms-chip {
+  font-family: var(--f-display); font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  padding: .1rem .45rem; border: 1.5px solid var(--rule); border-radius: var(--radius-xs); color: var(--cat-ink);
+  background: var(--surface-2); white-space: nowrap;
+}
+.ms-row.is-ok .ms-chip   { background: var(--cat1-soft); border-color: var(--cat1); }
+.ms-row.is-todo .ms-chip { background: var(--cat2-soft); border-color: var(--cat2); }
+.ms-row.is-over .ms-chip { background: var(--cat3-soft); border-color: var(--cat3); }
+.ms-checks { gap: .2rem; font-size: .92rem; }
+.ms-checks .ms-mark { display: inline-block; width: 1.1rem; font-weight: 700; }
+.ms-checks .is-ok .ms-mark { color: var(--accent); }
+.ms-record { display: none; }
+
+/* presentation: the same machine, read from across the room */
+.presenting [data-interactive="milling-simulator"] .ms-dro-val { font-size: 1.5rem; }
+
+@media print {
+  [data-interactive="milling-simulator"] {
+    background: #FFF !important; border-color: #777 !important; color: #111 !important;
+  }
+  [data-interactive="milling-simulator"].is-live .ms-static { display: flex; }
+  [data-ms-live] { display: none !important; }
+  .ms-record:not(:empty) { display: flex; flex-direction: column; gap: .4rem; break-inside: avoid; }
+  .ms-record-img { width: 60%; max-width: 4in; }
+  .msd-scroll { overflow: visible; border-color: #999 !important; background: #FFF !important; }
+  .msd-svg { min-width: 0; }
+  .msd-figure { break-inside: avoid; }
 }
