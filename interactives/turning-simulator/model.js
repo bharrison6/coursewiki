@@ -584,7 +584,7 @@
       case 'shoulder': return 'The knurling wheels would be pushed into a shoulder. Knurling forms a surface the wheels can roll on; it cannot cut a step.';
       case 'peck': return 'The drill is ' + inch(data.depth || 0) + ' into this cut, three drill diameters. Back it out of the hole to clear the chips, then go back in.';
       case 'retract': return 'The threading tool is still in the thread. Back it out past the crests' + (data.clear != null ? ' (X ' + (t.side === 'in' ? 'below ' : 'above ') + fmt(data.clear) + ')' : '') + ' before you move the carriage, or it will cut the crests off.';
-      case 'infeed': return 'That pass would feed ' + inch(data.infeed || 0) + ' deeper than the last one. The ' + t.name.toLowerCase() + (t.maxInfeed ? ' takes at most ' + inch(t.maxInfeed) + ' per pass.' : ' is not a threading tool.');
+      case 'infeed': return 'That pass would cut ' + inch(data.infeed || 0) + ' deep at the bottom of the groove. The ' + t.name.toLowerCase() + (t.maxInfeed ? ' takes at most ' + inch(t.maxInfeed) + ' of infeed per pass: feed it in less, and take more passes.' : ' is not a threading tool.');
       case 'limit': return 'That is the end of the slide\'s travel.';
       case 'axis': return 'Tailstock tools ride on the centerline. They move only along Z.';
       case 'threadstop': return 'The threading tool would have run into a shoulder before the end of the pass, so the pass stopped at the last full turn short of it. Stop the pass sooner, or cut a relief groove for the tool to run into.';
@@ -767,6 +767,7 @@
   }
   function setPitch(st, tpi) {
     if (PITCHES.indexOf(tpi) < 0) { throw new Error('unknown pitch: ' + tpi); }
+    if (st.spindle) { return { ok: false, text: 'Stop the spindle before you change the leadscrew gearing.' }; }
     st.tpi = tpi; return { ok: true };
   }
 

@@ -299,13 +299,14 @@ test('threading: infeed per pass is limited, the tool must back out, and a wrong
   drive(st, [['mv', 0.1, 0.330]]);              // 0.0225 in on the first pass
   const deep = M.threadPass(st, -0.69);
   assert.equal(deep.stop.code, 'infeed');
-  assert.match(deep.stop.text, /0\.015 in per pass/);
+  assert.match(deep.stop.text, /0\.015 in of infeed per pass/);
   drive(st, [['x', 0.350]]);
   assert.equal(M.threadPass(st, -0.69).stop, null);
   const back = M.move(st, 0.1, 0.350);         // return without backing out
   assert.equal(back.stop.code, 'retract');
   assert.match(back.stop.text, /X above 0\.375/);
-  drive(st, [['x', 0.5], ['z', 0.1], ['tpi', 13], ['x', 0.352]]);
+  assert.equal(M.setPitch(st, 13).ok, false, 'no gear change with the spindle running');
+  drive(st, [['x', 0.5], ['z', 0.1], ['sp', false], ['tpi', 13], ['sp', true], ['x', 0.352]]);
   M.threadPass(st, -0.69);
   assert.ok(Array.from(st.work.thO).some((v) => v === -1), 'columns cut at two pitches');
   const th = M.evaluate(st).items.find((x) => x.label === 'Thread');

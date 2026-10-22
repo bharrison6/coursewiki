@@ -634,7 +634,8 @@
       toolShape(); toolUI(); draw();
     });
     el.tpi.addEventListener('change', function () {
-      M.setPitch(st, parseInt(el.tpi.value, 10));
+      var r = M.setPitch(st, parseInt(el.tpi.value, 10));
+      if (!r.ok) { el.tpi.value = String(st.tpi); say('stop', 'Spindle running.', r.text); return; }
       log('Set the leadscrew gearing to ' + st.tpi + ' threads per inch');
       draw();
       say('info', st.tpi + ' threads per inch.', 'Each pass now advances the tool ' + M.fmt(1 / st.tpi, 4) + ' in per turn of the work.');
