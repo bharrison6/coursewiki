@@ -176,10 +176,13 @@
     feed: ['diameter', 'speed', 'teeth', 'chip'],
     rate: ['diameter', 'speed', 'teeth', 'chip', 'width', 'depth']
   };
-  function partial(values) {
+  function partial(values, errors) {
     var out = { needs: {} };
     Object.keys(NEEDS).forEach(function (k) {
       out.needs[k] = NEEDS[k].filter(function (f) { return !finite(values[f]); });
+      // Blank means no cap; an invalid nonblank cap leaves the actual
+      // spindle speed unknown, so every dependent result must wait.
+      if ((errors || []).some(function (e) { return e.field === 'maxRpm'; })) out.needs[k].push('maxRpm');
     });
     if (!out.needs.rpm.length) {
       var requested = spindleSpeed(values.speed, values.diameter);

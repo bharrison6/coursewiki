@@ -25,6 +25,19 @@ const worked = () => M.setupToCanon('in', { diameter: 0.5, speed: 300, teeth: 4,
 const capped = () => M.setupToCanon('in', { diameter: 0.125, speed: 300, teeth: 2, chip: 0.0008, width: 0.05, depth: 0.1, maxRpm: 4000, eta: null });
 const AL = DATA.get('al-6061-t6').energyJMm3;
 
+test('an invalid nonblank machine cap makes dependent results unknown', () => {
+  const input = { diameter: '0.5', speed: '400', teeth: '4', chip: '0.00415', width: '0.1', depth: '0.5', maxRpm: '0', eta: '' };
+  const bad = M.readFields('in', input);
+  assert.ok(bad.errors.some(e => e.field === 'maxRpm'));
+  const p = M.partial(bad.values, bad.errors);
+  for (const kind of ['rpm', 'feed', 'rate']) assert.ok(p.needs[kind].includes('maxRpm'));
+  assert.equal(p.rpm, undefined); assert.equal(p.feed, undefined);
+  assert.deepEqual(D.workedLines(bad.values, 'in', AL, bad.errors), []);
+  const blank = M.readFields('in', Object.assign({}, input, { maxRpm: '' }));
+  assert.equal(blank.errors.length, 0);
+  assert.ok(M.partial(blank.values, blank.errors).rpm > 3000, 'an explicitly blank optional cap still means no cap');
+});
+
 test('the formula anchors, in both unit systems', () => {
   rel(M.spindleSpeedInch(300, 0.5), 12 * 300 / (Math.PI * 0.5), 1e-12, 'inch RPM');
   rel(M.spindleSpeed(90, 12), 1000 * 90 / (Math.PI * 12), 1e-12, 'metric RPM');

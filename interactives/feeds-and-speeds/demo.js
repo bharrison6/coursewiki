@@ -81,8 +81,8 @@
      `values` are canonical and may be partial; each line appears once its
      inputs are valid. `energy` is a J/mm3 band or null; `eta` a percent.
      Returns plain-text lines; the demo and the tests share them.          */
-  function workedLines(values, unit, energy) {
-    var R = findRemoval(), p = M.partial(values), u = M.UNITS[unit], lines = [];
+  function workedLines(values, unit, energy, errors) {
+    var R = findRemoval(), p = M.partial(values, errors), u = M.UNITS[unit], lines = [];
     if (p.rpm === undefined) return lines;
     var D = M.format(M.fromCanon(unit, 'diameter', values.diameter), 'diameter', unit);
     var V = M.format(M.fromCanon(unit, 'speed', values.speed), 'speed', unit);
@@ -264,12 +264,13 @@
     var gApplyP = el('p', { class: 'fs-guide-apply' });
     var gApply = el('button', { type: 'button' }, 'Use the middle of these ranges');
     var gApplyNote = el('span', { class: 'fs-guide-note' }, 'Fills cutting speed and feed per tooth only. Your cutter, flutes and cut stay as entered.');
+    var gBasis = el('p', { class: 'fs-guide-basis' });
     gApplyP.appendChild(gApply); gApplyP.appendChild(gApplyNote);
     var gMore = el('details', { class: 'fs-guide-more' });
     gMore.appendChild(el('summary', {}, 'What these ranges assume, and where they come from'));
     var gNotes = el('ul'), gSources = el('p', { class: 'fs-guide-sources' });
     gMore.appendChild(gNotes); gMore.appendChild(gSources);
-    [gTitle, gCond, gList, gApplyP, gMore].forEach(function (x) { guide.appendChild(x); });
+    [gTitle, gCond, gList, gBasis, gApplyP, gMore].forEach(function (x) { guide.appendChild(x); });
 
     // ---- the form, in three groups, every field empty
     var form = el('div', { class: 'fs-form' });
@@ -418,7 +419,7 @@
     /* ---- the guide card --------------------------------------------------*/
     var WHERE = { inside: 'inside the range', below: 'below the range', above: 'above the range' };
     function renderGuide() {
-      var g = material(), u = state.unit, v = state.read.values, p = M.partial(v);
+      var g = material(), u = state.unit, v = state.read.values, p = M.partial(v, state.read.errors);
       gTitle.textContent = 'Generic solid-carbide starting ranges: ' + g.label;
       gCond.textContent = g.condition;
       gRows.speed.band.textContent = M.show(g.vcMMin[0], 'speed', u).replace(/ .*$/, '') + '–' + M.show(g.vcMMin[1], 'speed', u);
@@ -451,6 +452,9 @@
       gRows.energy.band.textContent = R.showEnergy(g.energyJMm3, u);
       gRows.energy.pos.textContent = 'Used for the power estimate. Changing the material changes nothing else.';
       gRows.energy.pos.setAttribute('data-pos', '');
+      gBasis.textContent = 'Guide basis: a side cut about 20% of the cutter diameter wide.' +
+        (v.width !== undefined && v.diameter !== undefined ? ' Your width is ' + M.format(100 * v.width / v.diameter, 'eta', u) + '% of diameter.' : '') +
+        ' The ranges do not automatically adjust for a wider cut, full-width slot or long reach.';
       gNotes.textContent = '';
       g.notes.forEach(function (t) { gNotes.appendChild(el('li', {}, t)); });
       gSources.textContent = 'Sources: ';
@@ -477,7 +481,7 @@
         errors.appendChild(el('li', {}, e.message));
       });
       renderGuide();
-      var p = M.partial(v);
+      var p = M.partial(v, r.errors);
       setTile('rpm', p.rpm === undefined ? null : M.show(p.rpm, 'rpm', u),
         p.rpm === undefined ? waitText(p.needs.rpm) : (p.capped ? 'machine top speed; ' + M.show(p.requestedRpm, 'rpm', u) + ' was asked for' : null));
       setTile('feed', p.feed === undefined ? null : M.show(p.feed, 'feed', u), p.feed === undefined ? waitText(p.needs.feed) : null);
@@ -502,7 +506,7 @@
           '. The feed is worked out from the speed the spindle really turns, so each tooth still takes the chip you asked for; the edge simply moves more slowly than the cutting speed you entered.'
         : '';
       work.textContent = '';
-      var lines = workedLines(v, u, g.energyJMm3);
+      var lines = workedLines(v, u, g.energyJMm3, r.errors);
       lines.forEach(function (line) { work.appendChild(el('span', { class: 'fs-line' }, line)); });
       work.hidden = !lines.length;
       rootEl.setAttribute('data-ready', String(q !== null));
@@ -524,7 +528,7 @@
       winSel.value = want;
     }
     function updateExperiment(announce) {
-      var v = state.read.values, p = M.partial(v);
+      var v = state.read.values, p = M.partial(v, state.read.errors);
       var ready = !p.needs.rate.length;
       waiting.hidden = ready; expBody.hidden = !ready;
       if (!ready) {
@@ -578,8 +582,8 @@
       ], elapsed, f, u, g.energyJMm3);
       tIn.value = String(Math.round(state.frac * 100));
       tOut.textContent = R.showSeconds(elapsed) + ' of ' + R.showSeconds(win);
-      scaleNote.textContent = 'Both drawings share one scale, the same in every direction, and show the same ' + R.showSeconds(win) +
-        ' of cutting. Gold is the solid removed in the time shown, drawn where it was; its volume is width × depth × travel. ' +
+      scaleNote.textContent = 'Both drawings share one scale along the three labeled axes and show ' + R.showSeconds(elapsed) +
+        ' of cutting. Gold is the solid removed in that time, drawn where it was; its volume is width × depth × travel. ' +
         'The stock around it is only there to hold the cut. Play runs ' + R.showSeconds(win) + ' of cutting in ' + PLAY_SECONDS + ' s.';
     }
 
@@ -631,7 +635,7 @@
     M.FIELDS.forEach(function (k) {
       inputs[k].addEventListener('input', function () { update(false); });
       inputs[k].addEventListener('change', function () {
-        var p = M.partial(state.read.values);
+        var p = M.partial(state.read.values, state.read.errors);
         if (p.feed !== undefined) status.textContent = 'Spindle ' + M.show(p.rpm, 'rpm', state.unit) + ', table feed ' + M.show(p.feed, 'feed', state.unit) + '.';
       });
     });
@@ -653,10 +657,14 @@
     Object.keys(unitRadios).forEach(function (u) {
       unitRadios[u].addEventListener('change', function () {
         if (!unitRadios[u].checked || u === state.unit) return;
-        var before = readForm();
+        var before = {}, oldUnit = state.unit;
+        M.FIELDS.forEach(function (k) {
+          var text = inputs[k].value.trim(), exact = state.exact[k], number = M.parseNumber(text);
+          if (number !== null) before[k] = exact && exact.text === text ? exact.canon : M.toCanon(oldUnit, k, number);
+        });
         state.unit = u;
         M.FIELDS.forEach(function (k) {
-          var c = before.values[k];
+          var c = before[k];
           if (c !== undefined && c !== null) setField(k, c);
         });
         update(false);
