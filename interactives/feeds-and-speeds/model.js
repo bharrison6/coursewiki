@@ -240,8 +240,8 @@
      Decimal places per quantity and unit. Rev/min are whole numbers;
      everything else carries enough places to read a typical value. */
   var PLACES = {
-    in: { diameter: 4, speed: 0, feed: 1, chip: 4, rpm: 0, maxRpm: 0, teeth: 0, eta: 0 },
-    mm: { diameter: 3, speed: 0, feed: 0, chip: 3, rpm: 0, maxRpm: 0, teeth: 0, eta: 0 }
+    in: { diameter: 4, speed: 0, feed: 1, chip: 4, rpm: 0, maxRpm: 0, teeth: 0, eta: 2 },
+    mm: { diameter: 3, speed: 0, feed: 0, chip: 3, rpm: 0, maxRpm: 0, teeth: 0, eta: 2 }
   };
 
   function group(intPart) { return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ','); }

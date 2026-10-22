@@ -26,6 +26,7 @@ const capped = () => M.setupToCanon('in', { diameter: 0.125, speed: 300, teeth: 
 const AL = DATA.get('al-6061-t6').energyJMm3;
 
 test('an invalid nonblank machine cap makes dependent results unknown', () => {
+  assert.equal(M.format(1.5, 'eta', 'in'), '1.5', 'fractional efficiency is not relabeled as a different percentage');
   const input = { diameter: '0.5', speed: '400', teeth: '4', chip: '0.00415', width: '0.1', depth: '0.5', maxRpm: '0', eta: '' };
   const bad = M.readFields('in', input);
   assert.ok(bad.errors.some(e => e.field === 'maxRpm'));
