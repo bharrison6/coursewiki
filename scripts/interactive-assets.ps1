@@ -29,21 +29,53 @@ function Initialize-InteractiveAssets([string]$sourceRoot) {
       }
     }
     if (-not $assets.CSS.Count -or -not $assets.JS.Count) { throw "interactive $id needs @@CSS and @@JS assets" }
+    $requires = @()
+    foreach ($dependency in ([string]$manifest.Meta.REQUIRES -split ',')) {
+      $dependency = $dependency.Trim()
+      if (-not $dependency) { continue }
+      if ($dependency -cnotmatch '^[a-z][a-z0-9-]*$') { throw "invalid interactive dependency in ${id}: $dependency" }
+      if ($requires -contains $dependency) { throw "duplicate interactive dependency in ${id}: $dependency" }
+      $requires += $dependency
+    }
+    $script:interactiveStampParts += "module:${id}:requires:$($requires -join ',')"
     $script:interactiveModules[$id] = [pscustomobject]@{
-      Id = $id; Root = $dir.FullName; CSS = $assets.CSS; JS = $assets.JS
+      Id = $id; Root = $dir.FullName; CSS = $assets.CSS; JS = $assets.JS; Requires = $requires
     }
   }
+  # Validate even unused declarations before any generated output is written.
+  $null = @(Resolve-InteractiveModuleOrder @($script:interactiveModules.Keys))
+}
+
+function Resolve-InteractiveModuleOrder([string[]]$ids) {
+  $complete = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $visiting = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $ordered = [Collections.Generic.List[string]]::new()
+  $visit = {
+    param([string]$id, [string[]]$chain)
+    if (@($script:interactiveModules.Keys) -cnotcontains $id) { throw "unknown or wrong-case interactive module: $id" }
+    if ($complete.Contains($id)) { return }
+    if (-not $visiting.Add($id)) { throw "interactive dependency cycle: $( (@($chain) + $id) -join ' -> ' )" }
+    foreach ($dependency in $script:interactiveModules[$id].Requires) {
+      & $visit $dependency @(@($chain) + $id)
+    }
+    [void]$visiting.Remove($id)
+    [void]$complete.Add($id)
+    $ordered.Add($id)
+  }
+  foreach ($id in $ids) { & $visit $id @() }
+  $ordered.ToArray()
 }
 
 function Get-InteractiveIds([string]$html) {
   # Comments are authoring placeholders, just as in Resolve-Links.
   $visible = [regex]::Replace($html, '(?s)<!--.*?-->', '')
   $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $roots = [Collections.Generic.List[string]]::new()
   foreach ($match in [regex]::Matches($visible, '\bdata-interactive\s*=\s*["'']([^"'']+)["'']')) {
     $id = $match.Groups[1].Value
-    if (@($script:interactiveModules.Keys) -cnotcontains $id) { throw "unknown or wrong-case interactive module: $id" }
-    if ($seen.Add($id)) { $id }
+    if ($seen.Add($id)) { $roots.Add($id) }
   }
+  Resolve-InteractiveModuleOrder $roots.ToArray()
 }
 
 function Get-InteractiveWebAssets([string]$html, [string]$up, [string]$kind) {

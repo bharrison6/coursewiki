@@ -45,4 +45,43 @@ Assert (Refuses { Initialize-InteractiveAssets $fixture } 'invalid') 'asset path
 Assert (Refuses { Initialize-InteractiveAssets $fixture } 'duplicate') 'duplicate script declarations fail'
 [IO.File]::WriteAllText($manifestPath, $manifest.Replace('@@ID: probe', '@@ID: other'))
 Assert (Refuses { Initialize-InteractiveAssets $fixture } 'match exactly') 'manifest identity matches its folder'
+
+# Two consumers share one dependency, which itself has a dependency.
+function New-ProbeModule([string]$id, [string]$requires = '') {
+  $dir = Join-Path $fixture "interactives/$id"
+  $null = [IO.Directory]::CreateDirectory($dir)
+  $conf = "@@ID: $id`n@@CSS: demo.css`n@@JS: model.js, demo.js`n@@REQUIRES: $requires`n@@END`n"
+  [IO.File]::WriteAllText((Join-Path $dir 'interactive.conf'), $conf)
+  [IO.File]::WriteAllText((Join-Path $dir 'demo.css'), ".$id { color: var(--ink); }")
+  [IO.File]::WriteAllText((Join-Path $dir 'model.js'), "window.${id}Model = {};")
+  [IO.File]::WriteAllText((Join-Path $dir 'demo.js'), "window.${id}Ready = true;")
+}
+New-ProbeModule 'core'
+New-ProbeModule 'shared' 'core'
+New-ProbeModule 'probe' 'shared'
+New-ProbeModule 'sibling' 'shared'
+Initialize-InteractiveAssets $fixture
+$both = '<div data-interactive="probe"></div><div data-interactive="sibling"></div>'
+$order = @(Get-InteractiveIds $both)
+Assert (($order -join ',') -ceq 'core,shared,probe,sibling') 'dependency order is stable and a shared module appears once'
+$web = @(Get-InteractiveWebAssets $both '../' 'JS')
+Assert ($web.Count -eq 8 -and $web[0] -match '/core/model.js' -and $web[2] -match '/shared/model.js' -and $web[4] -match '/probe/model.js') 'web dependencies load before both consumers'
+$inline = @(Get-InteractiveInlineAssets $both 'JS') -join "`n"
+Assert ([regex]::Matches($inline, 'window.sharedReady').Count -eq 1) 'aggregate inlines a shared dependency once'
+$dependencyStamp = $script:interactiveStampParts -join "`n"
+New-ProbeModule 'probe' 'shared,core'
+Initialize-InteractiveAssets $fixture
+Assert (($script:interactiveStampParts -join "`n") -ne $dependencyStamp) 'dependency declarations participate in the cache stamp'
+New-ProbeModule 'probe' 'missing'
+Assert (Refuses { Initialize-InteractiveAssets $fixture } 'unknown') 'missing dependencies fail before generation'
+New-ProbeModule 'probe' 'Shared'
+Assert (Refuses { Initialize-InteractiveAssets $fixture } 'invalid|wrong-case') 'dependency casing is checked'
+New-ProbeModule 'probe' 'shared,shared'
+Assert (Refuses { Initialize-InteractiveAssets $fixture } 'duplicate') 'duplicate dependency declarations fail'
+New-ProbeModule 'probe' 'shared'
+New-ProbeModule 'core' 'probe'
+Assert (Refuses { Initialize-InteractiveAssets $fixture } 'dependency cycle') 'transitive dependency cycles fail'
+New-ProbeModule 'core'
+New-ProbeModule 'probe' 'probe'
+Assert (Refuses { Initialize-InteractiveAssets $fixture } 'dependency cycle') 'self-dependencies fail'
 Write-Output "$script:checks checks passed; synthetic fixture retained at $fixture"

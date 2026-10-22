@@ -104,6 +104,11 @@ the same assets in standalone print aggregates. Modules initialize every matchin
 independently and must work alongside other modules in an aggregate. Unknown module IDs,
 wrong-case filenames, and missing assets fail the build.
 
+Use optional `@@REQUIRES: cutter-geometry` for shared module dependencies. Dependencies
+load before their consumers and appear once even when multiple demos use them in an
+aggregate. Missing dependencies, duplicate declarations and dependency cycles fail before
+generation. Keep a shared operation in its owning module rather than copying its code.
+
 Run the loader checks with `pwsh -File tests/build/interactive-assets.test.ps1`.
 Calculation tests live beside their topic peers under `tests/interactives/` and run with
 `node --test --test-concurrency=2 tests/interactives/*.test.cjs`.
