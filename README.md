@@ -109,6 +109,13 @@ load before their consumers and appear once even when multiple demos use them in
 aggregate. Missing dependencies, duplicate declarations and dependency cycles fail before
 generation. Keep a shared operation in its owning module rather than copying its code.
 
+`feeds-and-speeds/cutting-data.js` owns the generic carbide material guidance, source links,
+diameter interpolation bounds, and the conversion from published power factors to cutting
+energy per solid volume. Consumers use that data directly rather than maintaining their own
+material tables. Removal rate and removed volume are distinct from the power estimate:
+the geometry determines solid volume per time, while the material-energy assumption determines
+estimated cutting power.
+
 Run the loader checks with `pwsh -File tests/build/interactive-assets.test.ps1`.
 Calculation tests live beside their topic peers under `tests/interactives/` and run with
 `node --test --test-concurrency=2 tests/interactives/*.test.cjs`.
