@@ -120,7 +120,6 @@ $script:written = [System.Collections.Generic.HashSet[string]]::new([StringCompa
 function Write-OutBytes([string]$path, [byte[]]$bytes) {
   [void]$script:written.Add($path)
   $dir = Split-Path $path -Parent
-  if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
   $name = $path.Substring($root.Length).TrimStart('\')
   if ($WhatIf) {
     $same = (Test-Path -LiteralPath $path) -and
@@ -131,6 +130,7 @@ function Write-OutBytes([string]$path, [byte[]]$bytes) {
     Write-Host ("  {0,-46} {1}" -f $name, $state)
     return
   }
+  if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
   [System.IO.File]::WriteAllBytes($path, $bytes)
   Write-Host ("  {0,-46} {1:n0} bytes" -f $name, $bytes.Length)
 }
@@ -138,7 +138,6 @@ function Write-OutBytes([string]$path, [byte[]]$bytes) {
 function Write-Out([string]$path, [string]$text) {
   [void]$script:written.Add($path)
   $dir = Split-Path $path -Parent
-  if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
   $name = $path.Substring($root.Length).TrimStart('\')
   $text = $text.Replace("`r`n", "`n")
   if ($WhatIf) {
@@ -147,6 +146,7 @@ function Write-Out([string]$path, [string]$text) {
              else { 'would CHANGE' }
     Write-Host ("  {0,-46} {1}" -f $name, $state)
   } else {
+    if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
     [System.IO.File]::WriteAllText($path, $text, $enc)
     Write-Host ("  {0,-46} {1:n0} bytes" -f $name, $enc.GetByteCount($text))
   }

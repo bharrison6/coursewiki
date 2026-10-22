@@ -1,0 +1,200 @@
+/* ============================================================================
+   milling-direction / demo.css
+
+   Every colour is a token from msu-theme.css; nothing here defines one.
+   Gold and red-orange are fills and strokes only, never text (contrast
+   rules 1 and 2 in the token layer). The panel, control and print shapes
+   follow the engineering labs in app.css, so this reads as one of them.
+   ==========================================================================*/
+
+[data-interactive="milling-direction"] {
+  margin: 1.5rem 0;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  min-width: 0;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+
+/* The paper figure is what a reader without JavaScript, and every printout,
+   gets. With the live demo running it steps aside on screen only. */
+.mill-static { margin: 0; display: flex; flex-direction: column; gap: .75rem; }
+.mill-static-panels {
+  display: grid; gap: .75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+.mill-static figcaption { color: var(--ink-soft); font-size: .92rem; }
+[data-interactive="milling-direction"].is-live .mill-static { display: none; }
+[data-mill-live] { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+[data-mill-live]:empty { display: none; }
+
+/* ---- toolbar ------------------------------------------------------------*/
+.mill-toolbar {
+  display: flex; flex-wrap: wrap; gap: .6rem 1rem;
+  align-items: center; justify-content: space-between;
+}
+.mill-seg, .mill-transport { display: flex; flex-wrap: wrap; gap: .4rem; }
+[data-interactive="milling-direction"] button,
+[data-interactive="milling-direction"] select {
+  min-height: 2.75rem;
+  padding: .5rem .85rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xs);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-display); font-weight: 700; font-size: .92rem;
+  letter-spacing: .02em; line-height: 1.2;
+  cursor: pointer;
+}
+[data-interactive="milling-direction"] button:hover { background: var(--surface-2); }
+.mill-seg button[aria-pressed="true"] {
+  border-color: var(--accent); color: var(--accent); background: var(--surface-2);
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+[data-interactive="milling-direction"] .mill-play {
+  min-width: 6.5rem;
+  border-color: var(--accent); background: var(--accent); color: var(--paper);
+}
+[data-interactive="milling-direction"] .mill-play:hover { background: var(--accent); filter: brightness(1.08); }
+[data-interactive="milling-direction"] :is(button, select, input, .mill-stage):focus-visible {
+  outline: 3px solid var(--cat2);
+  outline-offset: 2px;
+}
+
+/* ---- the drawing --------------------------------------------------------*/
+.mill-stage {
+  display: grid; gap: .75rem;
+  grid-template-columns: minmax(0, 1fr);
+  border-radius: var(--radius-sm);
+}
+.mill-stage[data-view="compare"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 44rem) { .mill-stage[data-view="compare"] { grid-template-columns: minmax(0, 1fr); } }
+.mill-panel, .mill-static-panels > div {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  min-width: 0;
+}
+.mill-panel[hidden] { display: none; }
+.mill-svg, .mill-graph-svg { display: block; width: 100%; height: auto; }
+
+.mill-work    { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 1.5; }
+.mill-stock   { fill: color-mix(in srgb, var(--msu-liteblue) 16%, var(--surface-2)); stroke: none; }
+.mill-surface { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 5 5; fill: none; }
+.mill-marks   { stroke: var(--ink-soft); stroke-width: 2; opacity: .45; fill: none; }
+.mill-feed    { stroke: var(--accent); stroke-width: 5; fill: none; }
+.mill-feed-head { fill: var(--accent); }
+.mill-body    { fill: var(--ink-soft); }
+.mill-hub     { fill: var(--paper); stroke: var(--ink-soft); stroke-width: 3; }
+.mill-tooth   { fill: var(--ink-soft); stroke: var(--ink-soft); stroke-width: 1; stroke-linejoin: round; }
+.mill-tooth.is-cutting { stroke: var(--accent); stroke-width: 3; }
+.mill-spin    { stroke: var(--ink-soft); stroke-width: 3; fill: none; }
+.mill-spin-head { fill: var(--ink-soft); }
+.mill-edgepath { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 4 5; fill: none; }
+.mill-chip    { fill: var(--msu-gold); stroke: var(--ink); stroke-width: 1.5; stroke-linejoin: round; opacity: .95; }
+.mill-chip-fly { stroke-width: 1; }
+.mill-force   { stroke: var(--msu-redorange); stroke-width: 4; fill: none; stroke-linecap: round; }
+.mill-force-head { fill: var(--msu-redorange); }
+.mill-contact { fill: var(--paper); stroke: var(--accent); stroke-width: 3; }
+.mill-mark    { fill: var(--ink); }
+.mill-rub     { fill: none; stroke: var(--msu-redorange); stroke-width: 2.5; stroke-dasharray: 3 3; }
+.mill-bite    { fill: none; stroke: var(--msu-gold); stroke-width: 3.5; }
+
+.mill-t {
+  font-family: var(--f-display); font-size: 18px; font-weight: 600;
+  fill: var(--ink);
+  paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round;
+}
+.mill-t-soft  { fill: var(--ink-soft); font-weight: 500; }
+.mill-t-title { font-size: 24px; font-weight: 700; }
+.mill-t-tag   { font-size: 20px; font-weight: 700; }
+.mill-t-feed  { fill: var(--accent); font-weight: 700; }
+
+/* ---- readouts -----------------------------------------------------------*/
+.mill-readouts {
+  display: grid; gap: .75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+.mill-read {
+  display: flex; flex-direction: column; gap: .15rem;
+  padding: .75rem .9rem;
+  border-inline-start: .25rem solid var(--accent);
+  background: var(--surface-2);
+  min-width: 0;
+}
+.mill-read[hidden] { display: none; }
+.mill-read .k {
+  color: var(--ink-soft);
+  font-family: var(--f-display); font-size: .7rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.mill-read .v { font-family: var(--f-display); font-size: 1.12rem; font-weight: 700; }
+.mill-read .t { font-size: .95rem; }
+.mill-read .p { font-size: .9rem; color: var(--ink-soft); }
+.mill-read .t:empty, .mill-read .p:empty { display: none; }
+
+/* ---- sliders ------------------------------------------------------------*/
+.mill-controls {
+  margin: 0; padding: 0; border: 0; min-width: 0;
+  display: grid; gap: .9rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  align-items: end;
+}
+.mill-controls p { margin: 0; display: grid; gap: .35rem; min-width: 0; }
+.mill-controls label {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: .1rem .5rem;
+  color: var(--ink);
+  font-family: var(--f-display); font-size: .78rem; font-weight: 700;
+  letter-spacing: .045em; line-height: 1.25; text-transform: uppercase;
+}
+.mill-out { color: var(--ink-soft); text-transform: none; letter-spacing: 0; font-weight: 600; }
+.mill-controls input[type="range"] {
+  width: 100%; min-height: 2.75rem; margin: 0;
+  accent-color: var(--accent);
+  background: transparent;
+}
+.mill-controls select { width: 100%; }
+
+.mill-graph {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: .4rem .5rem 0;
+}
+.mill-axis  { stroke: var(--ink-soft); stroke-width: 1.5; fill: none; }
+.mill-peak  { stroke: var(--rule); stroke-width: 1.5; stroke-dasharray: 6 5; fill: none; }
+.mill-curve { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.mill-curve-climb        { stroke: var(--accent); }
+.mill-curve-conventional { stroke: var(--ink); stroke-dasharray: 10 7; }
+.mill-curve.is-dim { opacity: .3; }
+.mill-dot { stroke: var(--paper); stroke-width: 3; }
+.mill-dot-climb        { fill: var(--accent); }
+.mill-dot-conventional { fill: var(--ink); }
+
+.mill-keys { margin: 0; color: var(--ink-soft); font-size: .88rem; }
+
+/* ---- presentation: big, but never taller than the panel ----------------*/
+.presenting [data-interactive="milling-direction"] { font-size: 1.08rem; }
+.presenting .mill-stage[data-view="compare"] .mill-svg { max-height: 46vh; }
+.presenting .mill-stage:not([data-view="compare"]) .mill-svg { max-height: 56vh; }
+.presenting .mill-graph-svg { max-height: 22vh; }
+.presenting [data-interactive="milling-direction"] :is(button, select) { min-height: 3rem; }
+
+@media (max-width: 36rem) {
+  [data-interactive="milling-direction"] { padding: 1rem; }
+  .mill-toolbar { flex-direction: column; align-items: stretch; }
+  .mill-seg button, .mill-transport button { flex: 1 1 auto; }
+}
+
+/* Paper: the static figure, in ink, every time. The live demo's state when
+   the print dialog opened is not a teaching choice anyone made. */
+@media print {
+  [data-interactive="milling-direction"] {
+    break-inside: avoid;
+    background: #FFF !important; border-color: #777 !important; color: #111 !important;
+  }
+  [data-interactive="milling-direction"].is-live .mill-static { display: flex; }
+  [data-mill-live] { display: none !important; }
+  .mill-static-panels > div { background: #FFF !important; border-color: #999 !important; }
+}

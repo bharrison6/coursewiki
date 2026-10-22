@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tolerances and Fits - CourseWiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<script>
+(function(){try{var m=JSON.parse(localStorage.getItem('det:theme'));
+if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m);}}catch(e){}})();
+</script>
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" href="../favicon.svg?v=1f5e817dfc" type="image/svg+xml">
+<link rel="stylesheet" href="../theme/msu-theme.css?v=1f5e817dfc">
+<link rel="stylesheet" href="../theme/app.css?v=1f5e817dfc">
+<link rel="stylesheet" href="../interactives/tolerance-fit/demo.css?v=1f5e817dfc">
+</head>
+<body class="app skin-app" data-page="tolerances-and-fits" data-base="../">
+<a class="skip" href="#main">Skip to content</a>
+<header class="appbar">
+  <button class="iconbtn nav-toggle" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <a class="brand" href="../index.html">
+    <img class="brandmark light-only" alt="Murray State University School of Engineering" src="../assets/soe-logo-4c.png">
+<img class="brandmark dark-only" alt="" aria-hidden="true" src="../assets/soe-logo-4c-reversed.png">
+    <span class="sub" data-brandlabel>CourseWiki</span>
+  </a>
+  <div class="search">
+    <input type="search" placeholder="Search topics" aria-label="Search topics" autocomplete="off" spellcheck="false">
+    <span class="hint">/</span>
+    <div class="results" role="listbox"></div>
+  </div>
+  <button class="iconbtn" type="button" data-act="theme" aria-label="Theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 010 16" fill="currentColor" stroke="none"/></svg></button>
+</header>
+
+<div class="shell has-toc">
+<aside class="sidebar" id="sidebar">
+  <div class="nav-topics">
+  <h2>Topics</h2>
+  <details class="navgroup" data-nav="c-safety">
+    <summary><span class="chev"></span><a class="navself" href="../safety/index.html">Safety</a></summary>
+    <details class="navgroup" data-nav="g-safety-universal-rules" open>
+      <summary><span class="chev"></span><a class="navself" href="../safety/index.html#g-safety-universal-rules">Universal Rules</a></summary>
+      <ul class="navlist">
+        <li><a href="../safety/chemicals-and-sds.html">Chemicals and Safety Data Sheets</a></li>
+        <li><a href="../safety/electrical-safety.html">Electrical Safety</a></li>
+        <li><a href="../safety/equipment-operating-procedure.html">Equipment Operating Procedure</a></li>
+        <li><a href="../safety/fire-safety.html">Fire Safety</a></li>
+        <li><a href="../safety/conduct-and-emergency.html">Lab Conduct and Emergencies</a></li>
+        <li><a href="../safety/lifting-and-carrying.html">Lifting and Carrying</a></li>
+        <li><a href="../safety/machine-hazards.html">Machine Hazards and Housekeeping</a></li>
+        <li><a href="../safety/ppe.html">Personal Protective Equipment</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-safety-equipment" open>
+      <summary><span class="chev"></span><a class="navself" href="../safety/index.html#g-safety-equipment">Equipment</a></summary>
+      <ul class="navlist">
+        <li><a href="../safety/equipment-categories.html">Equipment Categories and Supervision</a></li>
+        <li><a href="../safety/metal-chips.html">Metal Chips and Swarf</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-engineering">
+    <summary><span class="chev"></span><a class="navself" href="../engineering/index.html">Engineering Fundamentals</a></summary>
+    <details class="navgroup" data-nav="g-engineering-units-and-measurement" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-units-and-measurement">Units and Measurement</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/dimensional-analysis.html">Dimensional Analysis</a></li>
+        <li><a href="../engineering/measurement-language.html">Measurement Language</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-motion-and-rotation" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-motion-and-rotation">Motion and Rotation</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/acceleration-and-squared-time.html">Acceleration and Squared Time</a></li>
+        <li><a href="../engineering/angular-motion.html">Angular Motion</a></li>
+        <li><a href="../engineering/motion-quantities.html">Motion Quantities</a></li>
+        <li><a href="../engineering/rotation-and-linear-speed.html">Rotation and Linear Speed</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-force-and-power" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-force-and-power">Force and Power</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/geometry-mass-and-force.html">Geometry, Mass, and Force</a></li>
+        <li><a href="../engineering/power-and-efficiency.html">Power and Efficiency</a></li>
+        <li><a href="../engineering/torque.html">Torque</a></li>
+        <li><a href="../engineering/work-and-energy.html">Work and Energy</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-electrical-quantities" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-electrical-quantities">Electrical Quantities</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/current-voltage-and-resistance.html">Current, Voltage, and Resistance</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-machining" open>
+    <summary><span class="chev"></span><a class="navself" href="../machining/index.html">Machining</a></summary>
+    <details class="navgroup" data-nav="g-machining-milling" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-milling">Milling</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/climb-and-conventional-milling.html">Climb and Conventional Milling</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-machining-measurement-and-fit" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-measurement-and-fit">Measurement and Fit</a></summary>
+      <ul class="navlist">
+        <li><a aria-current="page" href="../machining/tolerances-and-fits.html">Tolerances and Fits</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-lean">
+    <summary><span class="chev"></span><a class="navself" href="../lean/index.html">Lean and Quality</a></summary>
+    <details class="navgroup" data-nav="g-lean-lean-and-organization" open>
+      <summary><span class="chev"></span><a class="navself" href="../lean/index.html#g-lean-lean-and-organization">Lean and Organization</a></summary>
+      <ul class="navlist">
+        <li><a href="../lean/5s-workplace-organization.html">5S Workplace Organization</a></li>
+      </ul>
+    </details>
+  </details>
+  </div>
+  <div class="navsplit"></div>
+  <div class="nav-tracks">
+  <h2>Tracks</h2>
+  <p class="navnote">Tracks built from the topics above. A course carries the topic tracks it needs; a programme is its courses, so it follows them.</p>
+  <details class="navgroup" data-nav="t-det" open>
+    <summary><span class="chev"></span><a class="navself" data-track="det" href="../presentations.html#pl-det">DET</a><span class="count">24</span></summary>
+    <details class="navgroup" data-nav="t-det-130">
+      <summary><span class="chev"></span><a class="navself" data-track="det-130" href="../presentations.html#pl-det-130">DET 130</a><span class="count">11</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="t-det-330">
+      <summary><span class="chev"></span><a class="navself" data-track="det-330" href="../presentations.html#pl-det-330">DET 330</a><span class="count">13</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+        <li><a data-track="machining-fundamentals" href="../presentations.html#pl-machining-fundamentals">Machining Fundamentals<span class="count">2</span></a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="t-det-403">
+      <summary><span class="chev"></span><a class="navself" data-track="det-403" href="../presentations.html#pl-det-403">DET 403</a><span class="count">22</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+        <li><a data-track="units-motion-and-force" href="../presentations.html#pl-units-motion-and-force">Units, Motion, and Force<span class="count">5</span></a></li>
+        <li><a data-track="rotation-and-torque" href="../presentations.html#pl-rotation-and-torque">Rotation and Torque<span class="count">3</span></a></li>
+        <li><a data-track="work-power-and-efficiency" href="../presentations.html#pl-work-power-and-efficiency">Work, Power, and Efficiency<span class="count">2</span></a></li>
+        <li><a data-track="electrical-units" href="../presentations.html#pl-electrical-units">Electrical Units<span class="count">1</span></a></li>
+      </ul>
+    </details>
+  </details>
+  <ul class="navlist tracknav">
+    <li><a data-track="5s-workplace-organization" href="../presentations.html#pl-5s-workplace-organization">5S Workplace Organization<span class="count">1</span></a></li>
+    <li><a data-track="electrical-units" href="../presentations.html#pl-electrical-units">Electrical Units<span class="count">1</span></a></li>
+    <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+    <li><a data-track="machining-fundamentals" href="../presentations.html#pl-machining-fundamentals">Machining Fundamentals<span class="count">2</span></a></li>
+    <li><a data-track="rotation-and-torque" href="../presentations.html#pl-rotation-and-torque">Rotation and Torque<span class="count">3</span></a></li>
+    <li><a data-track="units-motion-and-force" href="../presentations.html#pl-units-motion-and-force">Units, Motion, and Force<span class="count">5</span></a></li>
+    <li><a data-track="work-power-and-efficiency" href="../presentations.html#pl-work-power-and-efficiency">Work, Power, and Efficiency<span class="count">2</span></a></li>
+  </ul>
+  </div>
+  <div class="navsplit"></div>
+  <div class="nav-practice"><h2>Practice</h2>
+    <ul class="navlist"><li><a href="../practice.html">Practice catalog</a></li></ul>
+  </div>
+</aside>
+<div class="backdrop"></div>
+
+<main id="main"><div class="article">
+  <div class="crumb"><a href="../index.html">CourseWiki</a><span class="sep">/</span><a href="index.html">Machining</a><span class="sep">/</span><span>Measurement and Fit</span></div>
+  <h1>Tolerances and Fits</h1>
+  <p class="lede">The permitted size ranges on a hole and a shaft decide whether the two have clearance, interference, or could have either.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="a-size-tolerance-gives-two-limits" data-card="a-size-tolerance-gives-two-limits">
+    <summary>A size tolerance gives two limits<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A size tolerance gives two limits</h2>
+  <p class="lede">Manufacturing produces variation. For each diameter in this lab, the drawing gives
+  a size <strong>between two limits</strong>. A measured diameter inside that interval passes this
+  size check.</p>
+  <dl class="dims">
+    <div><dt>Nominal size</dt><dd>The size a feature is named by, such as <code>&Oslash;0.7500 in</code>.
+    <code>&Oslash;</code> means diameter. Every limit is measured from this number.</dd></div>
+    <div><dt>Deviation</dt><dd>How far a limit sits above (<code>+</code>) or below
+    (<code>&minus;</code>) nominal. <code>+0.0010</code> puts a limit 0.0010&nbsp;in above it.</dd></div>
+    <div><dt>Limits</dt><dd>Nominal plus each deviation: the largest and smallest sizes that pass
+    inspection. <code>&Oslash;0.7500 +0.0010 / 0.0000</code> means anything from 0.7500&nbsp;in to
+    0.7510&nbsp;in.</dd></div>
+    <div><dt>Tolerance</dt><dd>The width of that range: largest limit minus smallest limit. Here,
+    0.0010&nbsp;in.</dd></div>
+  </dl>
+  <div class="panel">
+    <p><strong>A size exactly on a limit passes.</strong> On this page the limits are part of the
+    allowed range: a 0.7500&nbsp;in hole and a 0.7510&nbsp;in hole are both good. A 0.7511&nbsp;in hole
+    is not.</p>
+  </div>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="clearance-is-the-hole-size-minus-the-shaft-size" data-card="clearance-is-the-hole-size-minus-the-shaft-size">
+    <summary>Clearance is the hole size minus the shaft size<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Clearance is the hole size minus the shaft size</h2>
+  <p class="lede">Put a shaft in a hole and the number that decides the fit is the
+  <strong>difference</strong> between their two diameters.</p>
+  <p class="conversion-equation">clearance = hole size &minus; shaft size</p>
+  <ul>
+    <li><strong>Positive:</strong> the hole is bigger. There is a gap, and the shaft slides in.</li>
+    <li><strong>Negative:</strong> the shaft is bigger. That is <strong>interference</strong>: on paper
+    the parts overlap, so the shaft has to be pressed in, or it does not go at all.</li>
+    <li><strong>Zero:</strong> exactly the same size, called <em>line-to-line</em>. No gap and no
+    overlap.</li>
+  </ul>
+  <p>Clearance is measured across the whole diameter. With the shaft centred in the hole, the gap you
+  would see on <strong>each side</strong> is half of it:</p>
+  <p class="conversion-equation">gap on each side = clearance &divide; 2</p>
+
+  <figure class="tf-static-fig">
+    <svg viewBox="0 0 600 252" role="img" aria-labelledby="tfs-sec-t tfs-sec-d">
+      <title id="tfs-sec-t">A shaft in a bored hole, cut in half along its axis</title>
+      <desc id="tfs-sec-d">A 0.7506 inch hole with a 0.7501 inch shaft through it. The 0.0005 inch
+      clearance is split between the two sides, leaving a 0.00025 inch gap above the shaft and the
+      same below it. The gap is drawn far wider than it would really look.</desc>
+      <defs>
+        <pattern id="tfs-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="9" class="tf-hatch-line" stroke="#565350" stroke-width="1.1"/>
+        </pattern>
+        <marker id="tfs-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse">
+          <path d="M0 0 L8 4 L0 8 z" class="tf-arrowhead" fill="#1F1E1C"/>
+        </marker>
+      </defs>
+      <rect class="tf-block" x="150" y="20" width="300" height="50" fill="#EDECE6" stroke="#1F1E1C" stroke-width="1.5"/>
+      <rect class="tf-hatch" x="150" y="20" width="300" height="50" fill="url(#tfs-hatch)"/>
+      <rect class="tf-block" x="150" y="170" width="300" height="50" fill="#EDECE6" stroke="#1F1E1C" stroke-width="1.5"/>
+      <rect class="tf-hatch" x="150" y="170" width="300" height="50" fill="url(#tfs-hatch)"/>
+      <path class="tf-shaft" d="M46 82 L464 82 L470 88 L470 152 L464 158 L46 158 L40 152 L40 88 Z" fill="#DCE3EA" stroke="#002144" stroke-width="2"/>
+      <line class="tf-center" x1="20" y1="120" x2="490" y2="120" stroke="#565350" stroke-dasharray="16 4 3 4"/>
+      <line class="tf-wall" x1="150" y1="70" x2="450" y2="70" stroke="#1F1E1C" stroke-width="2.5"/>
+      <line class="tf-wall" x1="150" y1="170" x2="450" y2="170" stroke="#1F1E1C" stroke-width="2.5"/>
+      <!-- shaft diameter -->
+      <line class="tf-dim" x1="100" y1="85" x2="100" y2="155" stroke="#1F1E1C" stroke-width="1.5" marker-start="url(#tfs-arrow)" marker-end="url(#tfs-arrow)"/>
+      <text class="tf-svg-label" x="20" y="44" font-size="15">SHAFT &#8960;</text>
+      <text class="tf-svg-tick" x="20" y="64" font-size="15">0.7501 in</text>
+      <!-- hole diameter -->
+      <line class="tf-leader" x1="452" y1="70" x2="530" y2="70" stroke="#565350"/>
+      <line class="tf-leader" x1="452" y1="170" x2="530" y2="170" stroke="#565350"/>
+      <line class="tf-dim" x1="515" y1="73" x2="515" y2="167" stroke="#1F1E1C" stroke-width="1.5" marker-start="url(#tfs-arrow)" marker-end="url(#tfs-arrow)"/>
+      <text class="tf-svg-label" x="524" y="114" font-size="15">HOLE &#8960;</text>
+      <text class="tf-svg-tick" x="524" y="134" font-size="13">0.7506 in</text>
+      <!-- the gap -->
+      <line class="tf-gapmark" x1="300" y1="158" x2="300" y2="170" stroke="#002144" stroke-width="4"/>
+      <line class="tf-gapmark" x1="300" y1="70" x2="300" y2="82" stroke="#002144" stroke-width="4"/>
+      <polyline class="tf-leader" points="300,172 300,226" fill="none" stroke="#565350"/>
+      <text class="tf-svg-small" x="300" y="246" text-anchor="middle" font-size="15">gap each side = (0.7506 &#8722; 0.7501) &#247; 2 = 0.00025 in</text>
+    </svg>
+    <figcaption><strong>The gap is drawn hugely enlarged.</strong> At the size of this drawing, a
+    0.00025&nbsp;in gap would be far too thin to see. Hatching marks the cut face of the
+    block.</figcaption>
+  </figure>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="three-kinds-of-fit-decided-by-the-two-worst-cases" data-card="three-kinds-of-fit-decided-by-the-two-worst-cases">
+    <summary>Three kinds of fit, decided by the two worst cases<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Three kinds of fit, decided by the two worst cases</h2>
+  <p class="lede">You do not have to check every pair of parts a drawing allows. Two pairs settle it:
+  the <strong>tightest</strong> and the <strong>loosest</strong>.</p>
+  <dl class="dims">
+    <div><dt>Tightest legal pair</dt><dd>The smallest hole with the largest shaft. Its clearance is
+    the least any good pair can have:<br><code>hole minimum &minus; shaft maximum</code></dd></div>
+    <div><dt>Loosest legal pair</dt><dd>The largest hole with the smallest shaft. Its clearance is the
+    most any good pair can have:<br><code>hole maximum &minus; shaft minimum</code></dd></div>
+  </dl>
+  <div class="unit-table-wrap">
+  <table class="unit-table">
+    <caption>The fit is named by where those two numbers land.</caption>
+    <thead><tr><th scope="col">Fit</th><th scope="col">Tightest pair</th><th scope="col">Loosest pair</th><th scope="col">What it means</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Clearance</th><td>gap, or exactly zero</td><td>gap</td><td>Every pair that passes inspection slides together.</td></tr>
+      <tr><th scope="row">Transition</th><td>overlap</td><td>gap</td><td>Some good pairs slide together; some have to be pressed.</td></tr>
+      <tr><th scope="row">Interference</th><td>overlap</td><td>overlap, or exactly zero</td><td>Every good pair has to be pressed together.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="aside"><strong>The zero cases are deliberate.</strong> When the tightest pair comes out at
+  exactly zero, every good pair either has a gap or just meets, so this page counts it as a clearance
+  fit and the lab marks it <em>zero at the limit</em>. The same goes the other way for interference.</p>
+
+  <figure class="tf-static-fig">
+    <svg viewBox="0 0 600 272" role="img" aria-labelledby="tfz-t tfz-d">
+      <title id="tfz-t">Hole and shaft tolerance ranges for the three kinds of fit</title>
+      <desc id="tfz-d">Three panels. In each, a box shows the range of sizes allowed for the hole and a
+      second box the range allowed for the shaft, drawn against the same dashed nominal line. For a
+      clearance fit the whole hole box sits above the shaft box. For a transition fit the two boxes
+      share part of their height. For an interference fit the whole shaft box sits above the hole
+      box.</desc>
+      <defs>
+        <pattern id="tfz-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <rect width="7" height="7" class="tf-xhatch-bg" fill="#FFEDE5"/>
+          <line x1="0" y1="0" x2="0" y2="7" class="tf-xhatch-line" stroke="#FF4500" stroke-width="1.4"/>
+        </pattern>
+      </defs>
+      <!-- clearance -->
+      <line class="tf-nominal" x1="15" y1="130" x2="185" y2="130" stroke="#1F1E1C" stroke-dasharray="5 4"/>
+      <rect class="tf-zone tf-zone-hole" x="55" y="90" width="45" height="40" fill="#F8E3A6" stroke="#ECAC00" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text class="tf-svg-label" x="77.5" y="83" text-anchor="middle" font-size="13">HOLE</text>
+      <rect class="tf-zone tf-zone-shaft" x="115" y="170" width="45" height="40" fill="#BEE7F7" stroke="#00A4E3" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text class="tf-svg-label" x="137.5" y="163" text-anchor="middle" font-size="13">SHAFT</text>
+      <text class="tf-svg-label" x="100" y="240" text-anchor="middle" font-size="15">CLEARANCE</text>
+      <text class="tf-svg-small" x="100" y="260" text-anchor="middle" font-size="14">hole always bigger</text>
+      <!-- transition -->
+      <rect class="tf-overlap" x="255" y="106" width="105" height="24" fill="url(#tfz-hatch)" stroke="#FF4500" stroke-width="1.5"/>
+      <line class="tf-nominal" x1="215" y1="130" x2="385" y2="130" stroke="#1F1E1C" stroke-dasharray="5 4"/>
+      <rect class="tf-zone tf-zone-hole" x="255" y="90" width="45" height="40" fill="#F8E3A6" fill-opacity=".8" stroke="#ECAC00" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text class="tf-svg-label" x="277.5" y="83" text-anchor="middle" font-size="13">HOLE</text>
+      <rect class="tf-zone tf-zone-shaft" x="315" y="106" width="45" height="32" fill="#BEE7F7" fill-opacity=".8" stroke="#00A4E3" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text class="tf-svg-label" x="337.5" y="99" text-anchor="middle" font-size="13">SHAFT</text>
+      <text class="tf-svg-label" x="300" y="240" text-anchor="middle" font-size="15">TRANSITION</text>
+      <text class="tf-svg-small" x="300" y="260" text-anchor="middle" font-size="14">could be either</text>
+      <!-- interference -->
+      <line class="tf-nominal" x1="415" y1="130" x2="585" y2="130" stroke="#1F1E1C" stroke-dasharray="5 4"/>
+      <rect class="tf-zone tf-zone-hole" x="455" y="90" width="45" height="40" fill="#F8E3A6" stroke="#ECAC00" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text class="tf-svg-label" x="477.5" y="83" text-anchor="middle" font-size="13">HOLE</text>
+      <rect class="tf-zone tf-zone-shaft" x="515" y="30" width="45" height="40" fill="#BEE7F7" stroke="#00A4E3" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text class="tf-svg-label" x="537.5" y="23" text-anchor="middle" font-size="13">SHAFT</text>
+      <text class="tf-svg-label" x="500" y="240" text-anchor="middle" font-size="15">INTERFERENCE</text>
+      <text class="tf-svg-small" x="500" y="260" text-anchor="middle" font-size="14">shaft always bigger</text>
+    </svg>
+    <figcaption><strong>Higher means bigger.</strong> Each box is the range of sizes one part may
+    have; the dashed line is the nominal size. The hatched band in the middle panel is the range of
+    sizes both parts are allowed to have, which is what makes an overlap possible.</figcaption>
+  </figure>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="fit-lab-make-two-parts-then-try-them-together" data-card="fit-lab-make-two-parts-then-try-them-together">
+    <summary>Fit lab: make two parts, then try them together<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Fit lab: make two parts, then try them together</h2>
+  <p class="lede">Pick a drawing, then set the size each part actually came out at. Watch whether
+  each part passes inspection, and whether the two go together.</p>
+  <ul>
+    <li>The <strong>section view</strong> is the pair you made, cut in half. The gold and blue bands
+    are where each wall is allowed to be.</li>
+    <li>The <strong>pair map</strong> is every pair the drawing allows. Anything above the diagonal
+    has a shaft bigger than its hole.</li>
+  </ul>
+  <div data-interactive="tolerance-fit">
+    <div class="tf-static">
+      <noscript><p class="aside">The interactive lab needs JavaScript. The table below holds the same
+      example drawings, worked out.</p></noscript>
+      <div class="unit-table-wrap">
+      <table class="unit-table">
+        <caption>The lab&rsquo;s example drawings. All are made-up teaching limits on a
+        &Oslash;0.7500&nbsp;in nominal, not values from any standard.</caption>
+        <thead><tr><th scope="col">Drawing</th><th scope="col">Hole limits</th><th scope="col">Shaft limits</th><th scope="col">Tightest pair</th><th scope="col">Loosest pair</th><th scope="col">Fit</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Slides freely</th><td>0.7500 to 0.7510</td><td>0.7480 to 0.7490</td><td>+0.0010</td><td>+0.0030</td><td>Clearance</td></tr>
+          <tr><th scope="row">Could go either way</th><td>0.7500 to 0.7510</td><td>0.7498 to 0.7506</td><td>&minus;0.0006</td><td>+0.0012</td><td>Transition</td></tr>
+          <tr><th scope="row">Pressed together</th><td>0.7500 to 0.7510</td><td>0.7515 to 0.7525</td><td>&minus;0.0025</td><td>&minus;0.0005</td><td>Interference</td></tr>
+          <tr><th scope="row">Zero at the worst case</th><td>0.7500 to 0.7510</td><td>0.7492 to 0.7500</td><td>0.0000</td><td>+0.0018</td><td>Clearance, zero at the limit</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+    </div>
+  </details>
+  <details class="xcard deck-slide is-gate" id="two-good-parts-can-still-make-a-bad-pair" data-card="two-good-parts-can-still-make-a-bad-pair">
+    <summary>Two good parts can still make a bad pair<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Two good parts can still make a bad pair</h2>
+  <p class="lede">Inspection checks one part at a time against its own limits. <strong>It never checks
+  the pair.</strong></p>
+  <p>Take the transition drawing from the lab: holes from 0.7500 to 0.7510&nbsp;in, shafts from 0.7498
+  to 0.7506&nbsp;in.</p>
+  <dl class="dims">
+    <div><dt>Hole made at 0.7502</dt><dd>Inside 0.7500 to 0.7510. <strong>Passes.</strong></dd></div>
+    <div><dt>Shaft made at 0.7505</dt><dd>Inside 0.7498 to 0.7506. <strong>Passes.</strong></dd></div>
+    <div><dt>Together</dt><dd><code>0.7502 &minus; 0.7505 = &minus;0.0003 in</code>. The shaft is
+    bigger than the hole. <strong>They overlap.</strong></dd></div>
+  </dl>
+  <div class="gate">
+    <p><strong>Neither part is wrong.</strong> The drawing allows that pair, and that is what
+    <em>transition fit</em> means. If every pair of good parts has to go together, the drawing has to
+    say so: the tightest legal pair must come out at zero or more. That is decided on the drawing,
+    before any part is made.</p>
+  </div>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="call-the-fit-from-the-drawing-alone" data-card="call-the-fit-from-the-drawing-alone">
+    <summary>Call the fit from the drawing alone<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Call the fit from the drawing alone</h2>
+  <p class="lede">Read the two callouts, work out the tightest and loosest pairs, and call it before
+  you look.</p>
+  <div data-interactive="tolerance-fit" data-tf-view="challenge">
+    <div class="tf-static">
+      <p>Five drawings, each on a &Oslash;0.7500&nbsp;in nominal. Work out the limits, then the tightest and
+      loosest pairs. The answer follows each one.</p>
+      <ol>
+        <li>Hole +0.0012&thinsp;/&thinsp;0.0000, shaft &minus;0.0004&thinsp;/&thinsp;&minus;0.0011. <em>Clearance: +0.0004 to +0.0023.</em></li>
+        <li>Hole +0.0008&thinsp;/&thinsp;0.0000, shaft +0.0010&thinsp;/&thinsp;+0.0003. <em>Transition: &minus;0.0010 to +0.0005.</em></li>
+        <li>Hole +0.0006&thinsp;/&thinsp;0.0000, shaft +0.0018&thinsp;/&thinsp;+0.0012. <em>Interference: &minus;0.0018 to &minus;0.0006.</em></li>
+        <li>Hole +0.0010&thinsp;/&thinsp;0.0000, shaft 0.0000&thinsp;/&thinsp;&minus;0.0007. <em>Clearance, zero at the limit: 0.0000 to +0.0017.</em></li>
+        <li>Hole +0.0015&thinsp;/&thinsp;+0.0005, shaft +0.0007&thinsp;/&thinsp;&minus;0.0003. <em>Transition: &minus;0.0002 to +0.0018.</em></li>
+      </ol>
+    </div>
+  </div>
+    </div>
+  </details>
+  <details class="xcard deck-wiki-only" id="what-this-lab-leaves-out" data-card="what-this-lab-leaves-out">
+    <summary>What this lab leaves out<span class="chev"></span></summary>
+    <div class="body">
+      <h2>What this lab leaves out</h2>
+  <p>The lab compares two diameters and nothing else. A real assembly also depends on:</p>
+  <ul>
+    <li><strong>Shape.</strong> No hole is perfectly round or straight, and no shaft is either. A shaft
+    can measure in tolerance everywhere a micrometer touches it and still be bent too far to go
+    in.</li>
+    <li><strong>Temperature.</strong> Parts grow when they warm up, so the same part can measure
+    differently straight off the machine and an hour later.</li>
+    <li><strong>Surface finish and measurement.</strong> A rough surface and an imperfect measurement
+    both blur the last decimal place the drawing asks for.</li>
+    <li><strong>Force.</strong> Whether an interference pair can be pressed together, how hard, and what
+    that does to the parts are questions about the material, not about the two sizes.</li>
+  </ul>
+  <p class="aside">The limits in the lab are made-up teaching values. Real drawings often take limits
+  from published tables of standard fits; those tables are not reproduced here.</p>
+    </div>
+  </details>
+</div>
+
+  <div class="usedin">
+    <div class="k">Appears in</div>
+    <div class="chips">
+      <a class="chip" data-track="det-330" href="tolerances-and-fits.html?p=det-330">DET 330</a>
+      <a class="chip" data-track="det" href="tolerances-and-fits.html?p=det">DET</a>
+      <a class="chip" data-track="machining-fundamentals" href="tolerances-and-fits.html?p=machining-fundamentals">Machining Fundamentals</a>
+    </div>
+  </div>
+</div></main>
+<aside class="toc">
+  <div class="k">On this page</div>
+  <ul>
+    <li><a href="#a-size-tolerance-gives-two-limits">A size tolerance gives two limits</a></li>
+    <li><a href="#clearance-is-the-hole-size-minus-the-shaft-size">Clearance is the hole size minus the shaft size</a></li>
+    <li><a href="#three-kinds-of-fit-decided-by-the-two-worst-cases">Three kinds of fit, decided by the two worst cases</a></li>
+    <li><a href="#fit-lab-make-two-parts-then-try-them-together">Fit lab: make two parts, then try them together</a></li>
+    <li><a href="#two-good-parts-can-still-make-a-bad-pair">Two good parts can still make a bad pair</a></li>
+    <li><a href="#call-the-fit-from-the-drawing-alone">Call the fit from the drawing alone</a></li>
+    <li><a href="#what-this-lab-leaves-out">What this lab leaves out</a></li>
+  </ul>
+</aside>
+
+</div>
+<script src="../search-index.js?v=1f5e817dfc"></script>
+<script src="../playlists.js?v=1f5e817dfc"></script>
+<script src="../practice-index.js?v=1f5e817dfc"></script>
+<script src="../theme/app.js?v=1f5e817dfc"></script>
+<script src="../interactives/tolerance-fit/model.js?v=1f5e817dfc"></script>
+<script src="../interactives/tolerance-fit/demo.js?v=1f5e817dfc"></script>
+</body>
+</html>
