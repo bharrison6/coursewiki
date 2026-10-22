@@ -3145,13 +3145,106 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 }
 
 /* ============================================================================
+   material-removal / removal.css
+
+   Every colour is a theme token. Gold marks the solid removed in the time
+   shown - a fill, never text (contrast rule 1 in the token layer). The
+   stock's three visible faces are one tint at three strengths so the block
+   reads as a solid in either theme.
+   ==========================================================================*/
+
+.mr-svg { display: block; width: 100%; height: auto; }
+
+.mr-stock-top   { fill: color-mix(in srgb, var(--msu-liteblue) 14%, var(--surface)); stroke: var(--ink-soft); stroke-width: 1.2; stroke-linejoin: round; }
+.mr-stock-front { fill: color-mix(in srgb, var(--msu-liteblue) 24%, var(--surface-2)); stroke: var(--ink-soft); stroke-width: 1.2; stroke-linejoin: round; }
+.mr-stock-side  { fill: color-mix(in srgb, var(--msu-liteblue) 34%, var(--surface-2)); stroke: var(--ink-soft); stroke-width: 1.2; stroke-linejoin: round; }
+.mr-cut-floor   { fill: color-mix(in srgb, var(--ink) 10%, var(--surface-2)); stroke: var(--ink-soft); stroke-width: 1; stroke-linejoin: round; }
+.mr-cut-wall    { fill: color-mix(in srgb, var(--ink) 18%, var(--surface-2)); stroke: var(--ink-soft); stroke-width: 1; stroke-linejoin: round; }
+
+.mr-removed {
+  fill: var(--msu-gold); fill-opacity: .62;
+  stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round;
+}
+.mr-removed-front { fill-opacity: .8; }
+.mr-removed-hidden { fill: none; stroke: var(--ink); stroke-width: 1.2; stroke-dasharray: 4 4; }
+.mr-start { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 4; }
+
+.mr-cutter { fill: var(--paper); fill-opacity: .42; stroke: var(--ink); stroke-width: 1.8; stroke-linejoin: round; }
+.mr-cutter-top { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+
+.mr-feed { stroke: var(--accent); stroke-width: 3; fill: none; }
+.mr-feed-head { fill: var(--accent); }
+.mr-dim { stroke: var(--ink); stroke-width: 1.3; fill: none; }
+.mr-scale { stroke: var(--ink); stroke-width: 2; fill: none; }
+
+.mr-t {
+  font-family: var(--f-display); font-size: 15px; font-weight: 600;
+  fill: var(--ink);
+  paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round;
+}
+.mr-t-small { font-size: 14px; }
+.mr-svg-compact .mr-t-small { font-size: 18px; }
+
+/* ---- power across the materials: HTML bars on one shared axis ----------*/
+.mr-chart { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
+.mr-chart-head {
+  margin: 0; display: grid; grid-template-columns: minmax(9rem, 13rem) 1fr; gap: .75rem;
+  font-family: var(--f-display); font-size: .7rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft);
+}
+.mr-rows { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .15rem; }
+.mr-row {
+  display: grid; align-items: center; gap: .2rem .75rem;
+  grid-template-columns: minmax(9rem, 13rem) minmax(6rem, 1fr) 7.5rem;
+  padding: .3rem .4rem; border-radius: var(--radius-xs);
+}
+.mr-row::before { content: none; }
+.mr-row.is-current { background: var(--surface-2); box-shadow: inset .25rem 0 0 var(--accent); }
+.mr-name { font-family: var(--f-display); font-weight: 600; font-size: .92rem; line-height: 1.25; }
+.mr-row.is-current .mr-name { font-weight: 800; }
+.mr-track {
+  position: relative; height: .9rem; min-width: 0;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 999px;
+}
+.mr-band {
+  position: absolute; top: -1px; bottom: -1px; min-width: .55rem;
+  background: var(--msu-gold); border: 1.5px solid var(--ink); border-radius: 999px;
+}
+.mr-band.is-single { min-width: .55rem; margin-left: -.275rem; }
+.mr-val { font-family: var(--f-display); font-weight: 600; font-variant-numeric: tabular-nums; font-size: .9rem; text-align: end; white-space: nowrap; }
+.mr-note { display: block; color: var(--ink-soft); font-size: .76rem; }
+.mr-axis-row { padding-block: 0; }
+.mr-axis {
+  position: relative; height: 1.3rem; min-width: 0;
+  font-family: var(--f-display); font-size: .78rem; color: var(--ink-soft); font-variant-numeric: tabular-nums;
+  border-top: 1px solid var(--ink-soft);
+}
+.mr-axis span { position: absolute; top: .15rem; transform: translateX(-50%); white-space: nowrap; }
+.mr-axis span:first-child { transform: none; }
+.mr-axis span:last-child { transform: translateX(-100%); }
+
+@media (max-width: 40rem) {
+  .mr-chart-head { grid-template-columns: 1fr; }
+  .mr-chart-head span:first-child { display: none; }
+  .mr-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .mr-track, .mr-axis { grid-column: 1 / -1; grid-row: 2; }
+  .mr-axis-row > span:not(.mr-axis) { display: none; }
+}
+
+@media print {
+  .mr-row.is-current { background: #EEE !important; }
+  .mr-track { background: #FFF !important; }
+}
+
+/* ============================================================================
    feeds-and-speeds / demo.css
 
    Every colour is a token from msu-theme.css; nothing here defines one.
    Gold and red-orange are fills and strokes only, never text (contrast
    rules 1 and 2 in the token layer). Control, tile and worked-step shapes
    follow the milling and fit labs, so the three read as one family.
-   The cutter's own look lives in the shared cutter-geometry module.
+   The removed-solid drawing and the material power chart are styled by the
+   shared material-removal module; this file only lays them out.
    ==========================================================================*/
 
 [data-interactive="feeds-and-speeds"] {
@@ -3207,15 +3300,19 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   letter-spacing: .08em; text-transform: uppercase;
 }
 
-/* ---- top bar: illustrative examples and units ---------------------------*/
+/* ---- top bar: material and units ----------------------------------------*/
 .fs-bar {
   display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
   gap: .75rem 1.25rem;
 }
-.fs-examples { display: flex; flex-direction: column; gap: .4rem; min-width: 0; flex: 1 1 24rem; }
-.fs-example-row { display: flex; flex-wrap: wrap; gap: .4rem; }
-.fs-units, .fs-hold { margin: 0; padding: 0; border: 0; min-width: 0; }
-.fs-units legend, .fs-hold legend {
+.fs-material { margin: 0; display: grid; gap: .35rem; min-width: 0; flex: 1 1 18rem; max-width: 26rem; }
+.fs-material label, .fs-window span {
+  font-family: var(--f-display); font-size: .78rem; font-weight: 700;
+  letter-spacing: .045em; text-transform: uppercase; color: var(--ink);
+}
+.fs-material select { width: 100%; text-align: start; }
+.fs-units, .fs-hold, .fs-group { margin: 0; padding: 0; border: 0; min-width: 0; }
+.fs-units legend, .fs-hold legend, .fs-group legend {
   padding: 0; margin-bottom: .2rem;
   font-family: var(--f-display); font-size: .78rem; font-weight: 700;
   letter-spacing: .045em; text-transform: uppercase; color: var(--ink);
@@ -3228,11 +3325,50 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 }
 .fs-units input, .fs-hold input { width: 1.1rem; height: 1.1rem; margin: 0; accent-color: var(--accent); }
 
+/* ---- the guide card: read-only ranges, set apart from what was entered --*/
+.fs-guide {
+  display: flex; flex-direction: column; gap: .6rem; min-width: 0;
+  padding: .9rem 1rem;
+  background: var(--paper);
+  border: 1px solid var(--rule); border-inline-start: .3rem solid var(--msu-liteblue);
+  border-radius: var(--radius-sm);
+}
+.fs-guide > p { margin: 0; }
+.fs-guide-title { font-family: var(--f-display); font-weight: 700; font-size: 1rem; color: var(--ink); }
+.fs-guide-cond { color: var(--ink-soft); font-size: .9rem; }
+.fs-guide-list { margin: 0; display: grid; gap: .45rem; }
+.fs-guide-list > div {
+  display: grid; gap: .1rem .9rem; align-items: baseline;
+  grid-template-columns: minmax(8rem, 10rem) minmax(0, 1fr);
+}
+.fs-guide-list dt {
+  font-family: var(--f-display); font-size: .74rem; font-weight: 700;
+  letter-spacing: .045em; text-transform: uppercase; color: var(--ink-soft);
+}
+.fs-guide-list dd { margin: 0; display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.fs-guide-band { font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; color: var(--ink); overflow-wrap: anywhere; }
+.fs-guide-pos { font-size: .88rem; color: var(--ink-soft); }
+.fs-guide-pos:empty { display: none; }
+.fs-guide-pos[data-pos="inside"] { padding-inline-start: .45rem; border-inline-start: 3px solid var(--cat1); }
+.fs-guide-pos[data-pos="below"], .fs-guide-pos[data-pos="above"] { padding-inline-start: .45rem; border-inline-start: 3px solid var(--flag); }
+.fs-guide-apply { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .9rem; }
+.fs-guide-note { font-size: .88rem; color: var(--ink-soft); flex: 1 1 16rem; }
+.fs-guide-more { font-size: .9rem; }
+.fs-guide-more summary {
+  cursor: pointer; min-height: 2.75rem; display: flex; align-items: center;
+  font-family: var(--f-display); font-weight: 700; color: var(--ink);
+}
+.fs-guide-more summary:focus-visible { outline: 3px solid var(--cat2); outline-offset: 2px; }
+.fs-guide-more ul { margin: .25rem 0 .5rem; padding-inline-start: 1.1rem; display: flex; flex-direction: column; gap: .3rem; }
+.fs-guide-sources { margin: 0; color: var(--ink-soft); }
+
 /* ---- the form ------------------------------------------------------------*/
 .fs-form {
-  display: grid; gap: .75rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr));
+  display: grid; gap: 1rem 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
 }
+.fs-group { display: flex; flex-direction: column; gap: .6rem; }
+.fs-group legend { margin-bottom: .45rem; padding-bottom: .25rem; border-bottom: 1px solid var(--rule); width: 100%; }
 .fs-form p { display: grid; gap: .35rem; margin: 0; min-width: 0; align-content: end; }
 .fs-form label {
   display: flex; flex-wrap: wrap; justify-content: space-between; gap: .1rem .5rem;
@@ -3269,11 +3405,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   border-inline-start: .3rem solid var(--accent);
   border-radius: var(--radius-xs);
 }
-.fs-result[data-kind="speed"], .fs-result[data-kind="chip"] { border-inline-start-color: var(--rule); }
+.fs-result[data-kind="speed"], .fs-result[data-kind="rate"] { border-inline-start-color: var(--ink-soft); }
 .fs-result[data-capped="true"] { border-inline-start-color: var(--flag); }
 .fs-v { font-family: var(--f-display); font-size: 1.3rem; font-weight: 700; line-height: 1.2; color: var(--ink); overflow-wrap: anywhere; }
 .fs-s { font-size: .88rem; line-height: 1.4; color: var(--ink-soft); }
-[data-stale="true"] :is(.fs-results, .fs-work, .fs-demo) { opacity: .55; }
+.fs-result[data-empty="true"] { border-inline-start-color: var(--rule); background: var(--paper); }
+.fs-result[data-empty="true"] .fs-v { color: var(--ink-soft); }
+.fs-result[data-kind="power"], .fs-result[data-kind="shaft"] { border-inline-start-color: var(--msu-gold); }
+.fs-result[hidden] { display: none; }
 .fs-cap {
   margin: 0; padding: .75rem .9rem;
   background: var(--flag-soft); border: 1.5px solid var(--flag); border-radius: var(--radius-sm);
@@ -3292,9 +3431,17 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   overflow-wrap: anywhere;
 }
 .fs-line { display: block; }
+.fs-work[hidden] { display: none; }
 
 /* ---- the experiment -------------------------------------------------------*/
-.fs-exp { display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
+.fs-exp, .fs-exp-body, .fs-chart { display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
+.fs-exp-body { gap: 1rem; }
+.fs-exp-body[hidden], .fs-waiting[hidden] { display: none; }
+.fs-waiting {
+  margin: 0; padding: .9rem 1rem;
+  background: var(--paper); border: 1.5px dashed var(--rule); border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+}
 .fs-exp-title {
   margin: 0;
   font-family: var(--f-display); font-size: 1.05rem; font-weight: 700; color: var(--ink);
@@ -3304,7 +3451,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
 }
 .fs-slider { margin: 0; display: grid; gap: .35rem; min-width: 0; }
-.fs-slider label, .fs-slow {
+.fs-slider label {
   display: flex; flex-wrap: wrap; justify-content: space-between; gap: .1rem .5rem;
   font-family: var(--f-display); font-size: .78rem; font-weight: 700;
   letter-spacing: .045em; line-height: 1.25; text-transform: uppercase; color: var(--ink);
@@ -3328,51 +3475,44 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 .fs-table tr[data-moved="true"] td:last-child { box-shadow: inset .25rem 0 0 var(--flag); }
 
 /* ---- transport and drawing ------------------------------------------------*/
-.fs-transport { display: flex; flex-wrap: wrap; gap: .5rem .75rem; align-items: center; }
-.fs-slow { align-items: center; gap: .5rem; margin-inline-start: auto; }
+.fs-transport {
+  display: grid; gap: .5rem .9rem; align-items: end;
+  grid-template-columns: auto auto minmax(12rem, 1fr) auto;
+}
+.fs-time { margin: 0; }
+.fs-window { display: grid; gap: .35rem; }
 .fs-stage {
   display: grid; gap: .75rem;
   grid-template-columns: minmax(0, 1fr);
   border-radius: var(--radius-sm);
 }
-.fs-panel, .fs-static-fig {
+.fs-sweep, .fs-static-fig {
   background: var(--paper);
   border: 1px solid var(--rule);
   border-radius: var(--radius-sm);
   min-width: 0;
 }
-.fs-svg, .fs-compare-svg, .fs-circ-svg { display: block; width: 100%; height: auto; }
-.fs-clock { margin: 0; font-size: .92rem; color: var(--ink); }
-.fs-fast {
-  margin: 0; padding: .45rem .7rem;
-  border-inline-start: 3px solid var(--flag); background: var(--flag-soft);
-  font-size: .9rem; color: var(--ink);
+.fs-sweep { display: flex; flex-direction: column; gap: .25rem; padding: .6rem .75rem .7rem; }
+.fs-sweeps { display: flex; flex-direction: column; gap: .75rem; }
+.fs-sweep-head { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .75rem; }
+.fs-sweep-title { font-family: var(--f-display); font-weight: 700; font-size: 1.02rem; color: var(--ink); }
+.fs-sweep-sub { font-size: .88rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.fs-sweep-read {
+  margin: 0; display: flex; flex-wrap: wrap; gap: .1rem 1.25rem;
+  font-size: .92rem; color: var(--ink); font-variant-numeric: tabular-nums;
 }
-.fs-fast[hidden] { display: none; }
+.fs-sweep-read strong { font-family: var(--f-display); }
+.fs-circ-svg { display: block; width: 100%; height: auto; }
+.fs-scale-note, .fs-chart-note { margin: 0; font-size: .9rem; color: var(--ink); }
+.fs-chart-note { color: var(--ink-soft); }
 .fs-keys { margin: 0; color: var(--ink-soft); font-size: .88rem; }
+.fs-chart { border-top: 1px solid var(--rule); padding-top: 1rem; }
 
 /* ---- SVG ----------------------------------------------------------------*/
-.fs-stock    { fill: color-mix(in srgb, var(--msu-liteblue) 16%, var(--surface-2)); stroke: var(--ink-soft); stroke-width: 1.5; }
-.fs-slot     { fill: var(--paper); stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 5 5; }
-.fs-marks    { stroke: var(--ink-soft); stroke-width: 2; opacity: .45; fill: none; }
-.fs-feed     { stroke: var(--accent); stroke-width: 5; fill: none; }
-.fs-feed-head { fill: var(--accent); }
-.fs-spin     { stroke: var(--ink-soft); stroke-width: 3; fill: none; }
-.fs-spin-head { fill: var(--ink-soft); }
-.fs-cutter-missing { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 6 6; }
-.fs-lens     { fill: none; stroke: var(--ink); stroke-width: 2; }
-.fs-lens-line { stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 3 4; fill: none; }
-.fs-inset    { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
-.fs-chip     { fill: var(--msu-gold); stroke: var(--ink); stroke-width: 1; }
-.fs-pass     { stroke: var(--ink); stroke-width: 2.5; fill: none; }
-.fs-tipline  { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; fill: none; }
-.fs-flash    { stroke: var(--msu-redorange); stroke-width: 6; stroke-linecap: round; fill: none; }
-.fs-scale    { stroke: var(--ink); stroke-width: 2; fill: none; }
-.fs-travel   { fill: color-mix(in srgb, var(--msu-liteblue) 30%, var(--surface-2)); stroke: var(--ink-soft); stroke-width: 1; }
-.fs-circ     { fill: var(--surface-2); stroke: var(--ink); stroke-width: 3; }
 .fs-unroll   { stroke: var(--msu-gold); stroke-width: 6; stroke-linecap: round; fill: none; }
 .fs-dim      { stroke: var(--ink-soft); stroke-width: 1.5; fill: none; }
 .fs-dot      { fill: var(--accent); stroke: var(--paper); stroke-width: 2; }
+.fs-circ     { fill: var(--surface-2); stroke: var(--ink); stroke-width: 3; }
 
 .fs-t {
   font-family: var(--f-display); font-size: 17px; font-weight: 600;
@@ -3381,21 +3521,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 }
 .fs-t-soft  { fill: var(--ink-soft); font-weight: 500; }
 .fs-t-small { font-size: 14px; }
-.fs-t-title { font-size: 21px; font-weight: 700; }
-.fs-t-tag   { font-size: 18px; font-weight: 700; }
-.fs-t-feed  { fill: var(--accent); font-weight: 700; }
-.fs-svg-compact .fs-t-small { font-size: 19px; }
-.fs-svg-compact .fs-t-title { font-size: 20px; }
 
 /* ---- presentation: big, but never taller than the panel -----------------*/
 .presenting [data-interactive="feeds-and-speeds"] { font-size: 1.05rem; }
-.presenting .fs-svg { max-height: 40vh; }
+.presenting .fs-sweep svg { max-height: 40vh; }
 .presenting [data-interactive="feeds-and-speeds"] :is(button, select) { min-height: 3rem; }
 
+@media (max-width: 44rem) {
+  .fs-transport { grid-template-columns: 1fr 1fr; }
+  .fs-time, .fs-window { grid-column: 1 / -1; }
+  .fs-guide-list > div { grid-template-columns: 1fr; }
+}
 @media (max-width: 36rem) {
   [data-interactive="feeds-and-speeds"] { padding: 1rem; }
-  .fs-slow { margin-inline-start: 0; }
-  .fs-transport button { flex: 1 1 auto; }
+  .fs-sweep { padding: .5rem; }
+  .fs-table { font-size: .84rem; table-layout: fixed; }
+  .fs-table th, .fs-table td { padding: .4rem .3rem; overflow-wrap: anywhere; hyphens: auto; }
+  .fs-table thead th { width: 25%; letter-spacing: .04em; }
+  .fs-table :is(td:last-child, thead th) { overflow-wrap: normal; hyphens: manual; }
 }
 
 /* Paper: the static figure, in ink, every time. Whatever the calculator
@@ -3407,7 +3550,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   }
   [data-interactive="feeds-and-speeds"].is-live .fs-static { display: flex; }
   [data-fs-live] { display: none !important; }
-  .fs-static-fig { background: #FFF !important; border-color: #999 !important; }
+  .fs-static-fig, .fs-sweep { background: #FFF !important; border-color: #999 !important; break-inside: avoid; }
 }
 
 /* ============================================================================
@@ -5765,7 +5908,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <article class="article bundled" id="p-feeds-and-speeds">
   <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Milling</span></div>
   <h1>Feeds and Speeds</h1>
-  <p class="lede">How a cutting speed and a cutter diameter set the spindle speed, how the spindle speed, flute count and chip load set the table feed, and what changes when only the spindle speed does.</p>
+  <p class="lede">How a cutting speed and a cutter diameter set the spindle speed, how the spindle speed, flute count and chip load set the table feed, how width, depth and feed set the volume of metal removed, and how that volume and the material set the cutting power.</p>
 <div class="cardtools">
   <button type="button" data-act="expand">Expand all</button>
   <button type="button" data-act="collapse">Collapse all</button>
@@ -5796,7 +5939,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <div class="panel">
     <p><strong>"Speeds" are the cutter turning; "feeds" are the work moving.</strong> That is all
     the phrase <em>feeds and speeds</em> means. The two are set separately on the machine, and the
-    rest of this page is about how they depend on each other.</p>
+    rest of this page is about how they depend on each other, how much metal they remove, and the
+    power that takes.</p>
   </div>
     </div>
   </details>
@@ -5823,7 +5967,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><strong>Worked example, with illustrative numbers.</strong> A 0.5 in cutter, with cutting data
   that calls for 300 SFM: 12 &times; 300 &divide; (&pi; &times; 0.5) = <strong>2,292 rev/min</strong>.
   The 300 SFM is there to make the arithmetic concrete. It is not a recommendation for any tool or
-  any material.</p>
+  any material. The feed value below is illustrative too; use the later material guide for the
+  carbide starting bands.</p>
   <p>Look at where the diameter sits: underneath. <strong>Halve the diameter and the spindle speed
   doubles.</strong> A small cutter has to turn faster to give its edge the same cutting speed, which
   is why small cutters so often ask for more speed than a machine has. That case has its own card
@@ -5848,33 +5993,100 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   ordinary end mill that is simply the number of flutes.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="calculator-work-out-a-setup-then-change-only-the-spindle-speed" data-card="calculator-work-out-a-setup-then-change-only-the-spindle-speed">
-    <summary>Calculator: work out a setup, then change only the spindle speed<span class="chev"></span></summary>
+  <details class="xcard deck-slide" id="removal-rate-width-times-depth-times-table-feed" data-card="removal-rate-width-times-depth-times-table-feed">
+    <summary>Removal rate: width &times; depth &times; table feed<span class="chev"></span></summary>
     <div class="body">
-      <h2>Calculator: work out a setup, then change only the spindle speed</h2>
-  <p class="lede">Enter a cutter and its cutting data, or start from one of the illustrative
-  examples. The calculator works out the two machine settings and shows the arithmetic. Then move the
-  spindle speed on its own, choose what to hold steady, and watch what has to give.</p>
+      <h2>Removal rate: width &times; depth &times; table feed</h2>
+  <p>Two more numbers describe the cut itself. The <strong>width of cut</strong> is how far the
+  cutter reaches sideways into the work, across the direction of feed. The <strong>depth of
+  cut</strong> is how far down its side the cutter is buried, along its axis. A side cut can be no
+  wider than the cutter; a wider path takes more than one pass.</p>
+  <p>While the table feeds, the cutter sweeps through the work and leaves a channel behind it. In a
+  stretch of time the cutter travels <strong>table feed &times; time</strong>, and the solid metal it
+  takes out in that stretch is a slab as wide as the cut, as deep as the cut, and as long as that
+  travel. Per minute, that is the <strong>material removal rate</strong>:</p>
+  <p class="conversion-equation">Removal rate (in&sup3;/min) = width of cut (in) &times; depth of cut
+  (in) &times; table feed (in/min)</p>
+  <p>The front of the cut is curved, because it is the cutter&rsquo;s own shape. The slab&rsquo;s
+  two ends are the same curve, one travel apart, so whatever the curve, the slab holds exactly
+  width &times; depth &times; travel.</p>
+  <p><strong>Worked example, continued.</strong> The same cutter, 0.1 in wide (20% of its diameter)
+  and 0.5 in deep, at 18.3 in/min: 0.1 &times; 0.5 &times; 18.3 &asymp; <strong>0.917
+  in&sup3;/min</strong>, or 15.0 cm&sup3;/min. In 5 seconds the cutter travels 1.53 in and removes
+  0.0764 in&sup3;.</p>
+  <p>That is the volume of <strong>solid metal</strong>. Once it is chips, the same metal lies loose
+  and takes up far more space, so the removal rate is not the size of the chip pile.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cutting-power-removal-rate-times-the-energy-each-cubic-inch-takes" data-card="cutting-power-removal-rate-times-the-energy-each-cubic-inch-takes">
+    <summary>Cutting power: removal rate times the energy each cubic inch takes<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Cutting power: removal rate times the energy each cubic inch takes</h2>
+  <p>Cutting a cubic inch of a given material takes roughly a given amount of energy. That is its
+  <strong>specific cutting energy</strong>, and it is why the same cut needs more power in steel than
+  in aluminum. Written as power per unit of removal rate, it turns a removal rate straight into
+  power:</p>
+  <p class="conversion-equation">Cutting power (hp) = removal rate (in&sup3;/min) &times; unit power
+  (hp per in&sup3;/min)</p>
+  <p class="conversion-equation">Cutting power (W) = removal rate (mm&sup3;/min) &times; specific
+  energy (J/mm&sup3;) &divide; 60</p>
+  <p>The <strong>60</strong> turns minutes into seconds, because a watt is a joule per second. One
+  mechanical horsepower is 745.7 W.</p>
+  <p><strong>Worked example, continued.</strong> For 6061-T6 aluminum the guide in the calculator
+  gives a band of 0.16 to 0.30 hp per in&sup3;/min. At 0.917 in&sup3;/min that is about
+  <strong>0.15 to 0.28 hp</strong>, or 110 to 210 W. The same cut in 304 stainless steel, whose band
+  is 0.65 to 1.3 hp per in&sup3;/min, needs about 0.60 to 1.2 hp.</p>
+  <p><strong>The answer is usually a band.</strong> Some table rows give one factor; that still
+  produces an estimate, not a measured certainty. Published bands cover a family of materials over
+  a range of hardness, and the energy a real cut takes also depends on chip thickness and
+  cutting-edge geometry. Treat the band as the size of the job, not a
+  prediction to the watt.</p>
+  <p>Three different powers get called &ldquo;the power&rdquo;, and they are not the same:</p>
+  <ul>
+    <li><strong>Cutting power</strong> is what the cutting edge spends. That is the estimate
+    above.</li>
+    <li><strong>Motor shaft power</strong> is more, because the belts, gears and bearings between the
+    motor and the cutter lose some on the way. If the drivetrain passes on 80% of what the motor
+    delivers, the motor must deliver the cutting power &divide; 0.8.</li>
+    <li><strong>Electrical power</strong> drawn from the supply is more again, because the motor and
+    its drive lose some too.</li>
+  </ul>
+  <p>None of these tells you whether a machine can take the cut. A spindle motor&rsquo;s rating is
+  not necessarily available at every speed, and power is only one limit: the tool, the holding and
+  the machine&rsquo;s stiffness are others. Use the estimate to compare cuts and to see why a cut
+  is heavy, not to approve one.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="calculator-from-material-guidance-to-removal-and-power" data-card="calculator-from-material-guidance-to-removal-and-power">
+    <summary>Calculator: from material guidance to removal and power<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Calculator: from material guidance to removal and power</h2>
+  <span id="calculator-work-out-a-setup-then-change-only-the-spindle-speed"></span>
+  <p class="lede">Choose a material to see generic carbide starting ranges for it, then enter the
+  cutter, the cutting data and the cut. Nothing is filled in for you. Each result appears as soon as
+  the fields it needs are filled, and says what it is still waiting for until then. <em>Use the middle
+  of these ranges</em> fills in only the cutting speed and feed per tooth.</p>
   <div class="panel">
-    <p><strong>How to read the drawings.</strong> You are looking down the cutter&rsquo;s axis at a
-    slot being cut. The cutter turns <strong>clockwise</strong> in place, and the work is fed to the
-    left, so the slot trails behind it. The main drawing is to scale. The separate box is a
-    <strong>schematic distance record</strong>: each tick records a tooth passing the front of the
-    cut. Gold shows how far the table has moved since the last pass. <strong>The gap between ticks
-    is the feed per tooth.</strong> These ticks record motion; they are not marks left on a machined
-    surface. Distance in this box is enlarged by the stated factor.</p>
-    <p>Everything runs in slow motion, and the turning and the feed are slowed by the same amount, so
-    what you see between them is the real ratio. The time scale is written under the drawing.</p>
+    <p><strong>How to read the drawings.</strong> You are looking at a block of work from the front,
+    a little above and to the right. The cutter feeds to the right along the front top edge.
+    <strong>Gold is the solid metal removed in the time shown</strong>, drawn where it was before the
+    cutter took it. The dashed blue curve is where the front of the cut stood when that time began;
+    the outlined cylinder is the cutter now. The three labeled axes use the same length scale, and the
+    drawings in one comparison share that scale, so a slab twice as long is twice the volume. The
+    block around the cut is there only to hold it; its size means nothing. The cut is already
+    underway when the interval starts; only the gold volume counts toward that interval.</p>
+    <p>The comparison below the drawings prices the setup&rsquo;s removal rate in every material.
+    The cut is the same in every row; only the energy per cubic inch changes.</p>
   </div>
   <div data-interactive="feeds-and-speeds">
     <figure class="fs-static">
-      <div class="fs-static-fig"><svg class="fs-compare-svg" viewBox="0 0 560 342" role="img" aria-label="Three rows over the same two turns of the setup cutter. Setup: 8 tooth passes. Doubling the spindle speed and holding the table feed: twice the passes over the same table travel, so each tooth takes half the chip. Doubling the spindle speed and holding the chip load: twice the passes, each the same size, so the table travels twice as far." focusable="false"><path class="fs-tipline" d="M520 16L520 302"/><text class="fs-t fs-t-small fs-t-soft" x="516" y="16" text-anchor="end">front of the cut</text><text class="fs-t fs-t-tag" x="24" y="46" text-anchor="start">Setup</text><text class="fs-t fs-t-soft" x="24" y="66" text-anchor="start">2,292 rev/min · 18.3 in/min · 0.0020 in/tooth</text><rect class="fs-travel" x="272" y="80" width="248" height="14"/><path class="fs-pass" d="M520 76L520 98M489 76L489 98M458 76L458 98M427 76L427 98M396 76L396 98M365 76L365 98M334 76L334 98M303 76L303 98"/><text class="fs-t fs-t-small" x="278" y="112" text-anchor="start">8 passes</text><text class="fs-t fs-t-tag" x="24" y="142" text-anchor="start">Spindle ×2, table feed held</text><text class="fs-t fs-t-soft" x="24" y="162" text-anchor="start">4,584 rev/min · 18.3 in/min · 0.0010 in/tooth</text><rect class="fs-travel" x="272" y="176" width="248" height="14"/><path class="fs-pass" d="M520 172L520 194M504.5 172L504.5 194M489 172L489 194M473.5 172L473.5 194M458 172L458 194M442.5 172L442.5 194M427 172L427 194M411.5 172L411.5 194M396 172L396 194M380.5 172L380.5 194M365 172L365 194M349.5 172L349.5 194M334 172L334 194M318.5 172L318.5 194M303 172L303 194M287.5 172L287.5 194"/><text class="fs-t fs-t-small" x="278" y="208" text-anchor="start">16 passes</text><text class="fs-t fs-t-tag" x="24" y="238" text-anchor="start">Spindle ×2, chip load held</text><text class="fs-t fs-t-soft" x="24" y="258" text-anchor="start">4,584 rev/min · 36.7 in/min · 0.0020 in/tooth</text><rect class="fs-travel" x="24" y="272" width="496" height="14"/><path class="fs-pass" d="M520 268L520 290M489 268L489 290M458 268L458 290M427 268L427 290M396 268L396 290M365 268L365 290M334 268L334 290M303 268L303 290M272 268L272 290M241 268L241 290M210 268L210 290M179 268L179 290M148 268L148 290M117 268L117 290M86 268L86 290M55 268L55 290"/><text class="fs-t fs-t-small" x="30" y="304" text-anchor="start">16 passes</text><path class="fs-pass" d="M24 315L24 329"/><text class="fs-t fs-t-small" x="32" y="326" text-anchor="start">one tooth pass</text><rect class="fs-travel" x="174" y="317" width="26" height="10"/><text class="fs-t fs-t-small" x="208" y="326" text-anchor="start">table travel in the same time</text></svg></div>
-      <figcaption>The same setup three ways, over the same stretch of time: two turns of the setup
-      cutter. Each tick is one tooth passing the front of the cut; the bar is how far the table moved
-      meanwhile. Doubling the spindle speed with the table feed held gives twice the passes over the
-      same travel, so <strong>each chip is half as thick</strong>. Doubling it with the chip load held
-      gives twice the passes at the same spacing, so <strong>the table has to move twice as
-      far</strong>. Numbers are from the illustrative 0.5 in, 4-flute example.</figcaption>
+      <div class="fs-sweeps"><div class="fs-sweep" data-run="setup"><p class="fs-sweep-head"><span class="fs-sweep-title">Setup</span><span class="fs-sweep-sub">2,292 rev/min · 18.3 in/min</span></p><svg class="mr-svg" viewBox="0 0 640 226" role="img" aria-label="After 5.00 s the cutter has travelled 1.53 in and removed a solid 0.100 in wide by 0.500 in deep: 0.0764 in³." focusable="false"><path class="mr-stock-side" d="M582.1 167L624 142.9L624 46.2L582.1 70.4Z"/><path class="mr-cut-wall" d="M84.5 124.7L347.6 124.7L347.6 64.3L84.5 64.3Z"/><path class="mr-cut-floor" d="M74 130.8L361.3 130.8L361.3 130.8L361.4 130.4L361.4 130L361.4 129.6L361.3 129.3L361.2 128.9L361 128.5L360.8 128.1L360.5 127.8L360.1 127.4L359.6 127L359 126.6L358.1 126.2L357.1 125.9L355.7 125.5L353.7 125.1L347.6 124.7L84.5 124.7Z"/><path class="mr-cut-wall" d="M361.3 70.4L361.4 70L361.4 69.6L361.4 69.2L361.3 68.9L361.2 68.5L361 68.1L360.8 67.7L360.5 67.3L360.1 67L359.6 66.6L359 66.2L358.1 65.8L357.1 65.5L355.7 65.1L353.7 64.7L347.6 64.3L347.6 124.7L353.7 125.1L355.7 125.5L357.1 125.9L358.1 126.2L359 126.6L359.6 127L360.1 127.4L360.5 127.8L360.8 128.1L361 128.5L361.2 128.9L361.3 129.3L361.4 129.6L361.4 130L361.4 130.4L361.3 130.8Z"/><path class="mr-stock-top" d="M84.5 64.3L347.6 64.3L353.7 64.7L355.7 65.1L357.1 65.5L358.1 65.8L359 66.2L359.6 66.6L360.1 67L360.5 67.3L360.8 67.7L361 68.1L361.2 68.5L361.3 68.9L361.4 69.2L361.4 69.6L361.4 70L361.3 70.4L582.1 70.4L624 46.2L115.9 46.2Z"/><path class="mr-stock-front" d="M74 167L582.1 167L582.1 70.4L361.3 70.4L361.3 130.8L74 130.8Z"/><path class="mr-removed-hidden" d="M176.7 130.8L176.8 130.4L176.8 130L176.8 129.6L176.7 129.3L176.6 128.9L176.4 128.5L176.2 128.1L175.9 127.8L175.5 127.4L175 127L174.4 126.6L173.5 126.2L172.5 125.9L171.1 125.5L169.1 125.1L163 124.7L347.6 124.7"/><path class="mr-removed" d="M347.6 64.3L353.7 64.7L355.7 65.1L357.1 65.5L358.1 65.8L359 66.2L359.6 66.6L360.1 67L360.5 67.3L360.8 67.7L361 68.1L361.2 68.5L361.3 68.9L361.4 69.2L361.4 69.6L361.4 70L361.3 70.4L176.7 70.4L176.8 70L176.8 69.6L176.8 69.2L176.7 68.9L176.6 68.5L176.4 68.1L176.2 67.7L175.9 67.3L175.5 67L175 66.6L174.4 66.2L173.5 65.8L172.5 65.5L171.1 65.1L169.1 64.7L163 64.3Z"/><path class="mr-removed mr-removed-front" d="M176.7 130.8L361.3 130.8L361.3 70.4L176.7 70.4Z"/><path class="mr-start" d="M163 64.3L169.1 64.7L171.1 65.1L172.5 65.5L173.5 65.8L174.4 66.2L175 66.6L175.5 67L175.9 67.3L176.2 67.7L176.4 68.1L176.6 68.5L176.7 68.9L176.8 69.2L176.8 69.6L176.8 70L176.7 70.4L176.7 130.8"/><path class="mr-cutter" d="M281.6 40.3L282.2 38.7L283.5 36.9L285.5 35L288.1 33.1L291.2 31.1L294.9 29.1L299 27.2L303.5 25.3L308.4 23.6L313.4 21.9L318.6 20.4L323.8 19.1L329 18L334 17.1L338.9 16.5L343.4 16.1L347.6 16L351.3 16.1L354.5 16.5L357.2 17.1L359.2 18L360.6 19.1L361.3 20.4L361.3 21.9L361.3 130.6L360.7 132.3L359.4 134.1L357.4 135.9L354.8 137.9L351.6 139.8L348 141.8L343.8 143.8L339.3 145.6L334.5 147.4L329.5 149L324.3 150.5L319.1 151.8L313.9 152.9L308.8 153.8L304 154.4L299.4 154.8L295.3 154.9L291.6 154.8L288.4 154.4L285.7 153.8L283.7 152.9L282.3 151.8L281.6 150.5L281.6 149Z"/><path class="mr-cutter-top" d="M351.6 31.1L354.8 29.1L357.4 27.2L359.4 25.3L360.7 23.6L361.3 21.9L361.3 20.4L360.6 19.1L359.2 18L357.2 17.1L354.5 16.5L351.3 16.1L347.6 16L343.4 16.1L338.9 16.5L334 17.1L329 18L323.8 19.1L318.6 20.4L313.4 21.9L308.4 23.6L303.5 25.3L299 27.2L294.9 29.1L291.2 31.1L288.1 33.1L285.5 35L283.5 36.9L282.2 38.7L281.6 40.3L281.6 41.8L282.3 43.1L283.7 44.2L285.7 45.1L288.4 45.7L291.6 46.1L295.3 46.2L299.4 46.1L304 45.7L308.8 45.1L313.9 44.2L319.1 43.1L324.3 41.8L329.5 40.3L334.5 38.7L339.3 36.9L343.8 35L348 33.1Z"/><path class="mr-feed" d="M119.9 32.2L167.9 32.2"/><path class="mr-feed-head" d="M175.9 32.2L164.9 38.3L164.9 26.2Z"/><text class="mr-t mr-t-small" x="181.9" y="37.2" text-anchor="start">feed</text><path class="mr-dim" d="M62 130.8L62 70.4M57 130.8L72 130.8M57 70.4L72 70.4"/><text class="mr-t mr-t-small" x="56" y="105.6" text-anchor="end">depth</text><path class="mr-dim" d="M62 62.4L72.5 56.3"/><text class="mr-t mr-t-small" x="61.2" y="55.3" text-anchor="end">width</text><path class="mr-dim" d="M152.5 179L152.5 191M152.5 185L337.1 185M337.1 179L337.1 191"/><text class="mr-t mr-t-small" x="152.5" y="205" text-anchor="start">travel in 5.00 s</text><path class="mr-scale" d="M563.6 209L563.6 214L624 214L624 209"/><text class="mr-t mr-t-small" x="557.6" y="214" text-anchor="end">0.500 in</text></svg><p class="fs-sweep-read"><span>In 5.00 s: travel <strong>1.53 in</strong>, removed <strong>0.0764 in³</strong></span><span>Removal rate <strong>0.917 in³/min</strong> · power ≈ <strong>0.15–0.28 hp</strong></span></p></div><div class="fs-sweep" data-run="feed"><p class="fs-sweep-head"><span class="fs-sweep-title">Spindle ×2, table feed held</span><span class="fs-sweep-sub">4,584 rev/min · 18.3 in/min</span></p><svg class="mr-svg" viewBox="0 0 640 226" role="img" aria-label="After 5.00 s the cutter has travelled 1.53 in and removed a solid 0.100 in wide by 0.500 in deep: 0.0764 in³." focusable="false"><path class="mr-stock-side" d="M582.1 167L624 142.9L624 46.2L582.1 70.4Z"/><path class="mr-cut-wall" d="M84.5 124.7L347.6 124.7L347.6 64.3L84.5 64.3Z"/><path class="mr-cut-floor" d="M74 130.8L361.3 130.8L361.3 130.8L361.4 130.4L361.4 130L361.4 129.6L361.3 129.3L361.2 128.9L361 128.5L360.8 128.1L360.5 127.8L360.1 127.4L359.6 127L359 126.6L358.1 126.2L357.1 125.9L355.7 125.5L353.7 125.1L347.6 124.7L84.5 124.7Z"/><path class="mr-cut-wall" d="M361.3 70.4L361.4 70L361.4 69.6L361.4 69.2L361.3 68.9L361.2 68.5L361 68.1L360.8 67.7L360.5 67.3L360.1 67L359.6 66.6L359 66.2L358.1 65.8L357.1 65.5L355.7 65.1L353.7 64.7L347.6 64.3L347.6 124.7L353.7 125.1L355.7 125.5L357.1 125.9L358.1 126.2L359 126.6L359.6 127L360.1 127.4L360.5 127.8L360.8 128.1L361 128.5L361.2 128.9L361.3 129.3L361.4 129.6L361.4 130L361.4 130.4L361.3 130.8Z"/><path class="mr-stock-top" d="M84.5 64.3L347.6 64.3L353.7 64.7L355.7 65.1L357.1 65.5L358.1 65.8L359 66.2L359.6 66.6L360.1 67L360.5 67.3L360.8 67.7L361 68.1L361.2 68.5L361.3 68.9L361.4 69.2L361.4 69.6L361.4 70L361.3 70.4L582.1 70.4L624 46.2L115.9 46.2Z"/><path class="mr-stock-front" d="M74 167L582.1 167L582.1 70.4L361.3 70.4L361.3 130.8L74 130.8Z"/><path class="mr-removed-hidden" d="M176.7 130.8L176.8 130.4L176.8 130L176.8 129.6L176.7 129.3L176.6 128.9L176.4 128.5L176.2 128.1L175.9 127.8L175.5 127.4L175 127L174.4 126.6L173.5 126.2L172.5 125.9L171.1 125.5L169.1 125.1L163 124.7L347.6 124.7"/><path class="mr-removed" d="M347.6 64.3L353.7 64.7L355.7 65.1L357.1 65.5L358.1 65.8L359 66.2L359.6 66.6L360.1 67L360.5 67.3L360.8 67.7L361 68.1L361.2 68.5L361.3 68.9L361.4 69.2L361.4 69.6L361.4 70L361.3 70.4L176.7 70.4L176.8 70L176.8 69.6L176.8 69.2L176.7 68.9L176.6 68.5L176.4 68.1L176.2 67.7L175.9 67.3L175.5 67L175 66.6L174.4 66.2L173.5 65.8L172.5 65.5L171.1 65.1L169.1 64.7L163 64.3Z"/><path class="mr-removed mr-removed-front" d="M176.7 130.8L361.3 130.8L361.3 70.4L176.7 70.4Z"/><path class="mr-start" d="M163 64.3L169.1 64.7L171.1 65.1L172.5 65.5L173.5 65.8L174.4 66.2L175 66.6L175.5 67L175.9 67.3L176.2 67.7L176.4 68.1L176.6 68.5L176.7 68.9L176.8 69.2L176.8 69.6L176.8 70L176.7 70.4L176.7 130.8"/><path class="mr-cutter" d="M281.6 40.3L282.2 38.7L283.5 36.9L285.5 35L288.1 33.1L291.2 31.1L294.9 29.1L299 27.2L303.5 25.3L308.4 23.6L313.4 21.9L318.6 20.4L323.8 19.1L329 18L334 17.1L338.9 16.5L343.4 16.1L347.6 16L351.3 16.1L354.5 16.5L357.2 17.1L359.2 18L360.6 19.1L361.3 20.4L361.3 21.9L361.3 130.6L360.7 132.3L359.4 134.1L357.4 135.9L354.8 137.9L351.6 139.8L348 141.8L343.8 143.8L339.3 145.6L334.5 147.4L329.5 149L324.3 150.5L319.1 151.8L313.9 152.9L308.8 153.8L304 154.4L299.4 154.8L295.3 154.9L291.6 154.8L288.4 154.4L285.7 153.8L283.7 152.9L282.3 151.8L281.6 150.5L281.6 149Z"/><path class="mr-cutter-top" d="M351.6 31.1L354.8 29.1L357.4 27.2L359.4 25.3L360.7 23.6L361.3 21.9L361.3 20.4L360.6 19.1L359.2 18L357.2 17.1L354.5 16.5L351.3 16.1L347.6 16L343.4 16.1L338.9 16.5L334 17.1L329 18L323.8 19.1L318.6 20.4L313.4 21.9L308.4 23.6L303.5 25.3L299 27.2L294.9 29.1L291.2 31.1L288.1 33.1L285.5 35L283.5 36.9L282.2 38.7L281.6 40.3L281.6 41.8L282.3 43.1L283.7 44.2L285.7 45.1L288.4 45.7L291.6 46.1L295.3 46.2L299.4 46.1L304 45.7L308.8 45.1L313.9 44.2L319.1 43.1L324.3 41.8L329.5 40.3L334.5 38.7L339.3 36.9L343.8 35L348 33.1Z"/><path class="mr-feed" d="M119.9 32.2L167.9 32.2"/><path class="mr-feed-head" d="M175.9 32.2L164.9 38.3L164.9 26.2Z"/><text class="mr-t mr-t-small" x="181.9" y="37.2" text-anchor="start">feed</text><path class="mr-dim" d="M62 130.8L62 70.4M57 130.8L72 130.8M57 70.4L72 70.4"/><text class="mr-t mr-t-small" x="56" y="105.6" text-anchor="end">depth</text><path class="mr-dim" d="M62 62.4L72.5 56.3"/><text class="mr-t mr-t-small" x="61.2" y="55.3" text-anchor="end">width</text><path class="mr-dim" d="M152.5 179L152.5 191M152.5 185L337.1 185M337.1 179L337.1 191"/><text class="mr-t mr-t-small" x="152.5" y="205" text-anchor="start">travel in 5.00 s</text><path class="mr-scale" d="M563.6 209L563.6 214L624 214L624 209"/><text class="mr-t mr-t-small" x="557.6" y="214" text-anchor="end">0.500 in</text></svg><p class="fs-sweep-read"><span>In 5.00 s: travel <strong>1.53 in</strong>, removed <strong>0.0764 in³</strong></span><span>Removal rate <strong>0.917 in³/min</strong> · power ≈ <strong>0.15–0.28 hp</strong></span></p></div><div class="fs-sweep" data-run="chip"><p class="fs-sweep-head"><span class="fs-sweep-title">Spindle ×2, chip load held</span><span class="fs-sweep-sub">4,584 rev/min · 36.7 in/min</span></p><svg class="mr-svg" viewBox="0 0 640 226" role="img" aria-label="After 5.00 s the cutter has travelled 3.06 in and removed a solid 0.100 in wide by 0.500 in deep: 0.153 in³." focusable="false"><path class="mr-stock-side" d="M582.1 167L624 142.9L624 46.2L582.1 70.4Z"/><path class="mr-cut-wall" d="M84.5 124.7L532.2 124.7L532.2 64.3L84.5 64.3Z"/><path class="mr-cut-floor" d="M74 130.8L545.9 130.8L545.9 130.8L546 130.4L546 130L546 129.6L545.9 129.3L545.8 128.9L545.6 128.5L545.4 128.1L545.1 127.8L544.7 127.4L544.2 127L543.6 126.6L542.7 126.2L541.7 125.9L540.3 125.5L538.3 125.1L532.2 124.7L84.5 124.7Z"/><path class="mr-cut-wall" d="M545.9 70.4L546 70L546 69.6L546 69.2L545.9 68.9L545.8 68.5L545.6 68.1L545.4 67.7L545.1 67.3L544.7 67L544.2 66.6L543.6 66.2L542.7 65.8L541.7 65.5L540.3 65.1L538.3 64.7L532.2 64.3L532.2 124.7L538.3 125.1L540.3 125.5L541.7 125.9L542.7 126.2L543.6 126.6L544.2 127L544.7 127.4L545.1 127.8L545.4 128.1L545.6 128.5L545.8 128.9L545.9 129.3L546 129.6L546 130L546 130.4L545.9 130.8Z"/><path class="mr-stock-top" d="M84.5 64.3L532.2 64.3L538.3 64.7L540.3 65.1L541.7 65.5L542.7 65.8L543.6 66.2L544.2 66.6L544.7 67L545.1 67.3L545.4 67.7L545.6 68.1L545.8 68.5L545.9 68.9L546 69.2L546 69.6L546 70L545.9 70.4L582.1 70.4L624 46.2L115.9 46.2Z"/><path class="mr-stock-front" d="M74 167L582.1 167L582.1 70.4L545.9 70.4L545.9 130.8L74 130.8Z"/><path class="mr-removed-hidden" d="M176.7 130.8L176.8 130.4L176.8 130L176.8 129.6L176.7 129.3L176.6 128.9L176.4 128.5L176.2 128.1L175.9 127.8L175.5 127.4L175 127L174.4 126.6L173.5 126.2L172.5 125.9L171.1 125.5L169.1 125.1L163 124.7L532.2 124.7"/><path class="mr-removed" d="M532.2 64.3L538.3 64.7L540.3 65.1L541.7 65.5L542.7 65.8L543.6 66.2L544.2 66.6L544.7 67L545.1 67.3L545.4 67.7L545.6 68.1L545.8 68.5L545.9 68.9L546 69.2L546 69.6L546 70L545.9 70.4L176.7 70.4L176.8 70L176.8 69.6L176.8 69.2L176.7 68.9L176.6 68.5L176.4 68.1L176.2 67.7L175.9 67.3L175.5 67L175 66.6L174.4 66.2L173.5 65.8L172.5 65.5L171.1 65.1L169.1 64.7L163 64.3Z"/><path class="mr-removed mr-removed-front" d="M176.7 130.8L545.9 130.8L545.9 70.4L176.7 70.4Z"/><path class="mr-start" d="M163 64.3L169.1 64.7L171.1 65.1L172.5 65.5L173.5 65.8L174.4 66.2L175 66.6L175.5 67L175.9 67.3L176.2 67.7L176.4 68.1L176.6 68.5L176.7 68.9L176.8 69.2L176.8 69.6L176.8 70L176.7 70.4L176.7 130.8"/><path class="mr-cutter" d="M466.2 40.3L466.8 38.7L468.1 36.9L470.1 35L472.7 33.1L475.8 31.1L479.5 29.1L483.6 27.2L488.1 25.3L493 23.6L498 21.9L503.2 20.4L508.4 19.1L513.6 18L518.6 17.1L523.5 16.5L528 16.1L532.2 16L535.9 16.1L539.1 16.5L541.8 17.1L543.8 18L545.2 19.1L545.9 20.4L545.9 21.9L545.9 130.6L545.3 132.3L544 134.1L542 135.9L539.4 137.9L536.2 139.8L532.6 141.8L528.4 143.8L523.9 145.6L519.1 147.4L514.1 149L508.9 150.5L503.7 151.8L498.5 152.9L493.4 153.8L488.6 154.4L484 154.8L479.9 154.9L476.2 154.8L473 154.4L470.3 153.8L468.3 152.9L466.9 151.8L466.2 150.5L466.2 149Z"/><path class="mr-cutter-top" d="M536.2 31.1L539.4 29.1L542 27.2L544 25.3L545.3 23.6L545.9 21.9L545.9 20.4L545.2 19.1L543.8 18L541.8 17.1L539.1 16.5L535.9 16.1L532.2 16L528 16.1L523.5 16.5L518.6 17.1L513.6 18L508.4 19.1L503.2 20.4L498 21.9L493 23.6L488.1 25.3L483.6 27.2L479.5 29.1L475.8 31.1L472.7 33.1L470.1 35L468.1 36.9L466.8 38.7L466.2 40.3L466.2 41.8L466.9 43.1L468.3 44.2L470.3 45.1L473 45.7L476.2 46.1L479.9 46.2L484 46.1L488.6 45.7L493.4 45.1L498.5 44.2L503.7 43.1L508.9 41.8L514.1 40.3L519.1 38.7L523.9 36.9L528.4 35L532.6 33.1Z"/><path class="mr-feed" d="M119.9 32.2L167.9 32.2"/><path class="mr-feed-head" d="M175.9 32.2L164.9 38.3L164.9 26.2Z"/><text class="mr-t mr-t-small" x="181.9" y="37.2" text-anchor="start">feed</text><path class="mr-dim" d="M62 130.8L62 70.4M57 130.8L72 130.8M57 70.4L72 70.4"/><text class="mr-t mr-t-small" x="56" y="105.6" text-anchor="end">depth</text><path class="mr-dim" d="M62 62.4L72.5 56.3"/><text class="mr-t mr-t-small" x="61.2" y="55.3" text-anchor="end">width</text><path class="mr-dim" d="M152.5 179L152.5 191M152.5 185L521.7 185M521.7 179L521.7 191"/><text class="mr-t mr-t-small" x="152.5" y="205" text-anchor="start">travel in 5.00 s</text><path class="mr-scale" d="M563.6 209L563.6 214L624 214L624 209"/><text class="mr-t mr-t-small" x="557.6" y="214" text-anchor="end">0.500 in</text></svg><p class="fs-sweep-read"><span>In 5.00 s: travel <strong>3.06 in</strong>, removed <strong>0.153 in³</strong></span><span>Removal rate <strong>1.83 in³/min</strong> · power ≈ <strong>0.29–0.55 hp</strong></span></p></div></div><div class="mr-chart" role="group" aria-label="Estimated cutting power for each material at 0.917 in³/min, the same cut in every row"><p class="mr-chart-head"><span>Material</span><span>Estimated cutting power at 0.917 in³/min</span></p><ul class="mr-rows"><li class="mr-row is-current" data-material="al-6061-t6" aria-current="true"><span class="mr-name">6061-T6 aluminum</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:7.3%;width:6.4%"></span></span><span class="mr-val">0.15–0.28 hp</span></li><li class="mr-row" data-material="al-7075-t6"><span class="mr-name">7075-T6 aluminum</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:7.3%;width:6.4%"></span></span><span class="mr-val">0.15–0.28 hp</span></li><li class="mr-row" data-material="steel-1018"><span class="mr-name">1018 mild steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band is-single" style="left:27.9%;width:0%"></span></span><span class="mr-val">0.56 hp <span class="mr-note">one factor</span></span></li><li class="mr-row" data-material="steel-1045"><span class="mr-name">1045 steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:27.9%;width:1.4%"></span></span><span class="mr-val">0.56–0.59 hp</span></li><li class="mr-row" data-material="steel-4140"><span class="mr-name">4140 prehard steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:35.8%;width:5.9%"></span></span><span class="mr-val">0.72–0.83 hp</span></li><li class="mr-row" data-material="stainless-304"><span class="mr-name">304 stainless steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:29.8%;width:30.5%"></span></span><span class="mr-val">0.60–1.2 hp</span></li><li class="mr-row" data-material="stainless-316"><span class="mr-name">316 stainless steel</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:29.8%;width:30.5%"></span></span><span class="mr-val">0.60–1.2 hp</span></li><li class="mr-row" data-material="iron-gray-30"><span class="mr-name">Class 30 gray cast iron</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:20.2%;width:10%"></span></span><span class="mr-val">0.40–0.60 hp</span></li><li class="mr-row" data-material="brass-c360"><span class="mr-name">C360 brass</span><span class="mr-track" aria-hidden="true"><span class="mr-band is-single" style="left:13.8%;width:0%"></span></span><span class="mr-val">0.28 hp <span class="mr-note">one factor</span></span></li><li class="mr-row" data-material="ti-6al-4v"><span class="mr-name">Ti-6Al-4V titanium</span><span class="mr-track" aria-hidden="true"><span class="mr-band" style="left:34.5%;width:18.2%"></span></span><span class="mr-val">0.69–1.1 hp</span></li></ul><p class="mr-row mr-axis-row" aria-hidden="true"><span></span><span class="mr-axis"><span style="left:0%">0</span><span style="left:50%">1.0</span><span style="left:100%">2.0 hp</span></span><span></span></p></div>
+      <figcaption>The worked example, 0.5 in cutter, 0.1 in wide and 0.5 in deep, three ways over
+      the same 5 seconds and at one scale. Doubling the spindle speed with the table feed held leaves
+      the slab unchanged: the same metal is removed, in chips half as thick. Doubling it with the chip
+      load held doubles the table feed, so the slab is <strong>twice as long</strong> and the removal
+      rate and power estimate double. Below, the setup&rsquo;s 0.917 in&sup3;/min priced in each
+      material, from the guide&rsquo;s cutting-energy bands.</figcaption>
     </figure>
     <div data-fs-live></div>
     <noscript><p class="aside">JavaScript is off, so the calculator is not running. The formulas and
@@ -5882,23 +6094,32 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="six-things-to-try-in-the-calculator" data-card="six-things-to-try-in-the-calculator">
-    <summary>Six things to try in the calculator<span class="chev"></span></summary>
+  <details class="xcard deck-slide" id="things-to-try-in-the-calculator" data-card="things-to-try-in-the-calculator">
+    <summary>Things to try in the calculator<span class="chev"></span></summary>
     <div class="body">
-      <h2>Six things to try in the calculator</h2>
+      <h2>Things to try in the calculator</h2>
   <ul class="boxes">
-    <li>Load the <strong>half-inch cutter</strong> example and check each worked line against the
-    formulas on this page.</li>
-    <li>Switch to <strong>metric</strong> and back. The lengths and speeds change units, but the
-    cutter and the cut do not: 0.5 in becomes 12.7 mm, and the spindle speed stays exactly the same.</li>
-    <li>Hold <strong>the table feed</strong> and drag the spindle speed to 200%. The chip load halves.
-    In the distance record the ticks crowd together and the gold travel bar gets narrower.</li>
-    <li>Now hold <strong>the chip load</strong> and do the same. The table feed doubles instead: the
-    ticks keep their spacing but arrive twice as often.</li>
-    <li>Press <strong>Play</strong> and count how many times the cutter turns while the work, in the
-    main drawing, barely seems to move. Then look at the enlarged distance record to see that it does.</li>
-    <li>Load the <strong>eighth-inch cutter on a 4,000 rev/min machine</strong>. Compare the speed
-    the cutting data asks for with the speed the machine can reach.</li>
+    <li>Before typing anything, read the results. Each one names the fields it is waiting for.</li>
+    <li>With <strong>6061-T6 aluminum</strong> chosen, enter a <strong>0.5 in</strong> diameter and
+    <strong>4</strong> flutes, then press <em>Use the middle of these ranges</em>. Cutting speed and
+    feed per tooth fill in at 400 SFM and 0.00415 in/tooth. Nothing else changes.</li>
+    <li>Enter a width of <strong>0.1 in</strong> and a depth of <strong>0.5 in</strong>. Check the
+    removal rate against width &times; depth &times; table feed in the arithmetic.</li>
+    <li>Change the material to <strong>304 stainless steel</strong>. The drawings, the table feed and
+    the removal rate stay exactly as they were; only the power estimate moves. The guide now marks
+    your cutting speed as above its range for stainless, but the calculator leaves your entries
+    alone.</li>
+    <li>Hold <strong>the table feed</strong> and drag the spindle speed to 200%. The slab does not
+    change and nor does the removal rate: the same metal comes off, in chips half as thick.</li>
+    <li>Now hold <strong>the chip load</strong> and do the same. The table feed doubles, the slab
+    grows twice as long in the same time, and the removal rate and power estimate double.</li>
+    <li>Switch to <strong>metric</strong> and back. The cut and every result stay the same, written
+    in other units, and any field you left empty stays empty.</li>
+    <li>Try a width larger than the diameter. The calculator refuses it: that is more than one
+    pass.</li>
+    <li>Enter a <strong>0.125 in</strong> cutter with a <strong>4,000 rev/min</strong> machine top
+    speed. Compare the speed the cutting speed asks for with the speed the machine can reach, and
+    where the cutting speed actually reached sits against the guide.</li>
   </ul>
     </div>
   </details>
@@ -5925,20 +6146,35 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   speed</em> box does this for a top speed.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="a-calculator-is-not-cutting-data" data-card="a-calculator-is-not-cutting-data">
-    <summary>A calculator is not cutting data<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="generic-ranges-are-a-starting-point-not-your-tool-s-data" data-card="generic-ranges-are-a-starting-point-not-your-tool-s-data">
+    <summary>Generic ranges are a starting point, not your tool&rsquo;s data<span class="chev"></span></summary>
     <div class="body">
-      <h2>A calculator is not cutting data</h2>
+      <h2>Generic ranges are a starting point, not your tool&rsquo;s data</h2>
+  <h3>What determines the surface speed?</h3>
+  <p>Start with the <strong>material and its hardness</strong>, then the cutting tool. Carbide is
+  a tool material, not one universal cutting edge: its grade, coating and geometry matter, as do
+  coolant and how steadily the setup can cut. A harder material generally calls for a lower
+  starting speed. Once that surface speed is chosen, the <strong>diameter determines the RPM</strong>;
+  a smaller cutter must turn faster to reach the same surface speed.</p>
+  <h3>What determines the feed per tooth?</h3>
+  <p>Choose a bite the <strong>cutting edge can carry and the flute can clear</strong>. That is why
+  the guide changes with cutter diameter: small cutters generally take smaller bites. Width and
+  depth of cut, a full-width slot, a long tool and a flexible setup change the loading and chip
+  clearance. The number of flutes then tells you how many of those bites happen per turn; it does
+  not by itself choose the size of each bite. Use the diameter-based range as a starting point,
+  with its stated engagement, and refine it from the actual tool&rsquo;s cutting data.</p>
   <div class="gate">
     <p><strong>The arithmetic on this page is exact. Its inputs are the part that takes
-    judgement.</strong> The cutting speed and feed per tooth come from cutting data, normally the
-    toolmaker&rsquo;s for that tool, that material and that kind of cut, or from the person
-    responsible for the machine. This page does not supply them, and its example numbers exist only
-    to make the arithmetic concrete.</p>
+    judgement.</strong> The ranges in the calculator are generic starting bands for solid-carbide end
+    mills, by material family, from published toolmaker tables. The cutting data for <em>your</em>
+    tool comes first: normally the toolmaker&rsquo;s for that tool, that material and that kind of
+    cut, or the person responsible for the machine.</p>
   </div>
-  <p>Cutting data accounts for things these formulas cannot see: the material being cut, what the tool
-  is made of, how much of the cutter is in the work, and how the setup is held. A calculator turns
-  data into machine settings. It cannot tell you whether the data suit your cut.</p>
+  <p>Cutting data accounts for things these formulas cannot see: the exact grade and hardness of the
+  material, the tool&rsquo;s coating and geometry, how far it reaches out of the holder, coolant, and
+  how the setup is held. The guide&rsquo;s feed-per-tooth ranges assume a side cut about 20% of the
+  cutter&rsquo;s diameter wide; a full-width slot or a long reach needs the tool&rsquo;s own data. A
+  calculator turns data into machine settings. It cannot tell you whether the data suit your cut.</p>
   <p class="deeper-ref" id="deeper-ref-15">Supporting detail: <a href="#deeper-addendum-15"><strong>Addendum 15</strong></a> &mdash; Feed per tooth is not always the thickness of the chip.</p>
     </div>
   </details>
@@ -6656,12 +6892,19 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     shows this: at a width of cut of 10% of the diameter, the thickest part of the chip is 60% of the
     feed per tooth.</p>
     <p>Some cutting data raises the feed per tooth for narrow cuts to make up for this. Read what your
-    data assumes before using its numbers, and ask if it does not say.</p>
+    data assumes before using its numbers, and ask if it does not say. Thinner chips also take more
+    energy per cubic inch, which is one reason a power estimate is a band.</p>
     <p>The spindle-speed, table-feed and feed-per-tooth relations follow
     <a href="https://www.sandvik.coromant.com/en-us/knowledge/machining-formulas-definitions/milling-formulas-definitions">Sandvik Coromant&rsquo;s milling formulas and definitions</a>.
-    The drawings use an idealized cutter section; see
-    <a href="https://www.harveyperformance.com/in-the-loupe/end-mill-anatomy/">Harvey Performance&rsquo;s end mill anatomy</a>
-    for the flutes, core and cutting edges of a real end mill.</p>
+    The calculator&rsquo;s cutting-speed and feed-per-tooth ranges are from
+    <a href="https://www.garrtool.com/wp-content/uploads/2018/11/TECHNICAL.pdf#page=8">GARR TOOL&rsquo;s general purpose milling guide</a>,
+    and its cutting-energy bands are converted from
+    <a href="https://www1.mscdirect.com/images/solutions/kennametal/millingTechInfoFormulas.pdf#page=2">Kennametal&rsquo;s milling power factors</a>.</p>
+    <p><a href="https://www.sandvik.coromant.com/en-us/knowledge/materials/specific-cutting-force">Sandvik&rsquo;s specific cutting-force explanation</a>
+    shows why chip thickness and cutting-edge geometry affect the energy estimate.
+    <a href="https://www.haascnc.com/content/dam/haascnc/productivity/spindles/torque-chart-jpg/torque-chart-machine-pdp-binder-/MM_8k_10k_Torque%20Binder_01_2024.pdf">Haas&rsquo;s spindle power curves</a>
+    illustrate why available power depends on RPM; read the machine&rsquo;s own curve and duty
+    rating rather than treating its headline horsepower as available everywhere.</p>
         <p class="deeper-back"><a href="#deeper-ref-15">Back to reference 15</a></p>
       </article>
     </li>
@@ -9640,7 +9883,472 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 });
 
 /* ============================================================================
-   feeds-and-speeds / model.js - the arithmetic and the motion, nothing drawn.
+   material-removal / removal.js - the solid a milling cut takes away, and
+   the power that removal implies. Numbers in, numbers or markup out.
+
+     removal rate  Q = ae * ap * vf        mm3/min  (width x depth x table feed)
+     travel        L = vf * t / 60         mm       (t in seconds)
+     volume        V = ae * ap * L         mm3      solid metal, before it is chips
+     power         P = Q * u / 60          W        (u, specific cutting energy, J/mm3)
+     1 mechanical horsepower = 745.699871582 W
+
+   u is a material band, not one number, so power is always a band. The
+   estimate is power at the cutting edge. Dividing by a drivetrain efficiency
+   gives the power the motor shaft must deliver - still not what the machine
+   draws from the wall, and not a check of what its motor can supply.
+
+   The drawing is a cavalier view: travel runs across the page, depth runs
+   straight down and width recedes at 30 degrees, every direction at the
+   same scale. A comparison is drawn from one frame, so its panels share
+   that scale and can be compared by eye.
+
+   Pure UMD: browser global CourseWikiRemoval, CommonJS the same object.
+   ==========================================================================*/
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiRemoval = api;
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  var HP_W = 745.699871582;
+  var MM_PER_IN = 25.4;
+  var MM3_PER_IN3 = MM_PER_IN * MM_PER_IN * MM_PER_IN;
+
+  function finite(v) { return typeof v === 'number' && isFinite(v); }
+
+  /* ---- the relations ------------------------------------------------------*/
+  function removalRate(widthMm, depthMm, feedMmPerMin) { return widthMm * depthMm * feedMmPerMin; }
+  function travel(feedMmPerMin, seconds) { return feedMmPerMin * seconds / 60; }
+  function volume(widthMm, depthMm, travelMm) { return widthMm * depthMm * travelMm; }
+  function power(rateMm3PerMin, energyJPerMm3) { return rateMm3PerMin * energyJPerMm3 / 60; }
+  function powerBand(rateMm3PerMin, band) { return [power(rateMm3PerMin, band[0]), power(rateMm3PerMin, band[1])]; }
+  function shaftPower(cuttingW, efficiency) { return cuttingW / efficiency; }
+  function toHp(watts) { return watts / HP_W; }
+
+  /* Width and depth checked against the cutter. A side cut can be no wider
+     than the cutter; a wider path is a second pass, not one cut. */
+  function engagementErrors(diameterMm, widthMm, depthMm) {
+    var e = [];
+    if (finite(diameterMm) && finite(widthMm) && widthMm > diameterMm * (1 + 1e-9)) {
+      e.push({ field: 'width', message: 'Width of cut cannot be more than the cutter diameter. A wider path takes more than one pass.' });
+    }
+    if (finite(widthMm) && !(widthMm > 0)) e.push({ field: 'width', message: 'Width of cut must be more than zero.' });
+    if (finite(depthMm) && !(depthMm > 0)) e.push({ field: 'depth', message: 'Depth of cut must be more than zero.' });
+    return e;
+  }
+
+  /* ---- display ------------------------------------------------------------*/
+  function group(intPart) { return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+  /* `n` significant figures, thousands grouped. Estimates are shown to two
+     or three figures; more would claim a precision the band does not have. */
+  function sig(v, n) {
+    if (!finite(v)) return '-';
+    if (v === 0) return '0';
+    var p = (n || 3) - 1 - Math.floor(Math.log10(Math.abs(v)));
+    var places = Math.max(0, p), f = Math.pow(10, p);
+    var s = (Math.round(Math.abs(v) * f) / f).toFixed(places);
+    var parts = s.split('.');
+    return (v < 0 ? '-' : '') + group(parts[0]) + (parts[1] ? '.' + parts[1] : '');
+  }
+
+  function showLength(mm, unit) {
+    return unit === 'in' ? sig(mm / MM_PER_IN, 3) + ' in' : sig(mm, 3) + ' mm';
+  }
+  function showVolume(mm3, unit) {
+    if (unit === 'in') return sig(mm3 / MM3_PER_IN3, 3) + ' in³';
+    return mm3 < 1000 ? sig(mm3, 3) + ' mm³' : sig(mm3 / 1000, 3) + ' cm³';
+  }
+  function showRate(mm3PerMin, unit) {
+    if (unit === 'in') return sig(mm3PerMin / MM3_PER_IN3, 3) + ' in³/min';
+    return mm3PerMin < 1000 ? sig(mm3PerMin, 3) + ' mm³/min' : sig(mm3PerMin / 1000, 3) + ' cm³/min';
+  }
+
+  /* One power, or a band in one shared unit: W below a kilowatt, kW above. */
+  function powerUnit(maxW) { return maxW >= 1000 ? 'kW' : 'W'; }
+  function inUnit(w, u) { return u === 'kW' ? w / 1000 : (u === 'hp' ? toHp(w) : w); }
+  function span(lo, hi, u, figures) {
+    var a = sig(inUnit(lo, u), figures), b = sig(inUnit(hi, u), figures);
+    return (a === b ? a : a + '–' + b) + ' ' + u;
+  }
+  function showPower(lo, hi) {
+    if (hi === undefined) hi = lo;
+    return span(lo, hi, powerUnit(hi), 2);
+  }
+  function showHp(lo, hi) {
+    if (hi === undefined) hi = lo;
+    return span(lo, hi, 'hp', 2);
+  }
+  /* "110–210 W (0.15–0.28 hp)" */
+  function showPowerBoth(lo, hi) { return showPower(lo, hi) + ' (' + showHp(lo, hi) + ')'; }
+
+  /* A specific-energy band said the way a student can use it: watts per
+     cm3/min in metric, horsepower per in3/min in inch. Both are J/mm3
+     rescaled; the J/mm3 figure goes alongside. */
+  function showEnergy(band, unit) {
+    var j = sig(band[0], 2) === sig(band[1], 2) ? sig(band[0], 2) : sig(band[0], 2) + '–' + sig(band[1], 2);
+    if (unit === 'in') {
+      return span(band[0] * MM3_PER_IN3 / 60, band[1] * MM3_PER_IN3 / 60, 'hp', 2).replace(/ hp$/, ' hp per in³/min') + ' (' + j + ' J/mm³)';
+    }
+    return span(band[0] * 1000 / 60, band[1] * 1000 / 60, 'W', 2) + ' per cm³/min (' + j + ' J/mm³)';
+  }
+
+  /* A "nice" length (1, 2 or 5 x 10^k) close to `target`. */
+  function niceLength(target) {
+    if (!(target > 0)) return 1;
+    var e = Math.floor(Math.log10(target)), base = Math.pow(10, e), m = target / base;
+    return (m < 1.5 ? 1 : (m < 3.5 ? 2 : (m < 7.5 ? 5 : 10))) * base;
+  }
+  /* The next 1, 2, 2.5 or 5 x 10^k at or above `v`: an axis end. */
+  function niceCeil(v) {
+    if (!(v > 0)) return 1;
+    var e = Math.floor(Math.log10(v)), base = Math.pow(10, e), m = v / base;
+    var steps = [1, 2, 2.5, 5, 10];
+    for (var i = 0; i < steps.length; i++) if (m <= steps[i] * (1 + 1e-9)) return steps[i] * base;
+    return 10 * base;
+  }
+
+  /* ---- how long to watch ----------------------------------------------------
+     A time span long enough for the setup to travel about three cutter
+     diameters, from a short list of round values. Long enough to read the
+     prism, short enough that its cross-section stays visible.            */
+  var WINDOWS = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 60, 120];
+  function autoWindow(feedMmPerMin, diameterMm) {
+    for (var i = 0; i < WINDOWS.length; i++) {
+      if (travel(feedMmPerMin, WINDOWS[i]) >= 3 * diameterMm) return WINDOWS[i];
+    }
+    return WINDOWS[WINDOWS.length - 1];
+  }
+  function showSeconds(s) { return (s < 1 ? sig(s, 2) : sig(s, 3)) + ' s'; }
+
+  /* ========================================================================
+     The drawing
+     ======================================================================*/
+  var COS = Math.cos(Math.PI / 6), SIN = Math.sin(Math.PI / 6);
+  var LAYOUT = {
+    wide:    { w: 640, maxH: 250, left: 74, right: 16, top: 16, bottom: 58 },
+    compact: { w: 320, maxH: 220, left: 66, right: 8, top: 14, bottom: 88 }
+  };
+
+  function n(v) { return (Math.round(v * 10) / 10).toString(); }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* One frame for a comparison. `runs` all share the cutter and the cut
+     cross-section and differ only in table feed; `seconds` is the longest
+     time any panel will show. The stock is sized from the cut so the cut
+     always reads, and the stock's size is not a quantity of the lesson.  */
+  function frame(runs, seconds, compact) {
+    var r0 = runs[0], D = r0.diameter, R = D / 2, ae = r0.width, ap = r0.depth;
+    var Lmax = 0;
+    runs.forEach(function (r) { Lmax = Math.max(Lmax, travel(r.feed, seconds)); });
+    var lead = Math.max(0.8 * D, 0.12 * Lmax);
+    var f = {
+      D: D, R: R, ae: ae, ap: ap, yc: ae - R, seconds: seconds, Lmax: Lmax,
+      xs: -R - lead, xe: Lmax + R + Math.max(0.5 * D, 0.06 * Lmax),
+      W: ae + Math.max(0.8 * ae, 0.6 * D),
+      H: ap + Math.max(0.6 * ap, 0.35 * D)
+    };
+    f.zTop = f.H + Math.max(0.8 * D, 0.5 * ap);
+    var L = LAYOUT[compact ? 'compact' : 'wide'];
+    f.layout = L; f.compact = !!compact;
+    // projected extent, in mm, of everything drawn
+    var pts = [[f.xs, 0, 0], [f.xe, 0, 0], [f.xe, f.W, f.H], [f.xs, f.W, f.H]];
+    [0, Lmax].forEach(function (xc) {
+      for (var k = 0; k < 16; k++) {
+        var a = 2 * Math.PI * k / 16;
+        pts.push([xc + R * Math.cos(a), f.yc + R * Math.sin(a), f.zTop]);
+        pts.push([xc + R * Math.cos(a), f.yc + R * Math.sin(a), f.H - ap]);
+      }
+    });
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    pts.forEach(function (p) {
+      var sx = p[0] + p[1] * COS, sy = -(p[2] + p[1] * SIN);
+      minX = Math.min(minX, sx); maxX = Math.max(maxX, sx); minY = Math.min(minY, sy); maxY = Math.max(maxY, sy);
+    });
+    var availW = L.w - L.left - L.right;
+    var s = availW / (maxX - minX);
+    if ((maxY - minY) * s > L.maxH) s = L.maxH / (maxY - minY);
+    f.scale = s;                                        // px per mm, every direction
+    f.ox = L.left - minX * s;
+    f.oy = L.top - minY * s;
+    f.w = L.w;
+    f.h = Math.ceil(L.top + (maxY - minY) * s + L.bottom);
+    return f;
+  }
+
+  function project(f, x, y, z) { return [f.ox + f.scale * (x + y * COS), f.oy - f.scale * (z + y * SIN)]; }
+  function pathOf(f, pts, close) {
+    return pts.map(function (p, i) { var q = project(f, p[0], p[1], p[2]); return (i ? 'L' : 'M') + n(q[0]) + ' ' + n(q[1]); }).join('') + (close ? 'Z' : '');
+  }
+  /* The front of the cut: the leading half of the cutter circle, inside
+     the width of cut, from y0 to y1. */
+  function frontX(f, xc, y) { return xc + Math.sqrt(Math.max(0, f.R * f.R - (y - f.yc) * (y - f.yc))); }
+  function arc(f, xc, z, y0, y1) {
+    var out = [];
+    for (var k = 0; k <= 16; k++) { var y = y0 + (y1 - y0) * k / 16; out.push([frontX(f, xc, y), y, z]); }
+    return out;
+  }
+  function hull(points) {
+    var p = points.slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+    var cross = function (o, a, b) { return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]); };
+    var lower = [], upper = [];
+    p.forEach(function (q) { while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], q) <= 0) lower.pop(); lower.push(q); });
+    for (var i = p.length - 1; i >= 0; i--) {
+      var q = p[i];
+      while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], q) <= 0) upper.pop();
+      upper.push(q);
+    }
+    return lower.slice(0, -1).concat(upper.slice(0, -1));
+  }
+  function arrowHead(tx, ty, dx, dy, size) {
+    var len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len;
+    var bx = tx - ux * size, by = ty - uy * size, w = size * 0.55;
+    return 'M' + n(tx) + ' ' + n(ty) + 'L' + n(bx - uy * w) + ' ' + n(by + ux * w) + 'L' + n(bx + uy * w) + ' ' + n(by - ux * w) + 'Z';
+  }
+  function txt(cls, x, y, s, anchor) {
+    return '<text class="mr-t ' + cls + '" x="' + n(x) + '" y="' + n(y) + '"' + (anchor ? ' text-anchor="' + anchor + '"' : '') + '>' + esc(s) + '</text>';
+  }
+
+  /* One run after `elapsed` seconds, drawn in frame `f`.
+     run - { feed (mm/min), width, depth, diameter (mm) }
+     o   - { unit, ariaLabel }                                          */
+  function renderSweep(run, elapsed, f, o) {
+    var opt = o || {}, unit = opt.unit || 'mm';
+    var R = f.R, ae = f.ae, ap = f.ap, H = f.H, W = f.W, zf = H - ap, xs = f.xs, xe = f.xe;
+    var t = Math.max(0, Math.min(elapsed, f.seconds));
+    var L = travel(run.feed, t), xc = L;
+    var xf0 = frontX(f, 0, 0), xfT = frontX(f, xc, 0);
+    var out = [];
+    var V = volume(ae, ap, L);
+    out.push('<svg class="mr-svg' + (f.compact ? ' mr-svg-compact' : '') + '" viewBox="0 0 ' + f.w + ' ' + f.h + '" role="img" aria-label="' +
+      esc(opt.ariaLabel || ('After ' + showSeconds(t) + ' the cutter has travelled ' + showLength(L, unit) + ' and removed a solid ' +
+        showLength(ae, unit) + ' wide by ' + showLength(ap, unit) + ' deep: ' + showVolume(V, unit) + '.')) + '" focusable="false">');
+
+    // ---- the stock, with the cut made so far (back faces first)
+    out.push('<path class="mr-stock-side" d="' + pathOf(f, [[xe, 0, 0], [xe, W, 0], [xe, W, H], [xe, 0, H]], true) + '"/>');
+    out.push('<path class="mr-cut-wall" d="' + pathOf(f, [[xs, ae, zf], [xc, ae, zf], [xc, ae, H], [xs, ae, H]], true) + '"/>');
+    out.push('<path class="mr-cut-floor" d="' + pathOf(f, [[xs, 0, zf], [xfT, 0, zf]].concat(arc(f, xc, zf, 0, ae), [[xs, ae, zf]]), true) + '"/>');
+    out.push('<path class="mr-cut-wall" d="' + pathOf(f, arc(f, xc, H, 0, ae).concat(arc(f, xc, zf, ae, 0)), true) + '"/>');
+    out.push('<path class="mr-stock-top" d="' + pathOf(f, [[xs, ae, H]].concat(arc(f, xc, H, ae, 0), [[xe, 0, H], [xe, W, H], [xs, W, H]]), true) + '"/>');
+    out.push('<path class="mr-stock-front" d="' + pathOf(f, [[xs, 0, 0], [xe, 0, 0], [xe, 0, H], [xfT, 0, H], [xfT, 0, zf], [xs, 0, zf]], true) + '"/>');
+
+    // ---- the solid removed in the time shown, drawn where it used to be.
+    // Its two ends are the same front shape, L apart, so it holds exactly
+    // width x depth x L however the ends curve.
+    if (L > 1e-9) {
+      out.push('<path class="mr-removed-hidden" d="' + pathOf(f, arc(f, 0, zf, 0, ae).concat([[xc, ae, zf]]), false) + '"/>');
+      out.push('<path class="mr-removed" d="' + pathOf(f, arc(f, xc, H, ae, 0).concat(arc(f, 0, H, 0, ae)), true) + '"/>');
+      out.push('<path class="mr-removed mr-removed-front" d="' + pathOf(f, [[xf0, 0, zf], [xfT, 0, zf], [xfT, 0, H], [xf0, 0, H]], true) + '"/>');
+    }
+    // where the cut stood at the start of the time shown
+    out.push('<path class="mr-start" d="' + pathOf(f, arc(f, 0, H, ae, 0).concat([[xf0, 0, zf]]), false) + '"/>');
+
+    // ---- the cutter, where it is now: an outline, so the cut shows through
+    var circ = [], top = [];
+    for (var k = 0; k < 48; k++) {
+      var a = 2 * Math.PI * k / 48, x = xc + R * Math.cos(a), y = f.yc + R * Math.sin(a);
+      circ.push(project(f, x, y, zf)); circ.push(project(f, x, y, f.zTop));
+      top.push([x, y, f.zTop]);
+    }
+    var h = hull(circ);
+    out.push('<path class="mr-cutter" d="' + h.map(function (q, i) { return (i ? 'L' : 'M') + n(q[0]) + ' ' + n(q[1]); }).join('') + 'Z"/>');
+    out.push('<path class="mr-cutter-top" d="' + pathOf(f, top, true) + '"/>');
+
+    // ---- feed direction, above the far end of the cut already made
+    var fa = project(f, xs, W, H);
+    fa = [fa[0] + 4, fa[1] - 14];
+    var fb = [fa[0] + 56, fa[1]];
+    out.push('<path class="mr-feed" d="M' + n(fa[0]) + ' ' + n(fa[1]) + 'L' + n(fb[0] - 8) + ' ' + n(fb[1]) + '"/>');
+    out.push('<path class="mr-feed-head" d="' + arrowHead(fb[0], fb[1], 1, 0, 11) + '"/>');
+    out.push(txt('mr-t-small', fb[0] + 6, fb[1] + 5, 'feed', 'start'));
+
+    // ---- dimensions: depth and width at the left end, travel underneath
+    var d0 = project(f, xs, 0, zf), d1 = project(f, xs, 0, H), off = 12;
+    out.push('<path class="mr-dim" d="M' + n(d0[0] - off) + ' ' + n(d0[1]) + 'L' + n(d1[0] - off) + ' ' + n(d1[1]) +
+      'M' + n(d0[0] - off - 5) + ' ' + n(d0[1]) + 'L' + n(d0[0] - 2) + ' ' + n(d0[1]) +
+      'M' + n(d1[0] - off - 5) + ' ' + n(d1[1]) + 'L' + n(d1[0] - 2) + ' ' + n(d1[1]) + '"/>');
+    out.push(txt('mr-t-small', d0[0] - off - 6, (d0[1] + d1[1]) / 2 + 5, 'depth', 'end'));
+    var w0 = project(f, xs, 0, H), w1 = project(f, xs, ae, H);
+    out.push('<path class="mr-dim" d="M' + n(w0[0] - off) + ' ' + n(w0[1] - 8) + 'L' + n(w1[0] - off) + ' ' + n(w1[1] - 8) + '"/>');
+    out.push(txt('mr-t-small', (w0[0] + w1[0]) / 2 - off - 6, (w0[1] + w1[1]) / 2 - 12, 'width', 'end'));
+    var b0 = project(f, 0, 0, 0), b1 = project(f, xc, 0, 0), by = b0[1] + 18;
+    out.push('<path class="mr-dim" d="M' + n(b0[0]) + ' ' + n(by - 6) + 'L' + n(b0[0]) + ' ' + n(by + 6) + 'M' + n(b0[0]) + ' ' + n(by) +
+      'L' + n(b1[0]) + ' ' + n(by) + 'M' + n(b1[0]) + ' ' + n(by - 6) + 'L' + n(b1[0]) + ' ' + n(by + 6) + '"/>');
+    out.push(txt('mr-t-small', b0[0], by + 20, L > 1e-9 ? 'travel in ' + showSeconds(t) : 'start', 'start'));
+
+    // ---- scale bar, along the travel direction
+    var bar = niceLength(70 / f.scale / (unit === 'in' ? MM_PER_IN : 1)) * (unit === 'in' ? MM_PER_IN : 1);
+    var sx0 = f.w - f.layout.right - bar * f.scale, sy0 = f.h - 12;
+    out.push('<path class="mr-scale" d="M' + n(sx0) + ' ' + (sy0 - 5) + 'L' + n(sx0) + ' ' + sy0 + 'L' + n(sx0 + bar * f.scale) + ' ' + sy0 +
+      'L' + n(sx0 + bar * f.scale) + ' ' + (sy0 - 5) + '"/>');
+    out.push(txt('mr-t-small', sx0 - 6, sy0, showLength(bar, unit), 'end'));
+    out.push('</svg>');
+    return out.join('');
+  }
+
+  /* ---- power across the materials, at one removal rate --------------------
+     Changing the material changes nothing in the cut, only the energy each
+     cubic millimetre costs. One axis for every row.                      */
+  function powerRows(rateMm3PerMin, materials) {
+    return materials.map(function (m) {
+      var b = powerBand(rateMm3PerMin, m.energyJMm3);
+      return { id: m.id, label: m.label, lo: b[0], hi: b[1], single: Math.abs(b[1] - b[0]) <= 1e-9 * Math.max(1, b[1]) };
+    });
+  }
+
+  /* HTML, so the labels stay readable at any width. `unit` 'in' sets the
+     axis in horsepower; 'mm' in watts or kilowatts. */
+  function renderPowerChart(rateMm3PerMin, materials, o) {
+    var opt = o || {}, rows = powerRows(rateMm3PerMin, materials);
+    var maxW = Math.max.apply(null, rows.map(function (r) { return r.hi; }));
+    var u = opt.unit === 'in' ? 'hp' : powerUnit(maxW);
+    var axisMax = niceCeil(inUnit(maxW, u));
+    var pct = function (w) { return Math.max(0, Math.min(100, inUnit(w, u) / axisMax * 100)); };
+    var out = ['<div class="mr-chart" role="group" aria-label="' + esc('Estimated cutting power for each material at ' + showRate(rateMm3PerMin, opt.unit) +
+      ', the same cut in every row') + '">'];
+    out.push('<p class="mr-chart-head"><span>Material</span><span>Estimated cutting power at ' + esc(showRate(rateMm3PerMin, opt.unit)) + '</span></p>');
+    out.push('<ul class="mr-rows">');
+    rows.forEach(function (r) {
+      var left = pct(r.lo), width = Math.max(pct(r.hi) - left, 0);
+      out.push('<li class="mr-row' + (r.id === opt.current ? ' is-current' : '') + '" data-material="' + esc(r.id) + '"' +
+        (r.id === opt.current ? ' aria-current="true"' : '') + '>' +
+        '<span class="mr-name">' + esc(r.label) + '</span>' +
+        '<span class="mr-track" aria-hidden="true"><span class="mr-band' + (r.single ? ' is-single' : '') + '" style="left:' + n(left) + '%;width:' + n(width) + '%"></span></span>' +
+        '<span class="mr-val">' + esc(span(r.lo, r.hi, u, 2)) + (r.single ? ' <span class="mr-note">one factor</span>' : '') + '</span></li>');
+    });
+    out.push('</ul>');
+    var ticks = [0, axisMax / 2, axisMax];
+    out.push('<p class="mr-row mr-axis-row" aria-hidden="true"><span></span><span class="mr-axis">' + ticks.map(function (v, i) {
+      return '<span style="left:' + (i * 50) + '%">' + esc(sig(v, 2) + (i === 2 ? ' ' + u : '')) + '</span>';
+    }).join('') + '</span><span></span></p>');
+    out.push('</div>');
+    return out.join('');
+  }
+
+  return {
+    HP_W: HP_W, MM_PER_IN: MM_PER_IN, MM3_PER_IN3: MM3_PER_IN3, WINDOWS: WINDOWS, LAYOUT: LAYOUT,
+    removalRate: removalRate, travel: travel, volume: volume, power: power, powerBand: powerBand,
+    shaftPower: shaftPower, toHp: toHp, engagementErrors: engagementErrors,
+    sig: sig, showLength: showLength, showVolume: showVolume, showRate: showRate, showPower: showPower,
+    showHp: showHp, showPowerBoth: showPowerBoth, showEnergy: showEnergy, showSeconds: showSeconds,
+    niceLength: niceLength, niceCeil: niceCeil, autoWindow: autoWindow,
+    frame: frame, project: project, frontX: frontX, renderSweep: renderSweep,
+    powerRows: powerRows, renderPowerChart: renderPowerChart
+  };
+});
+
+/* General-purpose carbide guidance, not a machine-specific cutting recipe.
+   GARR TOOL Technical, printed p.290: material-family SFM and diameter-based
+   feed/tooth, with basic radial engagement about 20% of diameter.
+   Kennametal Technical Information, M446: approximate volume-per-horsepower
+   factors by material family/hardness. Converted below to cutting J/mm3.
+   Alloy names select broad families; they do not imply alloy-specific tests. */
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiCuttingData = api;
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+  var INCH = 25.4, HP_W = 745.6998715822702;
+  var sourceCut = {
+    title: 'GARR TOOL: General Purpose Milling Guide, p. 290',
+    url: 'https://www.garrtool.com/wp-content/uploads/2018/11/TECHNICAL.pdf#page=8'
+  };
+  var sourcePower = {
+    title: 'Kennametal: milling power factors, p. M446',
+    url: 'https://www1.mscdirect.com/images/solutions/kennametal/millingTechInfoFormulas.pdf#page=2'
+  };
+  var diametersIn = [1/16, 1/8, 3/16, 1/4, 5/16, 3/8, 1/2, 5/8, 3/4, 1];
+  var chipIn = {
+    nonferrous: [[.0003,.0005],[.0006,.0010],[.0008,.0014],[.0012,.0020],[.0014,.0028],[.0020,.0030],[.0035,.0048],[.0050,.0060],[.0058,.0070],[.0068,.0090]],
+    steel: [[.0003,.0008],[.0003,.0008],[.0005,.0010],[.0010,.0015],[.0012,.0020],[.0012,.0020],[.0014,.0024],[.0018,.0026],[.0020,.0028],[.0022,.0030]],
+    stainless: [[.0003,.0006],[.0003,.0007],[.0005,.0010],[.0008,.0015],[.0009,.0013],[.0010,.0018],[.0015,.0020],[.0018,.0022],[.0018,.0035],[.0023,.0036]],
+    iron: [[.0005,.0008],[.0008,.0012],[.0010,.0015],[.0015,.0025],[.0015,.0025],[.0020,.0030],[.0025,.0035],[.0035,.0045],[.0035,.0045],[.0045,.0055]],
+    titanium: [[.0003,.0008],[.0003,.0008],[.0005,.0012],[.0005,.0012],[.0008,.0015],[.0010,.0015],[.0013,.0020],[.0018,.0025],[.0020,.0030],[.0025,.0035]]
+  };
+  function energyFromK(k) {
+    if (!(typeof k === 'number' && isFinite(k) && k > 0)) throw new Error('K must be positive cubic inches per minute per horsepower.');
+    return HP_W * 60 / (Math.pow(INCH, 3) * k);
+  }
+  function material(id, label, condition, sfm, group, kRange, powerBasis, note) {
+    return {
+      id: id, label: label, condition: condition,
+      vcMMin: sfm.map(function (v) { return v * .3048; }),
+      chipLoads: chipIn[group].map(function (range, i) {
+        return { diameterMm: diametersIn[i] * INCH, minMm: range[0] * INCH, maxMm: range[1] * INCH };
+      }),
+      energyJMm3: [energyFromK(kRange[1]), energyFromK(kRange[0])],
+      powerBasis: powerBasis,
+      notes: [
+        'General-purpose solid-carbide starting band; basic side engagement about 20% of cutter diameter.',
+        'Diameter knots span 1/16 to 1 inch. Between knots the displayed chip-load band is linearly interpolated, not separately tested.',
+        'Slotting, long reach, coating, coolant and setup stiffness require the actual tool data; this guide makes no automatic correction.',
+        powerBasis,
+        note
+      ],
+      sources: [sourceCut, sourcePower]
+    };
+  }
+  var materials = [
+    material('al-6061-t6', '6061-T6 aluminum', 'Wrought, T6; broad aluminum-family baseline', [300,500], 'nonferrous', [3.33,6.25],
+      'Power band: generic aluminum, 30–150 HB (500 kg); K = 3.33–6.25 in³/min per hp.',
+      'Use an aluminum-suitable edge and chip space. This is a family-level guide, not a test of this exact alloy.'),
+    material('al-7075-t6', '7075-T6 aluminum', 'Wrought, T6; broad aluminum-family baseline', [300,500], 'nonferrous', [3.33,6.25],
+      'Power band: generic aluminum, 30–150 HB (500 kg); K = 3.33–6.25 in³/min per hp.',
+      'Shares the broad aluminum starting band with 6061; this does not mean their optimal cutting data are identical.'),
+    material('steel-1018', '1018 mild steel', 'Soft supplied condition; below 40 HRC', [150,200], 'steel', [1.64,1.64],
+      'Power factor: generic carbon/alloy steel, 85–200 HB; K = 1.64 in³/min per hp.',
+      'One tabulated power factor gives one estimate, not a measured uncertainty interval.'),
+    material('steel-1045', '1045 steel', 'Annealed or normalized; below 40 HRC', [150,200], 'steel', [1.56,1.64],
+      'Power band: generic carbon/alloy steel, 85–253 HB; K = 1.56–1.64 in³/min per hp.',
+      'Hardened 1045 needs a different hardness row; the alloy name alone does not specify its condition.'),
+    material('steel-4140', '4140 prehard steel', 'About 28–32 HRC; speed guide below 40 HRC', [150,200], 'steel', [1.10,1.28],
+      'Power band: generic carbon/alloy steel, 254–327 HB; K = 1.10–1.28 in³/min per hp.',
+      'Prehard is distinct from annealed 4140. Check the supplied hardness before treating this band as applicable.'),
+    material('stainless-304', '304 stainless steel', 'Wrought 300-series; power assumption 135–275 HB; below 40 HRC', [100,150], 'stainless', [.76,1.54],
+      'Power band: generic stainless, 135–275 HB; K = 0.76–1.54 in³/min per hp.',
+      'The stainless power band is a broad family/hardness assumption, not an alloy-specific coefficient.'),
+    material('stainless-316', '316 stainless steel', 'Wrought 300-series; power assumption 135–275 HB; below 40 HRC', [100,150], 'stainless', [.76,1.54],
+      'Power band: generic stainless, 135–275 HB; K = 0.76–1.54 in³/min per hp.',
+      'Shares the broad 300-series guide with 304; work hardening and actual tool geometry still affect the cut.'),
+    material('iron-gray-30', 'Class 30 gray cast iron', 'Gray iron; verify actual grade and hardness', [175,225], 'iron', [1.52,2.27],
+      'Power band: generic cast iron, 150–250 HB; K = 1.52–2.27 in³/min per hp.',
+      'The power band combines the applicable generic cast-iron hardness rows; it is not a class-30 material test.'),
+    material('brass-c360', 'C360 brass', 'Free-machining brass; power assumption 100–150 HB', [200,400], 'nonferrous', [3.33,3.33],
+      'Power factor: generic copper alloy, 100–150 HB; K = 3.33 in³/min per hp.',
+      'The speed/feed guide is the broad brass/bronze row; use actual tool and temper data to refine it.'),
+    material('ti-6al-4v', 'Ti-6Al-4V titanium', 'Annealed alloy; power assumption 250–375 HB', [100,150], 'titanium', [.87,1.33],
+      'Power band: generic titanium, 250–375 HB; K = 0.87–1.33 in³/min per hp.',
+      'The generic titanium row includes Ti-6Al-4V; heat, coolant delivery and the actual carbide grade matter.')
+  ];
+  function get(id) {
+    for (var i = 0; i < materials.length; i++) if (materials[i].id === id) return materials[i];
+    return null;
+  }
+  function guidance(id, diameterMm) {
+    var m = get(id);
+    if (!m) return null;
+    var knots = m.chipLoads, fz = null;
+    if (typeof diameterMm === 'number' && isFinite(diameterMm) && diameterMm >= knots[0].diameterMm && diameterMm <= knots[knots.length - 1].diameterMm) {
+      for (var i = 0; i < knots.length; i++) {
+        if (Math.abs(diameterMm - knots[i].diameterMm) < 1e-10) { fz = [knots[i].minMm, knots[i].maxMm]; break; }
+        if (diameterMm < knots[i].diameterMm) {
+          var a = knots[i - 1], b = knots[i], t = (diameterMm - a.diameterMm) / (b.diameterMm - a.diameterMm);
+          fz = [a.minMm + t * (b.minMm - a.minMm), a.maxMm + t * (b.maxMm - a.maxMm)];
+          break;
+        }
+      }
+    }
+    return Object.assign({}, m, { fzMm: fz, diameterMinMm: knots[0].diameterMm, diameterMaxMm: knots[knots.length - 1].diameterMm });
+  }
+  return { materials: materials, get: get, guidance: guidance, energyFromK: energyFromK };
+});
+
+/* ============================================================================
+   feeds-and-speeds / model.js - the arithmetic, nothing drawn.
 
    Every quantity is held in one canonical set of units - millimetres,
    metres per minute, millimetres per tooth, millimetres per minute - and
@@ -9655,7 +10363,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
      cutting speed  Vc = pi * D * n / 1000              m/min
 
    z is the number of teeth that take a chip in each turn. For an ordinary
-   end mill that is the flute count.
+   end mill that is the flute count. What the cut removes, and the power
+   that takes, belong to the material-removal module.
+
+   Nothing here holds a starting setup. A blank field is a blank field, and
+   each result is worked out as soon as the fields it needs are valid.
 
    Pure UMD: browser global CourseWikiFeedsSpeeds, CommonJS the same object.
    ==========================================================================*/
@@ -9670,15 +10382,16 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   var M_PER_FT = 0.3048;
 
   /* Display units. `toCanon` multiplies a displayed number into canonical
-     units; dividing reverses it. */
+     units; dividing reverses it. Width and depth of cut are lengths, like
+     the diameter. */
   var UNITS = {
     in: {
       name: 'inch', diameter: 'in', speed: 'ft/min', speedShort: 'SFM', feed: 'in/min', chip: 'in/tooth',
-      toCanon: { diameter: MM_PER_IN, speed: M_PER_FT, feed: MM_PER_IN, chip: MM_PER_IN }
+      toCanon: { diameter: MM_PER_IN, width: MM_PER_IN, depth: MM_PER_IN, speed: M_PER_FT, feed: MM_PER_IN, chip: MM_PER_IN }
     },
     mm: {
       name: 'metric', diameter: 'mm', speed: 'm/min', speedShort: 'm/min', feed: 'mm/min', chip: 'mm/tooth',
-      toCanon: { diameter: 1, speed: 1, feed: 1, chip: 1 }
+      toCanon: { diameter: 1, width: 1, depth: 1, speed: 1, feed: 1, chip: 1 }
     }
   };
 
@@ -9689,24 +10402,23 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     speed:    { min: 1, max: 3000 },         // m/min
     teeth:    { min: 1, max: 16 },           // whole teeth
     chip:     { min: 0.0005, max: 3 },       // mm/tooth
-    maxRpm:   { min: 10, max: 200000 }       // rev/min, optional
+    maxRpm:   { min: 10, max: 200000 },      // rev/min, optional
+    width:    { min: 0.01, max: 300 },       // mm
+    depth:    { min: 0.01, max: 300 },       // mm
+    eta:      { min: 1, max: 100 }           // percent, optional
   };
 
-  /* Illustrative setups. They are arithmetic examples, not cutting data:
-     the page says so wherever they appear. Each exists in both unit
-     systems so the button row reads naturally in either. */
-  var EXAMPLES = {
-    in: [
-      { id: 'half-inch', title: 'Half-inch cutter', unit: 'in', diameter: 0.5, speed: 300, teeth: 4, chip: 0.002, maxRpm: null },
-      { id: 'eighth-inch-capped', title: 'Eighth-inch cutter, 4,000 rev/min machine', unit: 'in', diameter: 0.125, speed: 300, teeth: 2, chip: 0.0008, maxRpm: 4000 }
-    ],
-    mm: [
-      { id: 'twelve-mm', title: '12 mm cutter', unit: 'mm', diameter: 12, speed: 90, teeth: 4, chip: 0.05, maxRpm: null },
-      { id: 'three-mm-capped', title: '3 mm cutter, 4,000 rev/min machine', unit: 'mm', diameter: 3, speed: 90, teeth: 2, chip: 0.02, maxRpm: 4000 }
-    ]
+  var FIELD_NAMES = {
+    diameter: 'Cutter diameter', speed: 'Cutting speed', teeth: 'Flutes', chip: 'Feed per tooth',
+    maxRpm: 'Machine top speed', width: 'Width of cut', depth: 'Depth of cut', eta: 'Drivetrain efficiency'
   };
+  var REQUIRED = ['diameter', 'speed', 'teeth', 'chip', 'width', 'depth'];
+  var OPTIONAL = ['maxRpm', 'eta'];
+  var FIELDS = ['diameter', 'teeth', 'maxRpm', 'speed', 'chip', 'width', 'depth', 'eta'];
 
   function finite(v) { return typeof v === 'number' && isFinite(v); }
+  function lengthKind(kind) { return kind === 'width' || kind === 'depth' || kind === 'travel' ? 'diameter' : kind; }
+  function unitless(kind) { return kind === 'teeth' || kind === 'maxRpm' || kind === 'rpm' || kind === 'eta'; }
 
   /* ---- the four relations -------------------------------------------------*/
   function spindleSpeed(speedMPerMin, diameterMm) { return 1000 * speedMPerMin / (Math.PI * diameterMm); }
@@ -9716,34 +10428,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   function chipLoad(feed, rpm, teeth) { return feed / (rpm * teeth); }
 
   /* ---- unit conversion ----------------------------------------------------*/
-  function toCanon(unit, kind, value) { return value * UNITS[unit].toCanon[kind]; }
-  function fromCanon(unit, kind, value) { return value / UNITS[unit].toCanon[kind]; }
+  function toCanon(unit, kind, value) { return unitless(kind) ? value : value * UNITS[unit].toCanon[lengthKind(kind)]; }
+  function fromCanon(unit, kind, value) { return unitless(kind) ? value : value / UNITS[unit].toCanon[lengthKind(kind)]; }
 
-  /* A setup in display units -> canonical, and back. Teeth and rev/min have
-     no unit system. */
+  /* A setup in display units -> canonical, and back. Missing fields stay
+     missing; optional ones are null. */
   function setupToCanon(unit, s) {
-    return {
-      diameter: toCanon(unit, 'diameter', s.diameter),
-      speed: toCanon(unit, 'speed', s.speed),
-      teeth: s.teeth,
-      chip: toCanon(unit, 'chip', s.chip),
-      maxRpm: s.maxRpm === null || s.maxRpm === undefined ? null : s.maxRpm
-    };
+    var c = {};
+    FIELDS.forEach(function (k) {
+      var v = s[k];
+      c[k] = v === null || v === undefined ? (OPTIONAL.indexOf(k) >= 0 ? null : undefined) : toCanon(unit, k, v);
+      if (c[k] === undefined) delete c[k];
+    });
+    return c;
   }
   function setupFromCanon(unit, c) {
-    return {
-      diameter: fromCanon(unit, 'diameter', c.diameter),
-      speed: fromCanon(unit, 'speed', c.speed),
-      teeth: c.teeth,
-      chip: fromCanon(unit, 'chip', c.chip),
-      maxRpm: c.maxRpm
-    };
-  }
-
-  function example(unit, id) {
-    var list = EXAMPLES[unit] || [];
-    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
-    return null;
+    var s = {};
+    Object.keys(c).forEach(function (k) { s[k] = c[k] === null ? null : fromCanon(unit, k, c[k]); });
+    return s;
   }
 
   /* ---- reading what a student typed ---------------------------------------
@@ -9756,48 +10458,41 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     var v = Number(s);
     return finite(v) ? v : null;
   }
+  function blank(t) { return t === undefined || t === null || String(t).trim() === ''; }
 
-  var FIELD_NAMES = {
-    diameter: 'Cutter diameter', speed: 'Cutting speed', teeth: 'Flutes',
-    chip: 'Feed per tooth', maxRpm: 'Machine top speed'
-  };
-
-  /* Validate one complete form. `raw` holds strings keyed like LIMITS.
-     Returns { ok, canon, errors: [{field, message}] }. */
-  function validate(unit, raw) {
-    var errors = [], disp = {};
-    ['diameter', 'speed', 'teeth', 'chip'].forEach(function (k) {
-      var v = parseNumber(raw[k]);
-      if (v === null) { errors.push({ field: k, message: FIELD_NAMES[k] + ' needs a number.' }); return; }
+  /* Read each field on its own. `raw` holds strings keyed like LIMITS.
+     Returns { values (canonical, valid fields only), errors, missing }:
+     a blank required field is missing, not wrong; a blank optional field
+     is null. Width is checked against the diameter when both are valid. */
+  function readFields(unit, raw) {
+    var values = {}, errors = [], missing = [];
+    FIELDS.forEach(function (k) {
+      var optional = OPTIONAL.indexOf(k) >= 0, t = raw[k];
+      if (blank(t)) { if (optional) values[k] = null; else missing.push(k); return; }
+      var v = parseNumber(t);
+      if (v === null) { errors.push({ field: k, message: FIELD_NAMES[k] + ' needs a number' + (optional ? ', or leave it empty.' : '.') }); return; }
       if (v <= 0) { errors.push({ field: k, message: FIELD_NAMES[k] + ' must be more than zero.' }); return; }
       if (k === 'teeth' && Math.round(v) !== v) { errors.push({ field: k, message: 'Flutes is a whole number of teeth.' }); return; }
-      disp[k] = v;
+      var c = toCanon(unit, k, v), L = LIMITS[k];
+      if (c < L.min - 1e-9 || c > L.max + 1e-9) {
+        errors.push({ field: k, message: FIELD_NAMES[k] + ' is outside what this calculator handles: ' +
+          show(L.min, k, unit) + ' to ' + show(L.max, k, unit) + '.' });
+        return;
+      }
+      values[k] = c;
     });
-    var blank = raw.maxRpm === undefined || raw.maxRpm === null || String(raw.maxRpm).trim() === '';
-    if (blank) disp.maxRpm = null;
-    else {
-      var m = parseNumber(raw.maxRpm);
-      if (m === null) errors.push({ field: 'maxRpm', message: 'Machine top speed needs a number, or leave it empty.' });
-      else if (m <= 0) errors.push({ field: 'maxRpm', message: 'Machine top speed must be more than zero.' });
-      else disp.maxRpm = m;
+    if (finite(values.width) && finite(values.diameter) && values.width > values.diameter * (1 + 1e-9)) {
+      errors.push({ field: 'width', message: 'Width of cut cannot be more than the cutter diameter. A wider path takes more than one pass.' });
+      delete values.width;
     }
-    var canon = null;
-    if (!errors.length) {
-      canon = setupToCanon(unit, disp);
-      Object.keys(LIMITS).forEach(function (k) {
-        var v = canon[k];
-        if (v === null || v === undefined) return;
-        var L = LIMITS[k];
-        if (v < L.min - 1e-9 || v > L.max + 1e-9) {
-          var lo = k === 'teeth' || k === 'maxRpm' ? L.min : fromCanon(unit, k, L.min);
-          var hi = k === 'teeth' || k === 'maxRpm' ? L.max : fromCanon(unit, k, L.max);
-          errors.push({ field: k, message: FIELD_NAMES[k] + ' is outside what this calculator draws: ' +
-            format(lo, k, unit) + ' to ' + format(hi, k, unit) + '.' });
-        }
-      });
-      if (errors.length) canon = null;
-    }
-    return { ok: !errors.length, canon: canon, errors: errors };
+    return { values: values, errors: errors, missing: missing };
+  }
+
+  /* The whole form at once: ok only when nothing is missing or wrong. */
+  function validate(unit, raw) {
+    var r = readFields(unit, raw);
+    var errors = r.errors.concat(r.missing.map(function (k) { return { field: k, message: FIELD_NAMES[k] + ' needs a number.' }; }));
+    return { ok: !errors.length, canon: errors.length ? null : r.values, errors: errors, values: r.values, missing: r.missing };
   }
 
   /* ---- the calculation -----------------------------------------------------
@@ -9821,6 +10516,37 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       teeth: c.teeth,
       diameter: c.diameter
     };
+  }
+
+  /* As much of `solve` as the valid fields allow. Each result is present
+     or absent, and `needs` names what an absent one is waiting for. */
+  var NEEDS = {
+    rpm: ['diameter', 'speed'],
+    feed: ['diameter', 'speed', 'teeth', 'chip'],
+    rate: ['diameter', 'speed', 'teeth', 'chip', 'width', 'depth']
+  };
+  function partial(values, errors) {
+    var out = { needs: {} };
+    Object.keys(NEEDS).forEach(function (k) {
+      out.needs[k] = NEEDS[k].filter(function (f) { return !finite(values[f]); });
+      // Blank means no cap; an invalid nonblank cap leaves the actual
+      // spindle speed unknown, so every dependent result must wait.
+      if ((errors || []).some(function (e) { return e.field === 'maxRpm'; })) out.needs[k].push('maxRpm');
+    });
+    if (!out.needs.rpm.length) {
+      var requested = spindleSpeed(values.speed, values.diameter);
+      var capped = finite(values.maxRpm) && requested > values.maxRpm;
+      out.requestedRpm = requested;
+      out.capped = capped;
+      out.rpm = capped ? values.maxRpm : requested;
+      out.speed = cuttingSpeed(out.rpm, values.diameter);
+    }
+    if (!out.needs.feed.length) {
+      out.full = solve(values);
+      out.feed = out.full.feed;
+      out.chip = values.chip;
+    }
+    return out;
   }
 
   /* The experiment: change only the spindle speed, by `factor` of what the
@@ -9851,106 +10577,20 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     return out;
   }
 
-  /* ---- motion, on one disclosed time scale ---------------------------------
-     The drawing runs `slowdown` times slower than the machine would. Both the
-     cutter's turning and the work's travel are worked from the same real
-     time, so the ratio between them is the real one.
-
-     The cutter turns clockwise; seen down its axis, the work is fed to the
-     LEFT, so the uncut material is on the right and the front of the cut is
-     at psi = 0 (math angle, x right, y up). A tooth is engaged while it is
-     on the front half, cos(psi) > 0, as in a full-width slot.             */
-  var SLOWDOWNS = [50, 200, 1000, 5000];
-
-  function realTime(screenSeconds, slowdown) { return screenSeconds / slowdown; }
-
-  /* Tooth angle at real time t, radians, normalised to (-pi, pi]. Tooth 0
-     sits at psi0 when t = 0. */
-  function wrap(a) {
-    var t = a % (2 * Math.PI);
-    if (t <= -Math.PI) t += 2 * Math.PI;
-    if (t > Math.PI) t -= 2 * Math.PI;
-    return t;
-  }
-
-  /* `run` is any object with rpm, feed (canonical mm/min), teeth. */
-  function motion(run, tReal, psi0) {
-    var z = run.teeth, omega = 2 * Math.PI * run.rpm / 60;     // rad per real second
-    var p0 = finite(psi0) ? psi0 : Math.PI / 2;
-    var turned = omega * tReal;
-    var teeth = [];
-    for (var k = 0; k < z; k++) {
-      var psi = wrap(p0 - turned - 2 * Math.PI * k / z);
-      teeth.push({ psi: psi, engaged: Math.cos(psi) > 1e-9 });
-    }
-    return {
-      teeth: teeth,
-      turns: turned / (2 * Math.PI),
-      workTravel: run.feed / 60 * tReal,                   // mm the work has moved, to the left
-      passPeriod: 60 / (run.rpm * z),                      // real seconds between tooth passes
-      passes: passesBefore(run, tReal, p0)
-    };
-  }
-
-  /* Real times at which a tooth crosses the front of the cut (psi = 0),
-     counted from t = 0. With psi0 in (0, 2pi/z], the first crossing is at
-     psi0 / omega and they follow every 60 / (n z) seconds. */
-  function firstPass(run, psi0) {
-    var omega = 2 * Math.PI * run.rpm / 60, pitch = 2 * Math.PI / run.teeth;
-    var lead = ((psi0 % pitch) + pitch) % pitch;
-    if (lead < 1e-12) lead = pitch;
-    return lead / omega;
-  }
-  function passesBefore(run, tReal, psi0) {
-    if (!(tReal >= 0)) return 0;
-    var t1 = firstPass(run, finite(psi0) ? psi0 : Math.PI / 2);
-    if (tReal < t1) return 0;
-    return 1 + Math.floor((tReal - t1) / (60 / (run.rpm * run.teeth)) + 1e-9);
-  }
-
-  /* Where the marks left by each pass sit on the work, measured back from
-     the front of the cut, in mm, newest first. Each tooth pass lays one; the
-     work carries them away. Their spacing is the feed per tooth - the
-     whole point of the inset. The cut is taken to be already under way at
-     t = 0, so passes before the clock started count too. */
-  function marks(run, tReal, psi0, count) {
-    var p0 = finite(psi0) ? psi0 : Math.PI / 2;
-    var t1 = firstPass(run, p0), period = 60 / (run.rpm * run.teeth), out = [];
-    var j = Math.floor((tReal - t1) / period + 1e-9);
-    for (; out.length < (count || 12); j--) {
-      var tj = t1 + j * period;
-      out.push({ index: j, age: tReal - tj, offset: run.feed / 60 * (tReal - tj) });
-    }
-    return out;
-  }
-
-  /* How far the uncut face has crept past the path of the tooth tips since
-     the last pass, mm. It grows from zero to one feed per tooth, and the
-     next tooth takes exactly that as its chip. */
-  function uncutSliver(run, tReal, psi0) {
-    var p0 = finite(psi0) ? psi0 : Math.PI / 2;
-    var t1 = firstPass(run, p0), period = 60 / (run.rpm * run.teeth);
-    if (tReal < t1) return run.feed / 60 * (tReal + (period - t1));
-    var since = (tReal - t1) % period;
-    return run.feed / 60 * since;
-  }
-
-  /* On-screen rates, for the "too quick to follow" note and the caption. */
-  function screenRates(run, slowdown) {
-    return {
-      turnsPerSecond: run.rpm / 60 / slowdown,
-      passesPerSecond: run.rpm * run.teeth / 60 / slowdown,
-      realTurnsPerSecond: run.rpm / 60,
-      realTravelPerSecond: run.feed / 60
-    };
+  /* Where a value sits against a guide band [low, high]. */
+  function bandPosition(value, band) {
+    if (!finite(value) || !band) return null;
+    if (value < band[0] * (1 - 1e-9)) return 'below';
+    if (value > band[1] * (1 + 1e-9)) return 'above';
+    return 'inside';
   }
 
   /* ---- display formatting --------------------------------------------------
      Decimal places per quantity and unit. Rev/min are whole numbers;
      everything else carries enough places to read a typical value. */
   var PLACES = {
-    in: { diameter: 4, speed: 0, feed: 1, chip: 4, rpm: 0, maxRpm: 0, teeth: 0, travel: 4 },
-    mm: { diameter: 3, speed: 0, feed: 0, chip: 3, rpm: 0, maxRpm: 0, teeth: 0, travel: 2 }
+    in: { diameter: 4, speed: 0, feed: 1, chip: 4, rpm: 0, maxRpm: 0, teeth: 0, eta: 2 },
+    mm: { diameter: 3, speed: 0, feed: 0, chip: 3, rpm: 0, maxRpm: 0, teeth: 0, eta: 2 }
   };
 
   function group(intPart) { return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
@@ -9968,74 +10608,70 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     return (v < 0 ? '-' : '') + group(parts[0]) + (frac ? '.' + frac : '');
   }
 
-  /* `kind` is diameter | speed | feed | chip | rpm | maxRpm | teeth | travel,
-     `value` already in display units. Speed under 100 gets one place so a
-     slow cut does not read as a round number. */
+  /* `kind` is a field or result name, `value` already in display units.
+     Speed under 100 gets one place so a slow cut does not read as a round
+     number. Efficiency may carry one place. */
   function format(value, kind, unit) {
-    var places = PLACES[unit][kind];
-    if (kind === 'chip' && value > 0) places = Math.max(places, 3 - Math.floor(Math.log10(value)));
-    if (kind === 'speed' && value < 100) places = 1;
-    if (kind === 'feed' && unit === 'mm' && value < 100) places = 1;
-    if (kind === 'feed' && unit === 'in' && value >= 100) places = 0;
-    var min = kind === 'chip' ? (unit === 'in' ? 4 : 3) : 0;
+    var k = lengthKind(kind);
+    var places = PLACES[unit][k];
+    if (k === 'chip' && value > 0) places = Math.max(places, 3 - Math.floor(Math.log10(value)));
+    if (k === 'speed' && value < 100) places = 1;
+    if (k === 'feed' && unit === 'mm' && value < 100) places = 1;
+    if (k === 'feed' && unit === 'in' && value >= 100) places = 0;
+    if (k === 'eta') places = 1;
+    var min = k === 'chip' ? (unit === 'in' ? 4 : 3) : 0;
     return fixed(value, places, min);
   }
 
   function unitLabel(kind, unit) {
     if (kind === 'rpm' || kind === 'maxRpm') return 'rev/min';
     if (kind === 'teeth') return 'flutes';
-    if (kind === 'travel') return UNITS[unit].diameter;
-    return kind === 'speed' ? UNITS[unit].speedShort : UNITS[unit][kind];
+    if (kind === 'eta') return '%';
+    var k = lengthKind(kind);
+    return k === 'speed' ? UNITS[unit].speedShort : UNITS[unit][k];
   }
 
   /* Canonical value -> "2,292 rev/min" in the chosen unit system. */
   function show(canonValue, kind, unit) {
-    var v = (kind === 'rpm' || kind === 'maxRpm' || kind === 'teeth') ? canonValue
-      : fromCanon(unit, kind === 'travel' ? 'diameter' : kind, canonValue);
-    return format(v, kind, unit) + ' ' + unitLabel(kind, unit);
+    var lab = unitLabel(kind, unit);
+    return format(fromCanon(unit, kind, canonValue), kind, unit) + (lab === '%' ? '%' : ' ' + lab);
   }
 
-  /* "x2", "x0.5", "held" - how a trial value compares with the setup. */
+  /* "x2", "x0.5", "unchanged" - how a trial value compares with the setup. */
   function ratioText(r) {
     if (!finite(r)) return '-';
     if (Math.abs(r - 1) < 5e-4) return 'unchanged';
-    var s = r >= 10 ? r.toFixed(0) : (r >= 1 ? r.toFixed(2) : r.toFixed(2));
+    var s = r >= 10 ? r.toFixed(0) : r.toFixed(2);
     s = s.replace(/\.?0+$/, '');
     return '×' + s;
   }
 
-  /* A "nice" scale-bar length (1, 2 or 5 x 10^k) close to `target`. */
-  function niceLength(target) {
-    if (!(target > 0)) return 1;
-    var e = Math.floor(Math.log10(target)), base = Math.pow(10, e), m = target / base;
-    var nice = m < 1.5 ? 1 : (m < 3.5 ? 2 : (m < 7.5 ? 5 : 10));
-    return nice * base;
-  }
-
   return {
-    UNITS: UNITS, LIMITS: LIMITS, EXAMPLES: EXAMPLES, HOLDS: HOLDS, SLOWDOWNS: SLOWDOWNS,
-    MM_PER_IN: MM_PER_IN, M_PER_FT: M_PER_FT,
+    UNITS: UNITS, LIMITS: LIMITS, HOLDS: HOLDS, FIELDS: FIELDS, REQUIRED: REQUIRED, OPTIONAL: OPTIONAL,
+    FIELD_NAMES: FIELD_NAMES, NEEDS: NEEDS, MM_PER_IN: MM_PER_IN, M_PER_FT: M_PER_FT,
     spindleSpeed: spindleSpeed, spindleSpeedInch: spindleSpeedInch, cuttingSpeed: cuttingSpeed,
     tableFeed: tableFeed, chipLoad: chipLoad,
     toCanon: toCanon, fromCanon: fromCanon, setupToCanon: setupToCanon, setupFromCanon: setupFromCanon,
-    example: example, parseNumber: parseNumber, validate: validate,
-    solve: solve, trial: trial,
-    realTime: realTime, motion: motion, marks: marks, uncutSliver: uncutSliver,
-    passesBefore: passesBefore, firstPass: firstPass, screenRates: screenRates, wrap: wrap,
-    format: format, show: show, unitLabel: unitLabel, ratioText: ratioText, niceLength: niceLength
+    parseNumber: parseNumber, readFields: readFields, validate: validate,
+    solve: solve, partial: partial, trial: trial, bandPosition: bandPosition,
+    format: format, show: show, unitLabel: unitLabel, ratioText: ratioText
   };
 });
 
 /* ============================================================================
-   feeds-and-speeds / demo.js - draws model.js and runs the calculator.
+   feeds-and-speeds / demo.js - runs the calculator and draws what it removes.
 
-   The render functions are pure (numbers in, SVG markup out) and exported
-   for Node. The printed figures in the page source are their output, so the
+   The render functions are pure (numbers in, markup out) and exported for
+   Node. The printed figures in the page source are their output, so the
    paper copy and the live demo are the same drawing.
 
-   The cutter itself is never drawn here. It comes from the shared
-   cutter-geometry module (CourseWikiCutter.render), the same primitive the
-   milling-direction demo paints, so the two pages cannot drift apart.
+   Three sources, kept apart on screen:
+     - what the student entered (the form),
+     - generic guidance for the chosen material (cutting-data.js, read-only),
+     - what follows from the entries (results, arithmetic, drawings).
+   Nothing is filled in until the student types it or asks for the guide's
+   middle values. The removed-solid drawing and the power band come from the
+   shared material-removal module (CourseWikiRemoval).
 
    The live calculator is built here rather than authored in the page, so
    the page source, search index and printed aggregate carry the teaching
@@ -10044,15 +10680,20 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 (function (root, factory) {
   var node = typeof module === 'object' && module.exports;
   var model = node ? require('./model.js') : root.CourseWikiFeedsSpeeds;
-  var cutter = null;
+  var data = null, removal = null;
   if (node) {
-    try { cutter = require('../cutter-geometry/cutter.js'); } catch (e) { cutter = null; }
+    try { data = require('./cutting-data.js'); } catch (e) { data = null; }
+    try { removal = require('../material-removal/removal.js'); } catch (e) { removal = null; }
   }
-  var api = factory(model, function () { return cutter || root.CourseWikiCutter || null; });
+  var api = factory(model,
+    function () { return data || root.CourseWikiCuttingData || null; },
+    function () { return removal || root.CourseWikiRemoval || null; });
   if (node) module.exports = api;
   else api.boot();
-})(typeof self !== 'undefined' ? self : this, function (M, findCutter) {
+})(typeof self !== 'undefined' ? self : this, function (M, findData, findRemoval) {
   'use strict';
+
+  var DEFAULT_MATERIAL = 'al-6061-t6';
 
   function n(v) { return (Math.round(v * 10) / 10).toString(); }
   function esc(s) {
@@ -10061,194 +10702,6 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   function txt(cls, x, y, s, anchor) {
     return '<text class="' + cls + '" x="' + n(x) + '" y="' + n(y) + '"' +
       (anchor ? ' text-anchor="' + anchor + '"' : '') + '>' + esc(s) + '</text>';
-  }
-  function arrowHead(tx, ty, dx, dy, size) {
-    var len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len;
-    var bx = tx - ux * size, by = ty - uy * size, w = size * 0.55;
-    return 'M' + n(tx) + ' ' + n(ty) + 'L' + n(bx - uy * w) + ' ' + n(by + ux * w) +
-      'L' + n(bx + uy * w) + ' ' + n(by - ux * w) + 'Z';
-  }
-
-  /* ------------------------------------------------------------------------
-     The live panel: the cutter seen down its axis, cutting a slot, and a
-     schematic distance record of successive tooth passes. One panel per run.
-
-     run    - { rpm, feed (mm/min), chip (mm/tooth), teeth, diameter (mm) }
-     tReal  - real seconds since the clock started
-     o      - { unit, title, sub, insetPxPerMm, slowdown, idPrefix,
-                cutter (optional API override), ariaLabel }
-     ----------------------------------------------------------------------*/
-  var PANEL = { w: 560, h: 336, cx: 172, cy: 176, R: 80 };
-  var INSET = { x: 372, y: 100, w: 178, h: 168 };
-
-  function renderPanel(run, tReal, o) {
-    var opt = o || {}, P = PANEL, I = INSET, unit = opt.unit || 'in';
-    var compact = !!opt.compact;
-    if (compact) I = { x: 20, y: 390, w: 320, h: 168 };
-    opt = Object.assign({}, opt, { insetPosition: I });
-    var cx = P.cx, cy = P.cy, R = P.R;
-    var mot = M.motion(run, tReal);
-    var out = [];
-    out.push('<svg class="fs-svg' + (compact ? ' fs-svg-compact' : '') + '" viewBox="0 0 ' + (compact ? 360 : P.w) + ' ' + (compact ? 580 : P.h) + '" role="img" aria-label="' +
-      esc(opt.ariaLabel || opt.title || 'Cutter and work') + '" focusable="false">');
-
-    // ---- the work: a plate with the slot the cutter has already cut. Seen
-    // down the axis, the work feeds left, so the slot trails to the left.
-    var left = 8, right = 344, top = 70, bottom = 282;
-    out.push('<path class="fs-stock" fill-rule="evenodd" d="M' + left + ' ' + top + 'L' + right + ' ' + top +
-      'L' + right + ' ' + bottom + 'L' + left + ' ' + bottom + 'Z' +
-      'M' + left + ' ' + (cy - R) + 'L' + cx + ' ' + (cy - R) +
-      'A' + R + ' ' + R + ' 0 0 1 ' + cx + ' ' + (cy + R) + 'L' + left + ' ' + (cy + R) + 'Z"/>');
-    out.push('<path class="fs-slot" d="M' + left + ' ' + (cy - R) + 'L' + cx + ' ' + (cy - R) +
-      'A' + R + ' ' + R + ' 0 0 1 ' + cx + ' ' + (cy + R) + 'L' + left + ' ' + (cy + R) + 'Z"/>');
-
-    // Texture fixed to the work, at the drawing's true scale. At real feeds
-    // it barely moves while the cutter spins - which is the lesson.
-    var pxPerMm = R / (run.diameter / 2), L = 30;
-    var shift = ((-(mot.workTravel * pxPerMm)) % L + L) % L, marks = '';
-    for (var x = left - L + shift; x < right; x += L) {
-      if (x < left + 3 || x > right - 9) continue;
-      marks += 'M' + n(x) + ' ' + (top + 8) + 'L' + n(x + 6) + ' ' + (top + 18);
-      marks += 'M' + n(x) + ' ' + (bottom - 18) + 'L' + n(x + 6) + ' ' + (bottom - 8);
-    }
-    out.push('<path class="fs-marks" d="' + marks + '"/>');
-
-    // ---- feed arrow, under the work, pointing the way the work moves
-    var ay = 312;
-    out.push('<path class="fs-feed" d="M' + (cx + 40) + ' ' + ay + 'L' + (cx - 30) + ' ' + ay + '"/>');
-    out.push('<path class="fs-feed-head" d="' + arrowHead(cx - 44, ay, -1, 0, 15) + '"/>');
-    out.push(txt('fs-t fs-t-feed', compact ? cx : cx + 52, compact ? ay + 28 : ay + 5, 'Work feed ' + M.show(run.feed, 'feed', unit), compact ? 'middle' : 'start'));
-
-    // ---- the cutter, from the shared primitive
-    var C = opt.cutter || findCutter();
-    if (C && typeof C.render === 'function') {
-      out.push('<g class="fs-cutter" transform="translate(' + cx + ' ' + cy + ')">' +
-        C.render({ radius: R, teeth: mot.teeth, idPrefix: (opt.idPrefix || 'fs') + '-cut' }) + '</g>');
-    } else {
-      out.push('<circle class="fs-cutter-missing" cx="' + cx + '" cy="' + cy + '" r="' + R + '"/>');
-      out.push(txt('fs-t fs-t-soft', cx, cy + 5, 'cutter drawing not loaded', 'middle'));
-    }
-
-    // ---- rotation arrow, clockwise, over the cutter
-    var r = R + 16, a0 = 2.35, a1 = 1.55, arc = '';
-    for (var k = 0; k <= 14; k++) {
-      var aa = a0 + (a1 - a0) * k / 14;
-      arc += (k ? 'L' : 'M') + n(cx + r * Math.cos(aa)) + ' ' + n(cy - r * Math.sin(aa));
-    }
-    out.push('<path class="fs-spin" d="' + arc + '"/>');
-    var ae = a1 - 0.1;
-    out.push('<path class="fs-spin-head" d="' + arrowHead(cx + r * Math.cos(ae), cy - r * Math.sin(ae),
-      Math.sin(a1), Math.cos(a1), 13) + '"/>');
-
-    out.push(renderInset(run, tReal, opt, pxPerMm));
-
-    // ---- title and the two numbers the machine is set to
-    out.push(txt('fs-t fs-t-title', 10, 26, opt.title || '', 'start'));
-    out.push(txt('fs-t fs-t-soft', 10, 52, opt.sub || (M.show(run.rpm, 'rpm', unit) + ' · ' + run.teeth + ' flutes'), 'start'));
-    out.push('</svg>');
-    return out.join('');
-  }
-
-  /* A schematic distance record, not a machined surface. Ticks record
-     successive tooth passes; gold is travel since the most recent pass. */
-  function renderInset(run, tReal, opt, mainPxPerMm) {
-    var I = opt.insetPosition || INSET, unit = opt.unit || 'in', s = opt.insetPxPerMm || 28 / run.chip;
-    var id = (opt.idPrefix || 'fs') + '-inset';
-    var tipX = I.x + I.w * 0.62, yU = I.y + 46, yC = I.y + 92, yB = I.y + I.h - 30;
-    var out = [];
-    out.push('<clipPath id="' + id + '"><rect x="' + I.x + '" y="' + I.y + '" width="' + I.w + '" height="' + I.h + '"/></clipPath>');
-    out.push('<rect class="fs-inset" x="' + I.x + '" y="' + I.y + '" width="' + I.w + '" height="' + I.h + '"/>');
-    out.push('<g clip-path="url(#' + id + ')">');
-
-    // A distance strip carried left at the same feed; no surface geometry.
-    var sliver = M.uncutSliver(run, tReal), faceX = tipX - sliver * s;
-    out.push('<rect class="fs-travel" x="' + I.x + '" y="' + yC + '" width="' + I.w + '" height="' + (yB - yC) + '"/>');
-    if (faceX < tipX - 0.05) {
-      out.push('<rect class="fs-chip" x="' + n(faceX) + '" y="' + yU + '" width="' + n(tipX - faceX) + '" height="' + (yC - yU) + '"/>');
-    }
-    // one mark per tooth pass, carried left with the work
-    var ms = M.marks(run, tReal, undefined, 40), d = '';
-    ms.forEach(function (m) {
-      var x = tipX - m.offset * s;
-      if (x < I.x - 4) return;
-      d += 'M' + n(x) + ' ' + (yC - 1) + 'L' + n(x) + ' ' + (yC + 12);
-    });
-    out.push('<path class="fs-pass" d="' + d + '"/>');
-    // the path of the tooth tips, and a flash as a tooth sweeps through
-    out.push('<path class="fs-tipline" d="M' + n(tipX) + ' ' + (I.y + 4) + 'L' + n(tipX) + ' ' + (I.y + I.h - 4) + '"/>');
-    if (ms.length && ms[0].age * (opt.slowdown || 200) < 0.18) {
-      out.push('<path class="fs-flash" d="M' + n(tipX) + ' ' + (I.y + 18) + 'L' + n(tipX) + ' ' + (yC + 14) + '"/>');
-    }
-    out.push('</g>');
-
-    // scale bar, so the magnification is stated rather than implied
-    var bar = M.niceLength(M.fromCanon(unit, 'chip', 40 / s));
-    var barPx = M.toCanon(unit, 'chip', bar) * s, bx = I.x + 10, by = I.y + I.h - 12;
-    out.push('<path class="fs-scale" d="M' + bx + ' ' + (by - 5) + 'L' + bx + ' ' + by + 'L' + n(bx + barPx) + ' ' + by +
-      'L' + n(bx + barPx) + ' ' + (by - 5) + '"/>');
-    out.push(txt('fs-t fs-t-small', bx + barPx + 6, by + 1, M.format(bar, 'chip', unit).replace(/0+$/, '').replace(/\.$/, '') + ' ' + M.UNITS[unit].diameter, 'start'));
-    var mag = s / mainPxPerMm;
-    out.push(txt('fs-t fs-t-small', I.x + 2, I.y - 22, 'Tooth-pass record', 'start'));
-    out.push(txt('fs-t fs-t-small fs-t-soft', I.x + 2, I.y - 6, 'distance ×' + roundSig(mag, 2) + ' · schematic', 'start'));
-    out.push(txt('fs-t fs-t-small fs-t-soft', tipX - 4, I.y + 22, 'pass here', 'end'));
-    out.push(txt('fs-t fs-t-small', I.x + 5, yC + 30, 'table travel', 'start'));
-    return out.join('');
-  }
-
-  function roundSig(v, sig) {
-    if (!(v > 0)) return '0';
-    var p = Math.pow(10, Math.floor(Math.log10(v)) - sig + 1);
-    return M.format(Math.round(v / p) * p, 'rpm', 'in');
-  }
-
-  /* ------------------------------------------------------------------------
-     The paper figure: one setup and two ways of doubling its spindle speed,
-     all over the SAME stretch of time - two turns of the setup's cutter.
-     A mark is one tooth pass; mark spacing is the feed per tooth; the bar is
-     how far the table moved. Exported for the page's static figure.
-     ----------------------------------------------------------------------*/
-  function renderComparison(canon, unit, opts) {
-    var o = opts || {}, factor = o.factor || 2;
-    var base = M.solve(canon);
-    var rows = [
-      { title: 'Setup', run: base },
-      { title: 'Spindle ×' + factor + ', table feed held', run: M.trial(canon, factor, 'feed') },
-      { title: 'Spindle ×' + factor + ', chip load held', run: M.trial(canon, factor, 'chip') }
-    ];
-    var span = 2 * 60 / base.rpm;                         // real seconds: two setup turns
-    var maxTravel = Math.max.apply(null, rows.map(function (r) { return r.run.feed / 60 * span; }));
-    var tipX = 520, x0 = 24, s = (tipX - x0) / maxTravel;   // px per mm, shared by every row
-    var H = 96, top = 24, out = [];
-    out.push('<svg class="fs-compare-svg" viewBox="0 0 560 ' + (top + H * rows.length + 30) + '" role="img" aria-label="' +
-      esc('Three rows over the same two turns of the setup cutter. Setup: ' + 2 * base.teeth + ' tooth passes. Doubling the spindle speed and holding the table feed: ' +
-        'twice the passes over the same table travel, so each tooth takes half the chip. Doubling the spindle speed and holding the chip load: ' +
-        'twice the passes, each the same size, so the table travels twice as far.') + '" focusable="false">');
-    out.push('<path class="fs-tipline" d="M' + tipX + ' ' + (top - 8) + 'L' + tipX + ' ' + (top + H * rows.length - 10) + '"/>');
-    out.push(txt('fs-t fs-t-small fs-t-soft', tipX - 4, top - 10 + 2, 'front of the cut', 'end'));
-    rows.forEach(function (row, i) {
-      var y = top + i * H, r = row.run;
-      var travel = r.feed / 60 * span;
-      var passes = Math.round(span * r.rpm * r.teeth / 60);
-      out.push(txt('fs-t fs-t-tag', x0, y + 22, row.title, 'start'));
-      out.push(txt('fs-t fs-t-soft', x0, y + 42, M.show(r.rpm, 'rpm', unit) + ' · ' + M.show(r.feed, 'feed', unit) +
-        ' · ' + M.show(r.chip, 'chip', unit), 'start'));
-      var by = y + 56;
-      out.push('<rect class="fs-travel" x="' + n(tipX - travel * s) + '" y="' + by + '" width="' + n(travel * s) + '" height="14"/>');
-      var d = '';
-      for (var k = 0; k < passes; k++) {
-        var x = tipX - k * r.chip * s;
-        d += 'M' + n(x) + ' ' + (by - 4) + 'L' + n(x) + ' ' + (by + 18);
-      }
-      out.push('<path class="fs-pass" d="' + d + '"/>');
-      out.push(txt('fs-t fs-t-small', tipX - travel * s + 6, by + 32, passes + ' passes', 'start'));
-    });
-    var ly = top + H * rows.length + 12;
-    out.push('<path class="fs-pass" d="M' + x0 + ' ' + (ly - 9) + 'L' + x0 + ' ' + (ly + 5) + '"/>');
-    out.push(txt('fs-t fs-t-small', x0 + 8, ly + 2, 'one tooth pass', 'start'));
-    out.push('<rect class="fs-travel" x="' + (x0 + 150) + '" y="' + (ly - 7) + '" width="26" height="10"/>');
-    out.push(txt('fs-t fs-t-small', x0 + 184, ly + 2, 'table travel in the same time', 'start'));
-    out.push('</svg>');
-    return out.join('');
   }
 
   /* One turn of the cutter, unrolled: the cutting edge travels pi x D. */
@@ -10272,36 +10725,62 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     return out.join('');
   }
 
-  /* The arithmetic, written out with the numbers in it. Returns plain-text
-     lines; the demo and the tests share them. */
-  function workedLines(canon, unit) {
-    var s = M.solve(canon), u = M.UNITS[unit], lines = [];
-    var D = M.format(M.fromCanon(unit, 'diameter', canon.diameter), 'diameter', unit);
-    var V = M.format(M.fromCanon(unit, 'speed', canon.speed), 'speed', unit);
-    var fz = M.format(M.fromCanon(unit, 'chip', canon.chip), 'chip', unit);
-    var rpmReq = M.format(s.requestedRpm, 'rpm', unit), rpm = M.format(s.rpm, 'rpm', unit);
-    if (unit === 'in') {
-      lines.push('Spindle speed = 12 × cutting speed ÷ (π × diameter) = 12 × ' + V + ' ÷ (π × ' + D + ') ≈ ' + rpmReq + ' rev/min');
-    } else {
-      lines.push('Spindle speed = 1000 × cutting speed ÷ (π × diameter) = 1000 × ' + V + ' ÷ (π × ' + D + ') ≈ ' + rpmReq + ' rev/min');
+  /* ---- guidance -------------------------------------------------------------
+     The guide's middle values, for a material and an optional diameter.
+     Feed per tooth is null outside the guide's diameter table.            */
+  function guideMiddle(materialId, diameterMm) {
+    var D = findData(), g = D && D.guidance(materialId, diameterMm);
+    if (!g) return null;
+    return {
+      speed: (g.vcMMin[0] + g.vcMMin[1]) / 2,
+      chip: g.fzMm ? (g.fzMm[0] + g.fzMm[1]) / 2 : null
+    };
+  }
+
+  /* ---- the arithmetic, written out with the numbers in it ------------------
+     `values` are canonical and may be partial; each line appears once its
+     inputs are valid. `energy` is a J/mm3 band or null; `eta` a percent.
+     Returns plain-text lines; the demo and the tests share them.          */
+  function workedLines(values, unit, energy, errors) {
+    var R = findRemoval(), p = M.partial(values, errors), u = M.UNITS[unit], lines = [];
+    if (p.rpm === undefined) return lines;
+    var D = M.format(M.fromCanon(unit, 'diameter', values.diameter), 'diameter', unit);
+    var V = M.format(M.fromCanon(unit, 'speed', values.speed), 'speed', unit);
+    var rpmReq = M.format(p.requestedRpm, 'rpm', unit), rpm = M.format(p.rpm, 'rpm', unit);
+    lines.push(unit === 'in'
+      ? 'Spindle speed = 12 × cutting speed ÷ (π × diameter) = 12 × ' + V + ' ÷ (π × ' + D + ') ≈ ' + rpmReq + ' rev/min'
+      : 'Spindle speed = 1000 × cutting speed ÷ (π × diameter) = 1000 × ' + V + ' ÷ (π × ' + D + ') ≈ ' + rpmReq + ' rev/min');
+    if (p.capped) lines.push('The machine tops out at ' + rpm + ' rev/min, so that is the speed it runs. Everything below uses ' + rpm + '.');
+    if (p.feed !== undefined) {
+      var fz = M.format(M.fromCanon(unit, 'chip', values.chip), 'chip', unit);
+      lines.push('Table feed = spindle speed × flutes × feed per tooth = ' + rpm + ' × ' + values.teeth + ' × ' + fz +
+        ' ≈ ' + M.show(p.feed, 'feed', unit));
     }
-    if (s.capped) {
-      lines.push('The machine tops out at ' + rpm + ' rev/min, so that is the speed it runs. Everything below uses ' + rpm + '.');
-    }
-    lines.push('Table feed = spindle speed × flutes × feed per tooth = ' + rpm + ' × ' + canon.teeth + ' × ' + fz +
-      ' ≈ ' + M.show(s.feed, 'feed', unit));
-    if (s.capped) {
-      var back = unit === 'in'
-        ? 'π × ' + D + ' × ' + rpm + ' ÷ 12'
-        : 'π × ' + D + ' × ' + rpm + ' ÷ 1000';
-      lines.push('Cutting speed actually reached = ' + back + ' ≈ ' + M.show(s.speed, 'speed', unit) +
+    if (p.capped) {
+      var back = unit === 'in' ? 'π × ' + D + ' × ' + rpm + ' ÷ 12' : 'π × ' + D + ' × ' + rpm + ' ÷ 1000';
+      lines.push('Cutting speed actually reached = ' + back + ' ≈ ' + M.show(p.speed, 'speed', unit) +
         ', not the ' + V + ' ' + u.speedShort + ' asked for.');
+    }
+    if (p.feed === undefined || !R || !(values.width > 0) || !(values.depth > 0)) return lines;
+    var q = R.removalRate(values.width, values.depth, p.feed);
+    lines.push('Removal rate = width × depth × table feed = ' + M.show(values.width, 'width', unit) + ' × ' +
+      M.show(values.depth, 'depth', unit) + ' × ' + M.show(p.feed, 'feed', unit) + ' ≈ ' + R.showRate(q, unit));
+    if (!energy) return lines;
+    var b = R.powerBand(q, energy);
+    lines.push('Cutting power ≈ removal rate × cutting energy = ' + R.showRate(q, unit) + ' × ' +
+      R.showEnergy(energy, unit).replace(/ \(.*\)$/, '') + ' ≈ ' + (unit === 'in'
+        ? R.showHp(b[0], b[1]) + ' (' + R.showPower(b[0], b[1]) + ')'
+        : R.showPowerBoth(b[0], b[1])));
+    if (values.eta > 0) {
+      var e = values.eta / 100;
+      lines.push('Motor shaft power ≈ cutting power ÷ drivetrain efficiency = ' + R.showPower(b[0], b[1]) + ' ÷ ' +
+        String(Math.round(e * 1000) / 1000) + ' ≈ ' + R.showPowerBoth(b[0] / e, b[1] / e));
     }
     return lines;
   }
 
   /* Screen-reader and readout text for a trial against its setup. */
-  function describeTrial(canon, t, unit) {
+  function describeTrial(t, unit) {
     var held = t.hold === 'chip' ? 'chip load held' : 'table feed held';
     var parts = ['Spindle ' + M.show(t.rpm, 'rpm', unit) + (t.capped ? ' (machine top speed)' : ''), held,
       'table feed ' + M.show(t.feed, 'feed', unit) + ' (' + M.ratioText(t.change.feed) + ')',
@@ -10310,15 +10789,67 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     return parts.join(', ') + '.';
   }
 
-  /* Inset scale: about 28 px per feed per tooth of the setup. Fixed while
-     the experiment runs, so a thinner chip LOOKS thinner. */
-  function insetScale(canon) { return 28 / canon.chip; }
+  /* ---- the removed-solid comparison ------------------------------------------
+     `rows` - [{ title, sub, run: {feed, width, depth, diameter} }]
+     One frame for every row, built from `frameRuns` (all the feeds this
+     comparison can reach), so a row's prism keeps its scale while the
+     experiment moves.                                                     */
+  function renderSweeps(rows, elapsed, f, unit, energy) {
+    var R = findRemoval();
+    return rows.map(function (row) {
+      var r = row.run, L = R.travel(r.feed, elapsed), q = R.removalRate(r.width, r.depth, r.feed);
+      var out = '<div class="fs-sweep" data-run="' + esc(row.id || '') + '">';
+      out += '<p class="fs-sweep-head"><span class="fs-sweep-title">' + esc(row.title) + '</span>' +
+        (row.sub ? '<span class="fs-sweep-sub">' + esc(row.sub) + '</span>' : '') + '</p>';
+      out += R.renderSweep(r, elapsed, f, { unit: unit });
+      out += '<p class="fs-sweep-read"><span>In ' + esc(R.showSeconds(elapsed)) + ': travel <strong>' + esc(R.showLength(L, unit)) +
+        '</strong>, removed <strong>' + esc(R.showVolume(R.volume(r.width, r.depth, L), unit)) + '</strong></span>' +
+        '<span>Removal rate <strong>' + esc(R.showRate(q, unit)) + '</strong>' +
+        (energy ? ' · power ≈ <strong>' + esc(unit === 'in' ? R.showHp.apply(null, R.powerBand(q, energy)) : R.showPower.apply(null, R.powerBand(q, energy))) + '</strong>' : '') +
+        '</span></p></div>';
+      return out;
+    }).join('');
+  }
+
+  /* The paper figure: one setup and two ways of doubling its spindle speed,
+     over the same stretch of time and at one scale, then the setup's
+     removal rate priced in every material. Exported for the page.        */
+  function renderStaticFigure(values, unit, materialId) {
+    var R = findRemoval(), DATA = findData();
+    var base = M.solve(values), held = M.trial(values, 2, 'feed'), chip = M.trial(values, 2, 'chip');
+    var run = function (feed) { return { feed: feed, width: values.width, depth: values.depth, diameter: values.diameter }; };
+    var rows = [
+      { id: 'setup', title: 'Setup', sub: M.show(base.rpm, 'rpm', unit) + ' · ' + M.show(base.feed, 'feed', unit), run: run(base.feed) },
+      { id: 'feed', title: 'Spindle ×2, table feed held', sub: M.show(held.rpm, 'rpm', unit) + ' · ' + M.show(held.feed, 'feed', unit), run: run(held.feed) },
+      { id: 'chip', title: 'Spindle ×2, chip load held', sub: M.show(chip.rpm, 'rpm', unit) + ' · ' + M.show(chip.feed, 'feed', unit), run: run(chip.feed) }
+    ];
+    var win = R.autoWindow(base.feed, values.diameter);
+    var f = R.frame(rows.map(function (r) { return r.run; }), win, false);
+    var g = DATA.get(materialId);
+    var q = R.removalRate(values.width, values.depth, base.feed);
+    return '<div class="fs-sweeps">' + renderSweeps(rows, win, f, unit, g.energyJMm3) + '</div>' +
+      R.renderPowerChart(q, DATA.materials, { unit: unit, current: materialId });
+  }
 
   /* ========================================================================
      Live demo
      ======================================================================*/
   var NAV_KEYS = { ' ': 1, 'Spacebar': 1, 'ArrowLeft': 1, 'ArrowRight': 1, 'ArrowUp': 1, 'ArrowDown': 1,
     'PageUp': 1, 'PageDown': 1, 'Home': 1, 'End': 1 };
+  var PLAY_SECONDS = 4;
+  var FIELD_GROUPS = [
+    { title: 'Cutter and machine', fields: [
+      { key: 'diameter', label: 'Cutter diameter' },
+      { key: 'teeth', label: 'Flutes' },
+      { key: 'maxRpm', label: 'Machine top speed', optional: 'no limit' }] },
+    { title: 'Cutting data', fields: [
+      { key: 'speed', label: 'Cutting speed' },
+      { key: 'chip', label: 'Feed per tooth (chip load)' }] },
+    { title: 'The cut', fields: [
+      { key: 'width', label: 'Width of cut' },
+      { key: 'depth', label: 'Depth of cut' },
+      { key: 'eta', label: 'Drivetrain efficiency', optional: 'not applied' }] }
+  ];
 
   function el(tag, attrs, text) {
     var e = document.createElement(tag);
@@ -10326,20 +10857,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (text !== undefined && text !== null) e.textContent = text;
     return e;
   }
+  function listWords(keys) {
+    var w = keys.map(function (k) { return M.FIELD_NAMES[k].toLowerCase(); });
+    return w.length < 2 ? w.join('') : w.slice(0, -1).join(', ') + ' and ' + w[w.length - 1];
+  }
 
   function wire(rootEl) {
     if (rootEl.hasAttribute('data-fs-wired')) return;
+    var DATA = findData(), R = findRemoval();
+    if (!DATA || !R) return;                       // the page's static figure stays
     rootEl.setAttribute('data-fs-wired', '');
     var host = rootEl.querySelector('[data-fs-live]') || rootEl;
     var uid = 'fs' + Math.random().toString(36).slice(2, 8);
     var reduce = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
 
-    var first = M.EXAMPLES.in[0];
     var state = {
-      unit: 'in', canon: M.setupToCanon('in', first), exampleId: first.id,
-      factor: 1, hold: 'feed', slowdown: 200, tScreen: 0, playing: false, scale: 0
+      unit: 'in', material: DATA.get(DEFAULT_MATERIAL) ? DEFAULT_MATERIAL : DATA.materials[0].id,
+      exact: {}, factor: 1, hold: 'feed', frac: 1, windowChoice: 'auto', playing: false, read: null
     };
-    state.scale = insetScale(state.canon);
 
     // Keep the page's own arrow-key and Space navigation off our controls.
     rootEl.addEventListener('keydown', function (e) {
@@ -10348,8 +10883,17 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       if (t && t !== rootEl && t.matches && t.matches('button, input, select, textarea, summary, [tabindex]')) e.stopPropagation();
     });
 
-    // ---- top bar: units and illustrative examples
+    // ---- top bar: material and units
     var bar = el('div', { class: 'fs-bar' });
+    var matP = el('p', { class: 'fs-material' });
+    var matLab = el('label', { for: uid + '-material' }, 'Material');
+    var matSel = el('select', { id: uid + '-material' });
+    DATA.materials.forEach(function (m) {
+      var op = el('option', { value: m.id }, m.label);
+      if (m.id === state.material) op.selected = true;
+      matSel.appendChild(op);
+    });
+    matP.appendChild(matLab); matP.appendChild(matSel);
     var units = el('fieldset', { class: 'fs-units' });
     units.appendChild(el('legend', {}, 'Units'));
     var unitRadios = {};
@@ -10360,43 +10904,66 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       lab.appendChild(r); lab.appendChild(document.createTextNode(' ' + u[1]));
       units.appendChild(lab); unitRadios[u[0]] = r;
     });
-    var exWrap = el('div', { class: 'fs-examples', role: 'group', 'aria-label': 'Illustrative examples' });
-    exWrap.appendChild(el('span', { class: 'fs-k' }, 'Illustrative numbers - not cutting data'));
-    var exRow = el('div', { class: 'fs-example-row' });
-    exWrap.appendChild(exRow);
-    bar.appendChild(exWrap); bar.appendChild(units);
+    bar.appendChild(matP); bar.appendChild(units);
 
-    // ---- the form
+    // ---- the guide card: read-only ranges for the chosen material
+    var guide = el('section', { class: 'fs-guide', 'aria-labelledby': uid + '-guide-title' });
+    var gTitle = el('p', { class: 'fs-guide-title', id: uid + '-guide-title' });
+    var gCond = el('p', { class: 'fs-guide-cond' });
+    var gList = el('dl', { class: 'fs-guide-list' });
+    var gRows = {};
+    [['speed', 'Cutting speed'], ['chip', 'Feed per tooth'], ['energy', 'Cutting energy']].forEach(function (r) {
+      var d = el('div', { 'data-guide': r[0] });
+      d.appendChild(el('dt', {}, r[1]));
+      var dd = el('dd');
+      var band = el('span', { class: 'fs-guide-band' }), pos = el('span', { class: 'fs-guide-pos' });
+      dd.appendChild(band); dd.appendChild(pos);
+      d.appendChild(dd); gList.appendChild(d);
+      gRows[r[0]] = { band: band, pos: pos };
+    });
+    var gApplyP = el('p', { class: 'fs-guide-apply' });
+    var gApply = el('button', { type: 'button' }, 'Use the middle of these ranges');
+    var gApplyNote = el('span', { class: 'fs-guide-note' }, 'Fills cutting speed and feed per tooth only. Your cutter, flutes and cut stay as entered.');
+    var gBasis = el('p', { class: 'fs-guide-basis' });
+    gApplyP.appendChild(gApply); gApplyP.appendChild(gApplyNote);
+    var gMore = el('details', { class: 'fs-guide-more' });
+    gMore.appendChild(el('summary', {}, 'What these ranges assume, and where they come from'));
+    var gNotes = el('ul'), gSources = el('p', { class: 'fs-guide-sources' });
+    gMore.appendChild(gNotes); gMore.appendChild(gSources);
+    [gTitle, gCond, gList, gBasis, gApplyP, gMore].forEach(function (x) { guide.appendChild(x); });
+
+    // ---- the form, in three groups, every field empty
     var form = el('div', { class: 'fs-form' });
-    var FIELDS = [
-      { key: 'diameter', label: 'Cutter diameter' },
-      { key: 'speed', label: 'Cutting speed' },
-      { key: 'teeth', label: 'Flutes' },
-      { key: 'chip', label: 'Feed per tooth (chip load)' },
-      { key: 'maxRpm', label: 'Machine top speed (optional)' }
-    ];
     var inputs = {}, unitTags = {};
-    FIELDS.forEach(function (f) {
-      var p = el('p');
-      var lab = el('label', { for: uid + '-' + f.key });
-      lab.appendChild(el('span', {}, f.label));
-      var tag = el('span', { class: 'fs-unit' });
-      lab.appendChild(tag);
-      var input = el('input', { id: uid + '-' + f.key, type: 'text', inputmode: f.key === 'teeth' || f.key === 'maxRpm' ? 'numeric' : 'decimal',
-        autocomplete: 'off', spellcheck: 'false', 'data-fs-field': f.key });
-      if (f.key === 'maxRpm') input.setAttribute('placeholder', 'no limit');
-      p.appendChild(lab); p.appendChild(input);
-      form.appendChild(p);
-      inputs[f.key] = input; unitTags[f.key] = tag;
+    FIELD_GROUPS.forEach(function (g) {
+      var set = el('fieldset', { class: 'fs-group' });
+      set.appendChild(el('legend', {}, g.title));
+      g.fields.forEach(function (f) {
+        var p = el('p');
+        var lab = el('label', { for: uid + '-' + f.key });
+        lab.appendChild(el('span', {}, f.label + (f.optional ? ' (optional)' : '')));
+        var tag = el('span', { class: 'fs-unit' });
+        lab.appendChild(tag);
+        var input = el('input', { id: uid + '-' + f.key, type: 'text',
+          inputmode: f.key === 'teeth' || f.key === 'maxRpm' ? 'numeric' : 'decimal',
+          autocomplete: 'off', spellcheck: 'false', 'data-fs-field': f.key });
+        if (f.optional) input.setAttribute('placeholder', f.optional);
+        p.appendChild(lab); p.appendChild(input);
+        set.appendChild(p);
+        inputs[f.key] = input; unitTags[f.key] = tag;
+      });
+      form.appendChild(set);
     });
     var errors = el('ul', { class: 'fs-errors', 'aria-live': 'polite' });
 
-    // ---- results
+    // ---- results: each tile says what it is waiting for until it can answer
     var results = el('div', { class: 'fs-results' });
     var tiles = {};
     [['rpm', 'Spindle speed', 'set this on the machine'], ['feed', 'Table feed', 'set this on the machine'],
       ['speed', 'Cutting speed reached', 'how fast the edge moves through the work'],
-      ['chip', 'Chip load', 'how far the work moves per tooth']].forEach(function (t) {
+      ['rate', 'Removal rate', 'solid metal removed each minute'],
+      ['power', 'Estimated cutting power', 'at the cutting edge, from the material’s energy band'],
+      ['shaft', 'Motor shaft power', 'cutting power ÷ drivetrain efficiency']].forEach(function (t) {
       var box = el('div', { class: 'fs-result', 'data-kind': t[0] });
       box.appendChild(el('span', { class: 'fs-k' }, t[1]));
       var v = el('span', { class: 'fs-v' });
@@ -10410,7 +10977,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     // ---- the experiment
     var exp = el('div', { class: 'fs-exp' });
-    exp.appendChild(el('p', { class: 'fs-exp-title' }, 'Now change only the spindle speed'));
+    exp.appendChild(el('p', { class: 'fs-exp-title' }, 'What the cut removes, and what changes when only the spindle speed does'));
+    var waiting = el('p', { class: 'fs-waiting' });
+    var expBody = el('div', { class: 'fs-exp-body' });
     var expControls = el('div', { class: 'fs-exp-controls' });
     var sp = el('p', { class: 'fs-slider' });
     var spLab = el('label', { for: uid + '-factor' });
@@ -10430,13 +10999,13 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       holdSet.appendChild(lab); holdRadios[h[0]] = r;
     });
     expControls.appendChild(sp); expControls.appendChild(holdSet);
-    exp.appendChild(expControls);
     var table = el('table', { class: 'fs-table' });
     var thead = el('thead'), hr = el('tr');
     ['', 'Setup', 'Changed', 'Change'].forEach(function (h, i) { hr.appendChild(el('th', i ? { scope: 'col' } : {}, h)); });
     thead.appendChild(hr); table.appendChild(thead);
     var tbody = el('tbody'), rows = {};
-    [['rpm', 'Spindle speed'], ['feed', 'Table feed'], ['chip', 'Chip load'], ['speed', 'Cutting speed']].forEach(function (r) {
+    [['rpm', 'Spindle speed'], ['feed', 'Table feed'], ['chip', 'Chip load'], ['speed', 'Cutting speed'],
+      ['rate', 'Removal rate'], ['power', 'Estimated power']].forEach(function (r) {
       var tr = el('tr', { 'data-row': r[0] });
       tr.appendChild(el('th', { scope: 'row' }, r[1]));
       var a = el('td'), b = el('td'), c = el('td');
@@ -10444,148 +11013,262 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       tbody.appendChild(tr); rows[r[0]] = { tr: tr, a: a, b: b, c: c };
     });
     table.appendChild(tbody);
-    exp.appendChild(table);
 
-    // ---- the drawing
-    var transport = el('div', { class: 'fs-transport', role: 'group', 'aria-label': 'Playback' });
+    var transport = el('div', { class: 'fs-transport', role: 'group', 'aria-label': 'Time shown' });
     var bPlay = el('button', { type: 'button', class: 'fs-play', 'aria-pressed': 'false' }, 'Play');
     var bReset = el('button', { type: 'button' }, 'Reset');
-    var slowP = el('label', { class: 'fs-slow', for: uid + '-slow' });
-    slowP.appendChild(el('span', {}, 'Slow motion'));
-    var slow = el('select', { id: uid + '-slow' });
-    M.SLOWDOWNS.forEach(function (k) {
-      var op = el('option', { value: String(k) }, '1/' + M.format(k, 'rpm', 'in') + ' speed');
-      if (k === state.slowdown) op.selected = true;
-      slow.appendChild(op);
-    });
-    slowP.appendChild(slow);
-    transport.appendChild(bPlay); transport.appendChild(bReset); transport.appendChild(slowP);
+    var tP = el('p', { class: 'fs-slider fs-time' });
+    var tLab = el('label', { for: uid + '-time' });
+    tLab.appendChild(el('span', {}, 'Time shown'));
+    var tOut = el('output', { for: uid + '-time', class: 'fs-out' });
+    tLab.appendChild(tOut);
+    var tIn = el('input', { id: uid + '-time', type: 'range', min: '0', max: '100', step: '1', value: '100' });
+    tP.appendChild(tLab); tP.appendChild(tIn);
+    var winLab = el('label', { class: 'fs-window', for: uid + '-window' });
+    winLab.appendChild(el('span', {}, 'Time span'));
+    var winSel = el('select', { id: uid + '-window' });
+    winLab.appendChild(winSel);
+    transport.appendChild(bPlay); transport.appendChild(bReset); transport.appendChild(tP); transport.appendChild(winLab);
 
     var stage = el('div', { class: 'fs-stage', tabindex: '0', role: 'group',
-      'aria-label': 'Cutter drawings. Space plays or pauses, left and right arrows change the spindle speed, Home resets the experiment.',
+      'aria-label': 'Removed-solid drawings. Space plays or pauses, left and right arrows change the spindle speed, Home resets the experiment.',
       'aria-describedby': uid + '-status' });
-    var panelA = el('div', { class: 'fs-panel', 'data-run': 'setup' });
-    var panelB = el('div', { class: 'fs-panel', 'data-run': 'changed' });
-    stage.appendChild(panelA); stage.appendChild(panelB);
-    var clock = el('p', { class: 'fs-clock' });
-    var fast = el('p', { class: 'fs-fast', hidden: '' });
-    var keys = el('p', { class: 'fs-keys' }, 'With the drawing selected: Space plays or pauses, ← → change the spindle speed, Home resets the experiment.');
+    var scaleNote = el('p', { class: 'fs-scale-note' });
+    var keys = el('p', { class: 'fs-keys' }, 'With the drawings selected: Space plays or pauses, ← → change the spindle speed, Home resets the experiment.');
+    var chartWrap = el('div', { class: 'fs-chart' });
+    var chartTitle = el('p', { class: 'fs-exp-title' }, 'The same cut in every material');
+    var chartBody = el('div');
+    var chartNote = el('p', { class: 'fs-chart-note' });
+    chartWrap.appendChild(chartTitle); chartWrap.appendChild(chartBody); chartWrap.appendChild(chartNote);
     var status = el('p', { class: 'sr-only', id: uid + '-status', 'aria-live': 'polite' });
 
+    [expControls, table, transport, stage, scaleNote, keys, chartWrap].forEach(function (x) { expBody.appendChild(x); });
+    exp.appendChild(waiting); exp.appendChild(expBody);
+
     var calc = el('div', { class: 'fs-calc' });
-    [bar, form, errors, results, capNote, work].forEach(function (x) { calc.appendChild(x); });
+    [bar, guide, form, errors, results, capNote, work].forEach(function (x) { calc.appendChild(x); });
     var demo = el('div', { class: 'fs-demo' });
-    [exp, transport, stage, clock, fast, keys, status].forEach(function (x) { demo.appendChild(x); });
+    [exp, status].forEach(function (x) { demo.appendChild(x); });
     host.appendChild(calc); host.appendChild(demo);
     rootEl.classList.add('is-live');
 
-    /* ---- behaviour ------------------------------------------------------*/
+    /* ---- reading the form ----------------------------------------------*/
     function shown(kind, canonValue) {
       if (canonValue === null || canonValue === undefined) return '';
-      var v = (kind === 'teeth' || kind === 'maxRpm') ? canonValue : M.fromCanon(state.unit, kind, canonValue);
-      return M.format(v, kind, state.unit);
+      return M.format(M.fromCanon(state.unit, kind, canonValue), kind, state.unit);
     }
-    function fillInputs() {
-      FIELDS.forEach(function (f) {
-        inputs[f.key].value = shown(f.key, state.canon[f.key]);
-        inputs[f.key].removeAttribute('aria-invalid');
-        unitTags[f.key].textContent = M.unitLabel(f.key, state.unit);
+    // Put a canonical value in a field, remembering it exactly so that a
+    // unit switch, or applying the guide, never re-rounds what the field holds.
+    function setField(k, canonValue) {
+      var t = shown(k, canonValue);
+      inputs[k].value = t;
+      state.exact[k] = { text: t, canon: canonValue };
+    }
+    function readForm() {
+      var raw = {};
+      M.FIELDS.forEach(function (k) { raw[k] = inputs[k].value; });
+      var r = M.readFields(state.unit, raw);
+      M.FIELDS.forEach(function (k) {
+        var x = state.exact[k];
+        if (x && r.values[k] !== undefined && r.values[k] !== null && inputs[k].value.trim() === x.text) r.values[k] = x.canon;
       });
-      errors.textContent = '';
+      return r;
     }
-    function renderExamples() {
-      exRow.textContent = '';
-      M.EXAMPLES[state.unit].forEach(function (ex) {
-        var b = el('button', { type: 'button', 'data-fs-example': ex.id, 'aria-pressed': String(ex.id === state.exampleId) }, ex.title);
-        b.addEventListener('click', function () {
-          state.canon = M.setupToCanon(ex.unit, ex);
-          state.exampleId = ex.id;
-          state.scale = insetScale(state.canon);
-          rootEl.removeAttribute('data-stale');
-          fillInputs(); renderExamples(); update(true);
-          status.textContent = ex.title + ' loaded. ' + summary();
-        });
-        exRow.appendChild(b);
-      });
-    }
-    function summary() {
-      var s = M.solve(state.canon);
-      return 'Spindle ' + M.show(s.rpm, 'rpm', state.unit) + (s.capped ? ', capped by the machine' : '') +
-        ', table feed ' + M.show(s.feed, 'feed', state.unit) + '.';
-    }
-    function trialRun() { return M.trial(state.canon, state.factor, state.hold); }
+    function material() { return DATA.guidance(state.material, state.read && state.read.values.diameter); }
 
+    /* ---- the guide card --------------------------------------------------*/
+    var WHERE = { inside: 'inside the range', below: 'below the range', above: 'above the range' };
+    function renderGuide() {
+      var g = material(), u = state.unit, v = state.read.values, p = M.partial(v, state.read.errors);
+      gTitle.textContent = 'Generic solid-carbide starting ranges: ' + g.label;
+      gCond.textContent = g.condition;
+      gRows.speed.band.textContent = M.show(g.vcMMin[0], 'speed', u).replace(/ .*$/, '') + '–' + M.show(g.vcMMin[1], 'speed', u);
+      var sp = '', spPos = '';
+      if (v.speed !== undefined) {
+        spPos = M.bandPosition(v.speed, g.vcMMin);
+        sp = 'Yours, ' + M.show(v.speed, 'speed', u) + ': ' + WHERE[spPos];
+        if (p.capped) {
+          spPos = M.bandPosition(p.speed, g.vcMMin);
+          sp += '. The machine reaches only ' + M.show(p.speed, 'speed', u) + ': ' + WHERE[spPos];
+        }
+      }
+      gRows.speed.pos.textContent = sp; gRows.speed.pos.setAttribute('data-pos', spPos);
+      if (v.diameter === undefined) {
+        gRows.chip.band.textContent = 'depends on the cutter diameter';
+        gRows.chip.pos.textContent = 'Enter a diameter to see the range for that cutter.';
+        gRows.chip.pos.setAttribute('data-pos', '');
+      } else if (!g.fzMm) {
+        gRows.chip.band.textContent = 'no range for this diameter';
+        gRows.chip.pos.textContent = 'The guide’s table covers ' + M.show(g.diameterMinMm, 'diameter', u) + ' to ' +
+          M.show(g.diameterMaxMm, 'diameter', u) + ' cutters and is not stretched beyond them.';
+        gRows.chip.pos.setAttribute('data-pos', '');
+      } else {
+        gRows.chip.band.textContent = M.show(g.fzMm[0], 'chip', u).replace(/ .*$/, '') + '–' + M.show(g.fzMm[1], 'chip', u) +
+          ' for a ' + M.show(v.diameter, 'diameter', u) + ' cutter';
+        var c = v.chip !== undefined ? M.bandPosition(v.chip, g.fzMm) : null;
+        gRows.chip.pos.textContent = c ? 'Yours, ' + M.show(v.chip, 'chip', u) + ': ' + WHERE[c] : '';
+        gRows.chip.pos.setAttribute('data-pos', c || '');
+      }
+      gRows.energy.band.textContent = R.showEnergy(g.energyJMm3, u);
+      gRows.energy.pos.textContent = 'Used for the power estimate. Changing the material changes nothing else.';
+      gRows.energy.pos.setAttribute('data-pos', '');
+      gBasis.textContent = 'Guide basis: a side cut about 20% of the cutter diameter wide.' +
+        (v.width !== undefined && v.diameter !== undefined ? ' Your width is ' + M.format(100 * v.width / v.diameter, 'eta', u) + '% of diameter.' : '') +
+        ' The ranges do not automatically adjust for a wider cut, full-width slot or long reach.';
+      gNotes.textContent = '';
+      g.notes.forEach(function (t) { gNotes.appendChild(el('li', {}, t)); });
+      gSources.textContent = 'Sources: ';
+      g.sources.forEach(function (s, i) {
+        if (i) gSources.appendChild(document.createTextNode('; '));
+        gSources.appendChild(el('a', { href: s.url }, s.title));
+      });
+      gSources.appendChild(document.createTextNode('.'));
+    }
+
+    /* ---- results ---------------------------------------------------------*/
+    function waitText(keys) { return keys.length ? 'Needs ' + listWords(keys) + '.' : ''; }
+    function setTile(k, value, sub) {
+      tiles[k].v.textContent = value === null ? '—' : value;
+      tiles[k].s.textContent = value === null ? sub : (sub || tiles[k].note);
+      tiles[k].box.setAttribute('data-empty', String(value === null));
+    }
     function update(announce) {
-      var c = state.canon, s = M.solve(c), t = trialRun(), u = state.unit;
-      tiles.rpm.v.textContent = M.show(s.rpm, 'rpm', u);
-      tiles.rpm.s.textContent = s.capped ? 'machine top speed; ' + M.show(s.requestedRpm, 'rpm', u) + ' was asked for' : tiles.rpm.note;
-      tiles.feed.v.textContent = M.show(s.feed, 'feed', u);
-      tiles.speed.v.textContent = M.show(s.speed, 'speed', u);
-      tiles.speed.s.textContent = s.capped ? 'below the ' + M.show(c.speed, 'speed', u) + ' asked for' : tiles.speed.note;
-      tiles.chip.v.textContent = M.show(s.chip, 'chip', u);
-      tiles.rpm.box.setAttribute('data-capped', String(s.capped));
-      tiles.speed.box.setAttribute('data-capped', String(s.capped));
-      capNote.hidden = !s.capped;
-      capNote.textContent = s.capped
-        ? 'The cutting speed asks for ' + M.show(s.requestedRpm, 'rpm', u) + ', but this machine stops at ' + M.show(s.rpm, 'rpm', u) +
+      var r = state.read = readForm(), v = r.values, u = state.unit, g = material();
+      M.FIELDS.forEach(function (k) { inputs[k].removeAttribute('aria-invalid'); unitTags[k].textContent = M.unitLabel(k, u); });
+      errors.textContent = '';
+      r.errors.forEach(function (e) {
+        inputs[e.field].setAttribute('aria-invalid', 'true');
+        errors.appendChild(el('li', {}, e.message));
+      });
+      renderGuide();
+      var p = M.partial(v, r.errors);
+      setTile('rpm', p.rpm === undefined ? null : M.show(p.rpm, 'rpm', u),
+        p.rpm === undefined ? waitText(p.needs.rpm) : (p.capped ? 'machine top speed; ' + M.show(p.requestedRpm, 'rpm', u) + ' was asked for' : null));
+      setTile('feed', p.feed === undefined ? null : M.show(p.feed, 'feed', u), p.feed === undefined ? waitText(p.needs.feed) : null);
+      setTile('speed', p.speed === undefined ? null : M.show(p.speed, 'speed', u),
+        p.speed === undefined ? waitText(p.needs.rpm) : (p.capped ? 'below the ' + M.show(v.speed, 'speed', u) + ' asked for' : null));
+      tiles.rpm.box.setAttribute('data-capped', String(!!p.capped));
+      tiles.speed.box.setAttribute('data-capped', String(!!p.capped));
+      var q = p.needs.rate.length ? null : R.removalRate(v.width, v.depth, p.feed);
+      setTile('rate', q === null ? null : R.showRate(q, u), q === null ? waitText(p.needs.rate) : null);
+      var band = q === null ? null : R.powerBand(q, g.energyJMm3);
+      setTile('power', band ? (u === 'in' ? R.showHp(band[0], band[1]) : R.showPower(band[0], band[1])) : null,
+        band ? (u === 'in' ? R.showPower(band[0], band[1]) : R.showHp(band[0], band[1])) + ' for ' + g.label : waitText(p.needs.rate));
+      var eta = v.eta;
+      tiles.shaft.box.hidden = !(eta > 0);
+      if (eta > 0) {
+        setTile('shaft', band ? (u === 'in' ? R.showHp(band[0] / (eta / 100), band[1] / (eta / 100)) : R.showPower(band[0] / (eta / 100), band[1] / (eta / 100))) : null,
+          band ? 'at ' + M.show(eta, 'eta', u) + ' efficiency; not wall power, not a check of the motor' : waitText(p.needs.rate));
+      }
+      capNote.hidden = !p.capped;
+      capNote.textContent = p.capped
+        ? 'The cutting speed asks for ' + M.show(p.requestedRpm, 'rpm', u) + ', but this machine stops at ' + M.show(p.rpm, 'rpm', u) +
           '. The feed is worked out from the speed the spindle really turns, so each tooth still takes the chip you asked for; the edge simply moves more slowly than the cutting speed you entered.'
         : '';
       work.textContent = '';
-      workedLines(c, u).forEach(function (line) { work.appendChild(el('span', { class: 'fs-line' }, line)); });
+      var lines = workedLines(v, u, g.energyJMm3, r.errors);
+      lines.forEach(function (line) { work.appendChild(el('span', { class: 'fs-line' }, line)); });
+      work.hidden = !lines.length;
+      rootEl.setAttribute('data-ready', String(q !== null));
+      updateExperiment(announce);
+    }
 
+    /* ---- the experiment ----------------------------------------------------*/
+    function setupRun() {
+      var v = state.read.values, s = M.solve(v);
+      return { s: s, run: { feed: s.feed, width: v.width, depth: v.depth, diameter: v.diameter } };
+    }
+    function windowSeconds(feed, d) { return state.windowChoice === 'auto' ? R.autoWindow(feed, d) : Number(state.windowChoice); }
+    function fillWindows(feed, d) {
+      var auto = R.autoWindow(feed, d), want = state.windowChoice;
+      winSel.textContent = '';
+      var op = el('option', { value: 'auto' }, 'auto (' + R.showSeconds(auto) + ')');
+      winSel.appendChild(op);
+      R.WINDOWS.forEach(function (w) { winSel.appendChild(el('option', { value: String(w) }, R.showSeconds(w))); });
+      winSel.value = want;
+    }
+    function updateExperiment(announce) {
+      var v = state.read.values, p = M.partial(v, state.read.errors);
+      var ready = !p.needs.rate.length;
+      waiting.hidden = ready; expBody.hidden = !ready;
+      if (!ready) {
+        play(false);
+        waiting.textContent = 'The removed-solid drawing and power comparison appear once the setup is complete. Still needed: ' + listWords(p.needs.rate) + '.';
+        return;
+      }
+      var u = state.unit, g = material(), S = setupRun(), t = M.trial(v, state.factor, state.hold);
+      fillWindows(S.s.feed, v.diameter);
       spOut.textContent = 'requested ' + M.ratioText(state.factor).replace('unchanged', 'as set') + ' · ' + M.show(t.rpm, 'rpm', u) + (t.capped ? ' (top speed)' : '');
-      var keysOrder = ['rpm', 'feed', 'chip', 'speed'];
-      keysOrder.forEach(function (k) {
-        var r = rows[k];
-        r.a.textContent = M.show(s[k], k, u);
-        r.b.textContent = M.show(t[k], k, u);
+      var qa = R.removalRate(v.width, v.depth, S.s.feed), qb = R.removalRate(v.width, v.depth, t.feed);
+      var pa = R.powerBand(qa, g.energyJMm3), pb = R.powerBand(qb, g.energyJMm3);
+      var pw = function (b) { return u === 'in' ? R.showHp(b[0], b[1]) : R.showPower(b[0], b[1]); };
+      var cells = {
+        rpm: [M.show(S.s.rpm, 'rpm', u), M.show(t.rpm, 'rpm', u), t.change.rpm],
+        feed: [M.show(S.s.feed, 'feed', u), M.show(t.feed, 'feed', u), t.change.feed],
+        chip: [M.show(S.s.chip, 'chip', u), M.show(t.chip, 'chip', u), t.change.chip],
+        speed: [M.show(S.s.speed, 'speed', u), M.show(t.speed, 'speed', u), t.change.speed],
+        rate: [R.showRate(qa, u), R.showRate(qb, u), qb / qa],
+        power: [pw(pa), pw(pb), qb / qa]
+      };
+      Object.keys(cells).forEach(function (k) {
+        var r = rows[k], c = cells[k];
+        r.a.textContent = c[0]; r.b.textContent = c[1];
         var held = (k === 'feed' && t.hold === 'feed') || (k === 'chip' && t.hold === 'chip');
-        r.c.textContent = held ? 'held' : M.ratioText(t.change[k]);
+        r.c.textContent = held ? 'held' : M.ratioText(c[2]).replace('unchanged', 'same');
         r.tr.setAttribute('data-held', String(held));
-        r.tr.setAttribute('data-moved', String(!held && Math.abs(t.change[k] - 1) > 5e-4));
+        r.tr.setAttribute('data-moved', String(!held && Math.abs(c[2] - 1) > 5e-4));
       });
+      chartBody.innerHTML = R.renderPowerChart(qa, DATA.materials, { unit: u, current: state.material });
+      chartNote.textContent = 'Every row is the setup’s cut, ' + R.showRate(qa, u) + '. Choosing another material moves only the power; ' +
+        'the drawings and the removal rate stay as they are. A wide bar is a broad published band; a dot is a single published factor, not a measured certainty.';
       draw();
-      if (announce) status.textContent = describeTrial(c, t, u);
+      if (announce) status.textContent = describeTrial(t, u) + ' Removal rate ' + R.showRate(qb, u) + '.';
     }
 
     function draw() {
-      var c = state.canon, s = M.solve(c), t = trialRun(), u = state.unit;
-      var tReal = M.realTime(state.tScreen, state.slowdown);
-      var cut = findCutter();
-      var compact = panelA.clientWidth < 480;
-      panelA.innerHTML = renderPanel(s, tReal, { unit: u, title: 'Setup', insetPxPerMm: state.scale,
-        compact: compact, slowdown: state.slowdown, idPrefix: uid + 'a', cutter: cut, ariaLabel: 'Setup: ' + summary() });
-      var achieved = t.rpm / s.rpm;
-      var title = Math.abs(achieved - 1) < 1e-9 ? (t.capped ? 'Changed · capped at setup RPM' : 'Changed (same as setup)')
-        : 'Spindle ' + M.ratioText(achieved) + (t.capped ? ' · capped' : '');
-      panelB.innerHTML = renderPanel(t, tReal, { unit: u, title: title, insetPxPerMm: state.scale,
-        compact: compact, slowdown: state.slowdown, idPrefix: uid + 'b', cutter: cut, ariaLabel: title + ': ' + describeTrial(c, t, u) });
-      var rs = M.screenRates(s, state.slowdown), rt = M.screenRates(t, state.slowdown);
-      clock.textContent = 'Shown at 1/' + M.format(state.slowdown, 'rpm', 'in') + ' of real speed, the same for the turning and the feed. ' +
-        'In one real second the setup cutter turns ' + M.format(rs.realTurnsPerSecond, 'feed', 'in') + ' times while the work moves ' +
-        M.show(rs.realTravelPerSecond, 'travel', u) + '. Time shown: ' + M.format(tReal, 'travel', 'in') + ' s of real cutting.';
-      var quick = Math.max(rs.passesPerSecond, rt.passesPerSecond) > 9;
-      fast.hidden = !quick;
-      fast.textContent = quick ? 'The teeth now pass faster than the eye can follow at this setting. Choose a slower motion to count them.' : '';
+      if (expBody.hidden) return;
+      var v = state.read.values, u = state.unit, g = material(), S = setupRun(), t = M.trial(v, state.factor, state.hold);
+      var win = windowSeconds(S.s.feed, v.diameter), elapsed = state.frac * win;
+      var reach = M.trial(v, 2, 'chip').feed;            // the most this experiment can feed
+      var compact = stage.clientWidth > 0 && stage.clientWidth < 520;
+      var f = R.frame([S.run, { feed: Math.max(reach, S.s.feed), width: v.width, depth: v.depth, diameter: v.diameter }], win, compact);
+      var achieved = t.rpm / S.s.rpm;
+      var title = Math.abs(achieved - 1) < 1e-9 ? (t.capped ? 'Changed · capped at setup speed' : 'Changed (same as setup)')
+        : 'Spindle ' + M.ratioText(achieved) + ', ' + (t.hold === 'chip' ? 'chip load held' : 'table feed held') + (t.capped ? ' · capped' : '');
+      stage.innerHTML = renderSweeps([
+        { id: 'setup', title: 'Setup', sub: M.show(S.s.rpm, 'rpm', u) + ' · ' + M.show(S.s.feed, 'feed', u), run: S.run },
+        { id: 'changed', title: title, sub: M.show(t.rpm, 'rpm', u) + ' · ' + M.show(t.feed, 'feed', u),
+          run: { feed: t.feed, width: v.width, depth: v.depth, diameter: v.diameter } }
+      ], elapsed, f, u, g.energyJMm3);
+      tIn.value = String(Math.round(state.frac * 100));
+      tOut.textContent = R.showSeconds(elapsed) + ' of ' + R.showSeconds(win);
+      scaleNote.textContent = 'Both drawings share one scale along the three labeled axes and show ' + R.showSeconds(elapsed) +
+        ' of cutting. Gold is the solid removed in that time, drawn where it was; its volume is width × depth × travel. ' +
+        'The stock around it is only there to hold the cut. Play runs ' + R.showSeconds(win) + ' of cutting in ' + PLAY_SECONDS + ' s.';
     }
 
+    /* ---- time ------------------------------------------------------------*/
     var raf = 0, last = null, stepTimer = 0;
     function tick(ts) {
       if (!state.playing) return;
       var dt = last === null ? 0 : Math.min(0.1, (ts - last) / 1000);
       last = ts;
-      state.tScreen += dt;
+      state.frac = Math.min(1, state.frac + dt / PLAY_SECONDS);
       draw();
+      if (state.frac >= 1) { play(false); return; }
       raf = requestAnimationFrame(tick);
     }
     function stepReduced() {
-      // Reduced motion: the same clock, in still frames a quarter-second apart.
+      // Reduced motion: the same clock, in still frames a quarter of the span apart.
       if (!state.playing) return;
-      state.tScreen += 0.25;
+      state.frac = Math.min(1, state.frac + 0.25);
       draw();
-      stepTimer = setTimeout(stepReduced, 800);
+      if (state.frac >= 1) { play(false); return; }
+      stepTimer = setTimeout(stepReduced, 900);
     }
     function play(on) {
+      if (on && expBody.hidden) on = false;
+      if (on && state.frac >= 1) state.frac = 0;
       state.playing = on;
       bPlay.textContent = on ? 'Pause' : 'Play';
       bPlay.setAttribute('aria-pressed', String(on));
@@ -10596,73 +11279,68 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       }
     }
     function resetExperiment() {
+      play(false);
       state.factor = 1; spIn.value = '100';
-      state.tScreen = 0;
-      update(true);
+      state.frac = 0;
+      updateExperiment(true);
     }
     function setFactor(pct) {
       var v = Math.max(25, Math.min(200, Math.round(pct / 5) * 5));
       spIn.value = String(v);
       state.factor = v / 100;
-      update(true);
+      updateExperiment(true);
     }
 
-    // form edits: each valid field updates the canonical setup in place;
-    // an invalid one is marked and the last good setup stays drawn
-    function readForm() {
-      var raw = {};
-      FIELDS.forEach(function (f) { raw[f.key] = inputs[f.key].value; });
-      var res = M.validate(state.unit, raw);
-      FIELDS.forEach(function (f) { inputs[f.key].removeAttribute('aria-invalid'); });
-      errors.textContent = '';
-      if (!res.ok) {
-        res.errors.forEach(function (e) {
-          inputs[e.field].setAttribute('aria-invalid', 'true');
-          errors.appendChild(el('li', {}, e.message));
-        });
-        rootEl.setAttribute('data-stale', 'true');
-        return;
-      }
-      rootEl.removeAttribute('data-stale');
-      var changedChip = Math.abs(res.canon.chip - state.canon.chip) > 1e-12;
-      // keep the exact canonical value for any field whose text still reads
-      // as the displayed rounding of it, so unit round-trips stay exact
-      FIELDS.forEach(function (f) {
-        if (inputs[f.key].value.trim() === shown(f.key, state.canon[f.key])) res.canon[f.key] = state.canon[f.key];
+    /* ---- events ------------------------------------------------------------*/
+    M.FIELDS.forEach(function (k) {
+      inputs[k].addEventListener('input', function () { update(false); });
+      inputs[k].addEventListener('change', function () {
+        var p = M.partial(state.read.values, state.read.errors);
+        if (p.feed !== undefined) status.textContent = 'Spindle ' + M.show(p.rpm, 'rpm', state.unit) + ', table feed ' + M.show(p.feed, 'feed', state.unit) + '.';
       });
-      state.canon = res.canon;
-      state.exampleId = null;
-      if (changedChip) state.scale = insetScale(state.canon);
-      renderExamples();
+    });
+    matSel.addEventListener('change', function () {
+      state.material = matSel.value;
       update(false);
-    }
-    FIELDS.forEach(function (f) {
-      inputs[f.key].addEventListener('input', readForm);
-      inputs[f.key].addEventListener('change', function () { if (!rootEl.hasAttribute('data-stale')) status.textContent = summary(); });
+      var g = material();
+      status.textContent = g.label + ' selected. Cutting energy ' + R.showEnergy(g.energyJMm3, state.unit) + '. Your entries are unchanged.';
+    });
+    gApply.addEventListener('click', function () {
+      var mid = guideMiddle(state.material, state.read.values.diameter);
+      setField('speed', mid.speed);
+      if (mid.chip !== null) setField('chip', mid.chip);
+      update(true);
+      status.textContent = 'Cutting speed set to ' + M.show(mid.speed, 'speed', state.unit) +
+        (mid.chip !== null ? ' and feed per tooth to ' + M.show(mid.chip, 'chip', state.unit) + '.' :
+          '. Feed per tooth needs a cutter diameter inside the guide’s table, so it was left as it was.');
     });
     Object.keys(unitRadios).forEach(function (u) {
       unitRadios[u].addEventListener('change', function () {
         if (!unitRadios[u].checked || u === state.unit) return;
+        var before = {}, oldUnit = state.unit;
+        M.FIELDS.forEach(function (k) {
+          if (['teeth', 'maxRpm', 'eta'].indexOf(k) >= 0) return;
+          var text = inputs[k].value.trim(), exact = state.exact[k], number = M.parseNumber(text);
+          if (number !== null) before[k] = exact && exact.text === text ? exact.canon : M.toCanon(oldUnit, k, number);
+        });
         state.unit = u;
-        rootEl.removeAttribute('data-stale');
-        fillInputs(); renderExamples(); update(false);
-        status.textContent = 'Switched to ' + M.UNITS[u].name + ' units. Same cutter, same cut: ' + summary();
+        M.FIELDS.forEach(function (k) {
+          var c = before[k];
+          if (c !== undefined && c !== null) setField(k, c);
+        });
+        update(false);
+        status.textContent = 'Switched to ' + M.UNITS[u].name + ' units. Same cutter, same cut; empty fields stay empty.';
       });
     });
     Object.keys(holdRadios).forEach(function (h) {
-      holdRadios[h].addEventListener('change', function () { if (holdRadios[h].checked) { state.hold = h; update(true); } });
+      holdRadios[h].addEventListener('change', function () { if (holdRadios[h].checked) { state.hold = h; updateExperiment(true); } });
     });
-    spIn.addEventListener('input', function () { state.factor = Number(spIn.value) / 100; update(false); });
-    spIn.addEventListener('change', function () { update(true); });
-    slow.addEventListener('change', function () {
-      // keep the same real moment on screen when the time scale changes
-      var tReal = M.realTime(state.tScreen, state.slowdown);
-      state.slowdown = Number(slow.value);
-      state.tScreen = tReal * state.slowdown;
-      draw();
-    });
+    spIn.addEventListener('input', function () { state.factor = Number(spIn.value) / 100; updateExperiment(false); });
+    spIn.addEventListener('change', function () { updateExperiment(true); });
+    tIn.addEventListener('input', function () { play(false); state.frac = Number(tIn.value) / 100; draw(); });
+    winSel.addEventListener('change', function () { state.windowChoice = winSel.value; draw(); });
     bPlay.addEventListener('click', function () { play(!state.playing); });
-    bReset.addEventListener('click', function () { play(false); resetExperiment(); });
+    bReset.addEventListener('click', resetExperiment);
     stage.addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       var used = true;
@@ -10670,7 +11348,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         case ' ': case 'Spacebar': play(!state.playing); break;
         case 'ArrowRight': setFactor(state.factor * 100 + 5); break;
         case 'ArrowLeft': setFactor(state.factor * 100 - 5); break;
-        case 'Home': play(false); resetExperiment(); break;
+        case 'Home': resetExperiment(); break;
         default: used = false;
       }
       if (used) { e.preventDefault(); e.stopPropagation(); }
@@ -10678,12 +11356,12 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (reduce.addEventListener) reduce.addEventListener('change', function () { if (state.playing) { play(false); play(true); } });
     addEventListener('beforeprint', function () { if (state.playing) play(false); });
 
-    fillInputs(); renderExamples(); update(false);
+    update(false);
     if (typeof ResizeObserver === 'function') {
-      var lastWidth = panelA.clientWidth;
+      var lastWidth = stage.clientWidth;
       new ResizeObserver(function () {
-        if (panelA.clientWidth !== lastWidth) { lastWidth = panelA.clientWidth; draw(); }
-      }).observe(panelA);
+        if (stage.clientWidth !== lastWidth) { lastWidth = stage.clientWidth; draw(); }
+      }).observe(stage);
     }
   }
 
@@ -10697,9 +11375,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   }
 
   return {
-    renderPanel: renderPanel, renderComparison: renderComparison, renderCircumference: renderCircumference,
-    workedLines: workedLines, describeTrial: describeTrial, insetScale: insetScale,
-    PANEL: PANEL, INSET: INSET, boot: boot
+    renderCircumference: renderCircumference, renderSweeps: renderSweeps, renderStaticFigure: renderStaticFigure,
+    workedLines: workedLines, describeTrial: describeTrial, guideMiddle: guideMiddle,
+    DEFAULT_MATERIAL: DEFAULT_MATERIAL, boot: boot
   };
 });
 
