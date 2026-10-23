@@ -85,6 +85,8 @@ test('jog directions and orientation arrows follow the actual rotated tool proje
     ['lower right', 'upper right'], ['lower left', 'lower right'],
     ['upper left', 'lower left'], ['upper right', 'upper left']
   ];
+  const compact = ['X+ ↘ · Y+ ↗ · Z+ ↑', 'X+ ↙ · Y+ ↘ · Z+ ↑',
+    'X+ ↖ · Y+ ↙ · Z+ ↑', 'X+ ↗ · Y+ ↖ · Z+ ↑'];
   for (let rot = 0; rot < 4; rot++) {
     for (const [i, axis] of ['x', 'y', 'z'].entries()) {
       const a = U.isoProject(50, 30, 20, rot);
@@ -104,6 +106,7 @@ test('jog directions and orientation arrows follow the actual rotated tool proje
     const cue = U.isoOrientation(rot);
     for (const axis of ['X', 'Y', 'Z']) assert.match(cue, new RegExp('>' + axis + '\\+<'));
     assert.ok(cue.includes('Positive machine directions:'));
+    assert.ok(cue.includes(compact[rot]), 'the compact phone key points the same way');
   }
   assert.equal(U.jogDirection('x', 1, 'flat', 2), 'right in top view', 'the top view has its own fixed orientation');
   assert.equal(U.jogDirection('y', 1, 'flat', 2), 'up in top view');

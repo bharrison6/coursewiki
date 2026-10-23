@@ -125,7 +125,12 @@
       out.push('<path d="M50 46L' + x + ' ' + y + 'M' + (bx - d[1] * 2.5) + ' ' + (by + d[0] * 2.5) + 'L' + x + ' ' + y + 'L' + (bx + d[1] * 2.5) + ' ' + (by - d[0] * 2.5) + '"/>');
       out.push('<text x="' + (50 + d[0] * 30) + '" y="' + (46 + d[1] * 30 + (d[1] > 0 ? 8 : 0)) + '" text-anchor="' + (d[0] > 0.1 ? 'start' : d[0] < -0.1 ? 'end' : 'middle') + '">' + a.toUpperCase() + '+</text>');
     });
-    return out.join('') + '<circle cx="50" cy="46" r="2"/></svg>';
+    var compact = ['x', 'y', 'z'].map(function (a) {
+      var d = isoAxis(a, rot), arrow = Math.abs(d[0]) < 1e-6 ? '↑' : d[1] < 0 ? (d[0] < 0 ? '↖' : '↗') : (d[0] < 0 ? '↙' : '↘');
+      return a.toUpperCase() + '+ ' + arrow;
+    }).join(' · ');
+    return out.join('') + '<circle cx="50" cy="46" r="2"/></svg>' +
+      '<span class="ms-axis-text" role="img" aria-label="Positive machine directions: ' + label + '">' + compact + '</span>';
   }
 
   /* ---- the finished part, cell by cell -----------------------------------
