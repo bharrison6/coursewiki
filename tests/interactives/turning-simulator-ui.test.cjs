@@ -26,12 +26,14 @@ test('every operating control is in the one workbench', () => {
   const controls = ['data-ts-act="spindle"', 'data-ts-act="measure"', 'data-ts-act="undo"', 'data-ts-act="hold"',
     'data-ts-in="z"', 'data-ts-act="feed-z"', 'data-ts-in="x"', 'data-ts-act="feed-x"', 'data-ts-in="stop"', 'data-ts-act="thread"',
     'data-ts-jog="x+"', 'data-ts-jog="x-"', 'data-ts-jog="z+"', 'data-ts-jog="z-"', '<select data-ts-drill>', '<select data-ts-tpi>',
-    'data-ts-viewwrap', 'data-ts-act="zoom"', 'data-ts-msg', 'data-ts-view="section"', 'data-ts-view="normal"'];
+    'data-ts-viewwrap', 'data-ts-act="zoom"', 'data-ts-msg', 'data-ts-view="section"', 'data-ts-view="normal"', '<select data-ts-turning>'];
   for (const c of controls) {
     assert.equal(bench.split(c).length - 1, 1, 'one ' + c + ' in the workbench');
     assert.ok(!outside.includes(c), c + ' only in the workbench');
   }
-  for (const t of M.TOOL_ORDER) assert.ok(bench.includes('data-ts-tool="' + t + '"'), t + ' in the tool rack');
+  for (const t of U.RACK_ORDER) assert.ok(bench.includes('data-ts-tool="' + t + '"'), t + ' in the tool rack');
+  assert.ok(bench.includes('<option value="face">Face: radial</option>'), 'the facing tool shares the Turn/face group');
+  assert.deepEqual(U.RACK_ORDER.concat('face').sort(), M.TOOL_ORDER.slice().sort(), 'every actual tool is reachable');
   for (const s of U.STEPS) assert.ok(bench.includes('value="' + s + '"'), 'step ' + s + ' beside the handwheels');
   // The part and the drawing are chosen above it; they are not used while cutting.
   for (const T of M.TARGETS) assert.ok(outside.includes('data-ts-part="' + T.id + '"'), T.id + ' above the bench');

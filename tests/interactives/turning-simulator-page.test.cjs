@@ -83,7 +83,10 @@ test('the drawn cutting edge is the model\'s edge, and the drawn tool is the too
 
 test('the work is drawn where the model has it, whole, in the section view and the normal view', () => {
   const st = M.create('stepped-pin');
-  M.play(st, [['sp', true], ['mv', 0, 1.4], ['x', 0], ['x', 1.4], ['mv', 0.1, 0.880], ['z', -1.0]]);
+  M.play(st, [['tool', 'face'], ['sp', true], ['mv', 0, 1.4], ['x', 0], ['x', 1.4],
+    ['sp', false], ['tool', 'turn'], ['sp', true], ['mv', 0.1, 0.880], ['z', -0.96], ['x', 1.1],
+    ['sp', false], ['tool', 'face'], ['sp', true], ['mv', -1.0, 1.1], ['x', .880], ['x', 1.1],
+    ['sp', false], ['tool', 'turn'], ['sp', true]]);
   const f = R.frame(M.target('stepped-pin'));
   const w = R.workPaths(st.work, f, 'section'), out = R.workPaths(st.work, f, 'normal');
   assert.deepEqual(R.workPaths(st.work, f), w, 'the section is the view a picture starts in');

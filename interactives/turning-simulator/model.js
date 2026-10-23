@@ -23,9 +23,9 @@
      inside tools   occupy r <= tip - edge(dz) at the head, with a round bar
                     under it that has to fit inside the hole
      axial tools    (tailstock) occupy r <= radius(dz) on the centerline
-   That is why leading edges are vertical, V flanks rise at 30 degrees and the
-   blade has square sides: the drawn shape is the shape that cuts and the
-   shape that collides.
+   The rougher's leading edge is angled, the facing blade has square sides,
+   and V flanks rise at 30 degrees. The drawn profile is the cutting and
+   collision profile. These are the particular tools provided by this lab.
 
    THE MECHANISMS are deliberately different, not one eraser:
      cut     metal inside the cutting window is removed; metal that would
@@ -88,7 +88,16 @@
     return function (dz) { var a = Math.abs(dz); return a <= h ? 0 : (a - h) * SQ3; };
   }
 
-  var turnInsert = insertEdge(0.016, TAN10);
+  /* Rounded roughing nose, with 10 degrees of lead on the leading flank.
+     Its reference is the nose's lowest point. The edge ahead of that point
+     leaves an angled shoulder; a radial facing cut finishes the allowance. */
+  function roughEdge(dz) {
+    var nose = 0.008, slope = dz < 0 ? 1 / TAN10 : TAN10;
+    var a = Math.atan(slope), tangent = nose * Math.sin(a), q = Math.abs(dz);
+    if (q <= 0.0006) { return 0; }
+    if (q <= tangent) { return nose - Math.sqrt(Math.max(0, nose * nose - q * q)); }
+    return nose * (1 - Math.cos(a)) + (q - tangent) * slope;
+  }
   var boreInsert = insertEdge(0.008, TAN10);
   var threadV = vEdge(0.004);
 
@@ -102,14 +111,25 @@
   var TOOLS = {
     turn: {
       id: 'turn', name: 'Turning tool', mount: 'post', side: 'out', action: 'cut',
-      span: [0, 0.75], cut: { from: 0, to: 0.30, depth: 0.20 }, maxEngage: 0.100,
+      span: [-0.04, 0.75], cut: { from: -0.04, to: 0.30, depth: 0.20 }, maxEngage: 0.100,
       edge: function (dz) {
-        if (dz < 0 || dz > 0.75) { return Infinity; }
-        if (dz <= 0.30) { return turnInsert(dz); }
+        if (dz < -0.04 || dz > 0.75) { return Infinity; }
+        if (dz <= 0.30) { return roughEdge(dz); }
         return 0.06;
       },
-      does: 'Turns a diameter feeding toward the chuck, and faces the end feeding toward the center. Its left edge is square, so it leaves a square shoulder.',
-      cannot: 'Takes at most 0.100 in of edge in one pass. Cannot reach inside a hole or cut a groove narrower than itself.'
+      does: 'This roughing tool has a 10° lead and a 0.008 in nose radius. Its edge cuts ahead of the readout point. For the stepped pin, stop 0.040 in short and face the allowance. Deeper shoulders need more clearance as the diameter decreases.',
+      cannot: 'An axial stop leaves an angled shoulder, not a finished face. Takes at most 0.100 in of edge in one pass. Other real turning tools and settings can both turn and face.'
+    },
+    face: {
+      id: 'face', name: 'Facing tool', mount: 'post', side: 'out', action: 'cut', radialOnly: true,
+      width: 0.0625, reach: 0.75,
+      span: [0, 0.30], cut: { from: 0, to: 0.0625, depth: 0.012 }, maxEngage: 0.065,
+      edge: function (dz) {
+        if (dz < 0 || dz > 0.30) { return Infinity; }
+        return dz <= 0.0625 ? 0 : 0.75;
+      },
+      does: 'A narrow square finishing blade, 1/16 in wide, set for radial feed. Put its left corner at the finished face or shoulder Z, then feed X across the remaining metal. The cut, not merely selecting this tool, makes the face flat.',
+      cannot: 'Faces axial slices up to its 0.0625 in width; take more than one slice for a larger allowance. Retract clear before moving Z: this blade has no side-cutting clearance.'
     },
     chamfer: {
       id: 'chamfer', name: 'Chamfer tool', mount: 'post', side: 'out', action: 'cut',
@@ -124,7 +144,7 @@
     },
     groove: {
       id: 'groove', name: 'Grooving and parting blade', mount: 'post', side: 'out', action: 'cut',
-      width: 0.125, reach: 0.70,
+      width: 0.125, reach: 0.70, radialOnly: true,
       span: [-0.125, 0.30], cut: { from: -0.125, to: 0, depth: 0.012 }, maxEngage: 0.13,
       edge: function (dz) {
         if (dz < -0.125 || dz > 0.30) { return Infinity; }
@@ -155,8 +175,8 @@
         if (a <= 0.1875) { return a - (0.1875 - 0.03); }
         return 0.25;
       },
-      does: 'Two hardened wheels pressed into the turning work. They do not cut: they push metal down into a diamond pattern, and the metal they push rises between the teeth.',
-      cannot: 'Makes no chips and removes nothing. A full knurl here is 0.020 in deep, so the knurled diameter ends up larger than the blank. Pressing past full depth only crushes the points.'
+      does: 'A single beveled wheel carrying a diamond pattern presses into the rotating work. Its axle is parallel to Z. The wheel rolls on the surface and displaces metal instead of cutting it away.',
+      cannot: 'This is form knurling: no chips. A full knurl here depresses the roots 0.010 in and raises the crests 0.010 in radially, adding 0.020 in to the blank diameter. Growth is a teaching approximation; real knurl growth depends on the material and wheels.'
     },
     bore: {
       id: 'bore', name: 'Boring bar', mount: 'post', side: 'in', action: 'cut',
@@ -184,8 +204,8 @@
         if (dz <= 0.2318) { return 0.0545 + (dz - 0.11) * TAN30; }
         return 0.125;
       },
-      does: 'A short, stiff drill with a small pilot and a 60 degree cone. It makes an accurate starting point, so a drill that follows it starts on center.',
-      cannot: 'Only drills as deep as its cone. Its body is not a cutter.'
+      does: 'A combined drill and countersink with a small pilot and a 60 degree cone, used to make a seat for a lathe center. Its shape is different from a spotting drill.',
+      cannot: 'Only drills as deep as its cone. For starting a twist drill, choose the starting method and spot angle recommended for that drill; this center drill is not a universal first step.'
     },
     drill: {
       id: 'drill', name: 'Twist drill', mount: 'tailstock', side: 'axial', action: 'cut',
@@ -211,7 +231,7 @@
       cannot: 'Only chamfers up to 0.750 in across, and only at the mouth of a hole on the centerline.'
     }
   };
-  var TOOL_ORDER = ['turn', 'chamfer', 'groove', 'thread', 'knurl', 'bore', 'ithread', 'center', 'drill', 'csink'];
+  var TOOL_ORDER = ['turn', 'face', 'chamfer', 'groove', 'thread', 'knurl', 'bore', 'ithread', 'center', 'drill', 'csink'];
 
   /* Inside tools: the bar has to fit. Its top sits `top` below the tip and it
      is `dia` across, so the smallest hole it enters is dia + top. */
@@ -346,7 +366,7 @@
       targetId: T.id, R: R, zJaw: zL, work: p,
       tool: 'turn', drill: '0.5000', tpi: 16,
       tz: 0, tr: 0, spindle: false,
-      win: { a: [], l: [] }, peck: null,
+      win: { a: [], l: [] }, peck: null, threadSeat: null,
       notes: { noCenter: false },
       part: null, parts: 0, version: 0
     };
@@ -364,13 +384,13 @@
     return {
       work: copyPiece(st.work), part: st.part ? copyPiece(st.part) : null, parts: st.parts,
       tool: st.tool, drill: st.drill, tpi: st.tpi, tz: st.tz, tr: st.tr, spindle: st.spindle,
-      peck: st.peck, notes: { noCenter: st.notes.noCenter }
+      peck: st.peck, threadSeat: st.threadSeat ? Object.assign({}, st.threadSeat) : null, notes: { noCenter: st.notes.noCenter }
     };
   }
   function restore(st, s) {
     st.work = copyPiece(s.work); st.part = s.part ? copyPiece(s.part) : null; st.parts = s.parts;
     st.tool = s.tool; st.drill = s.drill; st.tpi = s.tpi; st.tz = s.tz; st.tr = s.tr; st.spindle = s.spindle;
-    st.peck = s.peck; st.notes = { noCenter: s.notes.noCenter };
+    st.peck = s.peck; st.threadSeat = s.threadSeat ? Object.assign({}, s.threadSeat) : null; st.notes = { noCenter: s.notes.noCenter };
     st.win = { a: [], l: [] };
     st.version++;
     return st;
@@ -406,7 +426,9 @@
     return DRILLS[0].d;
   }
 
-  function emptyAfter(ro, ri) { return (ro - ri < 0.003) || (ri < EPS && ro < 0.012); }
+  // Separation occurs when the modeled wall is cut through, not at a fixed
+  // small core diameter. Burrs, elastic tearing and break-off are not modeled.
+  function emptyAfter(ro, ri) { return ro <= ri + EPS; }
 
   function step(st, tool, z, r, apply, opts) {
     var p = st.work, out = { code: null, area: 0, formed: false, emptied: false, threadHit: false, info: null };
@@ -573,6 +595,7 @@
         ? 'The knurling tool\'s holder would hit the work there.'
         : 'Only the cutting edge can touch the work. Another part of the ' + t.name.toLowerCase() + ' would hit it there.';
       case 'side': return 'The side of the blade would be pushed into the wall of the groove. A blade cuts only on its front edge: back it straight out, move over, and plunge again.';
+      case 'face-side': return 'This facing blade is set for radial cutting. Back it clear of the work before moving Z, then feed X across the face.';
       case 'jaws': return 'The tool would run into the chuck jaws. Keep the tool clear of the chuck.';
       case 'chuck': return 'That would reach into the part of the bar held in the chuck.';
       case 'chuck-body': return 'The drill is in as far as its flutes reach: the drill chuck would hit the work.';
@@ -587,7 +610,7 @@
       case 'infeed': return 'That pass would cut ' + inch(data.infeed || 0) + ' deep at the bottom of the groove. The ' + t.name.toLowerCase() + (t.maxInfeed ? ' takes at most ' + inch(t.maxInfeed) + ' of infeed per pass: feed it in less, and take more passes.' : ' is not a threading tool.');
       case 'limit': return 'That is the end of the slide\'s travel.';
       case 'axis': return 'Tailstock tools ride on the centerline. They move only along Z.';
-      case 'threadstop': return 'The threading tool would have run into a shoulder before the end of the pass, so the pass stopped at the last full turn short of it. Stop the pass sooner, or cut a relief groove for the tool to run into.';
+      case 'threadstop': return 'The threading tool would have run into a shoulder before the commanded stop, so it stopped at the last clear carriage position. Stop the pass sooner, or cut a relief groove for the tool to run into.';
       case 'parted': return 'Parted off. The finished part has dropped clear: see the inspection below.';
       case 'nopass': return 'A threading pass runs toward the chuck: set a stop Z to the left of the tool.';
       case 'notthread': return 'Choose a threading tool to take a threading pass.';
@@ -632,12 +655,25 @@
     var clipped = Math.abs(tz - toZ) > 1e-9 || Math.abs(tx - toX) > 1e-9;
     var z0 = st.tz, r0 = st.tr, r1 = tx / 2;
     var dzT = tz - z0, drT = r1 - r0, len = Math.sqrt(dzT * dzT + drT * drT);
+    // The sampled axial thread profile is at one fixed angular phase. The
+    // carriage may stop between those samples; radial withdrawal from its
+    // actual helical groove must not be mistaken for cutting a sampled crest.
+    var retractingThread = tool.action === 'thread' && st.threadSeat && Math.abs(dzT) < EPS &&
+      (tool.side === 'out' ? drT >= 0 : drT <= 0);
+    if (tool.action === 'thread' && Math.abs(dzT) > EPS) {
+      var clear = threadClear(st, tool);
+      if (clear !== null && (tool.side === 'out' ? r0 * 2 < clear - EPS : r0 * 2 > clear + EPS)) {
+        res.stop = stopObj(st, 'retract', { clear: clear }); return res;
+      }
+      st.threadSeat = null;
+    }
     var n = Math.max(1, Math.ceil(len / STEP - 1e-9));
     var pz = z0, pr = r0;
     for (var k = 1; k <= n && len > 0; k++) {
       var z = z0 + dzT * k / n, r = r0 + drT * k / n;
-      var chk = step(st, tool, z, r, false);
+      var chk = step(st, tool, z, r, false, retractingThread ? { noCut: true } : null);
       if (chk.code) { res.stop = stopObj(st, chk.code, chk.code === 'retract' ? { clear: threadClear(st, tool) } : null); break; }
+      if (tool.radialOnly && Math.abs(dzT) > EPS && chk.area > EPS) { res.stop = stopObj(st, tool.id === 'face' ? 'face-side' : 'side'); break; }
       if ((chk.area > EPS || chk.formed) && !st.spindle) { res.stop = stopObj(st, 'spindle'); break; }
       var sl = Math.sqrt((z - pz) * (z - pz) + (r - pr) * (r - pr));
       var eng = winPush(st, chk.area, sl);
@@ -654,7 +690,7 @@
         var D = drillSize(st);
         if (depth > tool.peck * D + 1e-9) { winPop(st); res.stop = stopObj(st, 'peck', { depth: tool.peck * D }); break; }
       }
-      var ap = step(st, tool, z, r, true);
+      var ap = step(st, tool, z, r, true, retractingThread ? { noCut: true } : null);
       st.tz = z; st.tr = r; pz = z; pr = r;
       res.moved = true; res.cut += chk.area; res.formed = res.formed || chk.formed;
       if (chk.area > EPS || chk.formed) { res.contact = true; st.version++; }
@@ -701,9 +737,8 @@
     var kMax = Math.floor((-zEnd) / pitch + 1e-9), kMin = Math.ceil((-st.tz) / pitch - 1e-9);
     var notches = [];
     for (k = kMin; k <= kMax; k++) { notches.push(-k * pitch); }
-    /* The tool comes to rest in the groove it has just cut. In the section plane
-       that is the last notch, never past the stop or the point it would crash. */
-    if (notches.length) { zEnd = notches[notches.length - 1]; }
+    // zEnd is carriage travel. Section-plane notch phase must not round it to
+    // a whole turn or move the readout away from the commanded stop.
     var worst = 0, any = false;
     for (k = 0; k < notches.length; k++) {
       var c = colAt(p, notches[k]);
@@ -743,6 +778,8 @@
     }
     st.tz = round(zEnd, 6);
     res.moved = true; res.cut = area; res.to = st.tz; res.infeed = worst;
+    res.turns = (res.from - res.to) / pitch;
+    st.threadSeat = { z: st.tz, pitch: pitch };
     st.win = { a: [], l: [] };
     st.version++;
     if (crash) { res.stop = stopObj(st, (crash === 'jaws' || crash === 'chuck') ? crash : 'threadstop'); res.crashed = true; res.crash = crash; }
@@ -757,7 +794,7 @@
     if (st.spindle) { return { ok: false, text: 'Stop the spindle before changing tools.' }; }
     st.tool = id;
     var park = parkFor(st, id);
-    st.tz = park.z; st.tr = park.r; st.win = { a: [], l: [] }; st.peck = null;
+    st.tz = park.z; st.tr = park.r; st.win = { a: [], l: [] }; st.peck = null; st.threadSeat = null;
     return { ok: true };
   }
   function setDrill(st, id) {
@@ -911,19 +948,27 @@
     }
     return out;
   }
-  /* The shoulder nearest its drawing position: a face where the outside
-     steps by more than 0.004 in from one column to the next, bigger on the
-     side the drawing has bigger. Thread and knurl teeth are bridged first. */
-  function stepNear(p, zF, sNom, dRight, dLeft) {
-    var sign = dLeft > dRight ? 1 : -1, best = null;
-    for (var i = 1; i < p.n; i++) {
-      if (!has(p, i) || !has(p, i - 1)) { continue; }
-      var s = zF - (p.zL + i * COL);
-      if (Math.abs(s - sNom) > 0.25) { continue; }
-      if (sign * (envOut(p, i - 1) - envOut(p, i)) <= 0.004) { continue; }
-      if (best === null || Math.abs(s - sNom) < Math.abs(best - sNom)) { best = s; }
+  /* Inspect the face at nine radii, rather than accepting one sharp change
+     in a sampled profile as a finished shoulder. Leave only a small corner
+     allowance for the nose/edge transition. Teeth are bridged for this check. */
+  function shoulderFace(p, zF, sNom, dRight, dLeft) {
+    var smallRight = dLeft > dRight, lo = Math.min(dLeft, dRight) / 2, hi = Math.max(dLeft, dRight) / 2;
+    var inset = Math.min(0.006, (hi - lo) / 8), positions = [];
+    for (var k = 0; k < 9; k++) {
+      var rho = lo + inset + (hi - lo - 2 * inset) * k / 8, best = null;
+      for (var i = 1; i < p.n; i++) {
+        if (!has(p, i) || !has(p, i - 1)) { continue; }
+        var s = zF - (p.zL + i * COL);
+        if (Math.abs(s - sNom) > 0.25) { continue; }
+        var left = envOut(p, i - 1), right = envOut(p, i);
+        var crosses = smallRight ? left > rho && right <= rho : left <= rho && right > rho;
+        if (crosses && (best === null || Math.abs(s - sNom) < Math.abs(best - sNom))) { best = s; }
+      }
+      if (best === null) { return null; }
+      positions.push(best);
     }
-    return best;
+    var mn = Math.min.apply(null, positions), mx = Math.max.apply(null, positions);
+    return { position: positions[4], min: mn, max: mx, spread: mx - mn, flat: mx - mn <= 0.0031 };
   }
 
   function evaluate(st) {
@@ -955,7 +1000,7 @@
       if (!face.flat) {
         it.made = 'Uneven by ' + inch(face.spread);
         it.status = 'over';
-        it.hint = 'Still the sawn end. Face it: feed the turning tool across the end toward the center (X 0).';
+        it.hint = 'Face the uneven or sawn end: choose the facing tool, place its left corner at the finished Z, and feed X to 0. Take axial slices no wider than 0.0625 in.';
       } else if (face.nub) {
         it.made = 'A nub ' + inch(face.nub) + ' tall is left at the center';
         it.status = 'over';
@@ -1006,23 +1051,24 @@
       var right = segAt(T.outside, sh.at - 0.01), left = segAt(T.outside, sh.at + 0.01);
       var dR = outerNom(right), dL = outerNom(left);
       if (right.kind === 'thread') { dR = right.crest[0]; }
-      var it = { id: 'sh-' + idx, label: 'Shoulder', spec: inch(sh.at) + ' ±' + fmt(sh.tol) + ' from the front face' };
-      var s = stepNear(piece, zF, sh.at, dR, dL);
-      if (s === null) {
-        it.made = 'No step yet'; it.status = 'missing';
-        it.hint = 'Turn the ' + dia(Math.min(dR, dL)) + ' section back to here.';
+      var it = { id: 'sh-' + idx, label: 'Shoulder', spec: 'Flat face, ' + inch(sh.at) + ' ±' + fmt(sh.tol) + ' from the front face' };
+      var faceAt = shoulderFace(piece, zF, sh.at, dR, dL);
+      if (faceAt === null) {
+        it.made = 'No complete shoulder face yet'; it.status = 'missing';
+        it.hint = 'Rough-turn short of this shoulder, then use a radial facing cut at Z ' + fmt(zF - sh.at) + ' to finish its allowance.';
       } else {
-        it.made = inch(s) + ' from the face';
-        var err = s - sh.at;
+        var s = faceAt.position;
+        it.made = faceAt.flat ? inch(s) + ' from the face' : 'Angled or uneven by ' + inch(faceAt.spread) + ', near ' + inch(s);
         // which way can it still move? toward the bigger diameter side, by cutting more
         var smallRight = dR < dL;
-        if (Math.abs(err) <= sh.tol + 1e-9) { it.status = 'ok'; }
-        else if ((smallRight && err < 0) || (!smallRight && err > 0)) {
+        var tooFar = smallRight ? faceAt.max > sh.at + sh.tol + EPS : faceAt.min < sh.at - sh.tol - EPS;
+        if (faceAt.flat && faceAt.min >= sh.at - sh.tol - EPS && faceAt.max <= sh.at + sh.tol + EPS) { it.status = 'ok'; }
+        else if (!tooFar) {
           it.status = 'over';
-          it.hint = (smallRight ? 'The ' + dia(dR) + ' section stops short. Carry that cut on to Z ' : 'Widen the ' + dia(dL) + ' cut toward the front, to Z ') + fmt(zF - sh.at) + '.' + lenNote;
+          it.hint = 'Shoulder allowance remains. With the facing tool clear, set Z ' + fmt(zF - sh.at) + (smallRight ? '' : ' minus its 0.0625 in width') + ', then feed X across the face to ' + fmt(Math.min(dR, dL)) + '. Retract before moving Z.' + lenNote;
         } else {
           it.status = 'under';
-          it.hint = 'The step is ' + inch(Math.abs(err)) + ' too far ' + (err > 0 ? 'back' : 'forward') + '. That metal is gone: undo back before that cut, or start new stock.';
+          it.hint = 'Part of the shoulder was cut beyond its allowed plane. That metal is gone: undo before that cut, rough-turn short of the shoulder, then face the remaining allowance.';
         }
       }
       add(it);
@@ -1101,7 +1147,7 @@
     if (inside && none) {
       it.made = mx < 0.01 ? 'No hole' : 'Does not run the full length';
       it.status = 'missing';
-      it.hint = mx < 0.01 ? 'Center drill, drill, then bore it to size.' : 'Drill and bore the hole deeper.';
+      it.hint = mx < 0.01 ? 'Drill a pilot hole, then bore it to size. On a real machine, use the starting method recommended for that drill.' : 'Drill and bore the hole deeper.';
       return;
     }
     it.made = Math.abs(mx - mn) < 0.0006 ? dia(mx) : dia(mn) + ' to ' + fmt(mx);
@@ -1136,7 +1182,7 @@
     });
     var cover = tagged / cols.length;
     var crestLo = sg.crest[0], crestHi = sg.crest[1], rootLo = sg.root[0], rootHi = sg.root[1];
-    if (inside && rootv < 0.01) { it.made = 'No hole'; it.status = 'missing'; it.hint = 'Center drill, then drill to the thread\'s inside size, ' + dia(sg.crest[0]) + ' to ' + fmt(sg.crest[1]) + '.'; return; }
+    if (inside && rootv < 0.01) { it.made = 'No hole'; it.status = 'missing'; it.hint = 'Drill to the thread\'s inside size, ' + dia(sg.crest[0]) + ' to ' + fmt(sg.crest[1]) + ', using the starting method recommended for the drill.'; return; }
     if (!tagged) {
       it.made = 'Not threaded' + (inside ? ', hole ' + dia(crest) : ', ' + dia(crest));
       it.status = 'missing';
@@ -1374,7 +1420,7 @@
     selectTool: selectTool, setSpindle: setSpindle, setDrill: setDrill, setPitch: setPitch,
     move: move, threadPass: threadPass, explain: explain,
     profileAt: profileAt, compare: compare, measureAt: measureAt, evaluate: evaluate,
-    frontZ: frontZ, has: has, zc: zc, colAt: colAt, envOut: envOut, envIn: envIn,
+    frontZ: frontZ, has: has, zc: zc, colAt: colAt, envOut: envOut, envIn: envIn, shoulderFace: shoulderFace,
     fmt: fmt, fmtSigned: fmtSigned, inch: inch, dia: dia, round: round, MINUS: MINUS
   };
 });

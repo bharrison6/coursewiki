@@ -307,7 +307,7 @@
   }
   function poly(list, close) { return 'M' + list.map(function (q) { return lp(q[0], q[1]); }).join('L') + (close ? 'Z' : ''); }
 
-  var INSERT_TOP = { turn: 0.20, chamfer: 0.15, groove: 0.70, thread: 0.06, knurl: 0.25 };
+  var INSERT_TOP = { turn: 0.20, face: 0.75, chamfer: 0.15, groove: 0.70, thread: 0.06, knurl: 0.25 };
 
   function toolShape(toolId, opt) {
     var t = M.TOOLS[toolId], o = opt || {};
@@ -362,8 +362,8 @@
   function toolIcon(toolId) {
     var t = M.TOOLS[toolId], b;
     if (t.side === 'out') {
-      var ext = toolId === 'turn' ? [-0.06, 0.62] : toolId === 'groove' ? [-0.35, 0.33] : toolId === 'thread' ? [-0.3, 0.38] : [-0.34, 0.34];
-      var up = toolId === 'groove' ? 0.75 : 0.52;
+      var ext = toolId === 'turn' ? [-0.06, 0.62] : toolId === 'face' ? [-0.10, 0.35] : toolId === 'groove' ? [-0.35, 0.33] : toolId === 'thread' ? [-0.3, 0.38] : [-0.34, 0.34];
+      var up = toolId === 'groove' || toolId === 'face' ? 0.80 : 0.52;
       b = [ext[0], -up, ext[1] - ext[0], up + 0.08];
     } else if (t.side === 'in') {
       b = [-0.1, -0.12, 0.95, 0.62];
@@ -600,9 +600,9 @@
   var SCENES = {
     'pin-turning': {
       target: 'stepped-pin',
-      label: 'The stepped pin part-way through: the end faced, the body turned in two passes, and the turning tool halfway along the first pass on the pin. The dashed outline is the drawing; the tinted metal is still to come off.',
-      ops: [['sp', true], ['mv', 0, 1.4], ['x', 0], ['x', 1.4], ['mv', 0.1, 0.880], ['z', -1.25], ['x', 1.1], ['z', 0.1],
-        ['x', 0.750], ['z', -1.25], ['x', 1.1], ['z', 0.1], ['x', 0.620], ['z', -0.30]]
+      label: 'The stepped pin part-way through: the end faced with the facing blade, the body turned short of its shoulder, and the roughing tool halfway along the first pin pass. The angled shoulder allowance still needs radial facing. The dashed outline is the drawing; the tinted metal is still to come off.',
+      ops: [['tool', 'face'], ['sp', true], ['mv', 0, 1.4], ['x', 0], ['x', 1.4], ['sp', false], ['tool', 'turn'], ['sp', true],
+        ['mv', 0.1, 0.880], ['z', -1.21], ['x', 1.1], ['z', 0.1], ['x', 0.750], ['z', -1.21], ['x', 1.1], ['z', 0.1], ['x', 0.620], ['z', -0.30]]
     }
   };
   function sceneState(name) {

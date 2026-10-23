@@ -29,17 +29,24 @@ function drive(st, ops) {
 }
 const stops = (log) => log.filter((e) => e.r && e.r.stop && e.r.stop.code !== 'parted').map((e) => e.r.stop.code);
 const tool = (id) => [['sp', false], ['tool', id], ['sp', true]];
-const FACE = [['sp', true], ['mv', 0, 1.4], ['x', 0], ['x', 1.4]];
+// Facing now uses the declared radial blade. Return to the rougher afterward.
+const FACE = [...tool('face'), ['mv', 0, 1.4], ['x', 0], ['x', 1.4], ...tool('turn')];
+// Deeper roughing passes stop farther short: the angled edge must remain clear
+// of the larger head. A later groove or radial facing cut removes this allowance.
+const THREAD_ROUGH = [[.88, -.722], [.76, -.712], [.64, -.701], [.52, -.690], [.4, -.680], [.375, -.678]]
+  .flatMap(([d, z]) => [['mv', .1, d], ['z', z], ['x', 1.1], ['z', .1]]);
 
 /* One sensible way to make each part. Other orders are tested below. */
 const SEQ = {
   'stepped-pin': [
     ...FACE,
-    ['mv', 0.1, 0.880], ['z', -1.25], ['x', 1.1], ['z', 0.1],
-    ['x', 0.760], ['z', -1.25], ['x', 1.1], ['z', 0.1],
-    ['x', 0.750], ['z', -1.25], ['x', 1.1], ['z', 0.1],
-    ['x', 0.620], ['z', -0.625], ['x', 0.8], ['z', 0.1],
-    ['x', 0.500], ['z', -0.625], ['x', 0.8], ['z', 0.1],
+    ['mv', 0.1, 0.880], ['z', -1.21], ['x', 1.1], ['z', 0.1],
+    ['x', 0.760], ['z', -1.21], ['x', 1.1], ['z', 0.1],
+    ['x', 0.750], ['z', -1.21], ['x', 1.1],
+    ...tool('face'), ['mv', -1.25, 1.1], ['x', 0.750], ['x', 1.1],
+    ...tool('turn'), ['mv', 0.1, 0.620], ['z', -0.585], ['x', 0.8], ['z', 0.1],
+    ['x', 0.500], ['z', -0.585], ['x', 0.8],
+    ...tool('face'), ['mv', -0.625, 0.8], ['x', 0.500], ['x', 0.8],
     ...tool('chamfer'), ['mv', 0.0, 0.6], ['x', 0.440], ['x', 0.7],
     ...tool('groove'), ['mv', -1.5, 1.2], ['x', 0]
   ],
@@ -58,8 +65,8 @@ const SEQ = {
     ...FACE,
     ['mv', 0.1, 0.860], ['z', -1.40], ['x', 1.1],
     ...tool('knurl'), ['mv', -0.90, 0.95], ['x', 0.840], ['z', -1.21], ['x', 1.0],
-    ...tool('turn'), ['mv', 0.1, 0.68], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.48], ['z', -0.75], ['x', 1.0], ['z', 0.1],
-    ['x', 0.375], ['z', -0.75], ['x', 1.0], ['z', 0.1],
+    ...tool('turn'), ...[[.74, -.720], [.62, -.710], [.5, -.699], [.38, -.689], [.375, -.688]]
+      .flatMap(([d, z]) => [['mv', .1, d], ['z', z], ['x', 1.0], ['z', .1]]),
     ...tool('groove'), ['x', 1.0], ['z', -0.625], ['x', 0.290], ['x', 1.0],
     ...tool('chamfer'), ['mv', 0, 0.5], ['x', 0.315], ['x', 0.6],
     ['sp', false], ['tool', 'thread'], ['tpi', 16], ['sp', true],
@@ -118,25 +125,35 @@ test('facing to the center leaves a flat face at the tool\'s Z; stopping short l
   assert.equal(st.part, null);
 
   const short = M.create('stepped-pin');
-  drive(short, [['sp', true], ['mv', 0, 1.4], ['x', 0.200], ['x', 1.4]]);
+  drive(short, [...tool('face'), ['mv', 0, 1.4], ['x', 0.200], ['x', 1.4]]);
   const f = M.evaluate(short).items[0];
   assert.equal(f.status, 'over');
   assert.match(f.made, /nub/);
   assert.match(f.hint, /X 0/);
 });
 
-test('a turning pass cuts its diameter up to a square shoulder and nowhere else', () => {
+test('the angled rougher leaves shoulder allowance which an actual radial facing cut removes', () => {
   const st = M.create('stepped-pin');
-  drive(st, [...FACE, ['mv', 0.1, 0.880], ['z', -0.500]]);
+  assert.deepEqual(stops(drive(st, [...FACE, ['mv', 0.1, 0.880], ['z', -0.585]])), []);
   const p = st.work;
   const at = (z) => p.ro[M.colAt(p, z)];
   assert.ok(Math.abs(at(-0.2) - 0.440) < 1e-9, 'cut to the readout diameter');
-  assert.ok(Math.abs(at(-0.4995 + 0.016) - 0.440) < 1e-6, 'full depth one nose radius from the stop');
-  assert.ok(at(-0.4995) < 0.46, 'cut right up to the stop');
-  assert.equal(at(-0.5005), 0.5, 'nothing left of the leading edge is touched');
-  assert.equal(at(-0.9), 0.5);
-  // The 0.016 in nose radius fillets the inside corner; it never undercuts it.
-  for (let z = -0.4995; z < -0.48; z += 0.001) assert.ok(at(z) >= 0.440 - 1e-9 && at(z) <= at(z - 0.001) + 1e-12, 'fillet rises toward the shoulder');
+  assert.equal(at(-0.6255), 0.5, 'stopping short preserves the larger diameter');
+  assert.ok(at(-0.5945) > .44 && at(-0.5945) < .5, 'a sloping transition survives the axial stop');
+  const rough = M.shoulderFace(p, 0, .625, .880, 1);
+  assert.ok(rough && !rough.flat && rough.spread > .006, 'inspection sees the angled face');
+  const before = p.ro.slice();
+  drive(st, tool('face'));
+  assert.deepEqual(st.work.ro, before, 'choosing a facing tool does not clean the shoulder');
+  assert.deepEqual(stops(drive(st, [['mv', -.625, 1.1], ['x', .880]])), []);
+  const done = M.shoulderFace(p, 0, .625, .880, 1);
+  assert.ok(done.flat && Math.abs(done.position - .625) < M.COL, 'radial sweep leaves the final plane');
+  assert.equal(at(-.6255), .5); assert.equal(at(-.6245), .44);
+  // The old shortcut now cuts ahead of the nose and does not create a flat face.
+  const shortcut = M.create('stepped-pin');
+  drive(shortcut, [...FACE, ['mv', .1, .88], ['z', -.625]]);
+  const wrong = M.shoulderFace(shortcut.work, 0, .625, .88, 1);
+  assert.ok(!wrong.flat && wrong.max > .630);
 });
 
 test('a cut deeper than the tool takes is refused at contact, by feed or by small jogs', () => {
@@ -207,6 +224,17 @@ test('the blade plunges and parts; sideways in a cut it is refused', () => {
   assert.ok(span(st.work)[1] * M.COL + st.work.zL <= -0.625 + 1e-9, 'the remnant stays in the chuck');
 });
 
+test('parting leaves a small core until the blade actually reaches the center', () => {
+  const st = M.create('stepped-pin');
+  assert.deepEqual(stops(drive(st, [...FACE, ...tool('groove'), ['mv', -.5, 1.2], ['x', .024]])), []);
+  assert.equal(st.part, null, 'a 0.024 in core is not an automatic break-off');
+  assert.ok(Math.abs(M.measureAt(st, -.55).od - .024) < 1e-7);
+  const before = M.snapshot(st);
+  assert.equal(M.move(st, -.5, 0).parted, true);
+  M.restore(st, before);
+  assert.equal(st.part, null, 'Undo restores the actual small core');
+});
+
 /* ---- holes ------------------------------------------------------------------*/
 
 test('the boring bar needs a hole it fits in, and cuts only with its tip', () => {
@@ -259,7 +287,7 @@ test('tailstock tools stay on the centerline; the drill is pecked; a hole withou
 
 function threadReady() {
   const st = M.create('thumb-screw');
-  const log = drive(st, [...FACE, ['mv', 0.1, 0.800], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.600], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.400], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.375], ['z', -0.75], ['x', 1.0], ...tool('groove'), ['x', 1.0], ['z', -0.625], ['x', 0.290], ['x', 1.0],
+  const log = drive(st, [...FACE, ...THREAD_ROUGH, ...tool('groove'), ['x', 1.0], ['z', -0.625], ['x', 0.290], ['x', 1.0],
     ['sp', false], ['tool', 'thread'], ['tpi', 16], ['sp', true]]);
   assert.deepEqual(stops(log), [], 'fixture: turned and grooved');
   return st;
@@ -280,7 +308,8 @@ test('a threading pass cuts one notch per pitch, and later passes land in the sa
   drive(st, [['mv', 0.1, 0.350]]);
   const r1 = M.threadPass(st, -0.69);
   assert.equal(r1.stop, null);
-  assert.ok(Math.abs(st.tz - -0.6875) < 1e-9, 'the tool rests in the last notch, short of the stop');
+  assert.equal(st.tz, -0.69, 'carriage travel reaches the requested stop independently of section phase');
+  assert.ok(Math.abs(r1.turns - .79 * 16) < 1e-9, 'turn count follows travel divided by lead');
   const p = st.work;
   const m1 = minima(p, -0.6, -0.05);
   assert.ok(m1.length >= 8);
@@ -317,7 +346,9 @@ test('threading: infeed per pass is limited, the tool must back out, and a wrong
 
 test('without a relief groove the threading tool cannot run up to the head', () => {
   const st = M.create('thumb-screw');
-  assert.deepEqual(stops(drive(st, [...FACE, ['mv', 0.1, 0.800], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.600], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.400], ['z', -0.75], ['x', 1.0], ['z', 0.1], ['x', 0.375], ['z', -0.75], ['x', 1.0], ['sp', false], ['tool', 'thread'], ['tpi', 16], ['sp', true], ['mv', 0.1, 0.350]])), []);
+  assert.deepEqual(stops(drive(st, [...FACE, ...THREAD_ROUGH, ...tool('face'),
+    ['mv', -.730, 1.1], ['x', .375], ['x', 1.1], ['z', -.750], ['x', .375], ['x', 1.1],
+    ['sp', false], ['tool', 'thread'], ['tpi', 16], ['sp', true], ['mv', 0.1, 0.350]])), []);
   const r = M.threadPass(st, -0.75);
   assert.equal(r.crashed, true);
   assert.equal(r.stop.code, 'threadstop');
@@ -331,10 +362,33 @@ test('the internal threading bar threads a drilled hole from outside the part', 
   drive(st, [...FACE, ...tool('center'), ['z', -0.15], ['z', 0.6], ['sp', false], ['tool', 'drill'], ['drill', '0.4219'], ['sp', true], ['z', -0.9], ['z', 0.6],
     ['sp', false], ['tool', 'ithread'], ['tpi', 13], ['sp', true], ['mv', 0.1, 0.445]]);
   assert.equal(M.threadPass(st, -0.6).stop, null);
+  assert.equal(st.tz, -.6, '13 TPI does not round the carriage to a section notch');
   const back = M.move(st, 0.1, st.tr * 2);
   assert.equal(back.stop.code, 'retract');
   assert.match(back.stop.text, /X below 0\.422/);
   assert.ok(Math.abs(st.work.thI[M.colAt(st.work, -0.3)] - 1 / 13) < 1e-12);
+  const beforeRetract = st.work.ri.slice();
+  assert.equal(M.move(st, -.6, .40).stop, null, 'radial withdrawal at a non-integral-turn endpoint is clear');
+  assert.deepEqual(st.work.ri, beforeRetract, 'withdrawal does not cut sampled crests');
+  assert.equal(M.move(st, .1, .40).stop, null);
+});
+
+test('thread carriage stops and partial passes do not snap to the section sampling phase', () => {
+  const st = threadReady();
+  drive(st, [['mv', .1, .350]]);
+  const before = M.snapshot(st), full = M.threadPass(st, -.600);
+  assert.equal(full.to, -.600);
+  assert.ok(Math.abs(full.turns - 11.2) < 1e-9);
+  M.restore(st, before);
+  const partial = M.threadPass(st, -.333);
+  assert.equal(partial.to, -.333);
+  assert.ok(Math.abs(partial.turns - .433 * 16) < 1e-9);
+  const far = M.colAt(st.work, -.5);
+  assert.equal(st.work.ro[far], before.work.ro[far], 'a stopped pass leaves unreached material intact');
+  const partialState = M.snapshot(st);
+  assert.equal(M.move(st, -.333, .5).stop, null);
+  M.restore(st, partialState);
+  assert.equal(M.move(st, -.333, .5).stop, null, 'restoring a partial cut also restores its withdrawal state');
 });
 
 /* ---- knurling is forming ------------------------------------------------------*/
@@ -356,7 +410,7 @@ test('the knurl moves metal instead of removing it: roots sink as far as crests 
   assert.equal(M.move(st, -0.3, 0.836).stop.code, 'fulldepth');
   M.move(st, -0.3, 0.840);
   const wall = M.move(st, -0.6, 0.840);
-  assert.equal(wall.stop.code, 'shoulder');
+  assert.ok(['shoulder', 'fulldepth'].includes(wall.stop.code), 'the wheels stop on the rough shoulder before forcing past full depth');
 });
 
 /* ---- inspection, alternative orders and corrections ---------------------------*/
@@ -373,6 +427,21 @@ for (const T of M.TARGETS) {
     assert.equal(ev.notes.length, 0);
   });
 }
+
+test('choosing facing tools without radial cleanup cannot pass a finished stepped pin', () => {
+  const st = M.create('stepped-pin');
+  let selected = 'turn', omit = false;
+  const ops = SEQ['stepped-pin'].filter(op => {
+    if (op[0] === 'tool') { selected = op[1]; omit = false; }
+    if (selected === 'face' && op[0] === 'mv' && op[1] < 0) omit = true;
+    return !(omit && ['mv', 'x', 'z'].includes(op[0]));
+  });
+  assert.deepEqual(stops(drive(st, ops)), []);
+  assert.ok(st.part, 'the deliberately unfinished part is still parted off');
+  const ev = M.evaluate(st);
+  assert.equal(ev.accepted, false);
+  assert.ok(ev.items.filter(x => x.id.startsWith('sh-')).every(x => x.status !== 'ok'));
+});
 
 test('another valid order also passes: bore before turning the outside, chamfers last', () => {
   const st = M.create('bushing');
@@ -414,12 +483,12 @@ test('inspection says what to do next, and tells fixable from scrap', () => {
   assert.match(under.hint, /undo/);
   // A step carried too far is scrap too; one that stops short says where to go.
   const s2 = M.create('stepped-pin');
-  drive(s2, [...FACE, ['mv', 0.1, 0.880], ['z', -0.600]]);
+  drive(s2, [...FACE, ...[.88, .76, .64, .5].flatMap(d => [['mv', .1, d], ['z', -.585], ['x', 1.1], ['z', .1]])]);
   const short = M.evaluate(s2).items.filter((x) => x.label === 'Shoulder')[0];
   assert.equal(short.status, 'over');
   assert.match(short.hint, /Z −0\.625/);
   const s3 = M.create('stepped-pin');
-  drive(s3, [...FACE, ['mv', 0.1, 0.880], ['z', -0.650]]);
+  drive(s3, [...FACE, ...[.88, .76, .64, .5].flatMap(d => [['mv', .1, d], ['z', -.650], ['x', 1.1], ['z', .1]])]);
   assert.equal(M.evaluate(s3).items.filter((x) => x.label === 'Shoulder')[0].status, 'under');
 });
 
@@ -522,7 +591,9 @@ test('every internal thread turn needs full depth too', () => {
 
 test('equal axial and radial extents do not turn a cylindrical nose into a chamfer', () => {
   const ops = SEQ['stepped-pin'], st = M.create('stepped-pin');
-  assert.deepEqual(stops(drive(st, [...ops.slice(0, -11), ['mv', 0.1, 0.440], ['z', -0.030], ['x', 0.800], ...ops.slice(-5)])), []);
+  const chamferAt = ops.findIndex(op => op[0] === 'tool' && op[1] === 'chamfer');
+  assert.deepEqual(stops(drive(st, [...ops.slice(0, chamferAt - 1), ...tool('face'),
+    ['mv', -.030, .8], ['x', .440], ['x', .8], ...ops.slice(-5)])), []);
   const ev = M.evaluate(st);
   assert.equal(ev.accepted, false);
   const chamfer = ev.items.find(x => x.id === 'ch-0');
