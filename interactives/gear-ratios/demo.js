@@ -49,7 +49,7 @@
       '<details class="gr-settings"><summary>Input speed, torque and direction</summary><div class="gr-inputs"></div>' +
       '<label class="gr-reverse"><input type="checkbox" data-gr-reverse>Reverse A (counterclockwise)</label></details>' +
       '<div class="gr-bottom"><span data-gr-input></span><button type="button" data-gr-reset>Reset lab</button></div></div></div>' +
-      '<p class="gr-insight" data-gr-insight></p><p class="gr-convention">Ratio i = input speed ÷ output speed, using magnitudes. CW / CCW are viewed from the front of every shaft.</p>' +
+      '<p class="gr-insight" data-gr-insight></p><p class="gr-convention">Ratio i = input speed ÷ output speed, using magnitudes. CW / CCW are viewed from the front of every shaft. Changing gears zeros the turns.</p>' +
       '<details class="gr-predict"><summary>Predict, then test a change</summary><div class="gr-predict-body"><label for="' + id + '-trial">Experiment</label>' +
       '<select id="' + id + '-trial" data-gr-trial><option value="bigger">Make B larger</option><option value="idler">Add an idler</option><option value="compound">Add a second stage</option></select>' +
       '<fieldset class="gr-choices"><legend data-gr-question></legend><div data-gr-choices></div></fieldset>' +
@@ -63,7 +63,7 @@
       box.innerHTML = '<label for="' + id + '-' + key + '"><span>' + label + '</span><output for="' + id + '-' + key + '"></output></label>' +
         '<input type="range" id="' + id + '-' + key + '" min="' + min + '" max="' + max + '" step="' + step + '" value="' + state[key] + '">';
       parent.appendChild(box); controls[key] = { box: box, input: box.querySelector('input'), output: box.querySelector('output'), label: box.querySelector('label span'), unit: unit };
-      controls[key].input.addEventListener('input', function () { state[key] = Number(controls[key].input.value); changed(); });
+      controls[key].input.addEventListener('input', function () { state[key] = Number(controls[key].input.value); changed(key); });
       controls[key].input.addEventListener('change', announce);
     }
     control('a', 'A · driver', 'teeth', 20, 60, 1, q('.gr-counts'));
@@ -83,7 +83,10 @@
       q('[data-gr-comparison]').hidden = true;
       q('[data-gr-feedback]').textContent = 'Your setup changed. Each prediction test loads the stated starting setup.';
     }
-    function changed() { inputTurns = 0; previous = null; clearPrediction(); update(); }
+    function changed(key) {
+      if (key !== 'rpm' && key !== 'torque' && key !== 'direction') inputTurns = 0;
+      previous = null; clearPrediction(); update();
+    }
     function tick(now) {
       frame = 0;
       if (!running || !visible || document.hidden || !root.isConnected || state.rpm === 0) { previous = null; return; }
@@ -103,7 +106,7 @@
       solution.gears.forEach(function (g) { q('[data-gear="' + g.id + '"]').setAttribute('transform', D.transform(g, inputTurns)); });
       var outTurns = inputTurns * solution.output.ratio;
       function turns(value) { return Math.abs(value).toFixed(2) + ' turns' + (value === 0 ? '' : value > 0 ? ' CW' : ' CCW'); }
-      q('[data-gr-turns]').textContent = 'A: ' + turns(inputTurns) + '  ·  ' + solution.output.id + ': ' + turns(outTurns);
+      q('[data-gr-turns]').textContent = 'Net turns · A: ' + turns(inputTurns) + '  ·  ' + solution.output.id + ': ' + turns(outTurns);
       root.dataset.grTurns = inputTurns.toFixed(6);
     }
     function update() {
@@ -145,7 +148,7 @@
       q('[data-gr-feedback]').textContent = 'Predict first. The test loads its stated gears at 120 rpm clockwise and 2 N·m input.';
     }
     q('.gr-modes').addEventListener('change', function (e) { state.mode = e.target.value; changed(); announce(); });
-    q('[data-gr-reverse]').addEventListener('change', function (e) { state.direction = e.target.checked ? -1 : 1; changed(); announce(); });
+    q('[data-gr-reverse]').addEventListener('change', function (e) { state.direction = e.target.checked ? -1 : 1; changed('direction'); announce(); });
     q('[data-gr-run]').addEventListener('click', function () {
       if (running) pause(); else { running = true; previous = null; this.textContent = 'Pause'; this.setAttribute('aria-pressed', 'true'); schedule(); }
     });
