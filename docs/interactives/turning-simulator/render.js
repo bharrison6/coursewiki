@@ -4,12 +4,16 @@
    Pure functions of the model's state, so the same code draws the live view,
    the page's printed figures and the tests' expectations. No DOM here.
 
-   THE VIEW is the lathe seen from the front with the work's upper half cut
-   away along the centerline, the way a half-section drawing shows a part:
-     above the centerline  the section - metal is hatched, a hole shows open
-     below the centerline  the outside of the part, with its thread and knurl
-   Tools on the cross slide come in from above, which is the side the section
-   is cut on, so the tool and the metal it touches are in the same plane.
+   THE VIEW is the lathe seen from the front, in one of two views of the work,
+   each drawn whole:
+     'section'  the work cut in half along its centerline, the way a section
+                drawing shows a part: metal hatched, a hole open, a thread or
+                knurl as its profile
+     'normal'   the outside of the work as it looks on the machine, with its
+                thread and knurl; a hole is a dashed hidden line, and a tool
+                inside the work is hidden behind it
+   Tools on the cross slide come in from above, in the plane the section is
+   cut on, so the tool and the metal it touches are in the same plane.
    The tool outlines are drawn from the model's own edge functions.
 
    Colours are classes only; demo.css maps them to theme tokens.
@@ -102,8 +106,26 @@
     var s = sign || 1;
     return list.map(function (q) { return f.x(q[0]) + ' ' + f.y(s * q[1]); }).join('L');
   }
-  function workPaths(p, f) {
-    var sec = [], ext = [], edges = [], threads = [], knurls = [], bore = [];
+  /* The same path reflected in the centerline: the other half of a whole view.
+     Built as geometry, not as a transform, so section hatching keeps one
+     direction across the whole part. These paths use only M, L, H, V and Z. */
+  function flipY(d, f) {
+    var y0 = f.y(0), out = '', cmd = '', k = 0;
+    (d.match(/[MLHVZ]|-?(?:\d+\.?\d*|\.\d+)/g) || []).forEach(function (tk) {
+      if (/^[MLHVZ]$/.test(tk)) { cmd = tk; k = 0; out += cmd; return; }
+      var v = parseFloat(tk);
+      if (cmd === 'V' || (cmd !== 'H' && k % 2 === 1)) { v = r1(2 * y0 - v); }
+      out += (k % 2 === 1 && cmd !== 'H' && cmd !== 'V' ? ' ' : (k > 0 ? 'L' : '')) + v;
+      k++;
+    });
+    return out;
+  }
+  function viewOf(view) { return view === 'normal' ? 'normal' : 'section'; }
+  /* Paths for the work in one view. Every key is always present, empty when the
+     view does not draw it, so a live picture can update the same elements. */
+  function workPaths(p, f, view) {
+    var sec = [], ext = [], edges = [], threads = [], knurls = [], bore = [], hidden = [];
+    var normal = viewOf(view) === 'normal';
     runs(p).forEach(function (rn) {
       var a = rn[0], b = rn[1], zA = p.zL + a * COL, zB = p.zL + (b + 1) * COL;
       var top = simplify(pts(p, a, b, function (i) { return topR(p, i); }));
@@ -111,6 +133,13 @@
       var hasHole = false;
       for (var hk = a; hk <= b; hk++) { if (p.ri[hk] > 0.0005) { hasHole = true; break; } }
       if (hasHole) { var bl = simplify(pts(p, a, b, function (i) { return p.ri[i]; })); bore.push('M' + f.x(zA) + ' ' + f.y(0) + 'L' + line(f, bl) + 'L' + f.x(zB) + ' ' + f.y(0) + 'Z'); }
+      // Seen from outside, a hole is its wall drawn as a hidden line.
+      var h0 = -1;
+      for (var hc = a; hc <= b + 1; hc++) {
+        var open = hc <= b && p.ri[hc] > 0.0005;
+        if (open && h0 < 0) { h0 = hc; }
+        if (!open && h0 >= 0) { hidden.push('M' + line(f, simplify(pts(p, h0, hc - 1, function (i) { return p.ri[i]; })))); h0 = -1; }
+      }
       sec.push('M' + f.x(zA) + ' ' + f.y(p.ri[a]) + 'L' + f.x(zA) + ' ' + f.y(top[0][1]) + 'L' + line(f, top) +
         'L' + f.x(zB) + ' ' + f.y(top[top.length - 1][1]) + 'L' + f.x(zB) + ' ' + f.y(bot[0][1]) + 'L' + line(f, bot) + 'Z');
       var outer = simplify(pts(p, a, b, function (i) { return p.ro[i]; }));
@@ -142,8 +171,15 @@
         if (!kn && i0 >= 0) { knurls.push(knurlLines(p, f, i0, k - 1)); i0 = -1; }
       }
     });
-    return { sec: sec.join(''), ext: ext.join(''), bore: bore.join(''), edges: edges.join(''), threads: threads.join(''), knurl: knurls.join('') };
+    var w = { sec: sec.join(''), ext: ext.join(''), bore: bore.join(''), edges: edges.join(''), knurl: knurls.join(''), hidden: hidden.join('') };
+    if (normal) {
+      return { sec: '', bore: '', ext: w.ext + flipY(w.ext, f), edges: w.edges + flipY(w.edges, f), threads: threads.join(''),
+        knurl: w.knurl + flipY(w.knurl, f), hidden: w.hidden + flipY(w.hidden, f) };
+    }
+    return { sec: w.sec + flipY(w.sec, f), bore: w.bore + flipY(w.bore, f), ext: '', edges: '', threads: '', knurl: '', hidden: '' };
   }
+  /* A thread seen from outside: one crest line per pitch, leaning half a pitch
+     across the whole diameter. */
   function threadLines(p, f, a, b) {
     var pitch = p.thO[a] > 0 ? p.thO[a] : 1 / 16, out = '';
     var z0 = p.zL + a * COL, z1 = p.zL + (b + 1) * COL;
@@ -152,8 +188,8 @@
       var zc = -(k + 0.5) * pitch, i = M.colAt(p, zc);
       if (i < a || i > b) { continue; }
       var R = M.envOut(p, i);
-      var xa = Math.max(z0, Math.min(z1, zc - pitch / 8)), xb = Math.max(z0, Math.min(z1, zc + pitch / 8));
-      out += 'M' + f.x(xa) + ' ' + f.y(-R) + 'L' + f.x(xb) + ' ' + f.y(0);
+      var xa = Math.max(z0, Math.min(z1, zc - pitch / 4)), xb = Math.max(z0, Math.min(z1, zc + pitch / 4));
+      out += 'M' + f.x(xa) + ' ' + f.y(-R) + 'L' + f.x(xb) + ' ' + f.y(R);
     }
     return out;
   }
@@ -184,7 +220,7 @@
   }
 
   /* ---- the drawing's outline over the work, placed at Z0 ---------------------*/
-  function ghostPaths(T, f) {
+  function ghostPaths(T, f, view) {
     var L = T.length.L, br = [0, L];
     T.outside.concat(T.inside).forEach(function (sg) { br.push(sg.from, sg.to); });
     T.chamfers.forEach(function (c) { br.push(c.edge === 'back-od' ? L - c.c : c.c); });
@@ -204,18 +240,21 @@
         roots += 'M' + f.x(-sg.from) + ' ' + f.y(rr) + 'H' + f.x(-sg.to) + 'M' + f.x(-sg.from) + ' ' + f.y(-rr) + 'H' + f.x(-sg.to);
       }
     });
+    var inRoots = '';
     T.inside.forEach(function (sg) {
       if (sg.kind === 'thread') {
         var rr = (sg.root[0] + sg.root[1]) / 4;
-        roots += 'M' + f.x(-sg.from) + ' ' + f.y(rr) + 'H' + f.x(-sg.to);
+        inRoots += 'M' + f.x(-sg.from) + ' ' + f.y(rr) + 'H' + f.x(-sg.to);
       }
     });
-    return { top: d, bottom: dBot, roots: roots };
+    // From outside only the part's silhouette and its outside thread show.
+    if (viewOf(view) === 'normal') { return { top: flipY(dBot, f), bottom: dBot, roots: roots }; }
+    return { top: d, bottom: flipY(d, f), roots: roots + inRoots + flipY(inRoots, f) };
   }
 
   /* ---- metal still to come off, and where the work is already too small -------*/
-  function comparePaths(st, f) {
-    var c = M.compare(st), p = st.work;
+  function comparePaths(st, f, view) {
+    var c = M.compare(st), p = st.work, normal = viewOf(view) === 'normal';
     function strips(list, mirror) {
       var out = '', k = 0;
       while (k < list.length) {
@@ -245,14 +284,15 @@
           seg.push([p.zL + i * COL, v], [p.zL + (i + 1) * COL, v]);
         }
         seg = simplify(seg);
-        out += 'M' + line(f, seg);
-        if (kind === 'out') { out += 'M' + line(f, seg, -1); }
+        out += 'M' + line(f, seg) + 'M' + line(f, seg, -1);
         k = j + 1;
       }
       return out;
     }
-    return { excess: strips(c.excessOut, false) + strips(c.excessIn, false), excessBottom: strips(c.excessOut, true),
-      under: marks(c.under, 'out') + marks(c.under, 'in'), counts: { excess: c.excessOut.length + c.excessIn.length, under: c.under.length } };
+    // From outside, metal still in a hole and a bore cut too big are out of sight.
+    return { excess: strips(c.excessOut, false) + (normal ? '' : strips(c.excessIn, false)),
+      excessBottom: strips(c.excessOut, true) + (normal ? '' : strips(c.excessIn, true)),
+      under: marks(c.under, 'out') + (normal ? '' : marks(c.under, 'in')), counts: { excess: c.excessOut.length + c.excessIn.length, under: c.under.length } };
   }
 
   /* ---- tools, in local units: origin at the reference point, y down ------------*/
@@ -336,16 +376,17 @@
   }
 
   /* ---- the chuck -----------------------------------------------------------------*/
-  function chuck(T, f, hatch) {
+  function chuck(T, f, hatch, view) {
     var R = T.stock.dia / 2, zJ = T.stock.zJaw, zj0 = zJ - M.JAW_LEN;
     var out = '';
     out += '<rect class="ts-chuck" x="' + f.x(f.zMin - 0.2) + '" y="' + f.y(R + M.BODY_UP) + '" width="' + r1((zj0 - f.zMin + 0.2) * S) + '" height="' + r1(2 * (R + M.BODY_UP) * S) + '"/>';
     out += '<rect class="ts-jaw" x="' + f.x(zj0) + '" y="' + f.y(R + M.JAW_UP) + '" width="' + r1(M.JAW_LEN * S) + '" height="' + r1(M.JAW_UP * S) + '"/>';
     out += '<rect class="ts-jaw" x="' + f.x(zj0) + '" y="' + f.y(-R) + '" width="' + r1(M.JAW_LEN * S) + '" height="' + r1(M.JAW_UP * S) + '"/>';
-    out += '<rect class="ts-sec" fill="' + hatch + '" x="' + f.x(zj0) + '" y="' + f.y(R) + '" width="' + r1(M.JAW_LEN * S) + '" height="' + r1(R * S) + '"/>';
-    out += '<rect class="ts-ext" x="' + f.x(zj0) + '" y="' + f.y(0) + '" width="' + r1(M.JAW_LEN * S) + '" height="' + r1(R * S) + '"/>';
+    // the end of the bar held in the jaws, in the same view as the rest of the work
+    out += '<rect class="' + (viewOf(view) === 'normal' ? 'ts-ext' : 'ts-sec" fill="' + hatch) + '" x="' + f.x(zj0) + '" y="' + f.y(R) + '" width="' + r1(M.JAW_LEN * S) + '" height="' + r1(2 * R * S) + '"/>';
     var cx = f.x(zJ - M.JAW_LEN / 2), cy = r1((f.y(R + M.JAW_UP)) / 2);
-    out += '<g class="ts-spin" transform="translate(' + cx + ' ' + cy + ')"><path class="ts-spin-arc" d="M-14 -6A15 15 0 1 1 -6 14"/><path class="ts-spin-head" d="M-11 17L-4 14L-8 8"/></g>';
+    // placed by the outer group, turned by the inner one: a CSS rotation replaces an SVG transform
+    out += '<g transform="translate(' + cx + ' ' + cy + ')"><g class="ts-spin"><path class="ts-spin-arc" d="M-14 -6A15 15 0 1 1 -6 14"/><path class="ts-spin-head" d="M-11 17L-4 14L-8 8"/></g></g>';
     out += '<text class="ts-lbl" x="' + r1(cx + 22) + '" y="' + cy + '" dy="5">Chuck</text>';
     return out;
   }
@@ -357,37 +398,44 @@
         '<rect class="ts-hatch-bg" width="7" height="7"/><line class="ts-hatch-line" x1="0" y1="0" x2="0" y2="7"/></pattern>' +
       '</defs>';
   }
-  /* opts: { idPrefix, ghost (default true), tint (default true), label } */
+  var VIEW_SAYS = { section: 'cut in half along its centerline', normal: 'seen from outside' };
+  /* opts: { idPrefix, view ('section', the default, or 'normal'), ghost (default
+     true), tint (default true), label }. Both views carry the same elements, so a
+     live picture updates them in place. A tool is drawn over the work, except a
+     tool inside it seen from outside, which the work hides. */
   function scene(st, opts) {
-    var o = opts || {}, id = o.idPrefix || 'ts';
+    var o = opts || {}, id = o.idPrefix || 'ts', view = viewOf(o.view);
     var T = M.target(st.targetId), f = frame(T);
-    var w = workPaths(st.work, f), g = ghostPaths(T, f), c = comparePaths(st, f);
+    var w = workPaths(st.work, f, view), g = ghostPaths(T, f, view), c = comparePaths(st, f, view);
     var t = M.TOOLS[st.tool];
     var hatch = 'url(#' + id + '-hatch)';
     var tx = f.x(st.tz), ty = f.y(st.tr);
-    var label = o.label || ('The work in the lathe, upper half cut away along the centerline, with the ' + t.name.toLowerCase() + ' at X ' + M.fmt(st.tr * 2) + ', Z ' + M.fmt(st.tz) + '.');
-    var s = '<svg class="ts-view" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(label) + '" focusable="false">' +
+    var label = o.label || ('The work in the lathe, ' + VIEW_SAYS[view] + ', with the ' + t.name.toLowerCase() + ' at X ' + M.fmt(st.tr * 2) + ', Z ' + M.fmt(st.tz) + '.');
+    var tool = '<g class="ts-tool" data-ts="tool" transform="translate(' + tx + ' ' + ty + ')">' + toolShape(st.tool, { drill: M.drillSize(st) }) + '</g>';
+    var behind = view === 'normal' && t.side !== 'out';
+    return '<svg class="ts-view is-' + view + '" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(label) + '" focusable="false">' +
       defs(id) +
-      '<g class="ts-machine">' + chuck(T, f, hatch) + '</g>' +
-      '<path class="ts-axis" d="M0 ' + f.y(0) + 'H' + f.W + '"/>' +
+      '<g class="ts-machine">' + chuck(T, f, hatch, view) + '</g>' +
       '<g class="ts-z0"><path d="M' + f.x(0) + ' ' + f.y(T.stock.dia / 2 + 0.70) + 'V' + f.y(-(T.stock.dia / 2 + 0.30)) + '"/>' +
         '<text class="ts-lbl" x="' + r1(f.x(0) + 5) + '" y="' + f.y(T.stock.dia / 2 + 0.70) + '" dy="12">Z0</text></g>' +
+      (behind ? tool : '') +
       '<path class="ts-bore" data-ts="bore" d="' + w.bore + '"/>' +
       '<path class="ts-sec" data-ts="sec" fill="' + hatch + '" d="' + w.sec + '"/>' +
-      '<path class="ts-excess" data-ts="excess" d="' + (o.tint === false ? '' : c.excess) + '"/>' +
-      '<path class="ts-ghost" data-ts="ghost-top" d="' + (o.ghost === false ? '' : g.top) + '"/>' +
-      '<path class="ts-ghost-root" data-ts="ghost-roots" d="' + (o.ghost === false ? '' : g.roots) + '"/>' +
-      '<g class="ts-tool" data-ts="tool" transform="translate(' + tx + ' ' + ty + ')">' + toolShape(st.tool, { drill: M.drillSize(st) }) + '</g>' +
       '<path class="ts-ext" data-ts="ext" d="' + w.ext + '"/>' +
+      '<path class="ts-hidden" data-ts="hidden" d="' + w.hidden + '"/>' +
       '<path class="ts-edge" data-ts="edges" d="' + w.edges + '"/>' +
       '<path class="ts-thread" data-ts="threads" d="' + w.threads + '"/>' +
       '<path class="ts-knurl" data-ts="knurl" d="' + w.knurl + '"/>' +
+      '<path class="ts-axis" d="M0 ' + f.y(0) + 'H' + f.W + '"/>' +
+      '<path class="ts-excess" data-ts="excess" d="' + (o.tint === false ? '' : c.excess) + '"/>' +
       '<path class="ts-excess" data-ts="excess-bottom" d="' + (o.tint === false ? '' : c.excessBottom) + '"/>' +
+      '<path class="ts-ghost" data-ts="ghost-top" d="' + (o.ghost === false ? '' : g.top) + '"/>' +
       '<path class="ts-ghost" data-ts="ghost-bottom" d="' + (o.ghost === false ? '' : g.bottom) + '"/>' +
+      '<path class="ts-ghost-root" data-ts="ghost-roots" d="' + (o.ghost === false ? '' : g.roots) + '"/>' +
       '<path class="ts-under" data-ts="under" d="' + (o.tint === false ? '' : c.under) + '"/>' +
+      (behind ? '' : tool) +
       '<g class="ts-chips" data-ts="chips"></g>' +
       '</svg>';
-    return s;
   }
 
   /* ---- the drawing of the part --------------------------------------------------------
@@ -534,15 +582,15 @@
 
   /* ---- the part once it has been cut off, on its own ----------------------------------*/
   function partFigure(piece, opts) {
-    var o = opts || {}, id = o.idPrefix || 'ts-part';
+    var o = opts || {}, id = o.idPrefix || 'ts-part', view = viewOf(o.view);
     var a = -1, b = -1, R = 0;
     for (var i = 0; i < piece.n; i++) { if (M.has(piece, i)) { if (a < 0) { a = i; } b = i; if (piece.ro[i] > R) { R = piece.ro[i]; } } }
     if (a < 0) { return ''; }
     var zA = piece.zL + a * COL, zB = piece.zL + (b + 1) * COL, m = 0.06;
-    var f = box(zA - m, zB + m, -R - m, R + m, R), w = workPaths(piece, f);
-    return '<svg class="ts-part-svg" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(o.label || 'The part as it came off the lathe, upper half cut away.') + '" focusable="false">' +
+    var f = box(zA - m, zB + m, -R - m, R + m, R), w = workPaths(piece, f, view);
+    return '<svg class="ts-part-svg" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(o.label || 'The part as it came off the lathe, ' + VIEW_SAYS[view] + '.') + '" focusable="false">' +
       defs(id) + '<path class="ts-bore" d="' + w.bore + '"/><path class="ts-sec" fill="url(#' + id + '-hatch)" d="' + w.sec + '"/>' +
-      '<path class="ts-ext" d="' + w.ext + '"/><path class="ts-edge" d="' + w.edges + '"/><path class="ts-thread" d="' + w.threads + '"/>' +
+      '<path class="ts-ext" d="' + w.ext + '"/><path class="ts-hidden" d="' + w.hidden + '"/><path class="ts-edge" d="' + w.edges + '"/><path class="ts-thread" d="' + w.threads + '"/>' +
       '<path class="ts-knurl" d="' + w.knurl + '"/><path class="ts-axis" d="M0 ' + f.y(0) + 'H' + f.W + '"/></svg>';
   }
 
@@ -567,7 +615,8 @@
   }
 
   return {
-    S: S, frame: frame, box: box, partFigure: partFigure, simplify: simplify, workPaths: workPaths, ghostPaths: ghostPaths, comparePaths: comparePaths,
+    S: S, VIEWS: ['section', 'normal'], frame: frame, box: box, partFigure: partFigure, simplify: simplify, flipY: flipY,
+    workPaths: workPaths, ghostPaths: ghostPaths, comparePaths: comparePaths,
     toolShape: toolShape, toolIcon: toolIcon, chuck: chuck, scene: scene, drawing: drawing, describe: describe,
     SCENES: SCENES, sceneState: sceneState, staticScene: staticScene, esc: esc
   };

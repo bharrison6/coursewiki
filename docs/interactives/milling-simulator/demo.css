@@ -137,8 +137,18 @@
    readout above them and the status and Undo below them on the screen a
    link to the simulator lands on (about 30rem of page and bench around
    them; 181 mm of top view and section for every 190 mm across). */
-.ms-views { display: flex; flex-direction: column; gap: .35rem; min-width: 0; container: ms-views / inline-size;
+.ms-views { position: relative; display: flex; flex-direction: column; gap: .35rem; min-width: 0; container: ms-views / inline-size;
   max-width: max(18rem, calc((100svh - 30rem) * 190 / 181)); width: 100%; margin-inline: auto; }
+/* the view switch: two halves of one control, in the top left corner of the views */
+.ms-viewbar { position: absolute; z-index: 1; top: .3rem; left: .35rem; display: flex; flex-wrap: wrap; align-items: center; gap: .1rem .5rem; pointer-events: none; }
+.ms-viewbar-btns, .ms-viewbar .ms-turn { display: flex; pointer-events: auto; }
+.ms-viewbar .ms-turn[hidden] { display: none; }
+[data-interactive="milling-simulator"] .ms-viewbar button { min-height: 2.25rem; padding: .2rem .6rem; font-size: .8rem; border-radius: 0; background: color-mix(in srgb, var(--paper) 90%, transparent); }
+[data-interactive="milling-simulator"] .ms-viewbar button:first-child { border-radius: var(--radius-xs) 0 0 var(--radius-xs); }
+[data-interactive="milling-simulator"] .ms-viewbar button:last-child { border-radius: 0 var(--radius-xs) var(--radius-xs) 0; margin-left: -1px; }
+[data-interactive="milling-simulator"] .ms-viewbar button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--paper); box-shadow: none; }
+.ms-viewbar .ms-view-how { font-family: var(--f-display); font-size: .68rem; color: var(--ink-soft);
+  padding: 0 .25rem; border-radius: 2px; background: color-mix(in srgb, var(--paper) 85%, transparent); }
 @container ms-app (min-width: 36rem) {
   .ms-workbench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(15.5rem, 18rem); gap: .6rem; align-items: stretch; }
   .ms-panel { contain: size; overflow-y: auto; overscroll-behavior: contain; }
@@ -189,7 +199,16 @@
 .ms-probe { right: .45rem; font-variant-numeric: tabular-nums; }
 .ms-canvas { display: block; width: 100%; height: auto; touch-action: none; }
 .ms-top-canvas { aspect-ratio: 190 / 120; cursor: grab; }
-.ms-iso-canvas { aspect-ratio: 1; touch-action: auto; }
+/* the isometric fills the space of the top view and section together */
+.ms-iso-canvas { aspect-ratio: 190 / 181; touch-action: auto; }
+.ms-orientation { position: absolute; left: .25rem; top: 2.7rem; width: 6.25rem; pointer-events: none;
+  border-radius: var(--radius-xs); background: color-mix(in srgb, var(--paper) 90%, transparent); }
+.ms-orientation svg { display: block; width: 100%; height: auto; }
+.ms-orientation path { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.ms-orientation circle { fill: var(--ink); }
+.ms-orientation text { fill: var(--ink); font: 700 12px var(--f-display); }
+.ms-axis-text { display: none; }
+.ms-key-tool { border: 2px solid var(--accent); border-radius: 50%; width: .8rem; height: .8rem; }
 .ms-section-host { touch-action: none; cursor: ns-resize; }
 .ms-section-svg { display: block; width: 100%; height: auto; }
 
@@ -214,7 +233,14 @@
   .ms-legend { gap: 0 .6rem; }
 }
 @container ms-views (max-width: 17.99rem) {
+  /* The phone toolbar wraps into two rows. Put its axis key under the picture
+     so neither the turn buttons nor the cutting geometry can cover it. */
+  .ms-orientation { position: static; width: auto; background: none; }
+  .ms-orientation svg { display: none; }
+  .ms-axis-text { display: block; padding: .15rem .3rem; text-align: center; white-space: nowrap;
+    color: var(--ink); font: 700 .75rem/1.4 var(--f-display); }
   .ms-legend { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: .25rem .45rem .3rem; border-top: 1px solid var(--rule); }
+  .ms-view-iso .ms-lg:last-child { grid-column: 1 / -1; }
 }
 
 /* section drawing */
@@ -327,8 +353,7 @@
 .ms-tray { display: flex; flex-wrap: wrap; gap: .3rem; }
 [data-interactive="milling-simulator"] .ms-tray button { font-size: .82rem; }
 .ms-drawing { min-width: 0; }
-.ms-more { display: grid; gap: .55rem; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); align-items: start; }
-@container ms-app (max-width: 34rem) { .ms-more { grid-template-columns: minmax(0, 1fr); } }
+.ms-more { display: grid; gap: .55rem; grid-template-columns: minmax(0, 36rem); }
 .ms-view-cap {
   display: flex; align-items: center; justify-content: space-between; gap: .4rem;
   min-height: 2.1rem; padding: .15rem .3rem .15rem .55rem;
