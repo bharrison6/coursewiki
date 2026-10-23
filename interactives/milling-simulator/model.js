@@ -1040,6 +1040,6 @@
     Sim: Sim, create: function (o) { return new Sim(o); },
     toolLabel: toolLabel, toolNoun: toolNoun, fmt: fmt, fmtSigned: fmtSigned, parseNum: parseNum, q4: q4,
     segDist: segDist, sdBox: sdBox, sdCircle: sdCircle, sdCapsule: sdCapsule, fitCircle: fitCircle,
-    segRectDist: segRectDist, cutWitnesses: cutWitnesses
+    segRectDist: segRectDist, cutWitnesses: cutWitnesses, primitiveFloor: primFloor
   };
 });
