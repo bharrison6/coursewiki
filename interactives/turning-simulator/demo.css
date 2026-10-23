@@ -25,6 +25,7 @@
 .ts-sec { stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
 .ts-ext { fill: var(--surface-2); stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
 .ts-edge, .ts-thread, .ts-knurl { fill: none; stroke: var(--ink-soft); stroke-width: 1; }
+.ts-hidden { fill: none; stroke: var(--ink-soft); stroke-width: 1.2; stroke-dasharray: 6 4; }
 .ts-knurl { stroke-width: .8; }
 .ts-axis { fill: none; stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 18 4 3 4; }
 .ts-z0 path { fill: none; stroke: var(--accent); stroke-width: 1.2; stroke-dasharray: 5 4; }
@@ -184,12 +185,19 @@
 .ts-view-box { position: relative; min-width: 0; width: 100%; max-width: var(--ts-view-w, none); margin-inline: auto; }
 .ts-view-wrap { min-width: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--paper); overflow: hidden; }
 .ts-view-wrap svg { border-radius: var(--radius-sm); }
-/* over the lower chuck jaw, which never moves, so it covers no work */
-.ts-lab .ts-zoom {
-  position: absolute; left: .3rem; bottom: .3rem;
+/* The view switch and Close up sit in the picture's bottom margin, below the
+   work: the switch over the chuck, which never moves, Close up past the end of
+   the bar. Neither adds height to the bench. */
+.ts-views { position: absolute; left: .3rem; bottom: .3rem; display: flex; }
+.ts-lab .ts-views button, .ts-lab .ts-zoom {
   min-height: 2.25rem; padding: .2rem .55rem; font-size: .72rem;
   background: color-mix(in srgb, var(--paper) 88%, transparent);
 }
+.ts-lab .ts-views button + button { margin-left: -1.5px; }
+.ts-lab .ts-views button:first-child { border-start-end-radius: 0; border-end-end-radius: 0; }
+.ts-lab .ts-views button:last-child { border-start-start-radius: 0; border-end-start-radius: 0; }
+.ts-lab .ts-views button[aria-pressed="true"], .ts-lab .ts-zoom[aria-pressed="true"] { background: var(--accent); }
+.ts-lab .ts-zoom { position: absolute; right: .3rem; bottom: .3rem; }
 
 /* what the last move did, with Undo beside it. It keeps three lines, so the
    bench never changes height under the hands; More opens a longer one. */
@@ -300,7 +308,8 @@
   .ts-rack { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-areas: none; gap: .3rem; }
   .ts-tool-group, .ts-tool-row { display: contents; }
   .ts-tool-group > .ts-k2 { display: none; }
-  .ts-tool-opt { grid-column: 1 / -1; }
+  .ts-tool-opt { grid-area: auto; grid-column: 1 / -1; }
+  .ts-lab .ts-views button, .ts-lab .ts-zoom { min-height: 2rem; padding: .15rem .45rem; font-size: .68rem; }
   .ts-pad { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "left up down right"; }
   /* the height a phone needs back for the threading pass and its pitch */
   .ts-feed > .ts-k { display: none; }
@@ -318,6 +327,8 @@
 .ts-key-under { border-top: 3px dashed var(--cat3); height: 0; }
 .ts-key-edge { border-top: 3px solid var(--cat2); height: 0; }
 .ts-key-ref { width: .8rem; border: 2px solid var(--cat3); border-radius: 50%; }
+.ts-key-hidden { border-top: 2px dashed var(--ink-soft); height: 0; }
+.ts-lab:not(.is-normal) .ts-lg-hidden { display: none; }
 .ts-keys { margin: 0; font-size: .9rem; color: var(--ink-soft); }
 
 /* the tool in use: what it does and what it cannot */
@@ -336,7 +347,9 @@
 .ts-cannot { color: var(--ink-soft); }
 .ts-cannot::before { content: "Cannot: "; font-family: var(--f-display); font-weight: 700; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; }
 
-/* the tool, draggable */
+/* the tool, draggable; the work under or over it never takes the pointer, so a
+   tool hidden inside the work in the normal view can still be dragged */
+.ts-view :is(.ts-machine, .ts-z0, .ts-bore, .ts-sec, .ts-ext, .ts-hidden, .ts-edge, .ts-thread, .ts-knurl, .ts-axis, .ts-excess, .ts-ghost, .ts-ghost-root, .ts-under) { pointer-events: none; }
 .ts-tool { cursor: grab; touch-action: none; }
 .is-dragging .ts-tool { cursor: grabbing; }
 .ts-handle { fill: transparent; stroke: none; }
@@ -407,6 +420,7 @@
 /* ---- presentation mode: bigger targets and numbers ------------------------------*/
 .presenting .ts-lab button { min-height: 3rem; font-size: .9rem; }
 .presenting .ts-panel button, .presenting .ts-rack button { min-height: 2.75rem; }
+.presenting .ts-lab .ts-views button, .presenting .ts-lab .ts-zoom { min-height: 2.25rem; font-size: .78rem; }
 .presenting .ts-dro b { font-size: 1.45rem; }
 .presenting .ts-msg { font-size: 1.1rem; }
 
@@ -421,7 +435,7 @@
   .ts-lab .ts-drawing[hidden] { display: flex !important; }
   .ts-drawing-scroll { overflow: visible; }
   .ts-drawing-scroll svg { min-width: 0; max-width: 100%; }
-  .ts-head, .ts-panel, .ts-rack, .ts-tray, .ts-keys, .ts-toolinfo, .ts-log, .ts-fb-act, .ts-zoom { display: none !important; }
+  .ts-head, .ts-panel, .ts-rack, .ts-tray, .ts-keys, .ts-toolinfo, .ts-log, .ts-fb-act, .ts-zoom, .ts-views { display: none !important; }
   .ts-feedback { display: block; }
   .ts-msg { display: block; min-height: 0; overflow: visible; }
   .ts-lab { border-color: #777; }

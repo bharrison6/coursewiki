@@ -26,7 +26,7 @@ test('every operating control is in the one workbench', () => {
   const controls = ['data-ts-act="spindle"', 'data-ts-act="measure"', 'data-ts-act="undo"', 'data-ts-act="hold"',
     'data-ts-in="z"', 'data-ts-act="feed-z"', 'data-ts-in="x"', 'data-ts-act="feed-x"', 'data-ts-in="stop"', 'data-ts-act="thread"',
     'data-ts-jog="x+"', 'data-ts-jog="x-"', 'data-ts-jog="z+"', 'data-ts-jog="z-"', '<select data-ts-drill>', '<select data-ts-tpi>',
-    'data-ts-viewwrap', 'data-ts-act="zoom"', 'data-ts-msg'];
+    'data-ts-viewwrap', 'data-ts-act="zoom"', 'data-ts-msg', 'data-ts-view="section"', 'data-ts-view="normal"'];
   for (const c of controls) {
     assert.equal(bench.split(c).length - 1, 1, 'one ' + c + ' in the workbench');
     assert.ok(!outside.includes(c), c + ' only in the workbench');
@@ -49,6 +49,18 @@ test('controls name what they do, and the feedback offers more rather than scrol
   // A tool button's label is its short name; the soft hyphen lets Countersink break in a narrow rack.
   assert.equal(U.SHORT.csink, 'Counter­sink');
   for (const t of M.TOOL_ORDER) assert.ok(U.SHORT[t], t + ' has a rack label');
+});
+
+test('one switch shows the whole work in section or from outside, never half of each', () => {
+  assert.match(bench, /<div class="ts-views" role="group" aria-label="View of the work"><button type="button" data-ts-view="section" aria-pressed="true">Section<\/button><button type="button" data-ts-view="normal" aria-pressed="false">Normal<\/button><\/div>/);
+  // The switch sits over the picture, so it adds no height to the bench.
+  assert.match(CSS, /\.ts-views \{ position: absolute;/);
+  assert.match(html, /V changes between the section and the normal view/);
+  assert.match(html, /ts-lg-hidden"><span class="ts-key ts-key-hidden" aria-hidden="true"><\/span>a hole, hidden inside/);
+  const page = fs.readFileSync(PAGE, 'utf8').replace(/\s+/g, ' ');
+  assert.match(page, /<strong>Section<\/strong> cuts the work in half along its centerline/);
+  assert.match(page, /<strong>Normal<\/strong> shows the outside/);
+  assert.ok(!/upper half of the work cut away|Above the centerline<\/strong>/.test(page), 'no half-and-half picture described');
 });
 
 test('nothing in the lab is a scrolling frame; only a wide drawing scrolls sideways', () => {

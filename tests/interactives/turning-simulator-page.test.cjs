@@ -81,19 +81,24 @@ test('the drawn cutting edge is the model\'s edge, and the drawn tool is the too
   }
 });
 
-test('the work is drawn where the model has it, section above and outside below', () => {
+test('the work is drawn where the model has it, whole, in the section view and the normal view', () => {
   const st = M.create('stepped-pin');
   M.play(st, [['sp', true], ['mv', 0, 1.4], ['x', 0], ['x', 1.4], ['mv', 0.1, 0.880], ['z', -1.0]]);
   const f = R.frame(M.target('stepped-pin'));
-  const w = R.workPaths(st.work, f);
-  const top = pairs(w.sec), bot = pairs(w.ext);
+  const w = R.workPaths(st.work, f, 'section'), out = R.workPaths(st.work, f, 'normal');
+  assert.deepEqual(R.workPaths(st.work, f), w, 'the section is the view a picture starts in');
+  const top = pairs(w.sec), bot = pairs(out.ext);
   // Flat stretches are drawn as one segment: find the segment over a Z at a radius.
   const spans = (list, z, y) => list.some((p, k) => k > 0 && p[1] === y && list[k - 1][1] === y && Math.min(p[0], list[k - 1][0]) <= f.x(z) && Math.max(p[0], list[k - 1][0]) >= f.x(z));
-  assert.ok(spans(top, -0.5, f.y(0.44)), 'turned radius in the section');
-  assert.ok(spans(bot, -0.5, f.y(-0.44)), 'the same radius mirrored outside');
-  assert.ok(spans(top, -1.5, f.y(0.5)), 'bar size beyond the pass');
-  // A step is a vertical edge on the outside view.
-  assert.ok(pairs(w.edges).some(([x]) => Math.abs(x - f.x(-1.0)) < 1), 'shoulder edge drawn');
+  assert.ok(spans(top, -0.5, f.y(0.44)) && spans(top, -0.5, f.y(-0.44)), 'turned radius in the section, both sides of the centerline');
+  assert.ok(spans(bot, -0.5, f.y(-0.44)) && spans(bot, -0.5, f.y(0.44)), 'the same radius outside, both sides');
+  assert.ok(spans(top, -1.5, f.y(0.5)) && spans(top, -1.5, f.y(-0.5)), 'bar size beyond the pass');
+  // One view at a time: no section in the normal view, no outside in the section.
+  for (const k of ['ext', 'edges', 'threads', 'knurl', 'hidden']) assert.equal(w[k], '', 'section draws no ' + k);
+  for (const k of ['sec', 'bore']) assert.equal(out[k], '', 'normal draws no ' + k);
+  // A step is a vertical edge on the outside view, across the whole diameter.
+  const edge = [...out.edges.matchAll(/M(-?[\d.]+) (-?[\d.]+)V(-?[\d.]+)/g)].filter((m) => Math.abs(+m[1] - f.x(-1.0)) < 1).flatMap((m) => [+m[2], +m[3]]);
+  assert.ok(Math.min(...edge) <= f.y(0.5) + 0.1 && Math.max(...edge) >= f.y(-0.5) - 0.1, 'shoulder edge drawn top to bottom');
   // Metal outside the drawing is tinted; nothing is marked undersize yet.
   const c = R.comparePaths(st, f);
   assert.ok(c.counts.excess > 0);
@@ -104,6 +109,35 @@ test('the work is drawn where the model has it, section above and outside below'
   assert.equal(R.comparePaths(st, f).counts.under, 0, 'still bigger than the Ø0.500 pin');
   M.play(st, [['x', 1.1], ['z', 0.1], ['x', 0.480], ['z', -0.4]]);
   assert.ok(R.comparePaths(st, f).counts.under > 0, 'Ø0.480 is under the smallest size of the pin');
+});
+
+test('a hole shows open in section and hidden from outside, and so does a tool inside it', () => {
+  const st = M.create('bushing');
+  M.play(st, [['sp', true], ['sp', false], ['tool', 'drill'], ['sp', true], ['z', -1.0], ['z', 0.6], ['sp', false], ['tool', 'bore'], ['sp', true], ['mv', 0.1, 0.55], ['z', -0.3]]);
+  const T = M.target('bushing'), f = R.frame(T);
+  const w = R.workPaths(st.work, f, 'section'), out = R.workPaths(st.work, f, 'normal');
+  const ys = (d) => pairs(d).map(([, y]) => y);
+  const r = st.work.ri[M.colAt(st.work, -0.5)];
+  assert.ok(r > 0.2, 'drilled');
+  assert.ok(ys(w.bore).some((y) => Math.abs(y - f.y(r)) < 0.2) && ys(w.bore).some((y) => Math.abs(y - f.y(-r)) < 0.2), 'the hole is open on both sides in section');
+  assert.ok(ys(out.hidden).some((y) => Math.abs(y - f.y(r)) < 0.2) && ys(out.hidden).some((y) => Math.abs(y - f.y(-r)) < 0.2), 'its wall is a hidden line on both sides outside');
+  // The mirror is exact: every point of the lower half is a point of the upper, reflected.
+  const y0 = f.y(0);
+  assert.equal(R.flipY('M10 20L30 40V50H60Z', f), 'M10 ' + (2 * y0 - 20).toFixed(1).replace(/\.0$/, '') + 'L30 ' + (2 * y0 - 40).toFixed(1).replace(/\.0$/, '') + 'V' + (2 * y0 - 50).toFixed(1).replace(/\.0$/, '') + 'H60Z');
+  // The drawing's bore is in the section's outline, not in the outside view's.
+  const gs = R.ghostPaths(T, f, 'section'), gn = R.ghostPaths(T, f, 'normal');
+  const rb = M.profileAt(T, 0.5).ri;
+  assert.ok(ys(gs.top).some((y) => Math.abs(y - f.y(rb)) < 0.2) && ys(gs.bottom).some((y) => Math.abs(y - f.y(-rb)) < 0.2), 'drawn bore in section');
+  assert.ok(!ys(gn.top + gn.bottom).some((y) => Math.abs(y - f.y(rb)) < 0.2 || Math.abs(y - f.y(-rb)) < 0.2), 'no bore outline outside');
+  // The boring bar is over the work in section; from outside the work covers it.
+  const at = (svg, a, b) => svg.indexOf(a) < svg.indexOf(b);
+  const sv = R.scene(st, { view: 'section' }), nv = R.scene(st, { view: 'normal' });
+  assert.ok(at(sv, 'data-ts="ext"', 'data-ts="tool"'), 'section: tool drawn over the work');
+  assert.ok(at(nv, 'data-ts="tool"', 'data-ts="ext"'), 'normal: the work hides a tool inside it');
+  M.play(st, [['x', 1.4], ['z', 0.6], ['sp', false], ['tool', 'turn']]);
+  assert.ok(at(R.scene(st, { view: 'normal' }), 'data-ts="ext"', 'data-ts="tool"'), 'normal: a tool outside the work is in front of it');
+  assert.match(sv, /aria-label="The work in the lathe, cut in half along its centerline, with the turning tool|aria-label="The work in the lathe, cut in half along its centerline/);
+  assert.match(nv, /aria-label="The work in the lathe, seen from outside/);
 });
 
 test('every view the parts pass through draws without gaps', () => {
@@ -117,10 +151,12 @@ test('every view the parts pass through draws without gaps', () => {
     const st = M.create(T.id);
     for (const op of seqs[T.id]) {
       M.play(st, [op]);
-      const svg = R.scene(st, { idPrefix: 'probe' });
-      assert.ok(!/NaN|undefined|Infinity/.test(svg), T.id + ' after ' + JSON.stringify(op));
+      for (const view of R.VIEWS) {
+        const svg = R.scene(st, { idPrefix: 'probe', view });
+        assert.ok(!/NaN|undefined|Infinity/.test(svg), T.id + ' ' + view + ' after ' + JSON.stringify(op));
+      }
     }
-    if (st.part) assert.ok(R.partFigure(st.part).startsWith('<svg'));
+    for (const view of R.VIEWS) if (st.part) assert.ok(R.partFigure(st.part, { view }).startsWith('<svg'));
     const dr = R.drawing(T);
     assert.ok(!/NaN|undefined|Infinity/.test(dr), T.id + ' drawing');
     assert.match(dr, /<desc id="[^"]+">[^<]{40,}<\/desc>/, 'the drawing says what it shows');

@@ -102,6 +102,10 @@
             '</div>' +
             '<div class="ts-view-box" data-ts-viewbox>' +
               '<div class="ts-view-wrap" data-ts-viewwrap tabindex="0" aria-describedby="' + id + '-keys"></div>' +
+              '<div class="ts-views" role="group" aria-label="View of the work">' +
+                '<button type="button" data-ts-view="section" aria-pressed="true">Section</button>' +
+                '<button type="button" data-ts-view="normal" aria-pressed="false">Normal</button>' +
+              '</div>' +
               '<button type="button" class="ts-zoom" data-ts-act="zoom" aria-pressed="false">Close up</button>' +
             '</div>' +
             '<div class="ts-feedback" data-ts-feedback>' +
@@ -159,13 +163,14 @@
             '<span class="ts-lg"><span class="ts-key ts-key-under" aria-hidden="true"></span>smaller than the drawing allows</span>' +
             '<span class="ts-lg"><span class="ts-key ts-key-edge" aria-hidden="true"></span>cutting edge</span>' +
             '<span class="ts-lg"><span class="ts-key ts-key-ref" aria-hidden="true"></span>the point the readout follows</span>' +
+            '<span class="ts-lg ts-lg-hidden"><span class="ts-key ts-key-hidden" aria-hidden="true"></span>a hole, hidden inside</span>' +
           '</p>' +
           '<div class="ts-tray-btns">' +
             '<button type="button" data-ts-act="ghost" aria-pressed="true">Drawing on the work</button>' +
             '<button type="button" data-ts-act="help" aria-expanded="false" aria-controls="' + id + '-help">Keys</button>' +
           '</div>' +
         '</div>' +
-        '<p class="ts-keys" id="' + id + '-help" hidden><span id="' + id + '-keys">Drag the tool, one slide at a time. Or select the view and use the arrow keys: left and right move along Z, up and down move X. Keys 1, 2 and 3 set the step; S starts or stops the spindle; U or Ctrl+Z undoes; M measures; Escape stops a feed.</span></p>' +
+        '<p class="ts-keys" id="' + id + '-help" hidden><span id="' + id + '-keys">Drag the tool, one slide at a time. Or select the view and use the arrow keys: left and right move along Z, up and down move X. Keys 1, 2 and 3 set the step; S starts or stops the spindle; U or Ctrl+Z undoes; M measures; V changes between the section and the normal view; Escape stops a feed.</span></p>' +
 
         '<div class="ts-toolinfo" data-ts-toolinfo>' +
           '<p class="ts-tool-name" data-ts-toolname></p>' +
@@ -213,7 +218,8 @@
     };
     var parts = {};          // part id -> { st, undo, log, measured, stale }
     var cur = null, st = null, T = null, f = null, view = null, P = {};
-    var opt = { ghost: true, zoom: false, step: 0.010 };
+    var opt = { ghost: true, zoom: false, step: 0.010, view: 'section' };
+    var VIEW_WORDS = { section: 'cut in half along its centerline', normal: 'seen from outside' };
     var busy = null;         // a running feed: { stop: fn }
     var jogGroup = null, drag = null, dirty = false, specCache = {}, returnFocus = null;
 
@@ -240,7 +246,7 @@
       }
     }
     function buildView() {
-      el.wrap.innerHTML = R.scene(st, { idPrefix: id + '-v', ghost: opt.ghost, tint: opt.ghost });
+      el.wrap.innerHTML = R.scene(st, { idPrefix: id + '-v', ghost: opt.ghost, tint: opt.ghost, view: opt.view });
       win = null;
       view = $(el.wrap, 'svg');
       P = {};
@@ -251,17 +257,27 @@
       fit();
     }
     function toolShape() {
+      // From outside, a tool that works inside the part is drawn behind it: a new scene.
+      if (opt.view === 'normal') { buildView(); return; }
       P.tool.innerHTML = R.toolShape(st.tool, { drill: M.drillSize(st) }) + '<rect class="ts-handle" x="-46" y="-46" width="92" height="92"/>';
+    }
+    function setView(v) {
+      if (busy || v === opt.view) { return; }
+      opt.view = v;
+      $$(lab, '[data-ts-view]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ts-view') === v)); });
+      lab.classList.toggle('is-normal', v === 'normal');
+      buildView();
+      renderInspection();
     }
 
     /* ---- drawing --------------------------------------------------------------*/
     function draw(piece) {
       var work = piece || st.work;
-      var w = R.workPaths(work, f);
-      P.sec.setAttribute('d', w.sec); P.ext.setAttribute('d', w.ext); P.bore.setAttribute('d', w.bore);
+      var w = R.workPaths(work, f, opt.view);
+      P.sec.setAttribute('d', w.sec); P.ext.setAttribute('d', w.ext); P.bore.setAttribute('d', w.bore); P.hidden.setAttribute('d', w.hidden);
       P.edges.setAttribute('d', w.edges); P.threads.setAttribute('d', w.threads); P.knurl.setAttribute('d', w.knurl);
       if (opt.ghost) {
-        var c = R.comparePaths({ targetId: st.targetId, work: work }, f);
+        var c = R.comparePaths({ targetId: st.targetId, work: work }, f, opt.view);
         P.excess.setAttribute('d', c.excess); P['excess-bottom'].setAttribute('d', c.excessBottom); P.under.setAttribute('d', c.under);
       }
       P.tool.setAttribute('transform', 'translate(' + f.x(st.tz) + ' ' + f.y(st.tr) + ')');
@@ -271,7 +287,7 @@
       el.droTool.textContent = t.name + (st.tool === 'drill' ? ' ' + M.fmt(M.drillSize(st)) : '') + (t.action === 'thread' ? ', ' + st.tpi + ' per inch' : '');
       el.droSpin.innerHTML = '<span class="ts-dro-word">Spindle </span>' + (st.spindle ? 'running' : 'stopped');
       lab.classList.toggle('is-running', st.spindle);
-      view.setAttribute('aria-label', 'The work in the lathe, upper half cut away. ' + t.name + ' at ' + (t.side === 'axial' ? 'the centerline' : 'X ' + M.fmt(pos.x)) + ', Z ' + M.fmt(pos.z) + '. Spindle ' + (st.spindle ? 'running' : 'stopped') + '.' + (st.part ? ' A part has been cut off.' : ''));
+      view.setAttribute('aria-label', 'The work in the lathe, ' + VIEW_WORDS[opt.view] + '. ' + t.name + ' at ' + (t.side === 'axial' ? 'the centerline' : 'X ' + M.fmt(pos.x)) + ', Z ' + M.fmt(pos.z) + '. Spindle ' + (st.spindle ? 'running' : 'stopped') + '.' + (st.part ? ' A part has been cut off.' : ''));
       applyZoom();
     }
     function later() { if (dirty) { return; } dirty = true; requestAnimationFrame(function () { dirty = false; draw(); }); }
@@ -336,6 +352,8 @@
     var chipBudget = 0;
     function chips(res) {
       if (reduceMotion.matches || !res || !(res.cut > 0)) { return; }
+      // a tool inside the work, seen from outside: its chips are inside too
+      if (opt.view === 'normal' && M.TOOLS[st.tool].side !== 'out') { return; }
       var t = now();
       if (t < chipBudget) { return; }
       chipBudget = t + 70;
@@ -673,7 +691,7 @@
       }
       el.notes.innerHTML = ev && ev.notes.length ? ev.notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') : '';
       el.partfig.hidden = !st.part;
-      el.partfig.innerHTML = st.part ? R.partFigure(st.part, { idPrefix: id + '-part' }) + '<p class="aside">The part as it came off, upper half cut away.</p>' : '';
+      el.partfig.innerHTML = st.part ? R.partFigure(st.part, { idPrefix: id + '-part', view: opt.view }) + '<p class="aside">The part as it came off, ' + VIEW_WORDS[opt.view] + '.</p>' : '';
     }
 
     /* ---- undo and new bar ------------------------------------------------------------------*/
@@ -711,6 +729,7 @@
     function act(b, e) {
       if (b.hasAttribute('data-ts-part')) { choosePart(b.getAttribute('data-ts-part')); return; }
       if (b.hasAttribute('data-ts-tool')) { changeTool(b.getAttribute('data-ts-tool')); return; }
+      if (b.hasAttribute('data-ts-view')) { setView(b.getAttribute('data-ts-view')); return; }
       if (b.hasAttribute('data-ts-jog')) {
         if (e.detail === 0) { var j = b.getAttribute('data-ts-jog'); jog(j[0], j[1] === '+' ? 1 : -1); }
         return;
@@ -786,6 +805,7 @@
       else if (k === 's' || k === 'S') { toggleSpindle(); }
       else if (k === 'u' || k === 'U') { undo(); }
       else if (k === 'm' || k === 'M') { measure(false); }
+      else if (k === 'v' || k === 'V') { setView(opt.view === 'section' ? 'normal' : 'section'); }
       else { handled = false; }
       if (handled) { e.preventDefault(); e.stopPropagation(); }
     });
