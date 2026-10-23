@@ -165,7 +165,7 @@
     q('[data-gr-test]').addEventListener('click', function () {
       if (guess === null) return;
       var t = TRIALS[selected], pair = trial(selected), before = M.solve(pair.before), after = M.solve(pair.after);
-      pause(); state = pair.after; inputTurns = 0; update();
+      pause(); state = pair.after; inputTurns = 0; update(); announce();
       q('[data-gr-feedback]').textContent = (guess === t.answer ? 'Prediction confirmed. ' : 'Here is what changes: ') + t.reason;
       q('[data-gr-comparison]').hidden = false;
       q('[data-gr-comparison]').textContent = 'Before: ' + M.format(Math.abs(before.output.rpm)) + ' rpm ' + M.direction(before.output.rpm) + ', ' + M.format(before.outputTorque) + ' N·m. After: ' + M.format(Math.abs(after.output.rpm)) + ' rpm ' + M.direction(after.output.rpm) + ', ' + M.format(after.outputTorque) + ' N·m (ideal).';
