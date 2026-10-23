@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>G-code and Toolpaths - CourseWiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<script>
+(function(){try{var m=JSON.parse(localStorage.getItem('det:theme'));
+if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m);}}catch(e){}})();
+</script>
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" href="../favicon.svg?v=53890a4631" type="image/svg+xml">
+<link rel="stylesheet" href="../theme/msu-theme.css?v=53890a4631">
+<link rel="stylesheet" href="../theme/app.css?v=53890a4631">
+<link rel="stylesheet" href="../interactives/milling-simulator/demo.css?v=53890a4631">
+<link rel="stylesheet" href="../interactives/gcode-playground/demo.css?v=53890a4631">
+</head>
+<body class="app skin-app" data-page="gcode-and-toolpaths" data-base="../">
+<a class="skip" href="#main">Skip to content</a>
+<header class="appbar">
+  <button class="iconbtn nav-toggle" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <a class="brand" href="../index.html">
+    <img class="brandmark light-only" alt="Murray State University School of Engineering" src="../assets/soe-logo-4c.png">
+<img class="brandmark dark-only" alt="" aria-hidden="true" src="../assets/soe-logo-4c-reversed.png">
+    <span class="sub" data-brandlabel>CourseWiki</span>
+  </a>
+  <div class="search">
+    <input type="search" placeholder="Search topics" aria-label="Search topics" autocomplete="off" spellcheck="false">
+    <span class="hint">/</span>
+    <div class="results" role="listbox"></div>
+  </div>
+  <button class="iconbtn" type="button" data-act="theme" aria-label="Theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 010 16" fill="currentColor" stroke="none"/></svg></button>
+</header>
+
+<div class="shell has-toc">
+<aside class="sidebar" id="sidebar">
+  <div class="nav-topics">
+  <h2>Topics</h2>
+  <details class="navgroup" data-nav="c-safety">
+    <summary><span class="chev"></span><a class="navself" href="../safety/index.html">Safety</a></summary>
+    <details class="navgroup" data-nav="g-safety-universal-rules" open>
+      <summary><span class="chev"></span><a class="navself" href="../safety/index.html#g-safety-universal-rules">Universal Rules</a></summary>
+      <ul class="navlist">
+        <li><a href="../safety/chemicals-and-sds.html">Chemicals and Safety Data Sheets</a></li>
+        <li><a href="../safety/electrical-safety.html">Electrical Safety</a></li>
+        <li><a href="../safety/equipment-operating-procedure.html">Equipment Operating Procedure</a></li>
+        <li><a href="../safety/fire-safety.html">Fire Safety</a></li>
+        <li><a href="../safety/conduct-and-emergency.html">Lab Conduct and Emergencies</a></li>
+        <li><a href="../safety/lifting-and-carrying.html">Lifting and Carrying</a></li>
+        <li><a href="../safety/machine-hazards.html">Machine Hazards and Housekeeping</a></li>
+        <li><a href="../safety/ppe.html">Personal Protective Equipment</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-safety-equipment" open>
+      <summary><span class="chev"></span><a class="navself" href="../safety/index.html#g-safety-equipment">Equipment</a></summary>
+      <ul class="navlist">
+        <li><a href="../safety/equipment-categories.html">Equipment Categories and Supervision</a></li>
+        <li><a href="../safety/metal-chips.html">Metal Chips and Swarf</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-engineering">
+    <summary><span class="chev"></span><a class="navself" href="../engineering/index.html">Engineering Fundamentals</a></summary>
+    <details class="navgroup" data-nav="g-engineering-units-and-measurement" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-units-and-measurement">Units and Measurement</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/dimensional-analysis.html">Dimensional Analysis</a></li>
+        <li><a href="../engineering/measurement-language.html">Measurement Language</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-motion-and-rotation" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-motion-and-rotation">Motion and Rotation</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/acceleration-and-squared-time.html">Acceleration and Squared Time</a></li>
+        <li><a href="../engineering/angular-motion.html">Angular Motion</a></li>
+        <li><a href="../engineering/motion-quantities.html">Motion Quantities</a></li>
+        <li><a href="../engineering/rotation-and-linear-speed.html">Rotation and Linear Speed</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-force-and-power" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-force-and-power">Force and Power</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/geometry-mass-and-force.html">Geometry, Mass, and Force</a></li>
+        <li><a href="../engineering/power-and-efficiency.html">Power and Efficiency</a></li>
+        <li><a href="../engineering/torque.html">Torque</a></li>
+        <li><a href="../engineering/work-and-energy.html">Work and Energy</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-electrical-quantities" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-electrical-quantities">Electrical Quantities</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/current-voltage-and-resistance.html">Current, Voltage, and Resistance</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-machining" open>
+    <summary><span class="chev"></span><a class="navself" href="../machining/index.html">Machining</a></summary>
+    <details class="navgroup" data-nav="g-machining-milling" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-milling">Milling</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/climb-and-conventional-milling.html">Climb and Conventional Milling</a></li>
+        <li><a href="../machining/feeds-and-speeds.html">Feeds and Speeds</a></li>
+        <li><a aria-current="page" href="../machining/gcode-and-toolpaths.html">G-code and Toolpaths</a></li>
+        <li><a href="../machining/milling-operations.html">Milling Operations</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-machining-turning" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-turning">Turning</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/lathe-operations.html">Lathe Operations</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-machining-measurement-and-fit" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-measurement-and-fit">Measurement and Fit</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/tolerances-and-fits.html">Tolerances and Fits</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-lean">
+    <summary><span class="chev"></span><a class="navself" href="../lean/index.html">Lean and Quality</a></summary>
+    <details class="navgroup" data-nav="g-lean-lean-and-organization" open>
+      <summary><span class="chev"></span><a class="navself" href="../lean/index.html#g-lean-lean-and-organization">Lean and Organization</a></summary>
+      <ul class="navlist">
+        <li><a href="../lean/5s-workplace-organization.html">5S Workplace Organization</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-artificial-intelligence">
+    <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html">Artificial Intelligence</a></summary>
+    <details class="navgroup" data-nav="g-artificial-intelligence-start-here" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-start-here">Start here</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/understanding-artificial-intelligence.html">Understanding Artificial Intelligence</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-artificial-intelligence-what-ai-is" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-what-ai-is">What AI is</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/how-language-models-work.html">How a Language Model Works</a></li>
+        <li><a href="../artificial-intelligence/types-of-ai.html">Types of AI</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-artificial-intelligence-where-ai-is-going" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-where-ai-is-going">Where AI is going</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/ai-winters.html">AI Winters: Boom and Bust</a></li>
+        <li><a href="../artificial-intelligence/ai-progress.html">The Pace of AI Progress</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-artificial-intelligence-how-to-use-ai" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-how-to-use-ai">How to use AI</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/ai-tool-guide.html">AI Tool Guide</a></li>
+        <li><a href="../artificial-intelligence/prompting-strategies.html">Prompting Strategies</a></li>
+      </ul>
+    </details>
+  </details>
+  </div>
+  <div class="navsplit"></div>
+  <div class="nav-tracks">
+  <h2>Tracks</h2>
+  <p class="navnote">Tracks built from the topics above. A course carries the topic tracks it needs; a programme is its courses, so it follows them.</p>
+  <details class="navgroup" data-nav="t-det" open>
+    <summary><span class="chev"></span><a class="navself" data-track="det" href="../presentations.html#pl-det">DET</a><span class="count">28</span></summary>
+    <details class="navgroup" data-nav="t-det-130">
+      <summary><span class="chev"></span><a class="navself" data-track="det-130" href="../presentations.html#pl-det-130">DET 130</a><span class="count">11</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="t-det-330">
+      <summary><span class="chev"></span><a class="navself" data-track="det-330" href="../presentations.html#pl-det-330">DET 330</a><span class="count">17</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+        <li><a data-track="machining-fundamentals" href="../presentations.html#pl-machining-fundamentals">Machining Fundamentals<span class="count">6</span></a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="t-det-403">
+      <summary><span class="chev"></span><a class="navself" data-track="det-403" href="../presentations.html#pl-det-403">DET 403</a><span class="count">22</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+        <li><a data-track="units-motion-and-force" href="../presentations.html#pl-units-motion-and-force">Units, Motion, and Force<span class="count">5</span></a></li>
+        <li><a data-track="rotation-and-torque" href="../presentations.html#pl-rotation-and-torque">Rotation and Torque<span class="count">3</span></a></li>
+        <li><a data-track="work-power-and-efficiency" href="../presentations.html#pl-work-power-and-efficiency">Work, Power, and Efficiency<span class="count">2</span></a></li>
+        <li><a data-track="electrical-units" href="../presentations.html#pl-electrical-units">Electrical Units<span class="count">1</span></a></li>
+      </ul>
+    </details>
+  </details>
+  <ul class="navlist tracknav">
+    <li><a data-track="5s-workplace-organization" href="../presentations.html#pl-5s-workplace-organization">5S Workplace Organization<span class="count">1</span></a></li>
+    <li><a data-track="ai-from-zero-to-takeoff" href="../presentations.html#pl-ai-from-zero-to-takeoff">AI: From Zero to Takeoff<span class="count">7</span></a></li>
+    <li><a data-track="electrical-units" href="../presentations.html#pl-electrical-units">Electrical Units<span class="count">1</span></a></li>
+    <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+    <li><a data-track="machining-fundamentals" href="../presentations.html#pl-machining-fundamentals">Machining Fundamentals<span class="count">6</span></a></li>
+    <li><a data-track="rotation-and-torque" href="../presentations.html#pl-rotation-and-torque">Rotation and Torque<span class="count">3</span></a></li>
+    <li><a data-track="units-motion-and-force" href="../presentations.html#pl-units-motion-and-force">Units, Motion, and Force<span class="count">5</span></a></li>
+    <li><a data-track="work-power-and-efficiency" href="../presentations.html#pl-work-power-and-efficiency">Work, Power, and Efficiency<span class="count">2</span></a></li>
+  </ul>
+  </div>
+  <div class="navsplit"></div>
+  <div class="nav-practice"><h2>Practice</h2>
+    <ul class="navlist"><li><a href="../practice.html">Practice catalog</a></li></ul>
+  </div>
+</aside>
+<div class="backdrop"></div>
+
+<main id="main"><div class="article">
+  <div class="crumb"><a href="../index.html">CourseWiki</a><span class="sep">/</span><a href="index.html">Machining</a><span class="sep">/</span><span>Milling</span></div>
+  <h1>G-code and Toolpaths</h1>
+  <p class="lede">How a CNC mill reads a program line by line: rapid and feed moves, absolute and incremental coordinates, units, arcs and a drilling cycle. Build a program from blocks and watch it cut a simulated block.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="a-cnc-program-is-a-list-of-lines-and-each-line-tells-the-machine-one-thing-to-do" data-card="a-cnc-program-is-a-list-of-lines-and-each-line-tells-the-machine-one-thing-to-do">
+    <summary>A CNC program is a list of lines, and each line tells the machine one thing to do<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A CNC program is a list of lines, and each line tells the machine one thing to do</h2>
+  <p class="lede">A CNC mill moves its tool by reading a program from the top down, one line at a
+  time. The language most mills read is called <strong>G-code</strong>. Each line holds a few
+  <em>words</em>, and together they say where the tool goes next, how fast, and what the spindle and
+  tool are doing.</p>
+  <dl class="dims">
+    <div><dt>Word</dt><dd>A letter and a number, such as <code>X20</code>, <code>G1</code> or
+    <code>F300</code>. The letter says what the number means: <code>X</code>, <code>Y</code> and
+    <code>Z</code> are positions, <code>F</code> is the feed rate, <code>S</code> the spindle speed,
+    <code>T</code> a tool number. <code>G</code> and <code>M</code> words are codes that choose what
+    kind of move or machine action the line is.</dd></div>
+    <div><dt>Block</dt><dd>One line of the program. Machinists often call a line a <em>block</em>; in
+    the simulator below, each block you snap into place is one line of G-code, with the same
+    number.</dd></div>
+    <div><dt>Work zero</dt><dd>The point the program&rsquo;s numbers count from. Here, as in
+    <a class="xref-page" href="milling-operations.html">Milling Operations</a>, X&nbsp;0, Y&nbsp;0 is the front left corner of the block and Z&nbsp;0 is its
+    finished top face. The uncut stock starts at Z&nbsp;+1. Positions refer to the tip of the tool,
+    on its centre line: Z&nbsp;&minus;3 is 3&nbsp;mm below work zero and 4&nbsp;mm below that raw top.
+    A pointed drill reaches its programmed Z at its tip; the full-diameter hole is shallower.</dd></div>
+    <div><dt>Modal</dt><dd>Most codes stay in force until another code from their group replaces
+    them. After a <code>G1</code>, a line with only <code>X80</code> is still a <code>G1</code> move; a
+    feed rate set once with <code>F</code> is used by every feed move after it. A word a line leaves
+    out keeps the value it had.</dd></div>
+  </dl>
+  <!-- printed figure gcode-slot: generated by render.js staticFigure('slot'); keep in step with the renderer -->
+  <figure class="gp-figure"><div class="gp-figure-program"><p class="gp-figure-title">A first cut: one slot</p><ol class="gp-listing"><li><code>(A first cut: a closed-ended slot)</code></li><li><code>G21 G90 G17</code></li><li><code>T1 M6</code></li><li><code>S2500 M3</code></li><li><code>G0 X10 Y30</code></li><li><code>G0 Z2</code></li><li><code>G1 Z-3 F100</code></li><li><code>G1 X90 F300</code></li><li><code>G0 Z20</code></li><li><code>M5</code></li><li><code>M30</code></li></ol></div><div class="gp-figure-view"><svg class="gp-svg" viewBox="-46 -81 162 173" role="img" aria-label="The block after the program “A first cut: one slot” has run: the top view and a front section, with every rapid and feed move drawn." focusable="false"><defs><pattern id="gp-static-slot-hatch" patternUnits="userSpaceOnUse" width="2.4" height="2.4" patternTransform="rotate(45)"><path class="gp-hatch-line" d="M0 0V2.4"/></pattern><clipPath id="gp-static-slot-ctop"><rect x="-46" y="-81" width="162" height="100"/></clipPath><clipPath id="gp-static-slot-cfront"><rect x="-46" y="26" width="162" height="49"/></clipPath><clipPath id="gp-static-slot-cstock"><rect x="0" y="-60" width="100" height="60"/></clipPath></defs><g clip-path="url(#gp-static-slot-ctop)"><rect class="gp-bg" x="-46" y="-81" width="162" height="100"/><rect class="gp-jaw" x="-30" y="0" width="146" height="14"/><rect class="gp-jaw" x="-30" y="-74" width="146" height="14"/><rect class="gp-stock" x="0" y="-60" width="100" height="60"/><g data-layer="cuts" clip-path="url(#gp-static-slot-cstock)"><circle class="gp-cut gp-d2" cx="10" cy="-30" r="5"/><path class="gp-cut gp-d2 gp-sweep" d="M10 -30L90 -30" stroke-width="10"/></g><rect class="gp-edge" x="0" y="-60" width="100" height="60"/><path class="gp-tick" d="M0 0V2.2"/><text class="gp-t gp-t-tick" x="0" y="6.6" text-anchor="middle">0</text><path class="gp-tick" d="M50 0V2.2"/><text class="gp-t gp-t-tick" x="50" y="6.6" text-anchor="middle">50</text><path class="gp-tick" d="M100 0V2.2"/><text class="gp-t gp-t-tick" x="100" y="6.6" text-anchor="middle">100</text><path class="gp-tick" d="M0 0H-2.2"/><text class="gp-t gp-t-tick" x="-3.2" y="1.4" text-anchor="end">0</text><path class="gp-tick" d="M0 -30H-2.2"/><text class="gp-t gp-t-tick" x="-3.2" y="-28.6" text-anchor="end">30</text><path class="gp-tick" d="M0 -60H-2.2"/><text class="gp-t gp-t-tick" x="-3.2" y="-58.6" text-anchor="end">60</text><text class="gp-t gp-t-axis" x="108" y="6.6" text-anchor="middle">X</text><text class="gp-t gp-t-axis" x="-3.2" y="-65" text-anchor="end">Y</text><circle class="gp-origin" cx="0" cy="0" r="1.3"/><text class="gp-t gp-t-note" x="-2" y="-3" text-anchor="end">X0 Y0</text><rect class="gp-home" x="-41.6" y="-31.6" width="3.2" height="3.2"/><text class="gp-t gp-t-note" x="-40" y="-23" text-anchor="middle">start</text><text class="gp-t gp-t-view" x="-44.5" y="-76.4" text-anchor="start">TOP VIEW</text><text class="gp-t gp-t-note" x="50" y="-68.4" text-anchor="middle">back vise jaw</text><text class="gp-t gp-t-note" x="50" y="12.4" text-anchor="middle">front vise jaw</text><g data-layer="plan"><path class="gp-plan gp-plan-feed" d="M10 -30L10 -30M10 -30L90 -30"/><path class="gp-plan gp-plan-rapid" d="M-40 -30L10 -30M10 -30L10 -30M90 -30L90 -30"/></g><g data-layer="hl"></g><g data-layer="trail"><path class="gp-trail gp-trail-feed" d="M10 -30L10 -30M10 -30L90 -30"/><path class="gp-trail gp-trail-rapid" d="M-40 -30L10 -30M10 -30L10 -30M90 -30L90 -30"/></g><g data-layer="hit"></g><g data-layer="tool"><g class="gp-tool"><circle class="gp-tool-disc" cx="90" cy="-30" r="5"/><path class="gp-tool-cross" d="M83.5 -30H96.5M90 -36.5V-23.5"/></g></g><g data-layer="contact"></g></g><g clip-path="url(#gp-static-slot-cfront)"><rect class="gp-bg" x="-46" y="26" width="162" height="49"/><rect class="gp-parallel" x="-46" y="71" width="162" height="4"/><path class="gp-jawtop" d="M-46 59H116"/><g data-layer="section"><path class="gp-metal" d="M0 71L0 50L5 50L5 54L95.25 54L95.25 50L100 50L100 71Z"/><path class="gp-metal-hatch" d="M0 71L0 50L5 50L5 54L95.25 54L95.25 50L100 50L100 71Z" fill="url(#gp-static-slot-hatch)"/><path class="gp-metal-edge" d="M0 71L0 50L5 50L5 54L95.25 54L95.25 50L100 50L100 71Z"/></g><path class="gp-zero" d="M-46 51H116"/><path class="gp-tick" d="M-46 31h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="32.4" text-anchor="start">Z +20</text><path class="gp-tick" d="M-46 41h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="42.4" text-anchor="start">Z +10</text><path class="gp-tick" d="M-46 51h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="52.4" text-anchor="start">Z 0</text><path class="gp-tick" d="M-46 61h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="62.4" text-anchor="start">Z −10</text><path class="gp-tick" d="M-46 71h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="72.4" text-anchor="start">Z −20</text><text class="gp-t gp-t-note" x="101.5" y="63.4" text-anchor="start">jaw top</text><g data-layer="fplan"><path class="gp-plan gp-plan-feed" d="M10 49L10 54M10 54L90 54"/><path class="gp-plan gp-plan-rapid" d="M-40 31L10 31M10 31L10 49M90 54L90 31"/></g><g data-layer="fhl"></g><g data-layer="ftrail"><path class="gp-trail gp-trail-feed" d="M10 49L10 54M10 54L90 54"/><path class="gp-trail gp-trail-rapid" d="M-40 31L10 31M10 31L10 49M90 54L90 31"/></g><g data-layer="ftool"><g class="gp-tool"><rect class="gp-tool-cut" x="85" y="9" width="10" height="22"/><path class="gp-tool-flute" d="M85 29L95 25"/><path class="gp-tool-flute" d="M85 22L95 18"/><path class="gp-tool-flute" d="M85 15L95 11"/><rect class="gp-tool-body" x="85" y="-9" width="10" height="18"/><path class="gp-tool-axis" d="M90 33V-9"/></g></g><g data-layer="fcontact"></g></g><text class="gp-t gp-t-view" x="-44.5" y="24.4">FRONT VIEW, CUT THROUGH THE BLOCK AT Y <tspan data-layer="secy">30.0</tspan></text><text class="gp-t gp-t-note" x="-44.5" y="82.4" text-anchor="start">Cut depth</text><rect class="gp-cut gp-d0 gp-swatch" x="-27.5" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="-22.1" y="82.4" text-anchor="start">Z 0</text><rect class="gp-cut gp-d2 gp-swatch" x="-15" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="-9.6" y="82.4" text-anchor="start">−5</text><rect class="gp-cut gp-d4 gp-swatch" x="-2.5" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="2.9" y="82.4" text-anchor="start">−10</text><rect class="gp-cut gp-d6 gp-swatch" x="10" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="15.4" y="82.4" text-anchor="start">−15</text><rect class="gp-cut gp-d8 gp-swatch" x="22.5" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="27.9" y="82.4" text-anchor="start">−20</text><rect class="gp-cut gp-dthru gp-swatch" x="35" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="40.4" y="82.4" text-anchor="start">through</text><path class="gp-trail gp-trail-feed" d="M-44.5 87.3h9"/><text class="gp-t gp-t-note" x="-33.5" y="88.5" text-anchor="start">feed (G1, G2, G3): cuts</text><path class="gp-trail gp-trail-rapid" d="M10.5 87.3h9"/><text class="gp-t gp-t-note" x="21.5" y="88.5" text-anchor="start">rapid (G0): through the air</text></svg></div><figcaption><strong>A first cut: one slot.</strong> Mill a closed-ended slot 10 mm wide to Z−3 with a Ø10 end mill. The raw top is Z+1, so the cut is 4 mm deep. Lift clear and stop. The program on the left, numbered line by line, and the block after it has run. Solid lines are feed moves, dashed lines are rapids; the darker the cut, the deeper it goes.</figcaption></figure>
+  <p>Read the program above from the top. Line&nbsp;2 sets millimetres, absolute positions and the XY
+  plane. Line&nbsp;3 puts tool&nbsp;1, a &Oslash;10 end mill, in the spindle, and line&nbsp;4 starts the
+  spindle at 2500&nbsp;rpm. Lines&nbsp;5 and 6 move the tool through the air to just above the start of
+  the slot. Line&nbsp;7 feeds it to Z&nbsp;&minus;3, cutting 4&nbsp;mm below the raw top at
+  Z&nbsp;+1. Line&nbsp;8 feeds it along the closed-ended slot, and
+  line&nbsp;9 lifts it clear. Line&nbsp;10 stops the spindle and line&nbsp;11 ends the program.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="rapid-moves-put-the-tool-in-place-through-the-air-feed-moves-cut" data-card="rapid-moves-put-the-tool-in-place-through-the-air-feed-moves-cut">
+    <summary>Rapid moves put the tool in place through the air; feed moves cut<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Rapid moves put the tool in place through the air; feed moves cut</h2>
+  <ul>
+    <li><strong><code>G0</code> is a rapid move.</strong> The machine moves as fast as it can. It is
+    for getting the tool to where a cut starts, through the air, never for cutting.</li>
+    <li><strong><code>G1</code> is a feed move.</strong> The tool moves in a straight line at the feed
+    rate set by <code>F</code>, here in millimetres per minute. This is the move that cuts.</li>
+    <li><strong>The spindle has to be turning first.</strong> <code>S</code> sets its speed in
+    revolutions per minute, <code>M3</code> starts it turning clockwise seen from above, and
+    <code>M5</code> stops it. <code>T1 M6</code> changes to tool&nbsp;1.</li>
+    <li><strong>A move goes in one straight line.</strong> <code>G1 X80 Y40 Z-2</code> moves all three
+    axes together and they all arrive at once. An axis left out of the line stays where it is:
+    <code>G1 X80</code> moves along X only.</li>
+  </ul>
+  <p>A rapid into metal is a crash: the tool arrives at full traverse speed with nothing to say it
+  should be cutting. The simulator stops a rapid at the point where it would touch the block and
+  says so. It does the same if a feed move reaches the metal with the spindle stopped.</p>
+  <p class="aside">This simulator moves a rapid in one straight line, the way the
+  <a href="https://linuxcnc.org/docs/stable/html/gcode/g-code.html">LinuxCNC G-code reference</a>
+  describes <code>G0</code>. Controls differ in how they move during a rapid, so check how the one you
+  use moves before you count on the path a rapid takes.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="g90-and-g91-g20-and-g21-two-modes-that-change-what-every-number-means" data-card="g90-and-g91-g20-and-g21-two-modes-that-change-what-every-number-means">
+    <summary>G90 and G91, G20 and G21: two modes that change what every number means<span class="chev"></span></summary>
+    <div class="body">
+      <h2>G90 and G91, G20 and G21: two modes that change what every number means</h2>
+  <dl class="dims">
+    <div><dt>G90, absolute</dt><dd>A number is a <strong>position</strong>, measured from work zero.
+    With the tool at X&nbsp;10, <code>G1 X30</code> moves it to X&nbsp;30.</dd></div>
+    <div><dt>G91, incremental</dt><dd>A number is a <strong>distance</strong> from where the tool is
+    now. With the tool at X&nbsp;10, the same <code>G1 X30</code> moves it 30&nbsp;mm, to X&nbsp;40.</dd></div>
+    <div><dt>G21, millimetres</dt><dd><code>X30</code> means 30&nbsp;mm and <code>F300</code> means
+    300&nbsp;mm per minute.</dd></div>
+    <div><dt>G20, inches</dt><dd>The same <code>X30</code> means 30&nbsp;inches, which is 762&nbsp;mm,
+    and the feed rate is in inches per minute. A millimetre program read in inches asks for moves 25.4
+    times as long.</dd></div>
+  </dl>
+  <p>Because these modes change the meaning of every line after them, a program sets both near its
+  start, before the first move. The simulator insists on it: a move before <code>G20</code> or
+  <code>G21</code> and <code>G90</code> or <code>G91</code> have been set stops the program, and so
+  does a change of units after the machine has started moving.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="g2-turns-clockwise-and-g3-counterclockwise-seen-from-above" data-card="g2-turns-clockwise-and-g3-counterclockwise-seen-from-above">
+    <summary>G2 turns clockwise and G3 counterclockwise, seen from above<span class="chev"></span></summary>
+    <div class="body">
+      <h2>G2 turns clockwise and G3 counterclockwise, seen from above</h2>
+  <p>An arc move cuts along part of a circle in the XY plane (<code>G17</code>) at the feed rate. Its
+  direction is the way it turns as seen looking down on the work from above: <code>G2</code>
+  clockwise, <code>G3</code> counterclockwise. The line gives the arc&rsquo;s <strong>end
+  point</strong> with X and Y, and its <strong>centre</strong> in one of two ways.</p>
+  <ul>
+    <li><strong>I and J</strong> say where the centre is, measured in X and Y from the point where the
+    arc <em>starts</em>. That is the usual mode, <code>G91.1</code>, and it holds even while
+    <code>G90</code> makes every X and Y a position. <code>G90.1</code> makes I and J a position
+    too.</li>
+    <li><strong>R</strong> gives the radius instead, and the control works out the centre. A positive
+    R is the arc of less than half a turn, a negative R the longer way round. An R arc cannot be a
+    full circle, because a circle through one point has no single centre; a full circle uses I and J
+    with its end point the same as its start.</li>
+  </ul>
+  <p><strong>Worked example.</strong> The tool is at X&nbsp;72, Y&nbsp;15, moving right along the
+  bottom of an outline. <code>G3 X80 Y23 I0 J8</code> puts the centre 0 in X and 8 in Y from the start,
+  at X&nbsp;72, Y&nbsp;23. Turning counterclockwise about it, the tool rounds a corner of radius 8 and
+  ends heading up the right-hand side at X&nbsp;80, Y&nbsp;23. The end point has to lie on the circle:
+  change <code>J8</code> to <code>J6</code> and the end is 2&nbsp;mm from where the circle goes, so
+  the simulator stops at that line instead of guessing.</p>
+  <!-- printed figure gcode-outline: generated by render.js staticFigure('outline'); keep in step with the renderer -->
+  <figure class="gp-figure"><div class="gp-figure-program"><p class="gp-figure-title">Arcs: a rounded outline</p><ol class="gp-listing"><li><code>(Groove around a rounded rectangle)</code></li><li><code>G21 G90 G17</code></li><li><code>T2 M6</code></li><li><code>S3000 M3</code></li><li><code>G0 X28 Y15</code></li><li><code>G0 Z2</code></li><li><code>G1 Z-1.5 F80</code></li><li><code>G1 X72 F250</code></li><li><code>G3 X80 Y23 I0 J8</code></li><li><code>G1 Y37</code></li><li><code>G3 X72 Y45 I-8 J0</code></li><li><code>G1 X28</code></li><li><code>G3 X20 Y37 I0 J-8</code></li><li><code>G1 Y23</code></li><li><code>G3 X28 Y15 I8 J0</code></li><li><code>G0 Z20</code></li><li><code>M5</code></li><li><code>M30</code></li></ol></div><div class="gp-figure-view"><svg class="gp-svg" viewBox="-46 -81 162 173" role="img" aria-label="The block after the program “Arcs: a rounded outline” has run: the top view and a front section, with every rapid and feed move drawn." focusable="false"><defs><pattern id="gp-static-outline-hatch" patternUnits="userSpaceOnUse" width="2.4" height="2.4" patternTransform="rotate(45)"><path class="gp-hatch-line" d="M0 0V2.4"/></pattern><clipPath id="gp-static-outline-ctop"><rect x="-46" y="-81" width="162" height="100"/></clipPath><clipPath id="gp-static-outline-cfront"><rect x="-46" y="26" width="162" height="49"/></clipPath><clipPath id="gp-static-outline-cstock"><rect x="0" y="-60" width="100" height="60"/></clipPath></defs><g clip-path="url(#gp-static-outline-ctop)"><rect class="gp-bg" x="-46" y="-81" width="162" height="100"/><rect class="gp-jaw" x="-30" y="0" width="146" height="14"/><rect class="gp-jaw" x="-30" y="-74" width="146" height="14"/><rect class="gp-stock" x="0" y="-60" width="100" height="60"/><g data-layer="cuts" clip-path="url(#gp-static-outline-cstock)"><circle class="gp-cut gp-d1" cx="28" cy="-15" r="3"/><path class="gp-cut gp-d1 gp-sweep" d="M28 -15L72 -15" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M72 -15L72.78 -15.04" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M72.78 -15.04L73.56 -15.15" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M73.56 -15.15L74.32 -15.34" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M74.32 -15.34L75.06 -15.61" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M75.06 -15.61L75.77 -15.94" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M75.77 -15.94L76.44 -16.35" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M76.44 -16.35L77.08 -16.82" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M77.08 -16.82L77.66 -17.34" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M77.66 -17.34L78.18 -17.92" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M78.18 -17.92L78.65 -18.56" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M78.65 -18.56L79.06 -19.23" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.06 -19.23L79.39 -19.94" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.39 -19.94L79.66 -20.68" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.66 -20.68L79.85 -21.44" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.85 -21.44L79.96 -22.22" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.96 -22.22L80 -23" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M80 -23L80 -37" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M80 -37L79.96 -37.78" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.96 -37.78L79.85 -38.56" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.85 -38.56L79.66 -39.32" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.66 -39.32L79.39 -40.06" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.39 -40.06L79.06 -40.77" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M79.06 -40.77L78.65 -41.44" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M78.65 -41.44L78.18 -42.08" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M78.18 -42.08L77.66 -42.66" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M77.66 -42.66L77.08 -43.18" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M77.08 -43.18L76.44 -43.65" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M76.44 -43.65L75.77 -44.06" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M75.77 -44.06L75.06 -44.39" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M75.06 -44.39L74.32 -44.66" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M74.32 -44.66L73.56 -44.85" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M73.56 -44.85L72.78 -44.96" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M72.78 -44.96L72 -45" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M72 -45L28 -45" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M28 -45L27.22 -44.96" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M27.22 -44.96L26.44 -44.85" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M26.44 -44.85L25.68 -44.66" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M25.68 -44.66L24.94 -44.39" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M24.94 -44.39L24.23 -44.06" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M24.23 -44.06L23.56 -43.65" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M23.56 -43.65L22.92 -43.18" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M22.92 -43.18L22.34 -42.66" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M22.34 -42.66L21.82 -42.08" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M21.82 -42.08L21.35 -41.44" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M21.35 -41.44L20.94 -40.77" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.94 -40.77L20.61 -40.06" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.61 -40.06L20.34 -39.32" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.34 -39.32L20.15 -38.56" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.15 -38.56L20.04 -37.78" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.04 -37.78L20 -37" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20 -37L20 -23" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20 -23L20.04 -22.22" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.04 -22.22L20.15 -21.44" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.15 -21.44L20.34 -20.68" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.34 -20.68L20.61 -19.94" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.61 -19.94L20.94 -19.23" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M20.94 -19.23L21.35 -18.56" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M21.35 -18.56L21.82 -17.92" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M21.82 -17.92L22.34 -17.34" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M22.34 -17.34L22.92 -16.82" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M22.92 -16.82L23.56 -16.35" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M23.56 -16.35L24.23 -15.94" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M24.23 -15.94L24.94 -15.61" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M24.94 -15.61L25.68 -15.34" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M25.68 -15.34L26.44 -15.15" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M26.44 -15.15L27.22 -15.04" stroke-width="6"/><path class="gp-cut gp-d1 gp-sweep" d="M27.22 -15.04L28 -15" stroke-width="6"/></g><rect class="gp-edge" x="0" y="-60" width="100" height="60"/><path class="gp-tick" d="M0 0V2.2"/><text class="gp-t gp-t-tick" x="0" y="6.6" text-anchor="middle">0</text><path class="gp-tick" d="M50 0V2.2"/><text class="gp-t gp-t-tick" x="50" y="6.6" text-anchor="middle">50</text><path class="gp-tick" d="M100 0V2.2"/><text class="gp-t gp-t-tick" x="100" y="6.6" text-anchor="middle">100</text><path class="gp-tick" d="M0 0H-2.2"/><text class="gp-t gp-t-tick" x="-3.2" y="1.4" text-anchor="end">0</text><path class="gp-tick" d="M0 -30H-2.2"/><text class="gp-t gp-t-tick" x="-3.2" y="-28.6" text-anchor="end">30</text><path class="gp-tick" d="M0 -60H-2.2"/><text class="gp-t gp-t-tick" x="-3.2" y="-58.6" text-anchor="end">60</text><text class="gp-t gp-t-axis" x="108" y="6.6" text-anchor="middle">X</text><text class="gp-t gp-t-axis" x="-3.2" y="-65" text-anchor="end">Y</text><circle class="gp-origin" cx="0" cy="0" r="1.3"/><text class="gp-t gp-t-note" x="-2" y="-3" text-anchor="end">X0 Y0</text><rect class="gp-home" x="-41.6" y="-31.6" width="3.2" height="3.2"/><text class="gp-t gp-t-note" x="-40" y="-23" text-anchor="middle">start</text><text class="gp-t gp-t-view" x="-44.5" y="-76.4" text-anchor="start">TOP VIEW</text><text class="gp-t gp-t-note" x="50" y="-68.4" text-anchor="middle">back vise jaw</text><text class="gp-t gp-t-note" x="50" y="12.4" text-anchor="middle">front vise jaw</text><g data-layer="plan"><path class="gp-plan gp-plan-feed" d="M28 -15L28 -15M28 -15L72 -15M72 -15A8 8 0 0 0 80 -23M80 -23L80 -37M80 -37A8 8 0 0 0 72 -45M72 -45L28 -45M28 -45A8 8 0 0 0 20 -37M20 -37L20 -23M20 -23A8 8 0 0 0 28 -15"/><path class="gp-plan gp-plan-rapid" d="M-40 -30L28 -15M28 -15L28 -15M28 -15L28 -15"/></g><g data-layer="hl"></g><g data-layer="trail"><path class="gp-trail gp-trail-feed" d="M28 -15L28 -15M28 -15L72 -15M72 -15L72.78 -15.04L73.56 -15.15L74.32 -15.34L75.06 -15.61L75.77 -15.94L76.44 -16.35L77.08 -16.82L77.66 -17.34L78.18 -17.92L78.65 -18.56L79.06 -19.23L79.39 -19.94L79.66 -20.68L79.85 -21.44L79.96 -22.22L80 -23M80 -23L80 -37M80 -37L79.96 -37.78L79.85 -38.56L79.66 -39.32L79.39 -40.06L79.06 -40.77L78.65 -41.44L78.18 -42.08L77.66 -42.66L77.08 -43.18L76.44 -43.65L75.77 -44.06L75.06 -44.39L74.32 -44.66L73.56 -44.85L72.78 -44.96L72 -45M72 -45L28 -45M28 -45L27.22 -44.96L26.44 -44.85L25.68 -44.66L24.94 -44.39L24.23 -44.06L23.56 -43.65L22.92 -43.18L22.34 -42.66L21.82 -42.08L21.35 -41.44L20.94 -40.77L20.61 -40.06L20.34 -39.32L20.15 -38.56L20.04 -37.78L20 -37M20 -37L20 -23M20 -23L20.04 -22.22L20.15 -21.44L20.34 -20.68L20.61 -19.94L20.94 -19.23L21.35 -18.56L21.82 -17.92L22.34 -17.34L22.92 -16.82L23.56 -16.35L24.23 -15.94L24.94 -15.61L25.68 -15.34L26.44 -15.15L27.22 -15.04L28 -15"/><path class="gp-trail gp-trail-rapid" d="M-40 -30L28 -15M28 -15L28 -15M28 -15L28 -15"/></g><g data-layer="hit"></g><g data-layer="tool"><g class="gp-tool"><circle class="gp-tool-disc" cx="28" cy="-15" r="3"/><path class="gp-tool-cross" d="M23.5 -15H32.5M28 -19.5V-10.5"/></g></g><g data-layer="contact"></g></g><g clip-path="url(#gp-static-outline-cfront)"><rect class="gp-bg" x="-46" y="26" width="162" height="49"/><rect class="gp-parallel" x="-46" y="71" width="162" height="4"/><path class="gp-jawtop" d="M-46 59H116"/><g data-layer="section"><path class="gp-metal" d="M0 71L0 50L20.5 50L20.5 52.5L79.75 52.5L79.75 50L100 50L100 71Z"/><path class="gp-metal-hatch" d="M0 71L0 50L20.5 50L20.5 52.5L79.75 52.5L79.75 50L100 50L100 71Z" fill="url(#gp-static-outline-hatch)"/><path class="gp-metal-edge" d="M0 71L0 50L20.5 50L20.5 52.5L79.75 52.5L79.75 50L100 50L100 71Z"/></g><path class="gp-zero" d="M-46 51H116"/><path class="gp-tick" d="M-46 31h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="32.4" text-anchor="start">Z +20</text><path class="gp-tick" d="M-46 41h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="42.4" text-anchor="start">Z +10</text><path class="gp-tick" d="M-46 51h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="52.4" text-anchor="start">Z 0</text><path class="gp-tick" d="M-46 61h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="62.4" text-anchor="start">Z −10</text><path class="gp-tick" d="M-46 71h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="72.4" text-anchor="start">Z −20</text><text class="gp-t gp-t-note" x="101.5" y="63.4" text-anchor="start">jaw top</text><g data-layer="fplan"><path class="gp-plan gp-plan-feed" d="M28 49L28 52.5M28 52.5L72 52.5M72 52.5L80 52.5M80 52.5L80 52.5M72 52.5L80 52.5M72 52.5L28 52.5M20 52.5L28 52.5M20 52.5L20 52.5M20 52.5L28 52.5"/><path class="gp-plan gp-plan-rapid" d="M-40 31L28 31M28 31L28 49M28 52.5L28 31"/></g><g data-layer="fhl"></g><g data-layer="ftrail"><path class="gp-trail gp-trail-feed" d="M28 49L28 52.5M28 52.5L72 52.5M72 52.5L72.78 52.5L73.56 52.5L74.32 52.5L75.06 52.5L75.77 52.5L76.44 52.5L77.08 52.5L77.66 52.5L78.18 52.5L78.65 52.5L79.06 52.5L79.39 52.5L79.66 52.5L79.85 52.5L79.96 52.5L80 52.5M80 52.5L80 52.5M80 52.5L79.96 52.5L79.85 52.5L79.66 52.5L79.39 52.5L79.06 52.5L78.65 52.5L78.18 52.5L77.66 52.5L77.08 52.5L76.44 52.5L75.77 52.5L75.06 52.5L74.32 52.5L73.56 52.5L72.78 52.5L72 52.5M72 52.5L28 52.5M28 52.5L27.22 52.5L26.44 52.5L25.68 52.5L24.94 52.5L24.23 52.5L23.56 52.5L22.92 52.5L22.34 52.5L21.82 52.5L21.35 52.5L20.94 52.5L20.61 52.5L20.34 52.5L20.15 52.5L20.04 52.5L20 52.5M20 52.5L20 52.5M20 52.5L20.04 52.5L20.15 52.5L20.34 52.5L20.61 52.5L20.94 52.5L21.35 52.5L21.82 52.5L22.34 52.5L22.92 52.5L23.56 52.5L24.23 52.5L24.94 52.5L25.68 52.5L26.44 52.5L27.22 52.5L28 52.5"/><path class="gp-trail gp-trail-rapid" d="M-40 31L28 31M28 31L28 49M28 52.5L28 31"/></g><g data-layer="ftool"><g class="gp-tool"><rect class="gp-tool-cut" x="25" y="18" width="6" height="13"/><path class="gp-tool-flute" d="M25 29L31 26"/><path class="gp-tool-flute" d="M25 24.8L31 21.8"/><path class="gp-tool-flute" d="M25 20.6L31 17.6"/><rect class="gp-tool-body" x="25" y="-9" width="6" height="27"/><path class="gp-tool-axis" d="M28 33V-9"/></g></g><g data-layer="fcontact"></g></g><text class="gp-t gp-t-view" x="-44.5" y="24.4">FRONT VIEW, CUT THROUGH THE BLOCK AT Y <tspan data-layer="secy">15.0</tspan></text><text class="gp-t gp-t-note" x="-44.5" y="82.4" text-anchor="start">Cut depth</text><rect class="gp-cut gp-d0 gp-swatch" x="-27.5" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="-22.1" y="82.4" text-anchor="start">Z 0</text><rect class="gp-cut gp-d2 gp-swatch" x="-15" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="-9.6" y="82.4" text-anchor="start">−5</text><rect class="gp-cut gp-d4 gp-swatch" x="-2.5" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="2.9" y="82.4" text-anchor="start">−10</text><rect class="gp-cut gp-d6 gp-swatch" x="10" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="15.4" y="82.4" text-anchor="start">−15</text><rect class="gp-cut gp-d8 gp-swatch" x="22.5" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="27.9" y="82.4" text-anchor="start">−20</text><rect class="gp-cut gp-dthru gp-swatch" x="35" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="40.4" y="82.4" text-anchor="start">through</text><path class="gp-trail gp-trail-feed" d="M-44.5 87.3h9"/><text class="gp-t gp-t-note" x="-33.5" y="88.5" text-anchor="start">feed (G1, G2, G3): cuts</text><path class="gp-trail gp-trail-rapid" d="M10.5 87.3h9"/><text class="gp-t gp-t-note" x="21.5" y="88.5" text-anchor="start">rapid (G0): through the air</text></svg></div><figcaption><strong>Arcs: a rounded outline.</strong> With a Ø6 end mill, follow a 60 × 30 rounded rectangle with R8 corners at Z−1.5. The groove is 2.5 mm below the raw top, Z+1. Four G3 arcs turn the corners. The program on the left, numbered line by line, and the block after it has run. Solid lines are feed moves, dashed lines are rapids; the darker the cut, the deeper it goes.</figcaption></figure>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="a-drilling-cycle-packs-a-whole-hole-into-one-line" data-card="a-drilling-cycle-packs-a-whole-hole-into-one-line">
+    <summary>A drilling cycle packs a whole hole into one line<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A drilling cycle packs a whole hole into one line</h2>
+  <p><code>G81 X15 Y15 Z-8 R2 F120</code> drills a hole at X&nbsp;15, Y&nbsp;15. The tool moves there at
+  rapid, comes down at rapid to <code>R</code>, the height just above the work where feeding begins,
+  feeds down to <code>Z</code>, the bottom of the hole, and rises back up at rapid.</p>
+  <ul>
+    <li><strong>How high it rises.</strong> In this simulator <code>G99</code> rises to R between
+    holes, and <code>G98</code> rises to the height the tool was at when the cycles began, or to R if
+    that is higher. The simulator needs one of the two before the first <code>G81</code>.</li>
+    <li><strong>The cycle is modal.</strong> After a <code>G81</code>, a line with only X or Y drills
+    another hole with the same depth, R and feed. <code>G80</code> ends the cycle; after it, a line
+    with only X or Y is an error until a <code>G0</code> or <code>G1</code> says how to move.</li>
+  </ul>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="the-program-is-the-path-of-the-tool-s-centre-not-the-edge-of-the-part" data-card="the-program-is-the-path-of-the-tool-s-centre-not-the-edge-of-the-part">
+    <summary>The program is the path of the tool&rsquo;s centre, not the edge of the part<span class="chev"></span></summary>
+    <div class="body">
+      <h2>The program is the path of the tool&rsquo;s centre, not the edge of the part</h2>
+  <p>Every X and Y in a program says where the <strong>centre</strong> of the tool goes. The metal is
+  cut by its edge, one radius further out. A &Oslash;10 end mill fed along Y&nbsp;30 cuts a slot from
+  Y&nbsp;25 to Y&nbsp;35. To leave a wall at X&nbsp;80 with the metal beyond it cut away, the centre runs
+  along X&nbsp;85. <a class="xref-page" href="milling-operations.html">Milling Operations</a> works through the same rule for a shoulder and a pocket.</p>
+  <p>Controls can do that offset for you with cutter radius compensation, <code>G41</code> and
+  <code>G42</code>. The simulator does not model it, so every program here is written as the path of
+  the centre, and a line with <code>G41</code> or <code>G42</code> stops with a message.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="simulator-build-a-program-from-blocks-and-watch-it-run" data-card="simulator-build-a-program-from-blocks-and-watch-it-run">
+    <summary>Simulator: build a program from blocks and watch it run<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Simulator: build a program from blocks and watch it run</h2>
+  <p class="lede">Pick a program, change it, and run it on a simulated block of metal in a vise. Every
+  block is one line of G-code; the same interpreter reads it whether you build it from blocks or type
+  it, and the machine runs exactly what it reads.</p>
+  <div class="panel">
+    <p><strong>How to drive it.</strong> Press a block in the program to open it and change its
+    numbers; leave a number empty to leave that word out of the line. Add a block from the row above
+    the program, either by pressing it, which puts it after the open block, or by dragging it into
+    place. Drag a block by its handle to move it; with the keyboard, focus the handle and press Alt with
+    &uarr; or &darr;. <em>Play</em> runs the program, <em>Step</em> runs one block and stops,
+    <em>Back</em> goes back one block and <em>Restart</em> starts again with fresh stock. The block
+    that is running is outlined in gold, and its move is drawn in gold on the views; press a move in
+    the top view to open the block that makes it. Any change to the program puts the simulation back to its
+    start, so it always shows the program as it now is.</p>
+  </div>
+  <div data-interactive="gcode-playground">
+    <div class="gp-static">
+      <!-- printed figure gcode-holes: generated by render.js staticFigure('holes'); keep in step with the renderer -->
+      <figure class="gp-figure"><div class="gp-figure-program"><p class="gp-figure-title">Holes: a drilling cycle</p><ol class="gp-listing"><li><code>(Four holes with a drilling cycle)</code></li><li><code>G21 G90 G17</code></li><li><code>T3 M6</code></li><li><code>S1500 M3</code></li><li><code>G0 X15 Y15</code></li><li><code>G0 Z10</code></li><li><code>G98 G81 X15 Y15 Z-8 R2 F120</code></li><li><code>X85</code></li><li><code>Y45</code></li><li><code>X15</code></li><li><code>G80</code></li><li><code>G0 Z20</code></li><li><code>M5</code></li><li><code>M30</code></li></ol></div><div class="gp-figure-view"><svg class="gp-svg" viewBox="-46 -81 162 173" role="img" aria-label="The block after the program “Holes: a drilling cycle” has run: the top view and a front section, with every rapid and feed move drawn." focusable="false"><defs><pattern id="gp-static-holes-hatch" patternUnits="userSpaceOnUse" width="2.4" height="2.4" patternTransform="rotate(45)"><path class="gp-hatch-line" d="M0 0V2.4"/></pattern><clipPath id="gp-static-holes-ctop"><rect x="-46" y="-81" width="162" height="100"/></clipPath><clipPath id="gp-static-holes-cfront"><rect x="-46" y="26" width="162" height="49"/></clipPath><clipPath id="gp-static-holes-cstock"><rect x="0" y="-60" width="100" height="60"/></clipPath></defs><g clip-path="url(#gp-static-holes-ctop)"><rect class="gp-bg" x="-46" y="-81" width="162" height="100"/><rect class="gp-jaw" x="-30" y="0" width="146" height="14"/><rect class="gp-jaw" x="-30" y="-74" width="146" height="14"/><rect class="gp-stock" x="0" y="-60" width="100" height="60"/><g data-layer="cuts" clip-path="url(#gp-static-holes-cstock)"><circle class="gp-cut gp-d4" cx="15" cy="-15" r="3"/><circle class="gp-cut gp-d4" cx="85" cy="-15" r="3"/><circle class="gp-cut gp-d4" cx="85" cy="-45" r="3"/><circle class="gp-cut gp-d4" cx="15" cy="-45" r="3"/></g><rect class="gp-edge" x="0" y="-60" width="100" height="60"/><path class="gp-tick" d="M0 0V2.2"/><text class="gp-t gp-t-tick" x="0" y="6.6" text-anchor="middle">0</text><path class="gp-tick" d="M50 0V2.2"/><text class="gp-t gp-t-tick" x="50" y="6.6" text-anchor="middle">50</text><path class="gp-tick" d="M100 0V2.2"/><text class="gp-t gp-t-tick" x="100" y="6.6" text-anchor="middle">100</text><path class="gp-tick" d="M0 0H-2.2"/><text class="gp-t gp-t-tick" x="-3.2" y="1.4" text-anchor="end">0</text><path class="gp-tick" d="M0 -30H-2.2"/><text class="gp-t gp-t-tick" x="-3.2" y="-28.6" text-anchor="end">30</text><path class="gp-tick" d="M0 -60H-2.2"/><text class="gp-t gp-t-tick" x="-3.2" y="-58.6" text-anchor="end">60</text><text class="gp-t gp-t-axis" x="108" y="6.6" text-anchor="middle">X</text><text class="gp-t gp-t-axis" x="-3.2" y="-65" text-anchor="end">Y</text><circle class="gp-origin" cx="0" cy="0" r="1.3"/><text class="gp-t gp-t-note" x="-2" y="-3" text-anchor="end">X0 Y0</text><rect class="gp-home" x="-41.6" y="-31.6" width="3.2" height="3.2"/><text class="gp-t gp-t-note" x="-40" y="-23" text-anchor="middle">start</text><text class="gp-t gp-t-view" x="-44.5" y="-76.4" text-anchor="start">TOP VIEW</text><text class="gp-t gp-t-note" x="50" y="-68.4" text-anchor="middle">back vise jaw</text><text class="gp-t gp-t-note" x="50" y="12.4" text-anchor="middle">front vise jaw</text><g data-layer="plan"><path class="gp-plan gp-plan-feed" d="M15 -15L15 -15M85 -15L85 -15M85 -45L85 -45M15 -45L15 -45"/><path class="gp-plan gp-plan-rapid" d="M-40 -30L15 -15M15 -15L15 -15M15 -15L15 -15M15 -15L15 -15M15 -15L85 -15M85 -15L85 -15M85 -15L85 -15M85 -15L85 -45M85 -45L85 -45M85 -45L85 -45M85 -45L15 -45M15 -45L15 -45M15 -45L15 -45M15 -45L15 -45"/></g><g data-layer="hl"></g><g data-layer="trail"><path class="gp-trail gp-trail-feed" d="M15 -15L15 -15M85 -15L85 -15M85 -45L85 -45M15 -45L15 -45"/><path class="gp-trail gp-trail-rapid" d="M-40 -30L15 -15M15 -15L15 -15M15 -15L15 -15M15 -15L15 -15M15 -15L85 -15M85 -15L85 -15M85 -15L85 -15M85 -15L85 -45M85 -45L85 -45M85 -45L85 -45M85 -45L15 -45M15 -45L15 -45M15 -45L15 -45M15 -45L15 -45"/></g><g data-layer="hit"></g><g data-layer="tool"><g class="gp-tool"><circle class="gp-tool-disc" cx="15" cy="-45" r="3"/><path class="gp-tool-cross" d="M10.5 -45H19.5M15 -49.5V-40.5"/></g></g><g data-layer="contact"></g></g><g clip-path="url(#gp-static-holes-cfront)"><rect class="gp-bg" x="-46" y="26" width="162" height="49"/><rect class="gp-parallel" x="-46" y="71" width="162" height="4"/><path class="gp-jawtop" d="M-46 59H116"/><g data-layer="section"><path class="gp-metal" d="M0 71L0 50L12 50L12 57.2L12.25 57.2L12.25 57.35L12.5 57.35L12.5 57.5L12.75 57.5L12.75 57.65L13 57.65L13 57.8L13.25 57.8L13.25 57.95L13.5 57.95L13.5 58.1L13.75 58.1L13.75 58.25L14 58.25L14 58.4L14.25 58.4L14.25 58.55L14.5 58.55L14.5 58.7L14.75 58.7L14.75 58.85L15 58.85L15 59L15.25 59L15.25 58.85L15.5 58.85L15.5 58.7L15.75 58.7L15.75 58.55L16 58.55L16 58.4L16.25 58.4L16.25 58.25L16.5 58.25L16.5 58.1L16.75 58.1L16.75 57.95L17 57.95L17 57.8L17.25 57.8L17.25 57.65L17.5 57.65L17.5 57.5L17.75 57.5L17.75 57.35L18 57.35L18 57.2L18.25 57.2L18.25 50L82 50L82 57.2L82.25 57.2L82.25 57.35L82.5 57.35L82.5 57.5L82.75 57.5L82.75 57.65L83 57.65L83 57.8L83.25 57.8L83.25 57.95L83.5 57.95L83.5 58.1L83.75 58.1L83.75 58.25L84 58.25L84 58.4L84.25 58.4L84.25 58.55L84.5 58.55L84.5 58.7L84.75 58.7L84.75 58.85L85 58.85L85 59L85.25 59L85.25 58.85L85.5 58.85L85.5 58.7L85.75 58.7L85.75 58.55L86 58.55L86 58.4L86.25 58.4L86.25 58.25L86.5 58.25L86.5 58.1L86.75 58.1L86.75 57.95L87 57.95L87 57.8L87.25 57.8L87.25 57.65L87.5 57.65L87.5 57.5L87.75 57.5L87.75 57.35L88 57.35L88 57.2L88.25 57.2L88.25 50L100 50L100 71Z"/><path class="gp-metal-hatch" d="M0 71L0 50L12 50L12 57.2L12.25 57.2L12.25 57.35L12.5 57.35L12.5 57.5L12.75 57.5L12.75 57.65L13 57.65L13 57.8L13.25 57.8L13.25 57.95L13.5 57.95L13.5 58.1L13.75 58.1L13.75 58.25L14 58.25L14 58.4L14.25 58.4L14.25 58.55L14.5 58.55L14.5 58.7L14.75 58.7L14.75 58.85L15 58.85L15 59L15.25 59L15.25 58.85L15.5 58.85L15.5 58.7L15.75 58.7L15.75 58.55L16 58.55L16 58.4L16.25 58.4L16.25 58.25L16.5 58.25L16.5 58.1L16.75 58.1L16.75 57.95L17 57.95L17 57.8L17.25 57.8L17.25 57.65L17.5 57.65L17.5 57.5L17.75 57.5L17.75 57.35L18 57.35L18 57.2L18.25 57.2L18.25 50L82 50L82 57.2L82.25 57.2L82.25 57.35L82.5 57.35L82.5 57.5L82.75 57.5L82.75 57.65L83 57.65L83 57.8L83.25 57.8L83.25 57.95L83.5 57.95L83.5 58.1L83.75 58.1L83.75 58.25L84 58.25L84 58.4L84.25 58.4L84.25 58.55L84.5 58.55L84.5 58.7L84.75 58.7L84.75 58.85L85 58.85L85 59L85.25 59L85.25 58.85L85.5 58.85L85.5 58.7L85.75 58.7L85.75 58.55L86 58.55L86 58.4L86.25 58.4L86.25 58.25L86.5 58.25L86.5 58.1L86.75 58.1L86.75 57.95L87 57.95L87 57.8L87.25 57.8L87.25 57.65L87.5 57.65L87.5 57.5L87.75 57.5L87.75 57.35L88 57.35L88 57.2L88.25 57.2L88.25 50L100 50L100 71Z" fill="url(#gp-static-holes-hatch)"/><path class="gp-metal-edge" d="M0 71L0 50L12 50L12 57.2L12.25 57.2L12.25 57.35L12.5 57.35L12.5 57.5L12.75 57.5L12.75 57.65L13 57.65L13 57.8L13.25 57.8L13.25 57.95L13.5 57.95L13.5 58.1L13.75 58.1L13.75 58.25L14 58.25L14 58.4L14.25 58.4L14.25 58.55L14.5 58.55L14.5 58.7L14.75 58.7L14.75 58.85L15 58.85L15 59L15.25 59L15.25 58.85L15.5 58.85L15.5 58.7L15.75 58.7L15.75 58.55L16 58.55L16 58.4L16.25 58.4L16.25 58.25L16.5 58.25L16.5 58.1L16.75 58.1L16.75 57.95L17 57.95L17 57.8L17.25 57.8L17.25 57.65L17.5 57.65L17.5 57.5L17.75 57.5L17.75 57.35L18 57.35L18 57.2L18.25 57.2L18.25 50L82 50L82 57.2L82.25 57.2L82.25 57.35L82.5 57.35L82.5 57.5L82.75 57.5L82.75 57.65L83 57.65L83 57.8L83.25 57.8L83.25 57.95L83.5 57.95L83.5 58.1L83.75 58.1L83.75 58.25L84 58.25L84 58.4L84.25 58.4L84.25 58.55L84.5 58.55L84.5 58.7L84.75 58.7L84.75 58.85L85 58.85L85 59L85.25 59L85.25 58.85L85.5 58.85L85.5 58.7L85.75 58.7L85.75 58.55L86 58.55L86 58.4L86.25 58.4L86.25 58.25L86.5 58.25L86.5 58.1L86.75 58.1L86.75 57.95L87 57.95L87 57.8L87.25 57.8L87.25 57.65L87.5 57.65L87.5 57.5L87.75 57.5L87.75 57.35L88 57.35L88 57.2L88.25 57.2L88.25 50L100 50L100 71Z"/></g><path class="gp-zero" d="M-46 51H116"/><path class="gp-tick" d="M-46 31h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="32.4" text-anchor="start">Z +20</text><path class="gp-tick" d="M-46 41h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="42.4" text-anchor="start">Z +10</text><path class="gp-tick" d="M-46 51h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="52.4" text-anchor="start">Z 0</text><path class="gp-tick" d="M-46 61h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="62.4" text-anchor="start">Z −10</text><path class="gp-tick" d="M-46 71h2.2"/><text class="gp-t gp-t-tick" x="-42.8" y="72.4" text-anchor="start">Z −20</text><text class="gp-t gp-t-note" x="101.5" y="63.4" text-anchor="start">jaw top</text><g data-layer="fplan"><path class="gp-plan gp-plan-feed" d="M15 49L15 59M85 49L85 59M85 49L85 59M15 49L15 59"/><path class="gp-plan gp-plan-rapid" d="M-40 31L15 31M15 31L15 41M15 41L15 49M15 59L15 41M15 41L85 41M85 41L85 49M85 59L85 41M85 41L85 41M85 41L85 49M85 59L85 41M85 41L15 41M15 41L15 49M15 59L15 41M15 41L15 31"/></g><g data-layer="fhl"></g><g data-layer="ftrail"><path class="gp-trail gp-trail-feed" d="M15 49L15 59M85 49L85 59M85 49L85 59M15 49L15 59"/><path class="gp-trail gp-trail-rapid" d="M-40 31L15 31M15 31L15 41M15 41L15 49M15 59L15 41M15 41L85 41M85 41L85 49M85 59L85 41M85 41L85 41M85 41L85 49M85 59L85 41M85 41L15 41M15 41L15 49M15 59L15 41M15 41L15 31"/></g><g data-layer="ftool"><g class="gp-tool"><path class="gp-tool-cut" d="M15 31L18 29.2L18 7L12 7L12 29.2Z"/><rect class="gp-tool-body" x="12" y="-9" width="6" height="16"/><path class="gp-tool-axis" d="M15 33V-9"/></g></g><g data-layer="fcontact"></g></g><text class="gp-t gp-t-view" x="-44.5" y="24.4">FRONT VIEW, CUT THROUGH THE BLOCK AT Y <tspan data-layer="secy">45.0</tspan></text><text class="gp-t gp-t-note" x="-44.5" y="82.4" text-anchor="start">Cut depth</text><rect class="gp-cut gp-d0 gp-swatch" x="-27.5" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="-22.1" y="82.4" text-anchor="start">Z 0</text><rect class="gp-cut gp-d2 gp-swatch" x="-15" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="-9.6" y="82.4" text-anchor="start">−5</text><rect class="gp-cut gp-d4 gp-swatch" x="-2.5" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="2.9" y="82.4" text-anchor="start">−10</text><rect class="gp-cut gp-d6 gp-swatch" x="10" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="15.4" y="82.4" text-anchor="start">−15</text><rect class="gp-cut gp-d8 gp-swatch" x="22.5" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="27.9" y="82.4" text-anchor="start">−20</text><rect class="gp-cut gp-dthru gp-swatch" x="35" y="79" width="4.4" height="4.4"/><text class="gp-t gp-t-note" x="40.4" y="82.4" text-anchor="start">through</text><path class="gp-trail gp-trail-feed" d="M-44.5 87.3h9"/><text class="gp-t gp-t-note" x="-33.5" y="88.5" text-anchor="start">feed (G1, G2, G3): cuts</text><path class="gp-trail gp-trail-rapid" d="M10.5 87.3h9"/><text class="gp-t gp-t-note" x="21.5" y="88.5" text-anchor="start">rapid (G0): through the air</text></svg></div><figcaption><strong>Holes: a drilling cycle.</strong> Drill four Ø6 holes with the tip reaching Z−8: 9 mm below the raw top, Z+1. Full-diameter depth is shorter because of the drill point. G81 drills the first hole; X or Y lines repeat it until G80. The program on the left, numbered line by line, and the block after it has run. Solid lines are feed moves, dashed lines are rapids; the darker the cut, the deeper it goes.</figcaption></figure>
+    </div>
+    <div data-gp-live></div>
+    <div class="gp-record"></div>
+    <noscript><p class="aside">JavaScript is off, so the simulator is not running. The figures on this
+    page show two of its example programs run to their end.</p></noscript>
+  </div>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="things-to-try-in-the-g-code-simulator" data-card="things-to-try-in-the-g-code-simulator">
+    <summary>Things to try in the G-code simulator<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Things to try in the G-code simulator</h2>
+  <ul class="boxes">
+    <li>Step through the slot program one block at a time. Watch the machine state change at blocks 2,
+    3 and 4 before anything moves.</li>
+    <li>Make the slot deeper and shorter, then run it again. Which numbers did you change?</li>
+    <li>Drag the <em>Spindle on</em> block below the first feed move, and read why the machine
+    stops.</li>
+    <li>Open block 7 of the slot program and switch it from <code>G1</code> to <code>G0</code>. What
+    does a rapid do when it meets the metal?</li>
+    <li>Change the slot program to <code>G91</code>. Before you press Play, work out where its first
+    move will go.</li>
+    <li>In the arcs program, swap one <code>G3</code> for a <code>G2</code>, and see which way that
+    corner turns now.</li>
+    <li>In the holes program, try <code>G99</code> instead of <code>G98</code>, then add a fifth
+    hole.</li>
+    <li>In the G-code text, type a line the simulator does not read, such as <code>G41</code> or
+    <code>M7</code>, and read what it says.</li>
+  </ul>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="what-the-simulator-reads-and-what-it-leaves-out" data-card="what-the-simulator-reads-and-what-it-leaves-out">
+    <summary>What the simulator reads, and what it leaves out<span class="chev"></span></summary>
+    <div class="body">
+      <h2>What the simulator reads, and what it leaves out</h2>
+  <p>The simulator reads a small part of G-code, modelled on the way the LinuxCNC control reads it.
+  Any other code, or a line that is not G-code at all, stops the program at that line with a message
+  saying what is wrong. Nothing is skipped.</p>
+  <dl class="dims gp-codes">
+    <div><dt>Motion</dt><dd><code>G0</code> rapid, <code>G1</code> feed, <code>G2</code> and
+    <code>G3</code> arcs in the XY plane, <code>G81</code> drilling cycle and <code>G80</code> to end
+    it.</dd></div>
+    <div><dt>Modes</dt><dd><code>G17</code> XY plane, <code>G20</code> inches, <code>G21</code>
+    millimetres, <code>G90</code> absolute, <code>G91</code> incremental, <code>G90.1</code> and
+    <code>G91.1</code> for I and J, <code>G94</code> feed per minute, <code>G98</code> and
+    <code>G99</code> for the drilling cycle. <code>G40</code>, <code>G49</code> and <code>G54</code> are
+    read as the settings the simulator always has: no cutter compensation, no tool length offset, and
+    its one work offset.</dd></div>
+    <div><dt>Machine</dt><dd><code>M3</code> spindle on, <code>M5</code> off, <code>M6</code> tool
+    change, <code>M8</code> and <code>M9</code> coolant on and off (shown, with no effect on the cut),
+    <code>M2</code> or <code>M30</code> program end: stops spindle and coolant, restores G90 and
+    G1, and leaves the tool at its last position.</dd></div>
+    <div><dt>Words</dt><dd><code>X Y Z</code> positions, <code>I J</code> arc centre, <code>R</code>
+    arc radius or drilling R plane, <code>F</code> feed rate, <code>S</code> spindle speed,
+    <code>T</code> tool, <code>N</code> line number, and comments in brackets or after a
+    semicolon.</dd></div>
+    <div><dt>Tools</dt><dd><code>T1</code> &Oslash;10 end mill, <code>T2</code> &Oslash;6 end mill,
+    <code>T3</code> &Oslash;6 drill, <code>T4</code> &Oslash;12 spot and chamfer tool, <code>T5</code>
+    &Oslash;50 face mill: the tools of <a class="xref-page" href="milling-operations.html">Milling Operations</a>, with the same rules about what each can
+    cut.</dd></div>
+  </dl>
+  <ul>
+    <li><strong>Some rules are the simulator&rsquo;s own.</strong> It needs units and distance mode
+    set before the first move, a speed before <code>M3</code>, <code>G98</code> or <code>G99</code>
+    before a drilling cycle, and, for a tool change, the spindle stopped and the tool at Z&nbsp;+20 or
+    higher. A real control may be less strict, or strict about different things.</li>
+    <li><strong>Only straight down and straight across, through metal.</strong> The block is modelled
+    as a height above each point, so the tool can cut moving along Z alone, or in X and Y at one
+    height. A move in X or Y and Z at once is followed exactly through the air, but stops if it would
+    reach the metal: ramping and helical moves are not modelled.</li>
+    <li><strong>Arcs are cut as short straight chords</strong>, each within 0.01&nbsp;mm of the true
+    arc. They are drawn as true arcs.</li>
+    <li><strong>Simple timing.</strong> Feed moves run at their F and rapids at 5000&nbsp;mm per minute,
+    with no acceleration, no blending of one move into the next, and no time for tool changes.</li>
+    <li><strong>Not a check of a real program.</strong> The speeds and feeds in the examples are round
+    teaching numbers, not cutting recommendations; <a class="xref-page" href="feeds-and-speeds.html">Feeds and Speeds</a> is about choosing them. A
+    program that runs here has met only this simulator&rsquo;s rules. Controls differ in the codes they
+    accept, in their starting modes and in how they change tools, so a program for a real machine is
+    checked against the manual for its control.</li>
+  </ul>
+  <details class="deeper">
+    <summary>How the simulator reads and runs a program</summary>
+    <p>Each line is read in the order a control carries out the parts of a line: feed rate, spindle
+    speed and tool first, then the tool change, the spindle, coolant, the modes, the move, and last the
+    program end. So <code>S2500 M3 G1 X20 F100</code> starts the spindle before it moves. Two codes
+    from one group on a line, such as <code>G0 G1</code>, are an error.</p>
+    <p>The interpreter first reads the whole program, and a second machine runs it at once to find its
+    path, its time and the first place it would stop; that is the path drawn before you press Play.
+    Pressing Play runs the program again on the block, move by move. The metal, the vise and the tools
+    are those of the simulator in <a class="xref-page" href="milling-operations.html">Milling Operations</a>: every cut is kept as the space the tool swept,
+    and a move that would break a tool rule or hit the vise stops where it would happen.</p>
+    <p>An arc&rsquo;s end point has to be on its circle to within 0.005&nbsp;mm or 0.1&nbsp;% of the
+    radius, whichever is larger. A rapid, or a feed with the spindle stopped, stops a hair short of the
+    first metal it would touch. The volume removed is an estimate from a 0.25&nbsp;mm grid.</p>
+  </details>
+    </div>
+  </details>
+</div>
+
+  <div class="usedin">
+    <div class="k">Appears in</div>
+    <div class="chips">
+      <a class="chip" data-track="det-330" href="gcode-and-toolpaths.html?p=det-330">DET 330</a>
+      <a class="chip" data-track="det" href="gcode-and-toolpaths.html?p=det">DET</a>
+      <a class="chip" data-track="machining-fundamentals" href="gcode-and-toolpaths.html?p=machining-fundamentals">Machining Fundamentals</a>
+    </div>
+  </div>
+</div></main>
+<aside class="toc">
+  <div class="k">On this page</div>
+  <ul>
+    <li><a href="#a-cnc-program-is-a-list-of-lines-and-each-line-tells-the-machine-one-thing-to-do">A CNC program is a list of lines, and each line tells the machine one thing to do</a></li>
+    <li><a href="#rapid-moves-put-the-tool-in-place-through-the-air-feed-moves-cut">Rapid moves put the tool in place through the air; feed moves cut</a></li>
+    <li><a href="#g90-and-g91-g20-and-g21-two-modes-that-change-what-every-number-means">G90 and G91, G20 and G21: two modes that change what every number means</a></li>
+    <li><a href="#g2-turns-clockwise-and-g3-counterclockwise-seen-from-above">G2 turns clockwise and G3 counterclockwise, seen from above</a></li>
+    <li><a href="#a-drilling-cycle-packs-a-whole-hole-into-one-line">A drilling cycle packs a whole hole into one line</a></li>
+    <li><a href="#the-program-is-the-path-of-the-tool-s-centre-not-the-edge-of-the-part">The program is the path of the tool's centre, not the edge of the part</a></li>
+    <li><a href="#simulator-build-a-program-from-blocks-and-watch-it-run">Simulator: build a program from blocks and watch it run</a></li>
+    <li><a href="#things-to-try-in-the-g-code-simulator">Things to try in the G-code simulator</a></li>
+    <li><a href="#what-the-simulator-reads-and-what-it-leaves-out">What the simulator reads, and what it leaves out</a></li>
+  </ul>
+</aside>
+
+</div>
+<script src="../search-index.js?v=53890a4631"></script>
+<script src="../playlists.js?v=53890a4631"></script>
+<script src="../practice-index.js?v=53890a4631"></script>
+<script src="../theme/app.js?v=53890a4631"></script>
+<script src="../interactives/milling-simulator/model.js?v=53890a4631"></script>
+<script src="../interactives/milling-simulator/inspect.js?v=53890a4631"></script>
+<script src="../interactives/milling-simulator/jobs.js?v=53890a4631"></script>
+<script src="../interactives/milling-simulator/draw.js?v=53890a4631"></script>
+<script src="../interactives/milling-simulator/demo.js?v=53890a4631"></script>
+<script src="../interactives/gcode-playground/gcode.js?v=53890a4631"></script>
+<script src="../interactives/gcode-playground/machine.js?v=53890a4631"></script>
+<script src="../interactives/gcode-playground/blocks.js?v=53890a4631"></script>
+<script src="../interactives/gcode-playground/render.js?v=53890a4631"></script>
+<script src="../interactives/gcode-playground/demo.js?v=53890a4631"></script>
+</body>
+</html>
