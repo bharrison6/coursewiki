@@ -157,12 +157,14 @@
     subset.innerHTML = 'Reads <code>G0 G1 G2 G3 G17 G20 G21 G40 G49 G54 G80 G81 G90 G91 G90.1 G91.1 G94 G98 G99</code>, ' +
       '<code>M2 M3 M5 M6 M8 M9 M30</code> and <code>F S T N X Y Z I J R</code>. Anything else stops the program at its line. ' +
       'Feeds and rapids run at a constant speed, with no acceleration.';
-    [view, transport, timeline, now, dro, modes, subset].forEach(function (n) { work.appendChild(n); });
+    work.appendChild(view);
+    var status = el('div', { class: 'gp-status' });
+    [transport, timeline, now, dro, modes, subset].forEach(function (n) { status.appendChild(n); });
     var live = el('p', { class: 'gp-vh', 'aria-live': 'polite' });
     // Program and work sit side by side; on a narrow screen the work comes
     // first and the palette moves down next to the program it adds to.
     var layout = el('div', { class: 'gp-layout' });
-    [head, palette, progPane, work].forEach(function (n) { layout.appendChild(n); });
+    [head, palette, progPane, work, status].forEach(function (n) { layout.appendChild(n); });
     app.appendChild(layout); app.appendChild(live);
     host.appendChild(app);
     var record = rootEl.querySelector('.gp-record') || rootEl.appendChild(el('div', { class: 'gp-record' }));
@@ -589,7 +591,9 @@
     }
     function currentState() {
       var m = machine, k = m.inLine ? m.line : m.line - 1;
-      if (m.status === 'alarm' && m.alarm) k = m.alarm.line - 1;
+      // A machine stop happened partway through its block, so that block's modes are in force;
+      // a program error stopped before its block began.
+      if (m.status === 'alarm' && m.alarm) k = m.alarm.kind === 'machine' ? m.alarm.line : m.alarm.line - 1;
       return lineState(k);
     }
     function units() { var st = currentState() || (S.program && S.program.endState); return st && st.units ? st.units : 'mm'; }
@@ -862,10 +866,13 @@
        two read together without the page scrolling between them. */
     function fitHeights() {
       var cols = getComputedStyle(layout).gridTemplateColumns.split(' ').length;
-      if (cols > 1) list.style.setProperty('--gp-list-h', Math.max(300, work.offsetHeight - bar.offsetHeight - 2) + 'px');
-      else list.style.setProperty('--gp-list-h', '28rem');
+      if (cols > 1) {
+        var a = work.getBoundingClientRect(), b = status.getBoundingClientRect();
+        var h = Math.max(a.bottom, b.bottom) - Math.min(a.top, b.top);
+        list.style.setProperty('--gp-list-h', Math.max(300, h - bar.offsetHeight - 2) + 'px');
+      } else list.style.setProperty('--gp-list-h', '28rem');
     }
-    if (window.ResizeObserver) new ResizeObserver(fitHeights).observe(work);
+    if (window.ResizeObserver) { var ro = new ResizeObserver(fitHeights); ro.observe(work); ro.observe(status); }
     else addEventListener('resize', fitHeights);
 
     addEventListener('beforeprint', function () {

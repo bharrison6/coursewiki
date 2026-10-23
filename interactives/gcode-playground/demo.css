@@ -183,14 +183,26 @@
 .gp-layout {
   display: grid; gap: .8rem; align-items: start;
   grid-template-columns: minmax(16rem, .78fr) minmax(0, 1.22fr);
-  grid-template-areas: "head head" "palette palette" "prog work";
+  grid-template-rows: auto auto auto 1fr;
+  grid-template-areas: "head head" "palette palette" "prog work" "prog status";
 }
 .gp-head { grid-area: head; }
 .gp-palette { grid-area: palette; }
 .gp-program { grid-area: prog; }
 .gp-work { grid-area: work; }
+.gp-status { grid-area: status; display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+/* Wide, as in a presentation: the program, the views and the controls in three
+   columns, so all of them are on screen at once. */
+@container (min-width: 68rem) {
+  .gp-layout {
+    grid-template-columns: minmax(17rem, .72fr) minmax(0, 1.28fr) minmax(17rem, .78fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "head head head" "palette palette palette" "prog work status";
+  }
+  .gp-view .gp-svg { max-height: max(24rem, calc(100svh - 17rem)); }
+}
 @container (max-width: 44rem) {
-  .gp-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "work" "palette" "prog"; }
+  .gp-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "head" "work" "status" "palette" "prog"; }
 }
 @container (max-width: 30rem) {
   .gp-chip code { display: none; }

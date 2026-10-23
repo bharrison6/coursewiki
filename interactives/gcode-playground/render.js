@@ -246,7 +246,7 @@
       rect('gp-parallel', V.x0, fy(SU.parallelTop), V.x1, FY1) +
       path('gp-jawtop', 'M' + n(V.x0) + ' ' + n(fy(SU.jawTop)) + 'H' + n(V.x1));
   }
-  function frontMarks(y) {
+  function frontMarks() {
     var out = [];
     out.push(path('gp-zero', 'M' + n(V.x0) + ' ' + n(fy(0)) + 'H' + n(V.x1)));
     [20, 10, 0, -10, -20].forEach(function (z) {
@@ -254,8 +254,11 @@
       out.push(text('gp-t gp-t-tick', V.x0 + 3.2, fy(z) + 1.4, 'Z ' + (z > 0 ? '+' : z < 0 ? '−' : '') + Math.abs(z), 'start'));
     });
     out.push(text('gp-t gp-t-note', 101.5, fy(SU.jawTop) + 4.4, 'jaw top', 'start'));
-    out.push('<text class="gp-t gp-t-view" x="' + n(V.x1 - 1.5) + '" y="' + n(FY0 + 4.6) + '" text-anchor="end">FRONT VIEW, CUT AT Y <tspan data-layer="secy">' + esc(M.fmt(y, 1)) + '</tspan></text>');
     return out.join('');
+  }
+  /* In the gap between the two views, where the tool never is. */
+  function frontLabel(y) {
+    return '<text class="gp-t gp-t-view" x="' + n(V.x0 + 1.5) + '" y="' + n(FY0 - 1.6) + '">FRONT VIEW, CUT THROUGH THE BLOCK AT Y <tspan data-layer="secy">' + esc(M.fmt(y, 1)) + '</tspan></text>';
   }
   function legend() {
     var out = [], x = V.x0 + 1.5, y = LEG + 1;
@@ -293,13 +296,13 @@
       '<g data-layer="contact">' + contactMark(state.contact, 'top') + '</g>' +
       '</g>' +
       '<g clip-path="url(#' + id + '-cfront)">' + frontStatic() +
-      '<g data-layer="section">' + section(sim, y, id) + '</g>' + frontMarks(y) +
+      '<g data-layer="section">' + section(sim, y, id) + '</g>' + frontMarks() +
       '<g data-layer="fplan">' + plan(moves, 'front') + '</g>' +
       '<g data-layer="fhl">' + highlight(hl, 'front') + '</g>' +
       '<g data-layer="ftrail">' + trail(state.trail || [], 'front') + '</g>' +
       '<g data-layer="ftool">' + toolSide(tool, pos) + '</g>' +
       '<g data-layer="fcontact">' + contactMark(state.contact, 'front') + '</g>' +
-      '</g>' + legend() + '</svg>';
+      '</g>' + frontLabel(y) + legend() + '</svg>';
   }
   /* ======================================================================
      The printed figure: an example program, run to its end

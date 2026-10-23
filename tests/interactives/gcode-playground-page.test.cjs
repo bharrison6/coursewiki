@@ -165,4 +165,14 @@ test('the page follows the module contract and says what the simulator reads', (
   assert.deepEqual(listed.slice().sort(), supported.slice().sort());
   for (const code of supported) assert.ok(page.includes('<code>' + code + '</code>'), 'page names ' + code);
   for (const e of G.TOOL_TABLE) assert.ok(page.includes('<code>T' + e.t + '</code>'), 'page names T' + e.t);
+  // The numbers the page states are the ones the code uses.
+  assert.ok(page.includes(G.MACHINE.rapid + '&nbsp;mm per minute'), 'rapid rate');
+  assert.ok(page.includes(X.CHORD_TOL + '&nbsp;mm of the true'), 'chord tolerance');
+  assert.ok(page.includes('Z&nbsp;+' + G.MACHINE.toolChangeZ + ' or'), 'tool change height');
+  assert.ok(page.includes('0.005&nbsp;mm or 0.1&nbsp;% of the'), 'arc end tolerance is stated');
+  const arcEnd = (r, x) => G.interpret(['G21 G90', 'T2 M6', 'S3000 M3', 'G0 X' + (50 + r) + ' Y30 Z2', 'G2 X' + x + ' Y30 I-' + r + ' J0 F100']).error;
+  assert.equal(arcEnd(2, 47.996), null, 'R2: 0.004 mm off is within 0.005 mm');
+  assert.match(arcEnd(2, 47.994).message, /not on the arc/, 'R2: 0.006 mm off is not');
+  assert.equal(arcEnd(20, 29.982), null, 'R20: 0.018 mm off is within 0.1 % of the radius');
+  assert.match(arcEnd(20, 29.978).message, /not on the arc/, 'R20: 0.022 mm off is not');
 });
