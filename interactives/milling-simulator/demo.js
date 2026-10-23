@@ -164,7 +164,8 @@
     }
     var c = clearance(sim);
     parts.push(!c ? 'At ' + where(sim) + '.' : c.beside ? 'The tool is at ' + where(sim) + ', beside the block: there is no metal under the cutter.'
-      : c.gap > 0.005 ? 'The tool is at ' + where(sim) + '. Its tip is ' + fmt(c.gap, 2) + ' mm above the metal under it; lower Z to cut.'
+      : c.gap > 0.005 ? 'The tool is at ' + where(sim) + '. Its tip is ' + fmt(c.gap, 2) + ' mm above the metal under it. ' +
+        (sim.tool && sim.tool.kind === 'face' ? 'For a facing cut, lower it beside the block, then feed across.' : 'This move stayed above the work.')
       : 'The tool is at ' + where(sim) + ', touching the metal.');
     return { kind: 'air', title: 'Nothing cut.', text: parts.join(' '), warn: false };
   }
@@ -180,6 +181,10 @@
     var t = sim.tool, r = t.dia / 2, p = sim.pos, top = job.top, raw = ST.rawTop;
     if (t.kind === 'face' || t.kind === 'end') {
       var name = t.kind === 'face' ? 'face mill' : 'end mill', left = -(r + 5), right = ST.x1 + r + 5;
+      if (p.y + r <= ST.y0 || p.y - r >= ST.y1) {
+        return { text: 'First position it beside the block at Y 30, raised clear of the work. Then it can face a strip across the top.',
+          fill: {x:left, y:30, z:SETUP.clearZ}, label:'Fill in a starting position' };
+      }
       if (sim.capsuleTouchesStock(p, p, r)) {
         return { text: 'A facing pass starts beside the block, where the ' + name + ' can go down to depth without touching metal.',
           fill: { x: left }, label: 'Fill in X ' + fmt(left, 2) };
@@ -190,7 +195,7 @@
       }
       var to = p.x < (ST.x0 + ST.x1) / 2 ? right : left;
       return { text: 'Feed it across to X ' + fmt(to, 2) + '. Where it passes over the block it cuts the raw top, ' + fmt(raw - top, 2) +
-        ' mm proud, down to Z ' + fmt(top, 2) + ' in a strip as wide as the cutter, Ø' + fmt(t.dia, 0) + '.',
+        ' mm proud, down to Z ' + fmt(top, 2) + ' in a strip up to the cutter’s width, Ø' + fmt(t.dia, 0) + '.',
         fill: { x: to }, label: 'Fill in X ' + fmt(to, 2) };
     }
     if (t.kind === 'bore') return { text: 'The boring head needs a hole to start in. Set its diameter, put its centre over the hole, then feed it down.' };
@@ -323,7 +328,7 @@
     add(views, vTop, vFront);
 
     // what the last move did, a next step, and Undo
-    var feedback = el('div', { class: 'ms-feedback' });
+    var feedback = el('div', { class: 'ms-feedback', id:uid+'-feedback' });
     var status = el('p', { class: 'ms-status', role: 'status', 'aria-live': 'polite' });
     var next = el('div', { class: 'ms-next' });
     var nextText = el('p', { class: 'ms-next-text' });
@@ -332,8 +337,16 @@
     add(next, nextText, nextFill);
     var fbAct = el('div', { class: 'ms-fb-act' });
     var undoBtn = button('Undo', { class: 'ms-undo', 'aria-keyshortcuts': 'Control+Z' });
+    var feedbackMore = button('Full text', {class:'ms-feedback-toggle', 'aria-expanded':'false', 'aria-controls':uid+'-feedback'});
+    feedbackMore.addEventListener('click', function () {
+      var expanded = !feedback.classList.contains('is-expanded');
+      feedback.classList.toggle('is-expanded', expanded);
+      feedbackMore.setAttribute('aria-expanded', String(expanded));
+      feedbackMore.textContent = expanded ? 'Less text' : 'Full text';
+      keepWorkspaceVisible();
+    });
     var stopBtn = button('Stop', { class: 'ms-stop', hidden: true, 'aria-keyshortcuts': 'Escape' });
-    add(fbAct, undoBtn, stopBtn);
+    add(fbAct, undoBtn, stopBtn, feedbackMore);
     // Undo floats at the top right, so the messages use the full width under it
     add(feedback, fbAct, status, next);
     add(machine, dro, views, feedback);
@@ -475,7 +488,9 @@
     function keepWorkspaceVisible() {
       var r = workbench.getBoundingClientRect(), g = goal.getBoundingClientRect();
       var bar = document.querySelector('.appbar'), top = (bar ? bar.getBoundingClientRect().bottom : 0) + 8;
-      var room = window.innerHeight - top - 8;
+      var nav = document.querySelector('.seqbar'), nr = nav && nav.getBoundingClientRect();
+      var bottom = nr && nr.height ? Math.min(window.innerHeight, nr.top) : window.innerHeight;
+      var room = bottom - top - 8;
       if (r.height > room || (r.top >= top && r.bottom <= top + room)) return;
       var edge = r.bottom - g.top <= room ? g.top : r.top;
       window.scrollBy({ top: edge - top, behavior: 'instant' });
@@ -835,6 +850,8 @@
 
     function say(kind, title, text) {
       feedback.className = 'ms-feedback is-' + kind;
+      feedbackMore.setAttribute('aria-expanded', 'false');
+      feedbackMore.textContent = 'Full text';
       status.innerHTML = '';
       if (title) add(status, el('strong', {}, title), document.createTextNode(' '));
       status.appendChild(document.createTextNode(text || ''));
@@ -1117,12 +1134,15 @@
     stopBtn.addEventListener('click', stop);
     nextFill.addEventListener('click', function () {
       var f = nextFill.ms || {}, axes = [];
+      clearEdits();
+      syncInputs();
       ['x', 'y', 'z'].forEach(function (ax) {
         if (f[ax] == null) return;
         goIn[ax].value = fmt(f[ax], 2); state.edited[ax] = true; goIn[ax].classList.add('is-edited');
         axes.push(ax.toUpperCase() + ' ' + fmt(f[ax], 2));
       });
-      say('info', 'Filled in.', axes.join(', ') + ' is in the Move to boxes; the other boxes keep the tool where it is. Press Move to make the move.');
+      say('info', 'Filled in.', axes.join(', ') + '. Press Move; the other axes stay at their current position.');
+      moveBox.scrollIntoView({block:'nearest', inline:'nearest'});
       goBtn.focus({ preventScroll: true });
       keepWorkspaceVisible();
     });

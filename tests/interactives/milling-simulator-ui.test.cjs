@@ -79,6 +79,8 @@ test('every move says whether it cut, and an air move says how far above the met
   let m = U.describeMove(go(s, { x: 50 }), s);
   assert.equal(m.title, 'Nothing cut.');
   assert.match(m.text, /19\.00 mm above the metal/);
+  assert.match(m.text, /lower it beside the block, then feed across/);
+  assert.doesNotMatch(m.text, /lower Z to cut/);
   m = U.describeMove(go(s, { x: -40 }), s);
   assert.equal(m.title, 'Nothing cut.');
   assert.match(m.text, /beside the block/);
@@ -121,6 +123,21 @@ test('the first-use suggestions are ordinary moves that face the top and then st
     const h = M.create(); h.loadTool(id);
     const n = U.nextStep(h, J.BY_ID.pocket);
     assert.ok(n && !n.fill, id + ' is told how it is used, not given a move');
+  }
+});
+
+test('the facing suggestion returns from either side in Y before promising a cutting pass', () => {
+  for (const y of [-40, 100]) {
+    const s = M.create(); s.loadTool('fm50'); go(s, {x:50, y});
+    const first = U.nextStep(s, J.BY_ID.shoulder);
+    assert.equal(first.fill.y, 30);
+    assert.equal(first.fill.z, M.SETUP.clearZ);
+    let steps=0, suggestion;
+    while ((suggestion=U.nextStep(s,J.BY_ID.shoulder)) && steps<5) {
+      go(s,Object.assign({},s.pos,suggestion.fill)); steps++;
+    }
+    assert.equal(steps,3); assert.ok(s.removed>0);
+    assert.equal(I.inspect(s,J.BY_ID.shoulder).overcut,false);
   }
 });
 
