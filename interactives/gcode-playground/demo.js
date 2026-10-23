@@ -221,8 +221,15 @@
       refresh(true);
     }
     function scheduleReplan() {
+      pause();
       clearTimeout(S.timer);
-      S.timer = setTimeout(function () { replan('edit'); }, 140);
+      S.timer = setTimeout(function () { S.timer = 0; replan('edit'); }, 140);
+    }
+    // Editing is debounced while typing, but running, switching views and
+    // printing must use the edit visible in the field, even before that delay.
+    function flushEdits() {
+      if (textTimer) applyTextEdit();
+      else if (S.timer) { clearTimeout(S.timer); S.timer = 0; replan('edit'); }
     }
 
     function cloneBlocks() { return S.blocks.map(function (b) { return { type: b.type, f: Object.assign({}, b.f), note: b.note }; }); }
@@ -295,7 +302,7 @@
           b.f[def.k] = input.value;
           afterFieldEdit(b);
         });
-        input.addEventListener('blur', function () { S.editKey = null; });
+        input.addEventListener('blur', function () { S.editKey = null; flushEdits(); });
         if (def.unit) {
           wrap.appendChild(input);
           wrap.appendChild(el('span', { class: 'gp-unit' }, def.unit === 'feed' ? 'per min' : def.unit));
@@ -782,6 +789,7 @@
       else if (machine.status === 'done') announce('Program finished.');
     }
     function play(stepOnce) {
+      flushEdits();
       if (machine.status === 'empty' || !S.program.lines.length) return;
       if (machine.finished()) machine.reset();
       S.changedAt = 0;
@@ -802,6 +810,7 @@
       if (S.playing) { S.playing = false; if (L.cuts) refresh(false); }
     }
     function runTo(k) {
+      flushEdits();
       pause();
       S.changedAt = 0;
       S.selected = null;
@@ -815,6 +824,7 @@
       play(true);
     });
     bBack.addEventListener('click', function () {
+      flushEdits();
       pause();
       var m = machine, target;
       if (m.status === 'alarm' && m.alarm) target = m.alarm.line;       // to just before the block that stopped
@@ -825,12 +835,13 @@
       if (S.selected) select(null);
       refresh(true);
     });
-    bReset.addEventListener('click', function () { pause(); machine.reset(); S.changedAt = 0; refresh(true); });
-    bEnd.addEventListener('click', function () { pause(); S.changedAt = 0; S.selected = null; var res = machine.runToEnd(); refresh(true); finishNotes(res); });
+    bReset.addEventListener('click', function () { flushEdits(); pause(); machine.reset(); S.changedAt = 0; refresh(true); });
+    bEnd.addEventListener('click', function () { flushEdits(); pause(); S.changedAt = 0; S.selected = null; var res = machine.runToEnd(); refresh(true); finishNotes(res); });
     speedSel.addEventListener('change', function () { S.speed = Number(speedSel.value) || 10; });
 
     /* ---- the text view ------------------------------------------------------------------- */
     function showTab(t) {
+      flushEdits();
       S.tab = t;
       tabBlocks.setAttribute('aria-selected', t === 'blocks' ? 'true' : 'false');
       tabText.setAttribute('aria-selected', t === 'text' ? 'true' : 'false');
@@ -858,18 +869,21 @@
       });
     });
     var textTimer = 0;
+    function applyTextEdit() {
+      clearTimeout(textTimer); textTimer = 0;
+      S.blocks = B.fromText(textArea.value);
+      S.selected = null; S.blocksDirty = true;
+      replan('text');
+    }
     textArea.addEventListener('input', function () {
+      pause();
       clearTimeout(textTimer);
       if (!S.textDirty) { pushUndo(); S.textDirty = true; }
-      textTimer = setTimeout(function () {
-        S.blocks = B.fromText(textArea.value);
-        S.selected = null;
-        S.blocksDirty = true;
-        replan('text');
-      }, 260);
+      textTimer = setTimeout(applyTextEdit, 260);
     });
-    textArea.addEventListener('blur', function () { S.textDirty = false; });
+    textArea.addEventListener('blur', function () { S.textDirty = false; if (textTimer) applyTextEdit(); });
     bCopy.addEventListener('click', function () {
+      flushEdits();
       var t = text();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(t).then(function () { announce('Program copied.'); bCopy.textContent = 'Copied'; setTimeout(function () { bCopy.textContent = 'Copy the program'; }, 1500); },
@@ -903,6 +917,7 @@
     else addEventListener('resize', fitHeights);
 
     addEventListener('beforeprint', function () {
+      flushEdits();
       pause();
       record.innerHTML = '';
       var ex = B.example(S.example);
