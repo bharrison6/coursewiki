@@ -336,14 +336,16 @@
 
   var INSERT_TOP = { turn: 0.20, face: 0.75, chamfer: 0.15, groove: 0.70, thread: 0.06, knurl: 0.25 };
 
-  function knurlHead(hand) {
+  function knurlHead(hand, mirrored) {
     var t = M.TOOLS.knurl, edge = sample(t.edge, t.cut.from, t.cut.to, [0]);
     var wheel = edge.concat(edge.slice().reverse().map(function (p) { return [p[0], 0.60 - p[1]]; }));
     var out = '<g class="ts-knurl-wheel" data-hand="' + (hand > 0 ? 'right' : 'left') + '">';
     out += '<path class="ts-tool-body" d="' + poly([[-.3,.25],[-.3,.75],[.3,.75],[.3,.25],[.2,.25],[.2,.62],[-.2,.62],[-.2,.25]], true) + '"/>';
     out += '<path class="ts-tool-wheel" d="' + poly(wheel, true) + '"/>';
     var width = (2 * t.wheelHalf - 2 * t.wheelChamfer) * S, period = t.pitch * S, teeth = '';
-    for (var y = -width; y <= .56 * S + width; y += period) { teeth += 'M0 ' + r1(y) + 'L' + r1(width) + ' ' + r1(y + hand * width * .58); }
+    // Mirroring the lower carrier must not mirror the physical tooth hand.
+    var projectedHand = mirrored ? -hand : hand;
+    for (var y = -width; y <= .56 * S + width; y += period) { teeth += 'M0 ' + r1(y) + 'L' + r1(width) + ' ' + r1(y + projectedHand * width * .58); }
     out += '<svg class="ts-knurl-barrel" x="' + r1((-t.wheelHalf + t.wheelChamfer) * S) + '" y="' + r1(-.58 * S) + '" width="' + r1(width) + '" height="' + r1(.56 * S) + '" overflow="hidden" aria-hidden="true">' +
       '<path class="ts-tool-knurl ts-knurl-teeth" style="--ts-knurl-period:' + r1(period) + 'px" d="' + teeth + '"/></svg>';
     [-1, 1].forEach(function (sign) { out += '<ellipse class="ts-tool-wheel-end" cx="' + r1(sign * .171 * S) + '" cy="' + r1(-.3 * S) + '" rx="' + r1(.016 * S) + '" ry="' + r1(.28 * S) + '"/>'; });
@@ -357,7 +359,7 @@
     var out = '';
     if (toolId === 'knurl') {
       out += knurlHead(1);
-      out += '<g data-ts-knurl-lower transform="translate(0 ' + r1((o.gap == null ? 1 : o.gap) * S) + ') scale(1 -1)">' + knurlHead(-1) + '</g>';
+      out += '<g data-ts-knurl-lower transform="translate(0 ' + r1((o.gap == null ? 1 : o.gap) * S) + ') scale(1 -1)">' + knurlHead(-1, true) + '</g>';
     } else if (t.side === 'out') {
       var br = [t.cut.from, t.cut.to, 0];
       var edge = sample(t.edge, t.span[0], t.span[1], br);

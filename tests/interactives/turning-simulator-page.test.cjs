@@ -88,6 +88,11 @@ test('paired knurl rolls have parallel axles, opposite tooth hands and a gap-bas
   assert.equal((svg.match(/class="ts-knurl-wheel"/g) || []).length, 2);
   assert.match(svg, /data-hand="right"/); assert.match(svg, /data-hand="left"/);
   assert.match(svg, /data-ts-knurl-lower transform="translate\(0 134\.4\) scale\(1 -1\)"/);
+  const slopes = [...svg.matchAll(/class="ts-tool-knurl ts-knurl-teeth"[^>]+d="([^"]+)"/g)].map((m, i) => {
+    const p = pairs(m[1]);
+    return (p[1][1] - p[0][1]) / (p[1][0] - p[0][0]) * (i ? -1 : 1);
+  });
+  assert.ok(slopes[0] * slopes[1] < 0, 'opposite tooth slopes survive the lower carrier reflection');
   for (const m of svg.matchAll(/class="ts-tool-axle" d="([^"]+)"/g)) {
     const p = pairs(m[1]); assert.equal(p[0][1], p[1][1], 'axles run along Z, horizontally in this view');
   }
