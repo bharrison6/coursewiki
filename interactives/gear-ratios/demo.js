@@ -30,6 +30,7 @@
     if (root.dataset.grReady || !M || !D) return;
     root.dataset.grReady = 'true';
     var id = 'gr-' + (++sequence), state = Object.assign({}, M.DEFAULT), solution = M.solve(state);
+    while (document.getElementById(id + '-a')) id = 'gr-' + (++sequence);
     var inputTurns = 0, running = false, frame = 0, previous = null, visible = false;
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)'), selected = 'bigger', guess = null;
     var lab = document.createElement('div'); lab.className = 'gr-lab';
@@ -39,7 +40,7 @@
         return '<label><input type="radio" name="' + id + '-mode" value="' + v[0] + '"' + (v[0] === 'pair' ? ' checked' : '') + '><span>' + v[1] + '</span></label>';
       }).join('') + '</div></fieldset>' +
       '<div class="gr-workbench"><div class="gr-observe"><div class="gr-view-head"><span data-gr-view>FRONT VIEW</span><strong data-gr-ratio></strong></div><div class="gr-plot"></div>' +
-      '<div class="gr-motion"><button type="button" data-gr-run>Run</button><button type="button" data-gr-step>Turn A once</button><button type="button" data-gr-zero>Zero turns</button></div>' +
+      '<div class="gr-motion"><button type="button" data-gr-run aria-pressed="false">Run</button><button type="button" data-gr-step>Turn A once</button><button type="button" data-gr-zero>Zero turns</button></div>' +
       '<div class="gr-turns" data-gr-turns></div><p class="gr-animation" data-gr-animation></p></div>' +
       '<div class="gr-controls"><div class="gr-counts"></div>' +
       '<div class="gr-results"><div><span data-gr-output-title>Output B</span><strong data-gr-speed></strong><small data-gr-direction></small></div>' +

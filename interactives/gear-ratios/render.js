@@ -77,7 +77,8 @@
       var bx = plan.positions.B.x;
       out.push('<path class="gr-shaft-link" d="M' + n(bx) + ' 98V288"/>');
       out.push('<rect class="gr-shaft-note" x="' + n(bx - 112) + '" y="176" width="224" height="40" rx="6"/>');
-      out.push(text(bx, 192, 'B + C: one rigid shaft', 'gr-note-strong') + text(bx, 208, 'Same speed and direction', 'gr-note-small'));
+      var shaftGear = solved.gears[1];
+      out.push(text(bx, 192, 'B + C: ' + M.format(Math.abs(shaftGear.rpm)) + ' rpm ' + M.direction(shaftGear.rpm), 'gr-note-strong') + text(bx, 208, 'One rigid shaft · same speed', 'gr-note-small'));
       out.push(text(18, 24, 'MESH 1', 'gr-stage', 'start') + text(622, 372, 'MESH 2', 'gr-stage', 'end'));
     }
     solved.gears.forEach(function (g, index) {
@@ -92,8 +93,9 @@
         '<circle class="gr-marker" cx="0" cy="' + n(-radius * .73) + '" r="4.2"/></g></g>');
       out.push('<circle class="gr-hub" r="' + n(hub) + '"/>' + text(0, 5.5, g.id, 'gr-hub-label') + '</g>');
       var labelY = s.mode === 'compound' ? (g.id === 'A' || g.id === 'B' ? 21 : 382) : 25;
-      var labelX = s.mode === 'compound' ? pos.x : (index + 0.5) * 640 / solved.gears.length;
-      if (s.mode !== 'compound') out.push('<path class="gr-leader" d="M' + n(labelX) + ' 33L' + n(pos.x) + ' ' + n(pos.y - radius - plan.scale - 7) + '"/>');
+      var labelX = s.mode === 'compound' ? (index % 2 ? 480 : 160) : (index + 0.5) * 640 / solved.gears.length;
+      var bottomLabel = s.mode === 'compound' && index > 1;
+      out.push('<path class="gr-leader" d="M' + n(labelX) + ' ' + (bottomLabel ? 363 : 33) + 'L' + n(pos.x) + ' ' + n(pos.y + (bottomLabel ? 1 : -1) * (radius + plan.scale + 5)) + '"/>');
       out.push(text(labelX, labelY, g.id + ' · ' + g.teeth + ' teeth', 'gr-gear-label'));
       if (s.mode !== 'compound') {
         out.push(text(labelX, 245, (g.rpm > 0 ? '↻ ' : g.rpm < 0 ? '↺ ' : '') + M.format(Math.abs(g.rpm)) + ' rpm', 'gr-rpm'));
