@@ -112,8 +112,9 @@
     var tabText = button('G-code text', { role: 'tab', 'aria-selected': 'false', 'aria-controls': uid + '-text', id: uid + '-tab-t' });
     tabs.appendChild(tabBlocks); tabs.appendChild(tabText);
     var bUndo = button('Undo', { disabled: true, title: 'Undo the last change to the program' });
+    var bSee = button('See machine', { class: 'gp-phone-jump' });
     var count = el('span', { class: 'gp-count' });
-    bar.appendChild(tabs); bar.appendChild(bUndo); bar.appendChild(count);
+    bar.appendChild(tabs); bar.appendChild(bUndo); bar.appendChild(bSee); bar.appendChild(count);
     var list = el('ol', { class: 'gp-blocks', id: uid + '-blocks', role: 'tabpanel', 'aria-labelledby': uid + '-tab-b' });
     var textPane = el('div', { class: 'gp-textpane', id: uid + '-text', role: 'tabpanel', 'aria-labelledby': uid + '-tab-t', hidden: true });
     var textArea = el('textarea', { id: uid + '-code', spellcheck: 'false', autocomplete: 'off', 'aria-describedby': uid + '-textnote' });
@@ -127,20 +128,25 @@
 
     // work
     var work = el('div', { class: 'gp-work' });
-    var view = el('div', { class: 'gp-view' });
+    var view = el('div', { class: 'gp-view', id: uid + '-view', tabindex: '-1', role: 'region', 'aria-label': 'Toolpath and workpiece drawing' });
+    var viewTools = el('div', { class: 'gp-view-tools' });
+    var bZoom = button('Enlarge drawing', { 'aria-pressed': 'false', 'aria-controls': uid + '-view' });
+    var zoomHint = el('span', {}, 'Enlarge, then scroll the drawing sideways to read its labels.');
+    viewTools.appendChild(bZoom); viewTools.appendChild(zoomHint);
     var transport = el('div', { class: 'gp-transport', role: 'group', 'aria-label': 'Run the program' });
     var bReset = button('Restart', { title: 'Back to the start: a fresh block and the tool at its start point' });
     var bBack = button('Back', { title: 'Back one block' });
     var bPlay = button('Play', { class: 'gp-primary' });
     var bStep = button('Step', { title: 'Run one block, then stop' });
     var bEnd = button('To the end', { title: 'Run the rest of the program at once' });
+    var bEdit = button('Edit selected block', { class: 'gp-phone-jump' });
     var timeline = el('div', { class: 'gp-timeline' });
     var timeText = el('span', { class: 'gp-time' });
     var speedSel = el('select', { id: uid + '-speed', title: 'How fast the simulation runs, against real machine time' });
     SPEEDS.forEach(function (v) { var o = el('option', { value: String(v) }, '×' + v + (v === 1 ? ' real time' : '')); if (v === S.speed) o.selected = true; speedSel.appendChild(o); });
     var speed = el('span', { class: 'gp-speed' });
     speed.appendChild(el('label', { for: uid + '-speed', class: 'gp-vh' }, 'Simulation speed')); speed.appendChild(speedSel);
-    [bReset, bBack, bPlay, bStep, bEnd].forEach(function (b) { transport.appendChild(b); });
+    [bReset, bBack, bPlay, bStep, bEnd, bEdit].forEach(function (b) { transport.appendChild(b); });
     timeline.appendChild(timeText); timeline.appendChild(speed);
     var now = el('div', { class: 'gp-now' });
     var dro = el('div', { class: 'gp-state', role: 'group', 'aria-label': 'Where the tool is' });
@@ -157,9 +163,10 @@
     subset.innerHTML = 'Reads <code>G0 G1 G2 G3 G17 G20 G21 G40 G49 G54 G80 G81 G90 G91 G90.1 G91.1 G94 G98 G99</code>, ' +
       '<code>M2 M3 M5 M6 M8 M9 M30</code> and <code>F S T N X Y Z I J R</code>. Anything else stops the program at its line. ' +
       'Feeds and rapids run at a constant speed, with no acceleration.';
-    work.appendChild(view);
+    work.appendChild(viewTools); work.appendChild(view);
     var status = el('div', { class: 'gp-status' });
     [transport, timeline, now, dro, modes, subset].forEach(function (n) { status.appendChild(n); });
+    status.appendChild(el('p', { class: 'gp-subset' }, 'Z is the tool tip’s position from work zero. The raw top starts at Z+1; cut depth depends on the surface already there. A drill’s full-diameter depth is shorter than its tip depth.'));
     var live = el('p', { class: 'gp-vh', 'aria-live': 'polite' });
     // Program and work sit side by side; on a narrow screen the work comes
     // first and the palette moves down next to the program it adds to.
@@ -167,6 +174,26 @@
     [head, palette, progPane, work, status].forEach(function (n) { layout.appendChild(n); });
     app.appendChild(layout); app.appendChild(live);
     host.appendChild(app);
+    function reveal(node) {
+      node.scrollIntoView({ block: 'center', behavior: reduce.matches ? 'auto' : 'smooth' });
+      node.focus({ preventScroll: true });
+    }
+    bSee.addEventListener('click', function () { reveal(view); });
+    bEdit.addEventListener('click', function () {
+      if (S.tab !== 'blocks') showTab('blocks');
+      var at = selIndex();
+      if (at < 0) at = Math.min(machine.line, S.blocks.length - 1);
+      if (at >= 0) {
+        select(S.blocks[at].id);
+        var li = list.children[at]; keepVisible(li); reveal(li._grip);
+      }
+    });
+    bZoom.addEventListener('click', function () {
+      var enlarged = view.classList.toggle('is-enlarged');
+      bZoom.setAttribute('aria-pressed', enlarged ? 'true' : 'false');
+      bZoom.textContent = enlarged ? 'Fit drawing' : 'Enlarge drawing';
+      if (!enlarged) view.scrollLeft = 0;
+    });
     var record = rootEl.querySelector('.gp-record') || rootEl.appendChild(el('div', { class: 'gp-record' }));
     rootEl.classList.add('is-live');
 

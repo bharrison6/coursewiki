@@ -123,6 +123,11 @@ Modules that draw their own figures can keep a pure renderer beside the model, a
 `turning-simulator/render.js` does. Use the same renderer for live and static figures,
 and keep instance IDs and browser state independent when several roots share an aggregate.
 Target assessment should check the remaining geometry and surviving features after later cuts.
+`gcode-playground` reuses the milling stock and tools through its manifest dependency.
+Its interpreter owns the declared G-code subset; its executor follows the commanded path
+using the stock model's lower-level motion primitive. The manual simulator's automatic
+retraction and axis routing are not G-code execution semantics. Program edits reset the
+execution and recompute the preview from the same interpreter and executor.
 Calculation tests live beside their topic peers under `tests/interactives/` and run with
 `node --test --test-concurrency=2 tests/interactives/*.test.cjs`.
 

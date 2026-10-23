@@ -612,7 +612,7 @@
     var series = st.cycle;
     var z = v.Z != null ? q(v.Z * sc) : series ? series.z : null;
     var r = v.R != null ? q(v.R * sc) : series ? series.r : null;
-    if (z == null || r == null) return problem('program', 'G81 needs Z (the bottom of the hole) and R (the height it starts feeding from) on its first line.');
+    if (z == null || r == null) return problem('program', 'G81 needs Z (the drill tip’s destination) and R (the height it starts feeding from) on its first line.');
     if (r < z - EPS) return problem('program', 'R ' + say(r, units) + ' is below Z ' + say(z, units) + '. R is the height the drill starts feeding from, so it has to be above the bottom of the hole.');
     var oldZ = series ? series.oldZ : from.z;
     var x = v.X != null ? q(v.X * sc) : from.x, y = v.Y != null ? q(v.Y * sc) : from.y;

@@ -166,15 +166,15 @@
      ====================================================================*/
   var EXAMPLES = [
     { id: 'slot', title: 'A first cut: one slot',
-      brief: 'Cut a slot 10 mm wide and 3 mm deep across the block with a Ø10 end mill, then lift clear and stop.',
+      brief: 'Mill a closed-ended slot 10 mm wide to Z−3 with a Ø10 end mill. The raw top is Z+1, so the cut is 4 mm deep. Lift clear and stop.',
       tries: [
         'Change the Z−3 in block 7 to Z−6, then play it again.',
         'Drag block 4, “Spindle on”, down below block 7. What stops the program?',
         'Switch block 2 to G20 inches. What do the same numbers mean now?'
       ],
-      text: ['(A first cut: a slot across the block)', 'G21 G90 G17', 'T1 M6', 'S2500 M3', 'G0 X10 Y30', 'G0 Z2', 'G1 Z-3 F100', 'G1 X90 F300', 'G0 Z20', 'M5', 'M30'] },
+      text: ['(A first cut: a closed-ended slot)', 'G21 G90 G17', 'T1 M6', 'S2500 M3', 'G0 X10 Y30', 'G0 Z2', 'G1 Z-3 F100', 'G1 X90 F300', 'G0 Z20', 'M5', 'M30'] },
     { id: 'outline', title: 'Arcs: a rounded outline',
-      brief: 'With a Ø6 end mill, cut a groove 1.5 mm deep around a 60 × 30 rectangle whose corners are rounded to R8. Four G3 arcs turn the corners.',
+      brief: 'With a Ø6 end mill, follow a 60 × 30 rounded rectangle with R8 corners at Z−1.5. The groove is 2.5 mm below the raw top, Z+1. Four G3 arcs turn the corners.',
       tries: [
         'Change the first G3 to G2. Which way does that corner go now?',
         'In block 9, change J8 to J6, so the end point is no longer on the circle. Read the message.',
@@ -183,7 +183,7 @@
       text: ['(Groove around a rounded rectangle)', 'G21 G90 G17', 'T2 M6', 'S3000 M3', 'G0 X28 Y15', 'G0 Z2', 'G1 Z-1.5 F80', 'G1 X72 F250',
         'G3 X80 Y23 I0 J8', 'G1 Y37', 'G3 X72 Y45 I-8 J0', 'G1 X28', 'G3 X20 Y37 I0 J-8', 'G1 Y23', 'G3 X28 Y15 I8 J0', 'G0 Z20', 'M5', 'M30'] },
     { id: 'holes', title: 'Holes: a drilling cycle',
-      brief: 'Drill four holes 8 mm deep with a Ø6 drill. One G81 line drills the first hole; each line after it with only X or Y drills another, until G80.',
+      brief: 'Drill four Ø6 holes with the tip reaching Z−8: 9 mm below the raw top, Z+1. Full-diameter depth is shorter because of the drill point. G81 drills the first hole; X or Y lines repeat it until G80.',
       tries: [
         'Change G98 to G99 in block 7. How high does the drill rise between holes now?',
         'Add a fifth hole in the middle: insert a “Next point” block X50 Y30 before the G80.',
