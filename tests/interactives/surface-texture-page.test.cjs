@@ -16,9 +16,42 @@ const P = require(path.join(MOD, 'profile.js'));
 const N = require(path.join(MOD, 'notation.js'));
 const R = require(path.join(MOD, 'render.js'));
 const Q = require(path.join(MOD, 'quiz.js'));
+const D = require(path.join(MOD, 'demo.js'));
 const page = () => fs.readFileSync(PAGE, 'utf8');
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, (msg || '') + ' ' + a + ' vs ' + b);
+
+test('equal-Ra guidance follows match success and the geometry actually traced', () => {
+  const start = R.equalSpec('rounded'), before = P.measure(start, 'x', 0.8);
+  const state = { spec: start, dir: 'x', lc: 0.8, match: true, matchResult: null, before };
+  const change = (key, value) => {
+    const target = P.measure(state.spec, state.dir, state.lc).Ra;
+    state.spec = S.make({ ...state.spec, [key]: value });
+    state.matchResult = P.solveHeightForRa(state.spec, state.dir, state.lc, target);
+    state.spec.height = state.matchResult.height;
+    return D.equalMission(state, P.measure(state.spec, state.dir, state.lc));
+  };
+  // Control: the intended comparison still explains the visible flat tops.
+  assert.match(change('shape', 'plateau'), /cut by deep narrow grooves/);
+  state.spec = start; state.matchResult = null;
+  const failed = change('lay', 'radial');
+  assert.equal(state.matchResult.achievable, false);
+  assert.match(failed, /Cannot hold the requested Ra 1.6 µm/);
+  assert.match(failed, /not an equal-Ra comparison/);
+  assert.match(failed, /trace follows the marks/);
+  assert.match(failed, /Restore comparison/);
+  assert.doesNotMatch(failed, /so Ra stays the same|data-st-act="shape-/);
+  // This second match is attainable, but its radial trace still does not
+  // cross the grooves: success alone must not restore the shape narrative.
+  const radialPlateau = change('shape', 'plateau');
+  assert.equal(state.matchResult.achievable, true);
+  assert.match(radialPlateau, /trace follows the marks/);
+  assert.doesNotMatch(radialPlateau, /cut by deep narrow grooves|narrow peaks standing up/);
+  state.spec = R.equalSpec('plateau'); state.dir = 'y'; state.matchResult = null;
+  assert.match(D.equalMission(state, P.measure(state.spec, 'y', 0.8)), /trace follows the marks/);
+  state.dir = 'x'; state.match = false;
+  assert.match(D.equalMission(state, P.measure(state.spec, 'x', 0.8)), /original Ra is not being held/);
+});
 
 /* Absolute points of render.js's compact path data (M, then relative l steps). */
 function points(d) {

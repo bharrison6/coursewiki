@@ -18,6 +18,50 @@
 (function () {
   'use strict';
 
+  // The guided comparison is conditional on both the measured result and
+  // its setup. Export this pure banner renderer for numerical regressions;
+  // the browser calls the same function with its live state and analysis.
+  function equalMission(st, an, S, N) {
+    var um = function (v) { return N.fmtUm(v) + ' µm'; };
+    var act = function (key, label) { return '<button type="button" class="st-act" data-st-act="' + key + '">' + label + '</button>'; };
+    var values = '<strong>Ra ' + um(an.Ra) + ', Rz ' + um(an.Rz) + ', Rt ' + um(an.Rt) + '.</strong> ';
+    var restore = act('restart', 'Restore comparison');
+    var relation = S.relation(st.spec.lay, st.dir);
+    var follows = relation === 'along' || relation === 'radius-along';
+    var geometry = follows ? 'This trace follows the marks, so changing their cross-sectional shape does not make it cross the grooves or peaks. ' : '';
+    var match = st.matchResult;
+    if (match && !match.achievable) {
+      return '<p>' + values + 'Cannot hold the requested Ra ' + um(match.target) + ' with these settings; this is not an equal-Ra comparison. ' + geometry +
+        'The closest available value is shown. Restore the comparison or keep exploring with the controls.</p>' + restore;
+    }
+    // Shape conclusions here describe the guided reference, not every
+    // possible superposition of marks, waviness, scratches and trace angles.
+    var referenceSetup = st.dir === 'x' && st.lc === 0.8 && st.spec.lay === 'parallel' && !st.spec.scratch &&
+      ['spacing', 'wave', 'waveLength'].every(function (k) { return st.spec[k] === S.DEFAULT[k]; });
+    if (!referenceSetup) {
+      return '<p>' + values + geometry + 'You changed the comparison setup. The guided comparison uses parallel marks traced left to right, with the original spacing, waviness and cutoff. ' +
+        'Restore it to compare shapes at the same Ra, or keep exploring with the controls.</p>' + restore;
+    }
+    if (st.spec.shape === 'rounded') {
+      return '<p>' + values + 'Pick another mark shape. ' + (st.match ? 'The lab will try to preserve the current Ra within the available mark-height range; ' : 'Keep Ra is switched off; ') +
+        'compare Rz and Rt, and where the peaks and valleys sit.</p>' + act('shape-plateau', 'Try flat tops, narrow grooves');
+    }
+    var ref = st.before;
+    var held = st.match && match && match.achievable && ref && Math.abs(an.Ra - ref.Ra) < 1e-6;
+    if (!held) {
+      return '<p>' + values + 'The original Ra is not being held for this comparison. Restore it to compare shapes at the same Ra, or keep exploring with the controls.</p>' + restore;
+    }
+    return '<p><strong>Ra ' + um(an.Ra) + ' (it was ' + um(ref.Ra) + '), but Rz ' + um(an.Rz) + ' (it was ' + um(ref.Rz) + ').</strong> ' +
+      (st.spec.shape === 'plateau' ? 'Most of this profile sits above the mean line, cut by deep narrow grooves. ' : 'Most of this profile sits below the mean line, with narrow peaks standing up. ') +
+      'Flat tops and narrow peaks give nearly the same Rz too; only where the extremes sit tells them apart. One number does not describe a surface.</p>' +
+      act(st.spec.shape === 'plateau' ? 'shape-peaked' : 'shape-plateau', st.spec.shape === 'plateau' ? 'Try narrow peaks' : 'Try flat tops') + act('next', 'Next experiment');
+  }
+
+  if (typeof module === 'object' && module && module.exports) {
+    module.exports = { equalMission: function (st, an) { return equalMission(st, an, require('./surface.js'), require('./notation.js')); } };
+    return;
+  }
+
   var S = window.CourseWikiTextureSurface, P = window.CourseWikiTextureProfile, N = window.CourseWikiTextureNotation;
   var R = window.CourseWikiTextureRender, Q = window.CourseWikiTextureQuiz;
   if (!S || !P || !N || !R || !Q || typeof document === 'undefined') { return; }
@@ -314,15 +358,7 @@
           'Tracing across the lay is the usual choice, but a direction the drawing specifies governs, so the direction belongs with the result.</p>' + act('next', 'Next experiment');
       }
       if (ex.id === 'equal') {
-        var ref = b && b.Ra ? b : null;
-        if (st.spec.shape === 'rounded') {
-          return '<p><strong>Ra ' + um(an.Ra) + ', Rz ' + um(an.Rz) + '.</strong> Pick another mark shape. ' + (st.match ? 'The lab changes the mark height so Ra stays the same; ' : '') +
-            'compare Rz and Rt, and where the peaks and valleys sit.</p>' + act('shape-plateau', 'Try flat tops, narrow grooves');
-        }
-        return '<p><strong>Ra ' + um(an.Ra) + (ref ? ' (it was ' + um(ref.Ra) + ')' : '') + ', but Rz ' + um(an.Rz) + (ref ? ' (it was ' + um(ref.Rz) + ')' : '') + '.</strong> ' +
-          (st.spec.shape === 'plateau' ? 'Most of this profile sits above the mean line, cut by deep narrow grooves. ' : 'Most of this profile sits below the mean line, with narrow peaks standing up. ') +
-          'Flat tops and narrow peaks give nearly the same Rz too; only where the extremes sit tells them apart. One number does not describe a surface.</p>' +
-          act(st.spec.shape === 'plateau' ? 'shape-peaked' : 'shape-plateau', st.spec.shape === 'plateau' ? 'Try narrow peaks' : 'Try flat tops') + act('next', 'Next experiment');
+        return equalMission(st, an, S, N);
       }
       if (ex.id === 'filter') {
         if (!(st.spec.wave > 0)) { return '<p>This experiment needs some waviness. ' + act('restart', 'Set it up again') + '</p>'; }
@@ -397,7 +433,7 @@
       r.addEventListener('change', announce);
     });
     $(lab, '[data-st-scratch]').addEventListener('change', function (e) { changeSpec('scratch', e.target.checked); announce(); });
-    $(lab, '[data-st-match]').addEventListener('change', function (e) { st.match = e.target.checked; });
+    $(lab, '[data-st-match]').addEventListener('change', function (e) { st.match = e.target.checked; renderMission(last); });
     $(lab, '[data-st-param]').addEventListener('change', function (e) { st.callout.param = e.target.value; render(); });
     $(lab, '[data-st-value]').addEventListener('change', function (e) { st.callout.value = Number(e.target.value); render(); });
 
