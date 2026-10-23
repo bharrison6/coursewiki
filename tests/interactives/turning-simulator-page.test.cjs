@@ -74,11 +74,40 @@ test('the drawn cutting edge is the model\'s edge, and the drawn tool is the too
         const dz = x / R.S, dr = -y / R.S;
         // Points at a step in the edge (insert to holder) sit on one side of it or the other.
         const near = [-0.0015, 0, 0.0015].some((h) => Math.abs(dr - t.edge(dz + h)) < 0.0012);
-        if (dr < 2.5) { assert.ok(near || Math.abs(dz - t.span[0]) < 0.002 || Math.abs(dz - t.span[1]) < 0.002, id + ' body at dz ' + dz); }
+        if (id === 'knurl') {
+          assert.ok(dr >= t.edge(dz) - .002, 'knurl arms stay outside the modeled forming/contact boundary');
+        } else if (dr < 2.5) { assert.ok(near || Math.abs(dz - t.span[0]) < 0.002 || Math.abs(dz - t.span[1]) < 0.002, id + ' body at dz ' + dz); }
       }
     }
     assert.ok(!/NaN|undefined|Infinity/.test(svg), id);
   }
+});
+
+test('paired knurl rolls have parallel axles, opposite tooth hands and a gap-based position', () => {
+  const svg = R.toolShape('knurl', { gap: .84 });
+  assert.equal((svg.match(/class="ts-knurl-wheel"/g) || []).length, 2);
+  assert.match(svg, /data-hand="right"/); assert.match(svg, /data-hand="left"/);
+  assert.match(svg, /data-ts-knurl-lower transform="translate\(0 134\.4\) scale\(1 -1\)"/);
+  for (const m of svg.matchAll(/class="ts-tool-axle" d="([^"]+)"/g)) {
+    const p = pairs(m[1]); assert.equal(p[0][1], p[1][1], 'axles run along Z, horizontally in this view');
+  }
+  const css = fs.readFileSync(path.join(MOD, 'demo.css'), 'utf8');
+  assert.match(css, /rotate\(-360deg\)/, 'the end-view arrow animates counterclockwise');
+  assert.match(css, /\[data-ts-knurl-lower\] \.ts-knurl-teeth \{ animation-direction: reverse;/, 'mirrored roll has the same physical spin sense');
+});
+
+test('section threads use labeled unhatched envelopes rather than mirrored physical notch teeth', () => {
+  const st = M.create('knurled-nut');
+  M.play(st, [['tool', 'drill'], ['drill', '0.4219'], ['sp', true], ['z', -.9], ['z', .6], ['sp', false],
+    ['tool', 'ithread'], ['tpi', 13], ['sp', true], ['mv', .1, .445], ['th', -.6]]);
+  const f = R.frame(M.target(st.targetId)), w = R.workPaths(st.work, f, 'section');
+  assert.ok(w.threadEnvelope.length > 0 && w.threads.length > 0, 'bands and dashed root lines are present');
+  assert.equal(R.workPaths(st.work, f, 'normal').threadEnvelope, '', 'outside view uses the helix cue instead');
+  const svg = R.scene(st, { view: 'section' });
+  assert.match(svg, /Threads are schematic crest and root envelopes, not a helical section/);
+  const css = fs.readFileSync(path.join(MOD, 'demo.css'), 'utf8');
+  assert.match(css, /\.ts-thread-envelope \{ fill: var\(--paper\)/, 'the envelope band is not hatched as solid section material');
+  assert.ok(!/NaN|undefined|Infinity/.test(svg));
 });
 
 test('the work is drawn where the model has it, whole, in the section view and the normal view', () => {

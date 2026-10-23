@@ -13,8 +13,10 @@
    THE WORK is a solid of revolution, so one half-profile describes it. The
    profile is cut into columns 0.001 in long. Each column holds one ring of
    metal between an inner radius ri (0 when solid) and an outer radius ro.
-   A column with no metal (ro <= ri) is a cut right through the work: anything
-   on the tailstock side of it has been parted off and falls away.
+   Thread grooves are sampled at one angular phase, with separate surviving
+   outer-crest and inner-minor envelopes. A root notch in that one section is
+   not an annular hole. Separation requires a kerf through those envelopes;
+   only then does the portion on the tailstock side fall away.
 
    A TOOL is described in the same section plane, relative to its reference
    point. Every tool the simulator ships keeps one interval per column:
@@ -175,7 +177,7 @@
         if (a <= 0.1875) { return a - (0.1875 - 0.03); }
         return 0.25;
       },
-      does: 'A single beveled wheel carrying a diamond pattern presses into the rotating work. Its axle is parallel to Z. The wheel rolls on the surface and displaces metal instead of cutting it away.',
+      does: 'A pair of opposed, beveled forming wheels, one left-hand and one right-hand, rolls a diamond pattern. Their axles are parallel to Z. Here X controls the simulated wheel gap, not a literal carriage coordinate; close the gap to form, then feed Z along the work.',
       cannot: 'This is form knurling: no chips. A full knurl here depresses the roots 0.010 in and raises the crests 0.010 in radially, adding 0.020 in to the blank diameter. Growth is a teaching approximation; real knurl growth depends on the material and wheels.'
     },
     bore: {
@@ -331,10 +333,16 @@
     this.ro = new Float64Array(n); this.ri = new Float64Array(n);
     this.kB = new Float64Array(n); this.kP = new Float64Array(n);
     this.thO = new Float64Array(n); this.thI = new Float64Array(n);
+    this.thBaseO = new Float64Array(n); this.thBaseI = new Float64Array(n);
   }
   function zc(p, i) { return p.zL + (i + 0.5) * COL; }
   function colAt(p, z) { return Math.floor((z - p.zL) / COL + 1e-9); }
-  function has(p, i) { return p.ro[i] > p.ri[i] + EPS; }
+  function outerEnvelope(p, i) { return p.thO[i] && p.thBaseO[i] > 0 ? p.thBaseO[i] : p.ro[i]; }
+  function innerEnvelope(p, i) { return p.thI[i] && p.thBaseI[i] > 0 ? p.thBaseI[i] : p.ri[i]; }
+  function has(p, i) { return outerEnvelope(p, i) > innerEnvelope(p, i) + EPS; }
+  function clearColumn(p, i) {
+    p.ro[i] = p.ri[i] = p.kB[i] = p.kP[i] = p.thO[i] = p.thI[i] = p.thBaseO[i] = p.thBaseI[i] = 0;
+  }
 
   function parkFor(st, toolId) {
     var t = TOOLS[toolId], R = st.R;
@@ -378,6 +386,7 @@
   function copyPiece(p) {
     var q = new Piece(p.zL, p.n);
     q.ro.set(p.ro); q.ri.set(p.ri); q.kB.set(p.kB); q.kP.set(p.kP); q.thO.set(p.thO); q.thI.set(p.thI);
+    q.thBaseO.set(p.thBaseO); q.thBaseI.set(p.thBaseI);
     return q;
   }
   function snapshot(st) {
@@ -425,10 +434,23 @@
     for (var i = 0; i < DRILLS.length; i++) { if (DRILLS[i].id === st.drill) { return DRILLS[i].d; } }
     return DRILLS[0].d;
   }
+  function hasThreads(p) {
+    for (var i = 0; i < p.n; i++) { if (p.thO[i] || p.thI[i]) { return true; } }
+    return false;
+  }
+  function knurlContact(st) {
+    if (st.tool !== 'knurl') { return false; }
+    var p = st.work, t = TOOLS.knurl;
+    var a = Math.max(0, colAt(p, st.tz + t.cut.from)), b = Math.min(p.n - 1, colAt(p, st.tz + t.cut.to));
+    for (var i = a; i <= b; i++) {
+      if (has(p, i) && st.tr + t.edge(zc(p, i) - st.tz) <= p.ro[i] + 0.0005) { return true; }
+    }
+    return false;
+  }
 
   // Separation occurs when the modeled wall is cut through, not at a fixed
   // small core diameter. Burrs, elastic tearing and break-off are not modeled.
-  function emptyAfter(ro, ri) { return ro <= ri + EPS; }
+  function emptyAfter(p, i) { return !has(p, i); }
 
   function step(st, tool, z, r, apply, opts) {
     var p = st.work, out = { code: null, area: 0, formed: false, emptied: false, threadHit: false, info: null };
@@ -451,7 +473,9 @@
         var e = edgeCol(tool, dz);
         if (e === Infinity) { continue; }
         var b = r + e;
-        top = p.ro[i];
+        // A later rotating cut also reaches crests between the fixed thread
+        // section samples. Keep their current envelope, including chamfers.
+        top = outerEnvelope(p, i);
         if (b >= top - EPS) { continue; }
         var inCut = dz >= tool.cut.from - COL / 2 && dz <= tool.cut.to + COL / 2;
         if (tool.action === 'form') {
@@ -474,12 +498,13 @@
         if (top > r + tool.cut.depth + EPS) { out.code = tool.id === 'groove' ? 'side' : 'body'; return out; }
         if (noCut) { continue; }
         if (tool.action === 'thread' && p.thO[i] !== 0) { out.code = 'retract'; out.info = { side: 'out' }; return out; }
-        var nt = Math.max(b, p.ri[i]);
+        var nt = Math.max(b, innerEnvelope(p, i));
         out.area += (top - nt) * COL;
         if (apply) {
-          p.ro[i] = nt;
+          p.ro[i] = Math.min(p.ro[i], nt);
+          if (p.thO[i]) { p.thBaseO[i] = Math.min(p.thBaseO[i], nt); }
           if (p.kB[i] > 0 && nt <= p.kB[i] - p.kP[i] + EPS) { p.kB[i] = 0; p.kP[i] = 0; }
-          if (emptyAfter(p.ro[i], p.ri[i])) { p.ro[i] = 0; p.ri[i] = 0; p.kB[i] = 0; p.kP[i] = 0; out.emptied = true; }
+          if (emptyAfter(p, i)) { clearColumn(p, i); out.emptied = true; }
         }
       }
       return out;
@@ -493,7 +518,7 @@
       for (i = Math.max(0, i0); i <= Math.min(p.n - 1, i1); i++) {
         if (!has(p, i)) { continue; }
         dz = zc(p, i) - z;
-        var ri = p.ri[i];
+        var ri = innerEnvelope(p, i);
         if (dz > bar.to + COL / 2) { out.code = 'holder'; return out; }
         var inHead = dz >= hd[0] - COL / 2 && dz <= hd[1] + COL / 2;
         var inBar = dz >= bar.from - COL / 2;
@@ -506,11 +531,12 @@
             if (ri < r - tool.cut.depth - EPS) { out.code = ri < 0.01 ? 'nohole' : 'body'; return out; }
             if (noCut) { continue; }
             if (tool.action === 'thread' && p.thI[i] !== 0) { out.code = 'retract'; out.info = { side: 'in' }; return out; }
-            var nb = Math.min(tt, p.ro[i]);
+            var nb = Math.min(tt, outerEnvelope(p, i));
             out.area += (nb - ri) * COL;
             if (apply) {
-              p.ri[i] = nb;
-              if (emptyAfter(p.ro[i], p.ri[i])) { p.ro[i] = 0; p.ri[i] = 0; out.emptied = true; }
+              p.ri[i] = Math.max(p.ri[i], nb);
+              if (p.thI[i]) { p.thBaseI[i] = Math.max(p.thBaseI[i], nb); }
+              if (emptyAfter(p, i)) { clearColumn(p, i); out.emptied = true; }
             }
           }
           continue;
@@ -533,13 +559,15 @@
         if (rr >= p.ri[i] - 1e-6) { out.code = tool.id === 'drill' ? 'chuck-body' : 'body'; return out; }
         continue;
       }
-      if (rr <= p.ri[i] + EPS) { continue; }
+      var inner = innerEnvelope(p, i);
+      if (rr <= inner + EPS) { continue; }
       if (noCut) { continue; }
-      var nr = Math.min(rr, p.ro[i]);
-      out.area += (nr - p.ri[i]) * COL;
+      var nr = Math.min(rr, outerEnvelope(p, i));
+      out.area += (nr - inner) * COL;
       if (apply) {
-        p.ri[i] = nr;
-        if (emptyAfter(p.ro[i], p.ri[i])) { p.ro[i] = 0; p.ri[i] = 0; out.emptied = true; }
+        p.ri[i] = Math.max(p.ri[i], nr);
+        if (p.thI[i]) { p.thBaseI[i] = Math.max(p.thBaseI[i], nr); }
+        if (emptyAfter(p, i)) { clearColumn(p, i); out.emptied = true; }
       }
     }
     return out;
@@ -561,9 +589,10 @@
       for (j = first; j <= last; j++) {
         piece.ro[j] = p.ro[j]; piece.ri[j] = p.ri[j]; piece.kB[j] = p.kB[j]; piece.kP[j] = p.kP[j];
         piece.thO[j] = p.thO[j]; piece.thI[j] = p.thI[j];
+        piece.thBaseO[j] = p.thBaseO[j]; piece.thBaseI[j] = p.thBaseI[j];
       }
     }
-    for (j = first; j <= last; j++) { p.ro[j] = 0; p.ri[j] = 0; p.kB[j] = 0; p.kP[j] = 0; p.thO[j] = 0; p.thI[j] = 0; }
+    for (j = first; j <= last; j++) { p.ro[j] = 0; p.ri[j] = 0; p.kB[j] = 0; p.kP[j] = 0; p.thO[j] = 0; p.thI[j] = 0; p.thBaseO[j] = 0; p.thBaseI[j] = 0; }
     if (!keep) { return 'debris'; }
     st.part = piece; st.parts++;
     return 'part';
@@ -756,7 +785,10 @@
       var reached = inside ? (r > p.ri[i] + EPS) : (r < p.ro[i] - EPS);
       if (!reached) { continue; }
       var tag = inside ? p.thI : p.thO;
-      if (tag[i] === 0) { tag[i] = pitch; } else if (Math.abs(tag[i] - pitch) > 1e-9) { tag[i] = -1; }
+      if (tag[i] === 0) {
+        (inside ? p.thBaseI : p.thBaseO)[i] = inside ? p.ri[i] : p.ro[i];
+        tag[i] = pitch;
+      } else if (Math.abs(tag[i] - pitch) > 1e-9) { tag[i] = -1; }
     }
     var area = 0;
     for (k = 0; k < notches.length; k++) {
@@ -913,6 +945,7 @@
   /* The outer surface with thread and knurl teeth bridged: the largest radius
      within half a pitch. What a micrometer across the crests would read. */
   function envOut(p, i) {
+    if (p.thO[i] !== 0 && p.thBaseO[i] > 0) { return p.thBaseO[i]; }
     if (p.thO[i] === 0 && p.kB[i] === 0) { return p.ro[i]; }
     var w = p.thO[i] > 0 ? Math.ceil(p.thO[i] / 2 / COL) + 1 : (p.thO[i] < 0 ? 25 : 3);
     var m = 0;
@@ -920,17 +953,19 @@
     return m;
   }
   function envIn(p, i) {
+    if (p.thI[i] !== 0 && p.thBaseI[i] > 0) { return p.thBaseI[i]; }
     if (p.thI[i] === 0) { return p.ri[i]; }
     var w = p.thI[i] > 0 ? Math.ceil(p.thI[i] / 2 / COL) + 1 : 25;
     var m = Infinity;
     for (var k = Math.max(0, i - w); k <= Math.min(p.n - 1, i + w); k++) { if (has(p, k) && p.ri[k] < m) { m = p.ri[k]; } }
     return m === Infinity ? p.ri[i] : m;
   }
-  /* The tool's view of the work at one Z: the outside and inside diameters. */
+  /* Surviving outside/inside diameters at one Z. For a thread these are the
+     crest/minor envelopes, not a notch treated as an annular empty groove. */
   function measureAt(st, z) {
     var p = st.work, i = colAt(p, z);
     if (i < 0 || i >= p.n || !has(p, i)) { return null; }
-    return { od: 2 * p.ro[i], id: 2 * p.ri[i] };
+    return { od: 2 * outerEnvelope(p, i), id: 2 * innerEnvelope(p, i) };
   }
 
   /* ---- inspection -------------------------------------------------------------------------
@@ -1414,13 +1449,13 @@
   return {
     COL: COL, STEP: STEP, WINDOW: WINDOW, SLACK: SLACK, play: play,
     TOOLS: TOOLS, TOOL_ORDER: TOOL_ORDER, DRILLS: DRILLS, PITCHES: PITCHES, TARGETS: TARGETS,
-    target: target, minBore: minBore, drillSize: drillSize,
+    target: target, minBore: minBore, drillSize: drillSize, hasThreads: hasThreads, knurlContact: knurlContact,
     create: create, snapshot: snapshot, restore: restore, position: position, limits: limits,
     parkFor: parkFor, jawTop: jawTop, JAW_LEN: JAW_LEN, JAW_UP: JAW_UP, BODY_UP: BODY_UP,
     selectTool: selectTool, setSpindle: setSpindle, setDrill: setDrill, setPitch: setPitch,
     move: move, threadPass: threadPass, explain: explain,
     profileAt: profileAt, compare: compare, measureAt: measureAt, evaluate: evaluate,
-    frontZ: frontZ, has: has, zc: zc, colAt: colAt, envOut: envOut, envIn: envIn, shoulderFace: shoulderFace,
+    frontZ: frontZ, has: has, zc: zc, colAt: colAt, envOut: envOut, envIn: envIn, outerEnvelope: outerEnvelope, innerEnvelope: innerEnvelope, shoulderFace: shoulderFace,
     fmt: fmt, fmtSigned: fmtSigned, inch: inch, dia: dia, round: round, MINUS: MINUS
   };
 });

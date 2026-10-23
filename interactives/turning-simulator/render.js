@@ -36,8 +36,9 @@
   }
 
   /* ---- the view's frame ----------------------------------------------------*/
-  function frame(T) {
+  function frame(T, toolId) {
     var R = T.stock.dia / 2;
+    if (toolId === 'knurl') { return box(T.stock.zJaw - 0.62, 0.85, -(R + 0.85), R + 0.85, R); }
     return box(T.stock.zJaw - 0.62, 0.85, -(R + 0.34), R + 0.74, R);
   }
   function box(zMin, zMax, rMin, rMax, R) {
@@ -63,12 +64,32 @@
   /* The outer radius as drawn in section: a knurl's teeth shown as a sawtooth
      between root and crest, at the knurl's pitch. */
   function topR(p, i) {
+    if (p.thO[i]) { return M.envOut(p, i); }
     if (p.kB[i] > 0) {
       var pk = M.TOOLS.knurl.pitch, root = p.kB[i] - p.kP[i], full = p.kB[i] + p.kP[i];
       var f = ((M.zc(p, i) / pk) % 1 + 1) % 1;
       return Math.min(p.ro[i], root + (full - root) * (1 - Math.abs(2 * f - 1)));
     }
     return p.ro[i];
+  }
+  function insideProfile(p, i) { return p.thI[i] ? M.envIn(p, i) : p.ri[i]; }
+  /* A threaded solid is not axisymmetric. The section therefore shows an
+     explicitly schematic crest/root envelope, not two mirrored notch trains
+     pretending to be opposite intersections of a single-start helix. */
+  function threadRoots(p, f, a, b, inside) {
+    var tags = inside ? p.thI : p.thO, radii = inside ? p.ri : p.ro;
+    var roots = [], crests = [];
+    for (var i = a; i <= b; i++) {
+      var w = Math.ceil((tags[i] > 0 ? tags[i] : 1 / 16) / (2 * COL)) + 1;
+      var root = radii[i];
+      for (var k = Math.max(a, i - w); k <= Math.min(b, i + w); k++) { root = inside ? Math.max(root, radii[k]) : Math.min(root, radii[k]); }
+      root = inside ? Math.min(root, M.outerEnvelope(p, i)) : Math.max(root, M.innerEnvelope(p, i));
+      roots.push([M.zc(p, i), root]);
+      crests.push([M.zc(p, i), inside ? M.envIn(p, i) : M.envOut(p, i)]);
+    }
+    var d = 'M' + line(f, simplify(roots));
+    var band = 'M' + line(f, simplify(roots)) + 'L' + line(f, simplify(crests).reverse()) + 'Z';
+    return { line: d + flipY(d, f), band: band + flipY(band, f) };
   }
   /* Points along a run, flat stretches as two column edges, slopes as centres. */
   function pts(p, a, b, fn) {
@@ -124,25 +145,25 @@
   /* Paths for the work in one view. Every key is always present, empty when the
      view does not draw it, so a live picture can update the same elements. */
   function workPaths(p, f, view) {
-    var sec = [], ext = [], edges = [], threads = [], knurls = [], bore = [], hidden = [];
+    var sec = [], ext = [], edges = [], threads = [], roots = [], envelopes = [], knurls = [], bore = [], hidden = [];
     var normal = viewOf(view) === 'normal';
     runs(p).forEach(function (rn) {
       var a = rn[0], b = rn[1], zA = p.zL + a * COL, zB = p.zL + (b + 1) * COL;
       var top = simplify(pts(p, a, b, function (i) { return topR(p, i); }));
-      var bot = simplify(pts(p, a, b, function (i) { return p.ri[i]; })).reverse();
+      var bot = simplify(pts(p, a, b, function (i) { return insideProfile(p, i); })).reverse();
       var hasHole = false;
       for (var hk = a; hk <= b; hk++) { if (p.ri[hk] > 0.0005) { hasHole = true; break; } }
-      if (hasHole) { var bl = simplify(pts(p, a, b, function (i) { return p.ri[i]; })); bore.push('M' + f.x(zA) + ' ' + f.y(0) + 'L' + line(f, bl) + 'L' + f.x(zB) + ' ' + f.y(0) + 'Z'); }
+      if (hasHole) { var bl = simplify(pts(p, a, b, function (i) { return insideProfile(p, i); })); bore.push('M' + f.x(zA) + ' ' + f.y(0) + 'L' + line(f, bl) + 'L' + f.x(zB) + ' ' + f.y(0) + 'Z'); }
       // Seen from outside, a hole is its wall drawn as a hidden line.
       var h0 = -1;
       for (var hc = a; hc <= b + 1; hc++) {
         var open = hc <= b && p.ri[hc] > 0.0005;
         if (open && h0 < 0) { h0 = hc; }
-        if (!open && h0 >= 0) { hidden.push('M' + line(f, simplify(pts(p, h0, hc - 1, function (i) { return p.ri[i]; })))); h0 = -1; }
+        if (!open && h0 >= 0) { hidden.push('M' + line(f, simplify(pts(p, h0, hc - 1, function (i) { return insideProfile(p, i); })))); h0 = -1; }
       }
-      sec.push('M' + f.x(zA) + ' ' + f.y(p.ri[a]) + 'L' + f.x(zA) + ' ' + f.y(top[0][1]) + 'L' + line(f, top) +
+      sec.push('M' + f.x(zA) + ' ' + f.y(insideProfile(p, a)) + 'L' + f.x(zA) + ' ' + f.y(top[0][1]) + 'L' + line(f, top) +
         'L' + f.x(zB) + ' ' + f.y(top[top.length - 1][1]) + 'L' + f.x(zB) + ' ' + f.y(bot[0][1]) + 'L' + line(f, bot) + 'Z');
-      var outer = simplify(pts(p, a, b, function (i) { return p.ro[i]; }));
+      var outer = simplify(pts(p, a, b, function (i) { return p.thO[i] ? M.envOut(p, i) : p.ro[i]; }));
       ext.push('M' + f.x(zA) + ' ' + f.y(0) + 'L' + f.x(zA) + ' ' + f.y(-outer[0][1]) + 'L' + line(f, outer, -1) +
         'L' + f.x(zB) + ' ' + f.y(-outer[outer.length - 1][1]) + 'L' + f.x(zB) + ' ' + f.y(0) + 'Z');
       // Edges seen on the outside: steps, and corners where the slope changes.
@@ -162,7 +183,13 @@
       for (var k = a; k <= b + 1; k++) {
         var tagged = k <= b && p.thO[k] !== 0;
         if (tagged && i0 < 0) { i0 = k; }
-        if (!tagged && i0 >= 0) { threads.push(threadLines(p, f, i0, k - 1)); i0 = -1; }
+        if (!tagged && i0 >= 0) { threads.push(threadLines(p, f, i0, k - 1)); var tr = threadRoots(p, f, i0, k - 1, false); roots.push(tr.line); envelopes.push(tr.band); i0 = -1; }
+      }
+      i0 = -1;
+      for (k = a; k <= b + 1; k++) {
+        var insideThread = k <= b && p.thI[k] !== 0;
+        if (insideThread && i0 < 0) { i0 = k; }
+        if (!insideThread && i0 >= 0) { var ti = threadRoots(p, f, i0, k - 1, true); roots.push(ti.line); envelopes.push(ti.band); i0 = -1; }
       }
       i0 = -1;
       for (k = a; k <= b + 1; k++) {
@@ -173,10 +200,10 @@
     });
     var w = { sec: sec.join(''), ext: ext.join(''), bore: bore.join(''), edges: edges.join(''), knurl: knurls.join(''), hidden: hidden.join('') };
     if (normal) {
-      return { sec: '', bore: '', ext: w.ext + flipY(w.ext, f), edges: w.edges + flipY(w.edges, f), threads: threads.join(''),
+      return { sec: '', bore: '', threadEnvelope: '', ext: w.ext + flipY(w.ext, f), edges: w.edges + flipY(w.edges, f), threads: threads.join(''),
         knurl: w.knurl + flipY(w.knurl, f), hidden: w.hidden + flipY(w.hidden, f) };
     }
-    return { sec: w.sec + flipY(w.sec, f), bore: w.bore + flipY(w.bore, f), ext: '', edges: '', threads: '', knurl: '', hidden: '' };
+    return { sec: w.sec + flipY(w.sec, f), bore: w.bore + flipY(w.bore, f), threadEnvelope: envelopes.join(''), ext: '', edges: '', threads: roots.join(''), knurl: '', hidden: '' };
   }
   /* A thread seen from outside: one crest line per pitch, leaning half a pitch
      across the whole diameter. */
@@ -309,18 +336,42 @@
 
   var INSERT_TOP = { turn: 0.20, face: 0.75, chamfer: 0.15, groove: 0.70, thread: 0.06, knurl: 0.25 };
 
+  function knurlHead(hand) {
+    var t = M.TOOLS.knurl, edge = sample(t.edge, t.cut.from, t.cut.to, [0]);
+    var wheel = edge.concat(edge.slice().reverse().map(function (p) { return [p[0], 0.60 - p[1]]; }));
+    var out = '<g class="ts-knurl-wheel" data-hand="' + (hand > 0 ? 'right' : 'left') + '">';
+    out += '<path class="ts-tool-body" d="' + poly([[-.3,.25],[-.3,.75],[.3,.75],[.3,.25],[.2,.25],[.2,.62],[-.2,.62],[-.2,.25]], true) + '"/>';
+    out += '<path class="ts-tool-wheel" d="' + poly(wheel, true) + '"/>';
+    var width = (2 * t.wheelHalf - 2 * t.wheelChamfer) * S, period = t.pitch * S, teeth = '';
+    for (var y = -width; y <= .56 * S + width; y += period) { teeth += 'M0 ' + r1(y) + 'L' + r1(width) + ' ' + r1(y + hand * width * .58); }
+    out += '<svg class="ts-knurl-barrel" x="' + r1((-t.wheelHalf + t.wheelChamfer) * S) + '" y="' + r1(-.58 * S) + '" width="' + r1(width) + '" height="' + r1(.56 * S) + '" overflow="hidden" aria-hidden="true">' +
+      '<path class="ts-tool-knurl ts-knurl-teeth" style="--ts-knurl-period:' + r1(period) + 'px" d="' + teeth + '"/></svg>';
+    [-1, 1].forEach(function (sign) { out += '<ellipse class="ts-tool-wheel-end" cx="' + r1(sign * .171 * S) + '" cy="' + r1(-.3 * S) + '" rx="' + r1(.016 * S) + '" ry="' + r1(.28 * S) + '"/>'; });
+    out += '<path class="ts-tool-axle" d="M' + lp(-.28, .3) + 'L' + lp(.28, .3) + '"/>';
+    out += '<path class="ts-tool-edge is-forming" d="' + poly(edge, false) + '"/></g>';
+    return out;
+  }
+
   function toolShape(toolId, opt) {
     var t = M.TOOLS[toolId], o = opt || {};
     var out = '';
-    if (t.side === 'out') {
+    if (toolId === 'knurl') {
+      out += knurlHead(1);
+      out += '<g data-ts-knurl-lower transform="translate(0 ' + r1((o.gap == null ? 1 : o.gap) * S) + ') scale(1 -1)">' + knurlHead(-1) + '</g>';
+    } else if (t.side === 'out') {
       var br = [t.cut.from, t.cut.to, 0];
       var edge = sample(t.edge, t.span[0], t.span[1], br);
-      var body = [[edge[0][0], TOP]].concat(edge, [[edge[edge.length - 1][0], TOP]]);
+      var bodyTop = toolId === 'chamfer' ? 0.85 : TOP;
+      var body = [[edge[0][0], bodyTop]].concat(edge, [[edge[edge.length - 1][0], bodyTop]]);
       out += '<path class="ts-tool-body" d="' + poly(body, true) + '"/>';
       var top = INSERT_TOP[toolId];
       var ins = sample(t.edge, t.cut.from, t.cut.to, [0]);
       var insert = [[ins[0][0], top]].concat(ins, [[ins[ins.length - 1][0], top]]);
       out += '<path class="ts-tool-insert' + (toolId === 'knurl' ? ' ts-tool-wheel' : '') + '" d="' + poly(insert, true) + '"/>';
+      if (toolId === 'chamfer') {
+        out += '<circle class="ts-tool-fastener" cx="0" cy="' + r1(-.32 * S) + '" r="' + r1(.035 * S) + '"/>';
+        out += '<text class="ts-tool-label" x="0" y="' + r1(-.48 * S) + '" text-anchor="middle">90° form</text>';
+      }
       if (toolId === 'knurl') {
         var kl = '';
         for (var z = -0.18; z <= 0.18; z += 0.06) { kl += 'M' + lp(z - 0.04, 0.22) + 'L' + lp(z + 0.04, 0.02) + 'M' + lp(z + 0.04, 0.22) + 'L' + lp(z - 0.04, 0.02); }
@@ -365,6 +416,7 @@
       var ext = toolId === 'turn' ? [-0.06, 0.62] : toolId === 'face' ? [-0.10, 0.35] : toolId === 'groove' ? [-0.35, 0.33] : toolId === 'thread' ? [-0.3, 0.38] : [-0.34, 0.34];
       var up = toolId === 'groove' || toolId === 'face' ? 0.80 : 0.52;
       b = [ext[0], -up, ext[1] - ext[0], up + 0.08];
+      if (toolId === 'knurl') { b = [-.32, -.62, .64, 1.44]; }
     } else if (t.side === 'in') {
       b = [-0.1, -0.12, 0.95, 0.62];
     } else {
@@ -372,7 +424,7 @@
     }
     var vb = [b[0] * S, b[1] * S, b[2] * S, b[3] * S].map(r1).join(' ');
     return '<svg class="ts-icon" viewBox="' + vb + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">' +
-      toolShape(toolId, { drill: 0.5 }).replace(/<g class="ts-ref">[\s\S]*?<\/g>/, '') + '</svg>';
+      toolShape(toolId, { drill: 0.5, gap: 0.2 }).replace(/<g class="ts-ref">[\s\S]*?<\/g>/, '') + '</svg>';
   }
 
   /* ---- the chuck -----------------------------------------------------------------*/
@@ -385,9 +437,14 @@
     // the end of the bar held in the jaws, in the same view as the rest of the work
     out += '<rect class="' + (viewOf(view) === 'normal' ? 'ts-ext' : 'ts-sec" fill="' + hatch) + '" x="' + f.x(zj0) + '" y="' + f.y(R) + '" width="' + r1(M.JAW_LEN * S) + '" height="' + r1(2 * R * S) + '"/>';
     var cx = f.x(zJ - M.JAW_LEN / 2), cy = r1((f.y(R + M.JAW_UP)) / 2);
-    // placed by the outer group, turned by the inner one: a CSS rotation replaces an SVG transform
-    out += '<g transform="translate(' + cx + ' ' + cy + ')"><g class="ts-spin"><path class="ts-spin-arc" d="M-14 -6A15 15 0 1 1 -6 14"/><path class="ts-spin-head" d="M-11 17L-4 14L-8 8"/></g></g>';
-    out += '<text class="ts-lbl" x="' + r1(cx + 22) + '" y="' + cy + '" dy="5">Chuck</text>';
+    // A separate axial end view: seen from the tailstock toward the chuck.
+    // The CCW arrow tangent and its negative screen rotation agree. The
+    // invisible guide gives the rotating group's bounding box an exact center.
+    out += '<g class="ts-chuck-end" role="img" aria-label="Chuck end view from the tailstock: counterclockwise forward rotation" transform="translate(' + cx + ' ' + cy + ')">' +
+      '<circle class="ts-spin-ring" r="21"/><g class="ts-spin"><circle class="ts-spin-guide" r="20"/>' +
+      '<path class="ts-spin-arc" d="M14 0A14 14 0 1 0 0 14"/><path class="ts-spin-head" d="M-5 9L1 14L-5 19"/></g></g>';
+    out += '<text class="ts-lbl" x="' + r1(cx + 27) + '" y="' + r1(cy - 2) + '">Chuck end</text>';
+    out += '<text class="ts-spin-view" x="' + r1(cx + 27) + '" y="' + r1(cy + 12) + '">from tailstock</text>';
     return out;
   }
 
@@ -405,13 +462,14 @@
      tool inside it seen from outside, which the work hides. */
   function scene(st, opts) {
     var o = opts || {}, id = o.idPrefix || 'ts', view = viewOf(o.view);
-    var T = M.target(st.targetId), f = frame(T);
+    var T = M.target(st.targetId), f = frame(T, st.tool);
     var w = workPaths(st.work, f, view), g = ghostPaths(T, f, view), c = comparePaths(st, f, view);
     var t = M.TOOLS[st.tool];
     var hatch = 'url(#' + id + '-hatch)';
     var tx = f.x(st.tz), ty = f.y(st.tr);
     var label = o.label || ('The work in the lathe, ' + VIEW_SAYS[view] + ', with the ' + t.name.toLowerCase() + ' at X ' + M.fmt(st.tr * 2) + ', Z ' + M.fmt(st.tz) + '.');
-    var tool = '<g class="ts-tool" data-ts="tool" transform="translate(' + tx + ' ' + ty + ')">' + toolShape(st.tool, { drill: M.drillSize(st) }) + '</g>';
+    if (M.hasThreads(st.work) && view === 'section') { label += ' Threads are schematic crest and root envelopes, not a helical section.'; }
+    var tool = '<g class="ts-tool" data-ts="tool" transform="translate(' + tx + ' ' + ty + ')">' + toolShape(st.tool, { drill: M.drillSize(st), gap: 2 * st.tr }) + '</g>';
     var behind = view === 'normal' && t.side !== 'out';
     return '<svg class="ts-view is-' + view + '" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(label) + '" focusable="false">' +
       defs(id) +
@@ -421,6 +479,7 @@
       (behind ? tool : '') +
       '<path class="ts-bore" data-ts="bore" d="' + w.bore + '"/>' +
       '<path class="ts-sec" data-ts="sec" fill="' + hatch + '" d="' + w.sec + '"/>' +
+      '<path class="ts-thread-envelope" data-ts="thread-envelope" d="' + w.threadEnvelope + '"/>' +
       '<path class="ts-ext" data-ts="ext" d="' + w.ext + '"/>' +
       '<path class="ts-hidden" data-ts="hidden" d="' + w.hidden + '"/>' +
       '<path class="ts-edge" data-ts="edges" d="' + w.edges + '"/>' +
@@ -588,8 +647,11 @@
     if (a < 0) { return ''; }
     var zA = piece.zL + a * COL, zB = piece.zL + (b + 1) * COL, m = 0.06;
     var f = box(zA - m, zB + m, -R - m, R + m, R), w = workPaths(piece, f, view);
-    return '<svg class="ts-part-svg" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(o.label || 'The part as it came off the lathe, ' + VIEW_SAYS[view] + '.') + '" focusable="false">' +
+    var label = o.label || 'The part as it came off the lathe, ' + VIEW_SAYS[view] + '.';
+    if (view === 'section' && M.hasThreads(piece)) { label += ' Thread bands are schematic crest/root envelopes.'; }
+    return '<svg class="ts-part-svg is-' + view + '" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(label) + '" focusable="false">' +
       defs(id) + '<path class="ts-bore" d="' + w.bore + '"/><path class="ts-sec" fill="url(#' + id + '-hatch)" d="' + w.sec + '"/>' +
+      '<path class="ts-thread-envelope" d="' + w.threadEnvelope + '"/>' +
       '<path class="ts-ext" d="' + w.ext + '"/><path class="ts-hidden" d="' + w.hidden + '"/><path class="ts-edge" d="' + w.edges + '"/><path class="ts-thread" d="' + w.threads + '"/>' +
       '<path class="ts-knurl" d="' + w.knurl + '"/><path class="ts-axis" d="M0 ' + f.y(0) + 'H' + f.W + '"/></svg>';
   }

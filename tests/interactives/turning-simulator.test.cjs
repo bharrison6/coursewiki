@@ -235,6 +235,31 @@ test('parting leaves a small core until the blade actually reaches the center', 
   assert.equal(st.part, null, 'Undo restores the actual small core');
 });
 
+test('thread root samples do not release a nut before the kerf reaches its minor bore', () => {
+  for (const threaded of [false, true]) {
+    const st = M.create('knurled-nut');
+    assert.deepEqual(stops(drive(st, [...tool('drill'), ['sp', false], ['drill', '0.4219'], ['sp', true], ['z', -.9], ['z', .6]])), []);
+    if (threaded) {
+      drive(st, [...tool('ithread'), ['sp', false], ['tpi', 13], ['sp', true]]);
+      for (const x of [.445, .469, .493, .503]) {
+        assert.deepEqual(stops(drive(st, [['mv', .1, x], ['th', -.6], ['x', .4], ['z', .1]])), []);
+      }
+    }
+    assert.deepEqual(stops(drive(st, [...tool('groove'), ['mv', -.5, 1.3], ['x', .450]])), []);
+    assert.equal(st.part, null, (threaded ? 'threaded' : 'drilled') + ' control stays attached at X .450');
+    assert.equal(M.position(st).x, .450);
+    const at = M.measureAt(st, -.53);
+    assert.ok(at.od > at.id, 'surviving helical/solid material remains across the kerf');
+    const before = M.snapshot(st);
+    const result = M.move(st, -.5, .300);
+    assert.equal(result.parted, true);
+    assert.ok(st.tr * 2 <= .421875 + 1e-9 && st.tr * 2 >= .4208, 'release is at the minor bore within one motion step');
+    M.restore(st, before);
+    assert.equal(st.part, null);
+    assert.ok(M.has(st.work, M.colAt(st.work, -.53)), 'Undo restores the connected web');
+  }
+});
+
 /* ---- holes ------------------------------------------------------------------*/
 
 test('the boring bar needs a hole it fits in, and cuts only with its tip', () => {
@@ -389,6 +414,22 @@ test('thread carriage stops and partial passes do not snap to the section sampli
   assert.equal(M.move(st, -.333, .5).stop, null);
   M.restore(st, partialState);
   assert.equal(M.move(st, -.333, .5).stop, null, 'restoring a partial cut also restores its withdrawal state');
+});
+
+test('thread envelopes retain the existing chamfer and follow later crest removal and Undo', () => {
+  const st = threadReady();
+  drive(st, [...tool('chamfer'), ['mv', 0, .5], ['x', .315], ['x', .6], ...tool('thread')]);
+  const original = st.work.ro.slice();
+  for (const x of [.350, .330, .300]) drive(st, [['mv', .1, x], ['th', -.69], ['x', .5], ['z', .1]]);
+  for (const z of [-.001, -.01, -.02, -.04, -.3]) {
+    const i = M.colAt(st.work, z);
+    assert.ok(Math.abs(M.envOut(st.work, i) - original[i]) < 1e-8, 'crest/chamfer envelope at ' + z);
+  }
+  const threaded = M.snapshot(st);
+  drive(st, [...tool('turn'), ['mv', .1, .340], ['z', -.4]]);
+  assert.ok(Math.abs(M.envOut(st.work, M.colAt(st.work, -.2)) - .170) < 1e-8, 'a later turning pass caps the crests');
+  M.restore(st, threaded);
+  assert.ok(Math.abs(M.envOut(st.work, M.colAt(st.work, -.2)) - .1875) < 1e-8, 'Undo restores the crest envelope');
 });
 
 /* ---- knurling is forming ------------------------------------------------------*/
