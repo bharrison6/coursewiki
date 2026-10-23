@@ -500,12 +500,12 @@
   }
 
   /* ---- the drawing of the part --------------------------------------------------------
-     A dimensioned half-section of the target as it would sit in the chuck: the
+     A complete outside or longitudinal section view of the target in the chuck: the
      front face on the right. Lengths are dimensioned from the front face, the way
      the inspection measures them. The specification table on the page carries
      the limits; the drawing shows nominal sizes. */
   function drawing(T, opts) {
-    var o = opts || {}, id = o.idPrefix || ('tsd-' + T.id);
+    var o = opts || {}, id = o.idPrefix || ('tsd-' + T.id), view = viewOf(o.view);
     var L = T.length.L, R = 0;
     T.outside.forEach(function (sg) { R = Math.max(R, outer(sg) / 2); });
     var DS = Math.min(280 / L, 170 / (2 * R));
@@ -519,26 +519,60 @@
     ss.sort(function (a, b) { return a - b; });
     var g = ss.map(function (s) { return M.profileAt(T, s); });
     var topPts = ss.map(function (s, i) { return X(s) + ' ' + Y(g[i].ro); });
-    var inPts = ss.map(function (s, i) { return X(s) + ' ' + Y(g[i].ri); }).reverse();
+    var inPts = ss.map(function (s, i) { return X(s) + ' ' + Y(g[i].ri); });
     var botPts = ss.map(function (s, i) { return X(s) + ' ' + Y(-g[i].ro); });
-    var art = '';
-    if (T.inside.length) { art += '<path class="ts-bore" d="M' + X(0) + ' ' + Y(0) + 'L' + inPts.slice().reverse().join('L') + 'L' + X(L) + ' ' + Y(0) + 'Z"/>'; }
-    art += '<path class="ts-sec" fill="url(#' + id + '-hatch)" d="M' + topPts.join('L') + 'L' + inPts.join('L') + 'Z"/>';
-    art += '<path class="ts-ext" d="M' + X(0) + ' ' + Y(0) + 'L' + botPts.join('L') + 'L' + X(L) + ' ' + Y(0) + 'Z"/>';
+    var inBot = ss.map(function (s, i) { return X(s) + ' ' + Y(-g[i].ri); });
+    var outline = 'M' + topPts.join('L') + 'L' + botPts.slice().reverse().join('L') + 'Z';
+    var hole = T.inside.length ? 'M' + inPts.join('L') + 'L' + inBot.slice().reverse().join('L') + 'Z' : '';
+    var threaded = T.outside.concat(T.inside).some(function (sg) { return sg.kind === 'thread'; });
+    var modeLabel = view === 'normal' ? 'Normal: outside view' : 'Section: through the centerline';
+    var detail = view === 'normal' ? 'Dashed lines show hidden internal features.' :
+      (threaded ? 'Thread bands are schematic crest/root envelopes, not a literal helical cut face.' : 'Hatching marks the material cut by the section plane.');
+    var art = '<text class="ts-dlbl" x="8" y="16">' + modeLabel + '</text>';
+    if (view === 'section' && threaded) { art += '<text class="ts-dlbl" x="8" y="30">Thread envelopes (schematic)</text>'; }
+    if (view === 'section') {
+      art += '<path class="ts-bore" d="' + hole + '"/>';
+      art += '<path class="ts-sec" fill="url(#' + id + '-hatch)" fill-rule="evenodd" d="' + outline + hole + '"/>';
+    } else {
+      art += '<path class="ts-ext" d="' + outline + '"/>';
+      if (hole) { art += '<path class="ts-hidden" d="M' + inPts.join('L') + 'M' + inBot.join('L') + '"/>'; }
+    }
+    function threadEnvelope(sg, inside) {
+      var rr = (sg.root[0] + sg.root[1]) / 4;
+      var xs = [sg.from].concat(ss.filter(function (s) { return s > sg.from && s < sg.to; }), [sg.to]);
+      var lines = '', bands = '';
+      [-1, 1].forEach(function (sign) {
+        var crest = [], root = [];
+        xs.forEach(function (s) {
+          var profile = M.profileAt(T, s), cr = inside ? profile.ri : profile.ro;
+          var rt = inside ? Math.max(cr, rr) : Math.min(cr, rr);
+          crest.push(X(s) + ' ' + Y(sign * cr)); root.push(X(s) + ' ' + Y(sign * rt));
+        });
+        lines += 'M' + root.join('L');
+        bands += 'M' + crest.join('L') + 'L' + root.slice().reverse().join('L') + 'Z';
+      });
+      if (view === 'section') { return '<path class="ts-thread-envelope" d="' + bands + '"/>'; }
+      return '<path class="' + (inside ? 'ts-hidden' : 'ts-dthin') + '" d="' + lines + '"/>';
+    }
     var edgeD = '';
     T.outside.forEach(function (sg, k) {
-      if (k > 0) { edgeD += 'M' + X(sg.from) + ' ' + Y(0) + 'V' + Y(-Math.max(outer(sg), outer(T.outside[k - 1])) / 2); }
+      if (view === 'normal' && k > 0) { var re = Math.max(outer(sg), outer(T.outside[k - 1])) / 2; edgeD += 'M' + X(sg.from) + ' ' + Y(re) + 'V' + Y(-re); }
       if (sg.kind === 'thread') {
-        var p = 1 / sg.tpi, rr = (sg.root[0] + sg.root[1]) / 4, rc = sg.crest[1] / 2, tl = '';
-        art += '<path class="ts-dthin" d="M' + X(sg.from) + ' ' + Y(rr) + 'H' + X(sg.to) + 'M' + X(sg.from) + ' ' + Y(-rr) + 'H' + X(sg.to) + '"/>';
-        for (var s = sg.from + p / 2; s < sg.to - p / 4; s += p) { tl += 'M' + X(s + p / 8) + ' ' + Y(-rc) + 'L' + X(s - p / 8) + ' ' + Y(0); }
-        art += '<path class="ts-thread" d="' + tl + '"/>';
+        art += threadEnvelope(sg, false);
+        if (view === 'normal') {
+          var p = 1 / sg.tpi, tl = '';
+          for (var s = sg.from + p / 2; s < sg.to - p / 4; s += p) {
+            tl += 'M' + X(s + p / 4) + ' ' + Y(M.profileAt(T, s + p / 4).ro) +
+              'L' + X(s - p / 4) + ' ' + Y(-M.profileAt(T, s - p / 4).ro);
+          }
+          art += '<path class="ts-thread" d="' + tl + '"/>';
+        }
       }
-      if (sg.kind === 'knurl') {
-        var kd = '', rk = sg.d / 2, pk = 0.08, run = rk * 0.58;
+      if (sg.kind === 'knurl' && view === 'normal') {
+        var kd = '', rk = sg.d / 2, pk = 0.08, run = 2 * rk * 0.58;
         for (var sgn = -1; sgn <= 1; sgn += 2) {
           for (var z = sg.from - run; z <= sg.to + run; z += pk) {
-            var c = clip(z, 0, z + sgn * run, -rk, sg.from, -rk, sg.to, 0);
+            var c = clip(z, rk, z + sgn * run, -rk, sg.from, -rk, sg.to, rk);
             if (c) { kd += 'M' + X(c[0]) + ' ' + Y(c[1]) + 'L' + X(c[2]) + ' ' + Y(c[3]); }
           }
         }
@@ -546,11 +580,12 @@
       }
     });
     T.inside.forEach(function (sg) {
-      if (sg.kind === 'thread') { var rr = (sg.root[0] + sg.root[1]) / 4; art += '<path class="ts-dthin" d="M' + X(sg.from) + ' ' + Y(rr) + 'H' + X(sg.to) + '"/>'; }
+      if (sg.kind === 'thread') { art += threadEnvelope(sg, true); }
     });
     T.chamfers.forEach(function (c) {
-      if (c.edge === 'front-od') { edgeD += 'M' + X(c.c) + ' ' + Y(0) + 'V' + Y(-outer(T.outside[0]) / 2); }
-      if (c.edge === 'back-od') { edgeD += 'M' + X(L - c.c) + ' ' + Y(0) + 'V' + Y(-outer(T.outside[T.outside.length - 1]) / 2); }
+      if (view !== 'normal') { return; }
+      if (c.edge === 'front-od') { var rf = outer(T.outside[0]) / 2; edgeD += 'M' + X(c.c) + ' ' + Y(rf) + 'V' + Y(-rf); }
+      if (c.edge === 'back-od') { var rb = outer(T.outside[T.outside.length - 1]) / 2; edgeD += 'M' + X(L - c.c) + ' ' + Y(rb) + 'V' + Y(-rb); }
     });
     art += '<path class="ts-edge" d="' + edgeD + '"/>';
     art += '<path class="ts-axis" d="M' + r1(x0 - 16) + ' ' + r1(cy) + 'H' + r1(xF + 16) + '"/>';
@@ -605,13 +640,19 @@
       texts += '<text class="ts-dtxt ts-halo" x="' + r1(cx) + '" y="' + ty + '" text-anchor="middle">' + esc(n.text) + '</text>';
     });
     var H = r1(Math.max(botY + 34 + (rowsUsed - 1) * 26 + 12, ny + 12));
-    return '<svg class="ts-drawing-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-labelledby="' + id + '-t ' + id + '-d" focusable="false">' +
-      '<title id="' + id + '-t">' + esc('Drawing: ' + T.title) + '</title>' +
-      '<desc id="' + id + '-d">' + esc(describe(T)) + '</desc>' +
+    return '<svg class="ts-drawing-svg" data-drawing-view="' + view + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-labelledby="' + id + '-t ' + id + '-d" focusable="false">' +
+      '<title id="' + id + '-t">' + esc('Target drawing: ' + T.title + '. ' + modeLabel) + '</title>' +
+      '<desc id="' + id + '-d">' + esc(detail + ' ' + describe(T)) + '</desc>' +
       '<defs><pattern id="' + id + '-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
         '<rect class="ts-hatch-bg" width="7" height="7"/><line class="ts-hatch-line" x1="0" y1="0" x2="0" y2="7"/></pattern>' +
         '<marker id="' + id + '-arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path class="ts-arrowhead" d="M0 0L8 4L0 8z"/></marker></defs>' +
       art + dim + notes + texts + '</svg>';
+  }
+  function drawingPair(T, opts) {
+    var o = opts || {}, id = o.idPrefix || ('tsd-' + T.id);
+    return '<div class="ts-drawing-pair">' + ['normal', 'section'].map(function (view) {
+      return '<div class="ts-drawing-sheet">' + drawing(T, { idPrefix: id + '-' + view, view: view }) + '</div>';
+    }).join('') + '</div>';
   }
   function outer(sg) { return sg.kind === 'thread' ? sg.crest[1] : sg.d; }
   function insideR(sg) { return sg.kind === 'thread' ? sg.crest[0] / 2 : sg.d / 2; }
@@ -681,7 +722,7 @@
   return {
     S: S, VIEWS: ['section', 'normal'], frame: frame, box: box, partFigure: partFigure, simplify: simplify, flipY: flipY,
     workPaths: workPaths, ghostPaths: ghostPaths, comparePaths: comparePaths,
-    toolShape: toolShape, toolIcon: toolIcon, chuck: chuck, scene: scene, drawing: drawing, describe: describe,
+    toolShape: toolShape, toolIcon: toolIcon, chuck: chuck, scene: scene, drawing: drawing, drawingPair: drawingPair, describe: describe,
     SCENES: SCENES, sceneState: sceneState, staticScene: staticScene, esc: esc
   };
 });

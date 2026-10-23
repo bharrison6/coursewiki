@@ -222,7 +222,7 @@
     };
     var parts = {};          // part id -> { st, undo, log, measured, stale }
     var cur = null, st = null, T = null, f = null, view = null, P = {};
-    var opt = { ghost: true, zoom: false, step: 0.010, view: 'section' };
+    var opt = { ghost: true, zoom: false, step: 0.010, view: 'section', drawingView: 'section' };
     var VIEW_WORDS = { section: 'cut in half along its centerline', normal: 'seen from outside' };
     var busy = null;         // a running feed: { stop: fn }
     var jogGroup = null, drag = null, dirty = false, specCache = {}, returnFocus = null;
@@ -237,8 +237,13 @@
       cur = partState(pid); st = cur.st; T = M.target(pid); f = R.frame(T);
       $$(lab, '[data-ts-part]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ts-part') === pid)); });
       el.goal.innerHTML = '<strong>' + esc(T.title) + '.</strong> ' + esc(T.summary) + ' From ' + M.fmt(T.stock.dia) + ' in bar.';
-      el.drawing.innerHTML = '<div class="ts-drawing-scroll" tabindex="0" role="region" aria-label="Dimensioned part drawing; scroll horizontally if needed">' + R.drawing(T, { idPrefix: id + '-d-' + pid }) + '</div>' +
-        '<figcaption><span class="ts-teaches">' + esc(T.teaches) + '</span><span class="ts-drawing-hint">Dimensions in inches. The dashed outline on the work is this drawing, placed at Z0.</span></figcaption>';
+      el.drawing.innerHTML = '<div class="ts-drawing-views" role="group" aria-labelledby="' + id + '-drawing-views">' +
+        '<span class="ts-k" id="' + id + '-drawing-views">Target drawing</span>' +
+        '<button type="button" data-ts-drawing-view="normal">Normal</button><button type="button" data-ts-drawing-view="section">Section</button></div>' +
+        '<div class="ts-drawing-scroll" tabindex="0" role="region" aria-label="Dimensioned target drawing; scroll horizontally if needed"></div>' +
+        '<figcaption><span class="ts-teaches">' + esc(T.teaches) + '</span><span class="ts-drawing-hint" data-ts-drawing-hint></span>' +
+        '<span class="ts-drawing-hint">Nominal dimensions in inches; the feature table below gives the limits. The dashed outline on the work is this target, placed at Z0. This switch changes only the target drawing.</span></figcaption>';
+      renderDrawing();
       buildView();
       toolUI();
       renderLog();
@@ -248,6 +253,13 @@
       } else {
         say('info', 'Back to the ' + T.title.toLowerCase() + '.', 'The work is where you left it.');
       }
+    }
+    function renderDrawing() {
+      $$(el.drawing, '[data-ts-drawing-view]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ts-drawing-view') === opt.drawingView)); });
+      $(el.drawing, '.ts-drawing-scroll').innerHTML = R.drawing(T, { idPrefix: id + '-d-' + T.id, view: opt.drawingView });
+      $(el.drawing, '[data-ts-drawing-hint]').textContent = opt.drawingView === 'normal' ?
+        'Normal shows the complete outside. Dashed lines identify hidden holes and internal threads.' :
+        'Section exposes the interior through the centerline. Thread bands are schematic crest/root envelopes; knurl texture remains a surface callout.';
     }
     function buildView() {
       f = R.frame(T, st.tool);
@@ -761,6 +773,9 @@
       if (el.bench.contains(b) || b.hasAttribute('data-ts-part') || b.classList.contains('ts-new')) { keepBenchVisible(); }
     });
     function act(b, e) {
+      if (b.hasAttribute('data-ts-drawing-view')) {
+        opt.drawingView = b.getAttribute('data-ts-drawing-view'); renderDrawing(); return;
+      }
       if (b.hasAttribute('data-ts-part')) { choosePart(b.getAttribute('data-ts-part')); return; }
       if (b.hasAttribute('data-ts-tool')) {
         var tid = b.getAttribute('data-ts-tool');
