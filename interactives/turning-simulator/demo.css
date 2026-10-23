@@ -304,11 +304,22 @@
   .ts-tool-opt { justify-content: flex-start; }
 }
 @container ts-lab (max-width: 35.99rem) {
+  /* Spend the phone's height on controls and the work, not repeated headings
+     and gaps. The threading row and pitch selector must fit above navigation. */
+  .ts-workbench { gap: .3rem; }
+  .ts-panel { gap: .4rem; }
+  .ts-jog-head { flex-wrap: nowrap; }
+  .ts-lab .ts-feed-row button { padding-block: .15rem; }
+  .ts-lab .ts-fb-act .ts-more { min-height: 1.5rem; }
   /* one grid of five: the post tools, then the three on the tailstock */
   .ts-rack { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-areas: none; gap: .3rem; }
   .ts-tool-group, .ts-tool-row { display: contents; }
   .ts-tool-group > .ts-k2 { display: none; }
   .ts-tool-opt { grid-area: auto; grid-column: 1 / -1; }
+  /* Keep the active setting clear of the site's fixed Exit presentation
+     button at the lower right. Its full label can wrap within this row. */
+  .ts-tool-opt { justify-content: flex-start; }
+  .ts-tool-opt .ts-k2 { max-width: 5rem; }
   .ts-lab .ts-views button, .ts-lab .ts-zoom { min-height: 2rem; padding: .15rem .45rem; font-size: .68rem; }
   .ts-pad { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "left up down right"; }
   /* the height a phone needs back for the threading pass and its pitch */
@@ -418,11 +429,13 @@
 .ts-static-parts { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
 
 /* ---- presentation mode: bigger targets and numbers ------------------------------*/
-.presenting .ts-lab button { min-height: 3rem; font-size: .9rem; }
-.presenting .ts-panel button, .presenting .ts-rack button { min-height: 2.75rem; }
-.presenting .ts-lab .ts-views button, .presenting .ts-lab .ts-zoom { min-height: 2.25rem; font-size: .78rem; }
-.presenting .ts-dro b { font-size: 1.45rem; }
-.presenting .ts-msg { font-size: 1.1rem; }
+@container ts-lab (min-width: 36rem) {
+  .presenting .ts-lab button { min-height: 3rem; font-size: .9rem; }
+  .presenting .ts-panel button, .presenting .ts-rack button { min-height: 2.75rem; }
+  .presenting .ts-lab .ts-views button, .presenting .ts-lab .ts-zoom { min-height: 2.25rem; font-size: .78rem; }
+  .presenting .ts-dro b { font-size: 1.45rem; }
+  .presenting .ts-msg { font-size: 1.1rem; }
+}
 
 /* ---- print: the drawing, the work as it stands and the inspection; no controls ---*/
 @media print {

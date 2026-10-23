@@ -131,7 +131,7 @@
             '</form>' +
             '<div class="ts-jog">' +
               '<div class="ts-jog-head">' +
-                '<span class="ts-k" id="' + id + '-step-t">Handwheels, step</span>' +
+                '<span class="ts-k" id="' + id + '-step-t">Step, in</span>' +
                 '<div class="ts-steps" role="radiogroup" aria-labelledby="' + id + '-step-t">' +
                   STEPS.map(function (s, k) { return '<label><input type="radio" name="' + id + '-step" value="' + s + '"' + (k === 1 ? ' checked' : '') + '><span>' + M.fmt(s) + '</span></label>'; }).join('') +
                 '</div>' +
@@ -827,10 +827,17 @@
     if (window.ResizeObserver) { new ResizeObserver(refit).observe(lab); }
     window.addEventListener('resize', refit);
     if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { seen = ''; refit(); }); }
-    window.addEventListener('load', function () { seen = ''; refit(); });
+    function enterLinkedBench() {
+      var card = lab.closest('.xcard');
+      // A simulator deep link should reach its operating workspace, including
+      // in presentation mode where the part heading can fill a phone screen.
+      if (card && window.location.hash === '#' + card.id) { keepBenchVisible(); }
+    }
+    window.addEventListener('load', function () { seen = ''; refit(); requestAnimationFrame(enterLinkedBench); });
+    if (document.readyState === 'complete') { requestAnimationFrame(enterLinkedBench); }
 
-    // On a narrow surface, start close up on the tool; Close up turns it off.
-    if (lab.getBoundingClientRect().width < 480) { opt.zoom = true; el.zoom.setAttribute('aria-pressed', 'true'); }
+    // Start with the stock, target and tool together at every width. Close up is
+    // useful once a cutting point has been chosen, not while the tool is parked.
     choosePart(M.TARGETS[0].id);
   }
 
