@@ -405,10 +405,46 @@
   /* ======================================================================
      Live section views: the part as it is now, through the tool
      ====================================================================*/
+  // Z down to -27: past the point of a drill through the part, but no
+  // deeper, so the block and the tool above it stay large on the screen
   var VIEW = {
-    front: { u0: -45, u1: 145, z0: -34, z1: 34 },
-    side: { u0: -30, u1: 90, z0: -34, z1: 34 }
+    front: { u0: -45, u1: 145, z0: -27, z1: 34 },
+    side: { u0: -30, u1: 90, z0: -27, z1: 34 }
   };
+  /* Along a section line: where the metal stands above the finished part
+     (still to remove) and where it is cut below it (too far), as closed
+     regions between the two profiles, and the finished profile itself.
+     Each sample is judged by the inspection's own envelope (inspect.js
+     envAt), so a wall inside its tolerance band is never marked as wrong.
+     pts: [u, height] samples along the line, heights clamped to the bottom. */
+  function sectionCompare(job, axis, at, pts) {
+    var env = { lo: 0, hi: 0, owner: 'top', mode: 'set' }, target = [], runs = { 1: [], 2: [] }, cur = null;
+    pts.forEach(function (q) {
+      var x = axis === 'front' ? q[0] : at, y = axis === 'front' ? at : q[0];
+      x = Math.min(Math.max(x, ST.x0 + 1e-9), ST.x1 - 1e-9);
+      y = Math.min(Math.max(y, ST.y0 + 1e-9), ST.y1 - 1e-9);
+      var zt = I.nominalAt(job, x, y), h = q[1], hv = h <= ST.bottom + 1e-9 ? -Infinity : h;
+      I.envAt(job, x, y, env);
+      var s = hv > env.hi + 1e-9 ? 1 : hv < env.lo - 1e-9 ? 2 : 0;
+      target.push([q[0], -zt]);
+      if (!s) { cur = null; return; }
+      if (!cur || cur.s !== s) { cur = { s: s, top: [], bot: [] }; runs[s].push(cur); }
+      cur.top.push([q[0], -Math.max(h, zt)]);
+      cur.bot.push([q[0], -Math.min(h, zt)]);
+    });
+    // each sample stands for a quarter millimetre, so a run is widened by
+    // half a sample at each end and a one-sample run still shows
+    function region(list) {
+      return list.map(function (r) {
+        var a = r.top[0], b = r.top[r.top.length - 1], c = r.bot[0], e = r.bot[r.bot.length - 1];
+        var top = [[a[0] - 0.125, a[1]]].concat(r.top, [[b[0] + 0.125, b[1]]]);
+        var bot = [[c[0] - 0.125, c[1]]].concat(r.bot, [[e[0] + 0.125, e[1]]]);
+        return poly(simplify(top.concat(bot.reverse())), true);
+      }).join('');
+    }
+    return { target: target, excess: region(runs[1]), over: region(runs[2]) };
+  }
+
   /* axis 'front': along X at Y = at (seen from the front);
      axis 'side': along Y at X = at (seen from the right, +Y to the right). */
   function renderSection(sim, job, axis, at, opts) {
@@ -443,14 +479,13 @@
       poly2.push([u1, -ST.bottom]);
       var d = poly(simplify(poly2), true);
       out.push(p('ms-metal', d) + p('ms-metal-hatch', d, ' fill="url(#' + id + ')"') + p('ms-metal-edge', d));
-      // the drawing's part, dashed over it
+      // the finished part over it: metal still to remove, metal cut past it,
+      // and its outline, judged by the inspection's own envelope
       if (job && !job.free && opts.target !== false) {
-        var tz = [];
-        for (var v = u0; v <= u1 + 1e-9; v += 0.25) {
-          var tx = axis === 'front' ? v : at, ty = axis === 'front' ? at : v;
-          tz.push([v, -I.nominalAt(job, Math.min(tx, ST.x1 - 1e-9), Math.min(ty, ST.y1 - 1e-9))]);
-        }
-        out.push(p('ms-target-line', poly(simplify(tz), false)));
+        var cmp = sectionCompare(job, axis, at, pts);
+        if (cmp.excess) out.push(p('ms-excess', cmp.excess));
+        if (cmp.over) out.push(p('ms-over', cmp.over));
+        out.push(p('ms-target-line', poly(simplify(cmp.target), false)));
       }
     } else {
       out.push(text('ms-t ms-t-soft', (V.u0 + V.u1) / 2, -2, 'the section line is off the part', 'middle'));
@@ -501,6 +536,6 @@
     targetOutline: targetOutline,
     toolShape: toolShape, placeTool: placeTool, renderToolIcon: renderToolIcon,
     renderDrawing: renderDrawing, renderSetup: renderSetup, renderRack: renderRack, renderJobFigures: renderJobFigures,
-    renderSection: renderSection, VIEW: VIEW, RACK: RACK, simplify: simplify
+    renderSection: renderSection, sectionCompare: sectionCompare, VIEW: VIEW, RACK: RACK, simplify: simplify
   };
 });

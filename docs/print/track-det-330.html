@@ -2921,11 +2921,16 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
    Gold and red-orange are fills and strokes only, never text (contrast
    rules 1 and 2 in the token layer). Control shapes follow the other
    machining labs, so this reads as one of them.
+
+   The finished part uses the lathe lab's language: the drawing's outline in
+   --cat1, metal still to remove in --cat2, metal cut past the drawing in
+   --cat3. The block itself is grey. Gouges are striped as well as coloured,
+   and every state is also named in words (legend, status, inspection).
    ==========================================================================*/
 
 [data-interactive="milling-simulator"] {
-  margin: 1.5rem 0;
-  padding: clamp(1rem, 3vw, 1.5rem);
+  margin: 1rem 0;
+  padding: clamp(.5rem, 2vw, 1rem);
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
@@ -2984,16 +2989,19 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 /* The printed figures step aside on screen once the machine is running. */
 [data-interactive="milling-simulator"].is-live .ms-static { display: none; }
 [data-ms-live]:empty { display: none; }
-.ms-app { display: flex; flex-direction: column; gap: .9rem; min-width: 0; container-type: inline-size; }
+/* Three containers: the whole app (layout), the work column (readout) and
+   the views (what fits on them). */
+.ms-app { display: flex; flex-direction: column; gap: .55rem; min-width: 0; container: ms-app / inline-size; }
+.ms-app [hidden] { display: none !important; }
 
 [data-interactive="milling-simulator"] button {
   min-height: 2.75rem;
-  padding: .5rem .8rem;
+  padding: .45rem .75rem;
   border: 1px solid var(--rule);
   border-radius: var(--radius-xs);
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--f-display); font-weight: 700; font-size: .9rem;
+  font-family: var(--f-display); font-weight: 700; font-size: .86rem;
   letter-spacing: .02em; line-height: 1.2;
   cursor: pointer;
 }
@@ -3003,61 +3011,135 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   border-color: var(--accent); color: var(--accent); background: var(--surface-2);
   box-shadow: inset 0 -3px 0 var(--accent);
 }
+[data-interactive="milling-simulator"] button[aria-expanded="true"] { border-color: var(--accent); background: var(--surface-2); }
 [data-interactive="milling-simulator"] .ms-primary { border-color: var(--accent); background: var(--accent); color: var(--paper); }
 [data-interactive="milling-simulator"] .ms-primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.08); }
-[data-interactive="milling-simulator"] :is(button, input, canvas, .msd-scroll, summary):focus-visible {
+[data-interactive="milling-simulator"] :is(button, input, canvas, .msd-scroll, summary, .ms-inspect):focus-visible {
   outline: 3px solid var(--cat2); outline-offset: 2px;
 }
 [data-interactive="milling-simulator"] input {
   min-height: 2.75rem; min-width: 0;
-  padding: .35rem .5rem;
+  padding: .3rem .45rem;
   border: 1px solid var(--rule); border-radius: var(--radius-xs);
   background: var(--surface); color: var(--ink);
   font-family: var(--f-mono); font-size: 1rem;
 }
 .ms-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.ms-small-label { font-family: var(--f-display); font-size: .76rem; font-weight: 700; color: var(--ink-soft); }
 
-/* job and brief */
-.ms-jobs { display: flex; flex-wrap: wrap; gap: .4rem; }
-.ms-brief { display: flex; flex-direction: column; gap: .45rem; }
-.ms-brief-title { font-family: var(--f-display); font-weight: 700; font-size: 1.08rem; }
-.ms-brief-tools { display: flex; flex-wrap: wrap; gap: .4rem; }
-.ms-hints { margin: 0; padding-left: 1.4rem; display: flex; flex-direction: column; gap: .35rem; }
+/* ---- the job and its goal --------------------------------------------------*/
+.ms-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .35rem .6rem; }
+.ms-jobs, .ms-head-tools { display: flex; flex-wrap: wrap; gap: .3rem; }
+[data-interactive="milling-simulator"] .ms-jobs button { padding-inline: .6rem; }
+.ms-job-name { display: none; font-weight: 600; }
+@container ms-app (min-width: 60rem) { .ms-job-name { display: inline; } .ms-job-name::before { content: " · "; } }
+.ms-goal { margin: 0; font-size: .98rem; line-height: 1.4; }
+.ms-goal strong { font-family: var(--f-display); }
+.ms-hints { margin: 0; padding-left: 1.4rem; display: flex; flex-direction: column; gap: .3rem; font-size: .95rem; }
 .ms-hints:empty { display: none; }
 .ms-hints li { padding-left: .2rem; }
-.ms-drawing > summary {
-  cursor: pointer; min-height: 2.75rem; display: flex; align-items: center;
-  font-family: var(--f-display); font-weight: 700; font-size: .95rem;
-}
-.ms-drawing[open] > summary { margin-bottom: .4rem; }
 
-/* The views: third-angle, one scale. The left column holds 190 mm of X and
-   the right 120 mm of Y, so the top view and the part view, and the two
-   sections, come out the same height. */
-.ms-views { display: grid; gap: .55rem; grid-template-columns: 190fr 120fr; }
-@container (max-width: 34rem) { .ms-views { grid-template-columns: minmax(0, 1fr); } }
+/* ---- the workbench: the work and its controls, one screen --------------
+   Wide: the work on the left, the controls beside it at the work's own
+   height (contain: size keeps the controls from making the row taller;
+   they scroll inside it only if a screen is too short).
+   Narrow: the work above, the controls scrolling under it, the whole
+   bench no taller than the screen, as the lathe lab does. */
+.ms-workbench { min-width: 0; display: flex; flex-direction: column; gap: .6rem; }
+.ms-machine { min-width: 0; display: flex; flex-direction: column; gap: .4rem; container: ms-work / inline-size; }
+.ms-panel { min-width: 0; display: flex; flex-direction: column; gap: .45rem; }
+.ms-panel > * { flex-shrink: 0; }
+/* The views grow with the width, but never past the height that keeps the
+   readout above them and the status and Undo below them on the screen a
+   link to the simulator lands on (about 30rem of page and bench around
+   them; 181 mm of top view and section for every 190 mm across). */
+.ms-views { display: flex; flex-direction: column; gap: .35rem; min-width: 0; container: ms-views / inline-size;
+  max-width: max(18rem, calc((100svh - 30rem) * 190 / 181)); width: 100%; margin-inline: auto; }
+@container ms-app (min-width: 36rem) {
+  .ms-workbench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(15.5rem, 18rem); gap: .6rem; align-items: stretch; }
+  .ms-panel { contain: size; overflow-y: auto; overscroll-behavior: contain; }
+}
+@container ms-app (max-width: 35.99rem) {
+  .ms-workbench { height: min(54rem, calc(100svh - var(--appbar-h, 3.5rem) - 6rem)); }
+  .ms-machine { flex: 0 0 auto; }
+  .ms-panel { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+    padding: .35rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); }
+  .ms-views { width: min(100%, calc(var(--ms-view-h, 26svh) * 190 / 181)); margin-inline: auto; }
+}
+/* the readout */
+.ms-dro {
+  display: flex; flex-direction: column; gap: .1rem;
+  padding: .35rem .7rem .4rem;
+  background: var(--band); color: var(--band-ink);
+  border-radius: var(--radius-sm);
+}
+.ms-dro-vals { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .9rem; }
+.ms-dro-v { white-space: nowrap; }
+.ms-dro-k { font-family: var(--f-display); font-weight: 800; font-size: .8rem; opacity: .8; margin-right: .3rem; }
+.ms-dro-val { display: inline-block; min-width: 4.8rem; text-align: right;
+  font-family: var(--f-mono); font-size: 1.15rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ms-dro.is-cutting { box-shadow: inset .3rem 0 0 var(--cat2); }
+.ms-dro-note { margin: 0; font-family: var(--f-display); font-size: .74rem; font-weight: 600; opacity: .85; }
+@container ms-work (max-width: 25rem) {
+  .ms-dro-val { min-width: 4.1rem; font-size: 1rem; }
+  .ms-dro-vals { gap: .1rem .6rem; }
+  /* on a phone, Help says what the readout follows */
+  .ms-dro-meaning { display: none; }
+  .ms-status, .ms-next { font-size: .86rem; }
+}
+
+/* the views: the top view, and section A-A at the same X scale under it */
 .ms-view {
-  margin: 0; min-width: 0; display: flex; flex-direction: column;
+  position: relative; margin: 0; min-width: 0;
   background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm); overflow: hidden;
 }
-.ms-view-cap {
-  display: flex; align-items: center; justify-content: space-between; gap: .4rem;
-  min-height: 2.1rem; padding: .15rem .3rem .15rem .55rem;
-  border-bottom: 1px solid var(--rule);
-  font-family: var(--f-display); font-size: .7rem; font-weight: 700;
-  letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft);
+.ms-view-label, .ms-probe {
+  position: absolute; top: .2rem; margin: 0; pointer-events: none;
+  font-family: var(--f-display); font-size: .68rem; font-weight: 700; color: var(--ink-soft);
 }
-.ms-turn { display: flex; gap: .25rem; }
-[data-interactive="milling-simulator"] .ms-mini { min-height: 2.75rem; min-width: 2.75rem; padding: 0 .5rem; font-size: 1.1rem; }
+.ms-view-label { left: .45rem; display: flex; gap: .5rem; align-items: baseline; }
+.ms-view-label, .ms-probe:not(:empty) { padding: 0 .25rem; border-radius: 2px; background: color-mix(in srgb, var(--paper) 85%, transparent); }
+.ms-view-label-end { left: auto; right: .45rem; }
+.ms-view-name { letter-spacing: .06em; text-transform: uppercase; color: var(--ink); }
+.ms-view-how { font-weight: 600; }
+.ms-probe { right: .45rem; font-variant-numeric: tabular-nums; }
 .ms-canvas { display: block; width: 100%; height: auto; touch-action: none; }
 .ms-top-canvas { aspect-ratio: 190 / 120; cursor: grab; }
 .ms-iso-canvas { aspect-ratio: 1; touch-action: auto; }
 .ms-section-host { touch-action: none; cursor: ns-resize; }
 .ms-section-svg { display: block; width: 100%; height: auto; }
+
+/* the legend sits in the empty band in front of the vise */
+.ms-legend {
+  position: absolute; left: .45rem; right: .45rem; bottom: .2rem; margin: 0; pointer-events: none;
+  display: flex; flex-wrap: wrap; gap: .05rem .8rem;
+  font-family: var(--f-display); font-size: .68rem; font-weight: 600; color: var(--ink-soft); line-height: 1.3;
+}
+.ms-legend.is-plain .ms-lg:not(:last-child) { display: none; }
+.ms-lg { display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap;
+  padding: 0 .2rem; border-radius: 2px; background: color-mix(in srgb, var(--paper) 85%, transparent); }
+.ms-key { display: inline-block; flex: none; width: 1.15rem; height: .72rem; border-radius: 2px; }
+.ms-key-target { border: 2px dashed var(--cat1); }
+.ms-key-excess { background: linear-gradient(90deg, color-mix(in srgb, var(--cat2) 35%, var(--paper)), var(--cat2)); }
+.ms-key-over { background: repeating-linear-gradient(45deg, var(--cat3) 0 3px, color-mix(in srgb, var(--cat3) 45%, var(--paper)) 3px 6px); }
+.ms-key-metal { background: linear-gradient(90deg, color-mix(in srgb, var(--ink) 20%, var(--surface)), color-mix(in srgb, var(--ink) 58%, var(--surface))); }
+/* a smaller view keeps the legend short; on a phone-sized view it moves
+   under the view, out of the drawing's way */
+@container ms-views (max-width: 26rem) {
+  .ms-lg-more, .ms-view-how { display: none; }
+  .ms-legend { gap: 0 .6rem; }
+}
+@container ms-views (max-width: 17.99rem) {
+  .ms-legend { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: .25rem .45rem .3rem; border-top: 1px solid var(--rule); }
+}
+
+/* section drawing */
 .ms-metal       { fill: color-mix(in srgb, var(--ink) 20%, var(--surface)); }
 .ms-hatch-line  { stroke: var(--ink-soft); stroke-width: .3; }
 .ms-metal-edge  { fill: none; stroke: var(--ink); stroke-width: .45; stroke-linejoin: round; }
-.ms-target-line { fill: none; stroke: var(--accent); stroke-width: .55; stroke-dasharray: 1.6 1.1; }
+.ms-excess      { fill: var(--cat2); fill-opacity: .55; stroke: none; }
+.ms-over        { fill: var(--cat3); fill-opacity: .4; stroke: var(--cat3); stroke-width: .7; stroke-dasharray: 1.6 .8; }
+.ms-target-line { fill: none; stroke: var(--cat1); stroke-width: .75; stroke-dasharray: 2.2 1.3; stroke-linejoin: round; }
 .ms-jaw-cut     { fill: color-mix(in srgb, var(--ink-soft) 32%, var(--paper)); stroke: var(--ink-soft); stroke-width: .3; }
 .ms-jaw-behind  { fill: color-mix(in srgb, var(--ink-soft) 12%, var(--paper)); stroke: var(--ink-soft); stroke-width: .25; }
 .ms-parallel    { fill: color-mix(in srgb, var(--ink-soft) 42%, var(--paper)); stroke: var(--ink-soft); stroke-width: .3; }
@@ -3066,112 +3148,137 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 .ms-zero        { stroke: var(--accent); stroke-width: .3; stroke-dasharray: 2 1; }
 .ms-jawtop      { stroke: var(--ink-soft); stroke-width: .25; stroke-dasharray: 1 1; }
 .ms-t           { font-family: var(--f-display); font-size: 3.2px; font-weight: 600; fill: var(--ink); }
-.ms-t-axis      { font-size: 7px; fill: var(--ink-soft); }
+.ms-t-axis      { font-size: 6px; fill: var(--ink-soft); }
 .ms-t-soft      { fill: var(--ink-soft); }
-.ms-probe, .ms-keys { font-size: .86rem; color: var(--ink-soft); margin: 0; }
-.ms-probe { min-height: 1.4em; font-variant-numeric: tabular-nums; }
 
-/* status: what the last move did, or why it stopped */
-.ms-status {
-  padding: .6rem .8rem;
-  border-inline-start: .3rem solid var(--accent);
+/* what the last move did, the next step, and Undo */
+.ms-feedback {
+  display: flow-root;
+  padding: .45rem .5rem .45rem .7rem;
   background: var(--surface-2);
-  font-size: .97rem;
+  border: 1px solid var(--rule); border-inline-start: .3rem solid var(--accent);
+  border-radius: var(--radius-xs);
 }
+.ms-feedback.is-stop { border-color: var(--cat3); background: var(--cat3-soft); }
+.ms-feedback.is-cut { border-inline-start-color: var(--cat2); }
+.ms-feedback.is-air { border-inline-start-color: var(--ink-soft); }
+.ms-status { margin: 0; font-size: .93rem; line-height: 1.38; }
+.ms-status strong { font-family: var(--f-display); }
 .ms-status:empty { display: none; }
-.ms-status.is-warn { border-inline-start-color: var(--cat3); background: var(--cat3-soft); }
+.ms-feedback-toggle { display: none; }
+@container ms-app (max-width: 35.99rem) {
+  .ms-feedback:not(.is-expanded) .ms-status:not(:empty),
+  .ms-feedback:not(.is-expanded) .ms-next-text {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  }
+  .ms-feedback .ms-feedback-toggle { display: block; min-width: 4.6rem; font-size: .72rem; padding: .2rem .3rem; }
+}
+.ms-next { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .6rem; margin-top: .3rem; font-size: .88rem; line-height: 1.38; }
+.ms-next-text { margin: 0; flex: 1 1 14rem; color: var(--ink-soft); }
+.ms-next.is-suggest .ms-next-text { color: var(--ink); }
+.ms-next strong { font-family: var(--f-display); }
+.ms-next:has(.ms-next-text:empty) { display: none; }
+[data-interactive="milling-simulator"] .ms-next-fill { border-color: var(--accent); min-height: 2.5rem; }
+[data-interactive="milling-simulator"] .ms-link-btn {
+  min-height: 0; padding: .05rem .1rem; border: 0; background: transparent; color: var(--accent);
+  font-size: .86rem; text-decoration: underline; text-underline-offset: .18em;
+}
+.ms-fb-act { float: right; margin: 0 0 .25rem .6rem; display: flex; flex-direction: column; gap: .3rem; }
+[data-interactive="milling-simulator"] .ms-undo, [data-interactive="milling-simulator"] .ms-stop { min-width: 4.6rem; }
+[data-interactive="milling-simulator"] .ms-stop { border-color: var(--cat3); background: var(--cat3-soft); color: var(--cat-ink); }
 
-/* the panel */
-.ms-panel { display: grid; gap: .65rem; grid-template-columns: minmax(0, 1fr); }
-/* Reuse the lathe lab's bounded work/controls arrangement. Controls scroll
-   in their own column instead of taking the moving cut off the screen. */
-.ms-workbench { min-width: 0; height: min(56rem, calc(100svh - var(--appbar-h, 3.5rem) - 6rem)); display: flex; flex-direction: column; gap: .7rem; }
-.ms-machine { min-width: 0; flex: 0 0 auto; }
-.ms-workbench .ms-panel { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: .5rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); }
-.ms-panel > * { flex-shrink: 0; }
-.ms-status { max-height: 4.5rem; overflow-y: auto; margin: .3rem 0 0; }
-@container (min-width: 42rem) {
-  .ms-workbench { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 1fr); align-items: start; }
-  .ms-workbench .ms-panel { height: 100%; }
-}
-@container (max-width: 41.99rem) {
-  .ms-views { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .ms-view-iso, .ms-view-side { display: none; }
-  .ms-view-top, .ms-view-front { grid-column: 1 / -1; }
-  .ms-top-canvas { width: min(100%, calc(19svh * 190 / 120)); margin-inline: auto; }
-  .ms-section-svg { max-height: 15svh; }
-  .ms-workbench .ms-panel { display: flex; flex-direction: column; }
-}
+/* ---- the controls ------------------------------------------------------------*/
 .ms-box {
   background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm);
-  padding: .7rem .8rem; display: flex; flex-direction: column; gap: .55rem; min-width: 0;
+  padding: .45rem .55rem .55rem; display: flex; flex-direction: column; gap: .35rem; min-width: 0;
 }
 .ms-box-title {
-  font-family: var(--f-display); font-size: .7rem; font-weight: 700;
+  margin: 0; font-family: var(--f-display); font-size: .68rem; font-weight: 700;
   letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft);
 }
-.ms-toolhead { display: flex; gap: .75rem; align-items: center; }
-.ms-toolicon { flex: none; width: 4.25rem; min-height: 64px; display: flex; justify-content: center; }
-.ms-toolicon svg { height: 64px; width: auto; }
-.ms-toolname { font-family: var(--f-display); font-weight: 700; }
-.ms-toolnote { font-size: .9rem; color: var(--ink-soft); }
-.ms-bore { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
-.ms-bore[hidden] { display: none; }
-.ms-bore input { width: 6.5rem; }
-.ms-rack { display: flex; flex-wrap: wrap; gap: .5rem .9rem; }
-.ms-rack-group { display: flex; flex-direction: column; gap: .25rem; }
-.ms-rack-name { font-family: var(--f-display); font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
-.ms-rack-row { display: flex; flex-wrap: wrap; gap: .3rem; }
-[data-interactive="milling-simulator"] .ms-rack-tool {
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: .2rem;
-  min-width: 3.1rem; padding: .3rem .35rem; font-size: .76rem; font-variant-numeric: tabular-nums;
+.ms-tool-now { color: var(--ink); letter-spacing: .02em; text-transform: none; font-size: .8rem; }
+.ms-panel button, .ms-panel input { min-height: 2.5rem; }
+.ms-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .3rem; }
+[data-interactive="milling-simulator"] .ms-kind {
+  display: flex; align-items: center; gap: .3rem; min-width: 0;
+  padding: .2rem .3rem; font-size: .72rem; line-height: 1.1; text-align: left;
 }
-.ms-rack-tool svg { height: 38px; width: auto; }
+.ms-kind svg { flex: none; height: 30px; width: auto; max-width: 1.9rem; }
+.ms-kind-name { min-width: 0; overflow-wrap: anywhere; }
+.ms-sizes { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .4rem; }
+.ms-sizes-label { font-family: var(--f-display); font-size: .74rem; font-weight: 700; color: var(--ink-soft); }
+.ms-chips { display: flex; flex-wrap: wrap; gap: .25rem; }
+[data-interactive="milling-simulator"] .ms-chip-btn { min-width: 2.55rem; padding: .25rem .4rem; font-variant-numeric: tabular-nums; }
+.ms-bore { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; }
+.ms-bore label { font-family: var(--f-display); font-size: .78rem; font-weight: 700; }
+.ms-bore input { width: 5.6rem; }
 
-.ms-dro { display: flex; flex-direction: column; gap: .35rem; }
-.ms-dro-row { display: grid; grid-template-columns: 1.3rem minmax(6.2rem, 1fr) auto minmax(4.6rem, 6rem); align-items: center; gap: .4rem; }
-.ms-dro-axis { font-family: var(--f-display); font-weight: 800; color: var(--accent); }
-.ms-dro-val {
-  font-family: var(--f-mono); font-size: 1.2rem; font-weight: 600; font-variant-numeric: tabular-nums;
-  background: var(--band); color: var(--band-ink);
-  padding: .2rem .55rem; border-radius: var(--radius-xs); text-align: right;
-}
-.ms-go-label { font-size: .76rem; color: var(--ink-soft); white-space: nowrap; }
-.ms-under, .ms-go-help { font-size: .86rem; color: var(--ink-soft); }
-.ms-go-row, .ms-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ms-go { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .3rem; }
+.ms-go-cell { display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.ms-go-label { font-family: var(--f-display); font-weight: 800; font-size: .76rem; color: var(--accent); }
+[data-interactive="milling-simulator"] .ms-go-in { width: 100%; text-align: right; font-size: .95rem; }
+[data-interactive="milling-simulator"] .ms-go-in.is-edited { border-color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+.ms-go-row { display: flex; flex-wrap: wrap; gap: .3rem; }
+.ms-go-row > button { flex: 1 1 auto; }
 
+.ms-jog-head { display: flex; align-items: center; gap: .35rem; }
+.ms-jog-head .ms-box-title { margin-right: auto; }
+.ms-seg { display: flex; flex-wrap: wrap; gap: .25rem; }
+[data-interactive="milling-simulator"] .ms-seg button { min-width: 2.4rem; padding: .25rem .4rem; }
+.ms-seg-unit { font-family: var(--f-display); font-size: .74rem; font-weight: 700; color: var(--ink-soft); }
 .ms-jog {
-  display: grid; gap: .3rem;
-  grid-template-columns: repeat(3, minmax(2.75rem, 1fr)) minmax(4.4rem, 1.3fr);
+  display: grid; gap: .28rem;
+  grid-template-columns: repeat(3, minmax(2.6rem, 1fr)) minmax(3.4rem, 1.15fr);
   grid-template-areas: ". yp . zp" "xm . xp ." ". ym . zm";
 }
 .ms-j-yp { grid-area: yp; } .ms-j-xm { grid-area: xm; } .ms-j-xp { grid-area: xp; }
 .ms-j-ym { grid-area: ym; } .ms-j-zp { grid-area: zp; } .ms-j-zm { grid-area: zm; }
-.ms-small-label { font-size: .76rem; color: var(--ink-soft); margin-bottom: -.3rem; }
-.ms-seg { display: flex; flex-wrap: wrap; gap: .3rem; }
+[data-interactive="milling-simulator"] .ms-jog-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .05rem;
+  padding: .15rem .2rem; line-height: 1; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+.ms-jog-sub { font-size: .6rem; font-weight: 600; color: var(--ink-soft); letter-spacing: 0; }
+
+/* ---- below the work ------------------------------------------------------------*/
+.ms-tray { display: flex; flex-wrap: wrap; gap: .3rem; }
+[data-interactive="milling-simulator"] .ms-tray button { font-size: .82rem; }
+.ms-drawing { min-width: 0; }
+.ms-more { display: grid; gap: .55rem; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); align-items: start; }
+@container ms-app (max-width: 34rem) { .ms-more { grid-template-columns: minmax(0, 1fr); } }
+.ms-view-cap {
+  display: flex; align-items: center; justify-content: space-between; gap: .4rem;
+  min-height: 2.1rem; padding: .15rem .3rem .15rem .55rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--f-display); font-size: .7rem; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft);
+}
+.ms-turn { display: flex; gap: .25rem; }
+[data-interactive="milling-simulator"] .ms-mini { min-height: 2.5rem; min-width: 2.5rem; padding: 0 .5rem; font-size: 1.1rem; }
+.ms-help {
+  display: flex; flex-direction: column; gap: .5rem;
+  padding: .7rem .85rem; background: var(--paper);
+  border: 1px solid var(--rule); border-radius: var(--radius-sm); font-size: .93rem;
+}
+.ms-help p { margin: 0; }
+.ms-help-row { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; }
 
 /* inspection */
 .ms-inspect {
   display: flex; flex-direction: column; gap: .55rem;
   padding: .8rem .9rem; background: var(--paper);
   border: 1px solid var(--rule); border-inline-start: .3rem solid var(--rule); border-radius: var(--radius-sm);
+  scroll-margin-top: calc(var(--appbar-h, 3.5rem) + 1rem);
 }
 .ms-inspect.is-complete { border-color: var(--cat1); background: var(--cat1-soft); }
 .ms-inspect.is-over { border-inline-start-color: var(--cat3); }
-.ms-inspect-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
-.ms-inspect-summary { font-family: var(--f-display); font-weight: 700; }
-.ms-legend { font-size: .86rem; color: var(--ink-soft); display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; }
-.ms-legend[hidden] { display: none; }
-.ms-key { display: inline-block; width: .9rem; height: .9rem; border: 1px solid var(--ink-soft); border-radius: 2px; }
-.ms-key-excess { background: var(--msu-gold); }
-.ms-key-over { background: var(--msu-redorange); margin-left: .6rem; }
+.ms-inspect-summary { margin: 0; font-family: var(--f-display); font-weight: 700; }
 .ms-rows { gap: .45rem; }
 .ms-rows > li, .ms-checks > li { padding-left: 0; }
 .ms-rows > li::before, .ms-checks > li::before { display: none; }
 .ms-row { padding: .5rem .65rem; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); display: flex; flex-direction: column; gap: .3rem; }
-.ms-row-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; }
+.ms-row-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; margin: 0; }
 .ms-row-label { font-weight: 600; }
-.ms-row-measured { font-size: .9rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.ms-row-measured { margin: 0; font-size: .9rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 .ms-chip {
   font-family: var(--f-display); font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
   padding: .1rem .45rem; border: 1.5px solid var(--rule); border-radius: var(--radius-xs); color: var(--cat-ink);
@@ -3187,6 +3294,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
 /* presentation: the same machine, read from across the room */
 .presenting [data-interactive="milling-simulator"] .ms-dro-val { font-size: 1.5rem; }
+/* the panel title and the track bar take more of the screen here */
+.presenting [data-interactive="milling-simulator"] .ms-views { max-width: calc((100svh - var(--appbar-h, 3.5rem) - 26rem) * 190 / 181); }
+.presenting [data-interactive="milling-simulator"] .ms-status { font-size: 1.05rem; }
+.presenting [data-interactive="milling-simulator"] .ms-legend,
+.presenting [data-interactive="milling-simulator"] .ms-view-label { font-size: .8rem; }
 
 @media print {
   .ms-workbench { display: block; height: auto; }
@@ -6507,18 +6619,6 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     <summary>Simulator: make the part on the drawing, then inspect it<span class="chev"></span></summary>
     <div class="body">
       <h2>Simulator: make the part on the drawing, then inspect it</h2>
-  <p class="lede">Pick a job and read its drawing. Choose a tool from the rack, move it through the
-  block, and watch the metal go. The inspection measures the part that is left after every move and
-  says what still differs from the drawing. Nothing checks which tools you used or in what order:
-  any way of making the right part passes.</p>
-  <div class="panel">
-    <p><strong>How to drive it.</strong> Drag the tool&rsquo;s circle in the top view to move it in X
-    and Y, or drag the tool in either section to move it up and down. To go to an exact place, type X, Y
-    and Z under the readout and press <em>Move</em>; the tool goes up before it goes across, and across
-    before it goes down. The handwheel buttons and the arrow keys move one step at a time. A move that
-    would break a tool or hit the vise stops where it would happen, and says why. <em>Undo</em> takes
-    back the last move: the one thing a real mill cannot do.</p>
-  </div>
   <div data-interactive="milling-simulator">
     <div class="ms-static msd-figures">
       <figure class="msd-figure"><div class="msd-scroll" tabindex="0" role="region" aria-label="Drawing for job 1; scrolls sideways on a narrow screen"><svg class="msd-svg" viewBox="-30 -68 170 134" role="img" aria-label="Drawing for job 1: Face the top, then cut a shoulder. Face the top flat at Z 0.00, then mill a shoulder 25 mm wide and 6 mm deep across the right-hand end." focusable="false"><defs><pattern id="msd-static-shoulder-hatch" patternUnits="userSpaceOnUse" width="2.2" height="2.2" patternTransform="rotate(45)"><path class="msd-hatch-line" d="M0 0V2.2"/></pattern></defs><path class="msd-vis msd-outline" d="M0 -60H100V0H0Z"/><path class="msd-vis" d="M75 0L75 -60"/><path class="msd-cut" d="M-7 -30H107"/><path class="msd-cut-end" d="M-7 -30H-3M103 -30H107"/><path class="msd-arrow" d="M-5 -35L-4.25 -32.8L-5.75 -32.8Z"/><path class="msd-cut-end" d="M-5 -30L-5 -33"/><path class="msd-arrow" d="M105 -35L105.75 -32.8L104.25 -32.8Z"/><path class="msd-cut-end" d="M105 -30L105 -33"/><text class="msd-t msd-t-label" x="-5" y="-36.5" text-anchor="middle">A</text><text class="msd-t msd-t-label" x="105" y="-36.5" text-anchor="middle">A</text><path class="msd-section" d="M0 54L0 34L75 34L75.05 40L100 40L100 54Z" fill="url(#msd-static-shoulder-hatch)"/><path class="msd-vis msd-section-edge" d="M0 54L0 34L75 34L75.05 40L100 40L100 54Z"/><text class="msd-t msd-t-label" x="50" y="61" text-anchor="middle">SECTION A–A</text><path class="msd-ext" d="M0 1L0 11.5"/><path class="msd-ext" d="M75 1L75 11.5"/><path class="msd-dim" d="M0 10L75 10"/><path class="msd-arrow" d="M0 10L2.2 9.25L2.2 10.75Z"/><path class="msd-arrow" d="M75 10L72.8 10.75L72.8 9.25Z"/><text class="msd-t msd-t-dim" x="37.5" y="8.9" text-anchor="middle">75</text><path class="msd-ext" d="M75 1L75 11.5"/><path class="msd-ext" d="M100 1L100 11.5"/><path class="msd-dim" d="M75 10L100 10"/><path class="msd-arrow" d="M75 10L77.2 9.25L77.2 10.75Z"/><path class="msd-arrow" d="M100 10L97.8 10.75L97.8 9.25Z"/><text class="msd-t msd-t-dim" x="87.5" y="8.9" text-anchor="middle">25</text><path class="msd-ext" d="M-1 -60L-9.5 -60"/><path class="msd-ext" d="M-1 0L-9.5 0"/><path class="msd-dim" d="M-8 -60L-8 0"/><path class="msd-arrow" d="M-8 -60L-7.25 -57.8L-8.75 -57.8Z"/><path class="msd-arrow" d="M-8 0L-8.75 -2.2L-7.25 -2.2Z"/><text class="msd-t msd-t-dim" x="-9.1" y="-30" text-anchor="middle" transform="rotate(-90 -9.1 -30)">60</text><path class="msd-ext" d="M76 34L107.5 34"/><path class="msd-ext" d="M101 40L107.5 40"/><path class="msd-dim" d="M106 34L106 40"/><path class="msd-dim" d="M106 29L106 34"/><path class="msd-dim" d="M106 40L106 45"/><path class="msd-arrow" d="M106 34L105.25 31.8L106.75 31.8Z"/><path class="msd-arrow" d="M106 40L106.75 42.2L105.25 42.2Z"/><text class="msd-t msd-t-dim" x="104.9" y="37" text-anchor="middle" transform="rotate(-90 104.9 37)">6</text><path class="msd-ext" d="M-1 34L-9.5 34"/><path class="msd-ext" d="M-1 54L-9.5 54"/><path class="msd-dim" d="M-8 34L-8 54"/><path class="msd-arrow" d="M-8 34L-7.25 36.2L-8.75 36.2Z"/><path class="msd-arrow" d="M-8 54L-8.75 51.8L-7.25 51.8Z"/><text class="msd-t msd-t-dim" x="-9.1" y="44" text-anchor="middle" transform="rotate(-90 -9.1 44)">20</text></svg></div><figcaption><strong>Job 1: Face the top, then cut a shoulder.</strong> Face the top flat at Z 0.00, then mill a shoulder 25 mm wide and 6 mm deep across the right-hand end.</figcaption></figure>
@@ -6529,6 +6629,20 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     <div data-ms-live></div>
     <noscript><p class="aside">JavaScript is off, so the simulator is not running. The drawings above
     are the four jobs it sets.</p></noscript>
+  </div>
+  <p>Pick a job, choose a tool and move it through the block. The finished part is drawn over the
+  block you are cutting: gold is metal still to remove, stronger where there is more of it, and
+  striped red-orange is metal cut past the drawing. The inspection measures the part that is left
+  after every move. Nothing checks which tools you used or in what order: any way of making the right
+  part passes.</p>
+  <div class="panel">
+    <p><strong>How to drive it.</strong> Choose a kind of tool, then its size. Drag the tool&rsquo;s
+    circle in the top view to move it in X and Y, or drag the tool in the section to move it up and
+    down. To go to an exact place, type X, Y and Z under <em>Move to</em> and press <em>Move</em>; the
+    tool goes up before it goes across, and across before it goes down. The handwheel buttons and the
+    arrow keys move one step at a time. A move that would break a tool or hit the vise stops where it
+    would happen, and says why. <em>Undo</em> takes back the last move: the one thing a real mill
+    cannot do.</p>
   </div>
     </div>
   </details>
@@ -6546,8 +6660,8 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     Read the inspection, then use <em>Undo</em> and cut it again in the right place.</li>
     <li>In job 2, clear the pocket with the &Oslash;12 end mill and read what the inspection says about
     its corners. Undo, and clear it with a smaller cutter.</li>
-    <li>Turn on <em>Show where it differs</em>. Gold is metal still to remove; red-orange is metal cut
-    away that the drawing keeps.</li>
+    <li>Watch the gold as you cut: it is metal the drawing does not keep. Cut one pass a little too
+    deep and see where the striped red-orange appears in the top view and the section.</li>
     <li>In job 3, try to tap a hole you drilled with the &Oslash;6.0 drill, then one you drilled with the
     &Oslash;4.2. Then drill &Oslash;5.0 only 10&nbsp;mm deep and tap it as deep as it will go. How much
     full thread do you get?</li>
@@ -11923,10 +12037,46 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   /* ======================================================================
      Live section views: the part as it is now, through the tool
      ====================================================================*/
+  // Z down to -27: past the point of a drill through the part, but no
+  // deeper, so the block and the tool above it stay large on the screen
   var VIEW = {
-    front: { u0: -45, u1: 145, z0: -34, z1: 34 },
-    side: { u0: -30, u1: 90, z0: -34, z1: 34 }
+    front: { u0: -45, u1: 145, z0: -27, z1: 34 },
+    side: { u0: -30, u1: 90, z0: -27, z1: 34 }
   };
+  /* Along a section line: where the metal stands above the finished part
+     (still to remove) and where it is cut below it (too far), as closed
+     regions between the two profiles, and the finished profile itself.
+     Each sample is judged by the inspection's own envelope (inspect.js
+     envAt), so a wall inside its tolerance band is never marked as wrong.
+     pts: [u, height] samples along the line, heights clamped to the bottom. */
+  function sectionCompare(job, axis, at, pts) {
+    var env = { lo: 0, hi: 0, owner: 'top', mode: 'set' }, target = [], runs = { 1: [], 2: [] }, cur = null;
+    pts.forEach(function (q) {
+      var x = axis === 'front' ? q[0] : at, y = axis === 'front' ? at : q[0];
+      x = Math.min(Math.max(x, ST.x0 + 1e-9), ST.x1 - 1e-9);
+      y = Math.min(Math.max(y, ST.y0 + 1e-9), ST.y1 - 1e-9);
+      var zt = I.nominalAt(job, x, y), h = q[1], hv = h <= ST.bottom + 1e-9 ? -Infinity : h;
+      I.envAt(job, x, y, env);
+      var s = hv > env.hi + 1e-9 ? 1 : hv < env.lo - 1e-9 ? 2 : 0;
+      target.push([q[0], -zt]);
+      if (!s) { cur = null; return; }
+      if (!cur || cur.s !== s) { cur = { s: s, top: [], bot: [] }; runs[s].push(cur); }
+      cur.top.push([q[0], -Math.max(h, zt)]);
+      cur.bot.push([q[0], -Math.min(h, zt)]);
+    });
+    // each sample stands for a quarter millimetre, so a run is widened by
+    // half a sample at each end and a one-sample run still shows
+    function region(list) {
+      return list.map(function (r) {
+        var a = r.top[0], b = r.top[r.top.length - 1], c = r.bot[0], e = r.bot[r.bot.length - 1];
+        var top = [[a[0] - 0.125, a[1]]].concat(r.top, [[b[0] + 0.125, b[1]]]);
+        var bot = [[c[0] - 0.125, c[1]]].concat(r.bot, [[e[0] + 0.125, e[1]]]);
+        return poly(simplify(top.concat(bot.reverse())), true);
+      }).join('');
+    }
+    return { target: target, excess: region(runs[1]), over: region(runs[2]) };
+  }
+
   /* axis 'front': along X at Y = at (seen from the front);
      axis 'side': along Y at X = at (seen from the right, +Y to the right). */
   function renderSection(sim, job, axis, at, opts) {
@@ -11961,14 +12111,13 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       poly2.push([u1, -ST.bottom]);
       var d = poly(simplify(poly2), true);
       out.push(p('ms-metal', d) + p('ms-metal-hatch', d, ' fill="url(#' + id + ')"') + p('ms-metal-edge', d));
-      // the drawing's part, dashed over it
+      // the finished part over it: metal still to remove, metal cut past it,
+      // and its outline, judged by the inspection's own envelope
       if (job && !job.free && opts.target !== false) {
-        var tz = [];
-        for (var v = u0; v <= u1 + 1e-9; v += 0.25) {
-          var tx = axis === 'front' ? v : at, ty = axis === 'front' ? at : v;
-          tz.push([v, -I.nominalAt(job, Math.min(tx, ST.x1 - 1e-9), Math.min(ty, ST.y1 - 1e-9))]);
-        }
-        out.push(p('ms-target-line', poly(simplify(tz), false)));
+        var cmp = sectionCompare(job, axis, at, pts);
+        if (cmp.excess) out.push(p('ms-excess', cmp.excess));
+        if (cmp.over) out.push(p('ms-over', cmp.over));
+        out.push(p('ms-target-line', poly(simplify(cmp.target), false)));
       }
     } else {
       out.push(text('ms-t ms-t-soft', (V.u0 + V.u1) / 2, -2, 'the section line is off the part', 'middle'));
@@ -12019,7 +12168,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     targetOutline: targetOutline,
     toolShape: toolShape, placeTool: placeTool, renderToolIcon: renderToolIcon,
     renderDrawing: renderDrawing, renderSetup: renderSetup, renderRack: renderRack, renderJobFigures: renderJobFigures,
-    renderSection: renderSection, VIEW: VIEW, RACK: RACK, simplify: simplify
+    renderSection: renderSection, sectionCompare: sectionCompare, VIEW: VIEW, RACK: RACK, simplify: simplify
   };
 });
 
@@ -12027,18 +12176,23 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
    milling-simulator / demo.js - the machine on the page.
 
    Builds the live simulator inside every [data-interactive="milling-
-   simulator"] root: the job, its drawing, four views of the work, the tool
-   rack, the readout and handwheels, and the inspection of the part.
+   simulator"] root. What a learner meets first, top to bottom:
+     the job and its goal in one line, the drawing one press away;
+     the work: a readout, a large top view and section A-A through the tool,
+       with the FINISHED part laid over the actual block (gold: metal still to
+       remove, deeper is stronger; striped red-orange: cut past the drawing;
+       a dashed outline: the drawing's edges);
+     what the last move did, an optional next step, and Undo, beside it;
+     the controls: a compact tool changer, move-to boxes, the handwheels.
+   The 3D part, section B-B, help and the full inspection are below it.
 
    The page source carries only teaching text and the printed figures; the
    controls are made here, so a reader without JavaScript (or a printout)
    never meets a row of dead buttons.
 
-   Views, in third-angle layout and at one scale:
-     top    canvas  the work from above; drag the tool to move X and Y
-     part   canvas  the part in isometric, turnable in quarter turns
-     front  SVG     a section along X through the tool; drag the tool for Z
-     right  SVG     a section along Y through the tool
+   The overlay is judged by inspect.js, the same envelope the inspection
+   uses, cell by cell; the outline is draw.js's drawing geometry. Nothing
+   here keeps a second copy of a target shape.
    ==========================================================================*/
 (function (root, factory) {
   var node = typeof module === 'object' && module.exports;
@@ -12076,22 +12230,27 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     var r = Math.round(c[0]), g = Math.round(c[1]), b = Math.round(c[2]);
     return alpha == null ? 'rgb(' + r + ',' + g + ',' + b + ')' : 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
   }
+  function luma(c) { return (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255; }
   function readPalette(elm) {
     var cs = getComputedStyle(elm), get = function (k) { return parseColor(cs.getPropertyValue(k)); };
     var P = {
       paper: get('--paper'), surface: get('--surface'), surface2: get('--surface-2'), ink: get('--ink'),
       inkSoft: get('--ink-soft'), rule: get('--rule'), accent: get('--accent'),
-      gold: get('--msu-gold'), blue: get('--msu-liteblue'), red: get('--msu-redorange')
+      target: get('--cat1'), excess: get('--cat2'), over: get('--cat3')
     };
+    // The block is plain grey, darker where it is lower, so that blue, gold
+    // and red-orange each keep one meaning: the finished part, metal to
+    // remove, metal cut too far.
+    var dark = luma(P.paper) < 0.35;
     P.metalTop = mix(P.surface, P.ink, 0.2);
-    P.metalDeep = mix(P.metalTop, P.blue, 0.6);
-    P.under = mix(P.paper, P.ink, 0.12);
+    P.metalDeep = mix(P.metalTop, dark ? P.paper : P.ink, dark ? 0.5 : 0.42);
+    P.under = mix(P.paper, P.ink, dark ? 0.04 : 0.12);
     P.jaw = mix(P.paper, P.inkSoft, 0.3);
     P.parallel = mix(P.paper, P.inkSoft, 0.45);
     return P;
   }
 
-  /* Colour of the metal at one raster cell: deeper is bluer, and a light
+  /* Colour of the metal at one raster cell: deeper is darker, and a light
      from the back left shades every slope, so walls read as walls. */
   function cellColor(P, h, gx, gy, bottom, top) {
     var t = (top - h) / (top - bottom);
@@ -12116,10 +12275,53 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     return [(q[0] + q[1]) * COS30, (q[0] - q[1]) * 0.5 - z];
   }
 
-  /* Plain-language account of a finished move, for the status line. */
+  /* ---- the finished part, cell by cell -----------------------------------
+     For each raster cell: the band of heights the inspection accepts there
+     (inspect.js envAt) and the drawing's nominal height (nominalAt). The
+     overlay compares the metal that is actually left with these. */
+  function targetField(sim, job) {
+    var n = sim.nx * sim.ny, lo = new Float32Array(n), hi = new Float32Array(n), nom = new Float32Array(n);
+    var env = { lo: 0, hi: 0, owner: 'top', mode: 'set' };
+    for (var j = 0; j < sim.ny; j++) {
+      var y = sim.cellY(j);
+      for (var i = 0; i < sim.nx; i++) {
+        var x = sim.cellX(i), k = i + j * sim.nx;
+        I.envAt(job, x, y, env);
+        lo[k] = env.lo; hi[k] = env.hi; nom[k] = I.nominalAt(job, x, y);
+      }
+    }
+    return { lo: lo, hi: hi, nom: nom };
+  }
+  /* 0 matches, 1 metal still to remove, 2 cut too far: the inspection's
+     cell rule (a column cut right through has no metal at all). */
+  function cellState(h, lo, hi, bottom) {
+    var hv = h <= bottom + 1e-9 ? -Infinity : h;
+    return hv > hi + 1e-9 ? 1 : hv < lo - 1e-9 ? 2 : 0;
+  }
+  /* How strongly to tint metal still to remove: the 1 mm facing allowance
+     is a light wash, a deep pocket or a through hole is strong. */
+  function excessAlpha(depth) {
+    return 0.2 + 0.65 * Math.min(1, Math.max(0, depth) / 7);
+  }
+
+  /* ---- what is under the cutter -------------------------------------------*/
+  function clearance(sim) {
+    var t = sim.tool;
+    if (!t) return null;
+    var top = sim.maxHeightIn(sim.pos.x, sim.pos.y, t.dia / 2);
+    if (top === -Infinity) return { beside: true };
+    return { top: top, gap: sim.pos.z - top };
+  }
+  function where(sim) {
+    return 'X ' + fmtSigned(sim.pos.x, 2) + ', Y ' + fmtSigned(sim.pos.y, 2) + ', Z ' + fmtSigned(sim.pos.z, 2);
+  }
+
+  /* Plain-language account of a finished move, for the status line. It
+     always says whether metal was cut, and where the tool now is. */
   function describeMove(sum, sim) {
-    if (sum.blocked) return { text: sum.blocked.message, warn: true };
-    var parts = [];
+    if (sum.blocked) return { kind: 'stop', title: 'Stopped.', text: sum.blocked.message, warn: true };
+    var parts = [], threaded = sum.notes.some(function (n) { return /^Thread cut/.test(n); });
+    var cut = sum.volume > 0.05 || sum.subGridCut;
     if (sum.volume > 0.05) {
       var v = sum.volume >= 1000 ? fmt(sum.volume / 1000, 2) + ' cm³' : fmt(sum.volume, sum.volume < 10 ? 1 : 0) + ' mm³';
       parts.push('Removed approximately ' + v + ' (grid estimate).');
@@ -12129,8 +12331,64 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     }
     if (sum.subGridCut) parts.push('A small cut changed the surface between display samples; the volume grid cannot resolve all of this removal. Inspect for its marked location.');
     sum.notes.forEach(function (n) { parts.push(n); });
-    if (!parts.length) parts.push('Moved to X ' + fmtSigned(sim.pos.x, 2) + ', Y ' + fmtSigned(sim.pos.y, 2) + ', Z ' + fmtSigned(sim.pos.z, 2) + '.');
-    return { text: parts.join(' '), warn: false };
+    if (sum.kind === 'tool') return { kind: 'info', title: 'Tool changed.', text: parts.join(' '), warn: false };
+    if (cut || threaded) {
+      parts.push('Now at ' + where(sim) + '.');
+      return { kind: 'cut', title: threaded && !cut ? 'Threaded.' : 'Cut.', text: parts.join(' '), warn: false };
+    }
+    var c = clearance(sim);
+    parts.push(!c ? 'At ' + where(sim) + '.' : c.beside ? 'The tool is at ' + where(sim) + ', beside the block: there is no metal under the cutter.'
+      : c.gap > 0.005 ? 'The tool is at ' + where(sim) + '. Its tip is ' + fmt(c.gap, 2) + ' mm above the metal under it. ' +
+        (sim.tool && sim.tool.kind === 'face' ? 'For a facing cut, lower it beside the block, then feed across.' : 'This move stayed above the work.')
+      : 'The tool is at ' + where(sim) + ', touching the metal.');
+    return { kind: 'air', title: 'Nothing cut.', text: parts.join(' '), warn: false };
+  }
+
+  /* An optional next step for a learner who has not cut anything yet. It
+     names a move and what it will do; the page only fills it into the
+     move-to boxes, and the learner makes the move. Facing comes first in
+     every job, so the suggestion is a first facing pass; for the other
+     tools it says how they are used. Returns null once anything is cut. */
+  function nextStep(sim, job) {
+    if (!sim.tool) return { text: 'Choose a tool. Each kind cuts a shape of its own.' };
+    if (job.free || sim.removed > 0.5 || sim.prims.length) return null;
+    var t = sim.tool, r = t.dia / 2, p = sim.pos, top = job.top, raw = ST.rawTop;
+    if (t.kind === 'face' || t.kind === 'end') {
+      var name = t.kind === 'face' ? 'face mill' : 'end mill', left = -(r + 5), right = ST.x1 + r + 5;
+      if (p.y + r <= ST.y0 || p.y - r >= ST.y1) {
+        return { text: 'First position it beside the block at Y 30, raised clear of the work. Then it can face a strip across the top.',
+          fill: {x:left, y:30, z:SETUP.clearZ}, label:'Fill in a starting position' };
+      }
+      if (sim.capsuleTouchesStock(p, p, r)) {
+        return { text: 'A facing pass starts beside the block, where the ' + name + ' can go down to depth without touching metal.',
+          fill: { x: left }, label: 'Fill in X ' + fmt(left, 2) };
+      }
+      if (Math.abs(p.z - top) > 1e-6) {
+        return { text: 'Lower it to Z ' + fmt(top, 2) + ', the finished top, here beside the block: nothing is under it to cut.',
+          fill: { z: top }, label: 'Fill in Z ' + fmt(top, 2) };
+      }
+      var to = p.x < (ST.x0 + ST.x1) / 2 ? right : left;
+      return { text: 'Feed it across to X ' + fmt(to, 2) + '. Where it passes over the block it cuts the raw top, ' + fmt(raw - top, 2) +
+        ' mm proud, down to Z ' + fmt(top, 2) + ' in a strip up to the cutter’s width, Ø' + fmt(t.dia, 0) + '.',
+        fill: { x: to }, label: 'Fill in X ' + fmt(to, 2) };
+    }
+    if (t.kind === 'bore') return { text: 'The boring head needs a hole to start in. Set its diameter, put its centre over the hole, then feed it down.' };
+    if (t.kind === 'spot') return { text: 'Put its point over a hole and feed it down for a countersink, or run it along an edge to chamfer it.' };
+    return { text: 'This tool only feeds straight down. Put its centre over the place for the hole, in X and Y, then lower Z.' };
+  }
+
+  /* The inspection in one line: how far along, and the next difference. */
+  function progressLine(rep) {
+    if (!rep) return '';
+    var firstBad = function (r) { var c = r.checks.filter(function (x) { return !x.ok; })[0]; return c ? c.text : ''; };
+    if (rep.complete) return rep.summary;
+    if (rep.overcut) {
+      var o = rep.rows.filter(function (r) { return r.status === 'over'; }).map(function (r) { return r.label; });
+      return rep.summary + (o.length ? ' Where: ' + o.join('; ') + '.' : '');
+    }
+    if (!rep.started) return rep.summary;
+    var r = rep.rows.filter(function (x) { return !x.ok; })[0];
+    return rep.done + ' of ' + rep.total + ' callouts match.' + (r ? ' ' + r.label + ': ' + firstBad(r) : '');
   }
 
   /* ======================================================================
@@ -12145,11 +12403,24 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     if (text != null) e.textContent = text;
     return e;
   }
-  function button(label, attrs) { var b = el('button', Object.assign({ type: 'button' }, attrs || {}), label); return b; }
+  function button(label, attrs) { return el('button', Object.assign({ type: 'button' }, attrs || {}), label); }
+  function add(parent) { for (var k = 1; k < arguments.length; k++) if (arguments[k]) parent.appendChild(arguments[k]); return parent; }
 
   function isolateKeys(e) {
     if (e.metaKey || e.ctrlKey || e.altKey || e.key === 'Escape') return;
     if ([' ', 'Spacebar', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].indexOf(e.key) >= 0) e.stopPropagation();
+  }
+
+  /* The rack, by kind: one button per kind, then its sizes. */
+  var KINDS = [];
+  M.TOOLS.forEach(function (t) {
+    var k = KINDS.filter(function (g) { return g.group === t.group; })[0];
+    if (!k) KINDS.push(k = { group: t.group, kind: t.kind, tools: [] });
+    k.tools.push(t);
+  });
+  var KIND_NAME = { face: 'Face mill', end: 'End mill', spot: 'Spot / chamfer', drill: 'Drill', tap: 'Tap', bore: 'Boring head' };
+  function sizeLabel(t) {
+    return t.kind === 'tap' ? M.THREADS[t.thread].label : 'Ø' + fmt(t.dia, t.dia % 1 ? 1 : 0);
   }
 
   function wire(rootEl) {
@@ -12159,151 +12430,213 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     var uid = 'ms' + Math.random().toString(36).slice(2, 8);
     var reduce = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
 
-    var sims = {}, jobs = J.JOBS;
+    var sims = {}, fields = {}, jobs = J.JOBS;
     var state = {
-      job: jobs[0], step: 1, speed: 'normal', overlay: false, target: true, rot: 0, hint: 0,
-      report: null, queue: [], running: null, drag: null, raf: 0, last: 0, armReset: 0
+      job: jobs[0], step: 1, speed: 'normal', target: true, rot: 0, hint: 0, kindShown: null,
+      report: null, queue: [], running: null, drag: null, raf: 0, last: 0, armReset: 0, edited: {}
     };
     function sim() { return sims[state.job.id] || (sims[state.job.id] = M.create()); }
+    function field() {
+      if (state.job.free) return null;
+      return fields[state.job.id] || (fields[state.job.id] = targetField(sim(), state.job));
+    }
     var P = readPalette(rootEl);
 
-    // ---- job bar and brief
+    /* ---- the job and its goal ------------------------------------------*/
     var app = el('div', { class: 'ms-app' });
+    var head = el('div', { class: 'ms-head' });
     var jobBar = el('div', { class: 'ms-jobs', role: 'group', 'aria-label': 'Job' });
     var jobButtons = {};
     jobs.forEach(function (j) {
-      var b = button(j.free ? j.short : j.n + '. ' + j.short, { 'aria-pressed': 'false', 'data-job': j.id });
+      var b = button('', { 'aria-pressed': 'false', 'data-job': j.id,
+        'aria-label': j.free ? j.title : 'Job ' + j.n + ': ' + j.title });
+      add(b, el('span', { class: 'ms-job-n' }, j.free ? 'Free practice' : 'Job ' + j.n),
+        j.free ? null : el('span', { class: 'ms-job-name' }, j.short));
       b.addEventListener('click', function () { setJob(j); });
       jobButtons[j.id] = b; jobBar.appendChild(b);
     });
-    var brief = el('div', { class: 'ms-brief' });
-    var briefTitle = el('p', { class: 'ms-brief-title' });
-    var briefText = el('p', { class: 'ms-brief-text' });
-    var briefTools = el('div', { class: 'ms-brief-tools' });
-    var hintBtn = button('Show a hint', { class: 'ms-hint-btn' });
-    var targetBtn = button('Show the drawing on the work', { 'aria-pressed': 'true' });
-    briefTools.appendChild(hintBtn); briefTools.appendChild(targetBtn);
+    var headTools = el('div', { class: 'ms-head-tools' });
+    var drawingBtn = button('Drawing', { 'aria-expanded': 'false', 'aria-controls': uid + '-drawing' });
+    var hintBtn = button('Hint', { class: 'ms-hint-btn' });
+    add(headTools, drawingBtn, hintBtn);
+    add(head, jobBar, headTools);
+    var goal = el('p', { class: 'ms-goal' });
     var hintList = el('ol', { class: 'ms-hints', 'aria-live': 'polite' });
-    brief.appendChild(briefTitle); brief.appendChild(briefText); brief.appendChild(briefTools); brief.appendChild(hintList);
-    var drawing = el('details', { class: 'ms-drawing', open: true });
-    var drawingSum = el('summary', {}, 'Drawing');
+    var drawing = el('div', { class: 'ms-drawing', id: uid + '-drawing', hidden: true });
     var drawingBody = el('div', { class: 'msd-scroll', tabindex: '0', role: 'region', 'aria-label': 'Drawing; scrolls sideways on a narrow screen' });
-    drawing.appendChild(drawingSum); drawing.appendChild(drawingBody);
+    drawing.appendChild(drawingBody);
 
-    // ---- views
+    /* ---- the work: readout, top view, section A-A ----------------------*/
+    var machine = el('div', { class: 'ms-machine' });
+    var dro = el('div', { class: 'ms-dro', role: 'group', 'aria-label': 'Readout' }), droOut = {};
+    var droVals = el('div', { class: 'ms-dro-vals' });
+    ['x', 'y', 'z'].forEach(function (ax) {
+      var v = el('span', { class: 'ms-dro-v' });
+      v.appendChild(el('span', { class: 'ms-dro-k', 'aria-hidden': 'true' }, ax.toUpperCase()));
+      droOut[ax] = el('output', { class: 'ms-dro-val', 'aria-label': ax === 'z' ? 'Z of the tool tip' : ax.toUpperCase() + ' of the tool centre' });
+      v.appendChild(droOut[ax]);
+      droVals.appendChild(v);
+    });
+    var droNote = el('p', { class: 'ms-dro-note' }), droUnder = el('span', {});
+    add(droNote, el('span', { class: 'ms-dro-meaning' }, 'X, Y: tool centre · Z: tip · '), droUnder);
+    add(dro, droVals, droNote);
+
     var views = el('div', { class: 'ms-views' });
-    function viewBox(cls, title) {
-      var f = el('figure', { class: 'ms-view ' + cls });
-      var cap = el('figcaption', { class: 'ms-view-cap' });
-      cap.appendChild(el('span', { class: 'ms-view-title' }, title));
-      f.appendChild(cap);
-      return { fig: f, cap: cap };
-    }
-    var vTop = viewBox('ms-view-top', 'Top'), vIso = viewBox('ms-view-iso', 'The part'),
-      vFront = viewBox('ms-view-front', 'Section A–A, along X through the tool'),
-      vSide = viewBox('ms-view-side', 'Section B–B, along Y through the tool');
-    var topCanvas = el('canvas', { class: 'ms-canvas ms-top-canvas', tabindex: '0', role: 'img',
-      'aria-describedby': uid + '-keys' });
-    vTop.fig.appendChild(topCanvas);
-    var isoCanvas = el('canvas', { class: 'ms-canvas ms-iso-canvas', role: 'img' });
-    var turnL = button('↶', { class: 'ms-mini', 'aria-label': 'Turn the part view left' });
-    var turnR = button('↷', { class: 'ms-mini', 'aria-label': 'Turn the part view right' });
-    var turnBox = el('span', { class: 'ms-turn' }); turnBox.appendChild(turnL); turnBox.appendChild(turnR);
-    vIso.cap.appendChild(turnBox);
-    vIso.fig.appendChild(isoCanvas);
+    var vTop = el('figure', { class: 'ms-view ms-view-top' });
+    var topCanvas = el('canvas', { class: 'ms-canvas ms-top-canvas', tabindex: '0', role: 'img', 'aria-describedby': uid + '-keys' });
+    var topLabel = el('figcaption', { class: 'ms-view-label' });
+    add(topLabel, el('span', { class: 'ms-view-name' }, 'Top view'), el('span', { class: 'ms-view-how' }, 'drag the tool'));
+    var probe = el('p', { class: 'ms-probe', 'aria-hidden': 'true' });
+    var legend = el('p', { class: 'ms-legend' });
+    legend.innerHTML = '<span class="ms-lg"><span class="ms-key ms-key-target" aria-hidden="true"></span>finished part</span>' +
+      '<span class="ms-lg"><span class="ms-key ms-key-excess" aria-hidden="true"></span><span>still to remove<span class="ms-lg-more">, deeper is stronger</span></span></span>' +
+      '<span class="ms-lg"><span class="ms-key ms-key-over" aria-hidden="true"></span>cut past the drawing</span>' +
+      '<span class="ms-lg"><span class="ms-key ms-key-metal" aria-hidden="true"></span><span>your block<span class="ms-lg-more">, darker is lower</span></span></span>';
+    add(vTop, topCanvas, probe, legend, topLabel);
+    var vFront = el('figure', { class: 'ms-view ms-view-front' });
     var frontHost = el('div', { class: 'ms-section-host', 'aria-hidden': 'true' });
-    var sideHost = el('div', { class: 'ms-section-host', 'aria-hidden': 'true' });
-    vFront.fig.appendChild(frontHost); vSide.fig.appendChild(sideHost);
-    views.appendChild(vTop.fig); views.appendChild(vIso.fig); views.appendChild(vFront.fig); views.appendChild(vSide.fig);
-    var probe = el('p', { class: 'ms-probe', 'aria-live': 'off' });
-    var keysNote = el('p', { class: 'ms-keys', id: uid + '-keys' },
-      'Drag the tool in the top view to move X and Y, or in a section to move Z. With the top view selected, the arrow keys move X and Y and Page Up and Page Down move Z, one step at a time.');
+    var frontLabel = el('figcaption', { class: 'ms-view-label ms-view-label-end' });
+    var frontName = el('span', { class: 'ms-view-name' });
+    add(frontLabel, frontName, el('span', { class: 'ms-view-how' }, 'drag the tool up or down'));
+    add(vFront, frontHost, frontLabel);
+    add(views, vTop, vFront);
 
-    // ---- the panel: tool, readout, handwheels
+    // what the last move did, a next step, and Undo
+    var feedback = el('div', { class: 'ms-feedback', id:uid+'-feedback' });
+    var status = el('p', { class: 'ms-status', role: 'status', 'aria-live': 'polite' });
+    var next = el('div', { class: 'ms-next' });
+    var nextText = el('p', { class: 'ms-next-text' });
+    var nextFill = button('', { class: 'ms-next-fill' });
+    var detailsBtn = button('Inspection details', { class: 'ms-link-btn', 'aria-controls': uid + '-inspect' });
+    add(next, nextText, nextFill);
+    var fbAct = el('div', { class: 'ms-fb-act' });
+    var undoBtn = button('Undo', { class: 'ms-undo', 'aria-keyshortcuts': 'Control+Z' });
+    var feedbackMore = button('Full text', {class:'ms-feedback-toggle', 'aria-expanded':'false', 'aria-controls':uid+'-feedback'});
+    feedbackMore.addEventListener('click', function () {
+      var expanded = !feedback.classList.contains('is-expanded');
+      feedback.classList.toggle('is-expanded', expanded);
+      feedbackMore.setAttribute('aria-expanded', String(expanded));
+      feedbackMore.textContent = expanded ? 'Less text' : 'Full text';
+      keepWorkspaceVisible();
+    });
+    var stopBtn = button('Stop', { class: 'ms-stop', hidden: true, 'aria-keyshortcuts': 'Escape' });
+    add(fbAct, undoBtn, stopBtn, feedbackMore);
+    // Undo floats at the top right, so the messages use the full width under it
+    add(feedback, fbAct, status, next);
+    add(machine, dro, views, feedback);
+
+    /* ---- the controls -----------------------------------------------------*/
     var panel = el('div', { class: 'ms-panel' });
-    var toolBox = el('section', { class: 'ms-box ms-toolbox', 'aria-label': 'Tool' });
-    var toolHead = el('div', { class: 'ms-toolhead' });
-    var toolIcon = el('div', { class: 'ms-toolicon', 'aria-hidden': 'true' });
-    var toolText = el('div', { class: 'ms-tooltext' });
-    var toolName = el('p', { class: 'ms-toolname' });
-    var toolNote = el('p', { class: 'ms-toolnote' });
-    toolText.appendChild(toolName); toolText.appendChild(toolNote);
-    toolHead.appendChild(toolIcon); toolHead.appendChild(toolText);
-    toolBox.appendChild(el('p', { class: 'ms-box-title' }, 'Tool in the spindle'));
-    toolBox.appendChild(toolHead);
+    var toolBox = el('section', { class: 'ms-box ms-toolbox', 'aria-labelledby': uid + '-tool-t' });
+    // the box title names the tool in the spindle, beside the rack it came from
+    var toolTitle = el('p', { class: 'ms-box-title', id: uid + '-tool-t' }), toolNow = el('span', { class: 'ms-tool-now' });
+    add(toolTitle, document.createTextNode('Tool '), toolNow);
+    toolBox.appendChild(toolTitle);
+    var kindRow = el('div', { class: 'ms-kinds' }), kindButtons = {};
+    KINDS.forEach(function (k) {
+      var one = k.tools.length === 1;
+      var b = button('', { class: 'ms-kind', 'aria-pressed': 'false', 'data-kind': k.group,
+        'aria-label': one ? 'Load the ' + M.toolNoun(k.tools[0]) : KIND_NAME[k.kind] + ': choose a size',
+        'aria-expanded': one ? null : 'false', 'aria-controls': one ? null : uid + '-sizes' });
+      b.innerHTML = D.renderToolIcon(k.tools[0], { height: 30 });
+      b.appendChild(el('span', { class: 'ms-kind-name' }, KIND_NAME[k.kind]));
+      b.addEventListener('click', function () {
+        if (one) { state.kindShown = null; changeTool(k.tools[0].id); return; }
+        state.kindShown = state.kindShown === k.group && !(sim().tool && sim().tool.group === k.group) ? null : k.group;
+        syncTools();
+      });
+      kindButtons[k.group] = b; kindRow.appendChild(b);
+    });
+    var sizeRow = el('div', { class: 'ms-sizes', id: uid + '-sizes', role: 'group' });
+    var sizeLab = el('span', { class: 'ms-sizes-label' });
+    var sizeChips = el('div', { class: 'ms-chips' }), sizeButtons = {};
+    add(sizeRow, sizeLab, sizeChips);
     var boreRow = el('div', { class: 'ms-bore', hidden: true });
-    var boreLabel = el('label', { for: uid + '-bore' }, 'Boring diameter Ø');
+    var boreLabel = el('label', { for: uid + '-bore' }, 'Boring Ø');
     var boreInput = el('input', { id: uid + '-bore', type: 'text', inputmode: 'decimal', size: '6', autocomplete: 'off' });
     var boreSet = button('Set');
-    boreRow.appendChild(boreLabel); boreRow.appendChild(boreInput); boreRow.appendChild(boreSet);
-    toolBox.appendChild(boreRow);
-    var rack = el('div', { class: 'ms-rack', role: 'group', 'aria-label': 'Tool rack' });
-    var rackButtons = {};
-    var groups = {};
-    M.TOOLS.forEach(function (t) {
-      if (!groups[t.group]) {
-        var g = el('div', { class: 'ms-rack-group' });
-        g.appendChild(el('p', { class: 'ms-rack-name' }, t.group));
-        g.appendChild(el('div', { class: 'ms-rack-row' }));
-        groups[t.group] = g; rack.appendChild(g);
-      }
-      var label = t.kind === 'tap' ? M.THREADS[t.thread].label : t.kind === 'bore' ? 'Ø12–40' :
-        t.kind === 'spot' ? 'Ø12, 90°' : 'Ø' + fmt(t.dia, t.dia % 1 ? 1 : 0);
-      var b = button('', { class: 'ms-rack-tool', 'aria-pressed': 'false', 'aria-label': 'Load ' + M.toolNoun(Object.assign({}, t)), 'data-tool': t.id });
-      b.innerHTML = D.renderToolIcon(t, { height: 38 }) + '<span>' + label + '</span>';
-      b.addEventListener('click', function () { changeTool(t.id); });
-      rackButtons[t.id] = b;
-      groups[t.group].querySelector('.ms-rack-row').appendChild(b);
-    });
-    toolBox.appendChild(rack);
+    add(boreRow, boreLabel, boreInput, boreSet);
+    add(toolBox, kindRow, sizeRow, boreRow);
 
-    var droBox = el('section', { class: 'ms-box ms-drobox', 'aria-label': 'Position' });
-    droBox.appendChild(el('p', { class: 'ms-box-title' }, 'Readout: where the tool tip is'));
-    var dro = el('div', { class: 'ms-dro' }), droOut = {}, goIn = {};
+    var moveBox = el('section', { class: 'ms-box ms-movebox', 'aria-labelledby': uid + '-move-t' });
+    moveBox.appendChild(el('p', { class: 'ms-box-title', id: uid + '-move-t' }, 'Move to'));
+    var go = el('div', { class: 'ms-go' }), goIn = {};
     ['x', 'y', 'z'].forEach(function (ax) {
-      var row = el('div', { class: 'ms-dro-row' });
-      row.appendChild(el('span', { class: 'ms-dro-axis', 'aria-hidden': 'true' }, ax.toUpperCase()));
-      droOut[ax] = el('output', { class: 'ms-dro-val', 'aria-label': ax.toUpperCase() + ' position' });
-      row.appendChild(droOut[ax]);
-      var lab = el('label', { class: 'ms-go-label', for: uid + '-go-' + ax }, 'Go to ' + ax.toUpperCase());
-      goIn[ax] = el('input', { id: uid + '-go-' + ax, class: 'ms-go-in', type: 'text', inputmode: 'decimal', autocomplete: 'off',
-        placeholder: 'stay', size: '7' });
-      row.appendChild(lab); row.appendChild(goIn[ax]);
-      dro.appendChild(row);
+      var cell = el('div', { class: 'ms-go-cell' });
+      cell.appendChild(el('label', { class: 'ms-go-label', for: uid + '-go-' + ax }, ax.toUpperCase()));
+      goIn[ax] = el('input', { id: uid + '-go-' + ax, class: 'ms-go-in', type: 'text', inputmode: 'decimal', autocomplete: 'off', size: '7',
+        'aria-describedby': uid + '-go-help' });
+      goIn[ax].addEventListener('input', function () { state.edited[ax] = true; goIn[ax].classList.add('is-edited'); });
+      // a click into a box selects its number, so typing replaces it
+      goIn[ax].addEventListener('focus', function () { goIn[ax].select(); goIn[ax].msFresh = true; });
+      goIn[ax].addEventListener('mouseup', function (e) { if (goIn[ax].msFresh) { e.preventDefault(); goIn[ax].msFresh = false; } });
+      cell.appendChild(goIn[ax]);
+      go.appendChild(cell);
     });
-    droBox.appendChild(dro);
-    var surfaceNote = el('p', { class: 'ms-under' });
-    droBox.appendChild(surfaceNote);
     var goRow = el('div', { class: 'ms-go-row' });
     var goBtn = button('Move', { class: 'ms-primary' });
     var upBtn = button('Raise to Z +' + fmt(SETUP.clearZ, 0));
-    var stopBtn = button('Stop', { disabled: true });
-    goRow.appendChild(goBtn); goRow.appendChild(upBtn); goRow.appendChild(stopBtn);
-    droBox.appendChild(goRow);
-    droBox.appendChild(el('p', { class: 'ms-go-help' }, 'Leave a box empty to keep that axis where it is. A move goes up before across, and across before down.'));
+    add(goRow, goBtn, upBtn);
+    var goHelp = el('p', { class: 'ms-vh', id: uid + '-go-help' }, 'Millimetres from work zero. X and Y place the tool centre; Z places its tip. A move goes up before across, and across before down.');
+    add(moveBox, go, goRow, goHelp);
 
-    var jogBox = el('section', { class: 'ms-box ms-jogbox', 'aria-label': 'Handwheels' });
-    jogBox.appendChild(el('p', { class: 'ms-box-title' }, 'Handwheels: one step at a time'));
-    var jog = el('div', { class: 'ms-jog' });
-    var jogDefs = [
-      ['y', 1, 'Y+', 'ms-j-yp'], ['x', -1, 'X−', 'ms-j-xm'], ['x', 1, 'X+', 'ms-j-xp'], ['y', -1, 'Y−', 'ms-j-ym'],
-      ['z', 1, 'Z+ up', 'ms-j-zp'], ['z', -1, 'Z− down', 'ms-j-zm']
-    ];
-    jogDefs.forEach(function (d) {
-      var b = button(d[2], { class: 'ms-jog-btn ' + d[3], 'aria-label': 'Move ' + d[0].toUpperCase() + (d[1] > 0 ? ' plus' : ' minus') + ' one step' });
-      b.addEventListener('click', function () { jogBy(d[0], d[1]); });
-      jog.appendChild(b);
-    });
-    jogBox.appendChild(jog);
-    var stepRow = el('div', { class: 'ms-seg', role: 'group', 'aria-label': 'Step size' });
+    var jogBox = el('section', { class: 'ms-box ms-jogbox', 'aria-labelledby': uid + '-jog-t' });
+    var jogHead = el('div', { class: 'ms-jog-head' });
+    jogHead.appendChild(el('p', { class: 'ms-box-title', id: uid + '-jog-t' }, 'Handwheels'));
+    var stepRow = el('div', { class: 'ms-seg', role: 'group', 'aria-label': 'Step for each press' });
     var stepButtons = {};
     STEPS.forEach(function (st) {
-      var b = button(fmt(st, st < 1 ? 1 : 0) + ' mm', { 'aria-pressed': 'false' });
+      var b = button(fmt(st, st < 1 ? 1 : 0), { 'aria-pressed': 'false', 'aria-label': 'Step ' + fmt(st, st < 1 ? 1 : 0) + ' mm' });
       b.addEventListener('click', function () { setStep(st); });
       stepButtons[st] = b; stepRow.appendChild(b);
     });
-    jogBox.appendChild(el('p', { class: 'ms-small-label' }, 'Step'));
-    jogBox.appendChild(stepRow);
+    add(jogHead, stepRow, el('span', { class: 'ms-seg-unit', 'aria-hidden': 'true' }, 'mm'));
+    var jog = el('div', { class: 'ms-jog' });
+    [['y', 1, 'Y+', 'ms-j-yp', 'away'], ['x', -1, 'X−', 'ms-j-xm', 'left'], ['x', 1, 'X+', 'ms-j-xp', 'right'], ['y', -1, 'Y−', 'ms-j-ym', 'toward you'],
+      ['z', 1, 'Z+', 'ms-j-zp', 'up'], ['z', -1, 'Z−', 'ms-j-zm', 'down']].forEach(function (d) {
+      var b = button('', { class: 'ms-jog-btn ' + d[3], 'aria-label': 'Move ' + d[0].toUpperCase() + (d[1] > 0 ? ' plus' : ' minus') + ', ' + d[4] + ', one step' });
+      add(b, el('span', { class: 'ms-jog-ax' }, d[2]), el('span', { class: 'ms-jog-sub', 'aria-hidden': 'true' }, d[4]));
+      b.addEventListener('click', function () { jogBy(d[0], d[1]); });
+      jog.appendChild(b);
+    });
+    add(jogBox, jogHead, jog);
+    add(panel, toolBox, moveBox, jogBox);
+
+    var workbench = el('div', { class: 'ms-workbench' });
+    add(workbench, machine, panel);
+
+    /* ---- below the work: more views, help, start over --------------------*/
+    var tray = el('div', { class: 'ms-tray' });
+    var targetBtn = button('Finished part on the work', { 'aria-pressed': 'true' });
+    var moreBtn = button('More views', { 'aria-expanded': 'false', 'aria-controls': uid + '-more' });
+    var helpBtn = button('Help and keys', { 'aria-expanded': 'false', 'aria-controls': uid + '-help' });
+    var resetBtn = button('Start this job over');
+    add(tray, targetBtn, moreBtn, helpBtn, resetBtn);
+
+    var more = el('div', { class: 'ms-more', id: uid + '-more', hidden: true });
+    var vIso = el('figure', { class: 'ms-view ms-view-iso' });
+    var isoCap = el('figcaption', { class: 'ms-view-cap' });
+    isoCap.appendChild(el('span', { class: 'ms-view-title' }, 'The part'));
+    var turnL = button('↶', { class: 'ms-mini', 'aria-label': 'Turn the part view left' });
+    var turnR = button('↷', { class: 'ms-mini', 'aria-label': 'Turn the part view right' });
+    add(isoCap, add(el('span', { class: 'ms-turn' }), turnL, turnR));
+    var isoCanvas = el('canvas', { class: 'ms-canvas ms-iso-canvas', role: 'img' });
+    add(vIso, isoCap, isoCanvas);
+    var vSide = el('figure', { class: 'ms-view ms-view-side' });
+    var sideCap = el('figcaption', { class: 'ms-view-cap' });
+    var sideName = el('span', { class: 'ms-view-title' });
+    sideCap.appendChild(sideName);
+    var sideHost = el('div', { class: 'ms-section-host', 'aria-hidden': 'true' });
+    add(vSide, sideCap, sideHost);
+    add(more, vIso, vSide);
+
+    var help = el('div', { class: 'ms-help', id: uid + '-help', hidden: true });
+    var keysNote = el('p', { id: uid + '-keys' },
+      'Drag the tool’s circle in the top view to move X and Y (hold Shift to keep to one axis), or drag the tool in a section to move Z. ' +
+      'With the top view selected, the arrow keys move X and Y and Page Up and Page Down move Z, one step at a time; [ and ] change the step. ' +
+      'Ctrl+Z undoes; Escape stops a move part-way, keeping what it has cut.');
+    var meaning = el('p', {}, 'The readout follows the centre of the tool in X and Y and its tip in Z, from work zero: X 0 Y 0 is the front left corner, Z 0 the finished top. ' +
+      'The raw block stands 1 mm proud, at Z +1.00. Volumes are grid estimates, and the inspection is a set of sampled teaching checks, not certified measurement.');
     var speedRow = el('div', { class: 'ms-seg', role: 'group', 'aria-label': 'Speed of moves on screen' });
     var speedButtons = {};
     [['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast']].forEach(function (sp) {
@@ -12311,52 +12644,35 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       b.addEventListener('click', function () { state.speed = sp[0]; syncSegs(); });
       speedButtons[sp[0]] = b; speedRow.appendChild(b);
     });
-    jogBox.appendChild(el('p', { class: 'ms-small-label' }, 'Speed on screen'));
-    jogBox.appendChild(speedRow);
-    var actRow = el('div', { class: 'ms-actions' });
-    var undoBtn = button('Undo');
-    var resetBtn = button('Start this job over');
-    actRow.appendChild(undoBtn); actRow.appendChild(resetBtn);
-    jogBox.appendChild(actRow);
+    add(help, keysNote, meaning, add(el('div', { class: 'ms-help-row' }, null), el('span', { class: 'ms-small-label' }, 'Speed on screen'), speedRow));
 
-    panel.appendChild(toolBox); panel.appendChild(droBox); panel.appendChild(jogBox);
-    var status = el('p', { class: 'ms-status', role: 'status', 'aria-live': 'polite' });
-
-    // ---- inspection
-    var inspect = el('section', { class: 'ms-inspect', 'aria-label': 'Inspection' });
-    var inspHead = el('div', { class: 'ms-inspect-head' });
-    var inspTitle = el('p', { class: 'ms-box-title' }, 'Inspection of the part as it is now');
-    var overlayBtn = button('Show where it differs', { 'aria-pressed': 'false' });
-    inspHead.appendChild(inspTitle); inspHead.appendChild(overlayBtn);
+    /* ---- the inspection ----------------------------------------------------*/
+    var inspect = el('section', { class: 'ms-inspect', id: uid + '-inspect', 'aria-labelledby': uid + '-insp-t', tabindex: '-1' });
+    var inspTitle = el('p', { class: 'ms-box-title', id: uid + '-insp-t' }, 'Inspection of the part as it is now');
     var inspSummary = el('p', { class: 'ms-inspect-summary' });
     var inspRows = el('ul', { class: 'ms-rows' });
-    var legend = el('p', { class: 'ms-legend', hidden: true });
-    legend.innerHTML = '<span class="ms-key ms-key-excess"></span> metal still to remove <span class="ms-key ms-key-over"></span> cut past the drawing';
-    inspect.appendChild(inspHead); inspect.appendChild(inspSummary); inspect.appendChild(legend); inspect.appendChild(inspRows);
+    add(inspect, inspTitle, inspSummary, inspRows);
 
     // the record a printout carries
     var record = el('div', { class: 'ms-record', 'aria-hidden': 'true' });
 
-    app.appendChild(jobBar); app.appendChild(brief); app.appendChild(drawing);
-    var workbench = el('div', {class:'ms-workbench'});
-    var machine = el('div', {class:'ms-machine'});
-    machine.appendChild(views); machine.appendChild(probe); machine.appendChild(status);
-    var panelHint = el('p', {class:'ms-under'}, 'Scroll this panel for tools, coordinates and handwheels.');
-    panel.insertBefore(panelHint, panel.firstChild);
-    workbench.appendChild(machine); workbench.appendChild(panel);
+    add(app, head, goal, hintList, drawing, workbench, tray, more, help, inspect);
+    /* Bring the whole bench on screen when a control is used, keeping the
+       goal above it in view too when both fit. */
     function keepWorkspaceVisible() {
-      var r = workbench.getBoundingClientRect();
+      var r = workbench.getBoundingClientRect(), g = goal.getBoundingClientRect();
       var bar = document.querySelector('.appbar'), top = (bar ? bar.getBoundingClientRect().bottom : 0) + 8;
-      if (r.height <= window.innerHeight - top - 8 && (r.top < top || r.bottom > window.innerHeight - 8)) {
-        window.scrollBy({top:r.top-top, behavior:'instant'});
-      }
+      var nav = document.querySelector('.seqbar'), nr = nav && nav.getBoundingClientRect();
+      var bottom = nr && nr.height ? Math.min(window.innerHeight, nr.top) : window.innerHeight;
+      var room = bottom - top - 8;
+      if (r.height > room || (r.top >= top && r.bottom <= top + room)) return;
+      var edge = r.bottom - g.top <= room ? g.top : r.top;
+      window.scrollBy({ top: edge - top, behavior: 'instant' });
     }
     // Align after activation: moving a button between pointerdown/up would
     // swallow the click. Keyboard activation has no pointer coordinates.
     panel.addEventListener('click', keepWorkspaceVisible);
     panel.addEventListener('keyup', keepWorkspaceVisible);
-    app.appendChild(workbench); app.appendChild(keysNote);
-    app.appendChild(inspect);
     host.appendChild(app);
     rootEl.appendChild(record);
     rootEl.classList.add('is-live');
@@ -12365,24 +12681,29 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
        Drawing the views
        ------------------------------------------------------------------ */
     var img = document.createElement('canvas'), imgCtx, imgData;
-    var over = document.createElement('canvas'), overCtx;
+    var over = document.createElement('canvas'), overCtx, overData;
     function resetImages() {
       var s = sim();
       img.width = s.nx; img.height = s.ny; imgCtx = img.getContext('2d');
       imgData = imgCtx.createImageData(s.nx, s.ny);
       over.width = s.nx; over.height = s.ny; overCtx = over.getContext('2d');
+      overData = overCtx.createImageData(s.nx, s.ny);
       paintCells(0, s.nx - 1, 0, s.ny - 1);
     }
     function underColor(x, y) {
       var parallel = SETUP.parallels.some(function (q) { return x >= q.x0 && x <= q.x1 && y >= q.y0 && y <= q.y1; });
       return parallel ? P.parallel : P.under;
     }
+    /* Repaint the metal and the finished-part overlay over a block of cells.
+       Witness-probe overcuts from the last inspection stay marked until the
+       next one, so a gouge between cell centres is not lost while moving. */
     function paintCells(i0, i1, j0, j1) {
-      var s = sim(), nx = s.nx, ny = s.ny, d = imgData.data, cell = M.CELL, bottom = ST.bottom;
+      var s = sim(), nx = s.nx, ny = s.ny, d = imgData.data, o = overData.data, cell = M.CELL, bottom = ST.bottom;
+      var F = field(), rep = state.report;
       i0 = Math.max(0, i0 - 1); i1 = Math.min(nx - 1, i1 + 1); j0 = Math.max(0, j0 - 1); j1 = Math.min(ny - 1, j1 + 1);
       for (var j = j0; j <= j1; j++) {
         for (var i = i0; i <= i1; i++) {
-          var h = s.rasterAt(i, j), c;
+          var k0 = i + j * nx, h = s.rasterAt(i, j), c;
           if (h <= bottom + 1e-6) c = underColor(s.cellX(i), s.cellY(j));
           else {
             var hl = s.rasterAt(Math.max(0, i - 1), j), hr = s.rasterAt(Math.min(nx - 1, i + 1), j);
@@ -12391,70 +12712,75 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
           }
           var k = 4 * (i + (ny - 1 - j) * nx);       // image rows run top-down: flip Y
           d[k] = c[0]; d[k + 1] = c[1]; d[k + 2] = c[2]; d[k + 3] = 255;
+          var v = 0;
+          if (F) {
+            v = cellState(h, F.lo[k0], F.hi[k0], bottom);
+            if (!v && rep && rep.status && rep.status[k0] === 2) v = 2;
+          }
+          if (v === 1) {
+            o[k] = P.excess[0]; o[k + 1] = P.excess[1]; o[k + 2] = P.excess[2];
+            o[k + 3] = Math.round(255 * excessAlpha(h - F.nom[k0]));
+          } else if (v === 2) {
+            // stripes, so a gouge differs from gold by pattern as well as hue
+            o[k] = P.over[0]; o[k + 1] = P.over[1]; o[k + 2] = P.over[2];
+            o[k + 3] = ((i + j) >> 3) & 1 ? 235 : 120;
+          } else o[k + 3] = 0;
         }
       }
       imgCtx.putImageData(imgData, 0, 0, i0, ny - 1 - j1, i1 - i0 + 1, j1 - j0 + 1);
-    }
-    function paintOverlay() {
-      var s = sim(), rep = state.report;
-      overCtx.clearRect(0, 0, s.nx, s.ny);
-      if (!rep || !rep.status || state.job.free) return;
-      var o = overCtx.createImageData(s.nx, s.ny), d = o.data, nx = s.nx, ny = s.ny;
-      for (var j = 0; j < ny; j++) for (var i = 0; i < nx; i++) {
-        var v = rep.status[i + j * nx];
-        if (!v) continue;
-        var c = v === 1 ? P.gold : P.red, k = 4 * (i + (ny - 1 - j) * nx);
-        d[k] = c[0]; d[k + 1] = c[1]; d[k + 2] = c[2]; d[k + 3] = v === 1 ? 120 : 200;
-      }
-      overCtx.putImageData(o, 0, 0);
+      overCtx.putImageData(overData, 0, 0, i0, ny - 1 - j1, i1 - i0 + 1, j1 - j0 + 1);
     }
 
-    var topScale = 1, topDpr = 1;
-    function sizeCanvas(cv, aspect) {
-      var w = Math.max(10, cv.clientWidth), dpr = Math.min(2, window.devicePixelRatio || 1);
+    function sizeCanvas(cv, aspect, width) {
+      var w = Math.max(10, width || cv.clientWidth), dpr = Math.min(2, window.devicePixelRatio || 1);
       var h = Math.round(w / aspect);
       if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
         cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
       }
       return { w: w, h: h, dpr: dpr };
     }
+    function showTarget() { return state.target && !state.job.free; }
     function drawTop() {
       var s = sim(), sz = sizeCanvas(topCanvas, (WIN.x1 - WIN.x0) / (WIN.y1 - WIN.y0));
       var ctx = topCanvas.getContext('2d'), k = sz.w / (WIN.x1 - WIN.x0);
-      topScale = k; topDpr = sz.dpr;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.fillStyle = css(P.paper); ctx.fillRect(0, 0, topCanvas.width, topCanvas.height);
-      // part coordinates, Y up
+      // part coordinates, Y up; one unit is one millimetre
       ctx.setTransform(k * sz.dpr, 0, 0, -k * sz.dpr, -WIN.x0 * k * sz.dpr, WIN.y1 * k * sz.dpr);
-      ctx.fillStyle = css(P.jaw); ctx.strokeStyle = css(P.inkSoft); ctx.lineWidth = 0.3;
+      var px = 1 / k;                                   // one screen pixel, in mm
+      ctx.fillStyle = css(P.jaw); ctx.strokeStyle = css(P.inkSoft); ctx.lineWidth = px;
       SETUP.jaws.forEach(function (q) { ctx.fillRect(q.x0, q.y0, q.x1 - q.x0, q.y1 - q.y0); ctx.strokeRect(q.x0, q.y0, q.x1 - q.x0, q.y1 - q.y0); });
-      // the work: the raster image, drawn the right way up
+      // the work, and the finished part over it, the right way up
       ctx.save();
       ctx.translate(ST.x0, ST.y1); ctx.scale(1, -1);
       ctx.imageSmoothingEnabled = true;
       ctx.drawImage(img, 0, 0, ST.x1 - ST.x0, ST.y1 - ST.y0);
-      if (state.overlay) ctx.drawImage(over, 0, 0, ST.x1 - ST.x0, ST.y1 - ST.y0);
+      if (showTarget()) ctx.drawImage(over, 0, 0, ST.x1 - ST.x0, ST.y1 - ST.y0);
       ctx.restore();
-      ctx.strokeStyle = css(P.ink); ctx.lineWidth = 0.35;
+      ctx.strokeStyle = css(P.ink); ctx.lineWidth = 1.2 * px;
       ctx.strokeRect(ST.x0, ST.y0, ST.x1 - ST.x0, ST.y1 - ST.y0);
-      // the drawing's outlines (top-view paths are written with y flipped)
-      if (state.target && !state.job.free) {
+      // the drawing's edges, on a paper halo so they read over gold and grey
+      if (showTarget()) {
         ctx.save(); ctx.scale(1, -1);
-        ctx.strokeStyle = css(P.accent); ctx.lineWidth = 0.45; ctx.setLineDash([1.6, 1.1]);
-        D.targetOutline(state.job).forEach(function (d) { ctx.stroke(new Path2D(d)); });
+        var paths = D.targetOutline(state.job).map(function (d) { return new Path2D(d); });
+        ctx.strokeStyle = css(P.paper, 0.75); ctx.lineWidth = 3.6 * px;
+        paths.forEach(function (p) { ctx.stroke(p); });
+        ctx.strokeStyle = css(P.target); ctx.lineWidth = 2 * px; ctx.setLineDash([6 * px, 3.5 * px]);
+        paths.forEach(function (p) { ctx.stroke(p); });
         ctx.restore(); ctx.setLineDash([]);
       }
-      // section lines through the tool
-      ctx.strokeStyle = css(P.inkSoft); ctx.lineWidth = 0.25; ctx.setLineDash([4, 1, 0.8, 1]);
+      // section line A-A through the tool (and B-B when that view is open)
+      ctx.strokeStyle = css(P.inkSoft); ctx.lineWidth = px; ctx.setLineDash([10 * px, 3 * px, 2 * px, 3 * px]);
       ctx.beginPath(); ctx.moveTo(WIN.x0, s.pos.y); ctx.lineTo(WIN.x1, s.pos.y);
-      ctx.moveTo(s.pos.x, WIN.y0); ctx.lineTo(s.pos.x, WIN.y1); ctx.stroke(); ctx.setLineDash([]);
+      if (!more.hidden) { ctx.moveTo(s.pos.x, WIN.y0); ctx.lineTo(s.pos.x, WIN.y1); }
+      ctx.stroke(); ctx.setLineDash([]);
       // the tool, seen from above
       if (s.tool) {
         var r = s.tool.dia / 2, engaged = s.pos.z < s.heightAt(s.pos.x, s.pos.y) || s.pos.z < s.maxHeightIn(s.pos.x, s.pos.y, r);
         ctx.beginPath(); ctx.arc(s.pos.x, s.pos.y, r, 0, 2 * Math.PI);
-        ctx.fillStyle = css(P.accent, engaged ? 0.32 : 0.12); ctx.fill();
-        ctx.strokeStyle = css(P.accent); ctx.lineWidth = engaged ? 0.7 : 0.45;
-        if (!engaged) ctx.setLineDash([1.2, 0.8]);
+        ctx.fillStyle = css(P.accent, engaged ? 0.34 : 0.14); ctx.fill();
+        ctx.strokeStyle = css(P.accent); ctx.lineWidth = (engaged ? 2.4 : 1.6) * px;
+        if (!engaged) ctx.setLineDash([4 * px, 2.5 * px]);
         ctx.stroke(); ctx.setLineDash([]);
         if (s.tool.kind === 'bore') {
           ctx.beginPath(); ctx.arc(s.pos.x, s.pos.y, s.tool.barDia / 2, 0, 2 * Math.PI); ctx.stroke();
@@ -12462,10 +12788,10 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
         var c = Math.min(3, r * 0.6) + 1.2;
         ctx.beginPath(); ctx.moveTo(s.pos.x - c, s.pos.y); ctx.lineTo(s.pos.x + c, s.pos.y);
         ctx.moveTo(s.pos.x, s.pos.y - c); ctx.lineTo(s.pos.x, s.pos.y + c);
-        ctx.strokeStyle = css(P.ink); ctx.lineWidth = 0.35; ctx.stroke();
+        ctx.strokeStyle = css(P.ink); ctx.lineWidth = 1.2 * px; ctx.stroke();
       }
       // axes at X0 Y0
-      ctx.strokeStyle = css(P.accent); ctx.lineWidth = 0.5;
+      ctx.strokeStyle = css(P.accent); ctx.lineWidth = 1.6 * px;
       ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(9, 0); ctx.moveTo(0, 0); ctx.lineTo(0, 9); ctx.stroke();
       ctx.setTransform(sz.dpr, 0, 0, sz.dpr, 0, 0);
       ctx.fillStyle = css(P.ink); ctx.font = '600 11px ' + getComputedStyle(rootEl).getPropertyValue('--f-display');
@@ -12475,17 +12801,20 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     }
     function describeTop() {
       var s = sim(), t = s.tool;
-      if (!t) return 'Top view of the block in the vise. No tool loaded.';
-      var under = s.heightAt(s.pos.x, s.pos.y);
-      return 'Top view. ' + M.toolLabel(t) + ' at X ' + fmtSigned(s.pos.x, 2) + ', Y ' + fmtSigned(s.pos.y, 2) + ', Z ' + fmtSigned(s.pos.z, 2) +
-        (under === -Infinity ? ', off the block.' : '; the metal under its centre is at Z ' + fmtSigned(under, 2) + '.');
+      var target = showTarget() ? ' The finished part is drawn over the block: gold is metal still to remove, striped red-orange is metal cut past the drawing.' : '';
+      if (!t) return 'Top view of the block in the vise. No tool loaded.' + target;
+      var c = clearance(s);
+      return 'Top view. ' + M.toolLabel(t) + ' at ' + where(s) +
+        (c.beside ? ', beside the block.' : '; the highest metal under it is at Z ' + fmtSigned(c.top, 2) + '.') + target;
     }
 
     var isoTimer = 0;
-    function drawIso() {
-      var s = sim(), sz = sizeCanvas(isoCanvas, 1), ctx = isoCanvas.getContext('2d');
+    function drawIso(cv, width) {
+      cv = cv || isoCanvas;
+      if (cv === isoCanvas && more.hidden) return;
+      var s = sim(), sz = sizeCanvas(cv, 1, width), ctx = cv.getContext('2d');
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.fillStyle = css(P.paper); ctx.fillRect(0, 0, isoCanvas.width, isoCanvas.height);
+      ctx.fillStyle = css(P.paper); ctx.fillRect(0, 0, cv.width, cv.height);
       var rot = state.rot, step = 2, cell = M.CELL * step, bottom = ST.bottom;
       // fit the block's projected outline into the canvas
       var corners = [[0, 0], [100, 0], [100, 60], [0, 60]], minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -12525,10 +12854,11 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
         ctx.fillStyle = css(cellColor(P, h, g[0], g[1], bottom, ST.rawTop));
         ctx.fillRect(sx, syTop - hTop / 2, w, hTop);
       }
-      isoCanvas.setAttribute('aria-label', 'The part in isometric, seen from ' + ['the front right', 'the back right', 'the back left', 'the front left'][rot] +
+      cv.setAttribute('aria-label', 'The part in isometric, seen from ' + ['the front right', 'the back right', 'the back left', 'the front left'][rot] +
         '. ' + (state.report ? state.report.summary : ''));
     }
     function scheduleIso(now) {
+      if (more.hidden) return;
       if (now) { clearTimeout(isoTimer); isoTimer = 0; drawIso(); return; }
       if (isoTimer) return;
       isoTimer = setTimeout(function () { isoTimer = 0; drawIso(); }, 180);
@@ -12536,9 +12866,13 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
 
     var secTimer = 0;
     function drawSections() {
-      var s = sim(), job = state.job, tgt = state.target && !job.free;
+      var s = sim(), job = state.job, tgt = showTarget();
+      frontName.textContent = 'Section A–A at Y ' + fmtSigned(s.pos.y, 2);
       frontHost.innerHTML = D.renderSection(s, job, 'front', s.pos.y, { idPrefix: uid + '-f', target: tgt });
-      sideHost.innerHTML = D.renderSection(s, job, 'side', s.pos.x, { idPrefix: uid + '-s', target: tgt });
+      if (!more.hidden) {
+        sideName.textContent = 'Section B–B at X ' + fmtSigned(s.pos.x, 2) + ', seen from the right';
+        sideHost.innerHTML = D.renderSection(s, job, 'side', s.pos.x, { idPrefix: uid + '-s', target: tgt });
+      }
     }
     function scheduleSections(now) {
       if (now) { clearTimeout(secTimer); secTimer = 0; drawSections(); return; }
@@ -12552,36 +12886,93 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     function syncSegs() {
       STEPS.forEach(function (st) { stepButtons[st].setAttribute('aria-pressed', String(state.step === st)); });
       Object.keys(speedButtons).forEach(function (k) { speedButtons[k].setAttribute('aria-pressed', String(state.speed === k)); });
-      overlayBtn.setAttribute('aria-pressed', String(state.overlay));
       targetBtn.setAttribute('aria-pressed', String(state.target));
-      legend.hidden = !state.overlay || state.job.free;
+      targetBtn.hidden = state.job.free;
+      legend.classList.toggle('is-plain', !showTarget());
       jobs.forEach(function (j) { jobButtons[j.id].setAttribute('aria-pressed', String(j === state.job)); });
+    }
+    function syncTools() {
+      var t = sim().tool, shown = state.kindShown || (t && t.group);
+      var kind = KINDS.filter(function (k) { return k.group === shown; })[0];
+      KINDS.forEach(function (k) {
+        var b = kindButtons[k.group];
+        b.setAttribute('aria-pressed', String(!!t && t.group === k.group));
+        if (k.tools.length > 1) b.setAttribute('aria-expanded', String(!!kind && kind === k));
+      });
+      var multi = kind && kind.tools.length > 1;
+      sizeRow.hidden = !multi;
+      if (multi && sizeRow.getAttribute('data-kind') !== kind.group) {
+        sizeRow.setAttribute('data-kind', kind.group);
+        sizeRow.setAttribute('aria-label', KIND_NAME[kind.kind] + ' size');
+        sizeLab.textContent = KIND_NAME[kind.kind] + (kind.kind === 'tap' ? '' : ' Ø');
+        sizeChips.innerHTML = ''; sizeButtons = {};
+        kind.tools.forEach(function (tt) {
+          var lab = kind.kind === 'tap' ? sizeLabel(tt) : fmt(tt.dia, tt.dia % 1 ? 1 : 0);
+          var b = button(lab, { class: 'ms-chip-btn', 'aria-pressed': 'false', 'aria-label': 'Load the ' + M.toolNoun(Object.assign({}, tt)) });
+          b.addEventListener('click', function () { changeTool(tt.id); });
+          sizeButtons[tt.id] = b; sizeChips.appendChild(b);
+        });
+      }
+      Object.keys(sizeButtons).forEach(function (id) { sizeButtons[id].setAttribute('aria-pressed', String(!!t && t.id === id)); });
+      boreRow.hidden = !(t && t.kind === 'bore');
+      if (t && t.kind === 'bore' && document.activeElement !== boreInput) boreInput.value = fmt(t.dia, 2);
+    }
+    function syncInputs() {
+      var s = sim();
+      ['x', 'y', 'z'].forEach(function (ax) {
+        if (state.edited[ax] || document.activeElement === goIn[ax]) return;
+        goIn[ax].value = fmt(s.pos[ax], 2);
+      });
+    }
+    function clearEdits() {
+      state.edited = {};
+      ['x', 'y', 'z'].forEach(function (ax) { goIn[ax].classList.remove('is-edited'); });
     }
     function syncPanel() {
       var s = sim(), t = s.tool;
       droOut.x.textContent = fmtSigned(s.pos.x, 2);
       droOut.y.textContent = fmtSigned(s.pos.y, 2);
       droOut.z.textContent = fmtSigned(s.pos.z, 2);
-      var under = s.heightAt(s.pos.x, s.pos.y);
-      surfaceNote.textContent = under === -Infinity ? 'The tool is off the block.' :
-        'Metal under the tool’s centre: Z ' + fmtSigned(under, 2) + (s.pos.z < under - 1e-6 ? ' (the tip is in the cut)' : s.pos.z <= under + 1e-6 ? ' (touching)' : ', ' + fmt(s.pos.z - under, 2) + ' mm below the tip') + '.';
-      toolName.textContent = t ? M.toolLabel(t) : 'None yet: pick one from the rack';
-      toolNote.textContent = t ? toolCanDo(t) : 'Every tool cuts a shape of its own. The rack below has one of each kind.';
-      toolIcon.innerHTML = t ? D.renderToolIcon(t, { height: 64 }) : '';
-      Object.keys(rackButtons).forEach(function (id) { rackButtons[id].setAttribute('aria-pressed', String(!!t && t.id === id)); });
-      boreRow.hidden = !(t && t.kind === 'bore');
-      if (t && t.kind === 'bore' && document.activeElement !== boreInput) boreInput.value = fmt(t.dia, 2);
-      undoBtn.disabled = !s.canUndo() || !!state.running;
-      stopBtn.disabled = !state.running && !state.drag;
+      toolNow.textContent = t ? M.toolLabel(t) : 'none yet';
+      var c = clearance(s), busy = !!state.running || !!state.drag;
+      // the tool cuts its own footprint as it goes, so a cut in progress
+      // shows as removed volume on the open move, not as metal in the circle
+      var cutting = busy && !!s.entry && s.entry.tally.volume > 0.05;
+      droUnder.textContent = (cutting ? 'cutting' : !c ? 'choose a tool to begin' : c.beside ? 'beside the block, no metal under it'
+        : c.gap > 0.005 ? fmt(c.gap, 2) + ' mm above the metal under it' : c.gap > -0.005 ? 'level with the metal under it' : 'in the metal, ' + fmt(-c.gap, 2) + ' mm deep');
+      dro.classList.toggle('is-cutting', cutting);
+      syncTools();
+      syncInputs();
+      undoBtn.hidden = busy; stopBtn.hidden = !busy;
+      undoBtn.disabled = !s.canUndo();
       resetBtn.textContent = state.armReset ? 'Sure? Start over' : 'Start this job over';
+      syncNext();
+    }
+    /* The line under the status: the optional next step, or how the part
+       stands against the drawing. */
+    function syncNext() {
+      var s = sim(), ns = (state.running || state.drag) ? null : nextStep(s, state.job), rep = state.report;
+      nextFill.hidden = !(ns && ns.fill);
+      detailsBtn.hidden = !!ns || state.job.free || !rep || !rep.started;
+      if (ns) {
+        next.className = 'ms-next is-suggest';
+        nextText.innerHTML = '';
+        add(nextText, el('strong', {}, s.tool ? 'Next, if you like: ' : 'First: '), document.createTextNode(ns.text));
+        if (ns.fill) { nextFill.textContent = ns.label; nextFill.ms = ns.fill; }
+      } else {
+        next.className = 'ms-next' + (rep && rep.overcut ? ' is-over' : rep && rep.complete ? ' is-complete' : '');
+        nextText.textContent = state.job.free ? 'Free practice has no drawing to check against. Approximate grid volume removed: ' + fmt(s.removed / 1000, 2) + ' cm³.'
+          : progressLine(rep);
+        if (!detailsBtn.hidden) add(nextText, document.createTextNode(' '), detailsBtn);
+      }
     }
     function toolCanDo(t) {
       switch (t.kind) {
-        case 'face': return 'Cuts with its rim of inserts as it moves across, up to 4 mm deep. Lower it beside the work, not onto it.';
-        case 'end': return 'Cuts on its end and its sides: plunges, then moves across up to ' + fmt(t.reach, 0) + ' mm deep. Inside corners take its ' + fmt(t.dia / 2, 0) + ' mm radius.';
-        case 'spot': return 'A 90° point: starts holes, cuts countersinks, and chamfers an edge as it moves along it.';
-        case 'drill': return 'Feeds straight down only. Leaves a hole of its own size, with a 118° point at the bottom.';
-        case 'tap': return 'Cuts an ' + M.THREADS[t.thread].label + ' thread inside a Ø' + fmt(M.THREADS[t.thread].tapDrill, 1) + ' hole. Straight in, straight out.';
+        case 'face': return 'It cuts with the inserts round its rim as it moves across, up to 4 mm deep.';
+        case 'end': return 'It cuts on its end and its sides: it can plunge, then move across up to ' + fmt(t.reach, 0) + ' mm deep. Inside corners take its ' + fmt(t.dia / 2, 0) + ' mm radius.';
+        case 'spot': return 'A 90° point: it starts holes, cuts countersinks, and chamfers an edge as it moves along it.';
+        case 'drill': return 'It feeds straight down only, and leaves a hole of its own size with a 118° point at the bottom.';
+        case 'tap': return 'It cuts an ' + M.THREADS[t.thread].label + ' thread inside a Ø' + fmt(M.THREADS[t.thread].tapDrill, 1) + ' hole. Straight in, straight out.';
         case 'bore': return 'Adjustable: set its diameter, then feed it down a hole at least Ø10 to open the hole to that size.';
       }
       return '';
@@ -12594,6 +12985,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
         inspSummary.textContent = 'Free practice has no drawing to check against. Approximate grid volume removed: ' + fmt(s.removed / 1000, 2) + ' cm³; very small cuts may fall between samples.';
         inspRows.innerHTML = '';
         inspect.classList.remove('is-complete', 'is-over');
+        syncNext();
         return;
       }
       var rep = I.inspect(s, job);
@@ -12604,10 +12996,10 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       inspRows.innerHTML = '';
       rep.rows.forEach(function (r) {
         var li = el('li', { class: 'ms-row is-' + r.status });
-        var head = el('p', { class: 'ms-row-head' });
-        head.appendChild(el('span', { class: 'ms-chip' }, { ok: 'Matches', todo: 'To do', over: 'Cut too far', none: 'Not started' }[r.status]));
-        head.appendChild(el('span', { class: 'ms-row-label' }, r.label));
-        li.appendChild(head);
+        var rh = el('p', { class: 'ms-row-head' });
+        rh.appendChild(el('span', { class: 'ms-chip' }, { ok: 'Matches', todo: 'To do', over: 'Cut too far', none: 'Not started' }[r.status]));
+        rh.appendChild(el('span', { class: 'ms-row-label' }, r.label));
+        li.appendChild(rh);
         if (r.measured) li.appendChild(el('p', { class: 'ms-row-measured' }, 'Measured: ' + r.measured));
         var ul = el('ul', { class: 'ms-checks' });
         r.checks.forEach(function (c) {
@@ -12620,18 +13012,25 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
         li.appendChild(ul);
         inspRows.appendChild(li);
       });
-      paintOverlay();
+      paintCells(0, s.nx - 1, 0, s.ny - 1);
+      syncNext();
     }
     function scheduleInspect(now) {
       clearTimeout(inspectTimer);
-      if (now) { runInspect(); drawTop(); scheduleIso(true); return; }
-      inspectTimer = setTimeout(function () { runInspect(); drawTop(); scheduleIso(true); }, 120);
+      var go = function () { runInspect(); drawTop(); scheduleIso(true); };
+      if (now) { go(); return; }
+      inspectTimer = setTimeout(go, 120);
     }
 
-    function say(text, warn) {
-      status.textContent = text;
-      status.classList.toggle('is-warn', !!warn);
+    function say(kind, title, text) {
+      feedback.className = 'ms-feedback is-' + kind;
+      feedbackMore.setAttribute('aria-expanded', 'false');
+      feedbackMore.textContent = 'Full text';
+      status.innerHTML = '';
+      if (title) add(status, el('strong', {}, title), document.createTextNode(' '));
+      status.appendChild(document.createTextNode(text || ''));
     }
+    function sayMove(m) { say(m.kind, m.title, m.text); }
 
     function redrawMoving() {
       var s = sim(), dirty = s.takeDirty();
@@ -12654,7 +13053,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     /* Queue a move to a target; it runs leg by leg on the animation clock. */
     function moveTo(target, label) {
       var s = sim();
-      if (!s.tool) { say('Load a tool from the rack first.', true); return; }
+      if (!s.tool) { say('stop', 'No tool.', 'Choose a tool first.'); return; }
       if (state.running || state.queue.length) {
         if (state.queue.length < 2) state.queue.push({ target: target, label: label });
         return;
@@ -12663,9 +13062,14 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     }
     function startMove(target, label) {
       var s = sim(), pl = s.plan(target);
+      if (label === 'Go to' || label === 'Raise') {
+        say('info', 'Moving.', 'To X ' + fmtSigned(pl.target.x, 2) + ', Y ' + fmtSigned(pl.target.y, 2) + ', Z ' + fmtSigned(pl.target.z, 2) +
+          '. Stop or Escape halts it where it is, keeping what it has cut.');
+      }
       s.begin('move', label || 'Move');
       if (pl.note) s.entry.notes.push(pl.note);
       state.running = { legs: pl.legs, k: 0 };
+      syncPanel();
       if (instant()) {
         while (state.running) stepMotion(Infinity);
         return;
@@ -12688,10 +13092,15 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       }
       if (run && run.k >= run.legs.length) finishMove();
     }
-    function finishMove() {
+    function finishMove(stopped) {
       var s = sim(), sum = s.commit();
       state.running = null;
-      if (sum) { var m = describeMove(sum, s); say(m.text, m.warn); }
+      if (sum) {
+        var m = describeMove(sum, s);
+        if (stopped && !sum.blocked) { m.title = 'Stopped part-way.'; m.text = 'Everything cut up to here is kept. ' + m.text; }
+        sayMove(m);
+      }
+      if (stopBtn === document.activeElement) undoBtn.focus({ preventScroll: true });
       redrawMoving();
       scheduleInspect();
       if (state.queue.length) { var nx = state.queue.shift(); startMove(nx.target, nx.label); }
@@ -12710,7 +13119,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       });
     }
     function stop() {
-      if (state.running) { state.running.k = state.running.legs.length; state.queue = []; finishMove(); }
+      if (state.running) { state.running.k = state.running.legs.length; state.queue = []; finishMove(true); }
       if (state.drag) endDrag(true);
     }
 
@@ -12725,7 +13134,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     function snap(v) { var g = Math.min(state.step, 1); return M.q4(Math.round(v / g) * g); }
     function startDrag(kind, target) {
       var s = sim();
-      if (!s.tool) { say('Load a tool from the rack first.', true); return false; }
+      if (!s.tool) { say('stop', 'No tool.', 'Choose a tool first.'); return false; }
       if (state.running) return false;
       s.begin('move', kind === 'xy' ? 'Drag' : 'Drag Z');
       state.drag = { kind: kind, target: target, leg: null, settled: false, released: false, lastCode: null };
@@ -12750,7 +13159,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       if (r.blocked) {
         dg.leg.blockedTarget = true;
         dg.settled = true;
-        if (dg.lastCode !== r.code) { say(r.message, true); dg.lastCode = r.code; }
+        if (dg.lastCode !== r.code) { say('stop', 'Stopped.', r.message); dg.lastCode = r.code; }
         if (dg.released) endDrag();
       }
     }
@@ -12760,7 +13169,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       if (!force && !dg.settled) { dg.released = true; return; }
       state.drag = null;
       var s = sim(), sum = s.commit();
-      if (sum && !dg.lastCode) { var m = describeMove(sum, s); say(m.text, m.warn); }
+      if (sum && !dg.lastCode) sayMove(describeMove(sum, s));
       redrawMoving();
       scheduleInspect();
     }
@@ -12771,10 +13180,10 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
     }
     topCanvas.addEventListener('pointerdown', function (ev) {
       var s = sim(), q = topPoint(ev);
-      if (!s.tool) { say('Load a tool from the rack first.', true); return; }
+      if (!s.tool) { say('stop', 'No tool.', 'Choose a tool first.'); return; }
       var grab = Math.max(s.tool.dia / 2, 4) + 3;
       if (Math.hypot(q.x - s.pos.x, q.y - s.pos.y) > grab) {
-        say('To move the tool, drag it: press on the tool’s circle, then slide.', false);
+        say('info', '', 'To move the tool, drag it: press on the tool’s circle, then slide.');
         return;
       }
       if (!startDrag('xy', { x: snap(q.x), y: snap(q.y), z: s.pos.z })) return;
@@ -12792,9 +13201,10 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
         state.drag.released = false;
         tick();
       }
-      var h = s.heightAt(q.x, q.y);
-      probe.textContent = 'Pointer at X ' + fmtSigned(q.x, 1) + ', Y ' + fmtSigned(q.y, 1) +
-        (h === -Infinity ? ' (off the block)' : ': metal top at Z ' + fmtSigned(h, 2) + (h <= ST.bottom + 1e-6 ? ', cut right through' : ''));
+      var h = s.heightAt(q.x, q.y), F = field(), fin = '';
+      if (F && h !== -Infinity) fin = ' · finished Z ' + fmtSigned(I.nominalAt(state.job, q.x, q.y), 2);
+      probe.textContent = 'X ' + fmtSigned(q.x, 1) + ' Y ' + fmtSigned(q.y, 1) +
+        (h === -Infinity ? ' · off the block' : ' · metal Z ' + fmtSigned(h, 2) + (h <= ST.bottom + 1e-6 ? ', cut through' : '') + fin);
     });
     var release = function () { if (state.drag) { state.drag.released = true; if (state.drag.settled) endDrag(); else tick(); } };
     topCanvas.addEventListener('pointerup', release);
@@ -12865,39 +13275,62 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       var s = sim();
       if (state.running || state.drag) return;
       var r = s.loadTool(id);
-      say(r.message, !r.ok);
+      if (!r.ok) say('stop', 'No change.', r.message);
+      else say('info', r.same ? '' : 'Tool changed.', r.message + (r.same ? '' : ' ' + toolCanDo(s.tool)));
+      state.kindShown = null;
       redrawMoving(); scheduleSections(true);
     }
     boreSet.addEventListener('click', function () {
       var v = M.parseNum(boreInput.value);
-      if (!isFinite(v)) { say('Type the boring diameter as a number of millimetres, such as 20.00.', true); return; }
+      if (!isFinite(v)) { say('stop', 'Not a number.', 'Type the boring diameter as a number of millimetres, such as 20.00.'); return; }
       var r = sim().setBoreDia(v);
-      say(r.message, !r.ok); syncPanel(); drawTop(); scheduleSections(true);
+      say(r.ok ? 'info' : 'stop', '', r.message); syncPanel(); drawTop(); scheduleSections(true);
     });
     boreInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); boreSet.click(); } });
     function goTo() {
       var s = sim(), t = {}, bad = [];
       ['x', 'y', 'z'].forEach(function (ax) {
         var raw = goIn[ax].value.trim();
-        if (!raw) { t[ax] = s.pos[ax]; return; }
+        if (!state.edited[ax] || !raw) { t[ax] = s.pos[ax]; return; }
         var v = M.parseNum(raw);
         if (!isFinite(v)) bad.push(ax.toUpperCase()); else t[ax] = v;
       });
-      if (bad.length) { say('Not a number in ' + bad.join(', ') + '. Type millimetres, such as −6.5 or 81.', true); return; }
+      if (bad.length) { say('stop', 'Not a number.', 'Check ' + bad.join(', ') + ': type millimetres, such as −6.5 or 81.'); return; }
+      clearEdits();
       moveTo(t, 'Go to');
     }
     goBtn.addEventListener('click', goTo);
     ['x', 'y', 'z'].forEach(function (ax) {
       goIn[ax].addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); goTo(); } });
+      goIn[ax].addEventListener('blur', function () { if (!state.edited[ax]) syncInputs(); });
     });
     upBtn.addEventListener('click', function () { moveTo({ z: SETUP.clearZ }, 'Raise'); });
     stopBtn.addEventListener('click', stop);
+    nextFill.addEventListener('click', function () {
+      var f = nextFill.ms || {}, axes = [];
+      clearEdits();
+      syncInputs();
+      ['x', 'y', 'z'].forEach(function (ax) {
+        if (f[ax] == null) return;
+        goIn[ax].value = fmt(f[ax], 2); state.edited[ax] = true; goIn[ax].classList.add('is-edited');
+        axes.push(ax.toUpperCase() + ' ' + fmt(f[ax], 2));
+      });
+      say('info', 'Filled in.', axes.join(', ') + '. Press Move; the other axes stay at their current position.');
+      moveBox.scrollIntoView({block:'nearest', inline:'nearest'});
+      goBtn.focus({ preventScroll: true });
+      keepWorkspaceVisible();
+    });
+    detailsBtn.addEventListener('click', function () {
+      inspect.scrollIntoView({ block: 'start', behavior: reduce.matches ? 'auto' : 'smooth' });
+      inspect.focus({ preventScroll: true });
+    });
     function doUndo() {
       var s = sim();
       if (state.running || state.drag) stop();
       var e = s.undo();
       if (!e) return;
-      say('Undone: ' + (e.kind === 'tool' ? e.label.toLowerCase() : 'the last move') + '. In the shop, metal that is cut stays cut; here you can take it back.', false);
+      clearEdits();
+      say('info', 'Undone.', (e.kind === 'tool' ? 'The ' + e.label.toLowerCase() : 'The last move') + ' is taken back; the tool is at ' + where(s) + '. In the shop, metal that is cut stays cut.');
       redrawAll(); scheduleInspect(true);
     }
     undoBtn.addEventListener('click', doUndo);
@@ -12909,10 +13342,24 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       clearTimeout(state.armReset); state.armReset = 0;
       stop();
       sim().reset();
-      say('A fresh block, 1 mm over on top, back in the vise.', false);
+      clearEdits();
+      say('info', 'A fresh block.', 'It is 1 mm over on top, back in the vise, with no tool loaded.');
       redrawAll(); scheduleInspect(true);
     });
-    overlayBtn.addEventListener('click', function () { state.overlay = !state.overlay; syncSegs(); paintOverlay(); drawTop(); });
+    function toggleRegion(btn, region, opened) {
+      region.hidden = !opened;
+      btn.setAttribute('aria-expanded', String(opened));
+    }
+    drawingBtn.addEventListener('click', function () {
+      var open = drawing.hidden;
+      toggleRegion(drawingBtn, drawing, open);
+      drawingBtn.textContent = open ? 'Hide the drawing' : 'Drawing';
+    });
+    moreBtn.addEventListener('click', function () {
+      toggleRegion(moreBtn, more, more.hidden);
+      drawTop(); scheduleSections(true); scheduleIso(true);
+    });
+    helpBtn.addEventListener('click', function () { toggleRegion(helpBtn, help, help.hidden); });
     targetBtn.addEventListener('click', function () { state.target = !state.target; syncSegs(); drawTop(); scheduleSections(true); });
     turnL.addEventListener('click', function () { state.rot = (state.rot + 3) % 4; scheduleIso(true); });
     turnR.addEventListener('click', function () { state.rot = (state.rot + 1) % 4; scheduleIso(true); });
@@ -12923,28 +13370,32 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
         state.hint++;
       }
       hintBtn.disabled = state.hint >= h.length;
-      hintBtn.textContent = state.hint >= h.length ? 'No more hints' : state.hint ? 'Another hint' : 'Show a hint';
+      hintBtn.textContent = state.hint >= h.length ? 'No more hints' : state.hint ? 'Another hint' : 'Hint';
     });
 
     function setJob(j) {
       if (state.running || state.drag) stop();
-      state.job = j; state.hint = 0;
-      briefTitle.textContent = j.free ? j.title : 'Job ' + j.n + ': ' + j.title;
-      briefText.textContent = j.brief;
+      state.job = j; state.hint = 0; state.report = null; state.kindShown = null;
+      clearEdits();
+      goal.innerHTML = '';
+      add(goal, el('strong', {}, j.free ? j.title + '.' : 'Job ' + j.n + ': ' + j.title + '.'), document.createTextNode(' ' + j.brief));
       hintList.innerHTML = '';
-      hintBtn.hidden = j.free; targetBtn.hidden = j.free;
-      hintBtn.disabled = false; hintBtn.textContent = 'Show a hint';
-      drawing.hidden = j.free;
+      hintBtn.hidden = j.free; drawingBtn.hidden = j.free;
+      hintBtn.disabled = false; hintBtn.textContent = 'Hint';
+      if (j.free) { toggleRegion(drawingBtn, drawing, false); drawingBtn.textContent = 'Drawing'; }
       drawingBody.innerHTML = j.free ? '' : D.renderDrawing(j, { idPrefix: uid + '-drawing-' + j.id });
       resetImages();
       syncSegs();
+      runInspect();
       redrawAll();
-      scheduleInspect(true);
-      say(sim().removed ? 'Back to job ' + j.n + ', as you left it.' : (sim().tool ? '' : 'Pick a tool from the rack to start.'), false);
+      var s = sim();
+      if (s.removed) say('info', 'Back to ' + (j.free ? 'free practice' : 'job ' + j.n) + '.', 'The block is as you left it.');
+      else if (s.tool) say('info', '', M.toolLabel(s.tool) + ' in the spindle at ' + where(s) + '.');
+      else say('info', j.free ? 'Free practice.' : 'Ready.', 'A raw block 1 mm over on top is in the vise.' + (j.free ? '' : ' The finished part is drawn over it.'));
     }
 
     /* ---- theme, size, print ----------------------------------------------*/
-    function rePalette() { P = readPalette(rootEl); redrawAll(); paintOverlay(); }
+    function rePalette() { P = readPalette(rootEl); redrawAll(); }
     if (window.MutationObserver) new MutationObserver(rePalette).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     var dark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
     if (dark && dark.addEventListener) dark.addEventListener('change', rePalette);
@@ -12959,8 +13410,9 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
       if (!sim().removed) return;
       record.appendChild(el('p', { class: 'ms-box-title' }, 'Your part: ' + (job.free ? job.title : 'job ' + job.n + ', ' + job.title)));
       try {
-        var shot = el('img', { class: 'ms-record-img', alt: 'The part as it was cut, in isometric.', src: isoCanvas.toDataURL('image/png') });
-        record.appendChild(shot);
+        var cv = document.createElement('canvas');
+        drawIso(cv, 480);
+        record.appendChild(el('img', { class: 'ms-record-img', alt: 'The part as it was cut, in isometric.', src: cv.toDataURL('image/png') }));
       } catch (e) { /* a tainted canvas cannot be copied; the report still prints */ }
       if (rep) {
         record.appendChild(el('p', {}, rep.summary));
@@ -12984,8 +13436,10 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   }
 
   return {
-    boot: boot, parseColor: parseColor, mix: mix, cellColor: cellColor,
-    isoTurn: isoTurn, isoProject: isoProject, describeMove: describeMove, WIN: WIN, STEPS: STEPS
+    boot: boot, parseColor: parseColor, mix: mix, cellColor: cellColor, readPalette: readPalette,
+    isoTurn: isoTurn, isoProject: isoProject, describeMove: describeMove, nextStep: nextStep, progressLine: progressLine,
+    targetField: targetField, cellState: cellState, excessAlpha: excessAlpha, clearance: clearance,
+    KINDS: KINDS, WIN: WIN, STEPS: STEPS
   };
 });
 
