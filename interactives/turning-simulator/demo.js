@@ -310,6 +310,9 @@
       var bar = document.querySelector('.appbar'), top = bar ? Math.max(0, bar.getBoundingClientRect().bottom) : 0;
       var nav = document.querySelector('.seqbar'), nr = nav && nav.getBoundingClientRect();
       var bottom = nr && nr.height ? Math.min(window.innerHeight, nr.top) : window.innerHeight;
+      var exit = document.querySelector('.present-exit'), er = exit && exit.getBoundingClientRect();
+      var br = el.bench.getBoundingClientRect();
+      if (er && er.height && er.left < br.right && er.right > br.left) { bottom = Math.min(bottom, er.top); }
       return { top: top + 6, bottom: bottom - 6 };
     }
     /* Where it can without shrinking the picture below half its width-limited size,
@@ -320,13 +323,18 @@
       if (!view || fitting) { return; }
       fitting = true;
       var room = screenRoom(), h = room.bottom - room.top;
+      var top = el.bench.getBoundingClientRect().top;
+      // Once the controls are on screen, a taller tool picture uses the space
+      // below their current top instead of moving the page under the hands.
+      var anchored = top >= room.top - 1 && top < room.bottom;
+      if (anchored) { h -= Math.max(0, top - room.top); }
       el.viewBox.style.removeProperty('--ts-view-w');
       var b = el.bench.getBoundingClientRect();
       if (b.height > 0) {
         var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
         var v0 = el.wrap.getBoundingClientRect().height, v = v0;
         var card = lab.closest('.xcard');
-        var lead = card ? b.top - card.getBoundingClientRect().top - (el.drawing.hidden ? 0 : el.drawing.getBoundingClientRect().height) + 10 : 0;
+        var lead = !anchored && card ? b.top - card.getBoundingClientRect().top - (el.drawing.hidden ? 0 : el.drawing.getBoundingClientRect().height) + 10 : 0;
         if (b.height > h - lead) { v = v0 - (b.height - (h - lead)); }
         if (v < Math.max(12 * rem, v0 / 2)) { v = b.height > h ? Math.max(7.5 * rem, v0 - (b.height - h)) : v0; }
         if (v < v0 - 0.5) { el.viewBox.style.setProperty('--ts-view-w', Math.floor(v * f.W / f.H) + 'px'); }
@@ -334,15 +342,13 @@
       }
       fitting = false;
     }
-    /* After a control is used, bring the whole bench on screen, with the part
-       buttons above it when they fit too. Never while a pointer is down on a
-       control: moving it then would swallow the click. */
+    /* On entering the operating workspace, anchor its top below the app bar.
+       Tool changes can then use the whole available height without shifting
+       the page. Never move it while a pointer is down on a control. */
     function keepBenchVisible() {
       var room = screenRoom(), h = room.bottom - room.top, b = el.bench.getBoundingClientRect();
-      if (!b.height || b.height > h + 1 || (b.top >= room.top - 1 && b.bottom <= room.bottom + 1)) { return; }
-      var head = $(lab, '.ts-head').getBoundingClientRect();
-      var from = b.bottom - head.top <= h ? head.top : b.top;
-      window.scrollBy({ top: from - room.top, behavior: 'instant' });
+      if (!b.height || b.height > h + 1 || Math.abs(b.top - room.top) <= 1) { return; }
+      window.scrollBy({ top: b.top - room.top, behavior: 'instant' });
     }
     var win = null;          // the close-up window, [x0, y0, w, h]
     function applyZoom(recenter) {
