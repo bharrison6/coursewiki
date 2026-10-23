@@ -45,6 +45,41 @@ test('the top-view overlay marks every cell as the inspection does', () => {
   }
 });
 
+test('the isometric view marks every cell as the top view does', () => {
+  for (const job of JOBS) {
+    const s = M.create();
+    deepPass(s);
+    const F = U.targetField(s, job);
+    let excess = 0, over = 0;
+    for (let k = 0; k < s.nx * s.ny; k++) {
+      const i = k % s.nx, j = (k - i) / s.nx, h = s.rasterAt(i, j);
+      const v = U.cellState(h, F.lo[k], F.hi[k], s.stock.bottom), t = U.isoTint(h, F.lo[k], F.hi[k], F.nom[k], s.stock.bottom, false);
+      assert.equal(t ? t.kind : 0, v, job.id + ' cell ' + k);
+      if (t && t.kind === 1) { excess++; assert.equal(t.alpha, U.excessAlpha(h - F.nom[k]), 'as strong as the top view'); }
+      if (t && t.kind === 2) over++;
+    }
+    assert.ok(excess > 0 && over > 0, job.id + ': both marks appear');
+  }
+  // a gouge the last inspection found between cell centres stays marked
+  assert.equal(U.isoTint(5, 0, 10, 0, -20, true).kind, 2);
+  assert.equal(U.isoTint(5, 0, 10, 0, -20, false), null);
+});
+
+test('one prominent switch chooses the top and front views or the isometric', () => {
+  const src = fs.readFileSync(path.join(MOD, 'demo.js'), 'utf8');
+  assert.match(src, /button\('Top and front', \{ 'aria-pressed': 'true'/);
+  assert.match(src, /button\('Isometric', \{ 'aria-pressed': 'false'/);
+  assert.match(src, /role: 'group', 'aria-label': 'View of the work'/);
+  assert.ok(!/button\('More views'/.test(src), 'the isometric is not hidden behind More views');
+  assert.match(src, /vTop\.hidden = vFront\.hidden = l === 'iso';/);
+  assert.match(src, /isoCanvas\.addEventListener\('keydown', wheelKeys\)/);
+  const css = fs.readFileSync(path.join(MOD, 'demo.css'), 'utf8');
+  assert.match(css, /\.ms-viewbar \{ position: absolute;/, 'the switch adds no height to the bench');
+  assert.match(css, /\.ms-iso-canvas \{ aspect-ratio: 190 \/ 181;/, 'the isometric takes the space of the pair');
+  const page = fs.readFileSync(path.join(__dirname, '..', '..', 'collections', 'machining', 'pages', 'milling-operations.html'), 'utf8').replace(/\s+/g, ' ');
+  assert.match(page, /<em>Top and front<\/em>, the top view with its section, and <em>Isometric<\/em>/);
+});
+
 test('the overlay is strongest where most metal is still to come off', () => {
   const job = J.BY_ID.shoulder, s = M.create(), F = U.targetField(s, job);
   const k = (x, y) => Math.floor((x - s.stock.x0) / M.CELL) + Math.floor((y - s.stock.y0) / M.CELL) * s.nx;

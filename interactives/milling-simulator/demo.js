@@ -4,13 +4,15 @@
    Builds the live simulator inside every [data-interactive="milling-
    simulator"] root. What a learner meets first, top to bottom:
      the job and its goal in one line, the drawing one press away;
-     the work: a readout, a large top view and section A-A through the tool,
-       with the FINISHED part laid over the actual block (gold: metal still to
-       remove, deeper is stronger; striped red-orange: cut past the drawing;
-       a dashed outline: the drawing's edges);
+     the work: a readout, then one of two views chosen by a switch over them:
+       a large top view and section A-A through the tool, or the part in
+       isometric, which turns; both with the FINISHED part laid over the
+       actual block (gold: metal still to remove, deeper is stronger; striped
+       red-orange: cut past the drawing; in the top and section, a dashed
+       outline: the drawing's edges);
      what the last move did, an optional next step, and Undo, beside it;
      the controls: a compact tool changer, move-to boxes, the handwheels.
-   The 3D part, section B-B, help and the full inspection are below it.
+   Section B-B, help and the full inspection are below it.
 
    The page source carries only teaching text and the printed figures; the
    controls are made here, so a reader without JavaScript (or a printout)
@@ -128,6 +130,17 @@
      is a light wash, a deep pocket or a through hole is strong. */
   function excessAlpha(depth) {
     return 0.2 + 0.65 * Math.min(1, Math.max(0, depth) / 7);
+  }
+
+  /* The tint of one cell's top in the isometric view: the top view's overlay
+     rule, so both views mark the same metal. null: no tint; otherwise the
+     kind (1 still to remove, 2 cut too far) and how strongly to tint. */
+  function isoTint(h, lo, hi, nom, bottom, reportOver) {
+    var v = cellState(h, lo, hi, bottom);
+    if (!v && reportOver) v = 2;
+    if (v === 1) return { kind: 1, alpha: excessAlpha(h - nom) };
+    if (v === 2) return { kind: 2, alpha: 0.7 };
+    return null;
   }
 
   /* ---- what is under the cutter -------------------------------------------*/
@@ -258,7 +271,7 @@
 
     var sims = {}, fields = {}, jobs = J.JOBS;
     var state = {
-      job: jobs[0], step: 1, speed: 'normal', target: true, rot: 0, hint: 0, kindShown: null,
+      job: jobs[0], step: 1, speed: 'normal', target: true, rot: 0, hint: 0, kindShown: null, layout: 'flat',
       report: null, queue: [], running: null, drag: null, raf: 0, last: 0, armReset: 0, edited: {}
     };
     function sim() { return sims[state.job.id] || (sims[state.job.id] = M.create()); }
@@ -307,18 +320,29 @@
     add(droNote, el('span', { class: 'ms-dro-meaning' }, 'X, Y: tool centre · Z: tip · '), droUnder);
     add(dro, droVals, droNote);
 
-    var views = el('div', { class: 'ms-views' });
+    /* One switch in the corner of the views, over the back of the vise: the top
+       view with section A-A, or the part in isometric. It names the view in use,
+       so it takes the place of the top view's label and adds no height. */
+    var viewBar = el('div', { class: 'ms-viewbar' });
+    var viewBtns = el('div', { class: 'ms-viewbar-btns', role: 'group', 'aria-label': 'View of the work' });
+    var flatBtn = button('Top and front', { 'aria-pressed': 'true', 'aria-controls': uid + '-views' });
+    var isoBtn = button('Isometric', { 'aria-pressed': 'false', 'aria-controls': uid + '-views' });
+    var viewHow = el('span', { class: 'ms-view-how' }, 'drag the tool');
+    var turnL = button('↶', { class: 'ms-mini', 'aria-label': 'Turn the part view left' });
+    var turnR = button('↷', { class: 'ms-mini', 'aria-label': 'Turn the part view right' });
+    var isoTurnRow = add(el('span', { class: 'ms-turn', hidden: true }), turnL, turnR);
+    add(viewBar, add(viewBtns, flatBtn, isoBtn), isoTurnRow, viewHow);
+    var views = el('div', { class: 'ms-views', id: uid + '-views' });
+    views.appendChild(viewBar);
     var vTop = el('figure', { class: 'ms-view ms-view-top' });
     var topCanvas = el('canvas', { class: 'ms-canvas ms-top-canvas', tabindex: '0', role: 'img', 'aria-describedby': uid + '-keys' });
-    var topLabel = el('figcaption', { class: 'ms-view-label' });
-    add(topLabel, el('span', { class: 'ms-view-name' }, 'Top view'), el('span', { class: 'ms-view-how' }, 'drag the tool'));
     var probe = el('p', { class: 'ms-probe', 'aria-hidden': 'true' });
     var legend = el('p', { class: 'ms-legend' });
     legend.innerHTML = '<span class="ms-lg"><span class="ms-key ms-key-target" aria-hidden="true"></span>finished part</span>' +
       '<span class="ms-lg"><span class="ms-key ms-key-excess" aria-hidden="true"></span><span>still to remove<span class="ms-lg-more">, deeper is stronger</span></span></span>' +
       '<span class="ms-lg"><span class="ms-key ms-key-over" aria-hidden="true"></span>cut past the drawing</span>' +
       '<span class="ms-lg"><span class="ms-key ms-key-metal" aria-hidden="true"></span><span>your block<span class="ms-lg-more">, darker is lower</span></span></span>';
-    add(vTop, topCanvas, probe, legend, topLabel);
+    add(vTop, topCanvas, probe, legend);
     var vFront = el('figure', { class: 'ms-view ms-view-front' });
     var frontHost = el('div', { class: 'ms-section-host', 'aria-hidden': 'true' });
     var frontLabel = el('figcaption', { class: 'ms-view-label ms-view-label-end' });
@@ -434,32 +458,33 @@
     /* ---- below the work: more views, help, start over --------------------*/
     var tray = el('div', { class: 'ms-tray' });
     var targetBtn = button('Finished part on the work', { 'aria-pressed': 'true' });
-    var moreBtn = button('More views', { 'aria-expanded': 'false', 'aria-controls': uid + '-more' });
+    var moreBtn = button('Section B–B', { 'aria-expanded': 'false', 'aria-controls': uid + '-more' });
     var helpBtn = button('Help and keys', { 'aria-expanded': 'false', 'aria-controls': uid + '-help' });
     var resetBtn = button('Start this job over');
     add(tray, targetBtn, moreBtn, helpBtn, resetBtn);
 
     var more = el('div', { class: 'ms-more', id: uid + '-more', hidden: true });
-    var vIso = el('figure', { class: 'ms-view ms-view-iso' });
-    var isoCap = el('figcaption', { class: 'ms-view-cap' });
-    isoCap.appendChild(el('span', { class: 'ms-view-title' }, 'The part'));
-    var turnL = button('↶', { class: 'ms-mini', 'aria-label': 'Turn the part view left' });
-    var turnR = button('↷', { class: 'ms-mini', 'aria-label': 'Turn the part view right' });
-    add(isoCap, add(el('span', { class: 'ms-turn' }), turnL, turnR));
-    var isoCanvas = el('canvas', { class: 'ms-canvas ms-iso-canvas', role: 'img' });
-    add(vIso, isoCap, isoCanvas);
+    // the isometric takes the place of the top view and section, in the same space
+    var vIso = el('figure', { class: 'ms-view ms-view-iso', hidden: true });
+    var isoCanvas = el('canvas', { class: 'ms-canvas ms-iso-canvas', tabindex: '0', role: 'img', 'aria-describedby': uid + '-keys' });
+    var isoLegend = el('p', { class: 'ms-legend' });
+    isoLegend.innerHTML = '<span class="ms-lg"><span class="ms-key ms-key-excess" aria-hidden="true"></span>still to remove</span>' +
+      '<span class="ms-lg"><span class="ms-key ms-key-tool" aria-hidden="true"></span>the tool</span>' +
+      '<span class="ms-lg"><span class="ms-key ms-key-over" aria-hidden="true"></span>cut past the drawing</span>';
+    add(vIso, isoCanvas, isoLegend);
     var vSide = el('figure', { class: 'ms-view ms-view-side' });
     var sideCap = el('figcaption', { class: 'ms-view-cap' });
     var sideName = el('span', { class: 'ms-view-title' });
     sideCap.appendChild(sideName);
     var sideHost = el('div', { class: 'ms-section-host', 'aria-hidden': 'true' });
     add(vSide, sideCap, sideHost);
-    add(more, vIso, vSide);
+    add(more, vSide);
+    add(views, vIso);
 
     var help = el('div', { class: 'ms-help', id: uid + '-help', hidden: true });
     var keysNote = el('p', { id: uid + '-keys' },
       'Drag the tool’s circle in the top view to move X and Y (hold Shift to keep to one axis), or drag the tool in a section to move Z. ' +
-      'With the top view selected, the arrow keys move X and Y and Page Up and Page Down move Z, one step at a time; [ and ] change the step. ' +
+      'With the top view or the isometric selected, the arrow keys move X and Y and Page Up and Page Down move Z, one step at a time; [ and ] change the step. ' +
       'Ctrl+Z undoes; Escape stops a move part-way, keeping what it has cut.');
     var meaning = el('p', {}, 'The readout follows the centre of the tool in X and Y and its tip in Z, from work zero: X 0 Y 0 is the front left corner, Z 0 the finished top. ' +
       'The raw block stands 1 mm proud, at Z +1.00. Volumes are grid estimates, and the inspection is a set of sampled teaching checks, not certified measurement.');
@@ -637,15 +662,17 @@
     var isoTimer = 0;
     function drawIso(cv, width) {
       cv = cv || isoCanvas;
-      if (cv === isoCanvas && more.hidden) return;
-      var s = sim(), sz = sizeCanvas(cv, 1, width), ctx = cv.getContext('2d');
+      if (cv === isoCanvas && state.layout !== 'iso') return;
+      var aspect = cv === isoCanvas && cv.clientHeight ? cv.clientWidth / cv.clientHeight : 1;
+      var s = sim(), sz = sizeCanvas(cv, aspect, width), ctx = cv.getContext('2d');
+      var F = cv === isoCanvas && showTarget() ? field() : null, rep = state.report;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.fillStyle = css(P.paper); ctx.fillRect(0, 0, cv.width, cv.height);
       var rot = state.rot, step = 2, cell = M.CELL * step, bottom = ST.bottom;
       // fit the block's projected outline into the canvas
       var corners = [[0, 0], [100, 0], [100, 60], [0, 60]], minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
       corners.forEach(function (c) {
-        [ST.rawTop, bottom].forEach(function (z) {
+        [ST.rawTop + (cv === isoCanvas ? 30 : 0), bottom].forEach(function (z) {
           var q = isoProject(c[0], c[1], z, rot);
           minX = Math.min(minX, q[0]); maxX = Math.max(maxX, q[0]); minY = Math.min(minY, q[1]); maxY = Math.max(maxY, q[1]);
         });
@@ -679,12 +706,48 @@
         var g = isoTurn((hr - hl) / (2 * cell), (hu - hd) / (2 * cell), 0);
         ctx.fillStyle = css(cellColor(P, h, g[0], g[1], bottom, ST.rawTop));
         ctx.fillRect(sx, syTop - hTop / 2, w, hTop);
+        if (F) {
+          var k0 = Math.min(s.nx - 1, ci * step + 1) + Math.min(s.ny - 1, cj * step + 1) * s.nx;
+          var tint = isoTint(h, F.lo[k0], F.hi[k0], F.nom[k0], bottom, rep && rep.status && rep.status[k0] === 2);
+          // gold for metal to remove; red-orange in alternate cells, a pattern as well as a hue
+          if (tint && (tint.kind === 1 || ((ci + cj) & 1))) {
+            ctx.fillStyle = css(tint.kind === 1 ? P.excess : P.over, tint.alpha);
+            ctx.fillRect(sx, syTop - hTop / 2, w, hTop);
+          }
+        }
       }
+      if (cv === isoCanvas && s.tool) drawIsoTool(ctx, s, rot, k, ox, oy);
       cv.setAttribute('aria-label', 'The part in isometric, seen from ' + ['the front right', 'the back right', 'the back left', 'the front left'][rot] +
-        '. ' + (state.report ? state.report.summary : ''));
+        '. ' + (s.tool ? M.toolLabel(s.tool) + ' at ' + where(s) + '. ' : '') + (state.report ? state.report.summary : ''));
+    }
+    /* The tool in the isometric: its cylinder from the tip up, over the metal
+       so it is never lost behind a wall. Filled as the top view fills it. */
+    function drawIsoTool(ctx, s, rot, k, ox, oy) {
+      var r = s.tool.dia / 2, z0 = s.pos.z, z1 = Math.max(z0 + 30, ST.rawTop + 24);
+      var ring = function (z) {
+        var pts = [];
+        for (var a = 0; a < 32; a++) {
+          var t = a / 32 * 2 * Math.PI, q = isoProject(s.pos.x + r * Math.cos(t), s.pos.y + r * Math.sin(t), z, rot);
+          pts.push([ox + q[0] * k, oy + q[1] * k]);
+        }
+        return pts;
+      };
+      var lo = ring(z0), hi = ring(z1);
+      var xs = lo.map(function (q) { return q[0]; }), xmin = Math.min.apply(null, xs), xmax = Math.max.apply(null, xs);
+      var c0 = isoProject(s.pos.x, s.pos.y, z0, rot), c1 = isoProject(s.pos.x, s.pos.y, z1, rot);
+      var y0 = oy + c0[1] * k, y1 = oy + c1[1] * k;
+      var engaged = s.pos.z < s.heightAt(s.pos.x, s.pos.y) || s.pos.z < s.maxHeightIn(s.pos.x, s.pos.y, r);
+      ctx.beginPath();
+      ctx.rect(xmin, y1, xmax - xmin, y0 - y1);
+      [lo, hi].forEach(function (pts) { ctx.moveTo(pts[0][0], pts[0][1]); pts.forEach(function (q) { ctx.lineTo(q[0], q[1]); }); ctx.closePath(); });
+      ctx.fillStyle = css(P.accent, engaged ? 0.34 : 0.18); ctx.fill('nonzero');
+      ctx.strokeStyle = css(P.accent); ctx.lineWidth = engaged ? 2 : 1.4;
+      ctx.beginPath(); ctx.moveTo(xmin, y1); ctx.lineTo(xmin, y0); ctx.moveTo(xmax, y1); ctx.lineTo(xmax, y0);
+      ctx.moveTo(lo[0][0], lo[0][1]); lo.forEach(function (q) { ctx.lineTo(q[0], q[1]); }); ctx.closePath();
+      ctx.stroke();
     }
     function scheduleIso(now) {
-      if (more.hidden) return;
+      if (state.layout !== 'iso') return;
       if (now) { clearTimeout(isoTimer); isoTimer = 0; drawIso(); return; }
       if (isoTimer) return;
       isoTimer = setTimeout(function () { isoTimer = 0; drawIso(); }, 180);
@@ -1069,7 +1132,7 @@
     });
 
     /* ---- keyboard: handwheels on the arrow keys, taken only here --------*/
-    topCanvas.addEventListener('keydown', function (e) {
+    function wheelKeys(e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       var used = true;
       switch (e.key) {
@@ -1084,7 +1147,9 @@
         default: used = false;
       }
       if (used) { e.preventDefault(); e.stopPropagation(); }
-    });
+    }
+    topCanvas.addEventListener('keydown', wheelKeys);
+    isoCanvas.addEventListener('keydown', wheelKeys);
     // Any control inside the simulator keeps arrow keys and Space for itself,
     // so the page's own next/previous navigation never fires as well.
     app.addEventListener('keydown', function (e) {
@@ -1186,7 +1251,19 @@
       drawTop(); scheduleSections(true); scheduleIso(true);
     });
     helpBtn.addEventListener('click', function () { toggleRegion(helpBtn, help, help.hidden); });
-    targetBtn.addEventListener('click', function () { state.target = !state.target; syncSegs(); drawTop(); scheduleSections(true); });
+    targetBtn.addEventListener('click', function () { state.target = !state.target; syncSegs(); drawTop(); scheduleSections(true); scheduleIso(true); });
+    function setLayout(l) {
+      state.layout = l;
+      flatBtn.setAttribute('aria-pressed', String(l === 'flat'));
+      isoBtn.setAttribute('aria-pressed', String(l === 'iso'));
+      vTop.hidden = vFront.hidden = l === 'iso';
+      vIso.hidden = isoTurnRow.hidden = l !== 'iso';
+      views.classList.toggle('is-iso', l === 'iso');
+      viewHow.textContent = l === 'iso' ? 'turn it to see every side' : 'drag the tool';
+      drawTop(); scheduleSections(true); scheduleIso(true);
+    }
+    flatBtn.addEventListener('click', function () { setLayout('flat'); });
+    isoBtn.addEventListener('click', function () { setLayout('iso'); });
     turnL.addEventListener('click', function () { state.rot = (state.rot + 3) % 4; scheduleIso(true); });
     turnR.addEventListener('click', function () { state.rot = (state.rot + 1) % 4; scheduleIso(true); });
     hintBtn.addEventListener('click', function () {
@@ -1263,7 +1340,7 @@
 
   return {
     boot: boot, parseColor: parseColor, mix: mix, cellColor: cellColor, readPalette: readPalette,
-    isoTurn: isoTurn, isoProject: isoProject, describeMove: describeMove, nextStep: nextStep, progressLine: progressLine,
+    isoTurn: isoTurn, isoProject: isoProject, isoTint: isoTint, describeMove: describeMove, nextStep: nextStep, progressLine: progressLine,
     targetField: targetField, cellState: cellState, excessAlpha: excessAlpha, clearance: clearance,
     KINDS: KINDS, WIN: WIN, STEPS: STEPS
   };
