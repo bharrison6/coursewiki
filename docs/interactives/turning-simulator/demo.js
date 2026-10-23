@@ -34,8 +34,9 @@
   var STEPS = [0.100, 0.010, 0.001];
   var SPEED = { feed: 0.7, rapid: 2.6, thread: 1.1 };   // in per second, for the picture only
   var reduceMotion = (typeof window !== 'undefined' && window.matchMedia) ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
-  var SHORT = { turn: 'Turn', chamfer: 'Chamfer', groove: 'Groove / part', thread: 'Thread', knurl: 'Knurl', bore: 'Bore',
+  var SHORT = { turn: 'Turn / face', face: 'Face', chamfer: 'Chamfer', groove: 'Groove / part', thread: 'Thread', knurl: 'Knurl', bore: 'Bore',
     ithread: 'Thread inside', center: 'Center drill', drill: 'Drill', csink: 'Counter\u00adsink' };
+  var RACK_ORDER = M.TOOL_ORDER.filter(function (t) { return t !== 'face'; });
 
   function $(root, sel) { return root.querySelector(sel); }
   function $$(root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
@@ -66,7 +67,7 @@
      sit outside the bench. */
   function markup(id) {
     var tools = function (mount) {
-      return M.TOOL_ORDER.filter(function (t) { return M.TOOLS[t].mount === mount; }).map(function (t) {
+      return RACK_ORDER.filter(function (t) { return M.TOOLS[t].mount === mount; }).map(function (t) {
         return '<button type="button" class="ts-toolbtn" data-ts-tool="' + t + '" aria-pressed="false">' + R.toolIcon(t) +
           '<span>' + esc(SHORT[t]) + '</span></button>';
       }).join('');
@@ -95,7 +96,7 @@
         '<div class="ts-workbench" data-ts-bench>' +
           '<div class="ts-machine">' +
             '<div class="ts-dro" aria-hidden="true">' +
-              '<span class="ts-dro-v"><span class="ts-k">X&nbsp;Ø</span><b data-ts-x></b></span>' +
+              '<span class="ts-dro-v"><span class="ts-k" data-ts-xlabel>X&nbsp;Ø</span><b data-ts-x></b></span>' +
               '<span class="ts-dro-v"><span class="ts-k">Z</span><b data-ts-z></b></span>' +
               '<span class="ts-dro-tool" data-ts-dro-tool></span>' +
               '<span class="ts-dro-spin" data-ts-dro-spin></span>' +
@@ -107,6 +108,7 @@
                 '<button type="button" data-ts-view="normal" aria-pressed="false">Normal</button>' +
               '</div>' +
               '<button type="button" class="ts-zoom" data-ts-act="zoom" aria-pressed="false">Close up</button>' +
+              '<span class="ts-thread-note" data-ts-thread-note hidden>Thread envelope<br>(schematic)</span>' +
             '</div>' +
             '<div class="ts-feedback" data-ts-feedback>' +
               '<div class="ts-fb-act">' +
@@ -150,6 +152,7 @@
             '<div class="ts-tool-group ts-tool-post" role="group" aria-labelledby="' + id + '-post"><span class="ts-k2" id="' + id + '-post">Tool post</span><div class="ts-tool-row">' + tools('post') + '</div></div>' +
             '<div class="ts-tool-group ts-tool-tail" role="group" aria-labelledby="' + id + '-tail"><span class="ts-k2" id="' + id + '-tail">Tailstock</span><div class="ts-tool-row">' + tools('tailstock') + '</div></div>' +
             '<div class="ts-tool-opt" data-ts-opts>' +
+              '<label data-ts-turning-wrap><span class="ts-k2">Cutting tool</span><select data-ts-turning><option value="turn">Turn: 10° lead</option><option value="face">Face: radial</option></select></label>' +
               '<label data-ts-drill-wrap><span class="ts-k2">Drill size</span><select data-ts-drill>' + M.DRILLS.map(function (d) { return '<option value="' + d.id + '">' + esc(d.label) + '</option>'; }).join('') + '</select></label>' +
               '<label data-ts-tpi-wrap><span class="ts-k2">Threads per inch</span><select data-ts-tpi>' + M.PITCHES.map(function (p) { return '<option value="' + p + '">' + p + '</option>'; }).join('') + '</select></label>' +
             '</div>' +
@@ -205,9 +208,10 @@
     var el = {
       drawing: $(lab, '[data-ts-drawing]'), goal: $(lab, '[data-ts-goal]'),
       bench: $(lab, '[data-ts-bench]'), viewBox: $(lab, '[data-ts-viewbox]'), wrap: $(lab, '[data-ts-viewwrap]'), zoom: $(lab, '[data-ts-act="zoom"]'),
-      x: $(lab, '[data-ts-x]'), z: $(lab, '[data-ts-z]'), droTool: $(lab, '[data-ts-dro-tool]'), droSpin: $(lab, '[data-ts-dro-spin]'),
+      x: $(lab, '[data-ts-x]'), xLabel: $(lab, '[data-ts-xlabel]'), z: $(lab, '[data-ts-z]'), droTool: $(lab, '[data-ts-dro-tool]'), droSpin: $(lab, '[data-ts-dro-spin]'), threadNote: $(lab, '[data-ts-thread-note]'),
       toolName: $(lab, '[data-ts-toolname]'), does: $(lab, '[data-ts-does]'), cannot: $(lab, '[data-ts-cannot]'),
       drill: $(lab, '[data-ts-drill]'), drillWrap: $(lab, '[data-ts-drill-wrap]'), tpi: $(lab, '[data-ts-tpi]'), tpiWrap: $(lab, '[data-ts-tpi-wrap]'),
+      turning: $(lab, '[data-ts-turning]'), turningWrap: $(lab, '[data-ts-turning-wrap]'),
       spindle: $(lab, '[data-ts-act="spindle"]'), feedback: $(lab, '[data-ts-feedback]'), msg: $(lab, '[data-ts-msg]'),
       undo: $(lab, '[data-ts-act="undo"]'), more: $(lab, '[data-ts-act="more"]'),
       inZ: $(lab, '[data-ts-in="z"]'), inX: $(lab, '[data-ts-in="x"]'), inStop: $(lab, '[data-ts-in="stop"]'),
@@ -246,6 +250,7 @@
       }
     }
     function buildView() {
+      f = R.frame(T, st.tool);
       el.wrap.innerHTML = R.scene(st, { idPrefix: id + '-v', ghost: opt.ghost, tint: opt.ghost, view: opt.view });
       win = null;
       view = $(el.wrap, 'svg');
@@ -257,9 +262,9 @@
       fit();
     }
     function toolShape() {
-      // From outside, a tool that works inside the part is drawn behind it: a new scene.
-      if (opt.view === 'normal') { buildView(); return; }
-      P.tool.innerHTML = R.toolShape(st.tool, { drill: M.drillSize(st) }) + '<rect class="ts-handle" x="-46" y="-46" width="92" height="92"/>';
+      // A paired knurl needs room on both sides of the work; internal tools
+      // change their depth ordering outside. Rebuild only when a tool changes.
+      buildView();
     }
     function setView(v) {
       if (busy || v === opt.view) { return; }
@@ -275,19 +280,24 @@
       var work = piece || st.work;
       var w = R.workPaths(work, f, opt.view);
       P.sec.setAttribute('d', w.sec); P.ext.setAttribute('d', w.ext); P.bore.setAttribute('d', w.bore); P.hidden.setAttribute('d', w.hidden);
+      P['thread-envelope'].setAttribute('d', w.threadEnvelope);
       P.edges.setAttribute('d', w.edges); P.threads.setAttribute('d', w.threads); P.knurl.setAttribute('d', w.knurl);
       if (opt.ghost) {
         var c = R.comparePaths({ targetId: st.targetId, work: work }, f, opt.view);
         P.excess.setAttribute('d', c.excess); P['excess-bottom'].setAttribute('d', c.excessBottom); P.under.setAttribute('d', c.under);
       }
       P.tool.setAttribute('transform', 'translate(' + f.x(st.tz) + ' ' + f.y(st.tr) + ')');
+      var lowerWheel = $(P.tool, '[data-ts-knurl-lower]');
+      if (lowerWheel) { lowerWheel.setAttribute('transform', 'translate(0 ' + (2 * st.tr * R.S) + ') scale(1 -1)'); }
       var pos = M.position(st), t = M.TOOLS[st.tool];
       el.x.textContent = t.side === 'axial' ? 'center' : M.fmt(pos.x);
       el.z.textContent = M.fmt(pos.z);
       el.droTool.textContent = t.name + (st.tool === 'drill' ? ' ' + M.fmt(M.drillSize(st)) : '') + (t.action === 'thread' ? ', ' + st.tpi + ' per inch' : '');
       el.droSpin.innerHTML = '<span class="ts-dro-word">Spindle </span>' + (st.spindle ? 'running' : 'stopped');
       lab.classList.toggle('is-running', st.spindle);
-      view.setAttribute('aria-label', 'The work in the lathe, ' + VIEW_WORDS[opt.view] + '. ' + t.name + ' at ' + (t.side === 'axial' ? 'the centerline' : 'X ' + M.fmt(pos.x)) + ', Z ' + M.fmt(pos.z) + '. Spindle ' + (st.spindle ? 'running' : 'stopped') + '.' + (st.part ? ' A part has been cut off.' : ''));
+      lab.classList.toggle('is-knurling', st.spindle && M.knurlContact(st));
+      el.threadNote.hidden = opt.view !== 'section' || !M.hasThreads(work);
+      view.setAttribute('aria-label', 'The work in the lathe, ' + VIEW_WORDS[opt.view] + '. ' + t.name + ' at ' + (t.side === 'axial' ? 'the centerline' : (st.tool === 'knurl' ? 'wheel gap ' : 'X ') + M.fmt(pos.x)) + ', Z ' + M.fmt(pos.z) + '. Spindle ' + (st.spindle ? 'running' : 'stopped') + '.' + (el.threadNote.hidden ? '' : ' Threads are schematic crest and root envelopes, not a helical section.') + (st.part ? ' A part has been cut off.' : ''));
       applyZoom();
     }
     function later() { if (dirty) { return; } dirty = true; requestAnimationFrame(function () { dirty = false; draw(); }); }
@@ -300,6 +310,9 @@
       var bar = document.querySelector('.appbar'), top = bar ? Math.max(0, bar.getBoundingClientRect().bottom) : 0;
       var nav = document.querySelector('.seqbar'), nr = nav && nav.getBoundingClientRect();
       var bottom = nr && nr.height ? Math.min(window.innerHeight, nr.top) : window.innerHeight;
+      var exit = document.querySelector('.present-exit'), er = exit && exit.getBoundingClientRect();
+      var br = el.bench.getBoundingClientRect();
+      if (er && er.height && er.left < br.right && er.right > br.left) { bottom = Math.min(bottom, er.top); }
       return { top: top + 6, bottom: bottom - 6 };
     }
     /* Where it can without shrinking the picture below half its width-limited size,
@@ -310,13 +323,18 @@
       if (!view || fitting) { return; }
       fitting = true;
       var room = screenRoom(), h = room.bottom - room.top;
+      var top = el.bench.getBoundingClientRect().top;
+      // Once the controls are on screen, a taller tool picture uses the space
+      // below their current top instead of moving the page under the hands.
+      var anchored = top >= room.top - 1 && top < room.bottom;
+      if (anchored) { h -= Math.max(0, top - room.top); }
       el.viewBox.style.removeProperty('--ts-view-w');
       var b = el.bench.getBoundingClientRect();
       if (b.height > 0) {
         var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
         var v0 = el.wrap.getBoundingClientRect().height, v = v0;
         var card = lab.closest('.xcard');
-        var lead = card ? b.top - card.getBoundingClientRect().top - (el.drawing.hidden ? 0 : el.drawing.getBoundingClientRect().height) + 10 : 0;
+        var lead = !anchored && card ? b.top - card.getBoundingClientRect().top - (el.drawing.hidden ? 0 : el.drawing.getBoundingClientRect().height) + 10 : 0;
         if (b.height > h - lead) { v = v0 - (b.height - (h - lead)); }
         if (v < Math.max(12 * rem, v0 / 2)) { v = b.height > h ? Math.max(7.5 * rem, v0 - (b.height - h)) : v0; }
         if (v < v0 - 0.5) { el.viewBox.style.setProperty('--ts-view-w', Math.floor(v * f.W / f.H) + 'px'); }
@@ -324,15 +342,13 @@
       }
       fitting = false;
     }
-    /* After a control is used, bring the whole bench on screen, with the part
-       buttons above it when they fit too. Never while a pointer is down on a
-       control: moving it then would swallow the click. */
+    /* On entering the operating workspace, anchor its top below the app bar.
+       Tool changes can then use the whole available height without shifting
+       the page. Never move it while a pointer is down on a control. */
     function keepBenchVisible() {
       var room = screenRoom(), h = room.bottom - room.top, b = el.bench.getBoundingClientRect();
-      if (!b.height || b.height > h + 1 || (b.top >= room.top - 1 && b.bottom <= room.bottom + 1)) { return; }
-      var head = $(lab, '.ts-head').getBoundingClientRect();
-      var from = b.bottom - head.top <= h ? head.top : b.top;
-      window.scrollBy({ top: from - room.top, behavior: 'instant' });
+      if (!b.height || b.height > h + 1 || Math.abs(b.top - room.top) <= 1) { return; }
+      window.scrollBy({ top: b.top - room.top, behavior: 'instant' });
     }
     var win = null;          // the close-up window, [x0, y0, w, h]
     function applyZoom(recenter) {
@@ -437,7 +453,24 @@
     /* ---- tools and spindle --------------------------------------------------------------*/
     function toolUI() {
       var t = M.TOOLS[st.tool];
-      $$(lab, '[data-ts-tool]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ts-tool') === st.tool)); });
+      var knurl = st.tool === 'knurl';
+      lab.classList.toggle('is-knurl-tool', knurl);
+      el.xLabel.textContent = knurl ? 'Gap Ø' : 'X Ø';
+      $(el.xRow, 'label').textContent = knurl ? 'Gap Ø' : 'X Ø';
+      $(el.xRow, 'button').textContent = knurl ? 'Set gap' : 'Feed to X';
+      [['x+', '▲', 'X+', 'away from center', 'open wheels'], ['x-', '▼', 'X−', 'toward center', 'close wheels']].forEach(function (d) {
+        var b = $(lab, '[data-ts-jog="' + d[0] + '"]');
+        $(b, '.ts-jog-ax').innerHTML = '<span aria-hidden="true">' + d[1] + '</span> ' + (knurl ? d[0] === 'x+' ? 'Gap+' : 'Gap−' : d[2]);
+        $(b, '.ts-jog-sub').textContent = knurl ? d[4] : d[3];
+        b.setAttribute('aria-label', knurl ? d[4] + ', one step in gap diameter' : d[2] + ', ' + d[3] + ', one step');
+      });
+      $$(lab, '[data-ts-tool]').forEach(function (b) {
+        var chosen = b.getAttribute('data-ts-tool') === st.tool || (b.getAttribute('data-ts-tool') === 'turn' && st.tool === 'face');
+        b.setAttribute('aria-pressed', String(chosen));
+        if (b.getAttribute('data-ts-tool') === 'turn') { $(b, '.ts-icon').outerHTML = R.toolIcon(st.tool === 'face' ? 'face' : 'turn'); }
+      });
+      el.turningWrap.hidden = st.tool !== 'turn' && st.tool !== 'face';
+      if (!el.turningWrap.hidden) { el.turning.value = st.tool; }
       el.toolName.innerHTML = '<strong>' + esc(t.name) + '</strong>' + (t.action === 'form' ? ' <span class="ts-tag">forms, does not cut</span>' : (t.action === 'thread' ? ' <span class="ts-tag">driven by the leadscrew</span>' : ''));
       el.does.textContent = t.does;
       el.cannot.textContent = t.cannot;
@@ -566,7 +599,7 @@
         log(label + (interrupted ? ', interrupted at Z ' + M.fmt(st.tz) : (res.crashed ? ', stopped early' : '')));
         if (interrupted) { say('stop', 'Feed stopped.', 'The tool is at Z ' + M.fmt(st.tz) + '. Only the portion reached before the stop has been applied. Retract before returning.'); return; }
         if (res.stop) { say(res.crashed ? 'stop' : 'info', res.crashed ? 'Stopped.' : 'Nothing cut.', res.stop.text); }
-        else { say('cut', 'Threading pass done.', 'The tool followed one helix from Z ' + M.fmt(z0) + ' to Z ' + M.fmt(zEnd) + ', ' + res.notches + ' turns. Back it out past the crests before you bring the carriage back.'); }
+        else { say('cut', 'Threading pass done.', 'The carriage moved from Z ' + M.fmt(z0) + ' to Z ' + M.fmt(zEnd) + ', ' + M.fmt(res.turns, 2) + ' spindle turns at this pitch. Back the tool out past the crests before returning.'); }
       }
       if (reduceMotion.matches) { finish(); return; }
       var stopped = false, last = now(), zt = z0;
@@ -587,10 +620,11 @@
     }
     /* The work as the pass leaves it: cut behind the tool, untouched ahead. */
     function mix(a, b, zt) {
-      var m = { zL: a.zL, n: a.n, ro: new Float64Array(a.n), ri: new Float64Array(a.n), kB: new Float64Array(a.n), kP: new Float64Array(a.n), thO: new Float64Array(a.n), thI: new Float64Array(a.n) };
+      var m = { zL: a.zL, n: a.n, ro: new Float64Array(a.n), ri: new Float64Array(a.n), kB: new Float64Array(a.n), kP: new Float64Array(a.n), thO: new Float64Array(a.n), thI: new Float64Array(a.n), thBaseO: new Float64Array(a.n), thBaseI: new Float64Array(a.n) };
       for (var i = 0; i < a.n; i++) {
         var src = M.zc(a, i) >= zt ? b : a;
         m.ro[i] = src.ro[i]; m.ri[i] = src.ri[i]; m.kB[i] = src.kB[i]; m.kP[i] = src.kP[i]; m.thO[i] = src.thO[i]; m.thI[i] = src.thI[i];
+        m.thBaseO[i] = src.thBaseO[i]; m.thBaseI[i] = src.thBaseI[i];
       }
       return m;
     }
@@ -728,7 +762,11 @@
     });
     function act(b, e) {
       if (b.hasAttribute('data-ts-part')) { choosePart(b.getAttribute('data-ts-part')); return; }
-      if (b.hasAttribute('data-ts-tool')) { changeTool(b.getAttribute('data-ts-tool')); return; }
+      if (b.hasAttribute('data-ts-tool')) {
+        var tid = b.getAttribute('data-ts-tool');
+        if (!(tid === 'turn' && st.tool === 'face')) { changeTool(tid); }
+        return;
+      }
       if (b.hasAttribute('data-ts-view')) { setView(b.getAttribute('data-ts-view')); return; }
       if (b.hasAttribute('data-ts-jog')) {
         if (e.detail === 0) { var j = b.getAttribute('data-ts-jog'); jog(j[0], j[1] === '+' ? 1 : -1); }
@@ -774,6 +812,11 @@
       if (!r.ok) { el.drill.value = st.drill; say('stop', 'Spindle running.', r.text); return; }
       log('Put the ' + M.fmt(M.drillSize(st)) + ' in drill in the tailstock');
       toolShape(); toolUI(); draw();
+    });
+    el.turning.addEventListener('change', function () {
+      changeTool(el.turning.value);
+      el.turning.value = st.tool === 'face' ? 'face' : 'turn';
+      keepBenchVisible();
     });
     el.tpi.addEventListener('change', function () {
       var r = M.setPitch(st, parseInt(el.tpi.value, 10));
@@ -849,7 +892,7 @@
     });
   }
 
-  if (node) { module.exports = { markup: markup, SHORT: SHORT, STEPS: STEPS }; }
+  if (node) { module.exports = { markup: markup, SHORT: SHORT, RACK_ORDER: RACK_ORDER, STEPS: STEPS }; }
   else if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot); }
     else { boot(); }

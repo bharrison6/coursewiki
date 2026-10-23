@@ -4515,6 +4515,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 .ts-jaw { fill: var(--rule); stroke: var(--ink-soft); stroke-width: 1.4; }
 .ts-spin path { fill: none; stroke: var(--ink-soft); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .ts-spin { opacity: .35; }
+.ts-spin-ring { fill: var(--paper); stroke: var(--rule); stroke-width: 1.3; }
+.ts-spin-guide { fill: none; stroke: none; }
+.ts-spin-view { fill: var(--ink-soft); font: 600 11px var(--f-display); }
+.ts-tool-wheel-end { fill: var(--surface-2); stroke: var(--ink); stroke-width: 1.2; }
+.ts-tool-axle { fill: none; stroke: var(--ink); stroke-width: 2; }
+.ts-tool-fastener { fill: var(--surface-2); stroke: var(--ink); stroke-width: 1.5; }
+.ts-tool-label { fill: var(--ink); font: 600 12px var(--f-display); }
+.ts-view.is-section .ts-thread, .ts-part-svg.is-section .ts-thread { stroke-dasharray: 5 3; }
+.ts-thread-envelope { fill: var(--paper); stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 5 3; }
 .ts-ghost { fill: none; stroke: var(--cat1); stroke-width: 1.6; stroke-dasharray: 6 4; stroke-linejoin: round; }
 .ts-ghost-root { fill: none; stroke: var(--cat1); stroke-width: 1; stroke-dasharray: 2 3; }
 .ts-excess { fill: var(--cat2); fill-opacity: .42; stroke: none; }
@@ -4653,7 +4662,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 /* one line always: a long tool name is cut short rather than adding a line */
 .ts-dro-tool { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ts-dro-spin { margin-left: auto; padding: .1rem .5rem; border: 1px solid currentColor; border-radius: var(--radius-xs); white-space: nowrap; }
-.is-running .ts-dro-spin { background: var(--flag); color: var(--flag-ink); border-color: var(--flag); }
+.is-running .ts-dro-spin { background: var(--flag); color: var(--msu-navy); border-color: var(--flag); }
 /* a narrow readout keeps to one line: the rack and the notes below name the tool */
 @container ts-work (max-width: 31rem) { .ts-dro-tool { display: none; } }
 @container ts-work (max-width: 20rem) {
@@ -4679,6 +4688,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 .ts-lab .ts-views button:last-child { border-start-start-radius: 0; border-end-start-radius: 0; }
 .ts-lab .ts-views button[aria-pressed="true"], .ts-lab .ts-zoom[aria-pressed="true"] { background: var(--accent); }
 .ts-lab .ts-zoom { position: absolute; right: .3rem; bottom: .3rem; }
+.ts-thread-note { position: absolute; right: .3rem; top: .3rem; padding: .12rem .3rem;
+  background: color-mix(in srgb, var(--paper) 92%, transparent); color: var(--ink);
+  border-radius: var(--radius-xs); font: 600 .65rem/1.15 var(--f-display); text-align: right; pointer-events: none; }
 
 /* what the last move did, with Undo beside it. It keeps three lines, so the
    bench never changes height under the hands; More opens a longer one. */
@@ -4714,8 +4726,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 .ts-panel button, .ts-rack button { min-height: 2.5rem; }
 .ts-run { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: .35rem; }
 .ts-lab .ts-spindle { border-color: var(--accent); }
-.ts-lab .ts-spindle[aria-pressed="true"] { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
-.ts-lab .ts-spindle[aria-pressed="true"]:not(:disabled):hover { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
+.ts-lab .ts-spindle[aria-pressed="true"] { background: var(--flag); border-color: var(--flag); color: var(--msu-navy); }
+.ts-lab .ts-spindle[aria-pressed="true"]:not(:disabled):hover { background: var(--flag); border-color: var(--flag); color: var(--msu-navy); }
 
 .ts-feed { margin: 0; display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
 .ts-feed .ts-k { margin: 0; }
@@ -4850,8 +4862,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 /* spindle running: the chuck's arrow turns */
 .ts-spin { transform-box: fill-box; transform-origin: center; }
 .is-running .ts-spin { opacity: .9; animation: ts-spin .7s linear infinite; }
-@keyframes ts-spin { to { transform: rotate(360deg); } }
+@keyframes ts-spin { to { transform: rotate(-360deg); } }
 .is-running .ts-spin path { stroke: var(--accent); }
+.is-knurling .ts-knurl-teeth { animation: ts-knurl-roll .45s linear infinite; }
+.is-knurling [data-ts-knurl-lower] .ts-knurl-teeth { animation-direction: reverse; }
+@keyframes ts-knurl-roll { to { transform: translateY(var(--ts-knurl-period)); } }
+@media (prefers-reduced-motion: reduce) {
+  .is-running .ts-spin, .is-knurling .ts-knurl-teeth { animation: none; }
+}
 
 /* chips: only where the model removed metal */
 .ts-chip { fill: none; stroke: var(--ink-soft); stroke-width: 1.6; stroke-linecap: round; pointer-events: none;
@@ -8744,10 +8762,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       a job and the drawings of the four parts it asks you to make. The next cards explain what each tool
       does.</p></noscript>
       <figure class="ts-static-fig">
-        <svg class="ts-view is-section" viewBox="0 0 603.2 332.8" role="img" aria-label="The stepped pin part-way through: the end faced, the body turned in two passes, and the turning tool halfway along the first pass on the pin. The dashed outline is the drawing; the tinted metal is still to come off." focusable="false"><defs><pattern id="ts-static-pin-turning-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="ts-hatch-bg" width="7" height="7"/><line class="ts-hatch-line" x1="0" y1="0" x2="0" y2="7"/></pattern></defs><g class="ts-machine"><rect class="ts-chuck" x="-32" y="-57.6" width="43.2" height="512"/><rect class="ts-jaw" x="11.2" y="67.2" width="88" height="51.2"/><rect class="ts-jaw" x="11.2" y="278.4" width="88" height="51.2"/><rect class="ts-sec" fill="url(#ts-static-pin-turning-hatch)" x="11.2" y="118.4" width="88" height="160"/><g transform="translate(55.2 33.6)"><g class="ts-spin"><path class="ts-spin-arc" d="M-14 -6A15 15 0 1 1 -6 14"/><path class="ts-spin-head" d="M-11 17L-4 14L-8 8"/></g></g><text class="ts-lbl" x="77.2" y="33.6" dy="5">Chuck</text></g><g class="ts-z0"><path d="M467.2 6.4V326.4"/><text class="ts-lbl" x="472.2" y="6.4" dy="12">Z0</text></g><path class="ts-bore" data-ts="bore" d=""/><path class="ts-sec" data-ts="sec" fill="url(#ts-static-pin-turning-hatch)" d="M99.2 198.4L99.2 118.4L99.2 118.4L267.2 118.4L267.3 136.7L267.6 137.3L268.1 137.8L268.7 138.2L269.4 138.4L419.2 138.4L419.3 147.1L419.6 147.7L420.1 148.2L420.6 148.5L421.2 148.8L467.2 148.8L467.2 148.8L467.2 198.4L467.2 198.4L99.2 198.4ZM99.2 198.4L99.2 278.4L99.2 278.4L267.2 278.4L267.3 260.1L267.6 259.5L268.1 259L268.7 258.6L269.4 258.4L419.2 258.4L419.3 249.7L419.6 249.1L420.1 248.6L420.6 248.3L421.2 248L467.2 248L467.2 248L467.2 198.4L467.2 198.4L99.2 198.4Z"/><path class="ts-ext" data-ts="ext" d=""/><path class="ts-hidden" data-ts="hidden" d=""/><path class="ts-edge" data-ts="edges" d=""/><path class="ts-thread" data-ts="threads" d=""/><path class="ts-knurl" data-ts="knurl" d=""/><path class="ts-axis" d="M0 198.4H603.2"/><path class="ts-excess" data-ts="excess" d="M267.2 136.7L267.4 136.7L267.4 137.1L267.5 137.1L267.5 137.3L267.7 137.3L267.7 137.5L267.8 137.5L267.8 137.7L268 137.7L268 137.8L268.2 137.8L268.2 138L268.3 138L268.3 138.1L268.6 138.1L268.6 138.2L267.2 138.2ZM367.2 138.4L419.2 138.4L419.2 147.1L419.4 147.1L419.4 147.5L419.5 147.5L419.5 147.7L419.7 147.7L419.7 147.9L419.8 147.9L419.8 148.1L420 148.1L420 148.2L420.2 148.2L420.2 148.4L420.3 148.4L420.3 148.5L420.5 148.5L420.5 148.5L420.6 148.5L420.6 148.6L421.1 148.8L467.2 148.8L467.2 161.4L467 161.4L467 161.2L466.9 161.2L466.9 161L466.7 161L466.7 160.9L466.6 160.9L466.6 160.7L466.4 160.7L466.4 160.6L466.2 160.6L466.2 160.4L466.1 160.4L466.1 160.2L465.9 160.2L465.9 160.1L465.8 160.1L465.8 159.9L465.6 159.9L465.6 159.8L465.4 159.8L465.4 159.6L465.3 159.6L465.3 159.4L465.1 159.4L465.1 159.3L465 159.3L465 159.1L464.8 159.1L464.8 159L464.6 159L464.6 158.8L464.5 158.8L464.5 158.6L464.3 158.6L464.3 158.5L464.2 158.5L464.2 158.3L464 158.3L464 158.2L367.2 158.2Z"/><path class="ts-excess" data-ts="excess-bottom" d="M267.2 260.1L267.4 260.1L267.4 259.7L267.5 259.7L267.5 259.5L267.7 259.5L267.7 259.3L267.8 259.3L267.8 259.1L268 259.1L268 259L268.2 259L268.2 258.8L268.3 258.8L268.3 258.7L268.6 258.7L268.6 258.6L267.2 258.6ZM367.2 258.4L419.2 258.4L419.2 249.7L419.4 249.7L419.4 249.3L419.5 249.3L419.5 249.1L419.7 249.1L419.7 248.9L419.8 248.9L419.8 248.7L420 248.7L420 248.6L420.2 248.6L420.2 248.4L420.3 248.4L420.3 248.3L420.5 248.3L420.5 248.3L420.6 248.3L420.6 248.2L421.1 248L467.2 248L467.2 235.4L467 235.4L467 235.6L466.9 235.6L466.9 235.8L466.7 235.8L466.7 235.9L466.6 235.9L466.6 236.1L466.4 236.1L466.4 236.2L466.2 236.2L466.2 236.4L466.1 236.4L466.1 236.6L465.9 236.6L465.9 236.7L465.8 236.7L465.8 236.9L465.6 236.9L465.6 237L465.4 237L465.4 237.2L465.3 237.2L465.3 237.4L465.1 237.4L465.1 237.5L465 237.5L465 237.7L464.8 237.7L464.8 237.8L464.6 237.8L464.6 238L464.5 238L464.5 238.2L464.3 238.2L464.3 238.3L464.2 238.3L464.2 238.5L464 238.5L464 238.6L367.2 238.6Z"/><path class="ts-ghost" data-ts="ghost-top" d="M467.2 163.2L467.2 163.2L467.2 163.2L467.2 163.2L462.4 158.4L462.4 158.4L367.2 158.4L367.2 138.4L367.2 158.4L367.2 138.4L267.2 138.4L267.2 118.4L267.2 138.4L267.2 118.4L227.2 118.4L227.2 118.4L227.2 118.4L227.2 118.4L227.2 198.4L227.2 198.4L227.2 198.4L227.2 198.4L267.2 198.4L267.2 198.4L267.2 198.4L267.2 198.4L367.2 198.4L367.2 198.4L367.2 198.4L367.2 198.4L462.4 198.4L462.4 198.4L467.2 198.4L467.2 198.4L467.2 198.4L467.2 198.4Z"/><path class="ts-ghost" data-ts="ghost-bottom" d="M467.2 233.6L467.2 233.6L467.2 233.6L467.2 233.6L462.4 238.4L462.4 238.4L367.2 238.4L367.2 258.4L367.2 238.4L367.2 258.4L267.2 258.4L267.2 278.4L267.2 258.4L267.2 278.4L227.2 278.4L227.2 278.4L227.2 278.4L227.2 278.4L227.2 198.4L227.2 198.4L227.2 198.4L227.2 198.4L267.2 198.4L267.2 198.4L267.2 198.4L267.2 198.4L367.2 198.4L367.2 198.4L367.2 198.4L367.2 198.4L462.4 198.4L462.4 198.4L467.2 198.4L467.2 198.4L467.2 198.4L467.2 198.4Z"/><path class="ts-ghost-root" data-ts="ghost-roots" d=""/><path class="ts-under" data-ts="under" d=""/><g class="ts-tool" data-ts="tool" transform="translate(419.2 148.8)"><path class="ts-tool-body" d="M0 -480L0 -2.6L0.3 -1.3L0.6 -0.9L1 -0.6L1.3 -0.3L1.9 -0.1L2.2 0L2.9 0L48 -8L48 -9.6L120 -9.6L120 -480Z"/><path class="ts-tool-insert" d="M0 -32L0 -2.6L0.3 -1.3L0.6 -0.9L1 -0.6L1.3 -0.3L1.9 -0.1L2.2 0L2.9 0L48 -8L48 -32Z"/><path class="ts-tool-edge" d="M0 -2.6L0.3 -1.3L0.6 -0.9L1 -0.6L1.3 -0.3L1.9 -0.1L2.2 0L2.9 0L48 -8"/><g class="ts-ref"><circle r="3.2"/><path d="M-6 0H6M0 -6V6"/></g></g><g class="ts-chips" data-ts="chips"></g></svg>
-        <figcaption>The stepped pin part-way through. The end has been faced, the body turned in two
-        passes, and the turning tool is halfway along the first pass on the pin. The tinted metal is still
-        to come off.</figcaption>
+        <svg class="ts-view is-section" viewBox="0 0 603.2 332.8" role="img" aria-label="The stepped pin part-way through: the end faced with the facing blade, the body turned short of its shoulder, and the roughing tool halfway along the first pin pass. The angled shoulder allowance still needs radial facing. The dashed outline is the drawing; the tinted metal is still to come off." focusable="false"><defs><pattern id="ts-static-pin-turning-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="ts-hatch-bg" width="7" height="7"/><line class="ts-hatch-line" x1="0" y1="0" x2="0" y2="7"/></pattern></defs><g class="ts-machine"><rect class="ts-chuck" x="-32" y="-57.6" width="43.2" height="512"/><rect class="ts-jaw" x="11.2" y="67.2" width="88" height="51.2"/><rect class="ts-jaw" x="11.2" y="278.4" width="88" height="51.2"/><rect class="ts-sec" fill="url(#ts-static-pin-turning-hatch)" x="11.2" y="118.4" width="88" height="160"/><g class="ts-chuck-end" role="img" aria-label="Chuck end view from the tailstock: counterclockwise forward rotation" transform="translate(55.2 33.6)"><circle class="ts-spin-ring" r="21"/><g class="ts-spin"><circle class="ts-spin-guide" r="20"/><path class="ts-spin-arc" d="M14 0A14 14 0 1 0 0 14"/><path class="ts-spin-head" d="M-5 9L1 14L-5 19"/></g></g><text class="ts-lbl" x="82.2" y="31.6">Chuck end</text><text class="ts-spin-view" x="82.2" y="45.6">from tailstock</text></g><g class="ts-z0"><path d="M467.2 6.4V326.4"/><text class="ts-lbl" x="472.2" y="6.4" dy="12">Z0</text></g><path class="ts-bore" data-ts="bore" d=""/><path class="ts-sec" data-ts="sec" fill="url(#ts-static-pin-turning-hatch)" d="M99.2 198.4L99.2 118.4L99.2 118.4L269 118.4L272.2 137.2L272.4 137.7L272.6 138L272.9 138.2L273.4 138.4L416.2 138.4L416.2 138.6L417.8 147.6L418 148.1L418.2 148.4L418.5 148.6L418.8 148.8L467.2 148.8L467.2 148.8L467.2 198.4L467.2 198.4L99.2 198.4ZM99.2 198.4L99.2 278.4L99.2 278.4L269 278.4L272.2 259.6L272.4 259.1L272.6 258.8L272.9 258.6L273.4 258.4L416.2 258.4L416.2 258.2L417.8 249.2L418 248.7L418.2 248.4L418.5 248.2L418.8 248L467.2 248L467.2 248L467.2 198.4L467.2 198.4L99.2 198.4Z"/><path class="ts-thread-envelope" data-ts="thread-envelope" d=""/><path class="ts-ext" data-ts="ext" d=""/><path class="ts-hidden" data-ts="hidden" d=""/><path class="ts-edge" data-ts="edges" d=""/><path class="ts-thread" data-ts="threads" d=""/><path class="ts-knurl" data-ts="knurl" d=""/><path class="ts-axis" d="M0 198.4H603.2"/><path class="ts-excess" data-ts="excess" d="M267.2 118.4L269 118.4L269 119.1L269.1 119.1L269.1 120L269.3 120L269.3 120.9L269.4 120.9L269.4 121.8L269.6 121.8L269.6 122.7L269.8 122.7L269.8 123.6L269.9 123.6L269.9 124.5L270.1 124.5L270.1 125.4L270.2 125.4L270.2 126.3L270.4 126.3L270.4 127.2L270.6 127.2L270.6 128.2L270.7 128.2L270.7 129.1L270.9 129.1L270.9 130L271 130L271 130.9L271.2 130.9L271.2 131.8L271.4 131.8L271.4 132.7L271.5 132.7L271.5 133.6L271.7 133.6L271.7 134.5L271.8 134.5L271.8 135.4L272 135.4L272 136.3L272.2 136.3L272.2 137.2L272.3 137.2L272.3 137.7L272.5 137.7L272.5 138L272.6 138L272.6 138.1L272.8 138.1L272.8 138.2L267.2 138.2ZM367.2 138.4L416.2 138.4L416.2 138.6L416.3 138.6L416.3 139.5L416.5 139.5L416.5 140.4L416.6 140.4L416.6 141.3L416.8 141.3L416.8 142.2L417 142.2L417 143.1L417.1 143.1L417.1 144L417.3 144L417.3 144.9L417.4 144.9L417.4 145.8L417.6 145.8L417.6 146.7L417.8 146.7L417.8 147.6L417.9 147.6L417.9 148.1L418.1 148.1L418.1 148.4L418.2 148.4L418.2 148.5L418.4 148.5L418.4 148.6L418.6 148.6L418.6 148.7L418.7 148.7L418.7 148.8L467.2 148.8L467.2 161.4L467 161.4L467 161.2L466.9 161.2L466.9 161L466.7 161L466.7 160.9L466.6 160.9L466.6 160.7L466.4 160.7L466.4 160.6L466.2 160.6L466.2 160.4L466.1 160.4L466.1 160.2L465.9 160.2L465.9 160.1L465.8 160.1L465.8 159.9L465.6 159.9L465.6 159.8L465.4 159.8L465.4 159.6L465.3 159.6L465.3 159.4L465.1 159.4L465.1 159.3L465 159.3L465 159.1L464.8 159.1L464.8 159L464.6 159L464.6 158.8L464.5 158.8L464.5 158.6L464.3 158.6L464.3 158.5L464.2 158.5L464.2 158.3L464 158.3L464 158.2L367.2 158.2Z"/><path class="ts-excess" data-ts="excess-bottom" d="M267.2 278.4L269 278.4L269 277.7L269.1 277.7L269.1 276.8L269.3 276.8L269.3 275.9L269.4 275.9L269.4 275L269.6 275L269.6 274.1L269.8 274.1L269.8 273.2L269.9 273.2L269.9 272.3L270.1 272.3L270.1 271.4L270.2 271.4L270.2 270.5L270.4 270.5L270.4 269.6L270.6 269.6L270.6 268.6L270.7 268.6L270.7 267.7L270.9 267.7L270.9 266.8L271 266.8L271 265.9L271.2 265.9L271.2 265L271.4 265L271.4 264.1L271.5 264.1L271.5 263.2L271.7 263.2L271.7 262.3L271.8 262.3L271.8 261.4L272 261.4L272 260.5L272.2 260.5L272.2 259.6L272.3 259.6L272.3 259.1L272.5 259.1L272.5 258.8L272.6 258.8L272.6 258.7L272.8 258.7L272.8 258.6L267.2 258.6ZM367.2 258.4L416.2 258.4L416.2 258.2L416.3 258.2L416.3 257.3L416.5 257.3L416.5 256.4L416.6 256.4L416.6 255.5L416.8 255.5L416.8 254.6L417 254.6L417 253.7L417.1 253.7L417.1 252.8L417.3 252.8L417.3 251.9L417.4 251.9L417.4 251L417.6 251L417.6 250.1L417.8 250.1L417.8 249.2L417.9 249.2L417.9 248.7L418.1 248.7L418.1 248.4L418.2 248.4L418.2 248.3L418.4 248.3L418.4 248.2L418.6 248.2L418.6 248.1L418.7 248.1L418.7 248L467.2 248L467.2 235.4L467 235.4L467 235.6L466.9 235.6L466.9 235.8L466.7 235.8L466.7 235.9L466.6 235.9L466.6 236.1L466.4 236.1L466.4 236.2L466.2 236.2L466.2 236.4L466.1 236.4L466.1 236.6L465.9 236.6L465.9 236.7L465.8 236.7L465.8 236.9L465.6 236.9L465.6 237L465.4 237L465.4 237.2L465.3 237.2L465.3 237.4L465.1 237.4L465.1 237.5L465 237.5L465 237.7L464.8 237.7L464.8 237.8L464.6 237.8L464.6 238L464.5 238L464.5 238.2L464.3 238.2L464.3 238.3L464.2 238.3L464.2 238.5L464 238.5L464 238.6L367.2 238.6Z"/><path class="ts-ghost" data-ts="ghost-top" d="M467.2 163.2L467.2 163.2L467.2 163.2L467.2 163.2L462.4 158.4L462.4 158.4L367.2 158.4L367.2 138.4L367.2 158.4L367.2 138.4L267.2 138.4L267.2 118.4L267.2 138.4L267.2 118.4L227.2 118.4L227.2 118.4L227.2 118.4L227.2 118.4L227.2 198.4L227.2 198.4L227.2 198.4L227.2 198.4L267.2 198.4L267.2 198.4L267.2 198.4L267.2 198.4L367.2 198.4L367.2 198.4L367.2 198.4L367.2 198.4L462.4 198.4L462.4 198.4L467.2 198.4L467.2 198.4L467.2 198.4L467.2 198.4Z"/><path class="ts-ghost" data-ts="ghost-bottom" d="M467.2 233.6L467.2 233.6L467.2 233.6L467.2 233.6L462.4 238.4L462.4 238.4L367.2 238.4L367.2 258.4L367.2 238.4L367.2 258.4L267.2 258.4L267.2 278.4L267.2 258.4L267.2 278.4L227.2 278.4L227.2 278.4L227.2 278.4L227.2 278.4L227.2 198.4L227.2 198.4L227.2 198.4L227.2 198.4L267.2 198.4L267.2 198.4L267.2 198.4L267.2 198.4L367.2 198.4L367.2 198.4L367.2 198.4L367.2 198.4L462.4 198.4L462.4 198.4L467.2 198.4L467.2 198.4L467.2 198.4L467.2 198.4Z"/><path class="ts-ghost-root" data-ts="ghost-roots" d=""/><path class="ts-under" data-ts="under" d=""/><g class="ts-tool" data-ts="tool" transform="translate(419.2 148.8)"><path class="ts-tool-body" d="M-6.4 -480L-6.4 -30.2L-1.3 -1.2L-1 -0.4L-0.6 -0.2L-0.3 0L0 0L0.3 0L48 -8.4L48 -9.6L120 -9.6L120 -480Z"/><path class="ts-tool-insert" d="M-6.4 -32L-6.4 -30.2L-1.3 -1.2L-1 -0.4L-0.6 -0.2L-0.3 0L0 0L0.3 0L48 -8.4L48 -32Z"/><path class="ts-tool-edge" d="M-6.4 -30.2L-1.3 -1.2L-1 -0.4L-0.6 -0.2L-0.3 0L0 0L0.3 0L48 -8.4"/><g class="ts-ref"><circle r="3.2"/><path d="M-6 0H6M0 -6V6"/></g></g><g class="ts-chips" data-ts="chips"></g></svg>
+        <figcaption>The stepped pin part-way through. The facing blade made the end flat; the body
+        was rough-turned short of its shoulder. Its angled allowance still needs radial facing.
+        The rougher is halfway along the first pin pass. The tinted metal is still to come off.</figcaption>
       </figure>
       <div class="ts-static-parts">
         <figure class="ts-static-fig">
@@ -8782,7 +8800,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     goes on turning work.</li>
     <li><strong>Each tool does only its own kind of work.</strong> When a move would ask a tool for
     something it cannot do, the simulator stops the tool there and says why. What the tool in use can
-    and cannot do is listed under the tool rack.</li>
+    and cannot do is listed under the tool rack. <em>Turn / face</em> offers two actual tools in its
+    <em>Cutting tool</em> selector; stop the spindle before changing between them.</li>
     <li><strong>Undo</strong> takes back one cut at a time. <strong>New bar</strong> starts the part again,
     and undo brings the old bar back.</li>
     <li><strong>Measure</strong> compares every feature with the drawing. The list under the simulator
@@ -8797,23 +8816,32 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="lede">Facing, turning, drilling, threading and knurling are not the same action with a
   different shape of tool. Each tool reaches different places and moves in different ways.</p>
   <dl class="dims">
-    <div><dt>Turning tool</dt><dd>Turns a diameter feeding toward the chuck, and faces the end feeding
-    toward the center. Its square left edge leaves a square shoulder; its small nose radius rounds the
-    inside corner.</dd></div>
+    <div><dt>Turning tool</dt><dd>The roughing tool supplied here has a 10&deg; lead and a
+    0.008&nbsp;in nose radius. Its angled edge reaches ahead of its readout point. Stopping an axial
+    pass leaves an angled shoulder; leave allowance instead of running the nose to the finished
+    shoulder plane.</dd></div>
+    <div><dt>Facing tool</dt><dd>A square, 1/16&nbsp;in wide finishing blade set for radial feed.
+    Put its left corner at the finished Z and feed X across the end or shoulder. Its actual sweep
+    removes the allowance and leaves the face flat. Retract clear before moving Z. These are the
+    lab&rsquo;s selected tools; other turning tools and settings can both turn and face.</dd></div>
     <div><dt>Chamfer tool</dt><dd>A 90&deg; point. Plunged at an edge, each side cuts a 45&deg;
     chamfer.</dd></div>
     <div><dt>Grooving and parting blade</dt><dd>Cuts only on its front edge. Plunged part of the way it
     makes a groove; plunged to the center, or into the hole, it parts the work off.</dd></div>
-    <div><dt>Center drill, drill, countersink</dt><dd>Fed from the tailstock along the axis. The center
-    drill makes an accurate start, the drill makes the hole, and the countersink chamfers its
-    mouth.</dd></div>
+    <div><dt>Center drill, drill, countersink</dt><dd>Fed from the tailstock along the axis. A center
+    drill makes a small pilot and a 60&deg; seat for a lathe center; a spotting drill has different
+    starting geometry. The twist drill makes the hole and the countersink chamfers its mouth. Choose
+    a real drill&rsquo;s starting method and spot angle from its maker&rsquo;s guidance.</dd></div>
     <div><dt>Boring bar</dt><dd>Turns the inside of a hole that is already there, the way the turning tool
     works on the outside. Its bar has to fit in the hole.</dd></div>
     <div><dt>Threading tools</dt><dd>Form tools with a 60&deg; point, one for outside threads and one on a
     bar for inside threads. For a threading pass the carriage is driven by the leadscrew, so the tool
     moves one thread pitch for every turn of the work.</dd></div>
-    <div><dt>Knurling tool</dt><dd>Does not cut. Hardened wheels press a diamond pattern into the turning
-    surface. The metal pushed down at the roots rises between the teeth, so the diameter grows.</dd></div>
+    <div><dt>Knurling tool</dt><dd>A straddle head with two opposed forming wheels, with left-hand and
+    right-hand diagonal teeth. Their axles lie parallel to Z; together they roll a diamond pattern.
+    <em>Gap Ø</em> is a simulated gap/contact-diameter control. A real tool&rsquo;s arm adjustment and
+    locking are separate from cross-slide infeed. The picture shows the barrels and axles in side
+    projection; the highlighted rims are the forming contact.</dd></div>
   </dl>
   <div class="gate">
     <p><strong>What makes the simulator stop a move.</strong> Each of these is something the real tool
@@ -8833,6 +8861,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <p class="aside">The simulator&rsquo;s limits are teaching values chosen for these four parts. A real
     tool&rsquo;s limits come from its maker and depend on the machine, the material and the setup.</p>
   </div>
+  <p class="aside">Tool shape and setting matter:
+  <a href="https://sherline.com/wp-content/uploads/2015/01/grinding.pdf">Sherline&rsquo;s tool-grinding guide</a>
+  describes cutting edges, clearance and form tools. The particular blade widths, nose radius and
+  operating limits used here are declared teaching choices, not specifications for every lathe tool.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="lathe-operations--most-parts-start-with-a-facing-cut-and-end-with-parting" data-card="lathe-operations--most-parts-start-with-a-facing-cut-and-end-with-parting">
@@ -8845,9 +8877,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><strong>Face first.</strong> The faced end is the datum: every length on the drawing is measured
     from it. A sawn end is neither flat nor square to the axis.</li>
     <li><strong>Rough, then finish.</strong> A large step comes off in several passes, and only the last
-    one goes to the size on the drawing.</li>
-    <li><strong>Center drill, drill, then bore.</strong> A center-drilled start keeps a drill on center. A
-    boring bar needs a hole its bar fits in, and it brings that hole to size.</li>
+    one goes to the size on the drawing. On the stepped pin, stop the roughing passes 0.040&nbsp;in
+    short of each shoulder, retract clear and change to the facing tool. With its left corner at the
+    final shoulder Z, feed X to the smaller diameter. A deeper shoulder needs more clearance for the
+    angled edge; the facing blade can remove its allowance in slices up to 0.0625&nbsp;in wide.</li>
+    <li><strong>Drill, then bore to size.</strong> The boring bar needs a hole its bar fits in. A center
+    drill is available here to explore its pilot and center-seat shape, but it is not a universal
+    prerequisite for drilling. On a real machine, use the starting method recommended for the
+    following drill.</li>
     <li><strong>Heavy work before thin sections.</strong> Knurling pushes hard on the work. Knurling
     before the thin sections next to it are turned keeps the work stiff while it happens.</li>
     <li><strong>Make room for the threading tool.</strong> A thread needs somewhere for the tool to stop:
@@ -8858,6 +8895,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><strong>Part off last.</strong> The part falls free, and anything not done to it by then needs
     another setup.</li>
   </ul>
+  <p>The small <strong>Chuck end</strong> circle is a separate axial view, looking from the tailstock
+  toward the chuck. Its forward-rotation arrow and animation run counterclockwise in that view.
+  The main picture is longitudinal, not a view along the spindle. See the viewpoint diagram in
+  <a href="https://service.haascnc.com/sites/default/files/Locked/1/Y-Axis%20Lathe%20Applications%20Training.pdf#page=16">Haas&rsquo;s
+  spindle-direction training, page 16</a>.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="lathe-operations--a-thread-is-cut-in-several-passes-along-one-helix" data-card="lathe-operations--a-thread-is-cut-in-several-passes-along-one-helix">
@@ -8867,6 +8909,12 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="lede">For a threading pass the carriage is coupled to the leadscrew, so the tool advances
   exactly one pitch for every turn of the work: 1/16&nbsp;in for 16 threads per inch. Every pass follows
   the same helix, so every pass deepens the same groove.</p>
+  <p><strong>The section uses a schematic thread envelope.</strong> Its unhatched bands lie between
+  the surviving crests and dashed roots; they are not solid annular thread teeth. A real single-start
+  helix intersects opposite sides half a pitch apart. The model samples a thread profile for depth
+  checks and preserves its material envelope for later cuts and parting. The carriage still stops at
+  the requested Z, even between full turns. <a href="https://www.sandvik.coromant.com/en-us/knowledge/threading/thread-turning/thread-turning-application-tips">Sandvik
+  explains the lead/pitch relation for single- and multi-start threads</a>.</p>
   <ul>
     <li><strong>A little deeper each pass.</strong> The simulator allows 0.015&nbsp;in of infeed per pass
     outside and 0.012&nbsp;in inside. The thread is done when its roots reach the root diameter on the
@@ -8899,6 +8947,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="aside">In the simulator the roots sink exactly as far as the crests rise, 0.010&nbsp;in each
   at full depth, so a full knurl adds 0.020&nbsp;in to the diameter. A real knurl&rsquo;s growth depends
   on its pitch, the material and how hard it is pressed.</p>
+  <p class="aside">This paired-wheel forming arrangement supports feeding along Z after engagement.
+  <a href="https://www.doriantool.com/wp-content/uploads/2022/05/SEC-H-Knurling-Tools_LowRes_compressed.pdf#page=19">Dorian&rsquo;s
+  straddle setup instructions (H-19)</a> and <a href="https://www.doriantool.com/wp-content/uploads/2022/05/SEC-H-Knurling-Tools_LowRes_compressed.pdf#page=48">paired
+  diagonal-wheel example (H-48)</a> describe that combination. The drawing is a generic teaching
+  head, not a dimensioned catalog tool or a setup instruction for a particular machine.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="lathe-operations--things-to-try-in-the-simulator" data-card="lathe-operations--things-to-try-in-the-simulator">
@@ -8908,6 +8961,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <ul class="boxes">
     <li>On the <strong>stepped pin</strong>, try to turn the body from 1.000 to 0.750&nbsp;in in one pass.
     Read why the tool stops, then do it in two.</li>
+    <li>Stop a roughing pass short of a shoulder and <strong>Measure</strong>. Choose Face without
+    cutting and measure again. Then make the radial facing cut: which geometry actually changed?</li>
     <li>Face the end but stop the cut at <strong>X 0.200</strong>. Measure: what is left at the
     center?</li>
     <li>Face <strong>0.010&nbsp;in past Z0</strong> and make the rest of the pin to the readout. Measure
@@ -21183,8 +21238,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
    THE WORK is a solid of revolution, so one half-profile describes it. The
    profile is cut into columns 0.001 in long. Each column holds one ring of
    metal between an inner radius ri (0 when solid) and an outer radius ro.
-   A column with no metal (ro <= ri) is a cut right through the work: anything
-   on the tailstock side of it has been parted off and falls away.
+   Thread grooves are sampled at one angular phase, with separate surviving
+   outer-crest and inner-minor envelopes. A root notch in that one section is
+   not an annular hole. Separation requires a kerf through those envelopes;
+   only then does the portion on the tailstock side fall away.
 
    A TOOL is described in the same section plane, relative to its reference
    point. Every tool the simulator ships keeps one interval per column:
@@ -21193,9 +21250,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
      inside tools   occupy r <= tip - edge(dz) at the head, with a round bar
                     under it that has to fit inside the hole
      axial tools    (tailstock) occupy r <= radius(dz) on the centerline
-   That is why leading edges are vertical, V flanks rise at 30 degrees and the
-   blade has square sides: the drawn shape is the shape that cuts and the
-   shape that collides.
+   The rougher's leading edge is angled, the facing blade has square sides,
+   and V flanks rise at 30 degrees. The drawn profile is the cutting and
+   collision profile. These are the particular tools provided by this lab.
 
    THE MECHANISMS are deliberately different, not one eraser:
      cut     metal inside the cutting window is removed; metal that would
@@ -21258,7 +21315,16 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     return function (dz) { var a = Math.abs(dz); return a <= h ? 0 : (a - h) * SQ3; };
   }
 
-  var turnInsert = insertEdge(0.016, TAN10);
+  /* Rounded roughing nose, with 10 degrees of lead on the leading flank.
+     Its reference is the nose's lowest point. The edge ahead of that point
+     leaves an angled shoulder; a radial facing cut finishes the allowance. */
+  function roughEdge(dz) {
+    var nose = 0.008, slope = dz < 0 ? 1 / TAN10 : TAN10;
+    var a = Math.atan(slope), tangent = nose * Math.sin(a), q = Math.abs(dz);
+    if (q <= 0.0006) { return 0; }
+    if (q <= tangent) { return nose - Math.sqrt(Math.max(0, nose * nose - q * q)); }
+    return nose * (1 - Math.cos(a)) + (q - tangent) * slope;
+  }
   var boreInsert = insertEdge(0.008, TAN10);
   var threadV = vEdge(0.004);
 
@@ -21272,14 +21338,25 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   var TOOLS = {
     turn: {
       id: 'turn', name: 'Turning tool', mount: 'post', side: 'out', action: 'cut',
-      span: [0, 0.75], cut: { from: 0, to: 0.30, depth: 0.20 }, maxEngage: 0.100,
+      span: [-0.04, 0.75], cut: { from: -0.04, to: 0.30, depth: 0.20 }, maxEngage: 0.100,
       edge: function (dz) {
-        if (dz < 0 || dz > 0.75) { return Infinity; }
-        if (dz <= 0.30) { return turnInsert(dz); }
+        if (dz < -0.04 || dz > 0.75) { return Infinity; }
+        if (dz <= 0.30) { return roughEdge(dz); }
         return 0.06;
       },
-      does: 'Turns a diameter feeding toward the chuck, and faces the end feeding toward the center. Its left edge is square, so it leaves a square shoulder.',
-      cannot: 'Takes at most 0.100 in of edge in one pass. Cannot reach inside a hole or cut a groove narrower than itself.'
+      does: 'This roughing tool has a 10° lead and a 0.008 in nose radius. Its edge cuts ahead of the readout point. For the stepped pin, stop 0.040 in short and face the allowance. Deeper shoulders need more clearance as the diameter decreases.',
+      cannot: 'An axial stop leaves an angled shoulder, not a finished face. Takes at most 0.100 in of edge in one pass. Other real turning tools and settings can both turn and face.'
+    },
+    face: {
+      id: 'face', name: 'Facing tool', mount: 'post', side: 'out', action: 'cut', radialOnly: true,
+      width: 0.0625, reach: 0.75,
+      span: [0, 0.30], cut: { from: 0, to: 0.0625, depth: 0.012 }, maxEngage: 0.065,
+      edge: function (dz) {
+        if (dz < 0 || dz > 0.30) { return Infinity; }
+        return dz <= 0.0625 ? 0 : 0.75;
+      },
+      does: 'A narrow square finishing blade, 1/16 in wide, set for radial feed. Put its left corner at the finished face or shoulder Z, then feed X across the remaining metal. The cut, not merely selecting this tool, makes the face flat.',
+      cannot: 'Faces axial slices up to its 0.0625 in width; take more than one slice for a larger allowance. Retract clear before moving Z: this blade has no side-cutting clearance.'
     },
     chamfer: {
       id: 'chamfer', name: 'Chamfer tool', mount: 'post', side: 'out', action: 'cut',
@@ -21294,7 +21371,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     },
     groove: {
       id: 'groove', name: 'Grooving and parting blade', mount: 'post', side: 'out', action: 'cut',
-      width: 0.125, reach: 0.70,
+      width: 0.125, reach: 0.70, radialOnly: true,
       span: [-0.125, 0.30], cut: { from: -0.125, to: 0, depth: 0.012 }, maxEngage: 0.13,
       edge: function (dz) {
         if (dz < -0.125 || dz > 0.30) { return Infinity; }
@@ -21325,8 +21402,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         if (a <= 0.1875) { return a - (0.1875 - 0.03); }
         return 0.25;
       },
-      does: 'Two hardened wheels pressed into the turning work. They do not cut: they push metal down into a diamond pattern, and the metal they push rises between the teeth.',
-      cannot: 'Makes no chips and removes nothing. A full knurl here is 0.020 in deep, so the knurled diameter ends up larger than the blank. Pressing past full depth only crushes the points.'
+      does: 'A pair of opposed, beveled forming wheels, one left-hand and one right-hand, rolls a diamond pattern. Their axles are parallel to Z. Here X controls the simulated wheel gap, not a literal carriage coordinate; close the gap to form, then feed Z along the work.',
+      cannot: 'This is form knurling: no chips. A full knurl here depresses the roots 0.010 in and raises the crests 0.010 in radially, adding 0.020 in to the blank diameter. Growth is a teaching approximation; real knurl growth depends on the material and wheels.'
     },
     bore: {
       id: 'bore', name: 'Boring bar', mount: 'post', side: 'in', action: 'cut',
@@ -21354,8 +21431,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         if (dz <= 0.2318) { return 0.0545 + (dz - 0.11) * TAN30; }
         return 0.125;
       },
-      does: 'A short, stiff drill with a small pilot and a 60 degree cone. It makes an accurate starting point, so a drill that follows it starts on center.',
-      cannot: 'Only drills as deep as its cone. Its body is not a cutter.'
+      does: 'A combined drill and countersink with a small pilot and a 60 degree cone, used to make a seat for a lathe center. Its shape is different from a spotting drill.',
+      cannot: 'Only drills as deep as its cone. For starting a twist drill, choose the starting method and spot angle recommended for that drill; this center drill is not a universal first step.'
     },
     drill: {
       id: 'drill', name: 'Twist drill', mount: 'tailstock', side: 'axial', action: 'cut',
@@ -21381,7 +21458,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       cannot: 'Only chamfers up to 0.750 in across, and only at the mouth of a hole on the centerline.'
     }
   };
-  var TOOL_ORDER = ['turn', 'chamfer', 'groove', 'thread', 'knurl', 'bore', 'ithread', 'center', 'drill', 'csink'];
+  var TOOL_ORDER = ['turn', 'face', 'chamfer', 'groove', 'thread', 'knurl', 'bore', 'ithread', 'center', 'drill', 'csink'];
 
   /* Inside tools: the bar has to fit. Its top sits `top` below the tip and it
      is `dia` across, so the smallest hole it enters is dia + top. */
@@ -21481,10 +21558,16 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     this.ro = new Float64Array(n); this.ri = new Float64Array(n);
     this.kB = new Float64Array(n); this.kP = new Float64Array(n);
     this.thO = new Float64Array(n); this.thI = new Float64Array(n);
+    this.thBaseO = new Float64Array(n); this.thBaseI = new Float64Array(n);
   }
   function zc(p, i) { return p.zL + (i + 0.5) * COL; }
   function colAt(p, z) { return Math.floor((z - p.zL) / COL + 1e-9); }
-  function has(p, i) { return p.ro[i] > p.ri[i] + EPS; }
+  function outerEnvelope(p, i) { return p.thO[i] && p.thBaseO[i] > 0 ? p.thBaseO[i] : p.ro[i]; }
+  function innerEnvelope(p, i) { return p.thI[i] && p.thBaseI[i] > 0 ? p.thBaseI[i] : p.ri[i]; }
+  function has(p, i) { return outerEnvelope(p, i) > innerEnvelope(p, i) + EPS; }
+  function clearColumn(p, i) {
+    p.ro[i] = p.ri[i] = p.kB[i] = p.kP[i] = p.thO[i] = p.thI[i] = p.thBaseO[i] = p.thBaseI[i] = 0;
+  }
 
   function parkFor(st, toolId) {
     var t = TOOLS[toolId], R = st.R;
@@ -21516,7 +21599,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       targetId: T.id, R: R, zJaw: zL, work: p,
       tool: 'turn', drill: '0.5000', tpi: 16,
       tz: 0, tr: 0, spindle: false,
-      win: { a: [], l: [] }, peck: null,
+      win: { a: [], l: [] }, peck: null, threadSeat: null,
       notes: { noCenter: false },
       part: null, parts: 0, version: 0
     };
@@ -21528,19 +21611,20 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   function copyPiece(p) {
     var q = new Piece(p.zL, p.n);
     q.ro.set(p.ro); q.ri.set(p.ri); q.kB.set(p.kB); q.kP.set(p.kP); q.thO.set(p.thO); q.thI.set(p.thI);
+    q.thBaseO.set(p.thBaseO); q.thBaseI.set(p.thBaseI);
     return q;
   }
   function snapshot(st) {
     return {
       work: copyPiece(st.work), part: st.part ? copyPiece(st.part) : null, parts: st.parts,
       tool: st.tool, drill: st.drill, tpi: st.tpi, tz: st.tz, tr: st.tr, spindle: st.spindle,
-      peck: st.peck, notes: { noCenter: st.notes.noCenter }
+      peck: st.peck, threadSeat: st.threadSeat ? Object.assign({}, st.threadSeat) : null, notes: { noCenter: st.notes.noCenter }
     };
   }
   function restore(st, s) {
     st.work = copyPiece(s.work); st.part = s.part ? copyPiece(s.part) : null; st.parts = s.parts;
     st.tool = s.tool; st.drill = s.drill; st.tpi = s.tpi; st.tz = s.tz; st.tr = s.tr; st.spindle = s.spindle;
-    st.peck = s.peck; st.notes = { noCenter: s.notes.noCenter };
+    st.peck = s.peck; st.threadSeat = s.threadSeat ? Object.assign({}, s.threadSeat) : null; st.notes = { noCenter: s.notes.noCenter };
     st.win = { a: [], l: [] };
     st.version++;
     return st;
@@ -21575,8 +21659,23 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     for (var i = 0; i < DRILLS.length; i++) { if (DRILLS[i].id === st.drill) { return DRILLS[i].d; } }
     return DRILLS[0].d;
   }
+  function hasThreads(p) {
+    for (var i = 0; i < p.n; i++) { if (p.thO[i] || p.thI[i]) { return true; } }
+    return false;
+  }
+  function knurlContact(st) {
+    if (st.tool !== 'knurl') { return false; }
+    var p = st.work, t = TOOLS.knurl;
+    var a = Math.max(0, colAt(p, st.tz + t.cut.from)), b = Math.min(p.n - 1, colAt(p, st.tz + t.cut.to));
+    for (var i = a; i <= b; i++) {
+      if (has(p, i) && st.tr + t.edge(zc(p, i) - st.tz) <= p.ro[i] + 0.0005) { return true; }
+    }
+    return false;
+  }
 
-  function emptyAfter(ro, ri) { return (ro - ri < 0.003) || (ri < EPS && ro < 0.012); }
+  // Separation occurs when the modeled wall is cut through, not at a fixed
+  // small core diameter. Burrs, elastic tearing and break-off are not modeled.
+  function emptyAfter(p, i) { return !has(p, i); }
 
   function step(st, tool, z, r, apply, opts) {
     var p = st.work, out = { code: null, area: 0, formed: false, emptied: false, threadHit: false, info: null };
@@ -21599,7 +21698,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         var e = edgeCol(tool, dz);
         if (e === Infinity) { continue; }
         var b = r + e;
-        top = p.ro[i];
+        // A later rotating cut also reaches crests between the fixed thread
+        // section samples. Keep their current envelope, including chamfers.
+        top = outerEnvelope(p, i);
         if (b >= top - EPS) { continue; }
         var inCut = dz >= tool.cut.from - COL / 2 && dz <= tool.cut.to + COL / 2;
         if (tool.action === 'form') {
@@ -21622,12 +21723,13 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         if (top > r + tool.cut.depth + EPS) { out.code = tool.id === 'groove' ? 'side' : 'body'; return out; }
         if (noCut) { continue; }
         if (tool.action === 'thread' && p.thO[i] !== 0) { out.code = 'retract'; out.info = { side: 'out' }; return out; }
-        var nt = Math.max(b, p.ri[i]);
+        var nt = Math.max(b, innerEnvelope(p, i));
         out.area += (top - nt) * COL;
         if (apply) {
-          p.ro[i] = nt;
+          p.ro[i] = Math.min(p.ro[i], nt);
+          if (p.thO[i]) { p.thBaseO[i] = Math.min(p.thBaseO[i], nt); }
           if (p.kB[i] > 0 && nt <= p.kB[i] - p.kP[i] + EPS) { p.kB[i] = 0; p.kP[i] = 0; }
-          if (emptyAfter(p.ro[i], p.ri[i])) { p.ro[i] = 0; p.ri[i] = 0; p.kB[i] = 0; p.kP[i] = 0; out.emptied = true; }
+          if (emptyAfter(p, i)) { clearColumn(p, i); out.emptied = true; }
         }
       }
       return out;
@@ -21641,7 +21743,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       for (i = Math.max(0, i0); i <= Math.min(p.n - 1, i1); i++) {
         if (!has(p, i)) { continue; }
         dz = zc(p, i) - z;
-        var ri = p.ri[i];
+        var ri = innerEnvelope(p, i);
         if (dz > bar.to + COL / 2) { out.code = 'holder'; return out; }
         var inHead = dz >= hd[0] - COL / 2 && dz <= hd[1] + COL / 2;
         var inBar = dz >= bar.from - COL / 2;
@@ -21654,11 +21756,12 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
             if (ri < r - tool.cut.depth - EPS) { out.code = ri < 0.01 ? 'nohole' : 'body'; return out; }
             if (noCut) { continue; }
             if (tool.action === 'thread' && p.thI[i] !== 0) { out.code = 'retract'; out.info = { side: 'in' }; return out; }
-            var nb = Math.min(tt, p.ro[i]);
+            var nb = Math.min(tt, outerEnvelope(p, i));
             out.area += (nb - ri) * COL;
             if (apply) {
-              p.ri[i] = nb;
-              if (emptyAfter(p.ro[i], p.ri[i])) { p.ro[i] = 0; p.ri[i] = 0; out.emptied = true; }
+              p.ri[i] = Math.max(p.ri[i], nb);
+              if (p.thI[i]) { p.thBaseI[i] = Math.max(p.thBaseI[i], nb); }
+              if (emptyAfter(p, i)) { clearColumn(p, i); out.emptied = true; }
             }
           }
           continue;
@@ -21681,13 +21784,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         if (rr >= p.ri[i] - 1e-6) { out.code = tool.id === 'drill' ? 'chuck-body' : 'body'; return out; }
         continue;
       }
-      if (rr <= p.ri[i] + EPS) { continue; }
+      var inner = innerEnvelope(p, i);
+      if (rr <= inner + EPS) { continue; }
       if (noCut) { continue; }
-      var nr = Math.min(rr, p.ro[i]);
-      out.area += (nr - p.ri[i]) * COL;
+      var nr = Math.min(rr, outerEnvelope(p, i));
+      out.area += (nr - inner) * COL;
       if (apply) {
-        p.ri[i] = nr;
-        if (emptyAfter(p.ro[i], p.ri[i])) { p.ro[i] = 0; p.ri[i] = 0; out.emptied = true; }
+        p.ri[i] = Math.max(p.ri[i], nr);
+        if (p.thI[i]) { p.thBaseI[i] = Math.max(p.thBaseI[i], nr); }
+        if (emptyAfter(p, i)) { clearColumn(p, i); out.emptied = true; }
       }
     }
     return out;
@@ -21709,9 +21814,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       for (j = first; j <= last; j++) {
         piece.ro[j] = p.ro[j]; piece.ri[j] = p.ri[j]; piece.kB[j] = p.kB[j]; piece.kP[j] = p.kP[j];
         piece.thO[j] = p.thO[j]; piece.thI[j] = p.thI[j];
+        piece.thBaseO[j] = p.thBaseO[j]; piece.thBaseI[j] = p.thBaseI[j];
       }
     }
-    for (j = first; j <= last; j++) { p.ro[j] = 0; p.ri[j] = 0; p.kB[j] = 0; p.kP[j] = 0; p.thO[j] = 0; p.thI[j] = 0; }
+    for (j = first; j <= last; j++) { p.ro[j] = 0; p.ri[j] = 0; p.kB[j] = 0; p.kP[j] = 0; p.thO[j] = 0; p.thI[j] = 0; p.thBaseO[j] = 0; p.thBaseI[j] = 0; }
     if (!keep) { return 'debris'; }
     st.part = piece; st.parts++;
     return 'part';
@@ -21743,6 +21849,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         ? 'The knurling tool\'s holder would hit the work there.'
         : 'Only the cutting edge can touch the work. Another part of the ' + t.name.toLowerCase() + ' would hit it there.';
       case 'side': return 'The side of the blade would be pushed into the wall of the groove. A blade cuts only on its front edge: back it straight out, move over, and plunge again.';
+      case 'face-side': return 'This facing blade is set for radial cutting. Back it clear of the work before moving Z, then feed X across the face.';
       case 'jaws': return 'The tool would run into the chuck jaws. Keep the tool clear of the chuck.';
       case 'chuck': return 'That would reach into the part of the bar held in the chuck.';
       case 'chuck-body': return 'The drill is in as far as its flutes reach: the drill chuck would hit the work.';
@@ -21757,7 +21864,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       case 'infeed': return 'That pass would cut ' + inch(data.infeed || 0) + ' deep at the bottom of the groove. The ' + t.name.toLowerCase() + (t.maxInfeed ? ' takes at most ' + inch(t.maxInfeed) + ' of infeed per pass: feed it in less, and take more passes.' : ' is not a threading tool.');
       case 'limit': return 'That is the end of the slide\'s travel.';
       case 'axis': return 'Tailstock tools ride on the centerline. They move only along Z.';
-      case 'threadstop': return 'The threading tool would have run into a shoulder before the end of the pass, so the pass stopped at the last full turn short of it. Stop the pass sooner, or cut a relief groove for the tool to run into.';
+      case 'threadstop': return 'The threading tool would have run into a shoulder before the commanded stop, so it stopped at the last clear carriage position. Stop the pass sooner, or cut a relief groove for the tool to run into.';
       case 'parted': return 'Parted off. The finished part has dropped clear: see the inspection below.';
       case 'nopass': return 'A threading pass runs toward the chuck: set a stop Z to the left of the tool.';
       case 'notthread': return 'Choose a threading tool to take a threading pass.';
@@ -21802,12 +21909,25 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     var clipped = Math.abs(tz - toZ) > 1e-9 || Math.abs(tx - toX) > 1e-9;
     var z0 = st.tz, r0 = st.tr, r1 = tx / 2;
     var dzT = tz - z0, drT = r1 - r0, len = Math.sqrt(dzT * dzT + drT * drT);
+    // The sampled axial thread profile is at one fixed angular phase. The
+    // carriage may stop between those samples; radial withdrawal from its
+    // actual helical groove must not be mistaken for cutting a sampled crest.
+    var retractingThread = tool.action === 'thread' && st.threadSeat && Math.abs(dzT) < EPS &&
+      (tool.side === 'out' ? drT >= 0 : drT <= 0);
+    if (tool.action === 'thread' && Math.abs(dzT) > EPS) {
+      var clear = threadClear(st, tool);
+      if (clear !== null && (tool.side === 'out' ? r0 * 2 < clear - EPS : r0 * 2 > clear + EPS)) {
+        res.stop = stopObj(st, 'retract', { clear: clear }); return res;
+      }
+      st.threadSeat = null;
+    }
     var n = Math.max(1, Math.ceil(len / STEP - 1e-9));
     var pz = z0, pr = r0;
     for (var k = 1; k <= n && len > 0; k++) {
       var z = z0 + dzT * k / n, r = r0 + drT * k / n;
-      var chk = step(st, tool, z, r, false);
+      var chk = step(st, tool, z, r, false, retractingThread ? { noCut: true } : null);
       if (chk.code) { res.stop = stopObj(st, chk.code, chk.code === 'retract' ? { clear: threadClear(st, tool) } : null); break; }
+      if (tool.radialOnly && Math.abs(dzT) > EPS && chk.area > EPS) { res.stop = stopObj(st, tool.id === 'face' ? 'face-side' : 'side'); break; }
       if ((chk.area > EPS || chk.formed) && !st.spindle) { res.stop = stopObj(st, 'spindle'); break; }
       var sl = Math.sqrt((z - pz) * (z - pz) + (r - pr) * (r - pr));
       var eng = winPush(st, chk.area, sl);
@@ -21824,7 +21944,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         var D = drillSize(st);
         if (depth > tool.peck * D + 1e-9) { winPop(st); res.stop = stopObj(st, 'peck', { depth: tool.peck * D }); break; }
       }
-      var ap = step(st, tool, z, r, true);
+      var ap = step(st, tool, z, r, true, retractingThread ? { noCut: true } : null);
       st.tz = z; st.tr = r; pz = z; pr = r;
       res.moved = true; res.cut += chk.area; res.formed = res.formed || chk.formed;
       if (chk.area > EPS || chk.formed) { res.contact = true; st.version++; }
@@ -21871,9 +21991,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     var kMax = Math.floor((-zEnd) / pitch + 1e-9), kMin = Math.ceil((-st.tz) / pitch - 1e-9);
     var notches = [];
     for (k = kMin; k <= kMax; k++) { notches.push(-k * pitch); }
-    /* The tool comes to rest in the groove it has just cut. In the section plane
-       that is the last notch, never past the stop or the point it would crash. */
-    if (notches.length) { zEnd = notches[notches.length - 1]; }
+    // zEnd is carriage travel. Section-plane notch phase must not round it to
+    // a whole turn or move the readout away from the commanded stop.
     var worst = 0, any = false;
     for (k = 0; k < notches.length; k++) {
       var c = colAt(p, notches[k]);
@@ -21891,7 +22010,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       var reached = inside ? (r > p.ri[i] + EPS) : (r < p.ro[i] - EPS);
       if (!reached) { continue; }
       var tag = inside ? p.thI : p.thO;
-      if (tag[i] === 0) { tag[i] = pitch; } else if (Math.abs(tag[i] - pitch) > 1e-9) { tag[i] = -1; }
+      if (tag[i] === 0) {
+        (inside ? p.thBaseI : p.thBaseO)[i] = inside ? p.ri[i] : p.ro[i];
+        tag[i] = pitch;
+      } else if (Math.abs(tag[i] - pitch) > 1e-9) { tag[i] = -1; }
     }
     var area = 0;
     for (k = 0; k < notches.length; k++) {
@@ -21913,6 +22035,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     }
     st.tz = round(zEnd, 6);
     res.moved = true; res.cut = area; res.to = st.tz; res.infeed = worst;
+    res.turns = (res.from - res.to) / pitch;
+    st.threadSeat = { z: st.tz, pitch: pitch };
     st.win = { a: [], l: [] };
     st.version++;
     if (crash) { res.stop = stopObj(st, (crash === 'jaws' || crash === 'chuck') ? crash : 'threadstop'); res.crashed = true; res.crash = crash; }
@@ -21927,7 +22051,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (st.spindle) { return { ok: false, text: 'Stop the spindle before changing tools.' }; }
     st.tool = id;
     var park = parkFor(st, id);
-    st.tz = park.z; st.tr = park.r; st.win = { a: [], l: [] }; st.peck = null;
+    st.tz = park.z; st.tr = park.r; st.win = { a: [], l: [] }; st.peck = null; st.threadSeat = null;
     return { ok: true };
   }
   function setDrill(st, id) {
@@ -22046,6 +22170,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   /* The outer surface with thread and knurl teeth bridged: the largest radius
      within half a pitch. What a micrometer across the crests would read. */
   function envOut(p, i) {
+    if (p.thO[i] !== 0 && p.thBaseO[i] > 0) { return p.thBaseO[i]; }
     if (p.thO[i] === 0 && p.kB[i] === 0) { return p.ro[i]; }
     var w = p.thO[i] > 0 ? Math.ceil(p.thO[i] / 2 / COL) + 1 : (p.thO[i] < 0 ? 25 : 3);
     var m = 0;
@@ -22053,17 +22178,19 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     return m;
   }
   function envIn(p, i) {
+    if (p.thI[i] !== 0 && p.thBaseI[i] > 0) { return p.thBaseI[i]; }
     if (p.thI[i] === 0) { return p.ri[i]; }
     var w = p.thI[i] > 0 ? Math.ceil(p.thI[i] / 2 / COL) + 1 : 25;
     var m = Infinity;
     for (var k = Math.max(0, i - w); k <= Math.min(p.n - 1, i + w); k++) { if (has(p, k) && p.ri[k] < m) { m = p.ri[k]; } }
     return m === Infinity ? p.ri[i] : m;
   }
-  /* The tool's view of the work at one Z: the outside and inside diameters. */
+  /* Surviving outside/inside diameters at one Z. For a thread these are the
+     crest/minor envelopes, not a notch treated as an annular empty groove. */
   function measureAt(st, z) {
     var p = st.work, i = colAt(p, z);
     if (i < 0 || i >= p.n || !has(p, i)) { return null; }
-    return { od: 2 * p.ro[i], id: 2 * p.ri[i] };
+    return { od: 2 * outerEnvelope(p, i), id: 2 * innerEnvelope(p, i) };
   }
 
   /* ---- inspection -------------------------------------------------------------------------
@@ -22081,19 +22208,27 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     }
     return out;
   }
-  /* The shoulder nearest its drawing position: a face where the outside
-     steps by more than 0.004 in from one column to the next, bigger on the
-     side the drawing has bigger. Thread and knurl teeth are bridged first. */
-  function stepNear(p, zF, sNom, dRight, dLeft) {
-    var sign = dLeft > dRight ? 1 : -1, best = null;
-    for (var i = 1; i < p.n; i++) {
-      if (!has(p, i) || !has(p, i - 1)) { continue; }
-      var s = zF - (p.zL + i * COL);
-      if (Math.abs(s - sNom) > 0.25) { continue; }
-      if (sign * (envOut(p, i - 1) - envOut(p, i)) <= 0.004) { continue; }
-      if (best === null || Math.abs(s - sNom) < Math.abs(best - sNom)) { best = s; }
+  /* Inspect the face at nine radii, rather than accepting one sharp change
+     in a sampled profile as a finished shoulder. Leave only a small corner
+     allowance for the nose/edge transition. Teeth are bridged for this check. */
+  function shoulderFace(p, zF, sNom, dRight, dLeft) {
+    var smallRight = dLeft > dRight, lo = Math.min(dLeft, dRight) / 2, hi = Math.max(dLeft, dRight) / 2;
+    var inset = Math.min(0.006, (hi - lo) / 8), positions = [];
+    for (var k = 0; k < 9; k++) {
+      var rho = lo + inset + (hi - lo - 2 * inset) * k / 8, best = null;
+      for (var i = 1; i < p.n; i++) {
+        if (!has(p, i) || !has(p, i - 1)) { continue; }
+        var s = zF - (p.zL + i * COL);
+        if (Math.abs(s - sNom) > 0.25) { continue; }
+        var left = envOut(p, i - 1), right = envOut(p, i);
+        var crosses = smallRight ? left > rho && right <= rho : left <= rho && right > rho;
+        if (crosses && (best === null || Math.abs(s - sNom) < Math.abs(best - sNom))) { best = s; }
+      }
+      if (best === null) { return null; }
+      positions.push(best);
     }
-    return best;
+    var mn = Math.min.apply(null, positions), mx = Math.max.apply(null, positions);
+    return { position: positions[4], min: mn, max: mx, spread: mx - mn, flat: mx - mn <= 0.0031 };
   }
 
   function evaluate(st) {
@@ -22125,7 +22260,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       if (!face.flat) {
         it.made = 'Uneven by ' + inch(face.spread);
         it.status = 'over';
-        it.hint = 'Still the sawn end. Face it: feed the turning tool across the end toward the center (X 0).';
+        it.hint = 'Face the uneven or sawn end: choose the facing tool, place its left corner at the finished Z, and feed X to 0. Take axial slices no wider than 0.0625 in.';
       } else if (face.nub) {
         it.made = 'A nub ' + inch(face.nub) + ' tall is left at the center';
         it.status = 'over';
@@ -22176,23 +22311,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       var right = segAt(T.outside, sh.at - 0.01), left = segAt(T.outside, sh.at + 0.01);
       var dR = outerNom(right), dL = outerNom(left);
       if (right.kind === 'thread') { dR = right.crest[0]; }
-      var it = { id: 'sh-' + idx, label: 'Shoulder', spec: inch(sh.at) + ' ±' + fmt(sh.tol) + ' from the front face' };
-      var s = stepNear(piece, zF, sh.at, dR, dL);
-      if (s === null) {
-        it.made = 'No step yet'; it.status = 'missing';
-        it.hint = 'Turn the ' + dia(Math.min(dR, dL)) + ' section back to here.';
+      var it = { id: 'sh-' + idx, label: 'Shoulder', spec: 'Flat face, ' + inch(sh.at) + ' ±' + fmt(sh.tol) + ' from the front face' };
+      var faceAt = shoulderFace(piece, zF, sh.at, dR, dL);
+      if (faceAt === null) {
+        it.made = 'No complete shoulder face yet'; it.status = 'missing';
+        it.hint = 'Rough-turn short of this shoulder, then use a radial facing cut at Z ' + fmt(zF - sh.at) + ' to finish its allowance.';
       } else {
-        it.made = inch(s) + ' from the face';
-        var err = s - sh.at;
+        var s = faceAt.position;
+        it.made = faceAt.flat ? inch(s) + ' from the face' : 'Angled or uneven by ' + inch(faceAt.spread) + ', near ' + inch(s);
         // which way can it still move? toward the bigger diameter side, by cutting more
         var smallRight = dR < dL;
-        if (Math.abs(err) <= sh.tol + 1e-9) { it.status = 'ok'; }
-        else if ((smallRight && err < 0) || (!smallRight && err > 0)) {
+        var tooFar = smallRight ? faceAt.max > sh.at + sh.tol + EPS : faceAt.min < sh.at - sh.tol - EPS;
+        if (faceAt.flat && faceAt.min >= sh.at - sh.tol - EPS && faceAt.max <= sh.at + sh.tol + EPS) { it.status = 'ok'; }
+        else if (!tooFar) {
           it.status = 'over';
-          it.hint = (smallRight ? 'The ' + dia(dR) + ' section stops short. Carry that cut on to Z ' : 'Widen the ' + dia(dL) + ' cut toward the front, to Z ') + fmt(zF - sh.at) + '.' + lenNote;
+          it.hint = 'Shoulder allowance remains. With the facing tool clear, set Z ' + fmt(zF - sh.at) + (smallRight ? '' : ' minus its 0.0625 in width') + ', then feed X across the face to ' + fmt(Math.min(dR, dL)) + '. Retract before moving Z.' + lenNote;
         } else {
           it.status = 'under';
-          it.hint = 'The step is ' + inch(Math.abs(err)) + ' too far ' + (err > 0 ? 'back' : 'forward') + '. That metal is gone: undo back before that cut, or start new stock.';
+          it.hint = 'Part of the shoulder was cut beyond its allowed plane. That metal is gone: undo before that cut, rough-turn short of the shoulder, then face the remaining allowance.';
         }
       }
       add(it);
@@ -22271,7 +22407,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (inside && none) {
       it.made = mx < 0.01 ? 'No hole' : 'Does not run the full length';
       it.status = 'missing';
-      it.hint = mx < 0.01 ? 'Center drill, drill, then bore it to size.' : 'Drill and bore the hole deeper.';
+      it.hint = mx < 0.01 ? 'Drill a pilot hole, then bore it to size. On a real machine, use the starting method recommended for that drill.' : 'Drill and bore the hole deeper.';
       return;
     }
     it.made = Math.abs(mx - mn) < 0.0006 ? dia(mx) : dia(mn) + ' to ' + fmt(mx);
@@ -22306,7 +22442,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
     var cover = tagged / cols.length;
     var crestLo = sg.crest[0], crestHi = sg.crest[1], rootLo = sg.root[0], rootHi = sg.root[1];
-    if (inside && rootv < 0.01) { it.made = 'No hole'; it.status = 'missing'; it.hint = 'Center drill, then drill to the thread\'s inside size, ' + dia(sg.crest[0]) + ' to ' + fmt(sg.crest[1]) + '.'; return; }
+    if (inside && rootv < 0.01) { it.made = 'No hole'; it.status = 'missing'; it.hint = 'Drill to the thread\'s inside size, ' + dia(sg.crest[0]) + ' to ' + fmt(sg.crest[1]) + ', using the starting method recommended for the drill.'; return; }
     if (!tagged) {
       it.made = 'Not threaded' + (inside ? ', hole ' + dia(crest) : ', ' + dia(crest));
       it.status = 'missing';
@@ -22538,13 +22674,13 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   return {
     COL: COL, STEP: STEP, WINDOW: WINDOW, SLACK: SLACK, play: play,
     TOOLS: TOOLS, TOOL_ORDER: TOOL_ORDER, DRILLS: DRILLS, PITCHES: PITCHES, TARGETS: TARGETS,
-    target: target, minBore: minBore, drillSize: drillSize,
+    target: target, minBore: minBore, drillSize: drillSize, hasThreads: hasThreads, knurlContact: knurlContact,
     create: create, snapshot: snapshot, restore: restore, position: position, limits: limits,
     parkFor: parkFor, jawTop: jawTop, JAW_LEN: JAW_LEN, JAW_UP: JAW_UP, BODY_UP: BODY_UP,
     selectTool: selectTool, setSpindle: setSpindle, setDrill: setDrill, setPitch: setPitch,
     move: move, threadPass: threadPass, explain: explain,
     profileAt: profileAt, compare: compare, measureAt: measureAt, evaluate: evaluate,
-    frontZ: frontZ, has: has, zc: zc, colAt: colAt, envOut: envOut, envIn: envIn,
+    frontZ: frontZ, has: has, zc: zc, colAt: colAt, envOut: envOut, envIn: envIn, outerEnvelope: outerEnvelope, innerEnvelope: innerEnvelope, shoulderFace: shoulderFace,
     fmt: fmt, fmtSigned: fmtSigned, inch: inch, dia: dia, round: round, MINUS: MINUS
   };
 });
@@ -22587,8 +22723,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   }
 
   /* ---- the view's frame ----------------------------------------------------*/
-  function frame(T) {
+  function frame(T, toolId) {
     var R = T.stock.dia / 2;
+    if (toolId === 'knurl') { return box(T.stock.zJaw - 0.62, 0.85, -(R + 0.85), R + 0.85, R); }
     return box(T.stock.zJaw - 0.62, 0.85, -(R + 0.34), R + 0.74, R);
   }
   function box(zMin, zMax, rMin, rMax, R) {
@@ -22614,12 +22751,32 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   /* The outer radius as drawn in section: a knurl's teeth shown as a sawtooth
      between root and crest, at the knurl's pitch. */
   function topR(p, i) {
+    if (p.thO[i]) { return M.envOut(p, i); }
     if (p.kB[i] > 0) {
       var pk = M.TOOLS.knurl.pitch, root = p.kB[i] - p.kP[i], full = p.kB[i] + p.kP[i];
       var f = ((M.zc(p, i) / pk) % 1 + 1) % 1;
       return Math.min(p.ro[i], root + (full - root) * (1 - Math.abs(2 * f - 1)));
     }
     return p.ro[i];
+  }
+  function insideProfile(p, i) { return p.thI[i] ? M.envIn(p, i) : p.ri[i]; }
+  /* A threaded solid is not axisymmetric. The section therefore shows an
+     explicitly schematic crest/root envelope, not two mirrored notch trains
+     pretending to be opposite intersections of a single-start helix. */
+  function threadRoots(p, f, a, b, inside) {
+    var tags = inside ? p.thI : p.thO, radii = inside ? p.ri : p.ro;
+    var roots = [], crests = [];
+    for (var i = a; i <= b; i++) {
+      var w = Math.ceil((tags[i] > 0 ? tags[i] : 1 / 16) / (2 * COL)) + 1;
+      var root = radii[i];
+      for (var k = Math.max(a, i - w); k <= Math.min(b, i + w); k++) { root = inside ? Math.max(root, radii[k]) : Math.min(root, radii[k]); }
+      root = inside ? Math.min(root, M.outerEnvelope(p, i)) : Math.max(root, M.innerEnvelope(p, i));
+      roots.push([M.zc(p, i), root]);
+      crests.push([M.zc(p, i), inside ? M.envIn(p, i) : M.envOut(p, i)]);
+    }
+    var d = 'M' + line(f, simplify(roots));
+    var band = 'M' + line(f, simplify(roots)) + 'L' + line(f, simplify(crests).reverse()) + 'Z';
+    return { line: d + flipY(d, f), band: band + flipY(band, f) };
   }
   /* Points along a run, flat stretches as two column edges, slopes as centres. */
   function pts(p, a, b, fn) {
@@ -22675,25 +22832,25 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   /* Paths for the work in one view. Every key is always present, empty when the
      view does not draw it, so a live picture can update the same elements. */
   function workPaths(p, f, view) {
-    var sec = [], ext = [], edges = [], threads = [], knurls = [], bore = [], hidden = [];
+    var sec = [], ext = [], edges = [], threads = [], roots = [], envelopes = [], knurls = [], bore = [], hidden = [];
     var normal = viewOf(view) === 'normal';
     runs(p).forEach(function (rn) {
       var a = rn[0], b = rn[1], zA = p.zL + a * COL, zB = p.zL + (b + 1) * COL;
       var top = simplify(pts(p, a, b, function (i) { return topR(p, i); }));
-      var bot = simplify(pts(p, a, b, function (i) { return p.ri[i]; })).reverse();
+      var bot = simplify(pts(p, a, b, function (i) { return insideProfile(p, i); })).reverse();
       var hasHole = false;
       for (var hk = a; hk <= b; hk++) { if (p.ri[hk] > 0.0005) { hasHole = true; break; } }
-      if (hasHole) { var bl = simplify(pts(p, a, b, function (i) { return p.ri[i]; })); bore.push('M' + f.x(zA) + ' ' + f.y(0) + 'L' + line(f, bl) + 'L' + f.x(zB) + ' ' + f.y(0) + 'Z'); }
+      if (hasHole) { var bl = simplify(pts(p, a, b, function (i) { return insideProfile(p, i); })); bore.push('M' + f.x(zA) + ' ' + f.y(0) + 'L' + line(f, bl) + 'L' + f.x(zB) + ' ' + f.y(0) + 'Z'); }
       // Seen from outside, a hole is its wall drawn as a hidden line.
       var h0 = -1;
       for (var hc = a; hc <= b + 1; hc++) {
         var open = hc <= b && p.ri[hc] > 0.0005;
         if (open && h0 < 0) { h0 = hc; }
-        if (!open && h0 >= 0) { hidden.push('M' + line(f, simplify(pts(p, h0, hc - 1, function (i) { return p.ri[i]; })))); h0 = -1; }
+        if (!open && h0 >= 0) { hidden.push('M' + line(f, simplify(pts(p, h0, hc - 1, function (i) { return insideProfile(p, i); })))); h0 = -1; }
       }
-      sec.push('M' + f.x(zA) + ' ' + f.y(p.ri[a]) + 'L' + f.x(zA) + ' ' + f.y(top[0][1]) + 'L' + line(f, top) +
+      sec.push('M' + f.x(zA) + ' ' + f.y(insideProfile(p, a)) + 'L' + f.x(zA) + ' ' + f.y(top[0][1]) + 'L' + line(f, top) +
         'L' + f.x(zB) + ' ' + f.y(top[top.length - 1][1]) + 'L' + f.x(zB) + ' ' + f.y(bot[0][1]) + 'L' + line(f, bot) + 'Z');
-      var outer = simplify(pts(p, a, b, function (i) { return p.ro[i]; }));
+      var outer = simplify(pts(p, a, b, function (i) { return p.thO[i] ? M.envOut(p, i) : p.ro[i]; }));
       ext.push('M' + f.x(zA) + ' ' + f.y(0) + 'L' + f.x(zA) + ' ' + f.y(-outer[0][1]) + 'L' + line(f, outer, -1) +
         'L' + f.x(zB) + ' ' + f.y(-outer[outer.length - 1][1]) + 'L' + f.x(zB) + ' ' + f.y(0) + 'Z');
       // Edges seen on the outside: steps, and corners where the slope changes.
@@ -22713,7 +22870,13 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       for (var k = a; k <= b + 1; k++) {
         var tagged = k <= b && p.thO[k] !== 0;
         if (tagged && i0 < 0) { i0 = k; }
-        if (!tagged && i0 >= 0) { threads.push(threadLines(p, f, i0, k - 1)); i0 = -1; }
+        if (!tagged && i0 >= 0) { threads.push(threadLines(p, f, i0, k - 1)); var tr = threadRoots(p, f, i0, k - 1, false); roots.push(tr.line); envelopes.push(tr.band); i0 = -1; }
+      }
+      i0 = -1;
+      for (k = a; k <= b + 1; k++) {
+        var insideThread = k <= b && p.thI[k] !== 0;
+        if (insideThread && i0 < 0) { i0 = k; }
+        if (!insideThread && i0 >= 0) { var ti = threadRoots(p, f, i0, k - 1, true); roots.push(ti.line); envelopes.push(ti.band); i0 = -1; }
       }
       i0 = -1;
       for (k = a; k <= b + 1; k++) {
@@ -22724,10 +22887,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
     var w = { sec: sec.join(''), ext: ext.join(''), bore: bore.join(''), edges: edges.join(''), knurl: knurls.join(''), hidden: hidden.join('') };
     if (normal) {
-      return { sec: '', bore: '', ext: w.ext + flipY(w.ext, f), edges: w.edges + flipY(w.edges, f), threads: threads.join(''),
+      return { sec: '', bore: '', threadEnvelope: '', ext: w.ext + flipY(w.ext, f), edges: w.edges + flipY(w.edges, f), threads: threads.join(''),
         knurl: w.knurl + flipY(w.knurl, f), hidden: w.hidden + flipY(w.hidden, f) };
     }
-    return { sec: w.sec + flipY(w.sec, f), bore: w.bore + flipY(w.bore, f), ext: '', edges: '', threads: '', knurl: '', hidden: '' };
+    return { sec: w.sec + flipY(w.sec, f), bore: w.bore + flipY(w.bore, f), threadEnvelope: envelopes.join(''), ext: '', edges: '', threads: roots.join(''), knurl: '', hidden: '' };
   }
   /* A thread seen from outside: one crest line per pitch, leaning half a pitch
      across the whole diameter. */
@@ -22858,20 +23021,46 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   }
   function poly(list, close) { return 'M' + list.map(function (q) { return lp(q[0], q[1]); }).join('L') + (close ? 'Z' : ''); }
 
-  var INSERT_TOP = { turn: 0.20, chamfer: 0.15, groove: 0.70, thread: 0.06, knurl: 0.25 };
+  var INSERT_TOP = { turn: 0.20, face: 0.75, chamfer: 0.15, groove: 0.70, thread: 0.06, knurl: 0.25 };
+
+  function knurlHead(hand, mirrored) {
+    var t = M.TOOLS.knurl, edge = sample(t.edge, t.cut.from, t.cut.to, [0]);
+    var wheel = edge.concat(edge.slice().reverse().map(function (p) { return [p[0], 0.60 - p[1]]; }));
+    var out = '<g class="ts-knurl-wheel" data-hand="' + (hand > 0 ? 'right' : 'left') + '">';
+    out += '<path class="ts-tool-body" d="' + poly([[-.3,.25],[-.3,.75],[.3,.75],[.3,.25],[.2,.25],[.2,.62],[-.2,.62],[-.2,.25]], true) + '"/>';
+    out += '<path class="ts-tool-wheel" d="' + poly(wheel, true) + '"/>';
+    var width = (2 * t.wheelHalf - 2 * t.wheelChamfer) * S, period = t.pitch * S, teeth = '';
+    // Mirroring the lower carrier must not mirror the physical tooth hand.
+    var projectedHand = mirrored ? -hand : hand;
+    for (var y = -width; y <= .56 * S + width; y += period) { teeth += 'M0 ' + r1(y) + 'L' + r1(width) + ' ' + r1(y + projectedHand * width * .58); }
+    out += '<svg class="ts-knurl-barrel" x="' + r1((-t.wheelHalf + t.wheelChamfer) * S) + '" y="' + r1(-.58 * S) + '" width="' + r1(width) + '" height="' + r1(.56 * S) + '" overflow="hidden" aria-hidden="true">' +
+      '<path class="ts-tool-knurl ts-knurl-teeth" style="--ts-knurl-period:' + r1(period) + 'px" d="' + teeth + '"/></svg>';
+    [-1, 1].forEach(function (sign) { out += '<ellipse class="ts-tool-wheel-end" cx="' + r1(sign * .171 * S) + '" cy="' + r1(-.3 * S) + '" rx="' + r1(.016 * S) + '" ry="' + r1(.28 * S) + '"/>'; });
+    out += '<path class="ts-tool-axle" d="M' + lp(-.28, .3) + 'L' + lp(.28, .3) + '"/>';
+    out += '<path class="ts-tool-edge is-forming" d="' + poly(edge, false) + '"/></g>';
+    return out;
+  }
 
   function toolShape(toolId, opt) {
     var t = M.TOOLS[toolId], o = opt || {};
     var out = '';
-    if (t.side === 'out') {
+    if (toolId === 'knurl') {
+      out += knurlHead(1);
+      out += '<g data-ts-knurl-lower transform="translate(0 ' + r1((o.gap == null ? 1 : o.gap) * S) + ') scale(1 -1)">' + knurlHead(-1, true) + '</g>';
+    } else if (t.side === 'out') {
       var br = [t.cut.from, t.cut.to, 0];
       var edge = sample(t.edge, t.span[0], t.span[1], br);
-      var body = [[edge[0][0], TOP]].concat(edge, [[edge[edge.length - 1][0], TOP]]);
+      var bodyTop = toolId === 'chamfer' ? 0.85 : TOP;
+      var body = [[edge[0][0], bodyTop]].concat(edge, [[edge[edge.length - 1][0], bodyTop]]);
       out += '<path class="ts-tool-body" d="' + poly(body, true) + '"/>';
       var top = INSERT_TOP[toolId];
       var ins = sample(t.edge, t.cut.from, t.cut.to, [0]);
       var insert = [[ins[0][0], top]].concat(ins, [[ins[ins.length - 1][0], top]]);
       out += '<path class="ts-tool-insert' + (toolId === 'knurl' ? ' ts-tool-wheel' : '') + '" d="' + poly(insert, true) + '"/>';
+      if (toolId === 'chamfer') {
+        out += '<circle class="ts-tool-fastener" cx="0" cy="' + r1(-.32 * S) + '" r="' + r1(.035 * S) + '"/>';
+        out += '<text class="ts-tool-label" x="0" y="' + r1(-.48 * S) + '" text-anchor="middle">90° form</text>';
+      }
       if (toolId === 'knurl') {
         var kl = '';
         for (var z = -0.18; z <= 0.18; z += 0.06) { kl += 'M' + lp(z - 0.04, 0.22) + 'L' + lp(z + 0.04, 0.02) + 'M' + lp(z + 0.04, 0.22) + 'L' + lp(z - 0.04, 0.02); }
@@ -22913,9 +23102,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   function toolIcon(toolId) {
     var t = M.TOOLS[toolId], b;
     if (t.side === 'out') {
-      var ext = toolId === 'turn' ? [-0.06, 0.62] : toolId === 'groove' ? [-0.35, 0.33] : toolId === 'thread' ? [-0.3, 0.38] : [-0.34, 0.34];
-      var up = toolId === 'groove' ? 0.75 : 0.52;
+      var ext = toolId === 'turn' ? [-0.06, 0.62] : toolId === 'face' ? [-0.10, 0.35] : toolId === 'groove' ? [-0.35, 0.33] : toolId === 'thread' ? [-0.3, 0.38] : [-0.34, 0.34];
+      var up = toolId === 'groove' || toolId === 'face' ? 0.80 : 0.52;
       b = [ext[0], -up, ext[1] - ext[0], up + 0.08];
+      if (toolId === 'knurl') { b = [-.32, -.62, .64, 1.44]; }
     } else if (t.side === 'in') {
       b = [-0.1, -0.12, 0.95, 0.62];
     } else {
@@ -22923,7 +23113,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     }
     var vb = [b[0] * S, b[1] * S, b[2] * S, b[3] * S].map(r1).join(' ');
     return '<svg class="ts-icon" viewBox="' + vb + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">' +
-      toolShape(toolId, { drill: 0.5 }).replace(/<g class="ts-ref">[\s\S]*?<\/g>/, '') + '</svg>';
+      toolShape(toolId, { drill: 0.5, gap: 0.2 }).replace(/<g class="ts-ref">[\s\S]*?<\/g>/, '') + '</svg>';
   }
 
   /* ---- the chuck -----------------------------------------------------------------*/
@@ -22936,9 +23126,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     // the end of the bar held in the jaws, in the same view as the rest of the work
     out += '<rect class="' + (viewOf(view) === 'normal' ? 'ts-ext' : 'ts-sec" fill="' + hatch) + '" x="' + f.x(zj0) + '" y="' + f.y(R) + '" width="' + r1(M.JAW_LEN * S) + '" height="' + r1(2 * R * S) + '"/>';
     var cx = f.x(zJ - M.JAW_LEN / 2), cy = r1((f.y(R + M.JAW_UP)) / 2);
-    // placed by the outer group, turned by the inner one: a CSS rotation replaces an SVG transform
-    out += '<g transform="translate(' + cx + ' ' + cy + ')"><g class="ts-spin"><path class="ts-spin-arc" d="M-14 -6A15 15 0 1 1 -6 14"/><path class="ts-spin-head" d="M-11 17L-4 14L-8 8"/></g></g>';
-    out += '<text class="ts-lbl" x="' + r1(cx + 22) + '" y="' + cy + '" dy="5">Chuck</text>';
+    // A separate axial end view: seen from the tailstock toward the chuck.
+    // The CCW arrow tangent and its negative screen rotation agree. The
+    // invisible guide gives the rotating group's bounding box an exact center.
+    out += '<g class="ts-chuck-end" role="img" aria-label="Chuck end view from the tailstock: counterclockwise forward rotation" transform="translate(' + cx + ' ' + cy + ')">' +
+      '<circle class="ts-spin-ring" r="21"/><g class="ts-spin"><circle class="ts-spin-guide" r="20"/>' +
+      '<path class="ts-spin-arc" d="M14 0A14 14 0 1 0 0 14"/><path class="ts-spin-head" d="M-5 9L1 14L-5 19"/></g></g>';
+    out += '<text class="ts-lbl" x="' + r1(cx + 27) + '" y="' + r1(cy - 2) + '">Chuck end</text>';
+    out += '<text class="ts-spin-view" x="' + r1(cx + 27) + '" y="' + r1(cy + 12) + '">from tailstock</text>';
     return out;
   }
 
@@ -22956,13 +23151,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
      tool inside it seen from outside, which the work hides. */
   function scene(st, opts) {
     var o = opts || {}, id = o.idPrefix || 'ts', view = viewOf(o.view);
-    var T = M.target(st.targetId), f = frame(T);
+    var T = M.target(st.targetId), f = frame(T, st.tool);
     var w = workPaths(st.work, f, view), g = ghostPaths(T, f, view), c = comparePaths(st, f, view);
     var t = M.TOOLS[st.tool];
     var hatch = 'url(#' + id + '-hatch)';
     var tx = f.x(st.tz), ty = f.y(st.tr);
     var label = o.label || ('The work in the lathe, ' + VIEW_SAYS[view] + ', with the ' + t.name.toLowerCase() + ' at X ' + M.fmt(st.tr * 2) + ', Z ' + M.fmt(st.tz) + '.');
-    var tool = '<g class="ts-tool" data-ts="tool" transform="translate(' + tx + ' ' + ty + ')">' + toolShape(st.tool, { drill: M.drillSize(st) }) + '</g>';
+    if (M.hasThreads(st.work) && view === 'section') { label += ' Threads are schematic crest and root envelopes, not a helical section.'; }
+    var tool = '<g class="ts-tool" data-ts="tool" transform="translate(' + tx + ' ' + ty + ')">' + toolShape(st.tool, { drill: M.drillSize(st), gap: 2 * st.tr }) + '</g>';
     var behind = view === 'normal' && t.side !== 'out';
     return '<svg class="ts-view is-' + view + '" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(label) + '" focusable="false">' +
       defs(id) +
@@ -22972,6 +23168,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       (behind ? tool : '') +
       '<path class="ts-bore" data-ts="bore" d="' + w.bore + '"/>' +
       '<path class="ts-sec" data-ts="sec" fill="' + hatch + '" d="' + w.sec + '"/>' +
+      '<path class="ts-thread-envelope" data-ts="thread-envelope" d="' + w.threadEnvelope + '"/>' +
       '<path class="ts-ext" data-ts="ext" d="' + w.ext + '"/>' +
       '<path class="ts-hidden" data-ts="hidden" d="' + w.hidden + '"/>' +
       '<path class="ts-edge" data-ts="edges" d="' + w.edges + '"/>' +
@@ -23139,8 +23336,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (a < 0) { return ''; }
     var zA = piece.zL + a * COL, zB = piece.zL + (b + 1) * COL, m = 0.06;
     var f = box(zA - m, zB + m, -R - m, R + m, R), w = workPaths(piece, f, view);
-    return '<svg class="ts-part-svg" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(o.label || 'The part as it came off the lathe, ' + VIEW_SAYS[view] + '.') + '" focusable="false">' +
+    var label = o.label || 'The part as it came off the lathe, ' + VIEW_SAYS[view] + '.';
+    if (view === 'section' && M.hasThreads(piece)) { label += ' Thread bands are schematic crest/root envelopes.'; }
+    return '<svg class="ts-part-svg is-' + view + '" viewBox="0 0 ' + f.W + ' ' + f.H + '" role="img" aria-label="' + esc(label) + '" focusable="false">' +
       defs(id) + '<path class="ts-bore" d="' + w.bore + '"/><path class="ts-sec" fill="url(#' + id + '-hatch)" d="' + w.sec + '"/>' +
+      '<path class="ts-thread-envelope" d="' + w.threadEnvelope + '"/>' +
       '<path class="ts-ext" d="' + w.ext + '"/><path class="ts-hidden" d="' + w.hidden + '"/><path class="ts-edge" d="' + w.edges + '"/><path class="ts-thread" d="' + w.threads + '"/>' +
       '<path class="ts-knurl" d="' + w.knurl + '"/><path class="ts-axis" d="M0 ' + f.y(0) + 'H' + f.W + '"/></svg>';
   }
@@ -23151,9 +23351,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   var SCENES = {
     'pin-turning': {
       target: 'stepped-pin',
-      label: 'The stepped pin part-way through: the end faced, the body turned in two passes, and the turning tool halfway along the first pass on the pin. The dashed outline is the drawing; the tinted metal is still to come off.',
-      ops: [['sp', true], ['mv', 0, 1.4], ['x', 0], ['x', 1.4], ['mv', 0.1, 0.880], ['z', -1.25], ['x', 1.1], ['z', 0.1],
-        ['x', 0.750], ['z', -1.25], ['x', 1.1], ['z', 0.1], ['x', 0.620], ['z', -0.30]]
+      label: 'The stepped pin part-way through: the end faced with the facing blade, the body turned short of its shoulder, and the roughing tool halfway along the first pin pass. The angled shoulder allowance still needs radial facing. The dashed outline is the drawing; the tinted metal is still to come off.',
+      ops: [['tool', 'face'], ['sp', true], ['mv', 0, 1.4], ['x', 0], ['x', 1.4], ['sp', false], ['tool', 'turn'], ['sp', true],
+        ['mv', 0.1, 0.880], ['z', -1.21], ['x', 1.1], ['z', 0.1], ['x', 0.750], ['z', -1.21], ['x', 1.1], ['z', 0.1], ['x', 0.620], ['z', -0.30]]
     }
   };
   function sceneState(name) {
@@ -23209,8 +23409,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   var STEPS = [0.100, 0.010, 0.001];
   var SPEED = { feed: 0.7, rapid: 2.6, thread: 1.1 };   // in per second, for the picture only
   var reduceMotion = (typeof window !== 'undefined' && window.matchMedia) ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
-  var SHORT = { turn: 'Turn', chamfer: 'Chamfer', groove: 'Groove / part', thread: 'Thread', knurl: 'Knurl', bore: 'Bore',
+  var SHORT = { turn: 'Turn / face', face: 'Face', chamfer: 'Chamfer', groove: 'Groove / part', thread: 'Thread', knurl: 'Knurl', bore: 'Bore',
     ithread: 'Thread inside', center: 'Center drill', drill: 'Drill', csink: 'Counter\u00adsink' };
+  var RACK_ORDER = M.TOOL_ORDER.filter(function (t) { return t !== 'face'; });
 
   function $(root, sel) { return root.querySelector(sel); }
   function $$(root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
@@ -23241,7 +23442,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
      sit outside the bench. */
   function markup(id) {
     var tools = function (mount) {
-      return M.TOOL_ORDER.filter(function (t) { return M.TOOLS[t].mount === mount; }).map(function (t) {
+      return RACK_ORDER.filter(function (t) { return M.TOOLS[t].mount === mount; }).map(function (t) {
         return '<button type="button" class="ts-toolbtn" data-ts-tool="' + t + '" aria-pressed="false">' + R.toolIcon(t) +
           '<span>' + esc(SHORT[t]) + '</span></button>';
       }).join('');
@@ -23270,7 +23471,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         '<div class="ts-workbench" data-ts-bench>' +
           '<div class="ts-machine">' +
             '<div class="ts-dro" aria-hidden="true">' +
-              '<span class="ts-dro-v"><span class="ts-k">X&nbsp;Ø</span><b data-ts-x></b></span>' +
+              '<span class="ts-dro-v"><span class="ts-k" data-ts-xlabel>X&nbsp;Ø</span><b data-ts-x></b></span>' +
               '<span class="ts-dro-v"><span class="ts-k">Z</span><b data-ts-z></b></span>' +
               '<span class="ts-dro-tool" data-ts-dro-tool></span>' +
               '<span class="ts-dro-spin" data-ts-dro-spin></span>' +
@@ -23282,6 +23483,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
                 '<button type="button" data-ts-view="normal" aria-pressed="false">Normal</button>' +
               '</div>' +
               '<button type="button" class="ts-zoom" data-ts-act="zoom" aria-pressed="false">Close up</button>' +
+              '<span class="ts-thread-note" data-ts-thread-note hidden>Thread envelope<br>(schematic)</span>' +
             '</div>' +
             '<div class="ts-feedback" data-ts-feedback>' +
               '<div class="ts-fb-act">' +
@@ -23325,6 +23527,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
             '<div class="ts-tool-group ts-tool-post" role="group" aria-labelledby="' + id + '-post"><span class="ts-k2" id="' + id + '-post">Tool post</span><div class="ts-tool-row">' + tools('post') + '</div></div>' +
             '<div class="ts-tool-group ts-tool-tail" role="group" aria-labelledby="' + id + '-tail"><span class="ts-k2" id="' + id + '-tail">Tailstock</span><div class="ts-tool-row">' + tools('tailstock') + '</div></div>' +
             '<div class="ts-tool-opt" data-ts-opts>' +
+              '<label data-ts-turning-wrap><span class="ts-k2">Cutting tool</span><select data-ts-turning><option value="turn">Turn: 10° lead</option><option value="face">Face: radial</option></select></label>' +
               '<label data-ts-drill-wrap><span class="ts-k2">Drill size</span><select data-ts-drill>' + M.DRILLS.map(function (d) { return '<option value="' + d.id + '">' + esc(d.label) + '</option>'; }).join('') + '</select></label>' +
               '<label data-ts-tpi-wrap><span class="ts-k2">Threads per inch</span><select data-ts-tpi>' + M.PITCHES.map(function (p) { return '<option value="' + p + '">' + p + '</option>'; }).join('') + '</select></label>' +
             '</div>' +
@@ -23380,9 +23583,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     var el = {
       drawing: $(lab, '[data-ts-drawing]'), goal: $(lab, '[data-ts-goal]'),
       bench: $(lab, '[data-ts-bench]'), viewBox: $(lab, '[data-ts-viewbox]'), wrap: $(lab, '[data-ts-viewwrap]'), zoom: $(lab, '[data-ts-act="zoom"]'),
-      x: $(lab, '[data-ts-x]'), z: $(lab, '[data-ts-z]'), droTool: $(lab, '[data-ts-dro-tool]'), droSpin: $(lab, '[data-ts-dro-spin]'),
+      x: $(lab, '[data-ts-x]'), xLabel: $(lab, '[data-ts-xlabel]'), z: $(lab, '[data-ts-z]'), droTool: $(lab, '[data-ts-dro-tool]'), droSpin: $(lab, '[data-ts-dro-spin]'), threadNote: $(lab, '[data-ts-thread-note]'),
       toolName: $(lab, '[data-ts-toolname]'), does: $(lab, '[data-ts-does]'), cannot: $(lab, '[data-ts-cannot]'),
       drill: $(lab, '[data-ts-drill]'), drillWrap: $(lab, '[data-ts-drill-wrap]'), tpi: $(lab, '[data-ts-tpi]'), tpiWrap: $(lab, '[data-ts-tpi-wrap]'),
+      turning: $(lab, '[data-ts-turning]'), turningWrap: $(lab, '[data-ts-turning-wrap]'),
       spindle: $(lab, '[data-ts-act="spindle"]'), feedback: $(lab, '[data-ts-feedback]'), msg: $(lab, '[data-ts-msg]'),
       undo: $(lab, '[data-ts-act="undo"]'), more: $(lab, '[data-ts-act="more"]'),
       inZ: $(lab, '[data-ts-in="z"]'), inX: $(lab, '[data-ts-in="x"]'), inStop: $(lab, '[data-ts-in="stop"]'),
@@ -23421,6 +23625,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       }
     }
     function buildView() {
+      f = R.frame(T, st.tool);
       el.wrap.innerHTML = R.scene(st, { idPrefix: id + '-v', ghost: opt.ghost, tint: opt.ghost, view: opt.view });
       win = null;
       view = $(el.wrap, 'svg');
@@ -23432,9 +23637,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       fit();
     }
     function toolShape() {
-      // From outside, a tool that works inside the part is drawn behind it: a new scene.
-      if (opt.view === 'normal') { buildView(); return; }
-      P.tool.innerHTML = R.toolShape(st.tool, { drill: M.drillSize(st) }) + '<rect class="ts-handle" x="-46" y="-46" width="92" height="92"/>';
+      // A paired knurl needs room on both sides of the work; internal tools
+      // change their depth ordering outside. Rebuild only when a tool changes.
+      buildView();
     }
     function setView(v) {
       if (busy || v === opt.view) { return; }
@@ -23450,19 +23655,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       var work = piece || st.work;
       var w = R.workPaths(work, f, opt.view);
       P.sec.setAttribute('d', w.sec); P.ext.setAttribute('d', w.ext); P.bore.setAttribute('d', w.bore); P.hidden.setAttribute('d', w.hidden);
+      P['thread-envelope'].setAttribute('d', w.threadEnvelope);
       P.edges.setAttribute('d', w.edges); P.threads.setAttribute('d', w.threads); P.knurl.setAttribute('d', w.knurl);
       if (opt.ghost) {
         var c = R.comparePaths({ targetId: st.targetId, work: work }, f, opt.view);
         P.excess.setAttribute('d', c.excess); P['excess-bottom'].setAttribute('d', c.excessBottom); P.under.setAttribute('d', c.under);
       }
       P.tool.setAttribute('transform', 'translate(' + f.x(st.tz) + ' ' + f.y(st.tr) + ')');
+      var lowerWheel = $(P.tool, '[data-ts-knurl-lower]');
+      if (lowerWheel) { lowerWheel.setAttribute('transform', 'translate(0 ' + (2 * st.tr * R.S) + ') scale(1 -1)'); }
       var pos = M.position(st), t = M.TOOLS[st.tool];
       el.x.textContent = t.side === 'axial' ? 'center' : M.fmt(pos.x);
       el.z.textContent = M.fmt(pos.z);
       el.droTool.textContent = t.name + (st.tool === 'drill' ? ' ' + M.fmt(M.drillSize(st)) : '') + (t.action === 'thread' ? ', ' + st.tpi + ' per inch' : '');
       el.droSpin.innerHTML = '<span class="ts-dro-word">Spindle </span>' + (st.spindle ? 'running' : 'stopped');
       lab.classList.toggle('is-running', st.spindle);
-      view.setAttribute('aria-label', 'The work in the lathe, ' + VIEW_WORDS[opt.view] + '. ' + t.name + ' at ' + (t.side === 'axial' ? 'the centerline' : 'X ' + M.fmt(pos.x)) + ', Z ' + M.fmt(pos.z) + '. Spindle ' + (st.spindle ? 'running' : 'stopped') + '.' + (st.part ? ' A part has been cut off.' : ''));
+      lab.classList.toggle('is-knurling', st.spindle && M.knurlContact(st));
+      el.threadNote.hidden = opt.view !== 'section' || !M.hasThreads(work);
+      view.setAttribute('aria-label', 'The work in the lathe, ' + VIEW_WORDS[opt.view] + '. ' + t.name + ' at ' + (t.side === 'axial' ? 'the centerline' : (st.tool === 'knurl' ? 'wheel gap ' : 'X ') + M.fmt(pos.x)) + ', Z ' + M.fmt(pos.z) + '. Spindle ' + (st.spindle ? 'running' : 'stopped') + '.' + (el.threadNote.hidden ? '' : ' Threads are schematic crest and root envelopes, not a helical section.') + (st.part ? ' A part has been cut off.' : ''));
       applyZoom();
     }
     function later() { if (dirty) { return; } dirty = true; requestAnimationFrame(function () { dirty = false; draw(); }); }
@@ -23475,6 +23685,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       var bar = document.querySelector('.appbar'), top = bar ? Math.max(0, bar.getBoundingClientRect().bottom) : 0;
       var nav = document.querySelector('.seqbar'), nr = nav && nav.getBoundingClientRect();
       var bottom = nr && nr.height ? Math.min(window.innerHeight, nr.top) : window.innerHeight;
+      var exit = document.querySelector('.present-exit'), er = exit && exit.getBoundingClientRect();
+      var br = el.bench.getBoundingClientRect();
+      if (er && er.height && er.left < br.right && er.right > br.left) { bottom = Math.min(bottom, er.top); }
       return { top: top + 6, bottom: bottom - 6 };
     }
     /* Where it can without shrinking the picture below half its width-limited size,
@@ -23485,13 +23698,18 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       if (!view || fitting) { return; }
       fitting = true;
       var room = screenRoom(), h = room.bottom - room.top;
+      var top = el.bench.getBoundingClientRect().top;
+      // Once the controls are on screen, a taller tool picture uses the space
+      // below their current top instead of moving the page under the hands.
+      var anchored = top >= room.top - 1 && top < room.bottom;
+      if (anchored) { h -= Math.max(0, top - room.top); }
       el.viewBox.style.removeProperty('--ts-view-w');
       var b = el.bench.getBoundingClientRect();
       if (b.height > 0) {
         var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
         var v0 = el.wrap.getBoundingClientRect().height, v = v0;
         var card = lab.closest('.xcard');
-        var lead = card ? b.top - card.getBoundingClientRect().top - (el.drawing.hidden ? 0 : el.drawing.getBoundingClientRect().height) + 10 : 0;
+        var lead = !anchored && card ? b.top - card.getBoundingClientRect().top - (el.drawing.hidden ? 0 : el.drawing.getBoundingClientRect().height) + 10 : 0;
         if (b.height > h - lead) { v = v0 - (b.height - (h - lead)); }
         if (v < Math.max(12 * rem, v0 / 2)) { v = b.height > h ? Math.max(7.5 * rem, v0 - (b.height - h)) : v0; }
         if (v < v0 - 0.5) { el.viewBox.style.setProperty('--ts-view-w', Math.floor(v * f.W / f.H) + 'px'); }
@@ -23499,15 +23717,13 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       }
       fitting = false;
     }
-    /* After a control is used, bring the whole bench on screen, with the part
-       buttons above it when they fit too. Never while a pointer is down on a
-       control: moving it then would swallow the click. */
+    /* On entering the operating workspace, anchor its top below the app bar.
+       Tool changes can then use the whole available height without shifting
+       the page. Never move it while a pointer is down on a control. */
     function keepBenchVisible() {
       var room = screenRoom(), h = room.bottom - room.top, b = el.bench.getBoundingClientRect();
-      if (!b.height || b.height > h + 1 || (b.top >= room.top - 1 && b.bottom <= room.bottom + 1)) { return; }
-      var head = $(lab, '.ts-head').getBoundingClientRect();
-      var from = b.bottom - head.top <= h ? head.top : b.top;
-      window.scrollBy({ top: from - room.top, behavior: 'instant' });
+      if (!b.height || b.height > h + 1 || Math.abs(b.top - room.top) <= 1) { return; }
+      window.scrollBy({ top: b.top - room.top, behavior: 'instant' });
     }
     var win = null;          // the close-up window, [x0, y0, w, h]
     function applyZoom(recenter) {
@@ -23612,7 +23828,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     /* ---- tools and spindle --------------------------------------------------------------*/
     function toolUI() {
       var t = M.TOOLS[st.tool];
-      $$(lab, '[data-ts-tool]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ts-tool') === st.tool)); });
+      var knurl = st.tool === 'knurl';
+      lab.classList.toggle('is-knurl-tool', knurl);
+      el.xLabel.textContent = knurl ? 'Gap Ø' : 'X Ø';
+      $(el.xRow, 'label').textContent = knurl ? 'Gap Ø' : 'X Ø';
+      $(el.xRow, 'button').textContent = knurl ? 'Set gap' : 'Feed to X';
+      [['x+', '▲', 'X+', 'away from center', 'open wheels'], ['x-', '▼', 'X−', 'toward center', 'close wheels']].forEach(function (d) {
+        var b = $(lab, '[data-ts-jog="' + d[0] + '"]');
+        $(b, '.ts-jog-ax').innerHTML = '<span aria-hidden="true">' + d[1] + '</span> ' + (knurl ? d[0] === 'x+' ? 'Gap+' : 'Gap−' : d[2]);
+        $(b, '.ts-jog-sub').textContent = knurl ? d[4] : d[3];
+        b.setAttribute('aria-label', knurl ? d[4] + ', one step in gap diameter' : d[2] + ', ' + d[3] + ', one step');
+      });
+      $$(lab, '[data-ts-tool]').forEach(function (b) {
+        var chosen = b.getAttribute('data-ts-tool') === st.tool || (b.getAttribute('data-ts-tool') === 'turn' && st.tool === 'face');
+        b.setAttribute('aria-pressed', String(chosen));
+        if (b.getAttribute('data-ts-tool') === 'turn') { $(b, '.ts-icon').outerHTML = R.toolIcon(st.tool === 'face' ? 'face' : 'turn'); }
+      });
+      el.turningWrap.hidden = st.tool !== 'turn' && st.tool !== 'face';
+      if (!el.turningWrap.hidden) { el.turning.value = st.tool; }
       el.toolName.innerHTML = '<strong>' + esc(t.name) + '</strong>' + (t.action === 'form' ? ' <span class="ts-tag">forms, does not cut</span>' : (t.action === 'thread' ? ' <span class="ts-tag">driven by the leadscrew</span>' : ''));
       el.does.textContent = t.does;
       el.cannot.textContent = t.cannot;
@@ -23741,7 +23974,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         log(label + (interrupted ? ', interrupted at Z ' + M.fmt(st.tz) : (res.crashed ? ', stopped early' : '')));
         if (interrupted) { say('stop', 'Feed stopped.', 'The tool is at Z ' + M.fmt(st.tz) + '. Only the portion reached before the stop has been applied. Retract before returning.'); return; }
         if (res.stop) { say(res.crashed ? 'stop' : 'info', res.crashed ? 'Stopped.' : 'Nothing cut.', res.stop.text); }
-        else { say('cut', 'Threading pass done.', 'The tool followed one helix from Z ' + M.fmt(z0) + ' to Z ' + M.fmt(zEnd) + ', ' + res.notches + ' turns. Back it out past the crests before you bring the carriage back.'); }
+        else { say('cut', 'Threading pass done.', 'The carriage moved from Z ' + M.fmt(z0) + ' to Z ' + M.fmt(zEnd) + ', ' + M.fmt(res.turns, 2) + ' spindle turns at this pitch. Back the tool out past the crests before returning.'); }
       }
       if (reduceMotion.matches) { finish(); return; }
       var stopped = false, last = now(), zt = z0;
@@ -23762,10 +23995,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     }
     /* The work as the pass leaves it: cut behind the tool, untouched ahead. */
     function mix(a, b, zt) {
-      var m = { zL: a.zL, n: a.n, ro: new Float64Array(a.n), ri: new Float64Array(a.n), kB: new Float64Array(a.n), kP: new Float64Array(a.n), thO: new Float64Array(a.n), thI: new Float64Array(a.n) };
+      var m = { zL: a.zL, n: a.n, ro: new Float64Array(a.n), ri: new Float64Array(a.n), kB: new Float64Array(a.n), kP: new Float64Array(a.n), thO: new Float64Array(a.n), thI: new Float64Array(a.n), thBaseO: new Float64Array(a.n), thBaseI: new Float64Array(a.n) };
       for (var i = 0; i < a.n; i++) {
         var src = M.zc(a, i) >= zt ? b : a;
         m.ro[i] = src.ro[i]; m.ri[i] = src.ri[i]; m.kB[i] = src.kB[i]; m.kP[i] = src.kP[i]; m.thO[i] = src.thO[i]; m.thI[i] = src.thI[i];
+        m.thBaseO[i] = src.thBaseO[i]; m.thBaseI[i] = src.thBaseI[i];
       }
       return m;
     }
@@ -23903,7 +24137,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
     function act(b, e) {
       if (b.hasAttribute('data-ts-part')) { choosePart(b.getAttribute('data-ts-part')); return; }
-      if (b.hasAttribute('data-ts-tool')) { changeTool(b.getAttribute('data-ts-tool')); return; }
+      if (b.hasAttribute('data-ts-tool')) {
+        var tid = b.getAttribute('data-ts-tool');
+        if (!(tid === 'turn' && st.tool === 'face')) { changeTool(tid); }
+        return;
+      }
       if (b.hasAttribute('data-ts-view')) { setView(b.getAttribute('data-ts-view')); return; }
       if (b.hasAttribute('data-ts-jog')) {
         if (e.detail === 0) { var j = b.getAttribute('data-ts-jog'); jog(j[0], j[1] === '+' ? 1 : -1); }
@@ -23949,6 +24187,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       if (!r.ok) { el.drill.value = st.drill; say('stop', 'Spindle running.', r.text); return; }
       log('Put the ' + M.fmt(M.drillSize(st)) + ' in drill in the tailstock');
       toolShape(); toolUI(); draw();
+    });
+    el.turning.addEventListener('change', function () {
+      changeTool(el.turning.value);
+      el.turning.value = st.tool === 'face' ? 'face' : 'turn';
+      keepBenchVisible();
     });
     el.tpi.addEventListener('change', function () {
       var r = M.setPitch(st, parseInt(el.tpi.value, 10));
@@ -24024,7 +24267,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
   }
 
-  if (node) { module.exports = { markup: markup, SHORT: SHORT, STEPS: STEPS }; }
+  if (node) { module.exports = { markup: markup, SHORT: SHORT, RACK_ORDER: RACK_ORDER, STEPS: STEPS }; }
   else if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot); }
     else { boot(); }

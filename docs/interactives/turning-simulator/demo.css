@@ -34,6 +34,15 @@
 .ts-jaw { fill: var(--rule); stroke: var(--ink-soft); stroke-width: 1.4; }
 .ts-spin path { fill: none; stroke: var(--ink-soft); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .ts-spin { opacity: .35; }
+.ts-spin-ring { fill: var(--paper); stroke: var(--rule); stroke-width: 1.3; }
+.ts-spin-guide { fill: none; stroke: none; }
+.ts-spin-view { fill: var(--ink-soft); font: 600 11px var(--f-display); }
+.ts-tool-wheel-end { fill: var(--surface-2); stroke: var(--ink); stroke-width: 1.2; }
+.ts-tool-axle { fill: none; stroke: var(--ink); stroke-width: 2; }
+.ts-tool-fastener { fill: var(--surface-2); stroke: var(--ink); stroke-width: 1.5; }
+.ts-tool-label { fill: var(--ink); font: 600 12px var(--f-display); }
+.ts-view.is-section .ts-thread, .ts-part-svg.is-section .ts-thread { stroke-dasharray: 5 3; }
+.ts-thread-envelope { fill: var(--paper); stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 5 3; }
 .ts-ghost { fill: none; stroke: var(--cat1); stroke-width: 1.6; stroke-dasharray: 6 4; stroke-linejoin: round; }
 .ts-ghost-root { fill: none; stroke: var(--cat1); stroke-width: 1; stroke-dasharray: 2 3; }
 .ts-excess { fill: var(--cat2); fill-opacity: .42; stroke: none; }
@@ -172,7 +181,7 @@
 /* one line always: a long tool name is cut short rather than adding a line */
 .ts-dro-tool { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ts-dro-spin { margin-left: auto; padding: .1rem .5rem; border: 1px solid currentColor; border-radius: var(--radius-xs); white-space: nowrap; }
-.is-running .ts-dro-spin { background: var(--flag); color: var(--flag-ink); border-color: var(--flag); }
+.is-running .ts-dro-spin { background: var(--flag); color: var(--msu-navy); border-color: var(--flag); }
 /* a narrow readout keeps to one line: the rack and the notes below name the tool */
 @container ts-work (max-width: 31rem) { .ts-dro-tool { display: none; } }
 @container ts-work (max-width: 20rem) {
@@ -198,6 +207,9 @@
 .ts-lab .ts-views button:last-child { border-start-start-radius: 0; border-end-start-radius: 0; }
 .ts-lab .ts-views button[aria-pressed="true"], .ts-lab .ts-zoom[aria-pressed="true"] { background: var(--accent); }
 .ts-lab .ts-zoom { position: absolute; right: .3rem; bottom: .3rem; }
+.ts-thread-note { position: absolute; right: .3rem; top: .3rem; padding: .12rem .3rem;
+  background: color-mix(in srgb, var(--paper) 92%, transparent); color: var(--ink);
+  border-radius: var(--radius-xs); font: 600 .65rem/1.15 var(--f-display); text-align: right; pointer-events: none; }
 
 /* what the last move did, with Undo beside it. It keeps three lines, so the
    bench never changes height under the hands; More opens a longer one. */
@@ -233,8 +245,8 @@
 .ts-panel button, .ts-rack button { min-height: 2.5rem; }
 .ts-run { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: .35rem; }
 .ts-lab .ts-spindle { border-color: var(--accent); }
-.ts-lab .ts-spindle[aria-pressed="true"] { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
-.ts-lab .ts-spindle[aria-pressed="true"]:not(:disabled):hover { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
+.ts-lab .ts-spindle[aria-pressed="true"] { background: var(--flag); border-color: var(--flag); color: var(--msu-navy); }
+.ts-lab .ts-spindle[aria-pressed="true"]:not(:disabled):hover { background: var(--flag); border-color: var(--flag); color: var(--msu-navy); }
 
 .ts-feed { margin: 0; display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
 .ts-feed .ts-k { margin: 0; }
@@ -369,8 +381,14 @@
 /* spindle running: the chuck's arrow turns */
 .ts-spin { transform-box: fill-box; transform-origin: center; }
 .is-running .ts-spin { opacity: .9; animation: ts-spin .7s linear infinite; }
-@keyframes ts-spin { to { transform: rotate(360deg); } }
+@keyframes ts-spin { to { transform: rotate(-360deg); } }
 .is-running .ts-spin path { stroke: var(--accent); }
+.is-knurling .ts-knurl-teeth { animation: ts-knurl-roll .45s linear infinite; }
+.is-knurling [data-ts-knurl-lower] .ts-knurl-teeth { animation-direction: reverse; }
+@keyframes ts-knurl-roll { to { transform: translateY(var(--ts-knurl-period)); } }
+@media (prefers-reduced-motion: reduce) {
+  .is-running .ts-spin, .is-knurling .ts-knurl-teeth { animation: none; }
+}
 
 /* chips: only where the model removed metal */
 .ts-chip { fill: none; stroke: var(--ink-soft); stroke-width: 1.6; stroke-linecap: round; pointer-events: none;
