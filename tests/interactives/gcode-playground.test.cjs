@@ -127,6 +127,24 @@ test('lines after the program end are marked as not run', () => {
   assert.equal(prog([...HEAD]).hasEnd, false);
 });
 
+test('M2 and M30 stop spindle and coolant after the last move, reset modes, and do not retract', () => {
+  for (const end of ['M2', 'M30']) {
+    const {p, m} = run([...HEAD, 'M8', 'G91 G0 X50 Y-10 Z-10 ' + end, 'G0 X99']);
+    assert.equal(p.error, null);
+    assert.equal(m.alarm, null);
+    assert.equal(m.status, 'done');
+    assert.deepEqual(m.position(), {x: 10, y: 20, z: 10});
+    assert.deepEqual(m.spindle, {on: false, rpm: 2500});
+    assert.equal(m.coolant, false);
+    assert.equal(p.endState.spindle, false);
+    assert.equal(p.endState.coolant, false);
+    assert.equal(p.endState.dist, 'abs');
+    assert.equal(p.endState.motion, 'G1');
+    assert.equal(p.lines[5].after, 'end');
+    assert.match(p.lines[4].explain, /stops the spindle and coolant/);
+  }
+});
+
 /* ======================================================================
    Distance mode and units
    ====================================================================*/

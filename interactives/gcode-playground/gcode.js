@@ -450,7 +450,11 @@
 
     if (c.m.stop === 2 || c.m.stop === 30) {
       st.ended = true;
-      said.push('Ends the program (M' + c.m.stop + ').' + (st.spindle ? ' The spindle is still on: a program normally stops it with M5 first.' : ''));
+      // LinuxCNC M2/M30 reset the supported modal state after this line's
+      // motion, as well as stopping spindle and coolant. Neither moves Z.
+      st.spindle = false; st.coolant = false;
+      st.dist = 'abs'; st.motion = 'G1'; st.motionLine = ln.index; st.cycle = null;
+      said.push('Ends the program (M' + c.m.stop + '), stops the spindle and coolant, and resets distance mode to G90 and motion to G1. The tool stays where the last move left it.');
       ln.ops.push({ op: 'end', code: c.m.stop, line: ln.index });
     }
     if (p.comments.length && said.length) said.push('The comment is for people reading the program.');

@@ -198,7 +198,11 @@
     }
     if (op.op === 'spindle') { this.spindle = { on: op.on, rpm: op.rpm }; return; }
     if (op.op === 'coolant') { this.coolant = op.on; return; }
-    if (op.op === 'end') return;
+    if (op.op === 'end') {
+      this.spindle.on = false;
+      this.coolant = false;
+      return;
+    }
     if (op.op === 'move') {
       this.legs = legsFor(op);
       this.seg = { line: op.line, kind: op.kind === 'rapid' ? 'rapid' : 'feed', pts: [cp(sim.pos)], head: null, cycle: !!op.cycle };
