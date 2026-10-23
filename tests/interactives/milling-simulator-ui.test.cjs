@@ -65,13 +65,14 @@ test('the isometric view marks every cell as the top view does', () => {
   assert.equal(U.isoTint(5, 0, 10, 0, -20, false), null);
 });
 
-test('one prominent switch chooses the top and front views or the isometric', () => {
+test('one prominent switch chooses 3D or the existing top/front and isometric views', () => {
   const src = fs.readFileSync(path.join(MOD, 'demo.js'), 'utf8');
   assert.match(src, /button\('Top and front', \{ 'aria-pressed': 'true'/);
   assert.match(src, /button\('Isometric', \{ 'aria-pressed': 'false'/);
+  assert.match(src, /button\('3D', \{ 'aria-pressed': 'false'/);
   assert.match(src, /role: 'group', 'aria-label': 'View of the work'/);
   assert.ok(!/button\('More views'/.test(src), 'the isometric is not hidden behind More views');
-  assert.match(src, /vTop\.hidden = vFront\.hidden = l === 'iso';/);
+  assert.match(src, /vTop\.hidden = vFront\.hidden = l !== 'flat';/);
   assert.match(src, /isoCanvas\.addEventListener\('keydown', wheelKeys\)/);
   const css = fs.readFileSync(path.join(MOD, 'demo.css'), 'utf8');
   assert.match(css, /\.ms-viewbar \{ position: absolute;/, 'the switch adds no height to the bench');

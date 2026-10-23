@@ -110,6 +110,7 @@
     return [p[0] - o[0], p[1] - o[1]];
   }
   function jogDirection(axis, sign, layout, rot) {
+    if(layout==='3d')return (sign>0?'increase ':'decrease ')+axis.toUpperCase()+' on the machine';
     if (layout !== 'iso') return axis === 'x' ? (sign > 0 ? 'right in top view' : 'left in top view') :
       axis === 'y' ? (sign > 0 ? 'up in top view' : 'down in top view') : (sign > 0 ? 'up' : 'down');
     var d = isoAxis(axis, rot), x = d[0] * sign, y = d[1] * sign;
@@ -357,11 +358,12 @@
     var viewBtns = el('div', { class: 'ms-viewbar-btns', role: 'group', 'aria-label': 'View of the work' });
     var flatBtn = button('Top and front', { 'aria-pressed': 'true', 'aria-controls': uid + '-views' });
     var isoBtn = button('Isometric', { 'aria-pressed': 'false', 'aria-controls': uid + '-views' });
+    var threeBtn = button('3D', { 'aria-pressed': 'false', 'aria-controls': uid + '-views' });
     var viewHow = el('span', { class: 'ms-view-how' }, 'drag the tool');
     var turnL = button('↶', { class: 'ms-mini', 'aria-label': 'Turn the part view left' });
     var turnR = button('↷', { class: 'ms-mini', 'aria-label': 'Turn the part view right' });
     var isoTurnRow = add(el('span', { class: 'ms-turn', hidden: true }), turnL, turnR);
-    add(viewBar, add(viewBtns, flatBtn, isoBtn), isoTurnRow, viewHow);
+    add(viewBar, add(viewBtns, threeBtn, flatBtn, isoBtn), isoTurnRow, viewHow);
     var views = el('div', { class: 'ms-views', id: uid + '-views' });
     views.appendChild(viewBar);
     var vTop = el('figure', { class: 'ms-view ms-view-top' });
@@ -522,6 +524,8 @@
     add(vSide, sideCap, sideHost);
     add(more, vSide);
     add(views, vIso);
+    var vThree=el('div',{class:'ms-view ms-view-3d',hidden:true}),webgl=null,webglTried=false;
+    views.appendChild(vThree);
 
     var help = el('div', { class: 'ms-help', id: uid + '-help', hidden: true });
     var keysNote = el('p', { id: uid + '-keys' },
@@ -565,8 +569,7 @@
     }
     // Align after activation: moving a button between pointerdown/up would
     // swallow the click. Keyboard activation has no pointer coordinates.
-    panel.addEventListener('click', keepWorkspaceVisible);
-    panel.addEventListener('keyup', keepWorkspaceVisible);
+    panel.addEventListener('click', function(e){if(e.target.closest('button'))keepWorkspaceVisible();});
     host.appendChild(app);
     rootEl.appendChild(record);
     rootEl.classList.add('is-live');
@@ -791,6 +794,12 @@
       ctx.stroke();
     }
     function scheduleIso(now) {
+      if(state.layout==='3d') {
+        if(vThree.closest('details:not([open])') || (vThree.checkVisibility&&!vThree.checkVisibility()))return;
+        if(!webglTried){webglTried=true;try{webgl=window.CourseWikiMilling3D.create(vThree);webgl.canvas.addEventListener('keydown',wheelKeys);}catch(e){vThree.textContent='3D is unavailable in this browser. Use Top and front or Isometric to continue.';vThree.setAttribute('data-renderer','unavailable');}}
+        if(webgl)webgl.update(sim(),P,!!now);
+        return;
+      }
       if (state.layout !== 'iso') return;
       if (now) { clearTimeout(isoTimer); isoTimer = 0; drawIso(); return; }
       if (isoTimer) return;
@@ -1298,19 +1307,21 @@
     targetBtn.addEventListener('click', function () { state.target = !state.target; syncSegs(); drawTop(); scheduleSections(true); scheduleIso(true); });
     function setLayout(l) {
       state.layout = l;
+      threeBtn.setAttribute('aria-pressed',String(l==='3d'));
       flatBtn.setAttribute('aria-pressed', String(l === 'flat'));
       isoBtn.setAttribute('aria-pressed', String(l === 'iso'));
-      vTop.hidden = vFront.hidden = l === 'iso';
-      vIso.hidden = isoTurnRow.hidden = l !== 'iso';
-      views.classList.toggle('is-iso', l === 'iso');
+      vTop.hidden = vFront.hidden = l !== 'flat';
+      vIso.hidden = l !== 'iso';vThree.hidden=l!=='3d';isoTurnRow.hidden=l==='flat';
+      views.classList.toggle('is-iso', l !== 'flat');
       syncJogDirections();
-      viewHow.textContent = l === 'iso' ? 'turn it to see every side' : 'drag the tool';
+      viewHow.textContent = l==='3d'?'drag to orbit · wheel to zoom':l === 'iso' ? 'turn it to see every side' : 'drag the tool';
       drawTop(); scheduleSections(true); scheduleIso(true);
     }
     flatBtn.addEventListener('click', function () { setLayout('flat'); });
     isoBtn.addEventListener('click', function () { setLayout('iso'); });
-    turnL.addEventListener('click', function () { state.rot = (state.rot + 3) % 4; syncJogDirections(); scheduleIso(true); });
-    turnR.addEventListener('click', function () { state.rot = (state.rot + 1) % 4; syncJogDirections(); scheduleIso(true); });
+    threeBtn.addEventListener('click',function(){setLayout('3d');});
+    turnL.addEventListener('click', function () { if(state.layout==='3d'&&webgl){webgl.turn(-1);return;}state.rot = (state.rot + 3) % 4; syncJogDirections(); scheduleIso(true); });
+    turnR.addEventListener('click', function () { if(state.layout==='3d'&&webgl){webgl.turn(1);return;}state.rot = (state.rot + 1) % 4; syncJogDirections(); scheduleIso(true); });
     hintBtn.addEventListener('click', function () {
       var h = state.job.hints;
       if (state.hint < h.length) {
@@ -1350,7 +1361,10 @@
     if (window.ResizeObserver) {
       var ro = new ResizeObserver(function () { drawTop(); scheduleIso(true); });
       ro.observe(topCanvas); ro.observe(isoCanvas);
+      ro.observe(vThree);
     } else addEventListener('resize', function () { drawTop(); scheduleIso(true); });
+    var containingCard=rootEl.closest('details');
+    if(containingCard)containingCard.addEventListener('toggle',function(){if(containingCard.open)scheduleIso(true);});
     addEventListener('beforeprint', function () {
       if (state.running || state.drag) stop();
       var job = state.job, rep = state.report;
@@ -1373,7 +1387,8 @@
     });
 
     setStep(1);
-    setJob(jobs[0]);
+    setJob(J.BY_ID.pocket);
+    setLayout('3d');
   }
 
   function boot() {
