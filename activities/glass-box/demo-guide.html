@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How a Language Model Works — presenter guide</title>
+<!-- This file is the one canonical source for the printable guide, PDF, and
+     Settings → Open Presenter Notes. build.js lifts guide-css and guide-scope
+     verbatim into the app; do not duplicate this prose in the application. -->
+<style id="guide-page">
+  @page { size: A4 portrait; margin: 10mm 9mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #fff; max-width: 210mm; margin: 0 auto; padding: 10mm 9mm; }
+  @media screen { body { box-shadow: 0 0 0 1px #e3e8f0; margin: 12px auto; } }
+  @media print { body { padding: 0; max-width: none; margin: 0; } }
+</style>
+<style id="guide-css">
+  .guide-scope { --ink:#111820; --ink2:#41505f; --ink3:#71808f; --line:#c2cede;
+                 --navy:#002144; --gold:#ECAC00; --hi:#FFF7E4;
+                 font-family:"Segoe UI",-apple-system,system-ui,Roboto,Helvetica,Arial,sans-serif;
+                 color:var(--ink); font-size:10pt; line-height:1.38; }
+  .guide-scope header { border-bottom:3pt solid var(--navy); padding-bottom:3mm; margin-bottom:4mm;
+           display:flex; justify-content:space-between; align-items:flex-end; gap:6mm; }
+  .guide-scope .eyebrow { font-size:7.5pt; font-weight:700; letter-spacing:1.5pt; text-transform:uppercase;
+             color:var(--navy); border-bottom:1.6pt solid var(--gold); display:inline-block; padding-bottom:.7mm; margin-bottom:1.6mm; }
+  .guide-scope h1 { font-size:21pt; letter-spacing:.3pt; line-height:1.08; color:var(--navy); }
+  .guide-scope h1 small { display:block; font-size:9pt; font-weight:600; letter-spacing:1.1pt; text-transform:uppercase; color:var(--ink2); margin-top:1.2mm; }
+  .guide-scope .meta { text-align:right; font-size:8.5pt; color:var(--ink2); line-height:1.4; }
+  .guide-scope .cols { column-count:2; column-gap:6mm; }
+  .guide-scope .cols section { break-inside:avoid-column; }
+  .guide-scope section { break-inside:avoid; margin-bottom:4mm; }
+  .guide-scope h2 { font-size:12.5pt; text-transform:uppercase; letter-spacing:.6pt; color:var(--navy); border-bottom:1.5pt solid var(--gold); padding-bottom:1mm; margin-bottom:1.6mm; }
+  .guide-scope h3 { font-size:10pt; color:var(--navy); margin:2mm 0 .7mm; }
+  .guide-scope p { margin-bottom:1.6mm; }
+  .guide-scope ol { margin:0 0 1.6mm 5mm; padding-left:0; }
+  .guide-scope ul { margin:0 0 1.6mm 4.5mm; padding-left:0; }
+  .guide-scope li { margin-bottom:1mm; }
+  .guide-scope .beat { display:grid; grid-template-columns:13mm 1fr; gap:2mm; margin-bottom:2.2mm; break-inside:avoid; }
+  .guide-scope .beat .t { font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums; font-size:8.5pt; }
+  .guide-scope .beat > div > b:first-of-type { display:block; }
+  .guide-scope .say { background:var(--hi); border-left:2.4pt solid var(--gold); padding:1.8mm 2.4mm; margin:1.5mm 0; font-style:italic; break-inside:avoid; }
+  .guide-scope .mis { border:.5pt solid var(--line); border-radius:1.4mm; padding:1.8mm 2.4mm; margin-bottom:2mm; break-inside:avoid; }
+  .guide-scope .mis b { display:block; font-weight:700; color:var(--navy); }
+  .guide-scope .mis b::before { content:"“"; }
+  .guide-scope .mis b::after { content:"”"; }
+  .guide-scope .mis span { display:block; color:var(--ink2); margin-top:.3mm; }
+  .guide-scope code { font-family:ui-monospace,Consolas,monospace; font-size:8.7pt; }
+  .guide-scope footer { margin-top:4mm; padding-top:2mm; border-top:.6pt solid var(--line); font-size:8pt; color:var(--ink3); display:flex; justify-content:space-between; gap:4mm; }
+  .guide-scope .warn { color:#a3341f; font-weight:600; }
+  .guide-scope .page-break { break-before:page; padding-top:2mm; }
+</style>
+</head>
+<body>
+<div class="guide-scope">
+<div class="guide">
+<header>
+  <div>
+    <div class="eyebrow">Murray State University</div>
+    <h1>How a Language Model Works<small>Demo 2 of 17 · Part one · 20 minutes</small></h1>
+  </div>
+  <p class="meta"><b>You need:</b> one browser and <code>index.html</code>.
+    It runs offline. For projection use Settings → Presentation mode.
+    Start fresh: the untrained model is useful evidence.</p>
+</header>
+
+<div class="cols">
+<section>
+  <h2>Learning goals</h2>
+  <p>What a learner knows at the end of each stage — these are the three Takeaway cards, verbatim.</p>
+  <ul>
+    <li><b>LLM.</b> Training changes the parameters; inference runs the frozen parameters forward to score every possible next token. A small model trained on a little text learns the shape of the language long before it learns to say anything true.</li>
+    <li><b>Reasoning.</b> Room to write intermediate steps lets the same machinery reach answers it cannot produce in one jump — a real, measurable gain on this task, and not the same thing as understanding arithmetic.</li>
+    <li><b>Agents.</b> Tools and a loop turn prediction into action, and the context window bounds what the loop can still see — a run can fail for want of memory, not for want of ability.</li>
+  </ul>
+  <h2>Where this sits on the path</h2>
+  <p>Demo 1 showed models that play and handed forward one idea, in its own words: a model is a representation that can be trained, and architecture, training method and model type are three separate questions. Its last stage ended on the transformer; this demo trains one. It shows a model that predicts text, then what it takes to reason and to act. It hands forward two things: <b>a model reads its context</b> (Demo 5, Prompting) and <b>a score is a measurement under conditions</b> — the exam rows here — which is how Demo 3 asks you to read published benchmarks.</p>
+</section>
+
+<section>
+  <h2>One question for the session</h2>
+  <p><b>What changes when a text predictor is given more structure, more checking, or tools?</b> This page shows three bounded mechanisms: a tiny language model learning next-character prediction, arithmetic experiments with written work and checking, and a tool loop with a scripted action selector. Use Details for the deeper architecture and implementation notes.</p>
+  <p class="say">“Keep asking what the program learned, what it is calculating now, and what part is a teaching fixture.”</p>
+</section>
+
+<section>
+  <h2>LLM · Language model — 6 minutes</h2>
+  <h3>Question</h3>
+  <p>How can adjustable numbers turn recent text into a next-character prediction?</p>
+  <h3>Predict prompt</h3>
+  <p>After all four eras, can it do simple math, like 2 + 2? The answer is no: its vocabulary has no digits, so 2+2= reaches it as blank spaces. Have someone type 2+2= into the prompt box to see it. The reveal says so on the card once Era 4 finishes, and Stage 2 trains the same kind of model on sums.</p>
+  <h3>Activity</h3>
+  <div class="beat"><div class="t">0:00</div><div><b>Open LLM.</b> Use Tokenize text and Inspect parameters on an untrained prompt. The numbers begin as random values.</div></div>
+  <div class="beat"><div class="t">1:30</div><div><b>Choose Train the model.</b> Read one untrained sample, then narrate the loss and samples as the first era completes. Use Try next-token prediction to compare likely next characters; change Temperature only after the audience sees the ranked choices.</div></div>
+  <div class="beat"><div class="t">4:30</div><div><b>Choose Trace attention.</b> Select a character and show which earlier positions receive weight for that prediction. It is a live intermediate value, not evidence that the model has a mind or intent.</div></div>
+  <h3>Expected observation</h3>
+  <p>Training changes the weights, loss declines, and the model’s next-character distribution changes. Its samples can become more patterned while still being limited by one short, original story.</p>
+  <h3>Check-yourself answer key</h3>
+  <p><b>Era 4 writes more like the story than Era 0. What changed?</b> Its parameters. Not a lookup of stored passages (nothing is stored to retrieve — the whole model is 42,458 numbers) and not a bigger vocabulary (Tokenize text shows the same 26 characters at every era).</p>
+  <h3>Teaching limit</h3>
+  <p>This is a character-level transformer trained from scratch on a tiny corpus. It demonstrates a transformer learning mechanism, not general language ability or a claim about every frontier system.</p>
+</section>
+
+<section>
+  <h2>Reasoning · Worked steps — 8 minutes</h2>
+  <h3>Question</h3>
+  <p>How do written intermediate steps and checking change a small model’s behavior on addition?</p>
+  <h3>Predict prompt</h3>
+  <p>Same exam, which scores higher — answers-only or worked steps? Take the vote before pressing Run experiment; the card echoes each guess and settles it from the two scores on screen.</p>
+  <h3>Activity</h3>
+  <div class="beat"><div class="t">6:00</div><div><b>Open Reasoning and choose Train and compare.</b> Compare direct-answer training with worked column arithmetic. The models share core width, depth, and heads, but their contexts, seeds, and update counts differ to fit their different text formats.</div></div>
+  <div class="beat"><div class="t">8:30</div><div><b>Choose Compare exam answers.</b> Read a live attempt and an exam row. The useful comparison is the presence of written intermediate work, not a universal performance promise.</div></div>
+  <div class="beat"><div class="t">10:30</div><div><b>Optional slow extension: Try more attempts.</b> Run 1, 2, 4, and 8 attempts with the same frozen under-trained model. The arithmetic checker rejects malformed work and accepted chains vote. More attempts add inference-time computation, not training.</div></div>
+  <h3>Expected observation</h3>
+  <p>Written steps provide smaller targets for the model to predict. Sampling plus checking can improve the chosen answer even when weights stay fixed.</p>
+  <h3>Check-yourself answer key</h3>
+  <p><b>The worked-steps model scores higher. What does that show?</b> That generating intermediate steps gives the same machinery more room to compute. The card’s two wrong options are wrong in opposite directions and both are common in a room: “it understands arithmetic” (too strong — both are next-token predictors, and the fine-tuning is supervised, not reinforcement learning) and “nothing changed, both just predict the next token” (too weak — the two exam scores on the page are the evidence against it). Give both corrections equal time.</p>
+  <h3>Teaching limit</h3>
+  <p>The checker validates column arithmetic from the addends. The optional accepted-example round also retains chains matching the generated answer, then uses ordinary next-token updates on those examples. That is rejection-selected supervised fine-tuning, not a policy-gradient reinforcement-learning update.</p>
+</section>
+
+<section>
+  <h2>Agents · Tool-using loop — 5 minutes</h2>
+  <h3>Question</h3>
+  <p>What does a system need in addition to text prediction to take actions and use results?</p>
+  <h3>Predict prompt</h3>
+  <p>Same task with Visible context set to Tiny — does the run still finish? Take the vote before the tiny run; the card settles it when the run ends.</p>
+  <h3>Activity</h3>
+  <div class="beat"><div class="t">14:00</div><div><b>Open Agents, then choose You choose the actions.</b> The calculator, search, reading, notebook, observations, and distractor consequences all run locally.</div></div>
+  <div class="beat"><div class="t">16:00</div><div><b>Choose Watch the scripted policy.</b> Point out the calculator’s deliberate bad syntax and its genuine error message, then the later corrected call. Open the raw context to see what the action selector can read.</div></div>
+  <div class="beat"><div class="t">18:00</div><div><b>Choose Tiny · last 450 characters, Restart run, and Watch the scripted policy again.</b> The goal leaves the visible context and the automatic run stops.</div></div>
+  <h3>Expected observation</h3>
+  <p>Tool results become new text in the context. The small window changes what the selector can use, so the same task can fail when its goal is no longer visible.</p>
+  <h3>Check-yourself answer key</h3>
+  <p><b>On Tiny the same policy stops without finishing. Why?</b> The goal scrolled out of the visible context. Not a weak policy (it is the same hand-written policy and it finishes on the full context) and not the calculator error (that error is real, deliberate, and recovered from in both runs).</p>
+  <h3>Teaching limit</h3>
+  <p>The action selector in this activity is a scripted policy, including the calculator mistake and retry; it is not a learned model. The loop, local tools, observations, and context truncation are the genuine mechanisms on display.</p>
+</section>
+
+<section>
+  <h2>Optional slow experiments and close</h2>
+  <p>Let Train the model and Train and compare continue while you discuss their live displays; each can take a few minutes. Try more attempts and Fine-tune on accepted examples are optional extensions. Do not promise a particular score or curve: the page uses seeded, bounded demonstrations.</p>
+  <p class="say">“A language model predicts. Reasoning experiments add written work, checking, or extra attempts. An agent adds a loop and tools; in this activity, its action choice is deliberately scripted.”</p>
+  <ul>
+    <li>Which claim came from a learned model, a fixed calculation, or a scripted policy?</li>
+    <li>Why can extra attempts help without changing weights?</li>
+    <li>What would need to change before this agent activity used a learned action selector?</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Misconceptions to expect</h2>
+  <div class="mis"><b>It is just predicting the next token, so it cannot really compute anything.</b><span>It does only predict the next token — and the worked-steps model still scores measurably higher on the identical exam. Prediction with room to write steps is computation. The two exam scores are the evidence; show them, do not argue it.</span></div>
+  <div class="mis"><b>The worked-steps model understands arithmetic.</b><span>Same architecture, different training text. It reaches more right answers; nothing on the page supports comprehension, and the fine-tuning is ordinary supervised training on its own accepted examples, not reinforcement learning.</span></div>
+  <div class="mis"><b>Attention shows what the model is thinking.</b><span>Attention weights are real intermediate values from this computation — a routing pattern for one prediction. They are not intent and not an explanation of why the answer came out as it did.</span></div>
+  <div class="mis"><b>Frontier models are this recipe plus scale.</b><span>The shape of the computation is the same as a decoder-only transformer. The scale, the data, and much of the training pipeline are not, and scale is not a detail. This page demonstrates selected mechanisms, not a miniature of every production model.</span></div>
+  <div class="mis"><b>The agent got smarter or dumber between the two runs.</b><span>It is the same scripted policy both times. What changed is what the loop could still see. A run can fail for want of memory, not for want of ability.</span></div>
+</section>
+
+<section>
+  <h2>Presenter controls</h2>
+  <p>Guide opens from the header and on entry. Settings contains Open Presenter Notes, Presentation mode, and Reset. Reset puts the whole demonstration back to its fresh state in place, without reloading the page: the transformer is untrained again, every era is gone, the Reasoning models and exam tables are cleared, and the Agents run is back at turn one on the full context. Presentation mode stays as you set it. Open printable guide opens the rendered copy of this same guide.</p>
+</section>
+</div>
+
+<footer>Bryant Harrison · Murray State University · How a Language Model Works · Offline, single-file demonstration · no account or runtime network</footer>
+</div>
+</div><!-- /guide -->
+</body>
+</html>

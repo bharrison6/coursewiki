@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompting Strategies - CourseWiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<script>
+(function(){try{var m=JSON.parse(localStorage.getItem('det:theme'));
+if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m);}}catch(e){}})();
+</script>
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" href="../favicon.svg?v=c236ecac71" type="image/svg+xml">
+<link rel="stylesheet" href="../theme/msu-theme.css?v=c236ecac71">
+<link rel="stylesheet" href="../theme/app.css?v=c236ecac71">
+<style>.activity-notes-the-stranger{color:var(--g-body,#111);font-size:.78em;line-height:1.4}
+.activity-notes-the-stranger b{color:var(--g-head,#111)}
+.activity-notes-the-stranger h1{font-size:2.09em;margin:0;letter-spacing:-.01em;color:var(--g-head,#111)}
+.activity-notes-the-stranger h1 span{font-weight:400;color:var(--g-mute,#777);font-size:.53em;letter-spacing:.08em;text-transform:uppercase;margin-left:.6em}
+.activity-notes-the-stranger .rule{border-bottom:2px solid var(--g-head,#111);margin:.28em 0 .7em}
+.activity-notes-the-stranger h2{font-size:.88em;letter-spacing:.16em;text-transform:uppercase;color:var(--g-mute,#555);margin:1em 0 .35em;
+  border-bottom:1px solid var(--g-line,#ccc);padding-bottom:.18em}
+.activity-notes-the-stranger .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(19em,1fr));gap:0 1.7em}
+.activity-notes-the-stranger .act{break-inside:avoid;margin-bottom:.7em}
+.activity-notes-the-stranger .act h3{font-size:1.06em;margin:0 0 .2em;color:var(--g-head,#111)}
+.activity-notes-the-stranger .act h3 b{display:inline-block;min-width:3.4em}
+.activity-notes-the-stranger .act .t{float:right;font-weight:400;color:var(--g-mute,#777);font-size:.88em}
+.activity-notes-the-stranger .act p{margin:.18em 0}
+.activity-notes-the-stranger .act .setup{font-style:italic;color:var(--g-body,#333)}
+.activity-notes-the-stranger .beat{padding-left:1.15em;text-indent:-1.15em}
+.activity-notes-the-stranger .beat b{font-weight:700}
+.activity-notes-the-stranger .land{margin-top:.28em;padding:.28em .45em;background:var(--g-panel,#f2f2f2);
+  border-left:3px solid var(--g-head,#111);font-weight:600;color:var(--g-head,#111)}
+.activity-notes-the-stranger ol,.activity-notes-the-stranger ul{margin:.15em 0 .5em;padding-left:1.15em}
+.activity-notes-the-stranger li{margin:.14em 0}
+.activity-notes-the-stranger table{width:100%;border-collapse:collapse;font-size:.92em}
+.activity-notes-the-stranger td{padding:.16em .3em;border-bottom:1px solid var(--g-line,#e3e3e3);vertical-align:top}
+.activity-notes-the-stranger td.k{width:3.4em;color:var(--g-mute,#666);font-variant-numeric:tabular-nums;white-space:nowrap}
+.activity-notes-the-stranger .lev{display:inline-block;padding:0 .3em;border-radius:2px;font-weight:700}
+.activity-notes-the-stranger .l1{background:var(--g-l1,#ffe6bf);color:var(--g-l1t,#111)}
+.activity-notes-the-stranger .l2{background:var(--g-l2,#c8f2e0);color:var(--g-l2t,#111)}
+.activity-notes-the-stranger .l3{background:var(--g-l3,#e2d9ff);color:var(--g-l3t,#111)}
+.activity-notes-the-stranger .foot{margin-top:.5em;font-size:.84em;color:var(--g-mute,#777);border-top:1px solid var(--g-line,#ddd);padding-top:.3em;line-height:1.5}
+/* A misconception card: the flawed model stated, then refuted. Refutation text
+   works by naming the wrong idea and flagging it as wrong before correcting it,
+   so the claim is bold and the refutation follows it in the same block. */
+.activity-notes-the-stranger .mis{break-inside:avoid;margin:.3em 0;padding:.35em .5em;font-size:.94em;line-height:1.4;
+  border-left:3px solid var(--g-mute,#999);background:var(--g-panel,#f4f4f4)}
+.activity-notes-the-stranger .mis b{display:block;color:var(--g-head,#111)}
+.activity-notes-the-stranger .page2{margin-top:1.2em}
+.activity-notes-the-stranger .sheet-title{font-size:1.21em;font-weight:700;margin:0 0 .1em;color:var(--g-head,#111)}
+.activity-notes-the-stranger .sheet-sub{font-size:.88em;color:var(--g-mute,#777);margin:0 0 .5em}
+.activity-notes-the-stranger .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(14em,1fr));gap:0}
+.activity-notes-the-stranger .card{border:1px dashed var(--g-mute,#999);padding:.8em .9em;display:flex;flex-direction:column;gap:.1em}
+.activity-notes-the-stranger .ci{font-size:1.65em;color:var(--g-mute,#888);line-height:1}
+.activity-notes-the-stranger .cl{font-size:1.43em;font-weight:800;line-height:1.12;margin-top:.18em;color:var(--g-head,#111)}
+.activity-notes-the-stranger .cs{font-size:.99em;color:var(--g-body,#333);margin-top:.28em;line-height:1.35}
+.activity-notes-the-stranger .cw{margin-top:auto;padding-top:.6em;font-size:.77em;color:var(--g-mute,#999);letter-spacing:.06em;text-transform:uppercase}</style>
+</head>
+<body class="app skin-app" data-page="prompting-strategies" data-base="../">
+<a class="skip" href="#main">Skip to content</a>
+<header class="appbar">
+  <button class="iconbtn nav-toggle" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <a class="brand" href="../index.html">
+    <img class="brandmark light-only" alt="Murray State University School of Engineering" src="../assets/soe-logo-4c.png">
+<img class="brandmark dark-only" alt="" aria-hidden="true" src="../assets/soe-logo-4c-reversed.png">
+    <span class="sub" data-brandlabel>CourseWiki</span>
+  </a>
+  <div class="search">
+    <input type="search" placeholder="Search topics" aria-label="Search topics" autocomplete="off" spellcheck="false">
+    <span class="hint">/</span>
+    <div class="results" role="listbox"></div>
+  </div>
+  <button class="iconbtn" type="button" data-act="theme" aria-label="Theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 010 16" fill="currentColor" stroke="none"/></svg></button>
+</header>
+
+<div class="shell has-toc">
+<aside class="sidebar" id="sidebar">
+  <div class="nav-topics">
+  <h2>Topics</h2>
+  <details class="navgroup" data-nav="c-safety">
+    <summary><span class="chev"></span><a class="navself" href="../safety/index.html">Safety</a></summary>
+    <details class="navgroup" data-nav="g-safety-universal-rules" open>
+      <summary><span class="chev"></span><a class="navself" href="../safety/index.html#g-safety-universal-rules">Universal Rules</a></summary>
+      <ul class="navlist">
+        <li><a href="../safety/chemicals-and-sds.html">Chemicals and Safety Data Sheets</a></li>
+        <li><a href="../safety/electrical-safety.html">Electrical Safety</a></li>
+        <li><a href="../safety/equipment-operating-procedure.html">Equipment Operating Procedure</a></li>
+        <li><a href="../safety/fire-safety.html">Fire Safety</a></li>
+        <li><a href="../safety/conduct-and-emergency.html">Lab Conduct and Emergencies</a></li>
+        <li><a href="../safety/lifting-and-carrying.html">Lifting and Carrying</a></li>
+        <li><a href="../safety/machine-hazards.html">Machine Hazards and Housekeeping</a></li>
+        <li><a href="../safety/ppe.html">Personal Protective Equipment</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-safety-equipment" open>
+      <summary><span class="chev"></span><a class="navself" href="../safety/index.html#g-safety-equipment">Equipment</a></summary>
+      <ul class="navlist">
+        <li><a href="../safety/equipment-categories.html">Equipment Categories and Supervision</a></li>
+        <li><a href="../safety/metal-chips.html">Metal Chips and Swarf</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-engineering">
+    <summary><span class="chev"></span><a class="navself" href="../engineering/index.html">Engineering Fundamentals</a></summary>
+    <details class="navgroup" data-nav="g-engineering-units-and-measurement" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-units-and-measurement">Units and Measurement</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/dimensional-analysis.html">Dimensional Analysis</a></li>
+        <li><a href="../engineering/measurement-language.html">Measurement Language</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-motion-and-rotation" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-motion-and-rotation">Motion and Rotation</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/acceleration-and-squared-time.html">Acceleration and Squared Time</a></li>
+        <li><a href="../engineering/angular-motion.html">Angular Motion</a></li>
+        <li><a href="../engineering/motion-quantities.html">Motion Quantities</a></li>
+        <li><a href="../engineering/rotation-and-linear-speed.html">Rotation and Linear Speed</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-force-and-power" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-force-and-power">Force and Power</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/geometry-mass-and-force.html">Geometry, Mass, and Force</a></li>
+        <li><a href="../engineering/power-and-efficiency.html">Power and Efficiency</a></li>
+        <li><a href="../engineering/torque.html">Torque</a></li>
+        <li><a href="../engineering/work-and-energy.html">Work and Energy</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-electrical-quantities" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-electrical-quantities">Electrical Quantities</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/current-voltage-and-resistance.html">Current, Voltage, and Resistance</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-machining">
+    <summary><span class="chev"></span><a class="navself" href="../machining/index.html">Machining</a></summary>
+    <details class="navgroup" data-nav="g-machining-milling" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-milling">Milling</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/climb-and-conventional-milling.html">Climb and Conventional Milling</a></li>
+        <li><a href="../machining/feeds-and-speeds.html">Feeds and Speeds</a></li>
+        <li><a href="../machining/milling-operations.html">Milling Operations</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-machining-turning" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-turning">Turning</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/lathe-operations.html">Lathe Operations</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-machining-measurement-and-fit" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-measurement-and-fit">Measurement and Fit</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/tolerances-and-fits.html">Tolerances and Fits</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-lean">
+    <summary><span class="chev"></span><a class="navself" href="../lean/index.html">Lean and Quality</a></summary>
+    <details class="navgroup" data-nav="g-lean-lean-and-organization" open>
+      <summary><span class="chev"></span><a class="navself" href="../lean/index.html#g-lean-lean-and-organization">Lean and Organization</a></summary>
+      <ul class="navlist">
+        <li><a href="../lean/5s-workplace-organization.html">5S Workplace Organization</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-artificial-intelligence" open>
+    <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html">Artificial Intelligence</a></summary>
+    <details class="navgroup" data-nav="g-artificial-intelligence-start-here" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-start-here">Start here</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/understanding-artificial-intelligence.html">Understanding Artificial Intelligence</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-artificial-intelligence-what-ai-is" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-what-ai-is">What AI is</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/how-language-models-work.html">How a Language Model Works</a></li>
+        <li><a href="../artificial-intelligence/types-of-ai.html">Types of AI</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-artificial-intelligence-where-ai-is-going" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-where-ai-is-going">Where AI is going</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/ai-winters.html">AI Winters: Boom and Bust</a></li>
+        <li><a href="../artificial-intelligence/ai-progress.html">The Pace of AI Progress</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-artificial-intelligence-how-to-use-ai" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-how-to-use-ai">How to use AI</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/ai-tool-guide.html">AI Tool Guide</a></li>
+        <li><a aria-current="page" href="../artificial-intelligence/prompting-strategies.html">Prompting Strategies</a></li>
+      </ul>
+    </details>
+  </details>
+  </div>
+  <div class="navsplit"></div>
+  <div class="nav-tracks">
+  <h2>Tracks</h2>
+  <p class="navnote">Tracks built from the topics above. A course carries the topic tracks it needs; a programme is its courses, so it follows them.</p>
+  <details class="navgroup" data-nav="t-det" open>
+    <summary><span class="chev"></span><a class="navself" data-track="det" href="../presentations.html#pl-det">DET</a><span class="count">27</span></summary>
+    <details class="navgroup" data-nav="t-det-130">
+      <summary><span class="chev"></span><a class="navself" data-track="det-130" href="../presentations.html#pl-det-130">DET 130</a><span class="count">11</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="t-det-330">
+      <summary><span class="chev"></span><a class="navself" data-track="det-330" href="../presentations.html#pl-det-330">DET 330</a><span class="count">16</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+        <li><a data-track="machining-fundamentals" href="../presentations.html#pl-machining-fundamentals">Machining Fundamentals<span class="count">5</span></a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="t-det-403">
+      <summary><span class="chev"></span><a class="navself" data-track="det-403" href="../presentations.html#pl-det-403">DET 403</a><span class="count">22</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+        <li><a data-track="units-motion-and-force" href="../presentations.html#pl-units-motion-and-force">Units, Motion, and Force<span class="count">5</span></a></li>
+        <li><a data-track="rotation-and-torque" href="../presentations.html#pl-rotation-and-torque">Rotation and Torque<span class="count">3</span></a></li>
+        <li><a data-track="work-power-and-efficiency" href="../presentations.html#pl-work-power-and-efficiency">Work, Power, and Efficiency<span class="count">2</span></a></li>
+        <li><a data-track="electrical-units" href="../presentations.html#pl-electrical-units">Electrical Units<span class="count">1</span></a></li>
+      </ul>
+    </details>
+  </details>
+  <ul class="navlist tracknav">
+    <li><a data-track="5s-workplace-organization" href="../presentations.html#pl-5s-workplace-organization">5S Workplace Organization<span class="count">1</span></a></li>
+    <li><a data-track="ai-from-zero-to-takeoff" href="../presentations.html#pl-ai-from-zero-to-takeoff">AI: From Zero to Takeoff<span class="count">7</span></a></li>
+    <li><a data-track="electrical-units" href="../presentations.html#pl-electrical-units">Electrical Units<span class="count">1</span></a></li>
+    <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+    <li><a data-track="machining-fundamentals" href="../presentations.html#pl-machining-fundamentals">Machining Fundamentals<span class="count">5</span></a></li>
+    <li><a data-track="rotation-and-torque" href="../presentations.html#pl-rotation-and-torque">Rotation and Torque<span class="count">3</span></a></li>
+    <li><a data-track="units-motion-and-force" href="../presentations.html#pl-units-motion-and-force">Units, Motion, and Force<span class="count">5</span></a></li>
+    <li><a data-track="work-power-and-efficiency" href="../presentations.html#pl-work-power-and-efficiency">Work, Power, and Efficiency<span class="count">2</span></a></li>
+  </ul>
+  </div>
+  <div class="navsplit"></div>
+  <div class="nav-practice"><h2>Practice</h2>
+    <ul class="navlist"><li><a href="../practice.html">Practice catalog</a></li></ul>
+  </div>
+</aside>
+<div class="backdrop"></div>
+
+<main id="main"><div class="article">
+  <div class="crumb"><a href="../index.html">CourseWiki</a><span class="sep">/</span><a href="index.html">Artificial Intelligence</a><span class="sep">/</span><span>How to use AI</span></div>
+  <h1>Prompting Strategies</h1>
+  <p class="lede">Why prompts work — three levers, sixty-four hand-written answers, zero network</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="explore-prompting-strategies" data-card="explore-prompting-strategies">
+    <summary>Explore Prompting Strategies<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Explore Prompting Strategies</h2>
+  <p>A question sits beside three toggleable levers, and the answer changes in exactly one dimension per lever. Sixty-four hand-written answers, each labelled as hand-written on the panel that shows it, a deck that decides your answer’s shape whenever you don’t, and a meter counting the expert vocabulary you got for free.</p>
+  <div data-interactive="the-stranger" class="document-activity"><p class="activity-links"><a class="button" target="_blank" rel="noopener" href="../activities/the-stranger/index.html">Open Prompting Strategies full screen</a> <a href="../activities/the-stranger/presenter-sheet.html">Printable guide</a> · <a href="../activities/the-stranger/The-Stranger-Presenter-Sheet.pdf">Guide PDF</a></p><iframe title="Prompting Strategies interactive activity" loading="lazy" allow="fullscreen" src="../activities/the-stranger/index.html?v=c236ecac71"></iframe></div>
+  <p>The activity runs in your browser without an AI service. Use its Guide button for instructions and Settings for presenter notes, presentation mode and reset. Open it full screen when you want more room.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="learning-path" data-card="learning-path">
+    <summary>Learning path<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Learning path</h2>
+  <ul>
+  <li><strong>Context.</strong> What changes when it knows who is asking?</li>
+  <li><strong>Success spec.</strong> If you don't say what finished looks like, who does?</li>
+  <li><strong>Expert keywords.</strong> What do you get for asking in the field's words?</li>
+</ul>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="presenter-notes-and-learning-guide" data-card="presenter-notes-and-learning-guide">
+    <summary>Presenter notes and learning guide<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Presenter notes and learning guide</h2>
+  <div class="activity-notes-the-stranger">
+
+<h1>PROMPTING STRATEGIES <span>The Stranger &middot; presenter sheet &middot; 12 minutes</span></h1>
+<div class="rule"></div>
+
+<div class="cols">
+<div>
+
+<h2>Learning goals</h2>
+<p>The three stage Takeaways, verbatim from the app. Each is a plain claim the activity
+demonstrably shows, and each is what that stage's check-yourself item tests.</p>
+<ol>
+  <li><span class="lev l1">CONTEXT</span> With no context the answer is aimed at everybody, which is
+  another way of saying nobody. Context changes <b>who it is for</b> &mdash; not its length, and not its
+  vocabulary.</li>
+  <li><span class="lev l2">SUCCESS SPEC</span> An unspecified target does not stay unspecified &mdash;
+  something else fills it in, and does not tell you. Saying what finished looks like takes that decision
+  back.</li>
+  <li><span class="lev l3">EXPERT KEYWORDS</span> Asking in a field's vocabulary gets that vocabulary back
+  &mdash; words nobody in the room supplied. That is real. It is also not the same thing as a better
+  answer, and telling those apart is the skill.</li>
+</ol>
+
+<h2>Where this sits on the path</h2>
+<p><b>Demo 5 of 17 &middot; Part three.</b> Demo 2 showed that a model reads its context; here the room
+controls that context, one lever at a time. It hands forward to Demo 6: a perfect prompt in a browser tab
+still cannot touch your files, so the surface decides reach.</p>
+
+<h2>One question for the session</h2>
+<p class="land">&ldquo;Who decided what a good answer to your question looks like?&rdquo;</p>
+
+<h2>The roleplay &mdash; three acts</h2>
+<p style="margin:0 0 .5em">You are the Stranger. A volunteer is the Asker. The app is on the projector
+behind you; run the same states on it as you say them out loud.</p>
+
+<div class="act">
+  <h3><span class="t">~3 min</span><b>ACT I</b> &mdash; <span class="lev l1">CONTEXT</span></h3>
+  <p class="setup">&ldquo;I am a stranger on a street corner. I am not stupid. I know a great
+  deal about almost everything. I have never met you.&rdquo;</p>
+  <p class="beat"><b>1.</b> The Asker says only: <i>&ldquo;Help me get ready for my test.&rdquo;</i>
+  Answer out loud, as blandly and generally as you honestly can. Cover every case. Do not clown it &mdash;
+  a real assistant is competent here, just aimed at nobody.</p>
+  <p class="beat"><b>2.</b> Ask the room: what would I have needed to know? Take three answers, put them
+  on the board.</p>
+  <p class="beat"><b>3.</b> The Asker reads the context block. Answer again, aimed at that kid.</p>
+  <p class="land">&ldquo;I didn't get smarter. You got specific.&rdquo;</p>
+</div>
+
+<div class="act">
+  <h3><span class="t">~4 min</span><b>ACT II</b> &mdash; <span class="lev l2">THE TARGET DECK</span></h3>
+  <p class="setup">Hold the eight cards from page two face down. &ldquo;Somebody has to decide what a
+  good answer looks like. If you don't decide, I do. And I never tell you what I picked.&rdquo;</p>
+  <p class="beat"><b>1.</b> Same question, context on, no success spec. <b>Draw a card and do not show
+  it.</b> Answer to the card &mdash; if it says exhaustive, talk for forty-five seconds without stopping.</p>
+  <p class="beat"><b>2.</b> Now show the card. Wait for the room.</p>
+  <p class="beat"><b>3.</b> Draw a different card. Same question, answer again. Same asker, same words,
+  different answer &mdash; and the difference was never theirs.</p>
+  <p class="beat"><b>4.</b> The Asker reads the success spec. Put the deck down and slide it across the
+  table, away from you. On the app, the deck lives <i>inside</i> lever 2: flip it on and the three card
+  names get struck out where they sit. Same gesture, same panel.</p>
+  <p class="land">&ldquo;You just took the deck out of my hands.&rdquo;</p>
+</div>
+
+<h2>On the app</h2>
+<p style="margin:0 0 .3em"><b>?</b> is the <b>Guide</b>: what every control does. It opens itself on load.
+<b>&#9881;&#xFE0E;</b> beside it is Settings &mdash; <b>Open Presenter Notes</b> (this sheet, on screen; or press
+<b>N</b>), <b>Presentation mode</b> (the projector build: big type, the 1&ndash;10 score strip, compare, and the
+card picker inside lever 2) and <b>Reset</b>.</p>
+<p style="margin:.18em 0"><b>Reset</b> is a fresh load without the reload: question 1, levers off, no answer on
+screen, scoreboard cleared. It deliberately leaves Presentation mode where you set it, so resetting between
+classes never drops you into student mode.</p>
+
+</div>
+<div>
+
+<div class="act">
+  <h3><span class="t">~4 min</span><b>ACT III</b> &mdash; <span class="lev l3">THE FOLDERS</span></h3>
+  <p class="setup">Three labelled folders or sheets: <b>BIOLOGY</b>, <b>BRIDGES</b>,
+  <b>WRITING AT WORK</b>. &ldquo;I have a folder on nearly everything. The words you use decide which
+  one I open.&rdquo;</p>
+  <p class="beat"><b>1.</b> The Asker: <i>&ldquo;Why do bridges stay up?&rdquo;</i> Open nothing. Answer in
+  plain words: the bottom gets stretched, the top gets squished. All true. All unusable.</p>
+  <p class="beat"><b>2.</b> The Asker adds the keyword block. Open BRIDGES and answer in the real
+  vocabulary &mdash; load path, bending moment, neutral axis, section depth.</p>
+  <p class="beat"><b>3.</b> On the app, press <b>H</b>. Count aloud the expert words in the answer that
+  the Asker never typed.</p>
+  <p class="land">&ldquo;You didn't know those words. You didn't have to. You only had to point at the
+  folder.&rdquo;</p>
+  <p class="beat"><b>Say this before you move on &mdash; it matters.</b> &ldquo;There are no folders. I
+  don't open anything. Your words change which words are likely to come next &mdash; that is Demo 2's
+  machine, doing this.&rdquo; The folders are a memory aid for the room. Left unsaid, the prop teaches a
+  filing-cabinet model of a language model, which contradicts Demo 2 &mdash; this demo's own
+  prerequisite &mdash; and a learner who does Demo 2 then Demo 5 is handed two incompatible machines.</p>
+</div>
+
+<h2>House rules</h2>
+<ol>
+  <li><b>The Stranger is never stupid.</b> In this demo the bare answers are bland, not broken &mdash; we
+  wrote them that way, because the demo dies the moment the bad answer looks rigged. Say it as a rule about
+  the demo, not about models: bare prompts in the wild also produce confident errors, wrong lengths and
+  refusals.</li>
+  <li><b>No trick answers.</b> If the prompt supports a good answer, give a good answer.</li>
+  <li><b>Every answer gets a number.</b> 1&ndash;10, from the room, out loud, on the board before the next one.</li>
+  <li><b>Nobody says &ldquo;the AI is bad at this&rdquo;</b> without naming which lever is off.</li>
+  <li><b>The Asker types nothing they wouldn't really type.</b> No fair inventing a great prompt to prove
+  a point.</li>
+</ol>
+
+<h2>Running order</h2>
+<table><tbody>
+  <tr><td class="k">0:00</td><td>Cold open. Act I, live, no screen.</td></tr>
+  <tr><td class="k">3:00</td><td>App, scenario 1, all levers off. Draw the card. Score it.</td></tr>
+  <tr><td class="k">4:30</td><td>One lever at a time. Score each. The curve argues for you.</td></tr>
+  <tr><td class="k">7:00</td><td>Act III on the bridge scenario. Highlighter on, count the words.</td></tr>
+  <tr><td class="k">9:30</td><td>&ldquo;Which lever would fix this?&rdquo; &mdash; two rounds, hands up.</td></tr>
+  <tr><td class="k">11:00</td><td>Closing slide. Read the line. Stop talking.</td></tr>
+</tbody></table>
+
+<h2>Per stage &mdash; question, predict prompt, expected observation, answer key, teaching limit</h2>
+<table><tbody>
+  <tr><td class="k"><span class="lev l1">1</span></td><td>
+    <b>Question:</b> What changes in the answer when it knows who you are?<br>
+    <b>Predict:</b> adding context changes <i>one</i> dimension &mdash; which one? (length / who it is
+    aimed at / which words) The room commits before you press Ask.<br>
+    <b>Expected observation:</b> the answer becomes aimed at one asker. Length and vocabulary are not
+    what this lever controls &mdash; they follow whichever card is dealt, so they can swing between runs.<br>
+    <b>Answer key:</b> <i>who it is aimed at</i>. The check item's correct option is <b>Context</b>;
+    a room that picks Success spec is told the spec is already doing its job.<br>
+    <b>Teaching limit:</b> a bare prompt is not information-free. &ldquo;Help me get ready for my
+    test&rdquo; already leaks topic, register and age. Do not claim it knows nothing.</td></tr>
+  <tr><td class="k"><span class="lev l2">2</span></td><td>
+    <b>Question:</b> If you never say what a good answer looks like, who decides instead?<br>
+    <b>Predict:</b> lever 2 is off, so the target is unspecified &mdash; what happens to it? (nothing /
+    something else fills it in / it asks you)<br>
+    <b>Expected observation:</b> a target card is dealt, face up, and the answer is written to it. Turn
+    lever 2 on and the deck is struck out inside the lever.<br>
+    <b>Answer key:</b> <i>something else fills it in</i>. Correct option <b>Success spec</b>.<br>
+    <b>Teaching limit:</b> <b>the deck is a teaching device, not a mechanism.</b> A real model does not
+    draw from three named cards; its defaults come from training, are more stable than a card draw, and
+    vary continuously. Say so &mdash; it is in the Details drawer too.</td></tr>
+  <tr><td class="k"><span class="lev l3">3</span></td><td>
+    <b>Question:</b> What do you actually get for asking in the vocabulary of the field?<br>
+    <b>Predict:</b> keywords off gives at most four expert terms &mdash; how many with keywords on?
+    (under five / about ten / fifteen or more)<br>
+    <b>Expected observation:</b> 15&ndash;20 tagged terms, most of them absent from the prompt. Press
+    <b>H</b> and count them aloud.<br>
+    <b>Answer key:</b> <i>fifteen or more</i>. Correct option <b>Expert keywords</b>. The stage also
+    carries the accuracy-brief case (below), whose correct option is <i>the prompt only asked for one kind
+    of finding</i>.<br>
+    <b>Teaching limit:</b> the counter measures <b>vocabulary, not understanding</b>, and the big number
+    is a readout of the author's tag list, not a detector. Ask the room the demo's own question: did the
+    answer get more useful, or just more impressive?</td></tr>
+</tbody></table>
+
+<h2>Misconceptions this demo can leave &mdash; name them, refute them</h2>
+<div class="mis"><b>&ldquo;I watched the model get better as the prompt got better.&rdquo;</b>
+No model ran. All 64 answers were written by hand before the file was saved, and the panel carries a
+permanent <b>Scripted</b> label saying so. What the room watched was an author's four answers, chosen to
+make one lever's effect legible. The claim the demo can honestly make is <i>what a better prompt tends to
+buy you</i>, never <i>what this model did</i>.</div>
+<div class="mis"><b>&ldquo;The rising curve proves more levers make better answers.&rdquo;</b>
+It cannot. The answers were written to improve as levers are pulled, the room scores them, and the mean
+rises &mdash; so the curve measures the room agreeing with the author and could not come out any other
+way. Keep it: making a room commit out loud is good teaching. Do not offer it as evidence, and say which
+it is.</div>
+<div class="mis"><b>&ldquo;If it is not in the prompt box, the AI does not know it.&rdquo;</b>
+False three ways. What it knows <i>in general</i> came from training and is not in the box; almost every
+real product prepends a system prompt the user never sees; and history, retrieved documents and tool
+output enter the context invisibly. The true and useful version: nothing about <i>you and your
+situation</i> reaches it unless you put it there.</div>
+<div class="mis"><b>&ldquo;A bad answer means I left a lever unpulled.&rdquo;</b>
+Sometimes. A lever fixes vague, mis-aimed or wrong-shaped. It does not fix confidently wrong, out of date,
+refusing, or past what the system can do &mdash; and on those, &ldquo;write a better prompt&rdquo; is the
+wrong response. The closing line says both halves; do not shorten it to the first.</div>
+<div class="mis"><b>&ldquo;A careful prompt cannot mislead.&rdquo;</b>
+The accuracy-brief case on stage 3 is a documented counter-example from building this very collection: a
+brief asked for 100% accuracy, every claim that came back was true, and the overall picture was still
+wrong &mdash; because the instruction only asked for one direction of finding. Symmetry is the repair, not
+more care.</div>
+
+<h2>Discussion questions</h2>
+<ol>
+  <li>The first answer was accurate. Why was it useless?</li>
+  <li>Who decided what a good answer looked like, and when?</li>
+  <li>The expert answer used words you never typed. Where did they come from, and how did asking in
+  plain words keep them hidden?</li>
+  <li>Which of the three levers is hardest to pull for a subject you know nothing about? What do you do then?</li>
+  <li>Name a time you blamed a tool for an answer you had underspecified.</li>
+  <li>Success spec means saying what &ldquo;done&rdquo; looks like. When is that hard to say &mdash; and what does
+  that tell you about the task itself?</li>
+</ol>
+
+<div class="foot">The app is one HTML file and touches no network. Every answer in it was written by hand
+before the file was saved: there is no model behind the glass. Keys: <b>1 2 3</b> levers &middot;
+<b>Enter</b> ask &middot; <b>Space</b> skip typing &middot; <b>H</b> highlight &middot; <b>R</b> replay card &middot;
+<b>P</b> pin to compare. The stage tabs switch levers; <b>Details</b> on each stage carries that stage's
+assumptions, sources and boundary. <b>Settings</b> holds <b>Open Presenter Notes</b>,
+<b>Presentation mode</b> (projector type plus the class score strip, compare, scoreboard and the card
+picker) and <b>Reset</b>, which restores the demo in place without reloading the page.</div>
+
+</div>
+</div>
+
+<div class="page2">
+  <p class="sheet-title">The target deck &mdash; cut along the dashed lines</p>
+  <p class="sheet-sub">Eight editorial choices somebody has to make. When the Asker doesn't make them,
+  the machine does, silently. Hold these face down; draw one whenever the success-spec lever is off.</p>
+  <div class="grid"><div class="card">
+  <div class="ci">▤</div>
+  <div class="cl">Length: exhaustive</div>
+  <div class="cs">Cover everything that could possibly be relevant. Leave nothing out.</div>
+  <div class="cw">turns up in: test · email</div>
+</div><div class="card">
+  <div class="ci">◐</div>
+  <div class="cl">Audience: someone who missed the whole semester</div>
+  <div class="cs">Assume they know nothing. Define every term before using it.</div>
+  <div class="cw">turns up in: test</div>
+</div><div class="card">
+  <div class="ci">▬</div>
+  <div class="cl">Format: dense paragraphs</div>
+  <div class="cs">No headings. No bullets. Flowing prose, start to finish.</div>
+  <div class="cw">turns up in: test · essay</div>
+</div><div class="card">
+  <div class="ci">▫</div>
+  <div class="cl">Length: short and safe</div>
+  <div class="cs">Keep it brief. Don&#x27;t risk being wrong about the details.</div>
+  <div class="cw">turns up in: bridge</div>
+</div><div class="card">
+  <div class="ci">☰</div>
+  <div class="cl">Format: numbered listicle</div>
+  <div class="cs">Everything as a numbered list. Ten items. Equal weight to each.</div>
+  <div class="cw">turns up in: bridge · email</div>
+</div><div class="card">
+  <div class="ci">◆</div>
+  <div class="cl">Audience: an expert peer</div>
+  <div class="cs">Assume deep familiarity. Skip the basics, get to the interesting part.</div>
+  <div class="cw">turns up in: bridge · essay</div>
+</div><div class="card">
+  <div class="ci">✦</div>
+  <div class="cl">Tone: encouraging coach</div>
+  <div class="cs">Lead with affirmation. Soften every critique. Protect motivation.</div>
+  <div class="cw">turns up in: essay</div>
+</div><div class="card">
+  <div class="ci">◇</div>
+  <div class="cl">Coverage: hedge every claim</div>
+  <div class="cs">Present all sides. Avoid committing to one recommendation.</div>
+  <div class="cw">turns up in: email</div>
+</div></div>
+</div>
+
+</div>
+    </div>
+  </details>
+</div>
+
+  <div class="usedin">
+    <div class="k">Appears in</div>
+    <div class="chips">
+      <a class="chip" data-track="ai-from-zero-to-takeoff" href="prompting-strategies.html?p=ai-from-zero-to-takeoff">AI: From Zero to Takeoff</a>
+    </div>
+  </div>
+</div></main>
+<aside class="toc">
+  <div class="k">On this page</div>
+  <ul>
+    <li><a href="#explore-prompting-strategies">Explore Prompting Strategies</a></li>
+    <li><a href="#learning-path">Learning path</a></li>
+    <li><a href="#presenter-notes-and-learning-guide">Presenter notes and learning guide</a></li>
+  </ul>
+</aside>
+
+</div>
+<script src="../search-index.js?v=c236ecac71"></script>
+<script src="../playlists.js?v=c236ecac71"></script>
+<script src="../practice-index.js?v=c236ecac71"></script>
+<script src="../theme/app.js?v=c236ecac71"></script>
+</body>
+</html>

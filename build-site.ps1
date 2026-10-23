@@ -250,6 +250,7 @@ foreach ($line in ($siteConf.Body -split "`r?`n")) {
 }
 
 # ------------------------------------------------------ collections + pages --
+Initialize-InteractiveAssets $root
 $pages       = [ordered]@{}
 $collections = [ordered]@{}
 
@@ -287,7 +288,7 @@ foreach ($cid in $collOrder) {
       throw "$($f.Name): @@SECTION '$($meta.SECTION)' is not in collection '$cid' @@GROUPS"
     }
 
-    $body = $split[1].Trim()
+    $body = Expand-ActivityNotes $split[1].Trim()
     $secs = @(); $i = 0
     foreach ($m in [regex]::Matches($body, '(?s)<section\b([^>]*)>(.*?)</section>')) {
       $i++
@@ -1208,10 +1209,12 @@ function New-Cards($p, $ctx, [string]$mode) {
     if ($s.Mode) { $cls += ' deck-' + $s.Mode }
     if ($s.Flag) { $cls += ' ' + $s.Flag }
     $head = if ($s.Head) { $s.Head } else { ConvertTo-HtmlText $p.Title }
-    [void]$sb.AppendLine('  <details class="' + $cls + '" id="' + $s.Slug + '" data-card="' + $s.Slug + '">')
+    $cardId = if ($mode -eq 'aggregate') { $p.Id + '--' + $s.Slug } else { $s.Slug }
+    [void]$sb.AppendLine('  <details class="' + $cls + '" id="' + $cardId + '" data-card="' + $cardId + '">')
     [void]$sb.AppendLine('    <summary>' + $head + '<span class="chev"></span></summary>')
     [void]$sb.AppendLine('    <div class="body">')
-    [void]$sb.AppendLine('      ' + (Resolve-Links $s.Html $ctx $mode))
+    $sectionHtml = Resolve-Links $s.Html $ctx $mode
+    [void]$sb.AppendLine('      ' + (Expand-ActivityDocuments $sectionHtml $ctx $mode))
     [void]$sb.AppendLine('    </div>')
     [void]$sb.AppendLine('  </details>')
   }
@@ -1595,7 +1598,6 @@ function New-PracticeItemMarkup($item) {
 
 # ------------------------------------------------------------ landing page ---
 Write-Host 'site'
-Initialize-InteractiveAssets $root
 foreach ($page in $allPages.Values) { $null = @(Get-InteractiveIds $page.Body) }
 $searchJs   = New-SearchIndex 'site'
 $playlistJs = New-PlaylistData

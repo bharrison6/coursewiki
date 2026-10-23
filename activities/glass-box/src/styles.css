@@ -1,0 +1,212 @@
+/* Glass Box — a cream teaching canvas with navy workbenches and gold actions. */
+/* The palette lives in ../tools/lesson-shell/tokens.css, injected above this
+   file. This demo's former :root block defined 16 tokens; a value-by-value diff
+   against the kit found every shared one byte-identical (case aside), so the
+   block was duplicate and is gone. Its two demo-only names were renames, not
+   new colours: --sky #007eb5 is the kit's --lite-deep #007EB5 and --sky-soft
+   #d9eff8 is the kit's --lite-soft #D9EFF8, both to the digit. body.presenter
+   went from 1.18rem to the kit's fleet-wide 1.2rem (plan A0 picks one value). */
+
+/* ---------- shared scaffold ---------- */
+.workspace-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:18px; margin-bottom:18px; }
+/* .workbench, .card, .panel-head, .panel-kicker, .panel-lede and .note are all
+   the kit's now, at values this demo's own rules matched to the digit
+   (--gold-lite #FFD76A was the literal #ffd76a here; --ink-2-on-navy #D7E5EF
+   was #d7e5ef; --ink-3-on-navy #B8CBD8 was #b8cbd8). Two deltas kept on
+   purpose: the kit's .panel-head adds flex-wrap:wrap, which only helps a narrow
+   header, and the kit's .workbench adds margin-bottom:18px, which this demo
+   does NOT want on a grid child — .workspace-grid already spaces its cells with
+   gap:18px, so the inherited margin would make the rows uneven. Zeroed below,
+   scoped to the grid so a standalone workbench keeps the fleet spacing. */
+.workspace-grid > .workbench { margin-bottom:0; }
+/* the nested inspector's head is this demo's own; the kit has no .inspection-head */
+.inspection-head { display:flex; justify-content:space-between; gap:12px; align-items:start; margin-bottom:9px; flex-wrap:wrap; }
+.inspection-head h3 { margin:3px 0 0; color:inherit; font-family:Georgia, "Times New Roman", serif; font-size:calc(var(--u) * 1.25); line-height:1.12; }
+.status-pill { display:inline-flex; align-items:center; min-height:28px; border:1px solid rgba(255,255,255,.35); border-radius:999px; padding:2px 9px; color:#fff; font-size:calc(var(--u) * .7); font-weight:800; text-transform:uppercase; letter-spacing:.05em; }
+.note b { color:inherit; }
+
+/* ---------- controls, live readings, and charts ---------- */
+.row, .action-row, .agent-controls { display:flex; flex-wrap:wrap; align-items:center; gap:9px; }
+.field-label, .range-label, .era-picker, .context-select { display:flex; justify-content:space-between; gap:12px; color:#d7e5ef; font-size:calc(var(--u) * .78); font-weight:800; }
+.field-label { margin:2px 0 5px; }
+.range-label { margin-top:13px; }
+input[type="text"], select { width:100%; min-height:44px; border:1px solid #8099aa; border-radius:9px; padding:8px 10px; background:#fff; color:var(--ink); }
+.workbench input[type="text"], .workbench select { border-color:#7892a5; }
+input[type="range"] { width:100%; accent-color:var(--gold); }
+.livebox, .rawctx, .schemas pre { overflow:auto; border:1px solid #7892a5; border-radius:10px; padding:11px; background:#01182c; color:#ecf6fb; font-family:ui-monospace, Consolas, monospace; font-size:calc(var(--u) * .8); line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+.sample-hero { min-height:116px; border-color:#719bb4; box-shadow:inset 0 0 0 1px rgba(236,172,0,.14); }
+.dim { color:#abc1d0; }
+.statline { display:flex; flex-wrap:wrap; gap:12px; margin-top:9px; color:#c5d7e2; font-size:calc(var(--u) * .78); }
+.statline b { color:#fff; font-variant-numeric:tabular-nums; }
+canvas.chart { display:block; width:100%; height:128px; margin-top:10px; border:1px solid rgba(255,255,255,.26); border-radius:10px; background:#012039; }
+.trainbar { position:sticky; bottom:10px; z-index:20; margin-top:12px; }
+.trainbar .btn { width:100%; box-shadow:0 8px 20px rgba(0,0,0,.3); }
+.eras, .era-picker > span:last-child, .attheads { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+.chip { min-height:36px; border:1px solid rgba(255,255,255,.35); border-radius:999px; padding:5px 10px; background:transparent; color:#d8e8f1; font-size:calc(var(--u) * .76); }
+.chip.on { border-color:var(--gold); background:var(--gold); color:var(--navy); font-weight:800; }
+.compare { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:9px; margin-top:12px; }
+.compare .cell { min-width:0; }
+.compare .cell h4 { margin:0 0 4px; color:#d7e5ef; font-size:calc(var(--u) * .8); }
+.probbars { display:flex; flex-direction:column; gap:6px; margin:12px 0; }
+.probbars .pb { display:grid; grid-template-columns:40px 1fr 52px; gap:8px; align-items:center; }
+.probbars .pch, .probbars .pbar { border-radius:5px; background:#123f5d; }
+.probbars .pch { padding:3px; text-align:center; font-family:ui-monospace, Consolas, monospace; }
+.probbars .pbar, .pline, .vb .vbar, .ctxmeter .cbar { position:relative; height:16px; overflow:hidden; }
+.probbars .pbar i, .pline i, .vb .vbar i, .ctxmeter .cbar i { position:absolute; inset:0 auto 0 0; border-radius:inherit; background:var(--lite-deep); }
+.probbars .pb.picked .pbar i, .mcard.scratch .pline i, .vb .vbar i { background:var(--gold); }
+.probbars .pv { color:#d7e5ef; font-size:calc(var(--u) * .76); text-align:right; }
+.gentext .cur { color:#ffd76a; }
+
+/* ---------- model inspection ---------- */
+.inspection { background:var(--paper); }
+.inspection-head p { max-width:290px; margin:0; color:var(--ink-2); font-size:calc(var(--u) * .84); }
+.inspect-tabs { display:flex; flex-wrap:wrap; gap:7px; border-bottom:1px solid var(--cream-deep); padding-bottom:10px; }
+.inspect-tabs button { min-height:38px; border:1px solid var(--line); border-radius:999px; padding:5px 11px; background:#fff; color:var(--ink-2); font-size:calc(var(--u) * .8); font-weight:800; }
+.inspect-tabs button.on { border-color:var(--navy); background:var(--navy); color:#fff; }
+.inspect-panel { padding-top:14px; }
+.inspect-panel .exp { margin:0 0 10px; color:var(--ink-2); }
+.tokens { display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
+.tok { border:1px solid var(--line); border-radius:7px; padding:3px 7px; background:#fff; color:var(--navy); font-family:ui-monospace, Consolas, monospace; }
+.tok small { display:block; color:var(--ink-3); font-size:calc(var(--u) * .58); text-align:center; }
+.tok.space { border-color:var(--lite-deep); background:var(--lite-soft); }
+.pmap { display:flex; flex-direction:column; gap:6px; }
+.pmap .prow { display:grid; grid-template-columns:minmax(102px,32%) 1fr auto; gap:8px; align-items:center; min-height:38px; border:1px solid transparent; border-radius:8px; padding:4px 6px; }
+.pmap button.prow { width:100%; color:inherit; background:transparent; text-align:left; }
+.pmap .prow:hover, .pmap .prow.on { border-color:var(--line); background:var(--cream); }
+.pmap .pname { color:var(--ink-2); font-size:calc(var(--u) * .8); }
+.pmap .pbar, .scale .sbar { position:relative; height:13px; overflow:hidden; border-radius:5px; background:var(--cream-deep); }
+.pmap .pbar i, .scale .sbar i { position:absolute; inset:0 auto 0 0; background:var(--lite-deep); }
+.pmap .prow[data-kind="attn"] .pbar i, .scale .srow.you .sbar i { background:var(--gold); }
+.pmap .pnum, .scale .snum { color:var(--ink-3); font-size:calc(var(--u) * .72); }
+.wpeek canvas, .attmatrix canvas { width:100%; border:1px solid var(--line); border-radius:9px; image-rendering:pixelated; }
+.atttext { line-height:2.15; word-break:break-all; font-family:ui-monospace, Consolas, monospace; }
+.atttext .attchar { min-width:36px; min-height:36px; border:0; border-bottom:2px solid transparent; background:transparent; }
+.atttext .q { border-bottom-color:var(--gold); background:#fff1be; }
+
+/* ---------- reasoning ---------- */
+.reason-main { margin-bottom:18px; }
+.duo { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
+.mcard { min-width:0; border:1px solid rgba(255,255,255,.32); border-radius:11px; padding:13px; background:var(--navy-2); }
+.mcard h3 { margin:0; font-size:calc(var(--u) * .98); }
+.mcard.direct h3 { color:#a9e0f6; }
+.mcard.scratch h3 { color:#ffd76a; }
+.model-role, .measurement { margin:4px 0 9px; color:#c5d7e2; font-size:calc(var(--u) * .76); }
+.mcard .fmt { margin:8px 0; border:1px solid rgba(255,255,255,.24); border-radius:8px; padding:7px; background:#012039; color:#d7e5ef; font-family:ui-monospace, Consolas, monospace; font-size:calc(var(--u) * .76); word-break:break-all; }
+.mcard .fmt b { color:#fff; }
+.pline { margin:7px 0; border-radius:99px; background:#012039; }
+.bignum { font-size:calc(var(--u) * 1.8); font-weight:850; font-variant-numeric:tabular-nums; }
+.acc-d { color:#7ecfee; } .acc-s { color:#ffd76a; } .bignum.dim { color:#b8cbd8; }
+.exam-card summary, details.fold summary { color:var(--navy); font-weight:850; cursor:pointer; }
+.exam-card[open] summary { margin-bottom:12px; }
+.textbook-fold { margin-top:12px; border:1px solid rgba(255,255,255,.34); border-radius:10px; background:rgba(255,255,255,.06); }
+details.fold.textbook-fold > summary { border-radius:9px; padding:9px 11px; color:#f6fbff; }
+details.fold.textbook-fold > summary::marker { color:var(--gold); }
+details.fold.textbook-fold > summary:hover, details.fold.textbook-fold > summary:focus-visible { background:rgba(255,255,255,.1); color:#ffd76a; }
+details.fold.textbook-fold[open] > summary { margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,.2); border-radius:9px 9px 0 0; background:rgba(255,255,255,.1); color:#ffd76a; }
+.textbook-fold > .note { margin:0 11px 8px; }
+.textbook-fold > .rawctx { margin:0 10px 10px; }
+.exlist { display:flex; flex-direction:column; gap:5px; max-height:250px; overflow:auto; }
+.exrow { border:1px solid var(--line); border-radius:7px; padding:5px 7px; background:#fff; font-family:ui-monospace, Consolas, monospace; font-size:calc(var(--u) * .74); word-break:break-all; }
+.exrow.wrong { border-color:var(--bad); background:var(--bad-soft); }
+.exrow.wrong .ans, .chainpeek .verdict.no { color:var(--bad); font-weight:800; }
+.exrow .ok, .chainpeek .verdict.ok { color:var(--ok); font-weight:800; }
+.votebars, .starbars { display:flex; flex-direction:column; gap:7px; margin:12px 0; }
+.vb { display:grid; grid-template-columns:86px 1fr 55px; gap:8px; align-items:center; }
+.vb .vlab, .vb .vnum { color:#d7e5ef; font-size:calc(var(--u) * .78); font-variant-numeric:tabular-nums; }
+.vb .vnum { text-align:right; color:#fff; }
+.vb .vbar { border-radius:99px; background:#123f5d; }
+.chainpeek .ch { margin-top:8px; }
+.chainpeek .verdict { margin:4px 0; font-size:calc(var(--u) * .75); }
+
+/* ---------- agents ---------- */
+.task-card { margin:0 0 12px; border:1px solid #7fa0b6; border-left:4px solid var(--gold); border-radius:9px; padding:10px 12px; background:#fff; color:var(--ink); }
+.task-card > span { color:var(--gold-deep); font-size:calc(var(--u) * .7); font-weight:850; letter-spacing:.08em; text-transform:uppercase; }
+.task-card p { margin:3px 0 0; }
+.agent-controls { margin:13px 0 9px; }
+.context-select { flex:1 1 210px; align-items:center; color:#d7e5ef; }
+.context-select select { width:auto; flex:1; min-width:170px; }
+.fixture-note { margin:8px 0; border-left:3px solid var(--gold); padding:7px 9px; background:rgba(255,255,255,.08); color:#e3eef5; font-size:calc(var(--u) * .78); }
+.ctxmeter { display:flex; align-items:center; gap:9px; margin:12px 0; }
+.ctxmeter .cbar { flex:1; border-radius:99px; background:#123f5d; }
+.ctxmeter .cnum { color:#d7e5ef; font-size:calc(var(--u) * .74); white-space:nowrap; }
+.transcript { display:flex; flex-direction:column; gap:7px; }
+.turn { border-radius:9px; padding:8px 10px; font-size:calc(var(--u) * .82); word-break:break-word; }
+.turn .who { display:block; margin-bottom:2px; color:var(--ink-3); font-size:calc(var(--u) * .63); font-weight:850; letter-spacing:.08em; text-transform:uppercase; }
+.turn.system, .turn.thought { border:1px dashed #7fa0b6; color:#d7e5ef; }
+.turn.goal { border:1px solid var(--gold); background:#123f5d; color:#fff; }
+.turn.action { border:1px solid #4c91b2; background:#062d48; font-family:ui-monospace, Consolas, monospace; }
+.turn.observation { border:1px solid rgba(255,255,255,.3); background:#fff; color:var(--ink); font-family:ui-monospace, Consolas, monospace; white-space:pre-wrap; }
+.turn.observation.err, .turn.stopped { border-color:var(--bad); background:var(--bad-soft); color:var(--ink); }
+.turn.final { border:1px solid var(--gold); background:#fff5ce; color:var(--ink); }
+.candidates { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+.cand { border:1px solid #7fa0b6; border-radius:9px; padding:10px; background:#fff; color:var(--ink); text-align:left; }
+.cand:hover { border-color:var(--gold); background:#fff9e7; }
+.cand .cth { display:block; color:var(--ink-2); font-style:italic; }
+.cand .cac { display:block; color:var(--lite-deep); font-family:ui-monospace, Consolas, monospace; font-size:calc(var(--u) * .76); }
+.rawctx, .schemas pre { max-height:310px; margin-top:8px; }
+.rawctx .cut { color:var(--bad); font-weight:850; }
+
+/* ---------- Details drawer and standard dialogs ---------- */
+body.details-open { overflow:hidden; }
+.evidence-card { margin-top:14px; border:1px solid var(--cream-deep); border-left:4px solid var(--gold); border-radius:9px; padding:11px; background:var(--cream); color:var(--ink-2); font-size:calc(var(--u) * .86); }
+.loopdia { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:10px 0; }
+.loopdia .lstep { border:1px solid var(--line); border-radius:8px; padding:8px 5px; background:#fff; color:var(--ink-2); font-size:calc(var(--u) * .72); text-align:center; }
+.loopdia .lstep b { display:block; color:var(--navy); }
+.loopdia .lstep.on { border-color:var(--gold); background:var(--navy); color:#fff; }
+.loopdia .lstep.on b { color:#ffd76a; }
+/* The four dialog cards are the kit's .lesson-dialog now. Every rule this demo
+   carried for .student-guide* had a .lesson-dialog* counterpart at the same
+   values, INCLUDING the `margin:auto` that centres the card — see the
+   dialog-centring note in the retrofit record. .evidence-card and .loopdia
+   above stay: the kit has .evidence-card, but this demo's is unchanged from it
+   and .loopdia is the activity's own. */
+/* The kit covers .guide-host .guide-scope zoom, .page-break and header; this
+   one nudge is not in the kit, so it stays. */
+.guide-host .guide-scope .meta { text-align:left; margin-top:2mm; }
+
+/* ---------- A2 prediction capture ----------------------------------------
+   The kit styles and Reset-restores the .echo, but ships no control for
+   capturing the prediction that fills it, so each demo provides its own. These
+   values are copied verbatim from zero-to-unbeatable (Demo 1) rather than
+   invented, so the two reference demos present the Predict card identically.
+   Reported for kit v3 along with the uppercase-inheritance note below. */
+.predict-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 5px; margin-top: 7px; }
+.predict-btn {
+  min-height: 36px; border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px;
+  background: var(--paper); color: var(--navy); font-weight: 750; font-size: calc(var(--u) * .78); line-height: 1.2;
+}
+.predict-btn:hover { border-color: var(--navy); }
+.predict-btn[aria-pressed="true"] { border-color: var(--navy); border-width: 2px; background: var(--lite-soft); }
+/* The kit's `.lesson-strip article span` uppercases the card label, and the
+   .echo is a span in the same article, so it inherits the uppercase. Undo it
+   here. Demo 1 found and fixed this independently; this is the second sighting,
+   which is why it is reported as kit friction rather than patched in the kit. */
+.lesson-strip .echo { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.lesson-strip .echo .ok { color: var(--ok); font-weight: 800; }
+.lesson-strip .echo .bad { color: var(--bad); font-weight: 800; }
+
+/* ---------- narrow screens: the ACTIVITY's grids only ----------------------
+   The kit already carries, at the same two breakpoints and the same values,
+   every chrome rule this block used to duplicate: .topline padding, .stages
+   (was .acts), main padding, .stage-intro single column, .details-trigger
+   justify, .lesson-strip single column and gap, .stage-intro h2 size,
+   .brandline, .msu-brand, .top-tools, .icon-btn, .icon-label, .stage-tab (was
+   .acts button), .workbench/.card padding, the phone dialog, .details-drawer
+   width — plus the landscape-short breakpoint this demo never had, and the
+   prefers-reduced-motion and prefers-contrast blocks it never had either.
+   What is left here is the four activity grids and the agent controls. */
+@media (max-width: 760px) {
+  .predict-btns { grid-template-columns:1fr; }
+  .workspace-grid, .duo { grid-template-columns:1fr; }
+  .reason-followups { grid-template-columns:1fr; }
+  .compare { grid-template-columns:1fr; }
+}
+@media (max-width: 480px) {
+  .agent-controls .btn { width:100%; }
+  .context-select { width:100%; flex-basis:100%; align-items:flex-start; flex-direction:column; gap:3px; }
+  .context-select select { width:100%; }
+  .loopdia { grid-template-columns:repeat(2,1fr); }
+  .vb { grid-template-columns:74px 1fr 46px; gap:6px; }
+  .pmap .prow { grid-template-columns:1fr; gap:4px; }
+  .pmap .pnum { display:none; }
+}

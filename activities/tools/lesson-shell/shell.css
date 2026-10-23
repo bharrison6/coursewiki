@@ -1,0 +1,566 @@
+/* ===========================================================================
+   lesson-shell / shell.css — the lesson parts that WRAP any activity.
+
+   Loaded after tokens.css and BEFORE the demo's own stylesheet, so a demo can
+   override any rule here without !important. Nothing in this file styles an
+   activity: no canvas, no game board, no workbench internals. It styles the
+   parts the template names — A0 header and footer, A1 stage tablist, A2 stage
+   intro and lesson strip, A3's kicker vocabulary, A4's observation cue, A5's
+   Details drawer, A6's check card, A7/A8's dialogs, and the credit pill.
+
+   CLASS VOCABULARY — a demo uses these names or the reviewer's grep fails:
+
+     .top .topline .brandline .brand-kicker .msu-brand .top-tools .icon-btn
+     .stages .stage-tab                        (A1, role=tablist)
+     section.stage .stage.on                   (A1, role=tabpanel)
+     .stage-intro .intro-copy .eyebrow .stage-question .refresh
+     .lesson-strip                             (A2, exactly 3 articles)
+     .details-trigger
+     .panel-kicker + .k-live .k-measured .k-sourced .k-scripted .k-illustrative
+     .control-label                            (A3)
+     .obs-cue                                  (A4)
+     .details-sheet .details-drawer .details-body .details-stage .evidence-card
+     .check .check-options .check-option .check-feedback   (A6)
+     .lesson-dialog .lesson-dialog-head .lesson-dialog-body .lesson-dialog-actions
+     .btn .btn.ghost .btn.small
+     .footer .footer-tools .footer-link
+     .bh-credit
+     .intro-more                               (A2 phone disclosure, v3;
+                                                built by behaviourScript())
+
+   RESERVED, NOT VOCABULARY: `.hidden`. The kit backs it with
+   `display: none !important` (see the rule beside `[hidden]` below) so that a
+   retrofit which deletes the demo's own chrome stylesheet cannot take the rule
+   with it. A demo must not redefine it; check-shell.js fails one that does.
+   =========================================================================== */
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; background: var(--cream); }
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font: 400 var(--u)/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+[hidden] { display: none !important; }
+/* A RESERVED KIT CLASS (v3), and the kit's one deliberate claim on a generic
+   author-space name. Added because five demos had independently written this
+   exact rule — bridge-works, should-have-known-that and the-stranger, all
+   spelling it `display: none !important` — and a retrofit that correctly
+   deletes the demo's own chrome stylesheet (ADOPTING.md §2) takes the rule with
+   it while the demo's JS keeps toggling the class. should-have-known-that
+   shipped straight into that: setup / turn / play panels rendered stacked, with
+   `build.js --check`, `check-shell` and `build-hub --check` all green, because
+   the markup and the contract were both correct. Five identical independent
+   copies of one rule is a missing kit primitive, not a coincidence.
+
+   `!important` is load-bearing, not defensive: without it a panel carrying its
+   own later `display: grid` wins on equal specificity and the class does
+   nothing — which is the exact case that fails.
+
+   THE PRICE, STATED: this is the one place the kit overrides a demo without
+   the demo being able to take it back unprefixed, so it is declared reserved
+   in ADOPTING.md rather than claimed quietly, and check-shell.js fails any
+   demo that defines `.hidden` as anything other than display:none. Prefer the
+   `hidden` ATTRIBUTE in new code — it is the platform's, it carries the right
+   semantics to assistive tech, and the rule above already covers it. */
+.hidden { display: none !important; }
+button, input, select, summary, textarea { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .48; cursor: not-allowed; }
+/* Every interactive thing clears the 38px touch floor CONTRACT.md's "touch
+   works" is checked against. */
+button, input, select, summary, a[href], [role="button"], [tabindex]:not([tabindex="-1"]) { min-height: 38px; }
+button:focus-visible, input:focus-visible, select:focus-visible,
+summary:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--lite);
+  outline-offset: 2px;
+}
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- A0 header + A1 stage navigation -------------------------------
+   The header is sticky so a presenter can always reach Guide, Settings and the
+   stage tabs. One measure (1180px) for the header, the tablist and main, so the
+   kicker, the tabs and the stage question all share a left edge. */
+.top {
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in srgb, var(--cream) 94%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--navy) 16%, transparent);
+  backdrop-filter: blur(12px);
+}
+.topline, .stages, main { max-width: 1180px; margin: 0 auto; }
+.topline { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: calc(14px + var(--safe-t)) 22px 10px; }
+.brandline { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: baseline; min-width: 0; }
+/* The kicker is `Murray State University · <tour part label>` — one spelling
+   fleet-wide, taken from tours/*.json, never an invented collection name. */
+.brand-kicker {
+  grid-column: 1 / -1;
+  color: var(--gold-deep); font-size: calc(var(--u) * .68); font-weight: 800;
+  letter-spacing: .14em; text-transform: uppercase;
+}
+.brandline h1 {
+  margin: 2px 0 0; color: var(--navy);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.45rem, 2.6vw, 2.25rem); line-height: 1.03;
+}
+.msu-brand { color: var(--ink-2); font-size: calc(var(--u) * .72); font-weight: 750; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.top-tools { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+/* Icon buttons carry a VISIBLE text label at >=480px; the icon alone is the
+   phone affordance. The accessible name stays on the button either way. */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  min-height: 40px; border: 1px solid var(--navy); border-radius: 999px;
+  padding: 5px 11px; color: var(--navy); background: var(--paper);
+  font-size: calc(var(--u) * .78); font-weight: 800;
+}
+.icon-btn:hover { background: var(--navy); color: #fff; }
+/* The header Notes button exists only in presentation mode (A8). */
+.top-tools .notes-open { display: none; }
+body.presenter .top-tools .notes-open { display: inline-flex; }
+
+/* A1: one tab per stage, short name + a question subtitle that ends in "?".
+   auto-fit means 2, 3 or 4 stages all work with no per-demo override. */
+.stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; padding: 0 22px 12px; }
+.stage-tab {
+  min-height: 52px; border: 1px solid var(--line); border-radius: 12px;
+  padding: 6px 9px; background: var(--paper); color: var(--ink-2);
+  font-weight: 800; line-height: 1.1; text-align: center;
+}
+.stage-tab span, .stage-tab small { display: block; }
+.stage-tab small { margin-top: 4px; color: var(--ink-3); font-size: calc(var(--u) * .68); font-weight: 650; }
+.stage-tab[aria-selected="true"] { border-color: var(--navy); background: var(--navy); color: #fff; box-shadow: inset 0 -4px 0 var(--gold); }
+.stage-tab[aria-selected="true"] small { color: var(--ink-2-on-navy); }
+/* A locked stage is dimmed but still announces why (title/aria-description on
+   the button); it is not removed, so the learner sees the whole route. */
+.stage-tab:disabled { opacity: .55; }
+.stage-tab .stage-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.45em; height: 1.45em; margin: 0 auto 2px; border-radius: 999px;
+  background: var(--cream-deep); color: var(--navy); font-size: calc(var(--u) * .72);
+}
+.stage-tab[aria-selected="true"] .stage-mark { background: var(--gold); color: var(--navy); }
+.stage-tab.complete .stage-mark { background: var(--ok); color: #fff; }
+
+/* ---------- A2 stage intro and lesson strip ------------------------------- */
+main { padding: 20px 22px 74px; }
+section.stage { display: none; }
+section.stage.on { display: block; }
+.stage-intro {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 22px;
+  padding: 22px; margin-bottom: 18px;
+  border: 1px solid var(--cream-deep); border-radius: var(--radius); background: var(--paper);
+}
+.intro-copy { max-width: 720px; }
+.eyebrow, .panel-kicker {
+  color: var(--gold-deep); font-size: calc(var(--u) * .72); font-weight: 850;
+  letter-spacing: .1em; text-transform: uppercase;
+}
+.stage-intro h2 {
+  margin: 5px 0 7px; color: var(--navy);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.5rem, 3vw, 2.35rem); line-height: 1.08;
+}
+/* The stage question is the first readable line after the nav (L3 pass
+   criterion). Exactly one question per stage — two is split attention. */
+.stage-question { margin: 0; color: var(--ink-2); font-size: calc(var(--u) * 1.02); }
+/* "Before you start": two or three sentences of prerequisite refresh, no more.
+   Bold every key term on first use and define it in place. */
+.refresh { margin: 11px 0 0; color: var(--ink-2); font-size: calc(var(--u) * .92); }
+.refresh b, .refresh strong { color: var(--navy); }
+.details-trigger {
+  align-self: start; min-height: 42px; border: 1px solid var(--navy);
+  border-radius: 999px; padding: 7px 13px; color: var(--navy);
+  background: transparent; font-weight: 800;
+}
+.details-trigger:hover { background: var(--navy); color: #fff; }
+/* Three cards, fixed labels: Predict · Try · Takeaway. */
+.lesson-strip { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.lesson-strip article { min-width: 0; border-left: 3px solid var(--gold); padding: 7px 10px; background: var(--cream); }
+.lesson-strip article span {
+  display: block; color: var(--navy); font-size: calc(var(--u) * .72);
+  font-weight: 850; letter-spacing: .08em; text-transform: uppercase;
+}
+.lesson-strip p { margin: 3px 0 0; color: var(--ink-2); font-size: calc(var(--u) * .8); }
+/* Where the activity captured the prediction, the observed result is echoed
+   beside it inside the Predict card. */
+/* text-transform is EXPLICITLY reset here, not merely omitted. `.echo` is a
+   span inside .lesson-strip article, and the card-label rule above styles
+   `.lesson-strip article span` — so without this the echo INHERITS the label's
+   uppercase and a captured prediction renders SHOUTING. Found by the
+   zero-to-unbeatable lane, which had to patch it demo-side; it belongs here.
+   letter-spacing is reset for the same reason. */
+.lesson-strip .echo {
+  display: block; margin-top: 5px; padding-top: 5px;
+  border-top: 1px dashed var(--cream-deep); color: var(--ink);
+  font-size: calc(var(--u) * .78);
+  font-weight: 400; text-transform: none; letter-spacing: normal;
+}
+.lesson-strip .echo b { color: var(--navy); }
+
+/* ---------- A2 phone intro disclosure (v3) --------------------------------
+   Operator ruling 2026-09-16, "collapsible intro at phone width". The
+   <details class="intro-more"> is BUILT BY behaviourScript() at runtime around
+   the lesson strip — partials.html is a reference sheet, not an injected file,
+   so markup there would reach only demos adopted after this change. See the
+   intro-disclosure section of index.js for why, and for what never collapses.
+
+   ABOVE 480px THIS IS INERT. The summary is display:none and the element is
+   held open, so the <details> is a transparent wrapper sitting in exactly the
+   grid cell .lesson-strip used to occupy: same geometry, no toggle chrome, and
+   nothing added to the accessibility tree. Desktop is unchanged by
+   construction rather than by inspection. */
+.stage-intro > .intro-more { grid-column: 1 / -1; margin: 0; }
+.intro-more > summary { display: none; }
+
+/* ---------- A3 provenance kickers and control labels ----------------------
+   SIX WORDS, and they are the only vocabulary. A claim on screen without one
+   of them is a defect (plan A3 / lens L1).
+
+     Live         computed here, now
+     Measured     computed here earlier and stored — say when, say the seed
+     Sourced      a published number — cite it in Details
+     Reasoned     the authors' own judgement, from the criteria the page shows
+     Scripted     a teaching fixture standing in for what a live system would
+                  have produced — say what is fixed
+     Illustrative invented numbers — say so
+
+   Reasoned was added on orchestrator ruling 2026-09-15, on evidence from the
+   front-doors accuracy audit. It is NOT a fold of Scripted: Scripted stands in
+   for a live system's output (the-stranger's 64 hand-written answers are the
+   type case), while Reasoned is judgement the authors own, derived from stated
+   criteria (front-doors' 28 job verdicts). Different mechanisms, so they
+   split. Without it, an honest "we could not confirm this" had to be rendered
+   as Illustrative — i.e. as INVENTED, which is a worse claim than the truth.
+
+   Reasoned reads neutral slate deliberately: a learner must not mistake a
+   judgement for a citation, so it shares nothing with Sourced's gold. */
+.k-live, .k-measured, .k-sourced, .k-reasoned, .k-scripted, .k-illustrative {
+  display: inline-block; border-radius: 999px; padding: 2px 8px;
+  font-size: calc(var(--u) * .64); font-weight: 850;
+  letter-spacing: .09em; text-transform: uppercase; white-space: nowrap;
+}
+.k-live { background: var(--ok-soft); color: var(--ok); }
+.k-measured { background: var(--lite-soft); color: var(--lite-deep); }
+.k-sourced { background: var(--cream-deep); color: var(--gold-deep); }
+.k-reasoned { background: #E3EAF0; color: #38546B; box-shadow: inset 0 0 0 1px #B9C8D4; }
+.k-scripted { background: #EEE6F5; color: #5A3E8C; }
+.k-illustrative { background: var(--bad-soft); color: var(--bad); }
+/* On a navy surface the same six read light. */
+.workbench .k-live, .navy-surface .k-live { background: rgba(255,255,255,.16); color: #9EE7C8; }
+.workbench .k-measured, .navy-surface .k-measured { background: rgba(255,255,255,.16); color: #8FD8F5; }
+.workbench .k-sourced, .navy-surface .k-sourced { background: rgba(255,255,255,.16); color: var(--gold-lite); }
+.workbench .k-reasoned, .navy-surface .k-reasoned { background: rgba(255,255,255,.16); color: #C6D6E3; box-shadow: inset 0 0 0 1px rgba(255,255,255,.34); }
+.workbench .k-scripted, .navy-surface .k-scripted { background: rgba(255,255,255,.16); color: #D3BCF2; }
+.workbench .k-illustrative, .navy-surface .k-illustrative { background: rgba(255,255,255,.16); color: #FFB49B; }
+
+/* AN HONESTY QUALIFIER, not a label. One optional free-text rider appended to
+   a provenance label, subordinate to it, never replacing it. The demo supplies
+   its own string; the kit deliberately does not enumerate the kinds, because
+   two audits produced four different kinds in two days:
+
+     Sourced · unconfirmed since 2026-09-08        staleness
+     Sourced · typical, range 250–400 MPa          one point in a real spread
+     Sourced · specified minimum, not typical      the value is a floor
+     Sourced · IRC 2021 — differs under IBC        code- and edition-dependent
+     Measured · seed 41                            which run produced it
+
+   Why a rider and not a second label: an unconfirmed published figure is still
+   Sourced. Demoting it to Illustrative would say it was invented, which is a
+   worse claim than the truth. Same for a range — a real spread reported at one
+   point is still a sourced measurement, honestly narrowed.
+
+   It wraps rather than pushing the panel wide: some riders are a clause, not a
+   word, and a phone at 320px must not scroll sideways. The LABEL stays nowrap. */
+.k-qual {
+  display: inline; margin-left: 5px;
+  color: var(--ink-3); font-size: calc(var(--u) * .66); font-weight: 650;
+  font-style: italic; letter-spacing: .02em;
+  white-space: normal; text-transform: none;
+}
+.k-qual::before { content: "· "; font-style: normal; }
+.workbench .k-qual, .navy-surface .k-qual { color: var(--ink-3-on-navy); }
+
+/* A claim-bearing prose block inside the Details drawer. The audit's second
+   structural finding was that a demo can label its grid cells and leave its
+   detail prose unlabeled — and that unlabeled surface is exactly where the one
+   uncertain claim lives. So detail prose that carries a claim is wrapped in
+   .claim and MUST open with a kicker; check-shell.js enforces that on any
+   block marked .claim. It cannot enforce it on prose nobody marked — see the
+   note at the head of check-shell.js. */
+.claim { margin: 0 0 12px; padding: 9px 11px 10px; border-left: 3px solid var(--line); border-radius: 0 var(--radius-2) var(--radius-2) 0; background: var(--cream); }
+.claim > .panel-kicker { display: block; margin-bottom: 4px; }
+.claim > p:last-child { margin-bottom: 0; }
+
+/* A3: every control says what changes and WHY you would change it. The label
+   sits at the control, never in a legend elsewhere (spatial contiguity). */
+.control-label { display: block; margin: 2px 0 5px; color: var(--ink-2); font-size: calc(var(--u) * .78); font-weight: 800; }
+.control-label .why { display: block; color: var(--ink-3); font-size: calc(var(--u) * .88); font-weight: 500; }
+.workbench .control-label, .navy-surface .control-label { color: var(--ink-2-on-navy); }
+.workbench .control-label .why, .navy-surface .control-label .why { color: var(--ink-3-on-navy); }
+
+/* ---------- A4 observation cue -------------------------------------------
+   One aria-live line that names the thing to notice at the moment it becomes
+   true. Must appear within one screen of the control that caused it. */
+.obs-cue {
+  display: flex; align-items: center; gap: 9px; min-height: 40px;
+  margin: 12px 0; padding: 8px 12px;
+  border-left: 4px solid var(--lite); border-radius: var(--radius-2);
+  background: var(--lite-soft); color: var(--ink);
+  font-size: calc(var(--u) * .88);
+}
+.obs-cue::before { content: "Notice"; color: var(--lite-deep); font-size: calc(var(--u) * .66); font-weight: 850; letter-spacing: .09em; text-transform: uppercase; flex: 0 0 auto; }
+.obs-cue:empty { display: none; }
+.obs-cue.cue-warm { border-left-color: var(--gold); background: #FFF6DC; }
+.obs-cue.cue-warm::before { color: var(--gold-deep); }
+
+/* ---------- generic surfaces a wrapped activity can reuse ----------------- */
+.card { min-width: 0; margin-bottom: 18px; border: 1px solid var(--cream-deep); border-radius: var(--radius); padding: 20px; background: var(--paper); color: var(--ink); }
+.workbench { min-width: 0; margin-bottom: 18px; border: 1px solid var(--navy); border-radius: var(--radius); padding: 20px; background: var(--navy); color: var(--ink-on-navy); box-shadow: 0 9px 24px rgba(0, 33, 68, .12); }
+.panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; margin-bottom: 9px; flex-wrap: wrap; }
+.panel-head h3 { margin: 3px 0 0; color: inherit; font-family: Georgia, "Times New Roman", serif; font-size: calc(var(--u) * 1.25); line-height: 1.12; }
+.workbench .panel-kicker { color: var(--gold-lite); }
+.panel-lede { margin: 0 0 14px; color: var(--ink-2); font-size: calc(var(--u) * .88); }
+.workbench .panel-lede { color: var(--ink-2-on-navy); }
+.note { color: var(--ink-3); font-size: calc(var(--u) * .78); }
+.workbench .note { color: var(--ink-3-on-navy); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; border: 1px solid var(--gold); border-radius: var(--radius-2);
+  padding: 9px 14px; background: var(--gold); color: var(--navy); font-weight: 850;
+}
+.btn:hover:not(:disabled) { background: #FFD05A; border-color: #FFD05A; }
+.btn.ghost { border-color: var(--navy); background: transparent; color: var(--navy); }
+.btn.ghost:hover:not(:disabled) { background: var(--navy); color: #fff; }
+.workbench .btn.ghost { border-color: var(--line-on-navy); color: #fff; }
+.workbench .btn.ghost:hover:not(:disabled) { background: #fff; border-color: #fff; color: var(--navy); }
+.btn.small { min-height: 40px; padding: 7px 11px; font-size: calc(var(--u) * .82); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+
+/* ---------- A6 check yourself --------------------------------------------
+   One or two items per stage, answerable from what was just observed, with
+   written feedback for EVERY option. At least one refutation item per demo:
+   it states the flawed model and the feedback names why it is wrong. */
+.check { margin: 18px 0 0; border: 1px solid var(--cream-deep); border-left: 4px solid var(--navy); border-radius: var(--radius); padding: 18px 20px; background: var(--paper); }
+.check h3 { margin: 4px 0 4px; color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-size: calc(var(--u) * 1.18); }
+.check .check-prompt { margin: 0 0 11px; color: var(--ink); }
+.check-options { display: grid; gap: 8px; }
+.check-option {
+  min-height: 46px; border: 1px solid var(--line); border-radius: var(--radius-2);
+  padding: 9px 13px; background: var(--paper); color: var(--ink);
+  font-weight: 650; text-align: left;
+}
+.check-option:hover:not(:disabled) { border-color: var(--navy); background: var(--cream); }
+.check-option[aria-pressed="true"] { border-color: var(--navy); border-width: 2px; background: var(--cream); font-weight: 800; }
+.check-option.correct[aria-pressed="true"] { border-color: var(--ok); background: var(--ok-soft); }
+.check-option.wrong[aria-pressed="true"] { border-color: var(--bad); background: var(--bad-soft); }
+.check-feedback { margin: 11px 0 0; color: var(--ink-2); font-size: calc(var(--u) * .9); }
+.check-feedback:empty { display: none; }
+.check-feedback b { color: var(--navy); }
+/* Peer Instruction: in presentation mode the item goes large and the feedback
+   stays hidden until the room has voted and someone taps. */
+body.presenter .check .check-prompt { font-size: calc(var(--u) * 1.12); }
+body.presenter .check-option { font-size: calc(var(--u) * 1.02); }
+
+/* ---------- A5 Details drawer, and A7/A8 dialogs --------------------------
+   A5 is a right-side drawer; A7 (Guide), A8 (Settings) and the presenter notes
+   are centred cards. `margin: auto` is what centres a <dialog> whose width is
+   constrained — without it the card sits against the left edge at >=1024px
+   (this is task-glass-box-dialog-centering, fixed here once for the fleet). */
+body.details-open { overflow: hidden; }
+.details-sheet { inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: none; padding: 0; border: 0; background: transparent; }
+.details-sheet::backdrop, .lesson-dialog::backdrop { background: rgba(0, 33, 68, .36); backdrop-filter: blur(2px); }
+.details-sheet[open] { display: flex; justify-content: flex-end; }
+.details-drawer { display: flex; flex-direction: column; width: min(510px, 46vw); height: 100%; background: var(--paper); color: var(--ink); box-shadow: -18px 0 48px rgba(0, 33, 68, .24); }
+.details-body { flex: 1; overflow: auto; padding: 22px; }
+.details-body h3 { margin: 16px 0 6px; color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-size: calc(var(--u) * 1.2); }
+.details-body h3:first-of-type { margin-top: 4px; }
+.details-body p { margin: 0 0 11px; color: var(--ink-2); }
+.details-body ul, .details-body ol { margin: 0 0 11px; padding-left: 21px; color: var(--ink-2); }
+.details-body li { margin: 4px 0; }
+.details-note { color: var(--ink-3) !important; font-size: calc(var(--u) * .8); }
+.details-stage { display: none; }
+.details-stage.on { display: block; }
+.details-formula { margin: 10px 0; padding: 11px; border-radius: var(--radius-2); background: var(--navy); color: #fff; font: 800 calc(var(--u) * 1.1) Georgia, "Times New Roman", serif; text-align: center; }
+/* The closing Boundary card: what this demo does NOT claim. */
+.evidence-card { margin-top: 14px; border: 1px solid var(--cream-deep); border-left: 4px solid var(--gold); border-radius: 9px; padding: 11px; background: var(--cream); color: var(--ink-2); font-size: calc(var(--u) * .86); }
+.evidence-card b { color: var(--navy); }
+
+.lesson-dialog {
+  width: min(680px, calc(100% - 32px)); max-height: min(88dvh, 800px);
+  margin: auto; padding: 0;
+  border: 1px solid var(--navy); border-top: 5px solid var(--gold); border-radius: 14px;
+  background: var(--paper); color: var(--ink); box-shadow: 0 24px 70px rgba(0, 33, 68, .3);
+}
+.lesson-dialog[open] { display: flex; flex-direction: column; }
+.lesson-dialog-head, .details-drawer .lesson-dialog-head { display: flex; align-items: center; gap: 10px; padding: 13px 16px; background: var(--navy); color: #fff; }
+.lesson-dialog-head h2 { flex: 1; margin: 0; color: #fff; font-size: calc(var(--u) * 1.18); }
+.lesson-dialog-head .head-sub { display: block; margin-top: 2px; color: var(--gold-lite); font-size: calc(var(--u) * .7); letter-spacing: .08em; text-transform: uppercase; }
+.lesson-dialog-head button { min-width: 40px; min-height: 40px; border: 1px solid var(--gold); border-radius: 8px; background: var(--gold); color: var(--navy); font-weight: 900; }
+.lesson-dialog-body { flex: 1; min-height: 0; overflow: auto; padding: 17px 19px 10px; }
+.lesson-dialog-body h3 { margin: 15px 0 5px; color: var(--navy); }
+.lesson-dialog-body p { margin: 0 0 10px; }
+.lesson-dialog-body ol, .lesson-dialog-body ul { padding-left: 22px; }
+.lesson-dialog-body li { margin: 5px 0; }
+.lesson-dialog-body .lede, .lesson-dialog-body .setnote { color: var(--ink-2); }
+.lesson-dialog-body .btn { width: 100%; }
+.lesson-dialog-actions { display: flex; justify-content: flex-end; padding: 10px 18px 16px; }
+.lesson-dialog-actions button { min-height: 44px; border: 1px solid var(--navy); border-radius: 8px; padding: 8px 16px; background: var(--navy); color: #fff; font-weight: 800; }
+/* The presenter notes are the printable guide, injected at build time. The
+   guide's own scoped stylesheet lands after this file, so it wins inside here. */
+.guide-host { padding-top: 14px; }
+.guide-host .guide-scope { zoom: 1; }
+.guide-host .guide-scope .page-break { break-before: auto; page-break-before: auto; padding-top: 0; }
+.guide-host .guide-scope header, .guide-host .guide-scope .g-head { display: block; }
+.guide-print { margin: 14px 0 4px; border-top: 1px solid var(--line); padding-top: 10px; color: var(--ink-2); font-size: calc(var(--u) * .84); }
+.guide-print a, .footer-link { color: var(--lite-deep); }
+
+/* ---------- A0 footer and the credit pill --------------------------------- */
+.footer { padding: 24px 22px 78px; color: var(--ink-3); font-size: calc(var(--u) * .78); text-align: center; }
+.footer-tools { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.footer-link { min-height: 36px; border: 0; background: transparent; font-weight: 750; text-decoration: underline; }
+
+/* ONE spec fleet-wide (plan A0, closing task-shared-credit-pill-design).
+   Text is exactly "Bryant Harrison · Murray State University" — provenance
+   belongs in demo.json built_with, not on the glass. Fixed in px, not --u, so
+   presentation mode does not blow it up on a projector. It never takes a
+   pointer event, and it hides whenever a modal or a bottom control bar is
+   open, so it cannot sit over a control. */
+.bh-credit {
+  position: fixed; left: 8px; bottom: calc(6px + var(--safe-b)); z-index: 30;
+  max-width: calc(100vw - 16px);
+  pointer-events: none;
+  font: 600 10px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--gold); background: rgba(0, 33, 68, .85);
+  border: 1px solid rgba(236, 172, 0, .4);
+  padding: 3px 10px; border-radius: 999px; letter-spacing: .03em;
+  animation: bh-settle 9s ease forwards;
+}
+@keyframes bh-settle { 0%, 65% { opacity: .93 } 100% { opacity: .5 } }
+body:has(dialog[open]) .bh-credit,
+body.has-bottom-bar .bh-credit { display: none; }
+@media print { .bh-credit { display: none !important; } }
+
+/* ---------- breakpoints ---------------------------------------------------
+   phone <= 480, narrow <= 760, wide > 760, plus the landscape-short case: a
+   phone held sideways on a projector table. Demo 1 has it, Demo 2 does not;
+   the plan keeps it. */
+/* The pill is position:fixed, so the page scrolls UNDER it and no amount of
+   padding can stop it passing over mid-page content — that is inherent to a
+   standing byline, and is why it takes no pointer event and fades to .5 (Demo
+   1 and Demo 2 both ship it that way). What padding CAN fix is the end of the
+   scroll, where the footer would otherwise sit permanently underneath it. So:
+   reserve that space at phone widths, and keep the pill as LOW as possible.
+
+   An earlier version of this file raised the pill 62px at <= 820px to clear a
+   bottom control bar. That was wrong twice over — it made mid-page overlap
+   worse rather than better (measured at 390px, sitting across the Predict
+   card), and a demo that actually has a bottom bar sets body.has-bottom-bar,
+   which HIDES the pill outright, so nothing needed raising. */
+@media (max-width: 480px) {
+  body { padding-bottom: calc(28px + var(--safe-b)); }
+}
+@media (max-width: 760px) {
+  .topline { padding: calc(12px + var(--safe-t)) 14px 9px; }
+  .stages { padding: 0 14px 10px; }
+  main { padding: 15px 14px 68px; }
+  .stage-intro { grid-template-columns: 1fr; padding: 17px; }
+  .details-trigger { justify-self: start; }
+  .lesson-strip { grid-template-columns: 1fr; }
+  .details-drawer { width: min(620px, 100vw); }
+  .check { padding: 15px 16px; }
+}
+@media (max-width: 480px) {
+  /* ---- A2 intro disclosure: the phone affordance ------------------------
+     The ONLY width at which the toggle exists. `phone` on the kit's own scale,
+     and the width at which the measurement says the intro stops fitting: at
+     320 the full intro is 726-775px against a 568-578px viewport, so it is
+     more than a whole screen by itself.
+
+     What stays visible when collapsed: the eyebrow, the h2 stage title, the
+     stage question and the Details pill. What goes behind the toggle: the
+     lesson strip (moved into the <details> by the shell) and the "Before you
+     start" refresh (hidden by the :has() rule below rather than moved, so the
+     desktop grid keeps identical geometry). The stage question stays because
+     it is the one line that orients; the h2 stays because .stage-intro is
+     aria-labelledby it, so hiding it would strip the region's accessible name.
+     The same judgement the landscape-short block below already made. */
+  .intro-more > summary {
+    display: flex; align-items: center; gap: 8px;
+    min-height: 44px; margin-top: 2px;
+    border-top: 1px dashed var(--cream-deep); padding: 9px 2px 0;
+    color: var(--navy); font-size: calc(var(--u) * .72); font-weight: 850;
+    letter-spacing: .07em; text-transform: uppercase;
+    cursor: pointer;
+  }
+  /* The default triangle is replaced by a chevron that reads at 12px and
+     rotates, so there is an unambiguous "there is more here" affordance. */
+  .intro-more > summary { list-style: none; }
+  .intro-more > summary::-webkit-details-marker { display: none; }
+  .intro-more > summary::after {
+    content: "\25BE"; margin-left: auto;
+    font-size: calc(var(--u) * .95); line-height: 1;
+    transition: transform .15s ease;
+  }
+  .intro-more[open] > summary::after { transform: rotate(180deg); }
+  .intro-more[open] > summary { border-bottom: 0; }
+  /* The refresh is HIDDEN, not moved: moving it out of .intro-copy would
+     change the desktop grid. :has() is already a dependency of this file (see
+     the credit pill's body:has(dialog[open]) rule). */
+  .stage-intro:has(> .intro-more:not([open])) .refresh { display: none; }
+  /* A projector is not a phone: presentation mode keeps the whole intro, and
+     the shell forces the element open to match. */
+  body.presenter .intro-more > summary { display: none; }
+
+  .brandline { grid-template-columns: 1fr; }
+  .msu-brand { white-space: normal; }
+  .topline { align-items: start; }
+  .top-tools { gap: 4px; }
+  .icon-btn { min-width: 40px; padding: 5px 8px; }
+  .icon-label { display: none; }
+  .stages { gap: 5px; }
+  .stage-tab { min-height: 50px; font-size: calc(var(--u) * .82); }
+  .stage-tab small { font-size: calc(var(--u) * .6); }
+  .lesson-strip { gap: 7px; }
+  .stage-intro h2 { font-size: 1.65rem; }
+  .card, .workbench { padding: 15px; }
+  .lesson-dialog { width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; border-left: 0; border-right: 0; }
+  .lesson-dialog-body { padding: 14px 14px 44px; }
+  .details-drawer { width: 100vw; }
+  /* The page must not scroll sideways at 320px. Anything wider than the
+     viewport inside a stage is the demo's job to make scrollable itself. */
+  .footer { padding: 20px 14px 72px; }
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .top { position: static; }
+  .topline { padding: 8px 14px 6px; }
+  .brandline h1 { font-size: 1.25rem; }
+  .stages { padding: 0 14px 7px; }
+  .stage-tab { min-height: 42px; }
+  .stage-tab small { display: none; }
+  main { padding: 10px 14px 44px; }
+  /* Keep the question and the Predict card; the title, the refresh line and
+     the other two cards cost more height than they earn here. */
+  .stage-intro { padding: 11px 13px; margin-bottom: 10px; gap: 8px 14px; }
+  .stage-intro h2, .stage-intro .eyebrow, .stage-intro .refresh { display: none; }
+  .stage-question { font-size: calc(var(--u) * .94); }
+  .lesson-strip { grid-template-columns: 1fr; gap: 4px; }
+  .lesson-strip article:not(:first-child) { display: none; }
+  .lesson-strip article:first-child { display: grid; grid-template-columns: 4.5rem 1fr; gap: .5rem; align-items: baseline; }
+  .obs-cue { margin: 7px 0; min-height: 34px; }
+  .check { margin-top: 10px; padding: 11px 13px; }
+  .footer { padding: 12px 14px 40px; }
+}
+
+/* ---------- required accessibility blocks (A0) ---------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  html { scroll-behavior: auto; }
+}
+@media (prefers-contrast: more) {
+  :root { --ink-2: #26394D; --ink-3: #33475C; --line: #6D8496; --cream-deep: #C9BC9F; --ink-2-on-navy: #EDF5FB; --ink-3-on-navy: #DCE9F3; }
+  .stage-tab, .check-option, .icon-btn { border-width: 2px; }
+  .lesson-strip article { border-left-width: 5px; }
+}

@@ -2867,6 +2867,21 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .velocity-bars [data-acceleration-bar] { background: #333 !important; }
 }
 
+/* Standalone activities keep their own document, styles, workers and controls. */
+.document-activity { min-width: 0; }
+.document-activity iframe { display: block; width: 100%; height: 80vh; min-height: 34rem; border: 1px solid var(--line); border-radius: .5rem; background: var(--paper); }
+.activity-links { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; }
+.document-activity + p { margin-top: 1rem; }
+[class^="activity-notes-"] { overflow-wrap: anywhere; }
+[class^="activity-notes-"] table { display: block; max-width: 100%; overflow-x: auto; }
+@media (max-width: 40rem) {
+  .document-activity iframe { min-height: 32rem; height: 75vh; }
+}
+@media print {
+  .document-activity iframe { display: none !important; }
+  .activity-links { display: block; }
+}
+
 /* ---- aggregate: many pages stacked in one printable file --------------- */
 .aggregate main { padding: clamp(1.5rem, 4vw, 3rem); max-width: 52rem; margin: 0 auto; }
 .agg-head { margin-bottom: 3rem; }
@@ -4638,7 +4653,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="three-categories-one-question" data-card="three-categories-one-question">
+  <details class="xcard deck-slide" id="equipment-categories--three-categories-one-question" data-card="equipment-categories--three-categories-one-question">
     <summary>Three categories, one question<span class="chev"></span></summary>
     <div class="body">
       <h2>Three categories, one question</h2>
@@ -4655,7 +4670,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   to every category, to every person present &mdash; see <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a> and <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="category-1" data-card="category-1">
+  <details class="xcard deck-slide" id="equipment-categories--category-1" data-card="equipment-categories--category-1">
     <summary><span class="cat cat-1">Category 1</span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="cat cat-1">Category 1</span></h2>
@@ -4666,7 +4681,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="category-2" data-card="category-2">
+  <details class="xcard deck-slide" id="equipment-categories--category-2" data-card="equipment-categories--category-2">
     <summary><span class="cat cat-2">Category 2</span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="cat cat-2">Category 2</span></h2>
@@ -4678,7 +4693,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="category-3" data-card="category-3">
+  <details class="xcard deck-slide is-stop" id="equipment-categories--category-3" data-card="equipment-categories--category-3">
     <summary><span class="cat cat-3">Category 3</span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="cat cat-3">Category 3</span></h2>
@@ -4692,7 +4707,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-wiki-only" id="which-category-is-my-machine" data-card="which-category-is-my-machine">
+  <details class="xcard deck-wiki-only" id="equipment-categories--which-category-is-my-machine" data-card="equipment-categories--which-category-is-my-machine">
     <summary>Which category is my machine?<span class="chev"></span></summary>
     <div class="body">
       <h2>Which category is my machine?</h2>
@@ -4719,7 +4734,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="before-operating-any-equipment" data-card="before-operating-any-equipment">
+  <details class="xcard deck-slide" id="equipment-operating-procedure--before-operating-any-equipment" data-card="equipment-operating-procedure--before-operating-any-equipment">
     <summary><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment<span class="chev"></span></summary>
     <div class="body">
       <h2><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment</h2>
@@ -4734,7 +4749,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="during-equipment-operation" data-card="during-equipment-operation">
+  <details class="xcard deck-slide" id="equipment-operating-procedure--during-equipment-operation" data-card="equipment-operating-procedure--during-equipment-operation">
     <summary><span class="phase" data-phase="During" aria-hidden="true"></span>During equipment operation<span class="chev"></span></summary>
     <div class="body">
       <h2><span class="phase" data-phase="During" aria-hidden="true"></span>During equipment operation</h2>
@@ -4746,7 +4761,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   are covered in <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="after-operating-any-equipment" data-card="after-operating-any-equipment">
+  <details class="xcard deck-slide" id="equipment-operating-procedure--after-operating-any-equipment" data-card="equipment-operating-procedure--after-operating-any-equipment">
     <summary><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment<span class="chev"></span></summary>
     <div class="body">
       <h2><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment</h2>
@@ -4773,7 +4788,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="personal-protective-equipment" data-card="personal-protective-equipment">
+  <details class="xcard deck-slide" id="ppe--personal-protective-equipment" data-card="ppe--personal-protective-equipment">
     <summary>Personal Protective Equipment<span class="chev"></span></summary>
     <div class="body">
       <h2>Personal Protective Equipment</h2>
@@ -4788,7 +4803,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </dl>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="eye-protection" data-card="eye-protection">
+  <details class="xcard deck-slide is-gate" id="ppe--eye-protection" data-card="ppe--eye-protection">
     <summary>Eye protection<span class="chev"></span></summary>
     <div class="body">
       <h2>Eye protection</h2>
@@ -4809,7 +4824,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="hearing-protection" data-card="hearing-protection">
+  <details class="xcard deck-slide is-gate" id="ppe--hearing-protection" data-card="ppe--hearing-protection">
     <summary>Hearing protection<span class="chev"></span></summary>
     <div class="body">
       <h2>Hearing protection</h2>
@@ -4854,7 +4869,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="aside">Both types significantly reduce harmful noise levels.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="foot-protection" data-card="foot-protection">
+  <details class="xcard deck-slide" id="ppe--foot-protection" data-card="ppe--foot-protection">
     <summary>Foot protection<span class="chev"></span></summary>
     <div class="body">
       <h2>Foot protection</h2>
@@ -4877,7 +4892,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   supportive and comfortable.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="respiratory-protection" data-card="respiratory-protection">
+  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection" data-card="ppe--respiratory-protection">
     <summary>Respiratory protection<span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection</h2>
@@ -4896,7 +4911,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   same protection. The next section is the one that decides which you need.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="respiratory-protection-what-to-wear" data-card="respiratory-protection-what-to-wear">
+  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection-what-to-wear" data-card="ppe--respiratory-protection-what-to-wear">
     <summary>Respiratory protection &mdash; what to wear<span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection &mdash; what to wear</h2>
@@ -4927,7 +4942,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   see <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="clothing-and-jewelry" data-card="clothing-and-jewelry">
+  <details class="xcard deck-slide is-stop" id="ppe--clothing-and-jewelry" data-card="ppe--clothing-and-jewelry">
     <summary>Clothing and jewelry<span class="chev"></span></summary>
     <div class="body">
       <h2>Clothing and jewelry</h2>
@@ -4944,7 +4959,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="hair-and-what-to-wear-instead" data-card="hair-and-what-to-wear-instead">
+  <details class="xcard deck-slide" id="ppe--hair-and-what-to-wear-instead" data-card="ppe--hair-and-what-to-wear-instead">
     <summary>Hair, and what to wear instead<span class="chev"></span></summary>
     <div class="body">
       <h2>Hair, and what to wear instead</h2>
@@ -4973,7 +4988,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-gate" id="lifting-rules" data-card="lifting-rules">
+  <details class="xcard deck-slide is-gate" id="lifting-and-carrying--lifting-rules" data-card="lifting-and-carrying--lifting-rules">
     <summary>Lifting Rules<span class="chev"></span></summary>
     <div class="body">
       <h2>Lifting Rules</h2>
@@ -5008,7 +5023,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   that point just sits somewhere different for every person and every shape.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="proper-lifting-technique" data-card="proper-lifting-technique">
+  <details class="xcard deck-slide" id="lifting-and-carrying--proper-lifting-technique" data-card="lifting-and-carrying--proper-lifting-technique">
     <summary>Proper lifting technique<span class="chev"></span></summary>
     <div class="body">
       <h2>Proper lifting technique</h2>
@@ -5039,7 +5054,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="electrical-sources" data-card="electrical-sources">
+  <details class="xcard deck-slide" id="electrical-safety--electrical-sources" data-card="electrical-safety--electrical-sources">
     <summary>Electrical Sources<span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical Sources</h2>
@@ -5062,7 +5077,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-shock-hazard" data-card="electrical-shock-hazard">
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-shock-hazard" data-card="electrical-safety--electrical-shock-hazard">
     <summary>Electrical &mdash; Shock Hazard<span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical &mdash; Shock Hazard</h2>
@@ -5100,7 +5115,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-burn-hazard" data-card="electrical-burn-hazard">
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-burn-hazard" data-card="electrical-safety--electrical-burn-hazard">
     <summary>Electrical &mdash; Burn Hazard<span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical &mdash; Burn Hazard</h2>
@@ -5173,7 +5188,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   not by the number printed on the front of the supply.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-conductors" data-card="electrical-conductors">
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-conductors" data-card="electrical-safety--electrical-conductors">
     <summary>Electrical Conductors<span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical Conductors</h2>
@@ -5294,7 +5309,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="cords-on-the-floor-the-one-most-likely-to-get-you" data-card="cords-on-the-floor-the-one-most-likely-to-get-you">
+  <details class="xcard deck-slide is-stop" id="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you">
     <summary>Cords on the floor &mdash; the one most likely to get you<span class="chev"></span></summary>
     <div class="body">
       <h2>Cords on the floor &mdash; the one most likely to get you</h2>
@@ -5385,7 +5400,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <a class="xref-page" href="#p-5s-workplace-organization">5S</a>. The safety case and the lean case are the same case.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="if-someone-is-shocked" data-card="if-someone-is-shocked">
+  <details class="xcard deck-slide is-stop" id="electrical-safety--if-someone-is-shocked" data-card="electrical-safety--if-someone-is-shocked">
     <summary>If someone is shocked<span class="chev"></span></summary>
     <div class="body">
       <h2>If someone is shocked</h2>
@@ -5422,7 +5437,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="what-is-a-safety-data-sheet-sds" data-card="what-is-a-safety-data-sheet-sds">
+  <details class="xcard deck-slide" id="chemicals-and-sds--what-is-a-safety-data-sheet-sds" data-card="chemicals-and-sds--what-is-a-safety-data-sheet-sds">
     <summary>What is a Safety Data Sheet (SDS)?<span class="chev"></span></summary>
     <div class="body">
       <h2>What is a Safety Data Sheet (SDS)?</h2>
@@ -5450,7 +5465,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Signal words, pictograms and H-numbers &mdash; how Section 2 is written.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="where-is-sds-binder-located" data-card="where-is-sds-binder-located">
+  <details class="xcard deck-slide" id="chemicals-and-sds--where-is-sds-binder-located" data-card="chemicals-and-sds--where-is-sds-binder-located">
     <summary>Where is SDS binder located?<span class="chev"></span></summary>
     <div class="body">
       <h2>Where is SDS binder located?</h2>
@@ -5473,7 +5488,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Telling a current sheet from an old one.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="material-storage-and-incompatible-materials" data-card="material-storage-and-incompatible-materials">
+  <details class="xcard deck-slide" id="chemicals-and-sds--material-storage-and-incompatible-materials" data-card="chemicals-and-sds--material-storage-and-incompatible-materials">
     <summary>Material Storage and incompatible materials<span class="chev"></span></summary>
     <div class="body">
       <h2>Material Storage and incompatible materials</h2>
@@ -5518,7 +5533,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="rotating-machinery" data-card="rotating-machinery">
+  <details class="xcard deck-slide is-stop" id="machine-hazards--rotating-machinery" data-card="machine-hazards--rotating-machinery">
     <summary>Rotating machinery<span class="chev"></span></summary>
     <div class="body">
       <h2>Rotating machinery</h2>
@@ -5639,7 +5654,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; What the investigations actually describe.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="moving-machinery-and-pinch-points" data-card="moving-machinery-and-pinch-points">
+  <details class="xcard deck-slide is-gate" id="machine-hazards--moving-machinery-and-pinch-points" data-card="machine-hazards--moving-machinery-and-pinch-points">
     <summary>Moving machinery and pinch points<span class="chev"></span></summary>
     <div class="body">
       <h2>Moving machinery and pinch points</h2>
@@ -5735,7 +5750,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Why belts and chains count as rotating, not pinching.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="guards-stay-on-and-taking-one-off-is-not-your-call" data-card="guards-stay-on-and-taking-one-off-is-not-your-call">
+  <details class="xcard deck-slide is-stop" id="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call">
     <summary>Guards stay on, and taking one off is not your call<span class="chev"></span></summary>
     <div class="body">
       <h2>Guards stay on, and taking one off is not your call</h2>
@@ -5760,7 +5775,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Why the rule has no exceptions in it.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="lockout-tagout-before-anyone-works-on-a-machine" data-card="lockout-tagout-before-anyone-works-on-a-machine">
+  <details class="xcard deck-slide is-stop" id="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine">
     <summary>Lockout/Tagout &mdash; before anyone works on a machine<span class="chev"></span></summary>
     <div class="body">
       <h2>Lockout/Tagout &mdash; before anyone works on a machine</h2>
@@ -5795,7 +5810,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="deeper-ref" id="deeper-ref-11">Supporting detail: <a href="#deeper-addendum-11"><strong>Addendum 11</strong></a> &mdash; What the standard actually covers.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="the-environment-around-the-machine" data-card="the-environment-around-the-machine">
+  <details class="xcard deck-slide" id="machine-hazards--the-environment-around-the-machine" data-card="machine-hazards--the-environment-around-the-machine">
     <summary>The environment around the machine<span class="chev"></span></summary>
     <div class="body">
       <h2>The environment around the machine</h2>
@@ -5806,7 +5821,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </dl>
     </div>
   </details>
-  <details class="xcard deck-slide" id="operating-habits" data-card="operating-habits">
+  <details class="xcard deck-slide" id="machine-hazards--operating-habits" data-card="machine-hazards--operating-habits">
     <summary>Operating habits<span class="chev"></span></summary>
     <div class="body">
       <h2>Operating habits</h2>
@@ -5836,7 +5851,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="decide-before-you-reach-for-anything" data-card="decide-before-you-reach-for-anything">
+  <details class="xcard deck-slide is-stop" id="fire-safety--decide-before-you-reach-for-anything" data-card="fire-safety--decide-before-you-reach-for-anything">
     <summary>Decide before you reach for anything<span class="chev"></span></summary>
     <div class="body">
       <h2>Decide before you reach for anything</h2>
@@ -5856,7 +5871,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="using-an-extinguisher-pass" data-card="using-an-extinguisher-pass">
+  <details class="xcard deck-slide" id="fire-safety--using-an-extinguisher-pass" data-card="fire-safety--using-an-extinguisher-pass">
     <summary>Using an extinguisher &mdash; PASS<span class="chev"></span></summary>
     <div class="body">
       <h2>Using an extinguisher &mdash; PASS</h2>
@@ -5895,7 +5910,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   you. Do not assume it is over &mdash; a knocked-down fire can reignite.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="fire-classes-and-what-puts-them-out" data-card="fire-classes-and-what-puts-them-out">
+  <details class="xcard deck-slide" id="fire-safety--fire-classes-and-what-puts-them-out" data-card="fire-safety--fire-classes-and-what-puts-them-out">
     <summary>Fire classes, and what puts them out<span class="chev"></span></summary>
     <div class="body">
       <h2>Fire classes, and what puts them out</h2>
@@ -5921,7 +5936,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   on it.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="metal-fires-and-what-it-takes-to-start-one" data-card="metal-fires-and-what-it-takes-to-start-one">
+  <details class="xcard deck-slide is-stop" id="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card="fire-safety--metal-fires-and-what-it-takes-to-start-one">
     <summary>Metal fires, and what it takes to start one<span class="chev"></span></summary>
     <div class="body">
       <h2>Metal fires, and what it takes to start one</h2>
@@ -6012,7 +6027,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="hot-work-and-the-things-that-start-fires" data-card="hot-work-and-the-things-that-start-fires">
+  <details class="xcard deck-slide" id="fire-safety--hot-work-and-the-things-that-start-fires" data-card="fire-safety--hot-work-and-the-things-that-start-fires">
     <summary>Hot work and the things that start fires<span class="chev"></span></summary>
     <div class="body">
       <h2>Hot work and the things that start fires</h2>
@@ -6038,7 +6053,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-wiki-only" id="know-these-before-you-need-them" data-card="know-these-before-you-need-them">
+  <details class="xcard deck-wiki-only" id="fire-safety--know-these-before-you-need-them" data-card="fire-safety--know-these-before-you-need-them">
     <summary>Know these before you need them<span class="chev"></span></summary>
     <div class="body">
       <h2>Know these before you need them</h2>
@@ -6066,7 +6081,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="four-reasons-a-chip-is-dangerous" data-card="four-reasons-a-chip-is-dangerous">
+  <details class="xcard deck-slide" id="metal-chips--four-reasons-a-chip-is-dangerous" data-card="metal-chips--four-reasons-a-chip-is-dangerous">
     <summary>Four reasons a chip is dangerous<span class="chev"></span></summary>
     <div class="body">
       <h2>Four reasons a chip is dangerous</h2>
@@ -6085,7 +6100,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </dl>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="never-clear-chips-with-your-hands" data-card="never-clear-chips-with-your-hands">
+  <details class="xcard deck-slide is-stop" id="metal-chips--never-clear-chips-with-your-hands" data-card="metal-chips--never-clear-chips-with-your-hands">
     <summary>Never clear chips with your hands<span class="chev"></span></summary>
     <div class="body">
       <h2>Never clear chips with your hands</h2>
@@ -6109,7 +6124,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="compressed-air-there-are-limits-on-this" data-card="compressed-air-there-are-limits-on-this">
+  <details class="xcard deck-slide is-gate" id="metal-chips--compressed-air-there-are-limits-on-this" data-card="metal-chips--compressed-air-there-are-limits-on-this">
     <summary>Compressed air &mdash; there are limits on this<span class="chev"></span></summary>
     <div class="body">
       <h2>Compressed air &mdash; there are limits on this</h2>
@@ -6142,7 +6157,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="cleaning-up" data-card="cleaning-up">
+  <details class="xcard deck-slide is-stop" id="metal-chips--cleaning-up" data-card="metal-chips--cleaning-up">
     <summary>Cleaning up<span class="chev"></span></summary>
     <div class="body">
       <h2>Cleaning up</h2>
@@ -6209,7 +6224,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="prohibited-behavior" data-card="prohibited-behavior">
+  <details class="xcard deck-slide is-stop" id="conduct-and-emergency--prohibited-behavior" data-card="conduct-and-emergency--prohibited-behavior">
     <summary>Prohibited behavior<span class="chev"></span></summary>
     <div class="body">
       <h2>Prohibited behavior</h2>
@@ -6223,7 +6238,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="staying-alert" data-card="staying-alert">
+  <details class="xcard deck-slide" id="conduct-and-emergency--staying-alert" data-card="conduct-and-emergency--staying-alert">
     <summary>Staying alert<span class="chev"></span></summary>
     <div class="body">
       <h2>Staying alert</h2>
@@ -6235,7 +6250,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="emergency-procedures" data-card="emergency-procedures">
+  <details class="xcard deck-slide" id="conduct-and-emergency--emergency-procedures" data-card="conduct-and-emergency--emergency-procedures">
     <summary>Emergency procedures<span class="chev"></span></summary>
     <div class="body">
       <h2>Emergency procedures</h2>
@@ -6249,7 +6264,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <a class="xref-page" href="#p-electrical-safety">If someone is shocked</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="workspace-responsibility" data-card="workspace-responsibility">
+  <details class="xcard deck-slide" id="conduct-and-emergency--workspace-responsibility" data-card="conduct-and-emergency--workspace-responsibility">
     <summary>Workspace responsibility<span class="chev"></span></summary>
     <div class="body">
       <h2>Workspace responsibility</h2>
@@ -6259,7 +6274,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-with-previous" id="section-5" data-card="section-5">
+  <details class="xcard deck-with-previous" id="conduct-and-emergency--section-5" data-card="conduct-and-emergency--section-5">
     <summary>Lab Conduct and Emergencies<span class="chev"></span></summary>
     <div class="body">
       <div class="footerband">
@@ -6280,7 +6295,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="why-5s-sits-in-a-safety-module" data-card="why-5s-sits-in-a-safety-module">
+  <details class="xcard deck-slide" id="5s-workplace-organization--why-5s-sits-in-a-safety-module" data-card="5s-workplace-organization--why-5s-sits-in-a-safety-module">
     <summary>Why 5S sits in a safety module<span class="chev"></span></summary>
     <div class="body">
       <h2>Why 5S sits in a safety module</h2>
@@ -6293,7 +6308,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="aside">This page is the basics. 5S will get its own expanded treatment later.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="sort-seiri" data-card="sort-seiri">
+  <details class="xcard deck-slide" id="5s-workplace-organization--sort-seiri" data-card="5s-workplace-organization--sort-seiri">
     <summary>Sort &mdash; <em>Seiri</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Sort &mdash; <em>Seiri</em></h2>
@@ -6304,7 +6319,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="set-in-order-seiton" data-card="set-in-order-seiton">
+  <details class="xcard deck-slide" id="5s-workplace-organization--set-in-order-seiton" data-card="5s-workplace-organization--set-in-order-seiton">
     <summary>Set in Order &mdash; <em>Seiton</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Set in Order &mdash; <em>Seiton</em></h2>
@@ -6315,7 +6330,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="shine-seiso" data-card="shine-seiso">
+  <details class="xcard deck-slide" id="5s-workplace-organization--shine-seiso" data-card="5s-workplace-organization--shine-seiso">
     <summary>Shine &mdash; <em>Seiso</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Shine &mdash; <em>Seiso</em></h2>
@@ -6328,7 +6343,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <a class="xref-page" href="#p-machine-hazards">the environment around the machine</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="standardize-seiketsu" data-card="standardize-seiketsu">
+  <details class="xcard deck-slide" id="5s-workplace-organization--standardize-seiketsu" data-card="5s-workplace-organization--standardize-seiketsu">
     <summary>Standardize &mdash; <em>Seiketsu</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Standardize &mdash; <em>Seiketsu</em></h2>
@@ -6339,7 +6354,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="sustain-shitsuke" data-card="sustain-shitsuke">
+  <details class="xcard deck-slide" id="5s-workplace-organization--sustain-shitsuke" data-card="5s-workplace-organization--sustain-shitsuke">
     <summary>Sustain &mdash; <em>Shitsuke</em><span class="chev"></span></summary>
     <div class="body">
       <h2>Sustain &mdash; <em>Shitsuke</em></h2>
@@ -6362,7 +6377,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="a-vertical-mill-shapes-a-block-with-a-turning-tool-moved-in-x-y-and-z" data-card="a-vertical-mill-shapes-a-block-with-a-turning-tool-moved-in-x-y-and-z">
+  <details class="xcard deck-slide" id="milling-operations--a-vertical-mill-shapes-a-block-with-a-turning-tool-moved-in-x-y-and-z" data-card="milling-operations--a-vertical-mill-shapes-a-block-with-a-turning-tool-moved-in-x-y-and-z">
     <summary>A vertical mill shapes a block with a turning tool moved in X, Y and Z<span class="chev"></span></summary>
     <div class="body">
       <h2>A vertical mill shapes a block with a turning tool moved in X, Y and Z</h2>
@@ -6396,7 +6411,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   tool&rsquo;s tip is, measured from work zero.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="each-kind-of-tool-cuts-a-shape-of-its-own-and-some-cannot-cut-sideways" data-card="each-kind-of-tool-cuts-a-shape-of-its-own-and-some-cannot-cut-sideways">
+  <details class="xcard deck-slide" id="milling-operations--each-kind-of-tool-cuts-a-shape-of-its-own-and-some-cannot-cut-sideways" data-card="milling-operations--each-kind-of-tool-cuts-a-shape-of-its-own-and-some-cannot-cut-sideways">
     <summary>Each kind of tool cuts a shape of its own, and some cannot cut sideways<span class="chev"></span></summary>
     <div class="body">
       <h2>Each kind of tool cuts a shape of its own, and some cannot cut sideways</h2>
@@ -6433,7 +6448,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="the-tool-s-centre-runs-one-radius-away-from-the-wall-it-cuts" data-card="the-tool-s-centre-runs-one-radius-away-from-the-wall-it-cuts">
+  <details class="xcard deck-slide" id="milling-operations--the-tool-s-centre-runs-one-radius-away-from-the-wall-it-cuts" data-card="milling-operations--the-tool-s-centre-runs-one-radius-away-from-the-wall-it-cuts">
     <summary>The tool&rsquo;s centre runs one radius away from the wall it cuts<span class="chev"></span></summary>
     <div class="body">
       <h2>The tool&rsquo;s centre runs one radius away from the wall it cuts</h2>
@@ -6459,7 +6474,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   simulator says which each side cut was. <a class="xref-page" href="#p-climb-and-conventional-milling">Climb and Conventional Milling</a> explains the difference.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="holes-drilled-to-size-threaded-by-a-tap-opened-up-by-a-boring-head" data-card="holes-drilled-to-size-threaded-by-a-tap-opened-up-by-a-boring-head">
+  <details class="xcard deck-slide" id="milling-operations--holes-drilled-to-size-threaded-by-a-tap-opened-up-by-a-boring-head" data-card="milling-operations--holes-drilled-to-size-threaded-by-a-tap-opened-up-by-a-boring-head">
     <summary>Holes: drilled to size, threaded by a tap, opened up by a boring head<span class="chev"></span></summary>
     <div class="body">
       <h2>Holes: drilled to size, threaded by a tap, opened up by a boring head</h2>
@@ -6488,7 +6503,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   big enough for its bar, which makes it the tool for a hole of an exact, larger size.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="simulator-make-the-part-on-the-drawing-then-inspect-it" data-card="simulator-make-the-part-on-the-drawing-then-inspect-it">
+  <details class="xcard deck-slide" id="milling-operations--simulator-make-the-part-on-the-drawing-then-inspect-it" data-card="milling-operations--simulator-make-the-part-on-the-drawing-then-inspect-it">
     <summary>Simulator: make the part on the drawing, then inspect it<span class="chev"></span></summary>
     <div class="body">
       <h2>Simulator: make the part on the drawing, then inspect it</h2>
@@ -6517,7 +6532,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="things-to-try-in-the-simulator" data-card="things-to-try-in-the-simulator">
+  <details class="xcard deck-slide" id="milling-operations--things-to-try-in-the-simulator" data-card="milling-operations--things-to-try-in-the-simulator">
     <summary>Things to try in the simulator<span class="chev"></span></summary>
     <div class="body">
       <h2>Things to try in the simulator</h2>
@@ -6542,7 +6557,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="what-the-simulator-leaves-out" data-card="what-the-simulator-leaves-out">
+  <details class="xcard deck-slide" id="milling-operations--what-the-simulator-leaves-out" data-card="milling-operations--what-the-simulator-leaves-out">
     <summary>What the simulator leaves out<span class="chev"></span></summary>
     <div class="body">
       <h2>What the simulator leaves out</h2>
@@ -6575,7 +6590,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="feed-direction-decides-whether-each-chip-starts-thick-or-thin" data-card="feed-direction-decides-whether-each-chip-starts-thick-or-thin">
+  <details class="xcard deck-slide" id="climb-and-conventional-milling--feed-direction-decides-whether-each-chip-starts-thick-or-thin" data-card="climb-and-conventional-milling--feed-direction-decides-whether-each-chip-starts-thick-or-thin">
     <summary>Feed direction decides whether each chip starts thick or thin<span class="chev"></span></summary>
     <div class="body">
       <h2>Feed direction decides whether each chip starts thick or thin</h2>
@@ -6611,7 +6626,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="watch-one-tooth-take-its-chip" data-card="watch-one-tooth-take-its-chip">
+  <details class="xcard deck-slide" id="climb-and-conventional-milling--watch-one-tooth-take-its-chip" data-card="climb-and-conventional-milling--watch-one-tooth-take-its-chip">
     <summary>Watch one tooth take its chip<span class="chev"></span></summary>
     <div class="body">
       <h2>Watch one tooth take its chip</h2>
@@ -6642,7 +6657,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="each-chip-forms-on-the-edge-rides-out-in-the-flute-and-is-thrown-clear" data-card="each-chip-forms-on-the-edge-rides-out-in-the-flute-and-is-thrown-clear">
+  <details class="xcard deck-slide" id="climb-and-conventional-milling--each-chip-forms-on-the-edge-rides-out-in-the-flute-and-is-thrown-clear" data-card="climb-and-conventional-milling--each-chip-forms-on-the-edge-rides-out-in-the-flute-and-is-thrown-clear">
     <summary>Each chip forms on the edge, rides out in the flute and is thrown clear<span class="chev"></span></summary>
     <div class="body">
       <h2>Each chip forms on the edge, rides out in the flute and is thrown clear</h2>
@@ -6680,7 +6695,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <a href="https://www.harveyperformance.com/in-the-loupe/end-mill-anatomy/">Harvey Performance&rsquo;s end mill anatomy</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="six-things-to-try-in-the-demo" data-card="six-things-to-try-in-the-demo">
+  <details class="xcard deck-slide" id="climb-and-conventional-milling--six-things-to-try-in-the-demo" data-card="climb-and-conventional-milling--six-things-to-try-in-the-demo">
     <summary>Six things to try in the demo<span class="chev"></span></summary>
     <div class="body">
       <h2>Six things to try in the demo</h2>
@@ -6705,7 +6720,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="starting-thin-means-rubbing-starting-thick-means-a-bite" data-card="starting-thin-means-rubbing-starting-thick-means-a-bite">
+  <details class="xcard deck-slide" id="climb-and-conventional-milling--starting-thin-means-rubbing-starting-thick-means-a-bite" data-card="climb-and-conventional-milling--starting-thin-means-rubbing-starting-thick-means-a-bite">
     <summary>Starting thin means rubbing; starting thick means a bite<span class="chev"></span></summary>
     <div class="body">
       <h2>Starting thin means rubbing; starting thick means a bite</h2>
@@ -6730,7 +6745,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="backlash-why-climb-milling-depends-on-the-machine" data-card="backlash-why-climb-milling-depends-on-the-machine">
+  <details class="xcard deck-slide is-gate" id="climb-and-conventional-milling--backlash-why-climb-milling-depends-on-the-machine" data-card="climb-and-conventional-milling--backlash-why-climb-milling-depends-on-the-machine">
     <summary>Backlash: why climb milling depends on the machine<span class="chev"></span></summary>
     <div class="body">
       <h2>Backlash: why climb milling depends on the machine</h2>
@@ -6761,7 +6776,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="deeper-ref" id="deeper-ref-15">Supporting detail: <a href="#deeper-addendum-15"><strong>Addendum 15</strong></a> &mdash; Why some machines climb mill without trouble.</p>
     </div>
   </details>
-  <details class="xcard deck-wiki-only" id="a-slot-is-both-at-once" data-card="a-slot-is-both-at-once">
+  <details class="xcard deck-wiki-only" id="climb-and-conventional-milling--a-slot-is-both-at-once" data-card="climb-and-conventional-milling--a-slot-is-both-at-once">
     <summary>A slot is both at once<span class="chev"></span></summary>
     <div class="body">
       <h2>A slot is both at once</h2>
@@ -6784,7 +6799,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="two-numbers-come-from-cutting-data-two-go-into-the-machine" data-card="two-numbers-come-from-cutting-data-two-go-into-the-machine">
+  <details class="xcard deck-slide" id="feeds-and-speeds--two-numbers-come-from-cutting-data-two-go-into-the-machine" data-card="feeds-and-speeds--two-numbers-come-from-cutting-data-two-go-into-the-machine">
     <summary>Two numbers come from cutting data; two go into the machine<span class="chev"></span></summary>
     <div class="body">
       <h2>Two numbers come from cutting data; two go into the machine</h2>
@@ -6814,7 +6829,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="spindle-speed-the-turns-it-takes-to-reach-the-cutting-speed" data-card="spindle-speed-the-turns-it-takes-to-reach-the-cutting-speed">
+  <details class="xcard deck-slide" id="feeds-and-speeds--spindle-speed-the-turns-it-takes-to-reach-the-cutting-speed" data-card="feeds-and-speeds--spindle-speed-the-turns-it-takes-to-reach-the-cutting-speed">
     <summary>Spindle speed: the turns it takes to reach the cutting speed<span class="chev"></span></summary>
     <div class="body">
       <h2>Spindle speed: the turns it takes to reach the cutting speed</h2>
@@ -6845,7 +6860,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   below.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="table-feed-each-tooth-takes-one-chip-load-as-it-passes" data-card="table-feed-each-tooth-takes-one-chip-load-as-it-passes">
+  <details class="xcard deck-slide" id="feeds-and-speeds--table-feed-each-tooth-takes-one-chip-load-as-it-passes" data-card="feeds-and-speeds--table-feed-each-tooth-takes-one-chip-load-as-it-passes">
     <summary>Table feed: each tooth takes one chip load as it passes<span class="chev"></span></summary>
     <div class="body">
       <h2>Table feed: each tooth takes one chip load as it passes</h2>
@@ -6863,7 +6878,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   ordinary end mill that is simply the number of flutes.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="removal-rate-width-times-depth-times-table-feed" data-card="removal-rate-width-times-depth-times-table-feed">
+  <details class="xcard deck-slide" id="feeds-and-speeds--removal-rate-width-times-depth-times-table-feed" data-card="feeds-and-speeds--removal-rate-width-times-depth-times-table-feed">
     <summary>Removal rate: width &times; depth &times; table feed<span class="chev"></span></summary>
     <div class="body">
       <h2>Removal rate: width &times; depth &times; table feed</h2>
@@ -6888,7 +6903,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   and takes up far more space, so the removal rate is not the size of the chip pile.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cutting-power-removal-rate-times-the-energy-each-cubic-inch-takes" data-card="cutting-power-removal-rate-times-the-energy-each-cubic-inch-takes">
+  <details class="xcard deck-slide" id="feeds-and-speeds--cutting-power-removal-rate-times-the-energy-each-cubic-inch-takes" data-card="feeds-and-speeds--cutting-power-removal-rate-times-the-energy-each-cubic-inch-takes">
     <summary>Cutting power: removal rate times the energy each cubic inch takes<span class="chev"></span></summary>
     <div class="body">
       <h2>Cutting power: removal rate times the energy each cubic inch takes</h2>
@@ -6927,7 +6942,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   is heavy, not to approve one.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="calculator-from-material-guidance-to-removal-and-power" data-card="calculator-from-material-guidance-to-removal-and-power">
+  <details class="xcard deck-slide" id="feeds-and-speeds--calculator-from-material-guidance-to-removal-and-power" data-card="feeds-and-speeds--calculator-from-material-guidance-to-removal-and-power">
     <summary>Calculator: from material guidance to removal and power<span class="chev"></span></summary>
     <div class="body">
       <h2>Calculator: from material guidance to removal and power</h2>
@@ -6964,7 +6979,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="things-to-try-in-the-calculator" data-card="things-to-try-in-the-calculator">
+  <details class="xcard deck-slide" id="feeds-and-speeds--things-to-try-in-the-calculator" data-card="feeds-and-speeds--things-to-try-in-the-calculator">
     <summary>Things to try in the calculator<span class="chev"></span></summary>
     <div class="body">
       <h2>Things to try in the calculator</h2>
@@ -6993,7 +7008,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="when-the-machine-cannot-turn-as-fast-as-the-formula-asks" data-card="when-the-machine-cannot-turn-as-fast-as-the-formula-asks">
+  <details class="xcard deck-slide" id="feeds-and-speeds--when-the-machine-cannot-turn-as-fast-as-the-formula-asks" data-card="feeds-and-speeds--when-the-machine-cannot-turn-as-fast-as-the-formula-asks">
     <summary>When the machine cannot turn as fast as the formula asks<span class="chev"></span></summary>
     <div class="body">
       <h2>When the machine cannot turn as fast as the formula asks</h2>
@@ -7016,7 +7031,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   speed</em> box does this for a top speed.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="generic-ranges-are-a-starting-point-not-your-tool-s-data" data-card="generic-ranges-are-a-starting-point-not-your-tool-s-data">
+  <details class="xcard deck-slide is-gate" id="feeds-and-speeds--generic-ranges-are-a-starting-point-not-your-tool-s-data" data-card="feeds-and-speeds--generic-ranges-are-a-starting-point-not-your-tool-s-data">
     <summary>Generic ranges are a starting point, not your tool&rsquo;s data<span class="chev"></span></summary>
     <div class="body">
       <h2>Generic ranges are a starting point, not your tool&rsquo;s data</h2>
@@ -7060,7 +7075,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="a-lathe-spins-the-work-and-moves-the-tool-on-two-slides" data-card="a-lathe-spins-the-work-and-moves-the-tool-on-two-slides">
+  <details class="xcard deck-slide" id="lathe-operations--a-lathe-spins-the-work-and-moves-the-tool-on-two-slides" data-card="lathe-operations--a-lathe-spins-the-work-and-moves-the-tool-on-two-slides">
     <summary>A lathe spins the work and moves the tool on two slides<span class="chev"></span></summary>
     <div class="body">
       <h2>A lathe spins the work and moves the tool on two slides</h2>
@@ -7096,7 +7111,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   hand until it is out of the chuck.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="lathe-simulator-make-the-part-on-the-drawing" data-card="lathe-simulator-make-the-part-on-the-drawing">
+  <details class="xcard deck-slide" id="lathe-operations--lathe-simulator-make-the-part-on-the-drawing" data-card="lathe-operations--lathe-simulator-make-the-part-on-the-drawing">
     <summary>Lathe simulator: make the part on the drawing<span class="chev"></span></summary>
     <div class="body">
       <h2>Lathe simulator: make the part on the drawing</h2>
@@ -7150,7 +7165,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="each-tool-does-one-kind-of-work-and-the-knurl-does-not-cut-at-all" data-card="each-tool-does-one-kind-of-work-and-the-knurl-does-not-cut-at-all">
+  <details class="xcard deck-slide is-gate" id="lathe-operations--each-tool-does-one-kind-of-work-and-the-knurl-does-not-cut-at-all" data-card="lathe-operations--each-tool-does-one-kind-of-work-and-the-knurl-does-not-cut-at-all">
     <summary>Each tool does one kind of work, and the knurl does not cut at all<span class="chev"></span></summary>
     <div class="body">
       <h2>Each tool does one kind of work, and the knurl does not cut at all</h2>
@@ -7195,7 +7210,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="most-parts-start-with-a-facing-cut-and-end-with-parting" data-card="most-parts-start-with-a-facing-cut-and-end-with-parting">
+  <details class="xcard deck-slide" id="lathe-operations--most-parts-start-with-a-facing-cut-and-end-with-parting" data-card="lathe-operations--most-parts-start-with-a-facing-cut-and-end-with-parting">
     <summary>Most parts start with a facing cut and end with parting<span class="chev"></span></summary>
     <div class="body">
       <h2>Most parts start with a facing cut and end with parting</h2>
@@ -7220,7 +7235,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="a-thread-is-cut-in-several-passes-along-one-helix" data-card="a-thread-is-cut-in-several-passes-along-one-helix">
+  <details class="xcard deck-slide" id="lathe-operations--a-thread-is-cut-in-several-passes-along-one-helix" data-card="lathe-operations--a-thread-is-cut-in-several-passes-along-one-helix">
     <summary>A thread is cut in several passes along one helix<span class="chev"></span></summary>
     <div class="body">
       <h2>A thread is cut in several passes along one helix</h2>
@@ -7241,7 +7256,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <p class="deeper-ref" id="deeper-ref-17">Supporting detail: <a href="#deeper-addendum-17"><strong>Addendum 17</strong></a> &mdash; How a manual lathe keeps every pass on one helix.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="a-knurl-moves-metal-instead-of-cutting-it" data-card="a-knurl-moves-metal-instead-of-cutting-it">
+  <details class="xcard deck-slide" id="lathe-operations--a-knurl-moves-metal-instead-of-cutting-it" data-card="lathe-operations--a-knurl-moves-metal-instead-of-cutting-it">
     <summary>A knurl moves metal instead of cutting it<span class="chev"></span></summary>
     <div class="body">
       <h2>A knurl moves metal instead of cutting it</h2>
@@ -7261,7 +7276,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   on its pitch, the material and how hard it is pressed.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="things-to-try-in-the-simulator" data-card="things-to-try-in-the-simulator">
+  <details class="xcard deck-slide" id="lathe-operations--things-to-try-in-the-simulator" data-card="lathe-operations--things-to-try-in-the-simulator">
     <summary>Things to try in the simulator<span class="chev"></span></summary>
     <div class="body">
       <h2>Things to try in the simulator</h2>
@@ -7286,7 +7301,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </ul>
     </div>
   </details>
-  <details class="xcard deck-wiki-only" id="what-this-simulator-leaves-out" data-card="what-this-simulator-leaves-out">
+  <details class="xcard deck-wiki-only" id="lathe-operations--what-this-simulator-leaves-out" data-card="lathe-operations--what-this-simulator-leaves-out">
     <summary>What this simulator leaves out<span class="chev"></span></summary>
     <div class="body">
       <h2>What this simulator leaves out</h2>
@@ -7326,7 +7341,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="a-size-tolerance-gives-two-limits" data-card="a-size-tolerance-gives-two-limits">
+  <details class="xcard deck-slide" id="tolerances-and-fits--a-size-tolerance-gives-two-limits" data-card="tolerances-and-fits--a-size-tolerance-gives-two-limits">
     <summary>A size tolerance gives two limits<span class="chev"></span></summary>
     <div class="body">
       <h2>A size tolerance gives two limits</h2>
@@ -7351,7 +7366,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="clearance-is-the-hole-size-minus-the-shaft-size" data-card="clearance-is-the-hole-size-minus-the-shaft-size">
+  <details class="xcard deck-slide" id="tolerances-and-fits--clearance-is-the-hole-size-minus-the-shaft-size" data-card="tolerances-and-fits--clearance-is-the-hole-size-minus-the-shaft-size">
     <summary>Clearance is the hole size minus the shaft size<span class="chev"></span></summary>
     <div class="body">
       <h2>Clearance is the hole size minus the shaft size</h2>
@@ -7413,7 +7428,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </figure>
     </div>
   </details>
-  <details class="xcard deck-slide" id="three-kinds-of-fit-decided-by-the-two-worst-cases" data-card="three-kinds-of-fit-decided-by-the-two-worst-cases">
+  <details class="xcard deck-slide" id="tolerances-and-fits--three-kinds-of-fit-decided-by-the-two-worst-cases" data-card="tolerances-and-fits--three-kinds-of-fit-decided-by-the-two-worst-cases">
     <summary>Three kinds of fit, decided by the two worst cases<span class="chev"></span></summary>
     <div class="body">
       <h2>Three kinds of fit, decided by the two worst cases</h2>
@@ -7486,7 +7501,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </figure>
     </div>
   </details>
-  <details class="xcard deck-slide" id="fit-lab-make-two-parts-then-try-them-together" data-card="fit-lab-make-two-parts-then-try-them-together">
+  <details class="xcard deck-slide" id="tolerances-and-fits--fit-lab-make-two-parts-then-try-them-together" data-card="tolerances-and-fits--fit-lab-make-two-parts-then-try-them-together">
     <summary>Fit lab: make two parts, then try them together<span class="chev"></span></summary>
     <div class="body">
       <h2>Fit lab: make two parts, then try them together</h2>
@@ -7518,7 +7533,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="two-good-parts-can-still-make-a-bad-pair" data-card="two-good-parts-can-still-make-a-bad-pair">
+  <details class="xcard deck-slide is-gate" id="tolerances-and-fits--two-good-parts-can-still-make-a-bad-pair" data-card="tolerances-and-fits--two-good-parts-can-still-make-a-bad-pair">
     <summary>Two good parts can still make a bad pair<span class="chev"></span></summary>
     <div class="body">
       <h2>Two good parts can still make a bad pair</h2>
@@ -7541,7 +7556,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="call-the-fit-from-the-drawing-alone" data-card="call-the-fit-from-the-drawing-alone">
+  <details class="xcard deck-slide" id="tolerances-and-fits--call-the-fit-from-the-drawing-alone" data-card="tolerances-and-fits--call-the-fit-from-the-drawing-alone">
     <summary>Call the fit from the drawing alone<span class="chev"></span></summary>
     <div class="body">
       <h2>Call the fit from the drawing alone</h2>
@@ -7562,7 +7577,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   </div>
     </div>
   </details>
-  <details class="xcard deck-wiki-only" id="what-this-lab-leaves-out" data-card="what-this-lab-leaves-out">
+  <details class="xcard deck-wiki-only" id="tolerances-and-fits--what-this-lab-leaves-out" data-card="tolerances-and-fits--what-this-lab-leaves-out">
     <summary>What this lab leaves out<span class="chev"></span></summary>
     <div class="body">
       <h2>What this lab leaves out</h2>

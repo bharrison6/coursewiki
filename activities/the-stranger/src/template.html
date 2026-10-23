@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes">
+<title>Prompting Strategies — why prompts work</title>
+<!--__SHELL_STAMP__-->
+<style>/*__SHELL_CSS__*/</style>
+<style>/*__CSS__*/</style>
+<style>/*__GUIDE_CSS__*/</style>
+</head>
+<body>
+
+<!-- ===== A0 HEADER + A1 STAGE TABLIST ==================================== -->
+<header class="top" id="brandbar">
+  <div class="topline">
+    <div class="brandline">
+      <span class="brand-kicker">Murray State University &middot; Part three &middot; Working with AI</span>
+      <h1>Prompting Strategies</h1>
+      <div class="msu-brand">Murray State University</div>
+    </div>
+    <div class="top-tools">
+      <button class="icon-btn notes-open" type="button" title="Open Presenter Notes" aria-label="Open Presenter Notes">Notes</button>
+      <button class="icon-btn guide-open" type="button" id="guide-open" title="Guide" aria-label="Guide"><span aria-hidden="true">?</span><span class="icon-label">Guide</span></button>
+      <button class="icon-btn" type="button" id="settings-open" title="Settings" aria-label="Settings"><span aria-hidden="true">&#9881;</span><span class="icon-label">Settings</span></button>
+    </div>
+  </div>
+  <!-- Three stages = the three levers. NOT gated: every lever is reachable
+       from the start, because the demo's method is comparing lever states and
+       a lock would forbid the comparison. The lesson order is a recommendation
+       the tabs express, not a gate. -->
+  <nav class="stages" role="tablist" aria-label="The three levers">
+    <button class="stage-tab" type="button" role="tab" id="tab-1" aria-controls="stage-1" aria-selected="true" tabindex="0">
+      <span class="stage-mark" aria-hidden="true">1</span><span>Context</span><small>What changes when it knows who is asking?</small>
+    </button>
+    <button class="stage-tab" type="button" role="tab" id="tab-2" aria-controls="stage-2" aria-selected="false" tabindex="-1">
+      <span class="stage-mark" aria-hidden="true">2</span><span>Success spec</span><small>If you don't say what finished looks like, who does?</small>
+    </button>
+    <button class="stage-tab" type="button" role="tab" id="tab-3" aria-controls="stage-3" aria-selected="false" tabindex="-1">
+      <span class="stage-mark" aria-hidden="true">3</span><span>Expert keywords</span><small>What do you get for asking in the field's words?</small>
+    </button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ===== STAGE 1 — CONTEXT ============================================== -->
+<section class="stage on" id="stage-1" role="tabpanel" aria-labelledby="tab-1" tabindex="-1">
+  <section class="stage-intro" aria-labelledby="stage-1-title">
+    <div class="intro-copy">
+      <span class="eyebrow">Demo 5 of 17 &middot; Part three &middot; Stage 1</span>
+      <h2 id="stage-1-title">Who is asking?</h2>
+      <p class="stage-question">What changes in the answer when it knows who you are?</p>
+      <p class="refresh"><b>Before you start.</b> Demo 2 showed that a language model predicts the next
+        words from its <b>context</b> &mdash; the text sitting in front of it. Here you build that context
+        yourself, one block at a time. Lever 1 adds the <b>context block</b>: who is asking, and what
+        they are working with.</p>
+    </div>
+    <button class="details-trigger" type="button" data-details="0" aria-label="Details for stage 1">Details <span aria-hidden="true">&rarr;</span></button>
+    <div class="lesson-strip" aria-label="Stage 1 learning guide">
+      <article>
+        <span>Predict</span>
+        <p>Adding context changes <b>one</b> dimension of the answer. Which one?</p>
+        <div class="predict-opts" data-predict="0" role="group" aria-label="Your prediction for stage 1">
+          <button class="predict-opt" type="button" aria-pressed="false" data-v="length">How long it is</button>
+          <button class="predict-opt" type="button" aria-pressed="false" data-v="aim">Who it is aimed at</button>
+          <button class="predict-opt" type="button" aria-pressed="false" data-v="words">Which words it uses</button>
+        </div>
+        <span class="echo" hidden></span>
+      </article>
+      <article><span>Try</span><p>Leave all three levers off and press <b>Ask</b>. Then turn on <b>1 &mdash; CONTEXT</b> and press <b>Ask</b> again.</p></article>
+      <article><span>Takeaway</span><p>With no context the answer is aimed at everybody, which is another way of saying nobody. Context changes <b>who it is for</b> &mdash; length and vocabulary follow the card dealt, not this lever.</p></article>
+    </div>
+  </section>
+  <div class="activity-host" id="host-1"></div>
+  <p class="obs-cue" id="cue-1" role="status" aria-live="polite"></p>
+  <div class="check-host" id="checks-1">
+<!--__CHECKS_1__-->
+  </div>
+</section>
+
+<!-- ===== STAGE 2 — SUCCESS SPEC ========================================= -->
+<section class="stage" id="stage-2" role="tabpanel" aria-labelledby="tab-2" tabindex="-1" hidden>
+  <section class="stage-intro" aria-labelledby="stage-2-title">
+    <div class="intro-copy">
+      <span class="eyebrow">Demo 5 of 17 &middot; Part three &middot; Stage 2</span>
+      <h2 id="stage-2-title">What does finished look like?</h2>
+      <p class="stage-question">If you never say what a good answer looks like, who decides instead?</p>
+      <p class="refresh"><b>Before you start.</b> Every answer has a shape &mdash; a length, an audience, a
+        format. Somebody decides it, always. A <b>success specification</b> is the block where you decide
+        it yourself. Leave it out and the decision still gets made, just not by you.</p>
+    </div>
+    <button class="details-trigger" type="button" data-details="1" aria-label="Details for stage 2">Details <span aria-hidden="true">&rarr;</span></button>
+    <div class="lesson-strip" aria-label="Stage 2 learning guide">
+      <article>
+        <span>Predict</span>
+        <p>Lever 2 is off, so the target is unspecified. What happens to it?</p>
+        <div class="predict-opts" data-predict="1" role="group" aria-label="Your prediction for stage 2">
+          <button class="predict-opt" type="button" aria-pressed="false" data-v="none">Nothing &mdash; it stays unspecified</button>
+          <button class="predict-opt" type="button" aria-pressed="false" data-v="filled">Something else fills it in</button>
+          <button class="predict-opt" type="button" aria-pressed="false" data-v="ask">It asks you what you want</button>
+        </div>
+        <span class="echo" hidden></span>
+      </article>
+      <article><span>Try</span><p>With lever 2 <b>off</b>, press <b>Ask</b> and watch the card it deals. Then turn on <b>2 &mdash; SUCCESS SPEC</b> and ask again.</p></article>
+      <article><span>Takeaway</span><p>An unspecified target does not stay unspecified &mdash; something else fills it in, and does not tell you. Saying what finished looks like takes that decision back.</p></article>
+    </div>
+  </section>
+  <div class="activity-host" id="host-2"></div>
+  <p class="obs-cue" id="cue-2" role="status" aria-live="polite"></p>
+  <div class="check-host" id="checks-2">
+<!--__CHECKS_2__-->
+  </div>
+</section>
+
+<!-- ===== STAGE 3 — EXPERT KEYWORDS ====================================== -->
+<section class="stage" id="stage-3" role="tabpanel" aria-labelledby="tab-3" tabindex="-1" hidden>
+  <section class="stage-intro" aria-labelledby="stage-3-title">
+    <div class="intro-copy">
+      <span class="eyebrow">Demo 5 of 17 &middot; Part three &middot; Stage 3</span>
+      <h2 id="stage-3-title">In whose words?</h2>
+      <p class="stage-question">What do you actually get for asking in the vocabulary of the field?</p>
+      <p class="refresh"><b>Before you start.</b> Lever 3 adds <b>expert keywords</b> &mdash; the vocabulary
+        to answer in. Under every answer is a counter: how many specialist words the answer used, and how
+        many of those <b>you never typed</b>. Watch both numbers, and then ask what they are worth.</p>
+    </div>
+    <button class="details-trigger" type="button" data-details="2" aria-label="Details for stage 3">Details <span aria-hidden="true">&rarr;</span></button>
+    <div class="lesson-strip" aria-label="Stage 3 learning guide">
+      <article>
+        <span>Predict</span>
+        <p>With keywords off you see at most four expert terms. With keywords on, how many?</p>
+        <div class="predict-opts" data-predict="2" role="group" aria-label="Your prediction for stage 3">
+          <button class="predict-opt" type="button" aria-pressed="false" data-v="low">Under five</button>
+          <button class="predict-opt" type="button" aria-pressed="false" data-v="mid">About ten</button>
+          <button class="predict-opt" type="button" aria-pressed="false" data-v="high">Fifteen or more</button>
+        </div>
+        <span class="echo" hidden></span>
+      </article>
+      <article><span>Try</span><p>Turn on <b>3 &mdash; EXPERT KEYWORDS</b>, press <b>Ask</b>, then press <b>Show me which ones</b>.</p></article>
+      <article><span>Takeaway</span><p>Asking in a field's vocabulary gets that vocabulary back &mdash; words nobody in the room supplied. That is real. It is also not the same thing as a better answer, and telling those apart is the skill.</p></article>
+    </div>
+  </section>
+  <div class="activity-host" id="host-3"></div>
+  <p class="obs-cue" id="cue-3" role="status" aria-live="polite"></p>
+  <div class="check-host" id="checks-3">
+<!--__CHECKS_3__-->
+  </div>
+</section>
+
+<!-- ===== THE ACTIVITY ====================================================
+     ONE node, moved between the three .activity-host elements on stagechange.
+     There is one activity, not three: the levers, the prompt and the answer
+     are the same machine in every stage, and copying it per panel would fork
+     the rendering state three ways. The stage frames one lever; it never hides
+     the other two, because flipping ONE lever and watching ONE dimension move
+     is the entire method.
+     ==================================================================== -->
+<div id="activity">
+
+  <section class="card" aria-labelledby="act-build">
+    <div class="panel-head">
+      <div>
+        <span class="panel-kicker"><span class="k-live">Live</span> your prompt, assembled as you toggle</span>
+        <h3 id="act-build">Step 1 &mdash; build the prompt</h3>
+      </div>
+    </div>
+    <p class="panel-lede">Each lever adds one block of text to what you send, and says underneath what leaving it off will cost you.</p>
+
+    <label class="control-label" for="scenario-tabs">Question
+      <span class="why">Which of the four student questions you are working on. Changing it clears the answer on screen; the levers stay where you set them.</span></label>
+    <div class="scenarios" id="scenario-tabs" role="group" aria-label="Choose a question"></div>
+
+    <div class="levers" id="levers"></div>
+  </section>
+
+  <section class="card" aria-labelledby="act-prompt">
+    <div class="panel-head">
+      <div>
+        <span class="panel-kicker"><span class="k-live">Live</span> assembled from the levers you have pulled</span>
+        <h3 id="act-prompt">Step 2 &mdash; this is the whole prompt</h3>
+      </div>
+    </div>
+    <p class="panel-lede">The literal text this demo would send. A real tool also prepends instructions you never see &mdash; see <b>Details</b>.</p>
+    <div class="prompt-box" id="prompt-box"></div>
+    <div class="ask-row">
+      <button class="btn" type="button" id="btn-ask" title="Ask with the prompt above (Enter)">Ask</button>
+      <button class="btn ghost small" type="button" id="btn-skip" title="Jump to the end of the typing (Space)">Skip typing</button>
+      <span class="ask-hint" id="ask-hint"></span>
+    </div>
+  </section>
+
+  <section class="workbench" aria-labelledby="act-answer">
+    <div class="panel-head">
+      <div>
+        <span class="panel-kicker"><span class="k-scripted">Scripted</span><span class="k-qual">hand-written example answer &mdash; no model runs here, and this file makes no network request of any kind</span></span>
+        <h3 id="act-answer">Step 3 &mdash; the answer</h3>
+      </div>
+      <div class="row">
+        <button class="btn ghost small presenter-only" type="button" id="btn-compare" title="Keep this answer on screen beside the next one">Pin to compare</button>
+        <button class="btn ghost small presenter-only" type="button" id="btn-scoreboard" title="The class scores so far">Scoreboard</button>
+      </div>
+    </div>
+    <div class="answer-wrap">
+      <div class="answer-cols" id="answer-cols">
+        <div class="answer-col" id="col-pin" hidden></div>
+        <div class="answer-col" id="col-live"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</main>
+
+<!-- ===== A0 FOOTER ======================================================= -->
+<div class="footer">
+  <span>Bryant Harrison &middot; Murray State University</span><br>
+  <span>One HTML file &middot; runs offline</span>
+  <div class="footer-tools">
+    <button type="button" class="footer-link guide-open">Guide</button><span aria-hidden="true">&middot;</span>
+    <button type="button" class="footer-link" id="presentation-foot">Presentation mode</button><span aria-hidden="true">&middot;</span>
+    <button type="button" class="footer-link notes-open">Presenter Notes</button>
+  </div>
+</div>
+
+<!-- ===== A7 GUIDE (opens on load) ======================================== -->
+<dialog class="lesson-dialog" id="guide" aria-labelledby="guide-title">
+  <div class="lesson-dialog-head">
+    <h2 id="guide-title">Guide<span class="head-sub">how to use this demo</span></h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body">
+    <p class="lede">A student asks a question. You decide how much you tell it before it answers. That is the whole demo.</p>
+    <p class="note"><b>Where this sits.</b> Demo 5 of 17. Demo 2 showed that a model reads its context; here you
+      control that context, one lever at a time.</p>
+    <ol>
+      <li><b>Context.</b> Pick a question, leave every lever off, press <b>Ask</b>. Then turn on <b>1 &mdash; CONTEXT</b> and ask again.</li>
+      <li><b>Success spec.</b> With lever 2 off, press <b>Ask</b> and watch the card it deals itself. Turn on <b>2 &mdash; SUCCESS SPEC</b> and the deck is struck out.</li>
+      <li><b>Expert keywords.</b> Turn on <b>3 &mdash; EXPERT KEYWORDS</b>, ask, then press <b>Show me which ones</b> and count the words nobody typed.</li>
+    </ol>
+    <p class="note">Every answer here was written by hand before the file was saved. Nothing is generated live
+      and nothing touches the internet.</p>
+    <h3>Getting around</h3>
+    <p>The stage tabs switch levers. <b>Details</b> opens the evidence and limits for the stage.
+      <b>Guide</b> reopens this card; <b>Settings</b> has <b>Open Presenter Notes</b>,
+      <b>Presentation mode</b> and <b>Reset</b>.</p>
+    <h3>Time</h3>
+    <p>About twelve minutes with a room. The typing animation is the slow step &mdash; <b>Skip typing</b> ends it.</p>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Start with Context</button></form>
+</dialog>
+
+<!-- ===== A8 SETTINGS ===================================================== -->
+<dialog class="lesson-dialog" id="settings" aria-labelledby="settings-title">
+  <div class="lesson-dialog-head">
+    <h2 id="settings-title">Settings</h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body" id="settings-menu">
+    <h3>Presenter notes</h3>
+    <p class="setnote">The printable session plan, on screen.</p>
+    <p><button class="btn notes-open" type="button">Open Presenter Notes</button></p>
+    <h3>Presentation mode</h3>
+    <p class="setnote">Scales the page up one notch for projecting to a room, puts a <b>Notes</b> button in the
+      header, and turns on the presenter tools: the 1&ndash;10 class score strip under each answer,
+      <b>Pin to compare</b>, the <b>Scoreboard</b>, and the card picker inside lever 2.</p>
+    <p><button class="btn ghost" type="button" id="presentation-btn" aria-pressed="false">Presentation mode</button></p>
+    <h3>Reset</h3>
+    <p class="setnote">Back to the start: question 1, all three levers off, no answer on screen, the scoreboard
+      cleared, the highlighter off, the card picker back to Random, and every prediction you made forgotten.
+      Presentation mode stays as you set it.</p>
+    <p><button class="btn ghost" type="button" id="reset-btn">Reset</button></p>
+    <h3>Highlight expert terms</h3>
+    <p class="setnote">Colour the specialist words inside every answer so a room can count them.</p>
+    <p><button class="btn ghost" type="button" id="hl-btn" aria-pressed="false">Highlight expert terms</button></p>
+    <h3>Closing slide</h3>
+    <p class="setnote">The line to end on, plus what the class scored.</p>
+    <p><button class="btn ghost" type="button" id="closing-btn">Closing slide</button></p>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Done</button></form>
+</dialog>
+
+<!-- ===== A5 DETAILS DRAWER =============================================== -->
+<dialog class="details-sheet" id="details" aria-labelledby="details-title">
+  <div class="details-drawer">
+    <div class="lesson-dialog-head">
+      <h2 id="details-title">Details<span class="head-sub" id="details-subtitle">Context</span></h2>
+      <form method="dialog"><button type="submit" aria-label="Close Details">&times;</button></form>
+    </div>
+    <div class="details-body" tabindex="0" role="region" aria-label="Stage details">
+
+      <!-- ---- stage 1 ---- -->
+      <section class="details-stage on" data-details-stage="0">
+        <span class="eyebrow">What is live</span>
+        <h3>What this page actually computes</h3>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-live">Live</span> the assembled prompt</span>
+          <p>Step 2 is built in front of you from the levers you have pulled. That text is real and it is all of it.</p>
+        </div>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-scripted">Scripted</span><span class="k-qual">all 64, written before the file was saved</span></span>
+          <p>Every answer is a hand-written fixture looked up from a table. There is no model in this file, no API key and no request of any kind &mdash; the build refuses to produce the page if it contains one. The typing animation is decoration at a fixed rate; it is not a model's speed.</p>
+        </div>
+        <h3>How it works</h3>
+        <div class="details-formula">answer = table[ question + which levers are on ]</div>
+        <p>Four questions &times; eight lever states, plus three alternate target-deck answers for each of the four states where the success spec is off: 64 authored answers in total.</p>
+        <h3>Assumptions and simplifications</h3>
+        <ul>
+          <li><b>These answers were written to make the levers legible.</b> Each single-lever answer was authored to improve in that lever's dimension and nothing else. A real model is messier: it may improve two things at once, or nothing, or get worse. This shows what a better prompt <i>tends</i> to buy you &mdash; it is not a measurement of what any model did.</li>
+          <li><b>The bare answers are bland, not broken &mdash; and we wrote them that way</b> so the room cannot dismiss the demo as rigged. Bare prompts in the wild also produce confident errors and refusals.</li>
+          <li><b>A bare prompt is not information-free.</b> The wording, register and topic of "help me get ready for my test" already carry a lot about the asker.</li>
+          <li><b>Four questions, one kind of asker.</b> All four are school or first-job tasks for a US high-school or early-college room. Levers behave differently on tasks with a single correct answer.</li>
+          <li><b>Three levers are not the whole of prompting.</b> Worked examples, step-by-step reasoning, output formats, tool access and simply iterating on a reply are all absent, and all matter.</li>
+        </ul>
+        <h3>Sources</h3>
+        <ul>
+          <li class="details-note">Nothing on this stage is a published figure, so there is nothing to cite. The counts above were measured from this file's own content by its build gates &mdash; see stage 3.</li>
+        </ul>
+        <div class="evidence-card"><b>Boundary:</b> this demo does not claim to show what any particular AI system does. It shows what changes when a request carries more of what the asker knows &mdash; using answers a person wrote to make that change visible.</div>
+      </section>
+
+      <!-- ---- stage 2 ---- -->
+      <section class="details-stage" data-details-stage="1" hidden>
+        <span class="eyebrow">What is live</span>
+        <h3>What this page actually computes</h3>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-live">Live</span> the card draw</span>
+          <p>With lever 2 off, the target card is chosen at random from three, in front of you, each time you ask.</p>
+        </div>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-scripted">Scripted</span><span class="k-qual">a teaching device, not a mechanism</span></span>
+          <p><b>A real model does not deal from a deck of three.</b> When you do not say what a finished answer should look like, it falls back on habits learned in training: more stable than a card draw, not confined to three options, and varying continuously rather than across three named archetypes. The deck makes a real and normally invisible thing visible. It is not what the machine does.</p>
+        </div>
+        <h3>How it works</h3>
+        <div class="details-formula">card = random of three &nbsp;&rarr;&nbsp; answer written to that card</div>
+        <p>Each question carries its own three cards, drawn from a printed deck of eight. In presentation mode a picker fixes the draw so a beat can be rehearsed; otherwise it is always random.</p>
+        <h3>Assumptions and simplifications</h3>
+        <ul>
+          <li><b>The deck is the simplification, and it is the biggest one in the demo.</b> Three discrete named cards stand in for a continuous distribution of defaults. Keep the insight &mdash; an unstated target gets filled in by something else &mdash; and drop the dice.</li>
+          <li><b>The card is shown to you.</b> A real system does not announce the target it assumed. That courtesy is the demo's, not the machine's.</li>
+          <li><b>Showing you the card is itself a teaching choice</b> that makes the effect look tidier than it is.</li>
+        </ul>
+        <h3>Sources</h3>
+        <ul>
+          <li class="details-note">No published figure is used on this stage. The claim about where real defaults come from is stated as the authors' reading, not as a citation &mdash; which is why it is not dressed as one.</li>
+        </ul>
+        <div class="evidence-card"><b>Boundary:</b> the deck is a prop for an argument, not a model of an algorithm. This demo does not claim that any system selects among a fixed menu of answer shapes.</div>
+      </section>
+
+      <!-- ---- stage 3 ---- -->
+      <section class="details-stage" data-details-stage="2" hidden>
+        <span class="eyebrow">What is live</span>
+        <h3>What this page actually computes</h3>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-scripted">Scripted</span><span class="k-qual">the count is an author's tag list, not a detector</span></span>
+          <p>The big number under an answer counts the specialist terms <b>the author tagged</b> in that answer. Nothing on this page detects specialist vocabulary; it reads a list.</p>
+        </div>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-live">Live</span> "words you never typed"</span>
+          <p>The second number <b>is</b> computed, now, against the prompt you assembled: each tagged term is looked for in your own text. It matches plain text, so a term that appears in your prompt only in another form &mdash; "mitosis" in the prompt against "mitotic" as a term &mdash; still counts as new.</p>
+        </div>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-measured">Measured</span><span class="k-qual">this file's own content, by its build gates</span></span>
+          <p>Across all 64 answers, keyword-off states carry <b>0 to 4</b> tagged terms and keyword-on states carry <b>15 to 20</b>. Those are measured ranges, enforced by the content gates, not estimates.</p>
+        </div>
+        <h3>How it works</h3>
+        <div class="details-formula">novel = term not found in your assembled prompt</div>
+        <p>Terms are matched on word boundaries and only the first occurrence of each is marked, which is what makes the final count equal the authored list exactly.</p>
+        <h3>Assumptions and simplifications</h3>
+        <ul>
+          <li><b>More expert words is not the same as a better answer.</b> The counter measures vocabulary, and vocabulary is the easiest thing to mistake for understanding. The demo's own walkthrough asks you to check whether the answer got more useful or just more impressive; that question is the point of this stage.</li>
+          <li><b>The 1&ndash;10 curve measures this room, not AI.</b> It plots the scores you give against how many levers were pulled. The answers were written to get better as levers are pulled, so a rising line means the room agrees with the author. It is a good way to make a room commit out loud; it is not evidence about models.</li>
+          <li><b>The lever colours include one non-brand hue.</b> Lever 3's violet is not part of the Murray State palette. It is kept deliberately: the three lever colours are a code printed on the physical cut-out target cards a presenter hands round the room, so the screen and the paper have to agree. It is the only sanctioned exception in this demo.</li>
+          <li><b>Some bad answers are not a prompting problem at all.</b> A lever can fix an answer that is vague, mis-aimed or the wrong shape. It cannot fix one that is confidently wrong, out of date, refusing, or past what the system can do. Those need checking, not a better prompt.</li>
+        </ul>
+        <h3>Sources</h3>
+        <ul>
+          <li class="details-note"><b>The 0&ndash;4 and 15&ndash;20 ranges</b> are measured from this file's own 64 answers by <code>tools/validate.py</code>, which is run by hand before a build &mdash; not by <code>build.js</code>. A clean <code>node build.js --check</code> is <i>not</i> evidence that a content gate holds.</li>
+          <li class="details-note"><b>The accuracy-brief case</b> in the check below is sourced to this project's own build record from 2026-09-16. It is first-party testimony about something that happened while these demos were being built, not a general research finding, and the figures in it are quoted as what that project's research lane reported.</li>
+        </ul>
+        <div class="evidence-card"><b>Boundary:</b> this demo does not claim that pulling all three levers makes an answer correct. It claims that the three levers change what an answer is aimed at, what shape it takes, and what words it uses &mdash; and that none of those is the same as being right.</div>
+      </section>
+
+    </div>
+    <form method="dialog" class="lesson-dialog-actions"><button type="submit">Back to activity</button></form>
+  </div>
+</dialog>
+
+<!-- ===== PRESENTER NOTES = THE PRINTABLE GUIDE =========================== -->
+<dialog class="lesson-dialog" id="presenter-notes" aria-labelledby="presenter-notes-title">
+  <div class="lesson-dialog-head">
+    <h2 id="presenter-notes-title">Presenter Notes<span class="head-sub">the printable guide, on screen</span></h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body guide-host">
+<!--__GUIDE__-->
+    <p class="guide-print"><a href="presenter-sheet.html" target="_blank" rel="noopener">Open the printable copy (presenter-sheet.html)</a> &mdash; the same document, laid out for print, with the eight cut-out target cards on page two; the PDF beside it is a render of that file.</p>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Back to the demo</button></form>
+</dialog>
+
+<!-- ===== THE ACTIVITY'S OWN DIALOGS =======================================
+     Each has its own id. `details` belongs to the kit (ADOPTING.md section 5)
+     and none of these reuses it. -->
+<dialog id="card-stage" aria-label="The target card it dealt itself">
+  <div id="card-host"></div>
+  <form method="dialog" class="card-actions"><button class="btn" type="submit">Read the answer</button></form>
+</dialog>
+
+<dialog class="lesson-dialog" id="scoreboard" aria-labelledby="scoreboard-title">
+  <div class="lesson-dialog-head">
+    <h2 id="scoreboard-title">Scoreboard<span class="head-sub">this room, this session</span></h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body">
+    <span class="panel-kicker"><span class="k-measured">Measured</span><span class="k-qual">this room's own 1&ndash;10 scores, this session</span></span>
+    <p class="setnote">Ask the room how useful an answer was, tap the number, watch the curve.</p>
+    <div class="claim">
+      <span class="panel-kicker"><span class="k-reasoned">Reasoned</span> what this curve can and cannot show</span>
+      <p>The answers were <b>written to get better as levers are pulled</b>. So a rising line shows the room agreeing with the author &mdash; it cannot come out any other way, and it is not a measurement of how AI behaves. Use it to make the room commit out loud, not as evidence.</p>
+    </div>
+    <div class="chart-host" id="chart"></div>
+    <h3>Every answer this session</h3>
+    <div id="score-list"></div>
+    <p><button class="btn ghost" type="button" id="btn-clear-scores">Clear the board</button></p>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Back to the demo</button></form>
+</dialog>
+
+<dialog class="lesson-dialog" id="draft" aria-labelledby="draft-title">
+  <div class="lesson-dialog-head">
+    <h2 id="draft-title">The attached draft</h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body draft">
+    <span class="panel-kicker"><span class="k-scripted">Scripted</span><span class="k-qual">a deliberately mediocre student draft, written for this demo</span></span>
+    <p class="setnote" id="draft-sub">essay-draft.docx &mdash; attached to the prompt in all eight states</p>
+    <div id="draft-body"></div>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Back to the demo</button></form>
+</dialog>
+
+<dialog class="lesson-dialog" id="closing-slide" aria-labelledby="closing-title">
+  <div class="lesson-dialog-head">
+    <h2 id="closing-title">The line to end on</h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body" style="text-align:center">
+    <p class="big" id="close-line"></p>
+    <p class="sub" id="close-sub"></p>
+    <div class="stats" id="close-stats"></div>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Back to the demo</button></form>
+</dialog>
+
+<div class="bh-credit">Bryant Harrison &middot; Murray State University</div>
+
+<script>/*__SHELL_JS__*/</script>
+<script>const DATA = __DATA__;</script>
+<script>/*__APP__*/</script>
+</body>
+</html>

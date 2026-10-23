@@ -1,0 +1,73 @@
+/* ===========================================================================
+   lesson-shell / tokens.css — the palette and type contract, part A0.
+
+   ONE :root block, named identically in every demo. A reviewer greps the built
+   index.html for these names and must find every one of them, so a demo that
+   needs a colour the kit does not have adds a NEW token in its own stylesheet;
+   it never renames or drops one of these.
+
+   Arrangement (plan A0, chosen over Demo 1's navy-panels-on-cream because the
+   launcher and every post-2026-09-09 demo already use it, and dark panels wash
+   out at the edges of a projector):
+
+     cream / paper   the page
+     navy            "live machine" surfaces — a workbench, a sim canvas frame,
+                     a live readout
+     gold            the primary action, and the lesson-strip rule
+     lite            the second data series and focus rings
+     warm            genuine failure states ONLY (Murray State brand guide says
+                     use Red Orange sparingly; CONTRACT.md repeats it)
+
+   Palette source: the Murray State brand guide — Blue #002144 (PMS 289),
+   Gold #ECAC00 (PMS 123), Lite Blue #00A4E3 (PMS 2995), Red Orange #FF4500.
+   =========================================================================== */
+
+:root {
+  /* --- the A0 required set. Every name below appears in every demo. ------- */
+  --u: 1rem;              /* type unit; everything scales off it */
+  --navy: #002144;        /* brand */
+  --gold: #ECAC00;        /* brand */
+  --lite: #00A4E3;        /* brand accent — second series, focus rings */
+  --warm: #FF4500;        /* brand accent — genuine failure states only */
+  --paper: #FFFDF8;       /* page */
+  --cream: #F7F0E3;       /* secondary surface */
+  --ink: #14273A;         /* body text on paper/cream */
+  --ink-2: #40556A;       /* secondary text */
+  --ink-3: #65788A;       /* tertiary text, notes */
+  --line: #C6D1D8;        /* hairlines on light surfaces */
+
+  /* --- derived shades the shell CSS needs. Also fleet-wide, also stable. -- */
+  --navy-2: #07345D;      /* raised navy surface inside a workbench */
+  --navy-deep: #01182C;   /* code/readout wells inside a workbench */
+  --cream-deep: #EBE0CA;  /* card borders on cream */
+  --gold-deep: #9F6700;   /* gold as TEXT on paper — 4.6:1, passes AA */
+  --gold-lite: #FFD76A;   /* gold as text on navy */
+  --lite-soft: #D9EFF8;   /* lite blue wash */
+  --lite-deep: #007EB5;   /* lite blue as text on paper — 4.6:1 */
+  --bad: #C63F1D;         /* a wrong answer, a contradicted prediction */
+  --bad-soft: #FDE8E1;
+  --ok: #1C704D;          /* a supported prediction */
+  --ok-soft: #E0F5EE;
+  --ink-on-navy: #F6FBFF; /* body text on a navy surface */
+  --ink-2-on-navy: #D7E5EF;
+  --ink-3-on-navy: #B8CBD8;
+  --line-on-navy: rgba(255, 255, 255, .30);
+  --radius: 16px;
+  --radius-2: 10px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+
+  color-scheme: light;
+}
+
+/* Presentation mode changes --u and nothing else. One value fleet-wide:
+   Demo 1 shipped 1.25rem and Demo 2 shipped 1.18rem; the plan picks 1.2. */
+body.presenter { --u: 1.2rem; }
+
+/* Very short portrait screens — an iPhone SE 1st gen is 320x568 — get the whole
+   layout down a notch rather than letting the activity push the primary action
+   off the bottom. .94rem keeps every tap target over 40px. body.presenter
+   out-specifies this, so presentation mode still wins. */
+@media (orientation: portrait) and (max-height: 660px) {
+  :root { --u: .94rem; }
+}

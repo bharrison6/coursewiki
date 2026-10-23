@@ -1,0 +1,891 @@
+/* =====================================================================
+   Types of AI — ACTIVITY styles only.
+
+   The lesson shell (../tools/lesson-shell: tokens.css + shell.css) is
+   injected BEFORE this file and owns the header, the lens-less stage
+   tablist, the stage intro, the lesson strip, the dialogs, the check cards
+   and the credit pill. Everything here is the demo's own: the board, the
+   rule ladder, the training panel, the network inspector, the montage, the
+   Ultimate extension, the lens row above the tablist, and the two map
+   stages (1d and Model types).
+
+   Palette is the kit's. The activity panels are navy "live machine"
+   surfaces (plan A0), so their text uses the kit's on-navy inks; the one
+   demo-only colour token is the navy hairline (--navy-line), kept because
+   the kit's --line-on-navy is translucent white and would change how the
+   board grid reads. Value heatmaps run red-orange -> navy -> gold rather
+   than red -> green, so the whole app stays inside the brand palette; every
+   heat square also carries its signed number, so nothing depends on
+   telling two warm hues apart.
+
+   Layout rule: everything scales off --u (the kit sets it; presentation
+   mode changes it and nothing else). Sizes that must survive a short phone
+   screen are expressed in dvh so the board shrinks instead of pushing the
+   TRAIN button off the bottom of the screen.
+   ===================================================================== */
+
+:root {
+  --navy-line:   #14406F;      /* hairline on a navy panel */
+  --navy-line-2: #1E5490;      /* raised hairline on a navy panel */
+  --weight-neg:  #B881B7;      /* negative connection weight, not a failure */
+  --you:         #FFFFFF;      /* the third official colour */
+  --ai:          var(--gold);
+}
+
+/* The activity's navy panels were laid out against a zeroed box model; the
+   reset is scoped to them so the kit's paper surfaces keep their rhythm. */
+#activity *, .montage *, #learned-body *, #selftest-out * { margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+#activity, .montage, #learned-body { -webkit-tap-highlight-color: transparent; }
+
+/* ------------------------------------------------------------ lens row */
+/* The demo's own two-way switch above the kit's tablist. Not a tablist:
+   the kit's is the only one, and each lens button just asks the shell to
+   select the first stage of its half. body[data-lens] is set by app.js. */
+#lens-nav { max-width: 1180px; margin: 0 auto; padding: 0 22px 10px; }
+.lens-seg {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--cream);
+}
+.lens-btn {
+  min-height: 46px; border: 0; border-radius: 9px; padding: 6px 12px; background: transparent;
+  color: var(--ink-2); font-weight: 800; font-size: calc(var(--u) * .92); text-align: center; line-height: 1.2;
+}
+.lens-btn span, .lens-btn small { display: block; }
+.lens-btn small { margin-top: 2px; color: var(--ink-3); font-size: calc(var(--u) * .66); font-weight: 650; }
+.lens-btn.on, .lens-btn[aria-pressed="true"] { background: var(--navy); color: #fff; box-shadow: inset 0 -3px 0 var(--gold); }
+.lens-btn[aria-pressed="true"] small { color: var(--ink-2-on-navy); }
+.lens-btn:hover:not([aria-pressed="true"]) { background: var(--paper); }
+body[data-lens="types"] .stages { display: none; }
+body[data-lens="architecture"] .stage-tab.lens-types-tab { display: none; }
+
+/* -------------------------------------------------------- the activity */
+/* One block, moved between the three playable stages' hosts by app.js. */
+.activity-host:empty { display: none; }
+#activity {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+  gap: calc(1.35 * var(--u)); align-items: start; margin-bottom: 6px;
+}
+#col-a { min-width: 0; padding: calc(1 * var(--u)); border-radius: 22px; color: var(--ink-on-navy); background: var(--navy); box-shadow: 0 18px 48px rgba(0,33,68,.16); }
+#col-b { min-width: 0; }
+#activity .panel-kicker { display: block; margin-bottom: 6px; }
+#activity .board-kicker { margin-bottom: 8px; }
+#activity .control-label { margin: 0 0 6px; }
+#activity .ctl-brain { margin: 8px 0 0; }
+#activity .ctl-brain .why b { color: var(--gold-lite); }
+.panel .control-label + .seg { margin-top: 2px; }
+
+/* ------------------------------------------------------------- panels */
+.panel {
+  background: var(--navy); border: 1px solid var(--navy-line);
+  border-radius: var(--radius-2); padding: calc(.7 * var(--u));
+  margin-bottom: calc(.6 * var(--u)); color: var(--ink-on-navy);
+}
+.help { font-size: calc(.72 * var(--u)); color: var(--ink-3-on-navy); line-height: 1.5; margin-top: calc(.4 * var(--u)); }
+
+/* ---------------------------------------------------------- opponent */
+#opponent-panel { padding: 0 0 calc(.75 * var(--u)); border: 0; border-bottom: 1px solid var(--navy-line); border-radius: 0; background: transparent; }
+#opp-row { display: flex; flex-direction: column; gap: calc(.3 * var(--u)); margin: 0 0 calc(.65 * var(--u)); }
+select {
+  width: 100%; min-width: 0;
+  background: var(--navy-2); color: var(--ink-on-navy); border: 1px solid var(--navy-line-2);
+  border-radius: 10px; padding: calc(.45 * var(--u)) calc(.55 * var(--u));
+  font-size: calc(.88 * var(--u)); font-family: inherit; font-weight: 700;
+  min-height: calc(2.8 * var(--u));
+}
+#score-row { display: flex; gap: calc(.35 * var(--u)); margin-top: calc(.45 * var(--u)); }
+.sc {
+  flex: 1; display: flex; align-items: baseline; justify-content: center; gap: .4em;
+  background: var(--navy-2); border: 1px solid var(--navy-line);
+  border-radius: 8px; padding: calc(.3 * var(--u)) 2px; min-height: calc(2.1 * var(--u));
+}
+.sc .n { font-size: calc(1.1 * var(--u)); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+.sc .k { font-size: calc(.56 * var(--u)); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3-on-navy); }
+.sc.win .n  { color: var(--gold); }
+.sc.loss .n { color: var(--warm); }
+.sc.draw .n { color: var(--ink-2-on-navy); }
+
+#era-strip {
+  display: flex; flex-wrap: wrap; gap: calc(.28 * var(--u)); align-items: center;
+  margin-top: calc(.45 * var(--u)); font-size: calc(.64 * var(--u));
+}
+#era-strip .k { letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3-on-navy); font-weight: 700; }
+#era-strip .chip {
+  background: var(--navy-deep); border: 1px solid var(--navy-line); border-radius: 99px;
+  padding: calc(.18 * var(--u)) calc(.45 * var(--u)); font-variant-numeric: tabular-nums;
+  color: var(--ink-3-on-navy); white-space: nowrap;
+}
+#era-strip .chip.on { border-color: var(--gold); color: var(--ink-on-navy); }
+#era-strip .chip .w { color: var(--gold); }
+#era-strip .chip .d { color: var(--ink-2-on-navy); }
+#era-strip .chip .l { color: var(--warm); }
+
+/* ------------------------------------------------------------- board */
+#board-wrap { margin-bottom: calc(.55 * var(--u)); }
+#board {
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+  gap: calc(.4 * var(--u)); aspect-ratio: 1; width: 100%;
+  /* The board yields first when the screen is short, so the TRAIN button
+     -- the whole point of the app -- never gets pushed below the fold.
+     29u is the measured height of everything else stacked above and
+     below it in the one-column layout; the floor stops the board
+     collapsing to nothing on a very short window. */
+  max-width: min(100%, 300px);
+  margin-inline: auto;
+}
+.cell {
+  position: relative; border: 1px solid var(--navy-line-2);
+  background: linear-gradient(180deg, #0A3161, #052A55);
+  border-radius: var(--radius-2); display: grid; place-items: center;
+  font-size: calc(2.6 * var(--u)); font-weight: 800; line-height: 1;
+  color: var(--ink-on-navy); cursor: pointer; padding: 0; font-family: inherit;
+  transition: background .12s ease, border-color .12s ease, transform .08s ease;
+  overflow: hidden;
+}
+.cell:disabled { cursor: default; }
+.cell.mk1 { color: var(--you); }
+.cell.mk2 { color: var(--ai); }
+.cell.open:active { background: var(--navy-line); transform: scale(.97); }
+.cell.win { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold) inset; }
+.cell.last::after {
+  content: ''; position: absolute; inset: auto auto calc(.28 * var(--u)) 50%;
+  transform: translateX(-50%); width: calc(1.1 * var(--u)); height: 3px;
+  border-radius: 3px; background: currentColor; opacity: .65;
+}
+.cell .v {
+  position: absolute; top: calc(.22 * var(--u)); left: 0; right: 0;
+  font-size: calc(.68 * var(--u)); font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.cell .n {
+  position: absolute; bottom: calc(.2 * var(--u)); left: 0; right: 0;
+  font-size: calc(.5 * var(--u)); font-weight: 600; opacity: .78;
+  font-variant-numeric: tabular-nums;
+}
+.cell.heat { font-size: calc(1.8 * var(--u)); border-color: var(--navy-line); }
+.cell.pick { box-shadow: 0 0 0 3px var(--lite) inset; }
+
+#status {
+  margin-top: calc(.3 * var(--u)); text-align: center;
+  font-size: calc(.88 * var(--u)); min-height: calc(1.8 * var(--u));
+  display: grid; place-items: center; padding: calc(.15 * var(--u));
+}
+#status .big { font-weight: 800; font-size: calc(1.02 * var(--u)); }
+#status .sub { color: var(--ink-3-on-navy); font-size: calc(.72 * var(--u)); }
+#status.you-win .big  { color: var(--gold); }
+#status.you-lose .big { color: var(--warm); }
+#status.drawn .big    { color: var(--lite); }
+
+/* ----------------------------------------------------------- buttons */
+#activity .btn, .montage .btn {
+  appearance: none; border: 1px solid var(--navy-line-2); background: var(--navy-2);
+  color: var(--ink-on-navy); font-family: inherit; font-size: calc(.9 * var(--u));
+  font-weight: 700; border-radius: 10px; padding: calc(.55 * var(--u)) calc(.7 * var(--u));
+  cursor: pointer; min-height: calc(2.75 * var(--u)); flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: .4em;
+}
+#activity .btn:hover, .montage .btn:hover, .seg button:hover { filter: brightness(1.1); }
+#activity .btn:active, .montage .btn:active { transform: translateY(1px); }
+#activity .btn.primary, .montage .btn.primary {
+  background: linear-gradient(180deg, #FFC42B, var(--gold));
+  border-color: #B98700; color: var(--navy);
+}
+#activity .btn.ghost, .montage .btn.ghost { background: transparent; color: var(--ink-2-on-navy); }
+#activity .btn.sm, .montage .btn.sm { font-size: calc(.76 * var(--u)); min-height: calc(2.7 * var(--u)); padding: calc(.4 * var(--u)) calc(.6 * var(--u)); flex: 0 0 auto; }
+#activity .btn[aria-pressed="true"], .montage .btn[aria-pressed="true"] { background: var(--lite); border-color: #6FD4FF; color: var(--navy); }
+#activity .btn.big, .montage .btn.big { flex-direction: column; gap: 1px; min-height: calc(3.5 * var(--u)); width: 100%; }
+#activity .btn.big .t-main, .montage .btn.big .t-main { font-size: calc(1.02 * var(--u)); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+#activity .btn.big .t-sub, .montage .btn.big .t-sub { font-size: calc(.68 * var(--u)); opacity: .78; font-weight: 700; }
+#activity .btn:disabled, .montage .btn:disabled { opacity: .45; cursor: default; }
+
+#play-controls { display: flex; gap: calc(.45 * var(--u)); padding: calc(.4 * var(--u)); margin-bottom: 0; }
+
+/* ------------------------------------------------------ brain readout */
+#brain-readout {
+  background: var(--navy); border: 1px solid var(--lite); border-radius: var(--radius-2);
+  padding: calc(.65 * var(--u)); margin-bottom: calc(.6 * var(--u));
+  font-size: calc(.74 * var(--u)); color: var(--ink-2-on-navy); line-height: 1.5;
+}
+#brain-readout b { color: var(--ink-on-navy); font-variant-numeric: tabular-nums; }
+.legend { display: flex; align-items: center; gap: calc(.35 * var(--u)); margin-top: calc(.45 * var(--u)); font-size: calc(.62 * var(--u)); color: var(--ink-3-on-navy); }
+.legend .ramp { flex: 1; height: calc(.5 * var(--u)); border-radius: 99px;
+  background: linear-gradient(90deg, #FF4500, #8A2C33, #0A3161, #97781A, #ECAC00); }
+
+/* -------------------------------------------------------------- train */
+#train-panel { border-color: var(--navy); background: var(--navy); box-shadow: 0 12px 34px rgba(0,33,68,.12); }
+.seg { display: flex; gap: calc(.35 * var(--u)); margin-top: calc(.5 * var(--u)); }
+.seg button {
+  flex: 1; background: var(--navy-2); border: 1px solid var(--navy-line-2); color: var(--ink-2-on-navy);
+  border-radius: 8px; padding: calc(.4 * var(--u)) 0; font-family: inherit;
+  font-size: calc(.76 * var(--u)); font-weight: 700; cursor: pointer;
+  min-height: calc(2.7 * var(--u)); font-variant-numeric: tabular-nums;
+}
+.seg button.on { background: var(--lite); border-color: #6FD4FF; color: var(--navy); }
+#train-stats {
+  margin-top: calc(.5 * var(--u)); display: flex; flex-wrap: wrap; gap: calc(.35 * var(--u));
+}
+#train-stats > p { flex-basis: 100%; margin: calc(.4 * var(--u)) 0 0; }
+#train-stats .st { flex: 1; background: var(--navy-deep); border: 1px solid var(--navy-line); border-radius: 8px;
+  padding: calc(.32 * var(--u)) calc(.2 * var(--u)); text-align: center; }
+#train-stats .st .n { display: block; font-size: calc(.9 * var(--u)); font-weight: 800; font-variant-numeric: tabular-nums; color: var(--gold); line-height: 1.15; }
+#train-stats .st .k { display: block; font-size: calc(.5 * var(--u)); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3-on-navy); }
+#btn-learned { width: 100%; margin-top: calc(.5 * var(--u)); flex: none; }
+
+#learned-report { padding: calc(.8 * var(--u)); overflow: hidden; }
+.learned-inline-head { margin-bottom: calc(.65 * var(--u)); }
+.learned-inline-head h3 {
+  margin: calc(.12 * var(--u)) 0 calc(.18 * var(--u)); color: var(--ink-on-navy);
+  font: 700 calc(1.18 * var(--u))/1.25 Georgia, "Times New Roman", serif;
+}
+#learned-inline-sub { color: var(--ink-2-on-navy); font-size: calc(.7 * var(--u)); line-height: 1.45; }
+#learned-inline-body .headline { margin-bottom: calc(.6 * var(--u)); }
+#learned-inline-body .lc:last-child { margin-bottom: 0; }
+#learned-inline-body .lc summary {
+  cursor: pointer; list-style-position: outside; color: var(--ink-on-navy);
+  padding: calc(.05 * var(--u)) calc(.08 * var(--u));
+}
+#learned-inline-body .lc summary::marker { color: var(--gold); }
+#learned-inline-body .lc summary:focus-visible { outline: 3px solid var(--lite); outline-offset: 3px; }
+#learned-inline-body .lc .lc-title { display: block; color: var(--gold); font-size: calc(.88 * var(--u)); font-weight: 800; }
+#learned-inline-body .lc .lc-ask { display: block; margin-top: calc(.1 * var(--u)); color: var(--ink-3-on-navy); font-size: calc(.71 * var(--u)); line-height: 1.5; }
+#learned-inline-body .lc .lc-body { margin-top: calc(.55 * var(--u)); }
+#learned-inline-body .lc-grid { max-width: min(100%, calc(20 * var(--u))); }
+#learned-inline-body .lc-cell .lv,
+#learned-inline-body .lc-cell .value-pair { font-size: max(12px, calc(.75 * var(--u))); }
+#learned-inline-body .lc-cell .value-pair .arrow { font-size: max(10px, calc(.62 * var(--u))); }
+#learned-inline-body .lc .ask,
+#learned-inline-body .lc .delta { font-size: max(13px, calc(.81 * var(--u))); }
+
+/* ------------------------------------------------------ network view */
+#network-view { padding: calc(.8 * var(--u)); overflow: hidden; }
+.network-view-head { display: flex; align-items: flex-start; justify-content: space-between; gap: calc(.5 * var(--u)); }
+.network-view-head h3 { color: var(--ink-on-navy); font: 700 calc(1.18 * var(--u))/1.2 Georgia, "Times New Roman", serif; }
+.parameter-count { color: var(--ink-2-on-navy); font-size: calc(.7 * var(--u)); font-weight: 800; white-space: nowrap; }
+.network-context, .weight-caution, .network-diagram-note, .network-empty p {
+  color: var(--ink-2-on-navy); font-size: calc(.76 * var(--u)); line-height: 1.48; margin-top: calc(.5 * var(--u));
+}
+.network-context b, .network-empty b { color: var(--ink-on-navy); }
+.network-layers {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: calc(.25 * var(--u)); align-items: center; margin-top: calc(.65 * var(--u));
+}
+.network-layers div { min-width: 0; padding: calc(.35 * var(--u)); text-align: center; border: 1px solid var(--navy-line); border-radius: 8px; background: var(--navy-deep); }
+.network-layers b, .network-layers span, .network-layers small { display: block; }
+.network-layers b { color: var(--gold); font-size: calc(1.05 * var(--u)); }
+.network-layers span { color: var(--ink-on-navy); font-size: calc(.62 * var(--u)); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.network-layers small { color: var(--ink-3-on-navy); font-size: calc(.52 * var(--u)); line-height: 1.25; }
+.network-layers > i { color: var(--ink-3-on-navy); font-size: calc(.5 * var(--u)); font-style: normal; text-align: center; }
+.network-diagram-note { margin-bottom: calc(.25 * var(--u)); }
+.network-diagram { width: 100%; min-height: 180px; display: block; border: 1px solid var(--navy-line); border-radius: 10px; background: var(--navy-deep); }
+.network-edges line { stroke: var(--edge); stroke-width: 2; opacity: .88; }
+.network-nodes circle { fill: #526F91; stroke: #A9C0DD; stroke-width: 1; }
+.network-nodes circle.active { fill: var(--lite); }
+.network-nodes circle.input-on { fill: #fff; stroke: var(--gold); stroke-width: 2; }
+.network-nodes circle.selected { fill: var(--gold); stroke: #fff; stroke-width: 2.5; }
+.network-labels text { fill: var(--ink-2-on-navy); font: 700 11px ui-sans-serif, system-ui, sans-serif; text-anchor: middle; }
+.weight-legend { display: grid; grid-template-columns: auto 1fr auto 1fr auto; gap: .35em; align-items: center; margin-top: calc(.55 * var(--u)); color: var(--ink-3-on-navy); font-size: calc(.57 * var(--u)); }
+.weight-legend i { display: block; height: 5px; background: linear-gradient(90deg, var(--weight-neg), var(--navy-2)); }
+.weight-legend i:nth-of-type(2) { background: linear-gradient(90deg, var(--navy-2), var(--gold)); }
+.network-inspector-controls { display: grid; grid-template-columns: 1.5fr 1fr; gap: calc(.45 * var(--u)); margin-top: calc(.65 * var(--u)); }
+.network-inspector-controls label { color: var(--gold); font-size: calc(.62 * var(--u)); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.network-inspector-controls select { margin-top: calc(.22 * var(--u)); font-size: calc(.72 * var(--u)); min-height: calc(2.55 * var(--u)); letter-spacing: 0; text-transform: none; }
+.selected-neuron { display: flex; justify-content: space-between; gap: .5em; margin-top: calc(.55 * var(--u)); color: var(--ink-on-navy); font-size: calc(.7 * var(--u)); }
+.selected-neuron span { color: var(--ink-2-on-navy); font-variant-numeric: tabular-nums; }
+.weight-table-wrap { margin-top: calc(.35 * var(--u)); max-height: calc(14 * var(--u)); overflow: auto; overscroll-behavior: contain; border: 1px solid var(--navy-line); border-radius: 8px; }
+.weight-table { width: 100%; border-collapse: collapse; font-size: calc(.64 * var(--u)); font-variant-numeric: tabular-nums; }
+.weight-table th, .weight-table td { padding: calc(.28 * var(--u)) calc(.35 * var(--u)); border-bottom: 1px solid var(--navy-line); text-align: right; white-space: nowrap; }
+.weight-table th:first-child { text-align: left; white-space: normal; }
+.weight-table thead { position: sticky; top: 0; z-index: 1; background: var(--navy-2); color: var(--ink-2-on-navy); }
+.weight-table tbody th { color: var(--ink-2-on-navy); font-weight: 600; }
+.weight-table tbody td { color: var(--ink-on-navy); }
+.weight-table .bias-row { background: var(--navy-2); }
+.weight-swatch { display: inline-block; width: .7em; height: .7em; margin-right: .35em; border-radius: 2px; background: var(--weight); border: 1px solid rgba(255,255,255,.4); }
+.active-input { display: inline-block; margin-left: .4em; color: var(--gold); font-size: .8em; font-weight: 800; text-transform: uppercase; }
+
+/* ------------------------------------------------------------- banner */
+.banner {
+  border-radius: var(--radius-2); padding: calc(.85 * var(--u));
+  margin-bottom: calc(.6 * var(--u));
+  background: #fff;
+  border: 1px solid var(--cream-deep); border-left: 5px solid var(--gold);
+}
+.banner h3 { font: 700 calc(1.12 * var(--u))/1.25 Georgia, "Times New Roman", serif; margin-bottom: calc(.4 * var(--u)); color: var(--navy); }
+.banner p { font-size: calc(.88 * var(--u)); color: var(--ink-2); line-height: 1.55; }
+.banner p + p { margin-top: calc(.45 * var(--u)); }
+.banner .proof {
+  margin-top: calc(.55 * var(--u)); font-size: calc(.72 * var(--u)); color: var(--ink-2);
+  border-top: 1px solid var(--cream-deep); padding-top: calc(.45 * var(--u));
+  font-variant-numeric: tabular-nums;
+}
+/* the quieter banner used where no proof is possible */
+.banner.quiet { border-color: #B7DCEB; border-left-color: var(--lite); background: #F2FAFD; }
+.banner.quiet h3 { color: var(--navy); }
+
+/* ------------------------------------------------------------ montage */
+/* The training overlay: the demo's own, not a dialog. It is a paced
+   visualisation of real work (the maths is faster than the animation, and
+   its kicker says so). */
+.montage {
+  position: fixed; inset: 0; z-index: 60; background: rgba(0, 12, 26, .88);
+  backdrop-filter: blur(3px); display: grid; place-items: center;
+  padding: calc(.7 * var(--u)); overflow-y: auto; overscroll-behavior: contain;
+  color: var(--ink-on-navy);
+}
+.montage .panel-kicker { display: block; margin-bottom: 8px; color: var(--gold-lite); }
+.montage-inner { width: 100%; max-width: calc(24 * var(--u)); text-align: center; margin: auto 0; }
+.m-label { font-size: calc(.62 * var(--u)); letter-spacing: .34em; color: var(--gold); font-weight: 800; }
+.m-count {
+  font-size: calc(2.9 * var(--u)); font-weight: 800; font-variant-numeric: tabular-nums;
+  line-height: 1.05; margin-top: calc(.1 * var(--u)); color: var(--ink-on-navy);
+  text-shadow: 0 0 calc(.8 * var(--u)) rgba(236, 172, 0, .5);
+}
+.m-count.blur { filter: blur(1.1px); }
+.m-count-sub { font-size: calc(.62 * var(--u)); color: var(--ink-3-on-navy); margin-bottom: calc(.7 * var(--u)); }
+.m-boards { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(.45 * var(--u));
+  margin-bottom: calc(.75 * var(--u)); max-width: min(100%, 42dvh); margin-inline: auto; }
+.mini { aspect-ratio: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  background: var(--navy-line); border-radius: 6px; overflow: hidden; padding: 2px; }
+.mini i { background: var(--navy); display: grid; place-items: center; font-style: normal;
+  font-size: calc(.58 * var(--u)); font-weight: 800; line-height: 1; }
+.mini i.m1 { color: var(--you); } .mini i.m2 { color: var(--ai); }
+.m-bars { display: grid; gap: calc(.5 * var(--u)); margin-bottom: calc(.7 * var(--u)); }
+.m-bar-head { display: flex; justify-content: space-between; font-size: calc(.68 * var(--u)); color: var(--ink-2-on-navy); font-variant-numeric: tabular-nums; }
+.m-bar-note { font-size: calc(.55 * var(--u)); color: var(--ink-3-on-navy); margin-top: 2px; text-align: left; }
+.track { height: calc(.4 * var(--u)); background: var(--navy); border-radius: 99px; overflow: hidden; margin-top: 3px; }
+.track.big { height: calc(.5 * var(--u)); }
+.fill { height: 100%; width: 0; border-radius: 99px; transition: width .1s linear; }
+.fill.eps  { background: var(--lite); }
+.fill.wr   { background: var(--gold); }
+.fill.prog { background: linear-gradient(90deg, var(--lite), var(--gold)); }
+
+/* ------------------------------------------------------ learned cards */
+.lc { background: var(--navy); border: 1px solid var(--navy-line); border-radius: var(--radius-2);
+  padding: calc(.65 * var(--u)); margin-bottom: calc(.6 * var(--u)); }
+.lc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(.28 * var(--u));
+  max-width: min(100%, calc(10.5 * var(--u))); margin: 0 auto; }
+.lc-cell { aspect-ratio: 1; border-radius: 7px; display: grid; place-items: center;
+  position: relative; border: 1px solid var(--navy-line); font-weight: 800; font-size: calc(1 * var(--u)); }
+.lc-cell.mk1 { color: var(--you); background: var(--navy-2); }
+.lc-cell.mk2 { color: var(--ai); background: var(--navy-2); }
+.lc-cell .lv { font-size: calc(.68 * var(--u)); font-variant-numeric: tabular-nums; font-weight: 800; }
+.lc-cell .value-pair { display: grid; gap: 1px; font-size: calc(.65 * var(--u)); line-height: 1.05; font-variant-numeric: tabular-nums; }
+.lc-cell .value-pair .before { opacity: .78; text-decoration: line-through; text-decoration-thickness: 1px; }
+.lc-cell .value-pair .arrow { font-size: calc(.52 * var(--u)); opacity: .72; }
+.lc-cell .value-pair .after { font-weight: 900; }
+.lc-cell .value-pair .cell-delta { font-size: .86em; opacity: .85; }
+.value-legend {
+  margin: 0 auto calc(.35 * var(--u)); color: var(--ink-2-on-navy); text-align: center;
+  font-size: max(12px, calc(.68 * var(--u))); font-variant-numeric: tabular-nums;
+}
+.lc-cell .dl { position: absolute; bottom: 2px; left: 0; right: 0; font-size: calc(.42 * var(--u)); font-weight: 800; }
+.lc-cell.up   { box-shadow: 0 0 0 2px var(--gold) inset; }
+.lc-cell.down { box-shadow: 0 0 0 2px var(--warm) inset; }
+.lc .delta { margin-top: calc(.55 * var(--u)); font-size: calc(.75 * var(--u)); line-height: 1.5; }
+.lc .delta .up   { color: var(--gold); font-weight: 800; }
+.lc .delta .down { color: var(--warm); font-weight: 800; }
+.lc .delta .flat { color: var(--ink-2-on-navy); font-weight: 700; }
+.headline {
+  background: linear-gradient(150deg, #0A3161, #002144); border: 1px solid var(--gold);
+  border-radius: var(--radius-2); padding: calc(.7 * var(--u)); margin-bottom: calc(.7 * var(--u));
+  font-size: calc(.82 * var(--u)); line-height: 1.55;
+}
+.headline b { color: var(--gold); }
+
+#selftest-out { margin-top: calc(.6 * var(--u)); font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: calc(.64 * var(--u)); line-height: 1.7; white-space: pre-wrap; color: var(--ink-2-on-navy);
+  background: var(--navy-deep); border: 1px solid var(--navy-line); border-radius: 8px; padding: calc(.5 * var(--u));
+  overflow-x: auto; }
+#selftest-out .ok { color: var(--gold); } #selftest-out .no { color: var(--warm); }
+
+/* ================================================================== *
+ * Step 1 — the hand-written rules
+ *
+ * Everything here is [hidden] outside step 1, so it costs no height in
+ * steps 2 and 3: the TRAIN button's fold budget is untouched by the
+ * rule ladder existing. Step 1 has no TRAIN button of its own, and what
+ * has to stay above the fold there — the depth control and the board —
+ * sits above everything added below.
+ * ================================================================== */
+
+
+#depth-seg { margin: calc(.65 * var(--u)) 0 calc(.7 * var(--u)); }
+#depth-seg button { font-size: calc(.82 * var(--u)); padding-inline: calc(.35 * var(--u)); }
+
+/* Step 3's memory toggle SHARES the row the era dropdown already
+   occupies. On its own line it costs 44px, which is enough on a 320x568
+   phone to push the TRAIN button off the bottom — and the TRAIN button
+   never going below the fold is the one layout rule this demo has. So
+   the row turns horizontal for step 3 only, the dropdown takes whatever
+   is left and truncates as selects do, and the toggle keeps its full
+   tap target. Steps 1 and 2 are untouched. */
+#mem-seg { margin-top: 0; flex: 0 0 auto; }
+#mem-seg button { font-size: calc(.72 * var(--u)); padding-inline: calc(.5 * var(--u)); }
+body.step-ult #opp-row { flex-direction: row; align-items: center; gap: calc(.35 * var(--u)); }
+body.step-ult #opp-row select { flex: 1 1 auto; width: auto; min-width: 0; }
+
+/* Step 1 carries one panel step 2 does not — the commentary line under
+   the board — so the board yields a little further here, exactly as it
+   does for the TRAIN button in step 2. Same principle, same place. */
+body.step-rules #board {
+  max-width: min(100%, 300px);
+}
+
+/* The commentary line under the board: which rule answered you. */
+#rule-fired {
+  background: var(--navy); border: 1px solid var(--lite); border-left-width: 3px;
+  border-radius: var(--radius-2); padding: calc(.55 * var(--u)) calc(.65 * var(--u));
+  margin: calc(.4 * var(--u)) 0 calc(.5 * var(--u));
+  font-size: calc(.875 * var(--u)); color: var(--ink-2-on-navy); line-height: 1.5;
+}
+#rule-fired.waiting { border-color: var(--navy-line-2); color: var(--ink-3-on-navy); }
+#rule-fired.nofire  { border-color: var(--warm); }
+#rule-fired .rf-head b { color: var(--gold); }
+#rule-fired.nofire .rf-head b { color: var(--warm); }
+#rule-fired .rf-off { color: var(--ink-3-on-navy); }
+
+/* The squares that set the rule off — deliberately not the same
+   treatment as .pick, which means "it is about to play here". */
+.cell.trig { border-color: var(--lite); box-shadow: 0 0 0 2px var(--lite) inset; }
+
+/* The ladder itself. */
+#rules-panel { padding: calc(.8 * var(--u)); }
+.rule-control-head { display: flex; align-items: end; justify-content: space-between; gap: 1em; }
+.rule-control-head h3 { margin: 0; color: var(--gold); font: 700 calc(1.08 * var(--u))/1.2 Georgia, "Times New Roman", serif; }
+.rule-control-head p { max-width: 36em; margin: .3em 0 0; color: var(--ink-2-on-navy); font-size: calc(.82 * var(--u)); line-height: 1.45; }
+.rp-sub { font-size: calc(.6 * var(--u)); color: var(--ink-3-on-navy); text-transform: uppercase;
+  letter-spacing: .1em; font-weight: 700; white-space: nowrap; }
+#rule-list { list-style: none; margin: calc(.5 * var(--u)) 0 0; padding: 0; }
+.rule {
+  display: flex; align-items: flex-start; gap: calc(.45 * var(--u));
+  padding: calc(.3 * var(--u)) calc(.35 * var(--u));
+  border-radius: 8px; border: 1px solid transparent;
+}
+.rule + .rule { margin-top: 2px; }
+.rule .rn {
+  flex: 0 0 auto; min-width: calc(1.35 * var(--u)); text-align: center;
+  font-size: calc(.68 * var(--u)); font-weight: 800; font-variant-numeric: tabular-nums;
+  color: var(--ink-3-on-navy); background: var(--navy-deep); border-radius: 5px;
+  padding: 1px 0; line-height: 1.5;
+}
+.rule .rt { flex: 1 1 auto; min-width: 0; }
+.rule .rt b { display: block; font-size: calc(.875 * var(--u)); color: var(--ink-on-navy); font-weight: 700; }
+.rule .rg { display: block; font-size: calc(.875 * var(--u)); color: var(--ink-2-on-navy); line-height: 1.35; }
+.rule .rc {
+  flex: 0 0 auto; font-size: calc(.6 * var(--u)); color: var(--ink-3-on-navy);
+  font-variant-numeric: tabular-nums; padding-top: 2px;
+}
+.rule.fired { background: var(--navy-2); border-color: var(--gold); }
+.rule.fired .rn { background: var(--gold); color: var(--navy); }
+.rule.fired .rt b { color: var(--gold); }
+/* A switched-off rule is a genuine gap in the opponent, so it reads as
+   absent rather than merely dim. */
+.rule.off { opacity: .42; }
+.rule.off .rt b { text-decoration: line-through; text-decoration-thickness: 1px; }
+.rule.fallback .rn { background: transparent; }
+.rule.fallback .rt b { color: var(--ink-2-on-navy); font-weight: 600; }
+.rule.fallback.fired { border-color: var(--warm); background: var(--navy-2); }
+.rule.fallback.fired .rt b { color: var(--warm); }
+.rp-foot {
+  margin-top: calc(.5 * var(--u)); font-size: calc(.8 * var(--u));
+  color: var(--ink-3-on-navy); line-height: 1.5;
+  border-top: 1px solid var(--navy-line); padding-top: calc(.4 * var(--u));
+}
+
+/* The game a shortened ladder loses, drawn out move by move. */
+.lg {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(2.3 * var(--u)), 1fr));
+  gap: calc(.35 * var(--u)); margin: calc(.6 * var(--u)) 0;
+}
+.lg-step .mini { border-radius: 5px; }
+.lg-who {
+  display: block; text-align: center; font-size: calc(.52 * var(--u));
+  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3-on-navy); margin-top: 2px;
+}
+.lg-step.fork .mini { outline: 2px solid var(--warm); outline-offset: 1px; }
+.lg-step.fork .lg-who { color: var(--warm); font-weight: 800; }
+.lg-note { font-size: calc(.72 * var(--u)); color: var(--ink-2-on-navy); line-height: 1.5; }
+.lg-note b { color: var(--warm); }
+
+/* ================================================================== *
+ * Ultimate tic-tac-toe
+ *
+ * Two square panes side by side: the meta-grid on the left — which is
+ * the score AND the board the match is won on — and the small board you
+ * were SENT to on the right, at full size.
+ *
+ * The 9x9 is the hard case on a phone and this is the answer to it.
+ * Eighty-one live cells at 320px would be 36px each, and the forced
+ * board would be one hairline outline somewhere inside a wall of
+ * glyphs. Split in two and each pane is ~148px at 320px wide, so the
+ * squares you tap are ~46px — the same size they are in the one-board
+ * game — and the meta boards are ~49px. Nothing is below 36px and
+ * nothing about the layout's height changed, so TRAIN stays above the
+ * fold exactly as it did.
+ *
+ * Ultimate rules make the split MORE honest than it was for nine
+ * independent boards. You do not choose which board to play in, so the
+ * right-hand pane is not a viewport onto a bigger thing you might
+ * rather be looking at — it is the only board you are allowed to touch.
+ *
+ * Three signals carry the send rule, and they are exclusive, so there
+ * is never a question about where the next mark can go:
+ *   .sent   the board the rules point at        solid gold, breathing
+ *   .open   any board, because the send freed you   dashed gold
+ *   .dest   where the square under your finger would send them  lite blue
+ * ================================================================== */
+
+#ult-wrap { margin-bottom: calc(.55 * var(--u)); }
+#ult-panes { display: flex; gap: calc(.55 * var(--u)); align-items: flex-start; justify-content: center; }
+/* Same trick as the one-board board: the panes are the element that
+   yields on a short screen, so they shrink rather than pushing TRAIN
+   off the bottom. Half the row normally; less than that when the screen
+   is short; and never past the 7.6u floor, which is what keeps a tap
+   target above 36px. Measured: 41px at 320x568 portrait, 37px at
+   812x375 landscape, 54px at 375x667. */
+#ult-meta, #ult-focus {
+  flex: 0 1 auto; min-width: 0; aspect-ratio: 1; display: grid;
+  width: min(calc(50% - .28 * var(--u)), max(calc(7.6 * var(--u)), calc(100dvh - 29 * var(--u))));
+}
+#ult-meta { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: calc(.22 * var(--u)); }
+#ult-focus { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: calc(.28 * var(--u)); }
+
+.mb {
+  position: relative; padding: calc(.14 * var(--u)); border-radius: 7px;
+  background: var(--navy); border: 1px solid var(--navy-line);
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+  gap: 1px; cursor: default; font-family: inherit; overflow: hidden;
+  transition: box-shadow .12s ease, border-color .12s ease;
+}
+.mb i { border-radius: 2px; background: rgba(255, 255, 255, .05); }
+.mb i.m1 { background: var(--you); }
+.mb i.m2 { background: var(--ai); }
+.mb.last  { border-color: var(--lite); }
+.mb.done i { opacity: .28; }
+
+/* THE FORCED BOARD. It has to be unmistakable at arm's length on a
+   phone, so it gets all four channels at once: a thick gold ring, a
+   gold border, a lift out of the panel colour, and a slow pulse that
+   nothing else on the page does. */
+.mb.sent {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold) inset, 0 0 0 2px rgba(236, 172, 0, .35);
+  background: #16233a;
+  animation: sentpulse 2.2s ease-in-out infinite;
+}
+@keyframes sentpulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--gold) inset, 0 0 0 2px rgba(236, 172, 0, .30); }
+  50%      { box-shadow: 0 0 0 3px var(--gold) inset, 0 0 0 6px rgba(236, 172, 0, .12); }
+}
+/* free choice: every live board is yours to pick, so they are all
+   ringed, dashed to say "choose" rather than "you are here" */
+.mb.open {
+  cursor: pointer; border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(236, 172, 0, .55) inset;
+}
+.mb.open.focus { box-shadow: 0 0 0 3px var(--gold) inset; background: #16233a; }
+/* where the square you are touching would send them */
+.mb.dest {
+  border-color: var(--lite);
+  box-shadow: 0 0 0 3px var(--lite) inset, 0 0 0 5px rgba(0, 164, 227, .18);
+}
+/* the three boards that won the match */
+.mb.metawin { box-shadow: 0 0 0 3px var(--gold) inset, 0 0 14px rgba(236, 172, 0, .5); }
+
+.mb .tag {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-weight: 800; font-size: calc(1.05 * var(--u)); line-height: 1; pointer-events: none;
+}
+.mb.r1 { background: #123a5e; } .mb.r1 .tag { color: var(--you); }
+.mb.r2 { background: #3d2f06; } .mb.r2 .tag { color: var(--ai); }
+.mb.r3 .tag { color: var(--ink-3-on-navy); }
+
+#ult-focus .cell { font-size: calc(1.9 * var(--u)); border-radius: 9px; }
+#ult-focus .cell.heat { font-size: calc(1.2 * var(--u)); }
+#ult-focus .cell .v { font-size: calc(.6 * var(--u)); top: calc(.14 * var(--u)); }
+#ult-focus .cell .n { font-size: calc(.44 * var(--u)); bottom: calc(.12 * var(--u)); }
+/* The destination badge: which board this square would send them to.
+   Quiet by default — it is a reference, not an instruction — and the
+   pane opposite lights up when you actually touch the square. */
+#ult-focus .cell .s {
+  position: absolute; top: calc(.1 * var(--u)); right: calc(.22 * var(--u));
+  font-size: calc(.5 * var(--u)); font-weight: 700; line-height: 1;
+  color: var(--ink-3-on-navy); opacity: .5; pointer-events: none;
+}
+#ult-focus .cell.heat .s { color: inherit; opacity: .55; }
+/* A square whose board is already finished hands the opponent the WHOLE
+   grid, and nothing about the picture inside this board says so. Gold,
+   because it is the loaded one. */
+#ult-focus .cell.sends-free .s { color: var(--gold); opacity: 1; font-size: calc(.62 * var(--u)); }
+#ult-focus .cell.sends-free { border-color: rgba(236, 172, 0, .4); }
+#ult-focus.free-dest { box-shadow: 0 0 0 2px rgba(236, 172, 0, .3); border-radius: 12px; }
+
+/* The send rule, restated in words on every turn, with the board count
+   on its second line. One row rather than two: a ring around a board
+   says WHERE, and only this says WHY, and on a 320x568 screen there is
+   not room for a separate scoreboard as well as the sentence that
+   carries the whole act. */
+#ult-where {
+  margin-top: calc(.45 * var(--u)); padding: calc(.32 * var(--u)) calc(.5 * var(--u));
+  border-radius: 8px; border: 1px solid var(--navy-line); background: var(--navy-2);
+  font-size: calc(.66 * var(--u)); line-height: 1.3; color: var(--ink-2-on-navy);
+}
+#ult-where .uw-say { display: block; }
+#ult-where b { color: var(--ink-on-navy); }
+#ult-where .uw-score {
+  display: block; margin-top: .15em;
+  font-size: calc(.56 * var(--u)); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-3-on-navy); font-variant-numeric: tabular-nums;
+}
+#ult-where .uw-score b { font-weight: 800; letter-spacing: 0; }
+#ult-where .uw-score b.you { color: var(--you); }
+#ult-where .uw-score b.ai  { color: var(--ai); }
+#ult-where.sent { border-color: rgba(236, 172, 0, .55); }
+#ult-where.sent .uw-say b { color: var(--gold); }
+#ult-where.free { border-color: rgba(236, 172, 0, .55); background: #16233a; }
+#ult-where.free .uw-say b { color: var(--gold); }
+
+/* ultimate-match thumbnails in the montage */
+.m-boards.ult { grid-template-columns: repeat(3, 1fr); }
+.miniu {
+  aspect-ratio: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+  gap: 2px; background: var(--navy-line); border-radius: 7px; padding: 2px;
+}
+.mub {
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+  gap: 1px; background: var(--navy); border-radius: 3px; padding: 1px;
+}
+.mub i { border-radius: 1px; background: rgba(255, 255, 255, .06); }
+.mub i.m1 { background: var(--you); } .mub i.m2 { background: var(--ai); }
+.mub.r1 { background: #123a5e; } .mub.r2 { background: #3d2f06; } .mub.r3 { opacity: .5; }
+
+/* comparison table and match score on the ultimate card */
+table.cmp { width: 100%; border-collapse: collapse; font-size: calc(.72 * var(--u)); margin-top: calc(.2 * var(--u)); }
+table.cmp th, table.cmp td { padding: calc(.28 * var(--u)) calc(.3 * var(--u)); text-align: right; border-bottom: 1px solid var(--navy-line); }
+table.cmp th:first-child, table.cmp td:first-child { text-align: left; color: var(--ink-3-on-navy); }
+table.cmp th { color: var(--gold); font-size: calc(.62 * var(--u)); letter-spacing: .1em; text-transform: uppercase; }
+table.cmp td { font-variant-numeric: tabular-nums; }
+table.cmp tr.hi td { font-weight: 800; color: var(--ink-on-navy); border-bottom: 0; font-size: calc(.86 * var(--u)); }
+/* three held-out pictures with each memory's answer beside them */
+.gex { display: flex; gap: calc(.4 * var(--u)); margin-top: calc(.5 * var(--u)); }
+.ge { flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: 1fr 1fr;
+      gap: calc(.18 * var(--u)); }
+.ge .mini { grid-column: 1 / -1; border-radius: 5px; }
+.gv { display: block; text-align: center; border-radius: 5px; font-weight: 800;
+      font-size: calc(.62 * var(--u)); padding: calc(.16 * var(--u)) 0;
+      font-variant-numeric: tabular-nums; }
+.ge .gk { grid-column: 1 / -1; text-align: center; color: var(--ink-3-on-navy);
+          font-size: calc(.56 * var(--u)); }
+.gexk { margin-top: calc(.3 * var(--u)); font-size: calc(.62 * var(--u)); color: var(--ink-3-on-navy); }
+.gexk .gv { display: inline-block; padding-inline: calc(.4 * var(--u)); font-weight: 700;
+            background: var(--navy-2); color: var(--ink-2-on-navy); border: 1px solid var(--navy-line); }
+
+.score3 { display: flex; gap: calc(.35 * var(--u)); margin: calc(.4 * var(--u)) 0; }
+.score3 .s3 {
+  flex: 1; background: var(--navy-2); border: 1px solid var(--navy-line); border-radius: 8px;
+  padding: calc(.35 * var(--u)) 2px; text-align: center;
+  font-size: calc(.56 * var(--u)); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3-on-navy);
+}
+.score3 .s3 b { display: block; font-size: calc(1.15 * var(--u)); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.score3 .w b { color: var(--gold); } .score3 .d b { color: var(--ink-2-on-navy); } .score3 .l b { color: var(--warm); }
+
+/* ---------------------------------------------------- narrow screens */
+@media (max-width: 820px) {
+  #activity { grid-template-columns: 1fr; }
+  #col-b { display: flex; flex-direction: column; }
+  #train-panel { order: -2; }
+  #rules-panel { order: -2; }
+}
+@media (max-width: 760px) {
+  #lens-nav { padding: 0 14px 9px; }
+  .lens-btn { min-height: 44px; font-size: calc(var(--u) * .86); }
+}
+@media (max-width: 520px) {
+  .rule-control-head { display: block; }
+  .rp-sub { display: block; margin-top: .35em; }
+  .network-layers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .network-layers > i { display: none; }
+  .network-inspector-controls { grid-template-columns: 1fr; }
+  .network-diagram { min-height: 150px; }
+  /* Specificity, not order: the 3-column base rule sits later in this file
+     (the map-card block), so an equal-specificity override here lost and the
+     cards stayed three-across on a 320px phone (found 2026-09-16). */
+  .map-card .method-grid, .map-card .family-grid, .map-card .type-grid { grid-template-columns: 1fr; }
+  .clarifiers { grid-template-columns: 1fr; }
+  .lens-btn small, .map-switch .map-btn small { display: none; }  /* .map-switch: outranks the base rule that sits later in this file */
+  .predict-btns { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  #lens-nav { padding: 0 14px 8px; }
+  .lens-seg { gap: 2px; }
+}
+
+body.presenter #board, body.presenter.step-rules #board { max-width: min(100%, 420px); }
+
+/* A phone held sideways has almost no height to spare: fold the opponent
+   picker and the scoreboard onto one line so the board keeps its size. */
+@media (orientation: landscape) and (max-height: 560px) {
+  #lens-nav { padding: 0 14px 6px; }
+  .lens-btn { min-height: 38px; }
+  .lens-btn small, .map-switch .map-btn small { display: none; }  /* .map-switch: outranks the base rule that sits later in this file */
+  .panel { padding: calc(.45 * var(--u)); margin-bottom: calc(.4 * var(--u)); }
+  #board-wrap { margin-bottom: calc(.4 * var(--u)); }
+  #opp-row { flex-direction: row; align-items: center; gap: calc(.4 * var(--u)); margin-top: 0; }
+  #score-row { margin-top: 0; flex: 0 0 auto; }
+  .sc { padding-inline: calc(.4 * var(--u)); }
+  #activity { grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); }
+  #board { max-width: min(100%, calc(100dvh - 12 * var(--u))); }
+}
+
+/* Shorter still — a 320x568 iPhone SE 1st gen. Nothing is dropped, the
+   rhythm just tightens, because the TRAIN button has to stay on screen. */
+@media (orientation: portrait) and (max-height: 610px) {
+  .panel { padding: calc(.5 * var(--u)); margin-bottom: calc(.45 * var(--u)); }
+  #score-row { margin-top: calc(.3 * var(--u)); }
+  .sc { min-height: calc(1.55 * var(--u)); }
+  .sc .n { font-size: calc(.95 * var(--u)); }
+  #status { min-height: calc(1.8 * var(--u)); margin-top: calc(.35 * var(--u)); }
+  #board-wrap, #ult-wrap { margin-bottom: calc(.4 * var(--u)); }
+  #ult-where {
+    margin-top: calc(.32 * var(--u)); padding: calc(.26 * var(--u)) calc(.42 * var(--u));
+    font-size: calc(.62 * var(--u)); line-height: 1.28;
+  }
+  #ult-where .uw-score { font-size: calc(.52 * var(--u)); }
+  .seg { margin-top: calc(.4 * var(--u)); }
+}
+
+
+/* ------------------------------------------ the two map stages (1d, types) */
+.map-card { padding: 20px; }
+.map-card > .panel-kicker { display: block; margin-bottom: 8px; }
+.map-card h3 { margin: 0 0 6px; color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-size: calc(var(--u) * 1.3); line-height: 1.15; }
+.map-card .panel-lede { margin-bottom: 14px; }
+.method-grid, .family-grid, .type-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.method-card, .family-grid article, .type-card {
+  min-width: 0; text-align: left; border: 1px solid var(--cream-deep); border-radius: var(--radius-2);
+  padding: 12px 13px; background: var(--cream); color: var(--ink);
+}
+.method-card { display: block; width: 100%; font: inherit; line-height: 1.4; position: relative; padding-bottom: 34px; }
+.method-card b, .family-grid h4, .type-card b { display: block; margin: 0 0 4px; color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-size: calc(var(--u) * 1.02); }
+.method-card span, .family-grid p, .type-card .io { display: block; margin: 0; color: var(--ink-2); font-size: calc(var(--u) * .84); }
+.method-card.featured { border-left: 5px solid var(--gold); }
+.method-card:hover { border-color: var(--navy); background: var(--paper); }
+.method-card[aria-pressed="true"] { border-color: var(--navy); border-width: 2px; background: var(--paper); }
+.method-card .uses {
+  position: absolute; left: 13px; right: 13px; bottom: 9px; font-style: normal;
+  font-size: calc(var(--u) * .68); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3);
+}
+.method-card[aria-pressed="true"] .uses { color: var(--gold-deep); }
+.method-card .uses:empty::before { content: "press to see which playable model used it"; font-weight: 650; letter-spacing: 0; text-transform: none; }
+.method-card[aria-pressed="true"] .uses:empty::before { content: "none of 1a, 1b, 1c used this one"; }
+/* Stage 1d's two halves sit behind two buttons (operator ruling 2026-09-16).
+   Same shape as the lens row: a group of aria-pressed buttons, not a tablist. */
+.map-switch {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; margin-bottom: 14px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--cream);
+}
+.map-switch.board-switch { margin-bottom: 10px; }
+.map-switch.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* 1d training-method cards: the one-line "used for" stage note (Sourced).
+   `.method-card span` makes every span a block; the kicker must stay inline. */
+.method-card .stage-note { display: block; margin-top: 6px; color: var(--ink-3); font-size: calc(var(--u) * .74); line-height: 1.35; }
+.method-card .stage-note b { display: inline; margin: 0; font-family: inherit; font-size: inherit; color: var(--ink-2); }
+.method-card .stage-note .k-sourced { display: inline-block; margin-right: 4px; font-size: calc(var(--u) * .6); color: var(--gold-deep); }
+.stages-note .panel-kicker { display: block; margin-bottom: 4px; }
+.map-btn {
+  min-height: 46px; border: 0; border-radius: 9px; padding: 6px 12px; background: transparent;
+  color: var(--ink-2); font: inherit; font-weight: 800; font-size: calc(var(--u) * .92); text-align: center; line-height: 1.2; cursor: pointer;
+}
+.map-btn span, .map-btn small { display: block; }
+.map-btn small { margin-top: 2px; color: var(--ink-3); font-size: calc(var(--u) * .66); font-weight: 650; }
+.map-btn[aria-pressed="true"] { background: var(--navy); color: #fff; box-shadow: inset 0 -3px 0 var(--gold); }
+.map-btn[aria-pressed="true"] small { color: var(--ink-2-on-navy); }
+.map-btn:hover:not([aria-pressed="true"]) { background: var(--paper); }
+/* The architecture-family cards are pressable like the method cards, and
+   share their look; pressing one writes what it stores and computes. */
+.family-card {
+  display: block; width: 100%; min-width: 0; position: relative; font: inherit; line-height: 1.4; text-align: left;
+  border: 1px solid var(--cream-deep); border-radius: var(--radius-2); padding: 12px 13px 34px; background: var(--cream); color: var(--ink); cursor: pointer;
+}
+.family-card b { display: block; margin: 0 0 4px; color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-size: calc(var(--u) * 1.02); }
+.family-card span { display: block; margin: 0; color: var(--ink-2); font-size: calc(var(--u) * .84); }
+.family-card:hover { border-color: var(--navy); background: var(--paper); }
+.family-card[aria-pressed="true"] { border-color: var(--navy); border-width: 2px; background: var(--paper); }
+.family-card .holds {
+  position: absolute; left: 13px; right: 13px; bottom: 9px; font-style: normal;
+  font-size: calc(var(--u) * .68); font-weight: 650; color: var(--ink-3);
+}
+.family-card[aria-pressed="true"] .holds { color: var(--gold-deep); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.family-card .holds:empty::before { content: "press to see what it stores and computes"; }
+.clarifiers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.clarifiers p, .search-note { margin: 0; padding: 10px 12px; border: 1px solid #BCD7E3; border-radius: var(--radius-2); background: var(--lite-soft); color: var(--ink-2); font-size: calc(var(--u) * .84); }
+.clarifiers b, .search-note b { color: var(--navy); }
+.search-note { display: block; margin-top: 12px; }
+.map-card .obs-cue { margin-top: 12px; }
+
+/* type cards: <details>, so a press is the Try and the open state is
+   something Reset must put back */
+.type-card { padding: 0; }
+.type-card summary { list-style: none; cursor: pointer; padding: 12px 13px; border-radius: var(--radius-2); }
+.type-card summary::-webkit-details-marker { display: none; }
+.type-card summary::after { content: "Press for the catalogue\2019s definition"; display: block; margin-top: 6px; color: var(--ink-3); font-size: calc(var(--u) * .68); font-weight: 650; }
+.type-card[open] summary::after { content: "Catalogue definition, verbatim"; }
+.type-card summary:hover { background: var(--paper); }
+.type-card summary:focus-visible { outline: 3px solid var(--lite); outline-offset: -3px; }
+.type-card .io { margin-top: 2px; }
+.type-card .io i { font-style: normal; color: var(--navy); font-weight: 800; }
+.type-card .also { display: block; margin-top: 4px; color: var(--ink-3); font-size: calc(var(--u) * .74); }
+.type-card .body { padding: 0 13px 12px; border-top: 1px dashed var(--cream-deep); }
+.type-card .body q { display: block; margin: 10px 0 8px; color: var(--ink); font-size: calc(var(--u) * .86); font-style: italic; }
+.type-card .body q::before, .type-card .body q::after { content: "\201C"; color: var(--gold-deep); font-style: normal; }
+.type-card .body q::after { content: "\201D"; }
+.type-card .body .n { display: block; color: var(--ink-3); font-size: calc(var(--u) * .74); margin-bottom: 8px; }
+.type-card .body a { display: inline-block; color: var(--lite-deep); font-weight: 800; font-size: calc(var(--u) * .84); }
+
+/* Model types: "Beyond one catalogue" cards are always open (no press):
+   the named example and its own-page link are the content. */
+.beyond-card { padding: 12px 13px; }
+.beyond-card .body { padding: 0; margin-top: 8px; }
+.type-card .body .n .k-sourced { margin-right: 6px; }
+
+/* the whole catalogue, in its own groups */
+#type-groups h4 { margin: 14px 0 6px; color: var(--navy); font-size: calc(var(--u) * .78); font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+#type-groups h4:first-child { margin-top: 0; }
+.type-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.type-chip {
+  display: inline-flex; align-items: baseline; gap: 6px; min-height: 34px; padding: 5px 10px;
+  border: 1px solid var(--cream-deep); border-radius: 999px; background: var(--cream); color: var(--navy);
+  font-size: calc(var(--u) * .8); font-weight: 750; text-decoration: none;
+}
+.type-chip:hover { border-color: var(--navy); background: var(--paper); }
+.type-chip small { color: var(--ink-3); font-weight: 650; font-variant-numeric: tabular-nums; }
+
+/* -------------------------------------------- predictions in the strip */
+.predict-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 5px; margin-top: 7px; }
+.predict-btn {
+  min-height: 36px; border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px;
+  background: var(--paper); color: var(--navy); font-weight: 750; font-size: calc(var(--u) * .78); line-height: 1.2;
+}
+.predict-btn:hover { border-color: var(--navy); }
+.predict-btn[aria-pressed="true"] { border-color: var(--navy); border-width: 2px; background: var(--lite-soft); }
+/* The kit's `.lesson-strip article span` uppercases the card label, and the
+   .echo is a span in the same article, so it inherits the uppercase. Undo it
+   here (kit friction, reported). */
+.lesson-strip .echo { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.lesson-strip .echo .ok { color: var(--ok); font-weight: 800; }
+.lesson-strip .echo .bad { color: var(--bad); font-weight: 800; }
+
+/* ------------------------------------------------ settings extras */
+.switch { display: flex; align-items: center; gap: 10px; padding: 4px 0 8px; color: var(--ink-2); cursor: pointer; }
+.switch input { width: 20px; height: 20px; accent-color: var(--gold); flex: 0 0 auto; }
+#settings-menu input[type=text] {
+  width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px;
+  background: var(--paper); color: var(--ink); font-size: calc(var(--u) * .9); min-height: 42px;
+}
+#settings-menu input[type=text]::placeholder { color: var(--ink-3); }
+#selftest-out:empty { display: none; }
+
+/* the details drawer's live proof line */
+.banner-host:empty { display: none; }
+.banner-host { margin: 4px 0 6px; }
+
+/* the Ultimate report dialog is the demo's own; its body is a navy well
+   like the panels it summarises */
+#learned .lesson-dialog-body { background: var(--navy); color: var(--ink-on-navy); }

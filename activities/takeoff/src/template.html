@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#002144">
+<meta name="description" content="Draw where five widely cited AI benchmarks went, see why the tests keep being replaced, read real achievements by who checked them, and test what two points can tell you about next year. An offline classroom activity.">
+<title>The Pace of AI Progress — how far, how fast, and how to read it</title>
+<!--
+  The Pace of AI Progress — a single-file, offline demonstration. Demo 3 of 17,
+  Part two ("Where it is going") of AI: From Zero to Takeoff.
+
+  Four stages: draw where five benchmark series went and reveal them with
+  their conditions; read four benchmark families and the four routes by which
+  a test stops measuring what it was meant to; read fourteen real achievements
+  by the rung of the acceptance ladder they sit on and the role AI played; then
+  see why two points cannot choose a forecast.
+
+  Two measures, two grammars, never one scale: benchmark rows carry their
+  conditions on the face of the chart; achievement cards carry their
+  acceptance status and the AI's role on the face of the card.
+
+  Every number resolves to a source fetched on the snapshot date in
+  src/data.js, and Settings -> Run data integrity checks proves the structure
+  live. Nothing is fetched at runtime and nothing is stored on the device.
+
+  Built against the shared lesson shell at ../tools/lesson-shell (build-time
+  only — see build.js). Companion: demo-guide.html, shipped as
+  presenter-guide.html. Sources live in src/ and are concatenated by build.js.
+-->
+<!--__SHELL_STAMP__-->
+<style>
+/*__SHELL_CSS__*/
+</style>
+<style>
+/*__CSS__*/
+</style>
+<!-- Injected by build.js from the guide's <style id="guide-css"> block. Last
+     in the head so .guide-scope rules win ties inside the notes overlay. -->
+<style>
+/*__GUIDE_CSS__*/
+</style>
+</head>
+<body>
+
+<header class="top" id="brandbar">
+  <div class="topline">
+    <div class="brandline">
+      <span class="brand-kicker">Murray State University &middot; Part two &middot; Where it is going</span>
+      <h1>The Pace of AI Progress</h1>
+      <div class="msu-brand">Murray State University</div>
+    </div>
+    <div class="top-tools">
+      <button class="icon-btn notes-open" type="button" title="Open Presenter Notes" aria-label="Open Presenter Notes">Notes</button>
+      <button class="icon-btn guide-open" type="button" id="guide-open" title="Guide" aria-label="Guide"><span aria-hidden="true">?</span><span class="icon-label">Guide</span></button>
+      <button class="icon-btn" type="button" id="settings-open" title="Settings" aria-label="Settings"><span aria-hidden="true">&#9881;</span><span class="icon-label">Settings</span></button>
+    </div>
+  </div>
+  <!-- A1. Four stages, ungated: stage 1's own draw-then-reveal loop is the
+       demo's prediction mechanism, and no later stage depends on stage 1
+       being finished, so no tab is locked. -->
+  <nav class="stages" role="tablist" aria-label="Pace of AI Progress lesson stages">
+    <button class="stage-tab" type="button" role="tab" id="tab-1" aria-controls="stage-1" aria-selected="true" tabindex="0">
+      <span class="stage-mark" aria-hidden="true">1</span><span>Measure</span><small>How far, how fast?</small>
+    </button>
+    <button class="stage-tab" type="button" role="tab" id="tab-2" aria-controls="stage-2" aria-selected="false" tabindex="-1">
+      <span class="stage-mark" aria-hidden="true">2</span><span>Retire</span><small>Why do the tests keep changing?</small>
+    </button>
+    <button class="stage-tab" type="button" role="tab" id="tab-3" aria-controls="stage-3" aria-selected="false" tabindex="-1">
+      <span class="stage-mark" aria-hidden="true">3</span><span>Achieve</span><small>What has it done, and who checked?</small>
+    </button>
+    <button class="stage-tab" type="button" role="tab" id="tab-4" aria-controls="stage-4" aria-selected="false" tabindex="-1">
+      <span class="stage-mark" aria-hidden="true">4</span><span>Forecast</span><small>What can two points tell you?</small>
+    </button>
+  </nav>
+</header>
+
+<main>
+
+<!-- =========================== STAGE 1 · Measure ========================= -->
+<section class="stage on" id="stage-1" role="tabpanel" aria-labelledby="tab-1" tabindex="-1">
+  <section class="stage-intro" aria-labelledby="stage-1-title">
+    <div class="intro-copy">
+      <span class="eyebrow">Demo 3 of 17 &middot; Part two &middot; Stage 1</span>
+      <h2 id="stage-1-title">Draw where the series went, then see it.</h2>
+      <p class="stage-question">From 3.5 minutes to five hours, from none of the hardest research problems to all but one: how much did the most-cited AI measurements move, and could you have guessed the size of it?</p>
+      <p class="refresh"><b>Before you start.</b> Demo 2 showed a model being measured; here you read published
+        measurements the same way. A <b>benchmark</b> is a test with defined tasks and a scoring rule, and a
+        score is a measurement <b>under conditions</b> &mdash; which harness ran the model, how much reasoning
+        effort it was allowed, which task set. Each series below starts with its early points shown. You draw
+        where you think it went; the published points are then revealed with their conditions.</p>
+    </div>
+    <button class="details-trigger" type="button" data-details="0" aria-label="Details">Details <span aria-hidden="true">&rarr;</span></button>
+    <div class="lesson-strip" aria-label="Stage 1 learning guide">
+      <article><span>Predict</span><p>Where did this series end? Draw the line across the shaded region to the ask date &mdash; your endpoint is your prediction.</p><span class="echo" hidden></span></article>
+      <article><span>Try</span><p>Drag across the chart (or focus it and press <b>Up</b> / <b>Down</b>), then press <b>Reveal</b>. Use <b>Choose a series</b> to jump.</p></article>
+      <article><span>Takeaway</span><p>On the tests the field cites most, the change since 2023 is measured in multiples, not points &mdash; and every series stops where its published record stops, with its conditions attached.</p></article>
+    </div>
+  </section>
+
+  <div id="round-body">
+    <aside id="round-intro" class="card">
+      <div id="round-head">
+        <span id="round-num"></span>
+        <span class="panel-kicker"><span class="k-sourced">Sourced</span><span class="k-qual" id="round-qual"></span></span>
+      </div>
+      <h3 id="round-name"></h3>
+      <p id="round-real" class="note"></p>
+      <p id="round-plain"></p>
+      <p id="round-q"></p>
+      <div class="reading-key"><b>Historical estimate</b><p>You are filling a gap in published history. This is not a prediction of the future; stage 4 is about why.</p></div>
+      <label class="control-label" for="round-select">Choose a series
+        <span class="why">Five series, five different tests. Jump to any of them; the order runs from the largest changes to the one with the harness held still.</span></label>
+      <select id="round-select"></select>
+    </aside>
+
+    <section id="round-chart" class="workbench" aria-labelledby="chart-heading">
+      <div class="panel-head">
+        <div>
+          <span class="panel-kicker"><span class="k-sourced">Sourced</span> published measurements, each point with its conditions in Details</span>
+          <h3 id="chart-heading"></h3>
+        </div>
+        <span id="chart-unit" class="note"></span>
+      </div>
+      <p class="panel-lede" id="chart-conditions"></p>
+      <div id="chart-wrap"><canvas id="chart" tabindex="0" aria-label="Historical estimate chart. Drag to draw, or use Up and Down arrows to adjust a straight line."></canvas></div>
+      <div class="legend-mini"><span class="lm-known"><i></i>shown measurements</span><span class="lm-guess"><i></i>your estimate</span><span class="lm-truth"><i></i>revealed measurements</span><span class="lm-bound"><i></i>where the series stops</span></div>
+      <p id="scale-note" class="note" hidden></p>
+      <div id="draw-row">
+        <span id="draw-hint" aria-live="polite">Drag across the shaded region, or use arrow keys on the chart.</span>
+        <button class="btn ghost small" type="button" id="btn-redraw">Clear</button>
+        <button class="btn" type="button" id="btn-reveal" disabled>Reveal</button>
+      </div>
+    </section>
+  </div>
+
+  <p class="obs-cue" id="cue-1" role="status" aria-live="polite"></p>
+
+  <div id="verdict" class="card" hidden></div>
+  <div id="twist-wrap" hidden>
+    <div class="card">
+      <span class="panel-kicker"><span class="k-sourced">Sourced</span> a comparison from the same source, on a different scale</span>
+      <p id="twist-q"></p>
+      <button class="btn" type="button" id="btn-twist">Show the comparison</button>
+      <div id="twist-body" hidden></div>
+    </div>
+  </div>
+  <div class="row"><button class="btn next-button" type="button" id="btn-next" hidden>Next series</button></div>
+  <div id="scorecard" class="card" hidden></div>
+
+  <section class="check" aria-labelledby="check-1-title" data-refutation="true">
+    <span class="eyebrow">Check yourself</span>
+    <h3 id="check-1-title">On most series your line was below the published result. What does that show?</h3>
+    <div class="check-options">
+      <button class="check-option correct" type="button" aria-pressed="false"
+              data-feedback="The gap between your line and the published point is a fact about the measurements &mdash; how far they moved, under their stated conditions. It says nothing about where they go next; each series stops where its published record stops.">The published results moved faster than the room guessed &mdash; on these tests, under these conditions.</button>
+      <button class="check-option wrong" type="button" aria-pressed="false"
+              data-feedback="It does not. Every line here fills a gap in published history, and the reveal shows what would have broken it: a successor test released inside the gap, a harness change, a corrected problem set. Two points cannot choose a forecast; stage 4 shows why.">That the room can forecast next year by drawing the line a bit further.</button>
+    </div>
+    <p class="check-feedback" role="status" aria-live="polite"></p>
+  </section>
+</section>
+
+<!-- =========================== STAGE 2 · Retire ========================== -->
+<section class="stage" id="stage-2" role="tabpanel" aria-labelledby="tab-2" tabindex="-1" hidden>
+  <section class="stage-intro" aria-labelledby="stage-2-title">
+    <div class="intro-copy">
+      <span class="eyebrow">Demo 3 of 17 &middot; Part two &middot; Stage 2</span>
+      <h2 id="stage-2-title">Every widely cited test gets replaced. Why?</h2>
+      <p class="stage-question">MMLU, ARC-AGI-1, SWE-bench, Terminal-Bench 2.0 &mdash; each was the standard test for a while and each has been retired or rebuilt. Were they all simply beaten?</p>
+      <p class="refresh"><b>Before you start.</b> A test is <b>saturated</b> when scores compress at the top until
+        it stops separating the leaders &mdash; on Terminal-Bench 2.0 the top five sit inside each other's error
+        bars. But a benchmark is retired when it stops measuring <em>what it was meant to measure</em>, and being
+        beaten is only one of four ways that happens; the others are <b>bad tasks</b>, <b>contamination</b> and
+        missing <b>coverage</b>. When a successor arrives it often counts something different, so a rising line
+        across generations is not one trend.</p>
+    </div>
+    <button class="details-trigger" type="button" data-details="1" aria-label="Details">Details <span aria-hidden="true">&rarr;</span></button>
+    <div class="lesson-strip" aria-label="Stage 2 learning guide">
+      <article><span>Predict</span><p>Pick a family before you open it. Was its last retired version beaten, or replaced for another reason?</p><span class="echo" hidden></span></article>
+      <article><span>Try</span><p>Press a family under <b>Choose a benchmark family</b>, then read each generation's status and the route chips. Open <b>Three corrections</b> below.</p></article>
+      <article><span>Takeaway</span><p>A benchmark is retired when it stops measuring what it was meant to; being beaten is one of four routes, and the replacement often counts something new &mdash; so a rising line across generations is not one trend.</p></article>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="family-heading">
+    <div class="panel-head">
+      <div>
+        <span class="panel-kicker"><span class="k-reasoned">Reasoned</span> the status and route chips are the authors' reading of the sources quoted beside each generation; every number and quotation on the cards is sourced and linked</span>
+        <h3 id="family-heading">Four benchmark families, generation by generation</h3>
+      </div>
+    </div>
+    <label class="control-label" id="family-label">Choose a benchmark family
+      <span class="why">Each family is one kind of test through its versions. Read the status, then the chips saying how the retired ones stopped measuring.</span></label>
+    <div id="family-nav" role="group" aria-labelledby="family-label"></div>
+    <div id="family-view"></div>
+    <p class="obs-cue" id="cue-2" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="card" aria-labelledby="corrections-heading">
+    <span class="panel-kicker"><span class="k-sourced">Sourced</span> each answer names the primary table that contradicts the claim</span>
+    <h3 id="corrections-heading">Three corrections, and a fourth</h3>
+    <div id="corrections"></div>
+    <div id="churn" class="stat-card"></div>
+  </section>
+
+  <section class="check" aria-labelledby="check-2-title" data-refutation="true">
+    <span class="eyebrow">Check yourself</span>
+    <h3 id="check-2-title">Terminal-Bench went 2.0 &rarr; 3.0 &rarr; 4.0. What does the higher number tell you?</h3>
+    <div class="check-options">
+      <button class="check-option correct" type="button" aria-pressed="false"
+              data-feedback="Right. A version changes when the old one stops measuring what it was meant to &mdash; beaten, bad tasks, contamination or coverage &mdash; and the new one may be easier, harder, or a different count. Opus 5 scores 42.7% on 3.0 and 51.8% on 4.0.">Only that the old version stopped measuring what it was meant to. Read the task count and the harness before assuming 'harder'.</button>
+      <button class="check-option wrong" type="button" aria-pressed="false"
+              data-feedback="Not on the primary leaderboard. Terminal-Bench 4.0 has 66 tasks to 2.1's 89, and Opus 5 scores higher on 4.0 than on 3.0. SWE-bench Verified was retired at 76.80% for flawed tests and contamination, not for being beaten.">Each version is harder than the last, because the last one was beaten.</button>
+    </div>
+    <p class="check-feedback" role="status" aria-live="polite"></p>
+  </section>
+</section>
+
+<!-- =========================== STAGE 3 · Achieve ========================= -->
+<section class="stage" id="stage-3" role="tabpanel" aria-labelledby="tab-3" tabindex="-1" hidden>
+  <section class="stage-intro" aria-labelledby="stage-3-title">
+    <div class="intro-copy">
+      <span class="eyebrow">Demo 3 of 17 &middot; Part two &middot; Stage 3</span>
+      <h2 id="stage-3-title">Outside the tests: what has AI done, and who checked?</h2>
+      <p class="stage-question">A Nobel Prize, an Olympiad gold, 2.2 million materials, a Millennium Prize Problem &mdash; which of these happened the way the headline says, and how would you tell?</p>
+      <p class="refresh"><b>Before you start.</b> A benchmark score is a <b>measurement</b> under conditions; an
+        achievement is an <b>event</b> whose truth is settled by human institutions over months or years. So an
+        achievement card carries two things a score never does: its <b>acceptance status</b> &mdash; the rung of
+        the ladder from Nobel Prize down to retracted &mdash; and the <b>AI's role</b>: a tool people used, a
+        result the system generated and people verified, or a result produced autonomously under stated rules.
+        Read the rung first, then the headline.</p>
+    </div>
+    <button class="details-trigger" type="button" data-details="2" aria-label="Details">Details <span aria-hidden="true">&rarr;</span></button>
+    <div class="lesson-strip" aria-label="Stage 3 learning guide">
+      <article><span>Predict</span><p>Before you filter: which rung do you think the September 2026 Navier&ndash;Stokes proof sits on &mdash; and which rung has only one occupant?</p><span class="echo" hidden></span></article>
+      <article><span>Try</span><p>Press a rung under <b>Filter by acceptance</b> or a role under <b>Filter by the AI's role</b>. Every card shows both on its face; open <b>Details</b> for the ladder's definitions.</p></article>
+      <article><span>Takeaway</span><p>An achievement is an event with an acceptance status and a stated AI role; the rung it sits on is the first thing to read, before the headline &mdash; and every rung from Nobel Prize to retracted has a real 2023&ndash;2026 occupant.</p></article>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="ach-heading">
+    <div class="panel-head">
+      <div>
+        <span class="panel-kicker"><span class="k-sourced">Sourced</span> every card cites the lab's own page, the journal, the contest body or the institution that owns the problem; one card rests on reporting and says so</span>
+        <h3 id="ach-heading">Fourteen achievements, by who checked them</h3>
+      </div>
+    </div>
+    <div class="filter-row">
+      <div>
+        <label class="control-label" id="rung-label">Filter by acceptance
+          <span class="why">The ladder, top to bottom. A rung with one occupant is as informative as a crowded one.</span></label>
+        <div id="rung-nav" role="group" aria-labelledby="rung-label"></div>
+      </div>
+      <div>
+        <label class="control-label" id="role-label">Filter by the AI's role
+          <span class="why">How load-bearing the system was: a tool, generated-then-verified, or autonomous under stated rules.</span></label>
+        <div id="role-nav" role="group" aria-labelledby="role-label"></div>
+      </div>
+    </div>
+    <p class="obs-cue" id="cue-3" role="status" aria-live="polite"></p>
+    <div id="achievements"></div>
+  </section>
+
+  <section class="check" aria-labelledby="check-3-title" data-refutation="true">
+    <span class="eyebrow">Check yourself</span>
+    <h3 id="check-3-title">Which rung does the September 2026 Navier&ndash;Stokes result sit on?</h3>
+    <div class="check-options">
+      <button class="check-option correct" type="button" aria-pressed="false"
+              data-feedback="Yes. A real, checkable advance on one of the four statements Clay accepts, with AI closing a gap inside a human strategy; Lean-checked; not peer-reviewed; Clay's page still 'Active'; no prize possible before 2028 under Clay's two-year rule; OpenAI not claiming it; priority disputed. That is the honest sentence, and it is a better story than the headline.">Announced, contested: Lean-checked, not peer-reviewed, not recognised by Clay, and under a priority dispute.</button>
+      <button class="check-option wrong" type="button" aria-pressed="false"
+              data-feedback="No. Clay's rules require publication, two years, and general acceptance; its Navier&ndash;Stokes page read 'Active' on 16 September 2026 with no mention of the result, and OpenAI states it does not intend to claim the prize. Statement (C) also leaves the unforced case (A) open. 'Solved' is the wrong word; say what happened instead.">Solved: a Millennium Prize Problem has been resolved by AI.</button>
+    </div>
+    <p class="check-feedback" role="status" aria-live="polite"></p>
+  </section>
+</section>
+
+<!-- =========================== STAGE 4 · Forecast ======================== -->
+<section class="stage" id="stage-4" role="tabpanel" aria-labelledby="tab-4" tabindex="-1" hidden>
+  <section class="stage-intro" aria-labelledby="stage-4-title">
+    <div class="intro-copy">
+      <span class="eyebrow">Demo 3 of 17 &middot; Part two &middot; Stage 4</span>
+      <h2 id="stage-4-title">Two points do not choose your forecast.</h2>
+      <p class="stage-question">Given everything above, what can two measurements tell you about next year?</p>
+      <p class="refresh"><b>Before you start.</b> In stage 1 you filled a gap in <b>published history</b>: the answer
+        existed. A <b>forecast</b> is different &mdash; the answer does not exist yet, and the shape of the curve
+        has to be assumed. An invented score below rises from 20 to 30 in one year. Three rules fit both points
+        exactly: a fixed gain, a fixed multiple, and slowing toward a ceiling. Nothing in the two points chooses
+        between them; only the next measurement does. Demo 4 picks this up: history, not a script, is how you
+        judge a boom.</p>
+    </div>
+    <button class="details-trigger" type="button" data-details="3" aria-label="Details">Details <span aria-hidden="true">&rarr;</span></button>
+    <div class="lesson-strip" aria-label="Stage 4 learning guide">
+      <article><span>Predict</span><p>Eight years on from the second point, how far apart will the three rules be &mdash; a few points, or a factor of ten?</p><span class="echo" hidden></span></article>
+      <article><span>Try</span><p>Drag <b>Years after the second point</b> and watch the three cards. Then read the boundary card beneath it.</p></article>
+      <article><span>Takeaway</span><p>A gap in published history can be estimated; a future cannot &mdash; three rules fit the same two points, and only the next measurement chooses between them. Make the claim specific: this system, these tasks, these conditions.</p></article>
+    </div>
+  </section>
+
+  <section class="card scenario" aria-labelledby="scenario-heading">
+    <span class="panel-kicker"><span class="k-illustrative">Illustrative</span> an invented score with invented rules; no relationship to any benchmark above</span>
+    <h3 id="scenario-heading">Three rules, one pair of points</h3>
+    <p>Imagine a score rose from 20 to 30 in one year. Three rules fit both points exactly. Move forward in time to see what each implies.</p>
+    <label class="control-label" for="scenario-years">Years after the second point: <output id="scenario-year">3</output>
+      <span class="why">Every rule agrees at year 0. The further you go, the further they disagree &mdash; the two points never chose.</span></label>
+    <input type="range" id="scenario-years" min="0" max="8" value="3">
+    <div id="scenario-results" aria-live="polite"></div>
+    <p class="scenario-note note">This invented score runs from 0 to 100. Values above 100 expose an assumption that breaks at a ceiling; they are shown as invalid, not clipped.</p>
+    <p class="obs-cue" id="cue-4" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="card" aria-labelledby="boundary-heading">
+    <span class="panel-kicker"><span class="k-sourced">Sourced</span> the same sources as stages 1 and 3, read for what is not yet done</span>
+    <h3 id="boundary-heading">The boundary, in proportion</h3>
+    <p class="panel-lede">Stage 1 led with magnitude because that is what the evidence shows. These are the limits the same sources report, kept to one sentence each.</p>
+    <ul id="boundaries"></ul>
+    <blockquote id="headline"></blockquote>
+  </section>
+
+  <section class="card" id="final" aria-labelledby="final-heading">
+    <h3 id="final-heading">Make the claim specific.</h3>
+    <p>&ldquo;This system improved on these tasks, under these conditions&rdquo; is a claim you can check. &ldquo;AI can do the job&rdquo; is not. To plan a change in your own work, choose a representative task and measure quality, time, cost and failures against what you do now.</p>
+    <p>Fast benchmark progress and slower work in a particular setting can both be true &mdash; the 19%-slower randomised trial sits on the same ladder as the Nobel Prize. Neither result decides the other. The next measurement will, and until then the honest forecast names its assumption.</p>
+    <details id="cut"><summary>Claims this page deliberately does not make</summary><ul id="cut-list"></ul></details>
+  </section>
+
+  <section class="check" aria-labelledby="check-4-title">
+    <span class="eyebrow">Check yourself</span>
+    <h3 id="check-4-title">A score went from 20 to 30 in a year. Which rule fits the two points?</h3>
+    <div class="check-options">
+      <button class="check-option correct" type="button" aria-pressed="false"
+              data-feedback="All three fit exactly, and by year 8 they disagree by a factor of ten. The two points cannot choose; the next measurement can. That is why the stage-1 series end where their published record ends, and why the reveal named what would have broken each line.">All three &mdash; a fixed gain, a fixed multiple, and slowing to a ceiling.</button>
+      <button class="check-option wrong" type="button" aria-pressed="false"
+              data-feedback="Simplest is not the same as supported. The straight line is one assumption of three that fit the points equally well, and on a logarithmic axis a straight line is the compound rule. Say which assumption you are making; the points will not say it for you.">The straight line &mdash; it is the simplest, so it is the most likely.</button>
+    </div>
+    <p class="check-feedback" role="status" aria-live="polite"></p>
+  </section>
+</section>
+
+</main>
+
+<div class="footer">
+  <span>Bryant Harrison &middot; Murray State University</span><br>
+  <span>One HTML file &middot; runs offline</span>
+  <div class="footer-tools">
+    <button type="button" class="footer-link guide-open">Guide</button><span aria-hidden="true">&middot;</span>
+    <button type="button" class="footer-link" id="presentation-foot">Presentation mode</button><span aria-hidden="true">&middot;</span>
+    <button type="button" class="footer-link notes-open">Presenter Notes</button>
+  </div>
+</div>
+
+<!-- ============================== A7 GUIDE =============================== -->
+<dialog class="lesson-dialog" id="guide" aria-labelledby="guide-title">
+  <div class="lesson-dialog-head">
+    <h2 id="guide-title">Guide<span class="head-sub">how to use this demo</span></h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body">
+    <p class="lede">How far has AI actually come, how would you know, and what can that tell you about next year?</p>
+    <p class="note">Demo 3 of 17, Part two. Demo 2 showed a model being measured; here you read published measurements the same way, and Demo 4 asks whether fast progress means a bubble.</p>
+    <ol>
+      <li><b>Measure.</b> Drag across the chart to draw where the series went, then press <b>Reveal</b>. Five series; <b>Choose a series</b> jumps between them.</li>
+      <li><b>Retire.</b> Press a family under <b>Choose a benchmark family</b> and read how each generation stopped measuring what it was meant to.</li>
+      <li><b>Achieve.</b> Filter fourteen real events by acceptance rung and by the AI's role; read the rung before the headline.</li>
+      <li><b>Forecast.</b> Drag <b>Years after the second point</b> and watch three rules that fit the same two points diverge.</li>
+    </ol>
+    <h3>Getting around</h3>
+    <p>The stage tabs switch stages. <b>Details</b> opens the evidence and limits for the current stage. <b>Guide</b> reopens this card; <b>Settings</b> has <b>Open Presenter Notes</b>, <b>Presentation mode</b>, <b>Reset</b> and the data integrity checks.</p>
+    <h3>Time</h3>
+    <p>About 25 minutes for all four stages; stage 1 alone is 10. Nothing loads from the network and nothing is stored.</p>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Start with Measure</button></form>
+</dialog>
+
+<!-- ============================= A8 SETTINGS ============================= -->
+<dialog class="lesson-dialog" id="settings" aria-labelledby="settings-title">
+  <div class="lesson-dialog-head">
+    <h2 id="settings-title">Settings</h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body" id="settings-menu">
+    <h3>Presenter notes</h3>
+    <p class="setnote">The printable session plan, on screen: the question for each stage, the prediction to ask for, what to say at each reveal, the answer key, and the questions you will get. This is the printable guide itself, not a summary of it.</p>
+    <p><button class="btn notes-open" type="button">Open Presenter Notes</button></p>
+    <h3>Presentation mode</h3>
+    <p class="setnote">Scales the whole page up one notch for projecting to a room, enlarges the chart type, and puts a <b>Notes</b> button in the header.</p>
+    <p><button class="btn ghost" type="button" id="presentation-btn" aria-pressed="false">Presentation mode</button></p>
+    <h3>Reset</h3>
+    <p class="setnote">Back to the start: the five drawn lines and their reveals cleared, the first series loaded, stage 1, the family and achievement filters back to their first state, the scenario at year 3, every check cleared, the integrity-check output cleared. The page does not reload. Presentation mode stays as you set it.</p>
+    <p><button class="btn ghost" type="button" id="reset-btn">Reset</button></p>
+    <h3>Data integrity checks</h3>
+    <p class="setnote">Checks the file's structure: every reference resolves to a source dated to the snapshot, every point carries its conditions, every series names where it stops, every label word is from its closed vocabulary, every rung of the ladder is occupied, and the drawing arithmetic is exact. It cannot validate what a source claims. Results appear here and in the browser console.</p>
+    <p><button class="btn ghost" type="button" id="btn-selftest">Run data integrity checks</button></p>
+    <span class="panel-kicker"><span class="k-live">Live</span> computed here when you press the button</span>
+    <div id="selftest-out"></div>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Done</button></form>
+</dialog>
+
+<!-- ======================= A5 DETAILS · one per stage ==================== -->
+<dialog class="details-sheet" id="details" aria-labelledby="details-title">
+  <div class="details-drawer">
+    <div class="lesson-dialog-head">
+      <h2 id="details-title">Details<span class="head-sub" id="details-subtitle">Measure</span></h2>
+      <form method="dialog"><button type="submit" aria-label="Close Details">&times;</button></form>
+    </div>
+    <div class="details-body" tabindex="0" role="region" aria-label="Stage details">
+
+      <section class="details-stage on" data-details-stage="0">
+        <span class="eyebrow">What is live, and what is sourced</span>
+        <h3>Your line is computed here; every dot is a published measurement</h3>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-live">Live</span> your drawn line, its endpoint, and the ratio at reveal</span>
+          <p>The moment you press Reveal, the page reads the endpoint of the line you drew and compares it with the last published point. Nothing is looked up for that comparison and nothing is scored beyond it.</p>
+        </div>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-sourced">Sourced</span> every plotted point, with its conditions</span>
+          <p>Each point is a published measurement copied with its date and its conditions from the source named in the table below &mdash; a leaderboard rendered in a browser, a research institute's own run data, or a lab's own page. Lines connect selected reports; they are not continuous measurements. Where two published figures disagree, the note gives both.</p>
+        </div>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-illustrative">Illustrative</span> the example task in each series' panel</span>
+          <p>The sample task shown for each series describes the format. It is not a reproduced benchmark item.</p>
+        </div>
+        <h3>How it works</h3>
+        <p>Your drag is resampled onto 64 columns across the shaded region, so a fast swipe and a slow one give the same line. The endpoint is read at the ask date and converted back through the axis scale (linear, or logarithmic for the time-horizon series). The ratio shown is published value divided by your endpoint; the point gap is shown for percentage series.</p>
+        <div id="round-details"></div>
+        <h3>Assumptions and simplifications</h3>
+        <ul>
+          <li>Every series is a <b>selection</b> of published reports, not a leaderboard or a census. Reports that exist and are not shown are absent for teaching reasons.</li>
+          <li>Each series ends where its published record ends, not at the snapshot: the hatched stretch and the dashed rule on the chart mark that, and the label says which.</li>
+          <li>Dates are model release or model-version dates unless a note says otherwise; an evaluation may have been run months later.</li>
+          <li>The five series use different tests, units and evaluators. The order they appear in is a teaching order, not a ranking, and there is no combined score.</li>
+          <li>Vendor-reported figures are labelled as such; where a third party republished or reproduced them, the note says so. No result here was replicated by this page.</li>
+          <li>The drawing activity fills a gap in published history. The ratio at reveal compares your endpoint with one selected report; it does not grade your reasoning, and a bold line that landed near the truth was not thereby a good forecast.</li>
+        </ul>
+        <h3>Sources</h3>
+        <ul id="sources-1"></ul>
+        <div class="evidence-card"><b>Boundary:</b> these series say how far published measurements moved on specific tests under specific conditions. They do not say what any system can do in your work, and they are not projected beyond their last point.</div>
+      </section>
+
+      <section class="details-stage" data-details-stage="1" hidden>
+        <span class="eyebrow">What is sourced, and what is reasoned</span>
+        <h3>The numbers and quotations are sourced; the status and route chips are our reading</h3>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-sourced">Sourced</span> every top score, task count, date and quotation on the generation cards</span>
+          <p>Each is copied from the benchmark's own site or leaderboard, the successor's own paper, the lab's own statement, or Epoch AI's run data, and links to it. The Terminal-Bench 1.0 scores are marked not captured because they could not be fetched.</p>
+        </div>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-reasoned">Reasoned</span> the status of each generation and the route chips</span>
+          <p>Saturated, nearly saturated, retired and still discriminating are our reading of the scores and intervals; the four routes &mdash; beaten, bad tasks, contamination, coverage &mdash; are our classification of the reasons the sources give. Both are shown beside the quotation they rest on so a reader can disagree.</p>
+        </div>
+        <h3>How it works</h3>
+        <p>Saturation is read in its precise sense: the top scores sit inside each other's confidence intervals, so the test no longer separates the leaders. A benchmark is marked retired when its authors, its co-author, or the aggregators that carried it stopped reporting it, whatever its top score was. A successor is marked as counting something different when its own documentation says the unit changed.</p>
+        <h3>Assumptions and simplifications</h3>
+        <ul>
+          <li>Four families are shown, not the whole field. Multimodal, video and preference-ranking benchmarks open other axes this page does not cover.</li>
+          <li>Task counts for Terminal-Bench 2.1 and 4.0 come from Artificial Analysis, not the benchmark's own page, which does not state them.</li>
+          <li>Two independent evaluators can differ on the same model and benchmark &mdash; 46.5% and 59.1% on Humanity's Last Exam for one model. Both are given; neither is chosen.</li>
+          <li>The benchmark-creation rate counts the benchmarks Epoch AI tracks, not every benchmark published.</li>
+          <li>A composite index &mdash; one number across many benchmarks &mdash; hides exactly this stage's lesson, which is why none is used.</li>
+        </ul>
+        <h3>Sources</h3>
+        <ul id="sources-2"></ul>
+        <div class="evidence-card"><b>Boundary:</b> that a test was retired is evidence about the test and about the pace that overtook it. It is not evidence that the successor is harder, that progress slowed, or that any two generations can be joined by a line.</div>
+      </section>
+
+      <section class="details-stage" data-details-stage="2" hidden>
+        <span class="eyebrow">What is sourced</span>
+        <h3>Every card cites its own institution; one rests on reporting</h3>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-sourced">Sourced</span> the what, the machine, the people, and who checked it, on every card</span>
+          <p>Thirteen cards cite a primary page: the Nobel Foundation, the journal, the contest organiser's own post, the lab's own announcement, or the institution that owns the problem (the Clay Mathematics Institute's status page and rules, for Navier&ndash;Stokes). The retraction card cites reporting, because the original posts were deleted, and says so on its face.</p>
+        </div>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-reasoned">Reasoned</span> the rung each card is placed on, and its AI-role label</span>
+          <p>The rungs are defined below; placing a card on one is our reading of what the sources say about who checked it. The AI-role label is our reading of what the source says the system did and what people did.</p>
+        </div>
+        <h3>How it works</h3>
+        <p>The acceptance ladder, top to bottom:</p>
+        <ul id="ladder-defs"></ul>
+        <p>The three roles:</p>
+        <ul id="role-defs"></ul>
+        <h3>Assumptions and simplifications</h3>
+        <ul>
+          <li>Fourteen cases are a teaching selection, not a sample of AI achievements, and are weighted toward mathematics because that is where the strongest and the most contested 2025&ndash;2026 claims sit.</li>
+          <li>Lean verification proves an argument is internally valid; it does not prove the formalized statement is the one mathematicians set out to prove. That human step is named on the cards it applies to.</li>
+          <li>"Officially graded" for the IMO and ICPC means graded by the contest's own body; no medal was awarded in either case, because medals go to human contestants.</li>
+          <li>The METR randomised trial's 95% interval (2% to 39% longer) is corroborated by secondary sources; METR's own post as read gives the point estimate.</li>
+          <li>The prior kissing-number bound (592) is not stated on DeepMind's AlphaEvolve page and is not claimed here.</li>
+        </ul>
+        <h3>Sources</h3>
+        <ul id="sources-3"></ul>
+        <div class="evidence-card"><b>Boundary:</b> the ladder ranks how thoroughly a claim has been checked, not how important it is. A retracted claim and a Nobel Prize can both be about mathematics done by the same kind of system; the rung tells you what has been established, nothing more.</div>
+      </section>
+
+      <section class="details-stage" data-details-stage="3" hidden>
+        <span class="eyebrow">What is illustrative, and what is sourced</span>
+        <h3>The scenario is invented; the boundary lines are sourced</h3>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-illustrative">Illustrative</span> the three rules and the 20&rarr;30 score</span>
+          <p>These are three assumptions, not three predictions. Let <i>t</i> be years after the second point. The linear rule is 30 + 10<i>t</i>. The compound rule is 30 &times; 1.5<sup><i>t</i></sup>. The saturation rule is 75 &minus; 45 &times; (9/11)<sup><i>t</i></sup>. All give 20 at <i>t</i> = &minus;1 and 30 at <i>t</i> = 0.</p>
+        </div>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-sourced">Sourced</span> the boundary sentences and the closing quotation</span>
+          <p>Each boundary line cites the dataset or the report chapter it comes from; the closing quotation is the Stanford AI Index's first headline finding.</p>
+        </div>
+        <h3>How it works</h3>
+        <div class="details-formula">30 + 10t &nbsp;&middot;&nbsp; 30 &times; 1.5<sup>t</sup> &nbsp;&middot;&nbsp; 75 &minus; 45 &times; (9/11)<sup>t</sup></div>
+        <p>For this toy score, 100 is the measurement ceiling. An extrapolation above 100 is shown as invalid for that scale rather than clipped. A straight line on a logarithmic axis indicates proportional change; it does not prove that change will continue.</p>
+        <h3>Assumptions and simplifications</h3>
+        <ul>
+          <li>The score, its 0&ndash;100 ceiling, and the saturation rule's ceiling of 75 are all choices, not fitted facts.</li>
+          <li>Three rules are shown; infinitely many fit two points.</li>
+          <li>The boundary card keeps the limits to one sentence each on purpose. The detailed sceptical reading of each source is in the stage 1 and stage 3 notes; restating it here would let the caveats eat the lesson.</li>
+        </ul>
+        <h3>Sources</h3>
+        <ul id="sources-4"></ul>
+        <div class="evidence-card"><b>Boundary:</b> this stage does not forecast anything. It shows that two points cannot, and it leaves the honest sentence &mdash; this system, these tasks, these conditions &mdash; as the one worth repeating.</div>
+      </section>
+
+    </div>
+    <form method="dialog" class="lesson-dialog-actions"><button type="submit">Back to activity</button></form>
+  </div>
+</dialog>
+
+<!-- Presenter notes ARE the printable guide. build.js injects the
+     .guide-scope body of src/demo-guide.html at the marker below. Edit
+     src/demo-guide.html, never this. -->
+<dialog class="lesson-dialog" id="presenter-notes" aria-labelledby="presenter-notes-title">
+  <div class="lesson-dialog-head">
+    <h2 id="presenter-notes-title">Presenter Notes<span class="head-sub">the printable guide, on screen</span></h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body guide-host">
+<!--__GUIDE__-->
+    <p class="guide-print"><a href="presenter-guide.html" target="_blank" rel="noopener">Open the printable copy (presenter-guide.html)</a> &mdash; the same document, laid out for print; the PDF beside it is a render of that file.</p>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Back to the demo</button></form>
+</dialog>
+
+<!-- Load order is load-bearing: the shell defines window.lessonShell before
+     app.js, which listens for 'stagechange' and 'lessonreset'. -->
+<script>
+/*__SHELL_JS__*/
+</script>
+<script>
+/*__APP__*/
+</script>
+<div class="bh-credit">Bryant Harrison &middot; Murray State University</div>
+</body>
+</html>

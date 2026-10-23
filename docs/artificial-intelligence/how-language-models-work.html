@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How a Language Model Works - CourseWiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<script>
+(function(){try{var m=JSON.parse(localStorage.getItem('det:theme'));
+if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m);}}catch(e){}})();
+</script>
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" href="../favicon.svg?v=c236ecac71" type="image/svg+xml">
+<link rel="stylesheet" href="../theme/msu-theme.css?v=c236ecac71">
+<link rel="stylesheet" href="../theme/app.css?v=c236ecac71">
+<style>.activity-notes-glass-box { --ink:#111820; --ink2:#41505f; --ink3:#71808f; --line:#c2cede;
+                 --navy:#002144; --gold:#ECAC00; --hi:#FFF7E4;
+                 font-family:"Segoe UI",-apple-system,system-ui,Roboto,Helvetica,Arial,sans-serif;
+                 color:var(--ink); font-size:10pt; line-height:1.38; }
+  .activity-notes-glass-box header { border-bottom:3pt solid var(--navy); padding-bottom:3mm; margin-bottom:4mm;
+           display:flex; justify-content:space-between; align-items:flex-end; gap:6mm; }
+  .activity-notes-glass-box .eyebrow { font-size:7.5pt; font-weight:700; letter-spacing:1.5pt; text-transform:uppercase;
+             color:var(--navy); border-bottom:1.6pt solid var(--gold); display:inline-block; padding-bottom:.7mm; margin-bottom:1.6mm; }
+  .activity-notes-glass-box h1 { font-size:21pt; letter-spacing:.3pt; line-height:1.08; color:var(--navy); }
+  .activity-notes-glass-box h1 small { display:block; font-size:9pt; font-weight:600; letter-spacing:1.1pt; text-transform:uppercase; color:var(--ink2); margin-top:1.2mm; }
+  .activity-notes-glass-box .meta { text-align:right; font-size:8.5pt; color:var(--ink2); line-height:1.4; }
+  .activity-notes-glass-box .cols { column-count:2; column-gap:6mm; }
+  .activity-notes-glass-box .cols [data-guide-section] { break-inside:avoid-column; }
+  .activity-notes-glass-box [data-guide-section] { break-inside:avoid; margin-bottom:4mm; }
+  .activity-notes-glass-box h2 { font-size:12.5pt; text-transform:uppercase; letter-spacing:.6pt; color:var(--navy); border-bottom:1.5pt solid var(--gold); padding-bottom:1mm; margin-bottom:1.6mm; }
+  .activity-notes-glass-box h3 { font-size:10pt; color:var(--navy); margin:2mm 0 .7mm; }
+  .activity-notes-glass-box p { margin-bottom:1.6mm; }
+  .activity-notes-glass-box ol { margin:0 0 1.6mm 5mm; padding-left:0; }
+  .activity-notes-glass-box ul { margin:0 0 1.6mm 4.5mm; padding-left:0; }
+  .activity-notes-glass-box li { margin-bottom:1mm; }
+  .activity-notes-glass-box .beat { display:grid; grid-template-columns:13mm 1fr; gap:2mm; margin-bottom:2.2mm; break-inside:avoid; }
+  .activity-notes-glass-box .beat .t { font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums; font-size:8.5pt; }
+  .activity-notes-glass-box .beat > div > b:first-of-type { display:block; }
+  .activity-notes-glass-box .say { background:var(--hi); border-left:2.4pt solid var(--gold); padding:1.8mm 2.4mm; margin:1.5mm 0; font-style:italic; break-inside:avoid; }
+  .activity-notes-glass-box .mis { border:.5pt solid var(--line); border-radius:1.4mm; padding:1.8mm 2.4mm; margin-bottom:2mm; break-inside:avoid; }
+  .activity-notes-glass-box .mis b { display:block; font-weight:700; color:var(--navy); }
+  .activity-notes-glass-box .mis b::before { content:"“"; }
+  .activity-notes-glass-box .mis b::after { content:"”"; }
+  .activity-notes-glass-box .mis span { display:block; color:var(--ink2); margin-top:.3mm; }
+  .activity-notes-glass-box code { font-family:ui-monospace,Consolas,monospace; font-size:8.7pt; }
+  .activity-notes-glass-box footer { margin-top:4mm; padding-top:2mm; border-top:.6pt solid var(--line); font-size:8pt; color:var(--ink3); display:flex; justify-content:space-between; gap:4mm; }
+  .activity-notes-glass-box .warn { color:#a3341f; font-weight:600; }
+  .activity-notes-glass-box .page-break { break-before:page; padding-top:2mm; }</style>
+</head>
+<body class="app skin-app" data-page="how-language-models-work" data-base="../">
+<a class="skip" href="#main">Skip to content</a>
+<header class="appbar">
+  <button class="iconbtn nav-toggle" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <a class="brand" href="../index.html">
+    <img class="brandmark light-only" alt="Murray State University School of Engineering" src="../assets/soe-logo-4c.png">
+<img class="brandmark dark-only" alt="" aria-hidden="true" src="../assets/soe-logo-4c-reversed.png">
+    <span class="sub" data-brandlabel>CourseWiki</span>
+  </a>
+  <div class="search">
+    <input type="search" placeholder="Search topics" aria-label="Search topics" autocomplete="off" spellcheck="false">
+    <span class="hint">/</span>
+    <div class="results" role="listbox"></div>
+  </div>
+  <button class="iconbtn" type="button" data-act="theme" aria-label="Theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 010 16" fill="currentColor" stroke="none"/></svg></button>
+</header>
+
+<div class="shell has-toc">
+<aside class="sidebar" id="sidebar">
+  <div class="nav-topics">
+  <h2>Topics</h2>
+  <details class="navgroup" data-nav="c-safety">
+    <summary><span class="chev"></span><a class="navself" href="../safety/index.html">Safety</a></summary>
+    <details class="navgroup" data-nav="g-safety-universal-rules" open>
+      <summary><span class="chev"></span><a class="navself" href="../safety/index.html#g-safety-universal-rules">Universal Rules</a></summary>
+      <ul class="navlist">
+        <li><a href="../safety/chemicals-and-sds.html">Chemicals and Safety Data Sheets</a></li>
+        <li><a href="../safety/electrical-safety.html">Electrical Safety</a></li>
+        <li><a href="../safety/equipment-operating-procedure.html">Equipment Operating Procedure</a></li>
+        <li><a href="../safety/fire-safety.html">Fire Safety</a></li>
+        <li><a href="../safety/conduct-and-emergency.html">Lab Conduct and Emergencies</a></li>
+        <li><a href="../safety/lifting-and-carrying.html">Lifting and Carrying</a></li>
+        <li><a href="../safety/machine-hazards.html">Machine Hazards and Housekeeping</a></li>
+        <li><a href="../safety/ppe.html">Personal Protective Equipment</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-safety-equipment" open>
+      <summary><span class="chev"></span><a class="navself" href="../safety/index.html#g-safety-equipment">Equipment</a></summary>
+      <ul class="navlist">
+        <li><a href="../safety/equipment-categories.html">Equipment Categories and Supervision</a></li>
+        <li><a href="../safety/metal-chips.html">Metal Chips and Swarf</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-engineering">
+    <summary><span class="chev"></span><a class="navself" href="../engineering/index.html">Engineering Fundamentals</a></summary>
+    <details class="navgroup" data-nav="g-engineering-units-and-measurement" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-units-and-measurement">Units and Measurement</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/dimensional-analysis.html">Dimensional Analysis</a></li>
+        <li><a href="../engineering/measurement-language.html">Measurement Language</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-motion-and-rotation" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-motion-and-rotation">Motion and Rotation</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/acceleration-and-squared-time.html">Acceleration and Squared Time</a></li>
+        <li><a href="../engineering/angular-motion.html">Angular Motion</a></li>
+        <li><a href="../engineering/motion-quantities.html">Motion Quantities</a></li>
+        <li><a href="../engineering/rotation-and-linear-speed.html">Rotation and Linear Speed</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-force-and-power" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-force-and-power">Force and Power</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/geometry-mass-and-force.html">Geometry, Mass, and Force</a></li>
+        <li><a href="../engineering/power-and-efficiency.html">Power and Efficiency</a></li>
+        <li><a href="../engineering/torque.html">Torque</a></li>
+        <li><a href="../engineering/work-and-energy.html">Work and Energy</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-engineering-electrical-quantities" open>
+      <summary><span class="chev"></span><a class="navself" href="../engineering/index.html#g-engineering-electrical-quantities">Electrical Quantities</a></summary>
+      <ul class="navlist">
+        <li><a href="../engineering/current-voltage-and-resistance.html">Current, Voltage, and Resistance</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-machining">
+    <summary><span class="chev"></span><a class="navself" href="../machining/index.html">Machining</a></summary>
+    <details class="navgroup" data-nav="g-machining-milling" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-milling">Milling</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/climb-and-conventional-milling.html">Climb and Conventional Milling</a></li>
+        <li><a href="../machining/feeds-and-speeds.html">Feeds and Speeds</a></li>
+        <li><a href="../machining/milling-operations.html">Milling Operations</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-machining-turning" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-turning">Turning</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/lathe-operations.html">Lathe Operations</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-machining-measurement-and-fit" open>
+      <summary><span class="chev"></span><a class="navself" href="../machining/index.html#g-machining-measurement-and-fit">Measurement and Fit</a></summary>
+      <ul class="navlist">
+        <li><a href="../machining/tolerances-and-fits.html">Tolerances and Fits</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-lean">
+    <summary><span class="chev"></span><a class="navself" href="../lean/index.html">Lean and Quality</a></summary>
+    <details class="navgroup" data-nav="g-lean-lean-and-organization" open>
+      <summary><span class="chev"></span><a class="navself" href="../lean/index.html#g-lean-lean-and-organization">Lean and Organization</a></summary>
+      <ul class="navlist">
+        <li><a href="../lean/5s-workplace-organization.html">5S Workplace Organization</a></li>
+      </ul>
+    </details>
+  </details>
+  <details class="navgroup" data-nav="c-artificial-intelligence" open>
+    <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html">Artificial Intelligence</a></summary>
+    <details class="navgroup" data-nav="g-artificial-intelligence-start-here" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-start-here">Start here</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/understanding-artificial-intelligence.html">Understanding Artificial Intelligence</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-artificial-intelligence-what-ai-is" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-what-ai-is">What AI is</a></summary>
+      <ul class="navlist">
+        <li><a aria-current="page" href="../artificial-intelligence/how-language-models-work.html">How a Language Model Works</a></li>
+        <li><a href="../artificial-intelligence/types-of-ai.html">Types of AI</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-artificial-intelligence-where-ai-is-going" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-where-ai-is-going">Where AI is going</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/ai-winters.html">AI Winters: Boom and Bust</a></li>
+        <li><a href="../artificial-intelligence/ai-progress.html">The Pace of AI Progress</a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="g-artificial-intelligence-how-to-use-ai" open>
+      <summary><span class="chev"></span><a class="navself" href="../artificial-intelligence/index.html#g-artificial-intelligence-how-to-use-ai">How to use AI</a></summary>
+      <ul class="navlist">
+        <li><a href="../artificial-intelligence/ai-tool-guide.html">AI Tool Guide</a></li>
+        <li><a href="../artificial-intelligence/prompting-strategies.html">Prompting Strategies</a></li>
+      </ul>
+    </details>
+  </details>
+  </div>
+  <div class="navsplit"></div>
+  <div class="nav-tracks">
+  <h2>Tracks</h2>
+  <p class="navnote">Tracks built from the topics above. A course carries the topic tracks it needs; a programme is its courses, so it follows them.</p>
+  <details class="navgroup" data-nav="t-det" open>
+    <summary><span class="chev"></span><a class="navself" data-track="det" href="../presentations.html#pl-det">DET</a><span class="count">27</span></summary>
+    <details class="navgroup" data-nav="t-det-130">
+      <summary><span class="chev"></span><a class="navself" data-track="det-130" href="../presentations.html#pl-det-130">DET 130</a><span class="count">11</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="t-det-330">
+      <summary><span class="chev"></span><a class="navself" data-track="det-330" href="../presentations.html#pl-det-330">DET 330</a><span class="count">16</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+        <li><a data-track="machining-fundamentals" href="../presentations.html#pl-machining-fundamentals">Machining Fundamentals<span class="count">5</span></a></li>
+      </ul>
+    </details>
+    <details class="navgroup" data-nav="t-det-403">
+      <summary><span class="chev"></span><a class="navself" data-track="det-403" href="../presentations.html#pl-det-403">DET 403</a><span class="count">22</span></summary>
+      <ul class="navlist navinc">
+        <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+        <li><a data-track="units-motion-and-force" href="../presentations.html#pl-units-motion-and-force">Units, Motion, and Force<span class="count">5</span></a></li>
+        <li><a data-track="rotation-and-torque" href="../presentations.html#pl-rotation-and-torque">Rotation and Torque<span class="count">3</span></a></li>
+        <li><a data-track="work-power-and-efficiency" href="../presentations.html#pl-work-power-and-efficiency">Work, Power, and Efficiency<span class="count">2</span></a></li>
+        <li><a data-track="electrical-units" href="../presentations.html#pl-electrical-units">Electrical Units<span class="count">1</span></a></li>
+      </ul>
+    </details>
+  </details>
+  <ul class="navlist tracknav">
+    <li><a data-track="5s-workplace-organization" href="../presentations.html#pl-5s-workplace-organization">5S Workplace Organization<span class="count">1</span></a></li>
+    <li><a data-track="ai-from-zero-to-takeoff" href="../presentations.html#pl-ai-from-zero-to-takeoff">AI: From Zero to Takeoff<span class="count">7</span></a></li>
+    <li><a data-track="electrical-units" href="../presentations.html#pl-electrical-units">Electrical Units<span class="count">1</span></a></li>
+    <li><a data-track="general-safety" href="../presentations.html#pl-general-safety">General Safety<span class="count">11</span></a></li>
+    <li><a data-track="machining-fundamentals" href="../presentations.html#pl-machining-fundamentals">Machining Fundamentals<span class="count">5</span></a></li>
+    <li><a data-track="rotation-and-torque" href="../presentations.html#pl-rotation-and-torque">Rotation and Torque<span class="count">3</span></a></li>
+    <li><a data-track="units-motion-and-force" href="../presentations.html#pl-units-motion-and-force">Units, Motion, and Force<span class="count">5</span></a></li>
+    <li><a data-track="work-power-and-efficiency" href="../presentations.html#pl-work-power-and-efficiency">Work, Power, and Efficiency<span class="count">2</span></a></li>
+  </ul>
+  </div>
+  <div class="navsplit"></div>
+  <div class="nav-practice"><h2>Practice</h2>
+    <ul class="navlist"><li><a href="../practice.html">Practice catalog</a></li></ul>
+  </div>
+</aside>
+<div class="backdrop"></div>
+
+<main id="main"><div class="article">
+  <div class="crumb"><a href="../index.html">CourseWiki</a><span class="sep">/</span><a href="index.html">Artificial Intelligence</a><span class="sep">/</span><span>What AI is</span></div>
+  <h1>How a Language Model Works</h1>
+  <p class="lede">Train a tiny language model, test worked solutions, and explore a tool-using loop.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="explore-how-a-language-model-works" data-card="explore-how-a-language-model-works">
+    <summary>Explore How a Language Model Works<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Explore How a Language Model Works</h2>
+  <p>Train a tiny transformer and inspect its predictions. Compare direct answers with worked arithmetic, then explore an agent loop with real tools and a clearly labeled scripted policy.</p>
+  <div data-interactive="glass-box" class="document-activity"><p class="activity-links"><a class="button" target="_blank" rel="noopener" href="../activities/glass-box/index.html">Open How a Language Model Works full screen</a> <a href="../activities/glass-box/demo-guide.html">Printable guide</a> · <a href="../activities/glass-box/Glass-Box-Demo-Guide.pdf">Guide PDF</a></p><iframe title="How a Language Model Works interactive activity" loading="lazy" allow="fullscreen" src="../activities/glass-box/index.html?v=c236ecac71"></iframe></div>
+  <p>The activity runs in your browser without an AI service. Use its Guide button for instructions and Settings for presenter notes, presentation mode and reset. Open it full screen when you want more room.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="learning-path" data-card="learning-path">
+    <summary>Learning path<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Learning path</h2>
+  <p>Train a tiny transformer and inspect its predictions. Compare direct answers with worked arithmetic, then explore an agent loop with real tools and a clearly labeled scripted policy.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="presenter-notes-and-learning-guide" data-card="presenter-notes-and-learning-guide">
+    <summary>Presenter notes and learning guide<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Presenter notes and learning guide</h2>
+  <div class="activity-notes-glass-box">
+<div class="guide">
+<header>
+  <div>
+    <div class="eyebrow">Murray State University</div>
+    <h1>How a Language Model Works<small>Demo 2 of 17 · Part one · 20 minutes</small></h1>
+  </div>
+  <p class="meta"><b>You need:</b> one browser and <code>index.html</code>.
+    It runs offline. For projection use Settings → Presentation mode.
+    Start fresh: the untrained model is useful evidence.</p>
+</header>
+
+<div class="cols">
+<div data-guide-section>
+  <h2>Learning goals</h2>
+  <p>What a learner knows at the end of each stage — these are the three Takeaway cards, verbatim.</p>
+  <ul>
+    <li><b>LLM.</b> Training changes the parameters; inference runs the frozen parameters forward to score every possible next token. A small model trained on a little text learns the shape of the language long before it learns to say anything true.</li>
+    <li><b>Reasoning.</b> Room to write intermediate steps lets the same machinery reach answers it cannot produce in one jump — a real, measurable gain on this task, and not the same thing as understanding arithmetic.</li>
+    <li><b>Agents.</b> Tools and a loop turn prediction into action, and the context window bounds what the loop can still see — a run can fail for want of memory, not for want of ability.</li>
+  </ul>
+  <h2>Where this sits on the path</h2>
+  <p>Demo 1 showed models that play and handed forward one idea, in its own words: a model is a representation that can be trained, and architecture, training method and model type are three separate questions. Its last stage ended on the transformer; this demo trains one. It shows a model that predicts text, then what it takes to reason and to act. It hands forward two things: <b>a model reads its context</b> (Demo 5, Prompting) and <b>a score is a measurement under conditions</b> — the exam rows here — which is how Demo 3 asks you to read published benchmarks.</p>
+</div>
+
+<div data-guide-section>
+  <h2>One question for the session</h2>
+  <p><b>What changes when a text predictor is given more structure, more checking, or tools?</b> This page shows three bounded mechanisms: a tiny language model learning next-character prediction, arithmetic experiments with written work and checking, and a tool loop with a scripted action selector. Use Details for the deeper architecture and implementation notes.</p>
+  <p class="say">“Keep asking what the program learned, what it is calculating now, and what part is a teaching fixture.”</p>
+</div>
+
+<div data-guide-section>
+  <h2>LLM · Language model — 6 minutes</h2>
+  <h3>Question</h3>
+  <p>How can adjustable numbers turn recent text into a next-character prediction?</p>
+  <h3>Predict prompt</h3>
+  <p>After all four eras, can it do simple math, like 2 + 2? The answer is no: its vocabulary has no digits, so 2+2= reaches it as blank spaces. Have someone type 2+2= into the prompt box to see it. The reveal says so on the card once Era 4 finishes, and Stage 2 trains the same kind of model on sums.</p>
+  <h3>Activity</h3>
+  <div class="beat"><div class="t">0:00</div><div><b>Open LLM.</b> Use Tokenize text and Inspect parameters on an untrained prompt. The numbers begin as random values.</div></div>
+  <div class="beat"><div class="t">1:30</div><div><b>Choose Train the model.</b> Read one untrained sample, then narrate the loss and samples as the first era completes. Use Try next-token prediction to compare likely next characters; change Temperature only after the audience sees the ranked choices.</div></div>
+  <div class="beat"><div class="t">4:30</div><div><b>Choose Trace attention.</b> Select a character and show which earlier positions receive weight for that prediction. It is a live intermediate value, not evidence that the model has a mind or intent.</div></div>
+  <h3>Expected observation</h3>
+  <p>Training changes the weights, loss declines, and the model’s next-character distribution changes. Its samples can become more patterned while still being limited by one short, original story.</p>
+  <h3>Check-yourself answer key</h3>
+  <p><b>Era 4 writes more like the story than Era 0. What changed?</b> Its parameters. Not a lookup of stored passages (nothing is stored to retrieve — the whole model is 42,458 numbers) and not a bigger vocabulary (Tokenize text shows the same 26 characters at every era).</p>
+  <h3>Teaching limit</h3>
+  <p>This is a character-level transformer trained from scratch on a tiny corpus. It demonstrates a transformer learning mechanism, not general language ability or a claim about every frontier system.</p>
+</div>
+
+<div data-guide-section>
+  <h2>Reasoning · Worked steps — 8 minutes</h2>
+  <h3>Question</h3>
+  <p>How do written intermediate steps and checking change a small model’s behavior on addition?</p>
+  <h3>Predict prompt</h3>
+  <p>Same exam, which scores higher — answers-only or worked steps? Take the vote before pressing Run experiment; the card echoes each guess and settles it from the two scores on screen.</p>
+  <h3>Activity</h3>
+  <div class="beat"><div class="t">6:00</div><div><b>Open Reasoning and choose Train and compare.</b> Compare direct-answer training with worked column arithmetic. The models share core width, depth, and heads, but their contexts, seeds, and update counts differ to fit their different text formats.</div></div>
+  <div class="beat"><div class="t">8:30</div><div><b>Choose Compare exam answers.</b> Read a live attempt and an exam row. The useful comparison is the presence of written intermediate work, not a universal performance promise.</div></div>
+  <div class="beat"><div class="t">10:30</div><div><b>Optional slow extension: Try more attempts.</b> Run 1, 2, 4, and 8 attempts with the same frozen under-trained model. The arithmetic checker rejects malformed work and accepted chains vote. More attempts add inference-time computation, not training.</div></div>
+  <h3>Expected observation</h3>
+  <p>Written steps provide smaller targets for the model to predict. Sampling plus checking can improve the chosen answer even when weights stay fixed.</p>
+  <h3>Check-yourself answer key</h3>
+  <p><b>The worked-steps model scores higher. What does that show?</b> That generating intermediate steps gives the same machinery more room to compute. The card’s two wrong options are wrong in opposite directions and both are common in a room: “it understands arithmetic” (too strong — both are next-token predictors, and the fine-tuning is supervised, not reinforcement learning) and “nothing changed, both just predict the next token” (too weak — the two exam scores on the page are the evidence against it). Give both corrections equal time.</p>
+  <h3>Teaching limit</h3>
+  <p>The checker validates column arithmetic from the addends. The optional accepted-example round also retains chains matching the generated answer, then uses ordinary next-token updates on those examples. That is rejection-selected supervised fine-tuning, not a policy-gradient reinforcement-learning update.</p>
+</div>
+
+<div data-guide-section>
+  <h2>Agents · Tool-using loop — 5 minutes</h2>
+  <h3>Question</h3>
+  <p>What does a system need in addition to text prediction to take actions and use results?</p>
+  <h3>Predict prompt</h3>
+  <p>Same task with Visible context set to Tiny — does the run still finish? Take the vote before the tiny run; the card settles it when the run ends.</p>
+  <h3>Activity</h3>
+  <div class="beat"><div class="t">14:00</div><div><b>Open Agents, then choose You choose the actions.</b> The calculator, search, reading, notebook, observations, and distractor consequences all run locally.</div></div>
+  <div class="beat"><div class="t">16:00</div><div><b>Choose Watch the scripted policy.</b> Point out the calculator’s deliberate bad syntax and its genuine error message, then the later corrected call. Open the raw context to see what the action selector can read.</div></div>
+  <div class="beat"><div class="t">18:00</div><div><b>Choose Tiny · last 450 characters, Restart run, and Watch the scripted policy again.</b> The goal leaves the visible context and the automatic run stops.</div></div>
+  <h3>Expected observation</h3>
+  <p>Tool results become new text in the context. The small window changes what the selector can use, so the same task can fail when its goal is no longer visible.</p>
+  <h3>Check-yourself answer key</h3>
+  <p><b>On Tiny the same policy stops without finishing. Why?</b> The goal scrolled out of the visible context. Not a weak policy (it is the same hand-written policy and it finishes on the full context) and not the calculator error (that error is real, deliberate, and recovered from in both runs).</p>
+  <h3>Teaching limit</h3>
+  <p>The action selector in this activity is a scripted policy, including the calculator mistake and retry; it is not a learned model. The loop, local tools, observations, and context truncation are the genuine mechanisms on display.</p>
+</div>
+
+<div data-guide-section>
+  <h2>Optional slow experiments and close</h2>
+  <p>Let Train the model and Train and compare continue while you discuss their live displays; each can take a few minutes. Try more attempts and Fine-tune on accepted examples are optional extensions. Do not promise a particular score or curve: the page uses seeded, bounded demonstrations.</p>
+  <p class="say">“A language model predicts. Reasoning experiments add written work, checking, or extra attempts. An agent adds a loop and tools; in this activity, its action choice is deliberately scripted.”</p>
+  <ul>
+    <li>Which claim came from a learned model, a fixed calculation, or a scripted policy?</li>
+    <li>Why can extra attempts help without changing weights?</li>
+    <li>What would need to change before this agent activity used a learned action selector?</li>
+  </ul>
+</div>
+
+<div data-guide-section>
+  <h2>Misconceptions to expect</h2>
+  <div class="mis"><b>It is just predicting the next token, so it cannot really compute anything.</b><span>It does only predict the next token — and the worked-steps model still scores measurably higher on the identical exam. Prediction with room to write steps is computation. The two exam scores are the evidence; show them, do not argue it.</span></div>
+  <div class="mis"><b>The worked-steps model understands arithmetic.</b><span>Same architecture, different training text. It reaches more right answers; nothing on the page supports comprehension, and the fine-tuning is ordinary supervised training on its own accepted examples, not reinforcement learning.</span></div>
+  <div class="mis"><b>Attention shows what the model is thinking.</b><span>Attention weights are real intermediate values from this computation — a routing pattern for one prediction. They are not intent and not an explanation of why the answer came out as it did.</span></div>
+  <div class="mis"><b>Frontier models are this recipe plus scale.</b><span>The shape of the computation is the same as a decoder-only transformer. The scale, the data, and much of the training pipeline are not, and scale is not a detail. This page demonstrates selected mechanisms, not a miniature of every production model.</span></div>
+  <div class="mis"><b>The agent got smarter or dumber between the two runs.</b><span>It is the same scripted policy both times. What changed is what the loop could still see. A run can fail for want of memory, not for want of ability.</span></div>
+</div>
+
+<div data-guide-section>
+  <h2>Presenter controls</h2>
+  <p>Guide opens from the header and on entry. Settings contains Open Presenter Notes, Presentation mode, and Reset. Reset puts the whole demonstration back to its fresh state in place, without reloading the page: the transformer is untrained again, every era is gone, the Reasoning models and exam tables are cleared, and the Agents run is back at turn one on the full context. Presentation mode stays as you set it. Open printable guide opens the rendered copy of this same guide.</p>
+</div>
+</div>
+
+<footer>Bryant Harrison · Murray State University · How a Language Model Works · Offline, single-file demonstration · no account or runtime network</footer>
+</div>
+</div>
+    </div>
+  </details>
+</div>
+
+  <div class="usedin">
+    <div class="k">Appears in</div>
+    <div class="chips">
+      <a class="chip" data-track="ai-from-zero-to-takeoff" href="how-language-models-work.html?p=ai-from-zero-to-takeoff">AI: From Zero to Takeoff</a>
+    </div>
+  </div>
+</div></main>
+<aside class="toc">
+  <div class="k">On this page</div>
+  <ul>
+    <li><a href="#explore-how-a-language-model-works">Explore How a Language Model Works</a></li>
+    <li><a href="#learning-path">Learning path</a></li>
+    <li><a href="#presenter-notes-and-learning-guide">Presenter notes and learning guide</a></li>
+  </ul>
+</aside>
+
+</div>
+<script src="../search-index.js?v=c236ecac71"></script>
+<script src="../playlists.js?v=c236ecac71"></script>
+<script src="../practice-index.js?v=c236ecac71"></script>
+<script src="../theme/app.js?v=c236ecac71"></script>
+</body>
+</html>

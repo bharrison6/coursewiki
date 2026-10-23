@@ -85,3 +85,12 @@ New-ProbeModule 'core'
 New-ProbeModule 'probe' 'probe'
 Assert (Refuses { Initialize-InteractiveAssets $fixture } 'dependency cycle') 'self-dependencies fail'
 Write-Output "$script:checks checks passed; synthetic fixture retained at $fixture"
+
+# A standalone document and an inline module cannot silently shadow each other.
+New-ProbeModule 'probe'
+$null = [IO.Directory]::CreateDirectory((Join-Path $fixture 'activities'))
+$null = [IO.Directory]::CreateDirectory((Join-Path $fixture 'scripts'))
+$documentReader = 'process.stdout.write(JSON.stringify([{id:"probe",title:"Synthetic activity",files:[],css:"",notes:""}]));'
+[IO.File]::WriteAllText((Join-Path $fixture 'scripts/read-activities.cjs'), $documentReader)
+Assert (Refuses { Initialize-InteractiveAssets $fixture } 'duplicate interactive identity') 'standalone documents and inline modules cannot share an identity'
+Write-Output "$script:checks checks passed; fixtures are synthetic and retained"

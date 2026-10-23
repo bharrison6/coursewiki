@@ -3,11 +3,28 @@
 function Initialize-InteractiveAssets([string]$sourceRoot) {
   $script:interactiveModules = [ordered]@{}
   $script:interactiveStampParts = @()
+  $activityRoot = Join-Path $sourceRoot 'activities'
+  if (Test-Path -LiteralPath $activityRoot) {
+    $activityJson = & node (Join-Path $sourceRoot 'scripts/read-activities.cjs') $activityRoot
+    if ($LASTEXITCODE -ne 0) { throw 'activity manifests or canonical guides failed validation' }
+    foreach ($activity in @($activityJson | ConvertFrom-Json)) {
+      $activityDir = Join-Path $activityRoot $activity.id
+      $script:interactiveModules[$activity.id] = [pscustomobject]@{
+        Id = $activity.id; Root = $activityDir; CSS = @(); JS = @(); Requires = @()
+        Document = $activity
+      }
+      $script:interactiveStampParts += ($activity | ConvertTo-Json -Depth 5 -Compress)
+      foreach ($file in $activity.files) {
+        $script:interactiveStampParts += [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $activityDir $file)))
+      }
+    }
+  }
   $moduleRoot = Join-Path $sourceRoot 'interactives'
   if (-not (Test-Path -LiteralPath $moduleRoot)) { return }
   foreach ($dir in (Get-ChildItem -LiteralPath $moduleRoot -Directory | Sort-Object Name)) {
     $manifest = Read-Conf (Join-Path $dir.FullName 'interactive.conf')
     $id = [string]$manifest.Meta.ID
+    if ($script:interactiveModules.Contains($id)) { throw "duplicate interactive identity across activities and modules: $id" }
     if ($id -cnotmatch '^[a-z][a-z0-9-]*$' -or $id -cne $dir.Name) {
       throw "interactive folder and @@ID must match exactly: $($dir.Name)"
     }
@@ -39,7 +56,7 @@ function Initialize-InteractiveAssets([string]$sourceRoot) {
     }
     $script:interactiveStampParts += "module:${id}:requires:$($requires -join ',')"
     $script:interactiveModules[$id] = [pscustomobject]@{
-      Id = $id; Root = $dir.FullName; CSS = $assets.CSS; JS = $assets.JS; Requires = $requires
+      Id = $id; Root = $dir.FullName; CSS = $assets.CSS; JS = $assets.JS; Requires = $requires; Document = $null
     }
   }
   # Validate even unused declarations before any generated output is written.
@@ -81,6 +98,7 @@ function Get-InteractiveIds([string]$html) {
 function Get-InteractiveWebAssets([string]$html, [string]$up, [string]$kind) {
   foreach ($id in @(Get-InteractiveIds $html)) {
     $module = $script:interactiveModules[$id]
+    if ($kind -eq 'CSS' -and $module.Document) { '<style>' + $module.Document.css + '</style>' }
     foreach ($name in $module.$kind) {
       $url = "${up}interactives/$id/${name}?v=$script:stamp"
       if ($kind -eq 'CSS') { '<link rel="stylesheet" href="' + $url + '">' }
@@ -92,6 +110,7 @@ function Get-InteractiveWebAssets([string]$html, [string]$up, [string]$kind) {
 function Get-InteractiveInlineAssets([string]$html, [string]$kind) {
   foreach ($id in @(Get-InteractiveIds $html)) {
     $module = $script:interactiveModules[$id]
+    if ($kind -eq 'CSS' -and $module.Document) { $module.Document.css }
     foreach ($name in $module.$kind) {
       [IO.File]::ReadAllText((Join-Path $module.Root $name))
     }
@@ -100,9 +119,57 @@ function Get-InteractiveInlineAssets([string]$html, [string]$kind) {
 
 function Copy-InteractiveAssets([string]$outputRoot) {
   foreach ($module in $script:interactiveModules.Values) {
+    if ($module.Document) {
+      foreach ($name in $module.Document.files) {
+        Write-OutBytes (Join-Path $outputRoot "activities/$($module.Id)/$name") `
+          ([IO.File]::ReadAllBytes((Join-Path $module.Root $name)))
+      }
+    }
     foreach ($name in @($module.CSS) + @($module.JS)) {
       Write-Out (Join-Path $outputRoot "interactives/$($module.Id)/$name") `
         ([IO.File]::ReadAllText((Join-Path $module.Root $name)))
     }
   }
+}
+
+function Expand-ActivityNotes([string]$html) {
+  [regex]::Replace($html, '<div data-activity-notes="([a-z][a-z0-9-]*)"></div>', {
+    param($match)
+    $id = $match.Groups[1].Value
+    if (-not $script:interactiveModules.Contains($id) -or -not $script:interactiveModules[$id].Document) {
+      throw "unknown document activity notes: $id"
+    }
+    $script:interactiveModules[$id].Document.notes
+  })
+}
+
+function Expand-ActivityDocuments([string]$html, $context, [string]$mode) {
+  [regex]::Replace($html, '<div data-interactive="([a-z][a-z0-9-]*)" data-activity></div>', {
+    param($match)
+    $id = $match.Groups[1].Value
+    if (-not $script:interactiveModules.Contains($id) -or -not $script:interactiveModules[$id].Document) {
+      throw "unknown document activity: $id"
+    }
+    $module = $script:interactiveModules[$id]
+    $activity = $module.Document
+    $up = if ($mode -eq 'aggregate') { $script:siteUrl + '/' } else { $context.Up }
+    $baseUrl = "${up}activities/$id/"
+    $title = [Net.WebUtility]::HtmlEncode($activity.title)
+    $src = 'src="' + $baseUrl + $activity.entry + '?v=' + $script:stamp + '"'
+    if ($mode -eq 'aggregate') {
+      $document = [IO.File]::ReadAllText((Join-Path $module.Root $activity.entry))
+      # Guide links inside an offline activity must also stay in the file.
+      foreach ($name in @($activity.guideHtml, $activity.guidePdf)) {
+        $mime = if ($name.EndsWith('.pdf')) { 'application/pdf' } else { 'text/html;charset=utf-8' }
+        $uri = 'data:' + $mime + ';base64,' + [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $module.Root $name)))
+        $document = $document.Replace('href="' + $name + '"', 'href="' + $uri + '"')
+      }
+      $src = 'srcdoc="' + [Net.WebUtility]::HtmlEncode($document) + '"'
+    }
+    '<div data-interactive="' + $id + '" class="document-activity">' +
+      '<p class="activity-links"><a class="button" target="_blank" rel="noopener" href="' + $baseUrl + $activity.entry + '">Open ' + $title + ' full screen</a> ' +
+      '<a href="' + $baseUrl + $activity.guideHtml + '">Printable guide</a> · ' +
+      '<a href="' + $baseUrl + $activity.guidePdf + '">Guide PDF</a></p>' +
+      '<iframe title="' + $title + ' interactive activity" loading="lazy" allow="fullscreen" ' + $src + '></iframe></div>'
+  })
 }

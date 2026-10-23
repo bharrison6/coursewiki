@@ -1,0 +1,407 @@
+/* ==========================================================================
+   AI Tool Guide (folder: front-doors) — activity styles.
+
+   Retrofitted onto lesson-shell v2. The shell's tokens.css and shell.css own
+   the header, stage tablist, stage intro, lesson strip, Details drawer,
+   dialogs, credit pill and the cream/paper palette; this file is the
+   ACTIVITY only — the four-by-four grid, the job cards, and Act III's
+   receipts panels — injected after the shell's CSS so any shell rule can be
+   overridden here without !important.
+
+   Phone first, and the four-by-four grid is the reason most of this file
+   exists. A capability table is the classic thing that ships as a
+   horizontal scroller nobody reads on a phone. This one does not scroll
+   sideways at any width. It is ONE piece of markup rendered two ways:
+
+     narrow  — four stacked door cards, each carrying its four axis rows with
+               their own labels. Reads top to bottom, thumb-sized.
+     wide    — a real five-column CSS grid: an axis rail plus four door
+               columns, rows aligned by the grid itself.
+
+   The switch is `display: contents` on the two wrapper divs, plus explicit
+   --col/--row custom properties that app.js stamps on every grid child.
+
+   Palette: the fleet tokens from ../tools/lesson-shell/tokens.css (--navy,
+   --gold, --lite, --warm, --paper, --cream, --ink, --ink-2, --ink-3, --line,
+   --ok, --bad and their derived shades). --warm/--bad are reserved for
+   genuine failure states — a "wrong door" verdict, a source chip that failed
+   to resolve, a failing self-test row — never decoration.
+   ========================================================================== */
+
+/* --------------------------------------------------------------- pieces */
+
+.panel {
+  background: var(--cream); border: 1px solid var(--cream-deep);
+  border-radius: var(--radius-2); padding: 16px; margin: 0 0 18px;
+}
+.panel.warn { border-left: 3px solid var(--gold); }
+.help { color: var(--ink-3); font-size: .88rem; }
+.lead { font-size: 1.05rem; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.hr { height: 1px; background: var(--line); margin: 16px 0; border: 0; }
+
+/* Source chips. 36px is this repository's tap-target floor and a source chip
+   is a real target — on a phone it is what the sceptic reaches for first. */
+.src {
+  display: inline-block; min-height: 36px; line-height: 34px;
+  padding: 0 12px; border-radius: 8px;
+  border: 1px solid rgba(0,126,181,0.4);
+  color: var(--lite-deep); background: var(--lite-soft);
+  font-size: .72rem; font-weight: 700; text-decoration: none;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.src:hover { background: #C7E7F5; }
+.src.bad { color: var(--bad); border-color: var(--bad); background: var(--bad-soft); }
+.src-row { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+.src-title { color: var(--ink-3); font-size: .76rem; line-height: 1.35; flex: 1 1 220px; min-width: 0; }
+
+/* The three original honesty words (verified / reasoned / unconfirmed) ride
+   alongside the fleet's six-word kicker rather than replace it — the kit's
+   .panel-kicker/.k-* classes carry the kicker, this carries the demo's own
+   word as a small badge next to it, wherever the two need to sit side by
+   side outside a .panel-kicker (the grid cells, the door-detail cost/where
+   sections). */
+.conf-word {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  font-size: .64rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  cursor: help; white-space: nowrap;
+  background: var(--cream-deep); color: var(--ink-2);
+}
+
+.quote {
+  border-left: 3px solid var(--lite); padding: 2px 0 2px 12px; margin: 12px 0;
+  color: var(--ink); font-size: .9rem; font-style: italic;
+}
+
+/* Predict button groups (A2 captured predictions). */
+.predict-group {
+  display: flex; flex-wrap: wrap; gap: 7px; margin: 8px 0 4px;
+}
+.predict-lbl {
+  flex: 1 1 100%; font-size: .8rem; font-weight: 700; color: var(--ink-2);
+}
+.predict-opt {
+  min-height: 38px; padding: 7px 13px;
+  border-radius: 999px; border: 1px solid var(--line);
+  background: var(--paper); color: var(--ink); font: 700 .85rem/1.15 inherit; cursor: pointer;
+}
+.predict-opt:hover { border-color: var(--lite); }
+.predict-opt.chosen { border-color: var(--gold); background: #FFF6DC; color: var(--gold-deep); }
+.predict-opt:disabled { opacity: .55; cursor: default; }
+.lesson-strip .echo {
+  display: block; margin-top: 8px; padding: 8px 10px;
+  border-left: 3px solid var(--lite); background: var(--lite-soft);
+  border-radius: 0 var(--radius-2) var(--radius-2) 0;
+  font-size: .86rem; color: var(--ink);
+}
+.lesson-strip .echo.match { border-left-color: var(--ok); background: var(--ok-soft); }
+.lesson-strip .echo.miss { border-left-color: var(--gold); background: #FFF6DC; }
+
+/* ===================================================================== */
+/* STAGE 1 — the four doors against the four axes                        */
+/* ===================================================================== */
+
+#grid {
+  /* narrow default: four stacked cards */
+  display: flex; flex-direction: column; gap: 16px; margin: 0 0 18px;
+}
+
+.g-rail { display: none; }
+
+.g-group {
+  border: 1px solid var(--line); border-radius: var(--radius-2);
+  background: var(--paper); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+/* --- door header ------------------------------------------------------- */
+
+.g-door {
+  text-align: left; width: 100%;
+  padding: 13px 14px; border: 0; border-bottom: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--lite-soft), var(--paper));
+  color: var(--ink); font: inherit; cursor: pointer;
+  display: flex; flex-direction: column; gap: 3px; min-height: 56px;
+}
+.g-door:hover { background: linear-gradient(160deg, #C7E7F5, var(--paper)); }
+.g-door .d-n {
+  font-size: .62rem; font-weight: 800; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gold-deep);
+}
+.g-door .d-name { font-size: 1rem; font-weight: 800; line-height: 1.22; color: var(--navy); }
+.g-door .d-prod { font-size: .76rem; color: var(--ink-2); line-height: 1.4; }
+.g-door .d-more {
+  font-size: .68rem; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--lite-deep); margin-top: 2px;
+}
+
+/* --- a cell ----------------------------------------------------------- */
+
+.g-cell {
+  text-align: left; width: 100%;
+  padding: 11px 14px; border: 0; border-top: 1px solid var(--line);
+  background: transparent; color: var(--ink); font: inherit; cursor: pointer;
+  display: flex; flex-direction: column; gap: 6px; min-height: 56px;
+}
+.g-group .g-cell:first-of-type { border-top: 0; }
+.g-cell:hover { background: var(--cream); }
+.g-cell:focus-visible { outline: 2px solid var(--lite); outline-offset: -2px; }
+
+/* The axis name inside a cell. Shown on a phone, where there is no rail to
+   carry it; hidden at wide, where the rail says it once for the whole row. */
+.g-cell .c-axis {
+  font-size: .64rem; font-weight: 800; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.g-cell .c-head { font-size: .94rem; font-weight: 700; line-height: 1.32; color: var(--ink); }
+.g-cell .c-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* the four-segment meter */
+.bar { display: flex; gap: 3px; flex: none; }
+.bar i {
+  display: block; width: 15px; height: 7px; border-radius: 2px;
+  background: var(--cream-deep);
+}
+.bar i.on { background: var(--lite); }
+.g-cell[data-axis="check"] .bar i.on { background: var(--gold); }
+.g-cell .c-tap {
+  font-size: .64rem; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--lite-deep); opacity: .9;
+}
+
+/* the check row reads differently and is allowed to look different */
+.g-cell[data-axis="check"] { background: #FFF9EB; }
+.g-cell[data-axis="check"]:hover { background: #FFF2CE; }
+
+/* --- wide: become a real grid ----------------------------------------- */
+
+@media (min-width: 940px) {
+  #grid {
+    display: grid;
+    grid-template-columns: 168px repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    align-items: stretch;
+  }
+  /* the wrappers stop being boxes and their children join the grid */
+  .g-rail, .g-group { display: contents; }
+
+  .g-corner, .g-axis, .g-door, .g-cell {
+    grid-column: var(--col); grid-row: var(--row);
+  }
+
+  .g-corner {
+    display: flex; align-items: flex-end;
+    font-size: .68rem; font-weight: 800; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-3); padding-bottom: 8px;
+  }
+  .g-axis {
+    display: flex; flex-direction: column; justify-content: center; gap: 3px;
+    padding: 10px 12px 10px 0;
+    border-right: 1px solid var(--line);
+  }
+  .g-axis .a-n {
+    font-size: .6rem; font-weight: 800; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--gold-deep);
+  }
+  .g-axis .a-q { font-size: .88rem; font-weight: 800; line-height: 1.26; color: var(--navy); }
+  .g-axis .a-lead { font-size: .72rem; color: var(--ink-3); line-height: 1.35; }
+  .g-axis[data-axis="check"] .a-n { color: var(--lite-deep); }
+
+  .g-door {
+    border: 1px solid var(--line); border-radius: 12px 12px 0 0;
+    border-bottom: 0; min-height: 0; padding: 12px;
+  }
+  .g-cell {
+    border: 1px solid var(--line); border-top: 0;
+    background: var(--paper); min-height: 104px; padding: 12px;
+  }
+  .g-group .g-cell:first-of-type { border-top: 0; }
+  .g-cell[data-axis="check"] {
+    border-radius: 0 0 12px 12px;
+    background: #FFF9EB;
+    border-top: 1px solid #F3D98A;
+  }
+  .g-cell .c-axis { display: none; }
+  .g-cell .c-head { font-size: .9rem; }
+}
+
+/* --- the exception badge --------------------------------------------- */
+
+.g-cell .c-flag {
+  font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--gold-deep);
+  border: 1px solid #F3D98A; border-radius: 999px; padding: 1px 7px;
+}
+
+/* ===================================================================== */
+/* STAGE 2 — pick a job                                                  */
+/* ===================================================================== */
+
+#job-picker { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 0 0 12px; }
+@media (min-width: 700px)  { #job-picker { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1040px) { #job-picker { grid-template-columns: 1fr 1fr 1fr; } }
+
+.job-btn {
+  text-align: left; min-height: 56px; padding: 12px 14px;
+  border-radius: 12px; border: 1px solid var(--line);
+  background: var(--paper); color: var(--ink); font: inherit; cursor: pointer;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.job-btn:hover { border-color: var(--lite); background: var(--cream); }
+.job-btn.on { border-color: var(--gold); background: #FFF6DC; }
+.job-btn .j-n {
+  font-size: .6rem; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.job-btn.on .j-n { color: var(--gold-deep); }
+.job-btn .j-name { font-size: .92rem; font-weight: 700; line-height: 1.3; }
+
+#predict-door { margin: 0 0 16px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: var(--radius-2); }
+
+#job-out { margin: 0 0 18px; }
+#job-out.empty { display: none; }
+
+.j-head { margin: 0 0 14px; }
+.j-head h2 { margin: 0 0 6px; color: var(--navy); }
+.j-detail { color: var(--ink-2); font-size: .92rem; margin: 0; }
+
+.j-caution {
+  border: 1px solid #F3D98A; background: #FFF9EB;
+  border-radius: 12px; padding: 12px 14px; margin: 14px 0 0;
+  font-size: .88rem;
+}
+.j-caution b { color: var(--gold-deep); }
+
+/* the verdict for the smallest door that does the job */
+.j-best {
+  display: flex; flex-direction: column; gap: 4px;
+  border: 1px solid #BEE3D4; background: var(--ok-soft);
+  border-radius: 12px; padding: 13px 15px; margin: 16px 0;
+}
+.j-best .b-lbl {
+  font-size: .62rem; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ok);
+}
+.j-best .b-door { font-size: 1.04rem; font-weight: 800; color: var(--navy); }
+.j-best .b-note { font-size: .86rem; color: var(--ink-2); }
+
+#job-doors { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 780px)  { #job-doors { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1120px) { #job-doors { grid-template-columns: repeat(4, 1fr); } }
+
+.jd {
+  border: 1px solid var(--line); border-radius: 12px;
+  background: var(--paper); padding: 13px 14px;
+  display: flex; flex-direction: column; gap: 7px;
+}
+.jd.v-yes    { border-left: 3px solid var(--ok); }
+.jd.v-partly { border-left: 3px solid var(--gold); }
+.jd.v-no     { border-left: 3px solid var(--bad); }
+.jd.is-best  { box-shadow: 0 0 0 1px #BEE3D4; }
+
+.jd .jd-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.jd .jd-n {
+  font-size: .6rem; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.jd .jd-name { font-size: .9rem; font-weight: 800; line-height: 1.24; flex: 1 1 100%; color: var(--navy); }
+.jd .jd-v {
+  display: inline-block; padding: 3px 9px; border-radius: 999px;
+  font-size: .66rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+}
+.jd.v-yes    .jd-v { background: var(--ok-soft); color: var(--ok); }
+.jd.v-partly .jd-v { background: #FFF6DC;  color: var(--gold-deep); }
+.jd.v-no     .jd-v { background: var(--bad-soft); color: var(--bad); }
+.jd .jd-why { font-size: .86rem; line-height: 1.5; margin: 0; color: var(--ink); }
+.jd .jd-hand {
+  font-size: .8rem; color: var(--ink-2); border-top: 1px solid var(--line);
+  padding-top: 7px; margin: 0;
+}
+.jd .jd-hand b { color: var(--ink); font-weight: 700; }
+.jd .jd-axis {
+  font-size: .62rem; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--lite-deep);
+}
+
+/* ===================================================================== */
+/* STAGE 3 — receipts                                                    */
+/* ===================================================================== */
+
+.cols2 { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 840px) { .cols2 { grid-template-columns: 1fr 1fr; } }
+
+.chg {
+  border: 1px solid var(--line); border-radius: 12px;
+  background: var(--paper); padding: 0; margin: 0 0 12px; overflow: hidden;
+}
+.chg-toggle {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  border: 0; background: transparent; padding: 14px; font: inherit; color: inherit;
+}
+.chg-toggle:hover { background: var(--cream); }
+.chg-body { padding: 0 14px 14px; }
+.chg .c-move {
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+  font-size: 1rem; font-weight: 800; margin-bottom: 4px;
+}
+.chg .c-was { color: var(--ink-3); text-decoration: line-through; }
+.chg .c-arrow { color: var(--gold-deep); }
+.chg .c-now { color: var(--ink); }
+.chg .c-what {
+  font-size: .64rem; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--lite-deep); margin-bottom: 8px;
+}
+.chg .c-body { font-size: .9rem; margin: 0; color: var(--ink); }
+.chg .c-claim { font-size: .96rem; font-weight: 700; margin: 0 0 6px; color: var(--navy); }
+
+.slist { list-style: none; margin: 0; padding: 0; }
+.slist li {
+  padding: 8px 0 8px 20px; position: relative;
+  font-size: .9rem; border-top: 1px solid var(--line);
+}
+.slist li:first-child { border-top: 0; }
+.slist li::before {
+  content: ""; position: absolute; left: 3px; top: 17px;
+  width: 7px; height: 7px; border-radius: 2px;
+}
+.slist.rot li::before  { background: var(--gold); }
+.slist.keep li::before { background: var(--lite); }
+
+.cut-item { padding: 11px 0; border-top: 1px solid var(--line); }
+.cut-item:first-child { border-top: 0; }
+.cut-item b { display: block; font-size: .92rem; margin-bottom: 3px; color: var(--navy); }
+.cut-item span { font-size: .86rem; color: var(--ink-2); }
+
+.source-item {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  padding: 10px 0; border-top: 1px solid var(--line);
+}
+.source-item:first-child { border-top: 0; }
+
+/* the detail sheet a cell/door opens (#item-details, not the kit's #details) */
+#item-details-body .d-axis {
+  font-size: .64rem; font-weight: 800; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--gold-deep); margin-bottom: 6px;
+}
+#item-details-body .d-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+#item-details-body .d-bar-text { font-size: .86rem; color: var(--ink-2); flex: 1 1 200px; }
+#item-details-body .lead { font-size: 1rem; }
+
+#selftest-out:empty { display: none; }
+.st-head {
+  margin-top: 10px; padding: 8px 11px; border-radius: 9px;
+  font-weight: 800; font-size: .88rem;
+}
+.st-head.good { background: var(--ok-soft); color: var(--ok); }
+.st-head.bad  { background: var(--bad-soft);  color: var(--bad); }
+.st-list { list-style: none; margin: 8px 0 0; padding: 0; max-height: 240px; overflow-y: auto; }
+.st-list li { display: flex; gap: 8px; padding: 4px 0; font-size: .8rem; border-top: 1px solid var(--line); }
+.st-list li b { flex: none; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .74rem; }
+.st-list li.ok b { color: var(--ok); }
+.st-list li.no b { color: var(--bad); }
+.st-list li span { color: var(--ink-2); }
+
+@media print {
+  .btn, .icon-btn, #job-picker { display: none !important; }
+  .panel, .g-group, .jd, .chg { border-color: #999; }
+}

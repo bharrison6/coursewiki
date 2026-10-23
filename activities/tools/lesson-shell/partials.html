@@ -1,0 +1,391 @@
+<!-- ===========================================================================
+     lesson-shell / partials.html — the markup for each template part.
+
+     THIS FILE IS NOT INJECTED. It is a reference sheet: copy the snippet you
+     need into your demo's src/template.html and fill in the ALL-CAPS slots.
+     Only tokens.css, shell.css and the two .js modules are consumed by a
+     build; this file exists so the next builder does not have to reverse the
+     class vocabulary out of the stylesheet.
+
+     Replace every ALL-CAPS placeholder. A placeholder left in the built file
+     is caught by check-shell.js, which refuses a built index.html containing
+     any of them.
+
+     IDS THE KIT RESERVES. Every id spelled in this file belongs to the shell's
+     own behaviour script, which looks them up by name. Do not reuse one for
+     your own element:
+
+       brandbar  guide  guide-open  guide-title  settings  settings-open
+       settings-title  settings-menu  presenter-notes  presenter-notes-title
+       details  details-title  details-subtitle  presentation-btn
+       presentation-foot  reset-btn
+
+     plus the per-stage tab-N / stage-N / stage-N-title / cue-N / check-N-title
+     family. `details` is the one that has actually bitten — see the A5 note
+     below. check-shell.js refuses a built file that defines any id twice, so a
+     collision fails the build rather than silently half-working.
+
+     ONE RESERVED CLASS, as of v3: `.hidden`. The kit backs it with
+     `display: none !important`, because five demos had each written that exact
+     rule for themselves and a retrofit that deletes the demo's chrome
+     stylesheet takes it away while the JS keeps toggling the class. Do not
+     redefine it; check-shell.js fails a build that does. Prefer the `hidden`
+     ATTRIBUTE in new markup and new code — it is the platform's, it says the
+     right thing to assistive technology, and the kit covers it too.
+
+     THE A2 STAGE INTRO IS COLLAPSIBLE AT PHONE WIDTH and you do not mark that
+     up here (v3, operator ruling 2026-09-16). The shell wraps `.lesson-strip`
+     in a <details class="intro-more"> at runtime and closes it at <=480px.
+     Author the intro exactly as shown below; see ADOPTING.md §4b for what the
+     disclosure assumes about your markup — chiefly that `.stage-question` is
+     never hidden at phone width and that your prediction echo lives in `.echo`
+     inside the strip.
+
+     Order on the page: header (A0) -> stage tablist (A1) -> one section.stage
+     per stage, each containing stage intro (A2) + activity (A3/A4) + check
+     (A6) -> footer (A0) -> dialogs (A5, A7, A8, notes) -> credit pill (A0).
+     =========================================================================== -->
+
+
+<!-- ===== A0 HEADER + A1 STAGE TABLIST =======================================
+     .brand-kicker is `Murray State University · <tour part label>` taken from
+     tours/*.json — "Part one · What AI is", "Part four · Example projects".
+     Not an invented collection name.
+
+     The Notes button is first in the DOM but CSS-hidden until presentation
+     mode (A8). Guide and Settings are always visible and always in this order.
+     ========================================================================== -->
+<header class="top" id="brandbar">
+  <div class="topline">
+    <div class="brandline">
+      <span class="brand-kicker">Murray State University · PART FOUR · EXAMPLE PROJECTS</span>
+      <h1>DEMO DISPLAY TITLE</h1>
+      <div class="msu-brand">Murray State University</div>
+    </div>
+    <div class="top-tools">
+      <button class="icon-btn notes-open" type="button" title="Open Presenter Notes" aria-label="Open Presenter Notes">Notes</button>
+      <button class="icon-btn guide-open" type="button" id="guide-open" title="Guide" aria-label="Guide"><span aria-hidden="true">?</span><span class="icon-label">Guide</span></button>
+      <button class="icon-btn" type="button" id="settings-open" title="Settings" aria-label="Settings"><span aria-hidden="true">&#9881;</span><span class="icon-label">Settings</span></button>
+    </div>
+  </div>
+  <!-- One tab per stage, 2 to 4 stages. Each tab: short name + a one-line
+       question subtitle THAT ENDS IN "?". Roving tabindex: the selected tab is
+       0 and every other is -1, so Tab enters the list once and Arrow keys move
+       within it. Wire the keyboard with stageNavScript() from index.js. -->
+  <nav class="stages" role="tablist" aria-label="LESSON STAGES">
+    <button class="stage-tab" type="button" role="tab" id="tab-1" aria-controls="stage-1" aria-selected="true" tabindex="0">
+      <span class="stage-mark" aria-hidden="true">1</span><span>SHORT NAME</span><small>ONE LINE QUESTION?</small>
+    </button>
+    <button class="stage-tab" type="button" role="tab" id="tab-2" aria-controls="stage-2" aria-selected="false" tabindex="-1">
+      <span class="stage-mark" aria-hidden="true">2</span><span>SHORT NAME</span><small>ONE LINE QUESTION?</small>
+    </button>
+  </nav>
+</header>
+
+
+<!-- ===== A2 STAGE INTRO (inside each section.stage, first child) ===========
+     Three fixed lines in this order, then the lesson strip:
+       1. eyebrow   `Demo N of 17 · Part <x> · Stage <k>` — places the demo on
+                    the path. A Part-four demo may carry its discipline too.
+       2. h2 + .stage-question — the serif stage title and ONE real question
+                    the activity will answer. No second question on the screen.
+                    NO objective line: "You will be able to..." is struck
+                    (operator amendment 2026-09-15). The goal is carried by the
+                    question above and the Takeaway below.
+       3. .refresh  "Before you start" — two or three sentences refreshing the
+                    prerequisite THIS stage leans on and nothing more. Bold
+                    each key term on first use and define it in place. For a
+                    demo after the first, also name what the previous demo
+                    handed forward.
+     ========================================================================== -->
+<section class="stage on" id="stage-1" role="tabpanel" aria-labelledby="tab-1" tabindex="-1">
+  <section class="stage-intro" aria-labelledby="stage-1-title">
+    <div class="intro-copy">
+      <span class="eyebrow">Demo N of 17 &middot; Part FOUR &middot; DISCIPLINE &middot; Stage 1</span>
+      <h2 id="stage-1-title">STAGE TITLE</h2>
+      <p class="stage-question">THE ONE QUESTION THIS STAGE ANSWERS?</p>
+      <p class="refresh"><b>Before you start.</b> TWO OR THREE SENTENCES. Bold a
+        <b>key term</b> and define it right here.</p>
+    </div>
+    <!-- data-details selects which .details-stage the drawer shows. -->
+    <button class="details-trigger" type="button" data-details="0" aria-label="Details">Details <span aria-hidden="true">&rarr;</span></button>
+    <!-- Fixed labels, this order, always three. Predict is FIRST and names a
+         specific outcome; where the activity can capture the prediction it
+         must, and the observed result is then echoed in .echo. Try names the
+         exact control in bold. Takeaway is the stage's learning goal in plain
+         words, written as a CLAIM, and it is what the A6 check tests. -->
+    <div class="lesson-strip" aria-label="Stage 1 learning guide">
+      <article><span>Predict</span><p>A CONCRETE PREDICTION PROMPT NAMING A SPECIFIC OUTCOME?</p><span class="echo" hidden></span></article>
+      <article><span>Try</span><p>Press <b>EXACT CONTROL NAME</b> and WHAT HAPPENS.</p></article>
+      <article><span>Takeaway</span><p>A PLAIN DECLARATIVE CLAIM OF WHAT YOU NOW KNOW.</p></article>
+    </div>
+  </section>
+
+  <!-- ===== A3 THE ACTIVITY ================================================
+       The demo's own engine, data and interaction — unchanged. Two template
+       obligations apply INSIDE it:
+         * every panel and readout carries exactly one provenance kicker, from
+           the SIX words and no others;
+         * every control carries a purpose label saying what changes and why.
+
+       THE SIX, and what each one commits you to:
+         Live          computed here, now
+         Measured      computed here earlier and stored — say when, say the seed
+         Sourced       a published number — it MUST resolve to a Sources entry
+                       in the Details drawer
+         Reasoned      the authors' own judgement, from criteria the page shows
+         Scripted      a hand-authored fixture standing in for what a live
+                       system would have produced — say what is fixed
+         Illustrative  invented numbers — say so
+
+       Sourced vs Reasoned is the distinction people get wrong. A number you
+       read somewhere is Sourced. A verdict you reached yourself from stated
+       criteria is Reasoned, and it is honest to own it as judgement — do not
+       dress it as a citation, and do not demote it to Illustrative, which
+       claims you invented it.
+
+       A QUALIFIER IS NOT A LABEL. Each kicker may carry ONE optional free-text
+       honesty rider in a .k-qual span, subordinate to the label and never
+       replacing it. Write your own string; the kit does not enumerate kinds.
+       Four that real audits asked for:
+
+         Sourced · unconfirmed since 2026-09-08     staleness
+         Sourced · typical, range 250–400 MPa       one point in a real spread
+         Sourced · specified minimum, not typical   the value is a floor
+         Sourced · IRC 2021 — differs under IBC     code/edition-dependent
+
+       An uncheckable published figure is still `Sourced`. Rendering it as
+       Illustrative would say you made it up, which is a worse claim than the
+       truth. Same for a ranged quantity shown at one point: still Sourced,
+       honestly narrowed by its rider. If a reveal shows a single number for a
+       quantity that is really a range, the rider is where you say so.
+       ==================================================================== -->
+  <section class="workbench" aria-labelledby="act-1-heading">
+    <div class="panel-head">
+      <div>
+        <span class="panel-kicker"><span class="k-live">Live</span> WHAT IS LIVE HERE</span>
+        <h3 id="act-1-heading">PANEL TITLE</h3>
+      </div>
+    </div>
+    <!-- A kicker carrying a qualifier looks like this. The label is the thing
+         you read first; the qualifier is quieter on purpose. -->
+    <!-- <span class="panel-kicker"><span class="k-sourced">Sourced</span
+         ><span class="k-qual">unconfirmed since 2026-09-08</span> vendor pricing page</span> -->
+    <p class="panel-lede">ONE SENTENCE ON WHAT THIS PANEL IS.</p>
+
+    <label class="control-label" for="some-control">CONTROL NAME
+      <span class="why">What it changes, and why you would change it.</span></label>
+    <!-- ... the demo's own control ... -->
+
+    <!-- ===== A4 OBSERVATION CUE ==========================================
+         One aria-live line naming the thing to notice AT THE MOMENT it becomes
+         true. It must appear within one screen of the control that caused it.
+         Leave it empty on load; :empty hides it.
+         ================================================================== -->
+    <p class="obs-cue" id="cue-1" role="status" aria-live="polite"></p>
+  </section>
+
+  <!-- ===== A6 CHECK YOURSELF =============================================
+       One or two items per stage, answerable from what was just observed.
+       WRITTEN FEEDBACK FOR EVERY OPTION — not just the right one. At least one
+       item per demo is a REFUTATION item: its wrong option states the flawed
+       model the stage could leave, and its feedback names why it is wrong.
+       Mark it data-refutation="true" so a reviewer can find it.
+       No score is kept unless the demo already keeps one.
+
+       THE FEEDBACK LEAD IS YOURS (v3). The shell writes a bold lead and then
+       your data-feedback. It takes that lead from data-correct-lead /
+       data-wrong-lead on THIS section, defaulting to the demo-neutral
+       "Correct." and "Not quite." Set your own where your demo has a better
+       word for it. Until v3 the kit hardcoded one demo's sentence — "Not what
+       the detector showed." — into the shared handler, and it rendered in
+       every built demo whatever its subject; check-shell.js now fails that.
+       ==================================================================== -->
+  <section class="check" aria-labelledby="check-1-title" data-refutation="true"
+           data-correct-lead="Correct." data-wrong-lead="Not quite.">
+    <span class="eyebrow">Check yourself</span>
+    <h3 id="check-1-title">ONE RETRIEVAL QUESTION FROM THIS STAGE?</h3>
+    <p class="check-prompt">OPTIONAL ONE-LINE SETUP.</p>
+    <div class="check-options">
+      <button class="check-option correct" type="button" aria-pressed="false"
+              data-feedback="Why this is right, in one or two sentences.">CORRECT OPTION</button>
+      <button class="check-option wrong" type="button" aria-pressed="false"
+              data-feedback="Names the misconception and why the observation rules it out.">THE FLAWED MODEL, STATED</button>
+    </div>
+    <p class="check-feedback" role="status" aria-live="polite"></p>
+  </section>
+</section>
+
+
+<!-- ===== A0 FOOTER ======================================================== -->
+<div class="footer">
+  <span>Bryant Harrison &middot; Murray State University</span><br>
+  <span>One HTML file &middot; runs offline</span>
+  <div class="footer-tools">
+    <button type="button" class="footer-link guide-open">Guide</button><span aria-hidden="true">&middot;</span>
+    <button type="button" class="footer-link" id="presentation-foot">Presentation mode</button><span aria-hidden="true">&middot;</span>
+    <button type="button" class="footer-link notes-open">Presenter Notes</button>
+  </div>
+</div>
+
+
+<!-- ===== A7 GUIDE (opens on load) =========================================
+     CONTRACT.md: a `?` button in the header whose accessible name is exactly
+     Guide, opening this overlay on first load, dismissible, reopenable.
+     Body <= 250 words, in order: lede with the demo-level question; "Where
+     this sits" (the learning-path line); ordered steps, one per stage, control
+     names bold; "Getting around"; time expectations; the printable link.
+     Every bolded control must exist. No teaching prose that is not also in the
+     presenter guide.
+     ======================================================================== -->
+<dialog class="lesson-dialog" id="guide" aria-labelledby="guide-title">
+  <div class="lesson-dialog-head">
+    <h2 id="guide-title">Guide<span class="head-sub">how to use this demo</span></h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body">
+    <p class="lede">THE DEMO-LEVEL QUESTION, ONCE.</p>
+    <p class="note">WHERE THIS SITS: one sentence from the learning path.</p>
+    <ol>
+      <li><b>STAGE ONE NAME.</b> Press <b>CONTROL</b>, then WHAT TO DO.</li>
+    </ol>
+    <h3>Getting around</h3>
+    <p>The stage tabs switch stages. <b>Details</b> opens the evidence and
+      limits for the current stage. <b>Guide</b> reopens this card;
+      <b>Settings</b> has <b>Open Presenter Notes</b>, <b>Presentation mode</b>
+      and <b>Reset</b>.</p>
+    <h3>Time</h3>
+    <p>HOW LONG THE WHOLE THING TAKES, AND ANY SLOW STEP.</p>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Start with STAGE ONE NAME</button></form>
+</dialog>
+
+
+<!-- ===== A8 SETTINGS ======================================================
+     The contract triad FIRST, in this order, labelled EXACTLY:
+       Open Presenter Notes / Presentation mode / Reset
+     Presentation mode adds the header Notes button and bumps --u.
+
+     Reset restores fresh-load demo state IN PLACE — no page reload (operator
+     ruling 2026-09-16). It LEAVES PRESENTATION MODE ALONE and does not reopen
+     the Guide. The shell restores what the kit owns and then dispatches
+     `lessonreset`; YOUR app.js must listen for it and restore the activity.
+     That handler is a required part of the template, not an optional extra —
+     see the Reset section of index.js and ADOPTING.md.
+
+     Write the .setnote to say what a learner will actually see come back, in
+     this demo's own nouns ("every answer cleared, stage 1, the timeline
+     rewound"), not the generic sentence.
+
+     Demo-specific options follow the triad, never before it.
+     ======================================================================== -->
+<dialog class="lesson-dialog" id="settings" aria-labelledby="settings-title">
+  <div class="lesson-dialog-head">
+    <h2 id="settings-title">Settings</h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body" id="settings-menu">
+    <h3>Presenter notes</h3>
+    <p class="setnote">The printable session plan, on screen.</p>
+    <p><button class="btn notes-open" type="button">Open Presenter Notes</button></p>
+    <h3>Presentation mode</h3>
+    <p class="setnote">Scales the page up one notch for projecting to a room, and puts a <b>Notes</b> button in the header.</p>
+    <p><button class="btn ghost" type="button" id="presentation-btn" aria-pressed="false">Presentation mode</button></p>
+    <h3>Reset</h3>
+    <p class="setnote">Back to the start: WHAT THIS DEMO PUTS BACK, IN ITS OWN NOUNS. Presentation mode stays as you set it.</p>
+    <p><button class="btn ghost" type="button" id="reset-btn">Reset</button></p>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Done</button></form>
+</dialog>
+
+
+<!-- ===== A5 DETAILS DRAWER ================================================
+     One .details-stage per stage. FIVE FIXED SECTIONS, in this order, in every
+     one of them:
+       1. What is live / measured / sourced / scripted  (mirrors the A3 kickers)
+       2. How it works        — the mechanism, with the formula or algorithm named
+       3. Assumptions and simplifications  — a bullet list. This is the
+          operator's "acknowledgement of assumptions"; a simplification a
+          domain reviewer can name and this list cannot is a defect.
+       4. Sources             — every Sourced kicker must resolve to an entry here
+       5. Boundary            — .evidence-card: what this demo does NOT claim
+     KNOWN ADOPTION TRAP: TWO DIFFERENT THINGS CALLED "DETAILS". This drawer is
+     PER-STAGE and FIXED — boundary, assumptions, sources for the stage as a
+     whole. It is not a place to show one timeline event, one grid cell or one
+     row. A demo that already has a per-ITEM drill-down has a second, unrelated
+     mechanism that belongs to the activity (A3) and must keep its own dialog
+     and its own id: two-winters uses #item-details, and a "Details" button on
+     each cell whose aria-label names the cell. Do NOT fold the two together —
+     the per-item content would displace the stage's boundary and sources, and
+     reusing the id `details` silently breaks whichever element the shell's
+     querySelector does not reach. check-shell.js fails a duplicate id, but the
+     design decision is yours to get right before it gets there.
+
+     DETAIL PROSE NEEDS LABELS TOO. A demo can label every grid cell in its
+     activity and leave the drawer's prose unlabeled — and the unlabeled
+     surface is exactly where an uncertain claim hides (this is the second
+     structural finding of the front-doors accuracy audit, 2026-09-15). So any
+     prose block here that carries a claim is wrapped in `.claim` and OPENS
+     with a kicker. check-shell.js enforces two things: every .details-stage
+     carries at least one kicker, and every .claim block opens with one.
+     ======================================================================== -->
+<dialog class="details-sheet" id="details" aria-labelledby="details-title">
+  <div class="details-drawer">
+    <div class="lesson-dialog-head">
+      <h2 id="details-title">Details<span class="head-sub" id="details-subtitle">STAGE NAME</span></h2>
+      <form method="dialog"><button type="submit" aria-label="Close Details">&times;</button></form>
+    </div>
+    <div class="details-body" tabindex="0" role="region" aria-label="Stage details">
+      <section class="details-stage on" data-details-stage="0">
+        <span class="eyebrow">What is live</span>
+        <h3>WHAT THE PAGE ACTUALLY COMPUTES</h3>
+        <p>Name each panel and which of the six words applies to it.</p>
+        <div class="claim">
+          <span class="panel-kicker"><span class="k-live">Live</span> WHICH PANEL</span>
+          <p>THE CLAIM THIS BLOCK MAKES.</p>
+        </div>
+        <!-- A judgement the authors own, not a citation: -->
+        <!-- <div class="claim">
+               <span class="panel-kicker"><span class="k-reasoned">Reasoned</span> our verdict</span>
+               <p>Why, from the criteria shown above.</p>
+             </div> -->
+        <h3>How it works</h3>
+        <div class="details-formula">THE FORMULA, IF THERE IS ONE</div>
+        <p>THE MECHANISM.</p>
+        <h3>Assumptions and simplifications</h3>
+        <ul><li>EACH ONE, PLAINLY.</li></ul>
+        <h3>Sources</h3>
+        <ul><li><a href="https://EXAMPLE" target="_blank" rel="noopener">SOURCE</a> — what it supports.</li></ul>
+        <div class="evidence-card"><b>Boundary:</b> WHAT THIS DEMO DOES NOT CLAIM.</div>
+      </section>
+    </div>
+    <form method="dialog" class="lesson-dialog-actions"><button type="submit">Back to activity</button></form>
+  </div>
+</dialog>
+
+
+<!-- ===== PRESENTER NOTES = THE PRINTABLE GUIDE ============================
+     build.js injects the .guide-scope body of src/demo-guide.html at the
+     marker below and its scoped stylesheet at /*__GUIDE_CSS__*/ in <head>.
+     One source, nothing fetched, and `node build.js --check` fails the moment
+     the two drift. DO NOT hand-edit the notes here — edit src/demo-guide.html.
+     ======================================================================== -->
+<dialog class="lesson-dialog" id="presenter-notes" aria-labelledby="presenter-notes-title">
+  <div class="lesson-dialog-head">
+    <h2 id="presenter-notes-title">Presenter Notes<span class="head-sub">the printable guide, on screen</span></h2>
+    <form method="dialog"><button type="submit" aria-label="Close">&times;</button></form>
+  </div>
+  <div class="lesson-dialog-body guide-host">
+<!--__GUIDE__-->
+    <p class="guide-print"><a href="demo-guide.html" target="_blank" rel="noopener">Open the printable copy (demo-guide.html)</a> &mdash; the same document, laid out for print; the PDF beside it is a render of that file.</p>
+  </div>
+  <form method="dialog" class="lesson-dialog-actions"><button type="submit">Back to the demo</button></form>
+</dialog>
+
+
+<!-- ===== A0 CREDIT PILL ===================================================
+     Last element in the body. Text is EXACTLY this — no build-provenance
+     suffix; that lives in demo.json built_with. Styling is in shell.css; the
+     markup carries no inline style.
+     ======================================================================== -->
+<div class="bh-credit">Bryant Harrison &middot; Murray State University</div>

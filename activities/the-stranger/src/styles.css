@@ -1,0 +1,276 @@
+/* ===========================================================================
+   the-stranger / src/styles.css — THE ACTIVITY'S styles only.
+
+   Injected AFTER tokens.css + shell.css, so anything here outranks a shell rule
+   without !important. Nothing in this file styles a template part: the header,
+   the stage tablist, the stage intro, the lesson strip, the Details drawer, the
+   check cards, the four dialogs, the footer and the credit pill are all the
+   kit's, and duplicating them here is the "two rules fighting" failure
+   ADOPTING.md section 2 warns about.
+
+   WHAT WAS DELETED when this demo adopted the kit, recorded so the next reader
+   does not go looking for it:
+     * the whole `.modal` / `.sheet` overlay system, its Escape handler, its
+       backdrop-click handler, [data-close] and syncOverlayFlag() — the kit's
+       four native <dialog> elements do all of it;
+     * `#bar`, `.tabrow`, `.brand`, `.lamp`, `.barright` — the demo's toolbar;
+     * `#guide` (the student walkthrough bar) — RETIRED. Its eight steps and
+       twelve quizzes became the A6 check bank. It also collided with the kit's
+       reserved `#guide` dialog id, which check-shell would have failed;
+     * `.mrow`/`.mhd`/`.msep`/`.tsw` — the demo's settings menu;
+     * `#modeBanner` and the presenter/student mode CSS — presentation mode is
+       the kit's now;
+     * the dark page theme: `--bg`, `--bg2`, `--panel`, `--ink`, `--dim`, the
+       streetlamp gradients, `overflow:hidden`, the full-viewport flex column;
+     * `.hidden`. The kit ships `[hidden]{display:none!important}` and NO
+       `.hidden` rule, so a surviving class toggle would render its panel
+       stacked with nothing to hide it and no static check could see it. Every
+       site was converted to the `hidden` ATTRIBUTE instead (progress file S3).
+
+   WHAT SURVIVED, and why each earns its place:
+     * the lever switches, the assembled-prompt blocks, the target deck and its
+       draw animation, the typewriter caret, the jargon marks, the score strip.
+       Those ARE the activity.
+   =========================================================================== */
+
+/* --- the demo's own tokens ------------------------------------------------
+   Additions, never renames: the kit's A0 set is required verbatim and a demo
+   that needs a colour the kit lacks ADDS a token (tokens.css head comment).
+
+   LEVER 3 VIOLET IS THE ONE SANCTIONED NON-BRAND HUE. It is not decoration and
+   it is not a mistake: the three lever colours are a code printed on the
+   physical cut-out cards a presenter hands round the room, so gold / lite /
+   violet exist on paper before they exist on screen. Changing it here would
+   desynchronise the screen from the props. Documented on the face of the demo
+   in the A5 Details drawer, stage 3, under Assumptions. */
+:root {
+  --lv1: var(--gold);           /* lever 1 — context */
+  --lv2: var(--lite);           /* lever 2 — success spec */
+  --lv3: #6C4BC4;               /* lever 3 — expert keywords. Non-brand, sanctioned. */
+  --lv3-soft: #EEE8FB;
+  --lv3-on-navy: #C3AEF5;
+  --stream: 420;                /* typewriter rate, characters per second */
+}
+
+/* --- A2 captured prediction ----------------------------------------------
+   The Predict card takes an actual answer, so the observed result can be shown
+   BESIDE the prediction instead of merely asserted in prose. Without this the
+   Predict card is a rhetorical question and the .echo has nothing to compare.
+
+   The text-transform reset is not cosmetic fussiness: the kit styles
+   `.lesson-strip article span` with `text-transform: uppercase` (it is the
+   rule that makes the PREDICT / TRY / TAKEAWAY labels caps), and `.echo` is a
+   <span> inside that article, so the observed-result sentence rendered as
+   "OBSERVED: WHO IT IS AIMED AT." The kit's own `.lesson-strip .echo` rule
+   sets colour and size but never resets the transform. Caught in a browser at
+   1024px; it is on the friction list for kit v3. */
+.lesson-strip .echo { text-transform: none; letter-spacing: normal; font-weight: 400; }
+.lesson-strip .echo b { font-weight: 800; }
+
+.predict-opts { display: grid; gap: 5px; margin-top: 7px; }
+.predict-opt {
+  min-height: 40px; border: 1px solid var(--line); border-radius: var(--radius-2);
+  padding: 6px 10px; background: var(--paper); color: var(--ink);
+  font-size: calc(var(--u) * .76); font-weight: 650; text-align: left;
+  text-transform: none; letter-spacing: normal;
+}
+.predict-opt:hover { border-color: var(--navy); background: var(--cream); }
+.predict-opt[aria-pressed="true"] { border-color: var(--navy); border-width: 2px; background: var(--paper); font-weight: 850; }
+.predict-opt[aria-pressed="true"]::before { content: "\2713 "; color: var(--gold-deep); font-weight: 900; }
+
+/* --- scenario tabs: INSIDE the activity, not the stage nav ----------------
+   The stage tabs (A1) are the three levers. These four are the four questions,
+   and they belong to the activity: switching question is not switching lesson
+   stage. Kept visually distinct from .stage-tab for exactly that reason. */
+.scenarios { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 4px; }
+.scenario-tab {
+  min-height: 40px; border: 1px solid var(--line); border-radius: 999px;
+  padding: 6px 13px; background: var(--paper); color: var(--ink-2);
+  font-size: calc(var(--u) * .82); font-weight: 750;
+}
+.scenario-tab:hover { border-color: var(--navy); }
+.scenario-tab[aria-pressed="true"] { border-color: var(--navy); background: var(--navy); color: #fff; }
+
+/* --- the three levers ----------------------------------------------------- */
+.levers { display: grid; gap: 9px; margin-top: 4px; }
+.lever { border: 1px solid var(--line); border-radius: var(--radius-2); background: var(--paper); overflow: hidden; }
+.lever-head {
+  display: flex; align-items: center; gap: 11px; width: 100%;
+  padding: 11px 13px; background: transparent; text-align: left;
+}
+.lever-head:hover { background: var(--cream); }
+.lever .num {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 1.9em; height: 1.9em; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--cream);
+  color: var(--ink-2); font-size: calc(var(--u) * .82); font-weight: 850;
+}
+.lever .txt { flex: 1 1 auto; min-width: 0; }
+.lever .nm { display: block; color: var(--navy); font-size: calc(var(--u) * .84); font-weight: 850; letter-spacing: .06em; }
+.lever .tg { display: block; margin-top: 2px; color: var(--ink-3); font-size: calc(var(--u) * .76); line-height: 1.35; }
+.sw { flex: 0 0 auto; position: relative; width: 2.6em; height: 1.4em; border-radius: 999px; border: 1px solid var(--line); background: var(--cream-deep); transition: .2s; }
+.sw::after { content: ""; position: absolute; top: 50%; left: .16em; transform: translateY(-50%); width: 1em; height: 1em; border-radius: 50%; background: var(--paper); box-shadow: 0 1px 3px rgba(0,0,0,.28); transition: .2s; }
+.lever.on .sw::after { left: calc(100% - 1.16em); }
+.lever.on { border-color: var(--navy); }
+.lever[data-l="0"].on { box-shadow: inset 4px 0 0 var(--lv1); }
+.lever[data-l="0"].on .sw { background: var(--lv1); border-color: var(--lv1); }
+.lever[data-l="1"].on { box-shadow: inset 4px 0 0 var(--lv2); }
+.lever[data-l="1"].on .sw { background: var(--lv2); border-color: var(--lv2); }
+.lever[data-l="2"].on { box-shadow: inset 4px 0 0 var(--lv3); }
+.lever[data-l="2"].on .sw { background: var(--lv3); border-color: var(--lv3); }
+/* The stage's own lever is raised, so a learner can see which one this stage
+   is about without the other two being hidden — hiding them would destroy the
+   demo's method, which is flipping ONE lever and watching ONE dimension move. */
+.lever.focus-lever { border-width: 2px; border-color: var(--navy); }
+.lever.focus-lever .nm::after { content: " — this stage"; color: var(--gold-deep); font-size: .82em; letter-spacing: .04em; }
+
+/* what leaving this lever in this position costs you, said BEFORE you ask */
+.conseq { padding: 9px 13px 11px; border-top: 1px dashed var(--line); color: var(--ink-2); font-size: calc(var(--u) * .78); line-height: 1.5; }
+.conseq b { color: var(--navy); font-weight: 800; }
+.lever[data-l="0"].on .conseq { background: #FFF8E4; }
+.lever[data-l="1"].on .conseq { background: var(--lite-soft); }
+.lever[data-l="2"].on .conseq { background: var(--lv3-soft); }
+
+/* --- the target deck lives INSIDE lever 2, because it IS lever 2 ---------- */
+.deckrow { display: flex; align-items: center; gap: 12px; padding: 2px 13px 10px; }
+.decknames { display: flex; flex-direction: column; gap: 2px; min-width: 0; color: var(--ink-3); font-size: calc(var(--u) * .72); line-height: 1.3; }
+.deckrow.gone .decknames { text-decoration: line-through; opacity: .55; }
+.deck { position: relative; flex: 0 0 auto; width: 3.4em; height: 2.2em; transition: transform .6s cubic-bezier(.5,-0.4,.3,1.4), opacity .5s; }
+.deck i { position: absolute; inset: 0; border-radius: 6px; border: 1px solid var(--cream-deep); background: linear-gradient(160deg, #FFFDF8, #EBE0CA); box-shadow: 0 2px 5px rgba(0,33,68,.18); }
+.deck i:nth-child(1) { transform: translate(-4px,-3px) rotate(-6deg); }
+.deck i:nth-child(2) { transform: translate(-1px,-1px) rotate(-2deg); }
+.deck i:nth-child(3) { background: linear-gradient(160deg, var(--lv3-soft), #DFD4F6); }
+.deck.gone { transform: translateX(-14%) rotate(-15deg) scale(.9); opacity: .32; filter: grayscale(1); }
+.rehearse { display: none; flex-wrap: wrap; align-items: center; gap: 7px; padding: 0 13px 11px; }
+body.presenter .rehearse { display: flex; }
+.rehearse select { min-height: 40px; max-width: 13em; border: 1px solid var(--line); border-radius: var(--radius-2); padding: 6px 9px; background: var(--paper); color: var(--ink); }
+
+/* --- the assembled prompt ------------------------------------------------- */
+.prompt-box { max-height: 34vh; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-2); padding: 11px; background: var(--cream); font-size: calc(var(--u) * .82); line-height: 1.55; }
+.pblock { margin: 6px 0; padding: 6px 10px; border-left: 3px solid var(--line); border-radius: 0 8px 8px 0; background: var(--paper); animation: slidein .28s ease both; }
+.pblock.base { border-color: var(--ink-3); color: var(--ink); font-weight: 650; }
+.pblock.c1 { border-color: var(--lv1); background: #FFF8E4; }
+.pblock.c2 { border-color: var(--lv2); background: var(--lite-soft); }
+.pblock.c3 { border-color: var(--lv3); background: var(--lv3-soft); }
+.pblock .lbl { display: block; margin-bottom: 2px; font-size: calc(var(--u) * .66); font-weight: 850; letter-spacing: .12em; text-transform: uppercase; opacity: .7; }
+@keyframes slidein { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: none } }
+.attach { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; margin: 6px 0; padding: 6px 11px; border: 1px dashed var(--line); border-radius: 8px; background: var(--paper); color: var(--ink-2); font-size: calc(var(--u) * .8); }
+.attach:hover { border-color: var(--gold); color: var(--gold-deep); }
+.ask-row { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 12px; }
+.ask-hint { color: var(--ink-3); font-size: calc(var(--u) * .78); }
+
+/* --- the answer surface: navy, because it is the "live machine" panel -----
+   Navy is the kit's surface for a live readout. It is used here with a
+   permanent SCRIPTED kicker precisely because the surface's visual grammar
+   says "machine" and the content is hand-written: the label has to be on the
+   surface that makes the claim, not in a drawer. */
+.answer-wrap { display: grid; gap: 11px; }
+.answer-cols { display: grid; gap: 11px; }
+.answer-cols.compare { grid-template-columns: 1fr 1fr; }
+.answer-col { min-width: 0; }
+.col-head { margin: 0 0 7px; color: var(--ink-2-on-navy); font-size: calc(var(--u) * .74); font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
+.bubble { min-width: 0; border-radius: 13px; padding: 11px 14px; line-height: 1.55; overflow-wrap: break-word; }
+.bubble.user { margin-bottom: 11px; border: 1px solid var(--line-on-navy); background: rgba(255,255,255,.07); }
+.bubble.user .pblock { margin: 4px 0; background: rgba(255,255,255,.08); color: var(--ink-on-navy); }
+.bubble.user .pblock.base { color: var(--ink-on-navy); }
+.bubble.ai { border: 1px solid var(--line-on-navy); background: var(--navy-2); color: var(--ink-on-navy); }
+.aihead { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-bottom: 7px; padding-bottom: 7px; border-bottom: 1px solid var(--line-on-navy); font-size: calc(var(--u) * .72); color: var(--ink-3-on-navy); }
+.aihead .nm { color: var(--ink-2-on-navy); font-weight: 750; letter-spacing: .04em; }
+.chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line-on-navy); border-radius: 999px; padding: 2px 9px; font-size: calc(var(--u) * .68); color: var(--ink-2-on-navy); }
+.chip.target { border-color: var(--lv3-on-navy); color: var(--lv3-on-navy); }
+.md h3 { margin: .9em 0 .3em; font-size: calc(var(--u) * .98); color: #fff; }
+.md h3:first-child { margin-top: .1em; }
+.md p { margin: .5em 0; }
+.md ul, .md ol { margin: .45em 0; padding-left: 1.4em; }
+.md li { margin: .22em 0; }
+.md b { color: #fff; }
+.md .tw-pending { display: none; }
+mark.jg { background: transparent; color: inherit; border-radius: 3px; padding: 0 .05em; transition: background .3s, color .3s; }
+body.hl mark.jg { background: rgba(195,174,245,.24); color: #EFE8FF; box-shadow: inset 0 -2px 0 rgba(195,174,245,.75); }
+body.hl mark.jg[data-novel="1"] { background: rgba(195,174,245,.38); box-shadow: inset 0 -2px 0 var(--lv3-on-navy); }
+mark.jg.pop { animation: pop .5s ease; }
+@keyframes pop { 0% { background: rgba(195,174,245,.8); color: #fff } 100% { background: transparent } }
+.caret { display: inline-block; width: .5em; height: 1.05em; margin-left: .05em; vertical-align: -.16em; background: var(--gold); animation: blink .9s steps(1,end) infinite; }
+@keyframes blink { 50% { opacity: 0 } }
+
+/* --- the jargon meter ----------------------------------------------------- */
+.meter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--line-on-navy); font-size: calc(var(--u) * .76); color: var(--ink-3-on-navy); }
+.meter .mlabel { font-size: calc(var(--u) * .68); font-weight: 850; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-2-on-navy); }
+.meter .big { font-size: calc(var(--u) * 1.5); font-weight: 850; line-height: 1; color: var(--lv3-on-navy); font-variant-numeric: tabular-nums; }
+.meter .never { color: var(--lv3-on-navy); font-weight: 650; }
+.meter .never.zero { color: var(--ink-3-on-navy); font-weight: 400; }
+.meter-kickers { display: grid; gap: 3px; width: 100%; margin-top: 6px; }
+
+/* the class 1-10 strip is presenter-only: it is the room scoring out loud */
+.scorestrip { display: none; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 10px; font-size: calc(var(--u) * .76); color: var(--ink-3-on-navy); }
+body.presenter .scorestrip { display: flex; }
+.sbtn { min-width: 2em; min-height: 40px; border: 1px solid var(--line-on-navy); border-radius: 8px; background: rgba(255,255,255,.07); color: var(--ink-2-on-navy); font-weight: 750; }
+.sbtn:hover { border-color: var(--gold); color: var(--gold-lite); }
+.sbtn[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 850; }
+
+/* --- the card-draw overlay ------------------------------------------------
+   Its own dialog with its own id. It is a per-EVENT reveal belonging to the
+   activity, not the per-stage A5 drawer, and ADOPTING.md section 5 is explicit
+   that folding the two together breaks whichever element querySelector does
+   not reach. Named #card-stage; `details` stays the kit's. */
+#card-stage { width: min(420px, calc(100% - 32px)); margin: auto; padding: 0; border: 0; background: transparent; }
+#card-stage::backdrop { background: rgba(0,33,68,.78); }
+.tcard {
+  display: flex; flex-direction: column; gap: 8px;
+  aspect-ratio: 5/7; padding: 20px; border-radius: 18px;
+  background: linear-gradient(165deg, var(--paper), var(--cream-deep)); color: var(--ink);
+  box-shadow: 0 24px 60px rgba(0,0,0,.45);
+  transform-origin: 50% 120%; animation: draw .85s cubic-bezier(.2,.9,.25,1.05) both;
+}
+@keyframes draw {
+  0% { transform: translateY(52vh) rotate(-16deg) scale(.55); opacity: 0 }
+  55% { opacity: 1 }
+  70% { transform: translateY(-2vh) rotate(3deg) scale(1.04) }
+  100% { transform: none; opacity: 1 }
+}
+.tcard .k { font-size: calc(var(--u) * .66); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.tcard .icon { font-size: calc(var(--u) * 2.1); line-height: 1; color: var(--ink-3); }
+.tcard .lab { font-size: calc(var(--u) * 1.06); font-weight: 850; line-height: 1.18; color: var(--navy); }
+.tcard .sub { font-size: calc(var(--u) * .8); line-height: 1.4; color: var(--ink-2); }
+.tcard .foot { margin-top: auto; padding-top: 8px; border-top: 1px solid var(--cream-deep); font-size: calc(var(--u) * .66); line-height: 1.4; color: var(--ink-3); }
+.tcard .foot b { color: var(--navy); }
+.card-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+
+/* --- the scoreboard ------------------------------------------------------- */
+.chart-host svg { width: 100%; height: auto; }
+.score-table { width: 100%; border-collapse: collapse; font-size: calc(var(--u) * .78); }
+.score-table th, .score-table td { padding: 5px 7px; border-bottom: 1px solid var(--line); text-align: left; }
+.score-table th { color: var(--ink-3); font-weight: 750; }
+
+/* --- the attached draft --------------------------------------------------- */
+.draft p { margin: 0 0 .7em; color: var(--ink-2); font-size: calc(var(--u) * .86); line-height: 1.6; }
+.draft p:first-of-type { color: var(--ink); }
+
+/* --- the closing slide ---------------------------------------------------- */
+#closing-slide { width: min(900px, calc(100% - 32px)); }
+#closing-slide .big { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.4rem, 3.4vw, 2.6rem); line-height: 1.2; color: var(--navy); }
+#closing-slide .sub { margin-top: .9em; color: var(--ink-2); }
+#closing-slide .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; margin-top: 1.6em; color: var(--ink-3); font-size: calc(var(--u) * .8); text-align: center; }
+#closing-slide .stats b { display: block; font-size: calc(var(--u) * 2); font-weight: 850; line-height: 1; color: var(--gold-deep); }
+
+/* --- presenter-only activity tools --------------------------------------- */
+.presenter-only { display: none; }
+body.presenter .presenter-only { display: inline-flex; }
+
+/* --- narrow widths --------------------------------------------------------
+   The page must not scroll sideways at 320px. Everything here either wraps or
+   is made scrollable in place, never allowed to push the page wide. */
+@media (max-width: 760px) {
+  .answer-cols.compare { grid-template-columns: 1fr; }
+  .prompt-box { max-height: 30vh; }
+}
+@media (max-width: 480px) {
+  .lever-head { padding: 9px 10px; gap: 8px; }
+  .lever .tg { font-size: calc(var(--u) * .72); }
+  .conseq { padding: 8px 10px 9px; }
+  .deckrow, .rehearse { padding-left: 10px; padding-right: 10px; }
+  .bubble { padding: 10px 11px; }
+  .scenario-tab { padding: 6px 10px; font-size: calc(var(--u) * .78); }
+  .meter .big { font-size: calc(var(--u) * 1.3); }
+  #closing-slide .stats { gap: 14px; }
+}

@@ -22,6 +22,8 @@ tracks/<name>.track            ordered page/track selections and track hierarchy
 practice/<bank-id>.html        reusable problems for the learner-built practice track
 theme/*.css                    shared MSU token layer and site behavior
 assets/                        SoE lockups and other static assets
+activities/<slug>/             complete standalone AI lesson sources and builds
+activities/tools/lesson-shell/ shared build-time lesson shell for those activities
 media/                         authored images referenced with [[img:...]]
 build-site.ps1                 the generator
 docs/                          GENERATED — the site. Never hand-edit.
@@ -123,6 +125,27 @@ and keep instance IDs and browser state independent when several roots share an 
 Target assessment should check the remaining geometry and surviving features after later cuts.
 Calculation tests live beside their topic peers under `tests/interactives/` and run with
 `node --test --test-concurrency=2 tests/interactives/*.test.cjs`.
+
+## Standalone AI activities
+
+The Artificial Intelligence collection and `ai-from-zero-to-takeoff` track contain
+the six AI lessons transferred from examples. `activities/<slug>/` is their canonical
+editable source, including the original model code, data, tests, guides and provenance.
+Each app remains a self-contained document so its styles, workers and controls stay
+independent of the wiki and of the other activities.
+
+Run `node activities/<slug>/build.js` after editing an activity, or use `--check` to
+verify its committed app and guide. The source guide is still the single source for
+app presenter notes, its printable copy and the notes embedded in CourseWiki.
+`scripts/read-activities.cjs` uses the existing lesson-shell guide extractor;
+the site build requires Node.js when activities are present. It publishes only each
+manifest's app, HTML guide and PDF under `docs/activities/<slug>/`.
+
+Topic pages declare `<div data-interactive="<slug>" data-activity></div>` and
+`<div data-activity-notes="<slug>"></div>`. The normal page, track, search and print
+pipeline consumes these markers. Web pages offer an embedded activity and full-screen
+link. Offline aggregates embed the complete app in `srcdoc`, and retain the complete
+learning guide as printable text. Edit source guides rather than generated wiki notes.
 
 ## Practice banks
 

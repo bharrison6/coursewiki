@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Tool Guide — notes for the presenter</title>
+<!--
+  Canonical, printable presenter guide for the AI Tool Guide demo (folder:
+  front-doors), retrofitted onto lesson-shell v2's A9 fixed-section format.
+
+  build.js lifts the stylesheet named guide-css and the .guide-scope div out
+  of here verbatim and injects them into index.html (Settings -> Open
+  Presenter Notes) and into presenter-guide.html, the shipped standalone
+  printable copy. Edit here; never edit either copy.
+
+  Everything in the guide-css sheet MUST be scoped to .guide-scope, because it
+  is injected into an app with its own stylesheet (the shell's, and the
+  activity's). Page-level styles for the standalone printable version live in
+  the second, unnamed sheet below, which is not extracted. The kit's
+  guide-contract.js finds both markers by a line-anchored search over a
+  comment-masked copy of this file and refuses to build if either matches
+  more or fewer than once -- so this paragraph cannot become the match.
+-->
+<style id="guide-css">
+.guide-scope { color: inherit; }
+.guide-scope .g-head { margin-bottom: 18px; }
+.guide-scope .g-kicker { font: 800 .7rem/1 system-ui, sans-serif; letter-spacing: .16em; text-transform: uppercase; color: #9F6700; }
+.guide-scope h1 { font-size: 1.5rem; margin: 6px 0 4px; }
+.guide-scope .g-sub { opacity: .8; font-size: .92rem; }
+.guide-scope h2 { font-size: 1.1rem; margin: 22px 0 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(20,39,58,0.16); }
+.guide-scope h3 { font-size: .98rem; margin: 15px 0 5px; }
+.guide-scope p { margin: 0 0 .8em; }
+.guide-scope ul, .guide-scope ol { padding-left: 20px; margin: 0 0 .9em; }
+.guide-scope li { margin-bottom: 5px; }
+.guide-scope .say {
+  border-left: 3px solid #ECAC00; padding: 2px 0 2px 12px;
+  margin: 0 0 .9em; font-style: italic; opacity: .95;
+}
+.guide-scope .warn { border-left-color: #FF4500; }
+.guide-scope .scroll { overflow-x: auto; }
+.guide-scope table { width: 100%; border-collapse: collapse; font-size: .86rem; min-width: 420px; }
+.guide-scope th, .guide-scope td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(20,39,58,0.14); vertical-align: top; }
+.guide-scope th { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+.guide-scope .tag {
+  display: inline-block; padding: 1px 7px; border-radius: 999px;
+  font-size: .68rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+}
+.guide-scope .tag.p { background: rgba(236,172,0,.18); color: #9F6700; }
+.guide-scope .tag.d { background: rgba(0,164,227,.18); color: #007EB5; }
+.guide-scope .tag.w { background: rgba(185,140,255,.22); color: #5A3E8C; }
+.guide-scope .tag.o { background: rgba(28,112,77,.16); color: #1C704D; }
+.guide-scope .mis {
+  border: 1px solid rgba(198,63,29,0.3); background: rgba(198,63,29,0.06);
+  border-radius: 10px; padding: 10px 12px; margin: 0 0 10px;
+}
+.guide-scope .mis .mis-claim { font-weight: 800; color: #C63F1D; display: block; margin-bottom: 3px; }
+.guide-scope .g-foot { margin-top: 24px; padding-top: 10px; border-top: 1px solid rgba(20,39,58,0.16); font-size: .82rem; opacity: .8; }
+</style>
+<style>
+/* Standalone printable page only — not extracted into the app. */
+body {
+  margin: 0; background: #fff; color: #14181f;
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.page { max-width: 46rem; margin: 0 auto; padding: 32px 22px 56px; }
+@media print {
+  body { font-size: 11.5pt; }
+  .page { max-width: none; padding: 0; }
+  h2 { break-after: avoid; }
+  table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="guide-scope">
+
+  <div class="g-head">
+    <div class="g-kicker">AI: From Zero to Takeoff &middot; Demo 6 of 17 &middot; Part three &middot; about 12 minutes</div>
+    <h1>AI Tool Guide &mdash; notes for the presenter</h1>
+    <div class="g-sub">
+      What to ask it with. Runs after The Stranger, which covered how to phrase the request.
+      About 12 minutes, or 4 if you are behind. You need: the built page open, and nothing else —
+      no network, no login, no account. Product claims checked 16 September 2026.
+    </div>
+  </div>
+
+  <h2>Learning goals</h2>
+  <p>The goal for each stage, in plain words — what a learner should be able to say after doing the activity, not before it. These are the three stage Takeaways, verbatim.</p>
+  <ol>
+    <li><b>Stage 1, The four doors.</b> Reach rises neatly because the four doors were chosen as a ladder — but review burden peaks at the desktop coworker (door 3), not the coding agent (door 4), because doors 2 and 4 hand you a change you can compare and take back — an edit inside a document with undo, a diff you can read — and door 3 hands you a finished thing.</li>
+    <li><b>Stage 2, Pick a job.</b> The smallest sufficient door changes by job — access is a cost you take on, not a feature to default to maximizing.</li>
+    <li><b>Stage 3, The receipts.</b> Two of four doors changed names in six months, and this page's own top uncertainty checked out unchanged when read directly — the doors are the stable unit here, not the names on them.</li>
+  </ol>
+
+  <h2>Where this sits on the path</h2>
+  <p>
+    Demo 5 (The Stranger) taught the room that how you phrase a request changes what a language
+    model gives back. The obvious next conclusion — and the wrong one — is that prompting is the
+    whole skill. This module is the correction: a perfectly phrased request to a browser tab still
+    cannot rename a file on your laptop. Phrasing is one variable; the surface is the other. Demo 7
+    onward (Part four) hands forward a related discipline — a useful classroom tool starts from a
+    learning goal, exposes its assumptions, and makes its evidence available for challenge — which
+    is also the discipline this page holds itself to, out loud, in Stage 3.
+  </p>
+
+  <h2>One question for the session</h2>
+  <p class="say">
+    The surface you use decides what the tool can reach &mdash; and the further it reaches, the
+    more of its work you have to check.
+  </p>
+  <p>
+    Everything on the page serves that sentence. If you only get one thing across, get that,
+    and specifically the second half, because the first half is intuitive and the second is not.
+  </p>
+
+  <h2>Stage 1 &middot; The four doors <span class="tag d">4 min</span></h2>
+  <p><b>Question.</b> If the model behind the glass is often the same, what actually changes as you move from a chat window to a coding agent?</p>
+  <p><b>Predict prompt.</b> Rows 1&ndash;3 (Sees, Does, Keeps going) were built to rise neatly door 1 to door 4 — which one row will not?</p>
+  <p><b>Activity, timed.</b> Put the grid up and say nothing for a beat (30s). Let the room read the four questions down the left, then take the on-screen prediction (30s). Open <b>door 1, row 2</b> (60s) — a chat window answers in the conversation. Then open <b>door 2, row 4</b> (60s) — accept or reject, you get a diff; this is the cell that surprises people, because it is the least glamorous door and has the best review story in the table. Open Row 4's note last (60s).</p>
+  <p><b>Expected observation.</b> Rows 1–3 step up cleanly door by door; row 4 does not — door 3 (desktop coworker) reads higher than door 4 (coding agent).</p>
+  <p><b>Check-yourself answer key.</b> "Which door is hardest to check?" — Door 3, the desktop coworker; the coding agent's diff is what makes it *easier* to check than a door with less reach, which is the point of the refutation option.</p>
+  <p><b>Teaching limit.</b> The staircase in rows 1–3 is a property of which four doors were chosen, not a law of nature — say so if anyone calls it suspiciously tidy.</p>
+  <p class="say">
+    &ldquo;Same model behind all four of these. What changes is how far it can reach &mdash; and
+    every step of reach you hand it, you get back as review.&rdquo;
+  </p>
+
+  <h2>Stage 2 &middot; Pick a job <span class="tag p">6 min</span></h2>
+  <p><b>Question.</b> For one real faculty task, which door is the smallest one that finishes the whole thing?</p>
+  <p><b>Predict prompt.</b> Before the reveal, guess which door finishes the chosen job.</p>
+  <p><b>Activity, timed.</b> Do not walk all 7 jobs. Pick two: <b>"Rename four hundred scanned files"</b> (90s) — the clearest floor in the module, two doors say wrong door outright, and it makes the point that better prompting cannot buy reach; then <b>"Reformat a syllabus into the department's template"</b> (90s) — the answer is the boring door, the agent already inside Docs, the most useful answer of the day for most of the room. Read the last line of each card out loud: "You hand over." That line is the whole argument.</p>
+  <p><b>Expected observation.</b> The prediction echo shows a guess that sometimes matches the computed smallest-sufficient-door and sometimes does not — both outcomes are useful; a mismatch is the more interesting one to talk through.</p>
+  <p><b>Check-yourself answer key.</b> "Why is renaming four hundred files 'wrong door' at doors 1 and 2?" — neither can touch the file system at all; the refutation option (lower answer quality) names the misconception that the gap is intelligence rather than reach.</p>
+  <p><b>Teaching limit.</b> The green box is computed, not written: the smallest-numbered door whose verdict is "does the whole job." Say "smallest" deliberately — the module is not asking what the most capable tool is.</p>
+  <p class="mis"><span class="mis-claim">Misconception: "the biggest door is the safest choice."</span>Bigger reach means more of the work you must check yourself, not less risk — the smallest sufficient door is the one that finishes the job with the least you have to verify afterward.</p>
+  <p>Before you present: check door 2 actually works on your own account. Murray State runs Google Workspace, which is why this module leads door 2 with Docs and Sheets rather than Word and Excel — but running Workspace is <em>not</em> the same as having Gemini switched on in it. On a campus account that is licensed and enabled by an administrator; Google's Docs page (opened 16 September 2026) says the feature needs "an eligible Google Workspace or Google AI plan," so a personal Google AI plan is the other route. Open a Doc and look for the pane the morning of the talk. If it is not there, say so from the stage and point at door 1.</p>
+  <p class="say">
+    &ldquo;Notice what I did not ask. Not which is best. Which is smallest and still finishes
+    the job.&rdquo;
+  </p>
+
+  <h2>Stage 3 &middot; The receipts <span class="tag w">2 min</span></h2>
+  <p><b>Question.</b> How much of a page about AI products should you expect to still be true in six months?</p>
+  <p><b>Predict prompt.</b> Guess how many of the four doors had a product renamed or retired in six months (0–4).</p>
+  <p><b>Activity, timed.</b> Show two entries under "What already changed" (20s each): <b>"Agent Mode" → "Edit with Copilot"</b>, with Microsoft's own sentence under it — same capability, new name, inside six months; and <b>"ChatGPT agent" → retired</b> — OpenAI's help page still explains how to use the thing it opens by telling you is gone. Then show one entry under <b>"What was rechecked and held"</b> (20s): the page's own pre-build audit could not confirm whether OpenAI's Codex is still unselectable on web and mobile (automated fetch got HTTP 403); opened directly in a browser instead, and it is still true, quoted from the vendor's current FAQ.</p>
+  <p><b>Expected observation.</b> The predicted count is compared against the actual count (2 real vendor changes; the third CHANGED entry is the module's own drafting mistake, not a vendor change) — most rooms guess low.</p>
+  <p><b>Check-yourself answer key.</b> "What does a 403 to an automated fetch mean?" — the tool was blocked, not that the claim is false; the refutation option (guess instead) names exactly the failure mode this page's research-not-memory discipline exists to prevent.</p>
+  <p><b>Teaching limit.</b> A rechecked claim is confirmed as of the date shown, not permanently — that is why the page names a refresh cadence rather than declaring itself finished.</p>
+  <p>If the room is engaged, the third CHANGED entry is worth ten seconds: the brief this module was built from called a product "GPT Work," a name on none of the OpenAI pages the module opened; the product is ChatGPT Work. Somebody who does this for a living got it wrong six weeks out of date. That is the argument for the date at the top of the page, and it is more persuasive as a confession than as advice.</p>
+  <p class="say">
+    &ldquo;Good &mdash; that is the module working. Which door was it? Because the door is still
+    there.&rdquo;
+  </p>
+
+  <h2>Misconceptions</h2>
+  <p class="mis"><span class="mis-claim">"The biggest door is always the safest or best choice."</span>Reach and review burden rise together; the smallest sufficient door is the one that finishes the job while asking you to hand over the least.</p>
+  <p class="mis"><span class="mis-claim">"The coding agent, having the most reach, must be the hardest to check."</span>Instrumentation decides review cost, not reach: the coding agent hands you a diff and a test suite, while the desktop coworker hands you a finished artefact with nothing to compare it to — which is what makes door 3, not door 4, the hardest door in the table to check.</p>
+  <p class="mis"><span class="mis-claim">"An automated tool returning an error means the underlying claim is unverifiable."</span>A 403 means the script was blocked; it says nothing about whether the page itself still says what it always said. This page's own top-ranked risk turned out to be exactly that gap, not a wrong claim.</p>
+
+  <h2>Discussion questions</h2>
+  <ol>
+    <li>Pick a task you actually did this week with AI. Which door did you use, and was it the smallest one that would have finished it?</li>
+    <li>Door 3 (desktop coworker) is the hardest door to check in this table. What would have to change about how it presents its work for that to stop being true?</li>
+    <li>This page predicts what will rot and what will hold (Stage 3). Six months from now, which prediction do you expect to be wrong, and why?</li>
+  </ol>
+
+  <h2>Presenter controls</h2>
+  <ul>
+    <li>
+      <b>The header buttons.</b> <b>?</b> is the Guide — the how-to panel that
+      opens on first load and reopens from that button. <b>&#9881;</b> is Settings, and it
+      offers <b>Open Presenter Notes</b> (this document, on screen), <b>Presentation mode</b>,
+      <b>Reset</b>, and the self-test.
+    </li>
+    <li>Turn on <b>&#9881; &rarr; Presentation mode</b> for projector-sized type.</li>
+    <li>Run the self-test once so you know it is green before anyone asks.</li>
+    <li>
+      <b>Re-read Stage 3 the morning of.</b> This is the one demo in the collection with a real
+      shelf life. If a name on screen has changed, say so from the stage &mdash; it is a better
+      moment than a correct page would have been.
+    </li>
+    <li>
+      <b>&#9881; &rarr; Reset</b> puts the demo back to how it opened — stage 1, no job
+      picked, no predictions made, no self-test on screen — in place, without a page reload,
+      and without turning Presentation mode off.
+    </li>
+    <li>No network is needed at any point. The source links need one, but only if somebody
+      asks you to follow one, and you can promise to send it instead.</li>
+  </ul>
+
+  <h2>Questions you will get</h2>
+
+  <h3>&ldquo;So which one should I buy?&rdquo;</h3>
+  <p>
+    The module deliberately does not answer this and neither should you. The honest reply is:
+    almost certainly none, because your institution already licenses one or two of these and that
+    decides it. Send them to IT.
+  </p>
+
+  <h3>&ldquo;Can it see my students&rsquo; work?&rdquo;</h3>
+  <p>
+    Only if you give it access, and whether you may give it access is a question for your
+    registrar and your IT department rather than for a vendor page. Two of the jobs in Stage 2 carry
+    that caution on screen for exactly this moment; open one and read it rather than
+    improvising a policy answer.
+  </p>
+
+  <h3>&ldquo;How do you know any of this?&rdquo;</h3>
+  <p>
+    Open <b>&#9881; &rarr; Run the self-test</b> in front of them. It checks that every claim
+    resolves to a declared source, that no source is cited and never used, that no price and no
+    vendor ranking leaked into anything the page can display, and that the review row genuinely
+    does not rise the way the other three do. Then tap any cell and follow the link.
+  </p>
+
+  <h2>What the numbers on the page mean</h2>
+  <div class="scroll">
+  <table>
+    <tr><th>Figure</th><th>What it is</th></tr>
+    <tr><td>16 cells</td><td>4 doors &times; 4 axes. Every one opens a reason, a label and a source.</td></tr>
+    <tr><td>13 verified</td><td>Cells where a page belonging to the company that makes the product was opened on the check date and says it.</td></tr>
+    <tr><td>3 reasoned</td><td>The ordering judgements. Labelled, because no vendor states them.</td></tr>
+    <tr><td>28 judgements</td><td>7 jobs &times; 4 doors in Stage 2. All reasoned from Stage 1, and each names the axis that decided it.</td></tr>
+    <tr><td>19 sources</td><td>All first-party, each carrying the date it was last opened. Two of the OpenAI pages refuse automated retrieval and were read in an ordinary browser.</td></tr>
+    <tr><td>9 things cut</td><td>Researched during the build and deliberately left off, each with the reason.</td></tr>
+  </table>
+  </div>
+
+  <div class="g-foot">
+    AI Tool Guide (Front Doors) &mdash; Bryant Harrison, Murray State University.
+    Product claims checked 16 September 2026 against first-party sources, opened in an ordinary
+    browser where automated retrieval is blocked. Every claim on screen carries a confidence label
+    and links to its origin; everything researched and left off is listed in Stage 3 under
+    &ldquo;Researched, and deliberately not on the page.&rdquo;
+  </div>
+
+</div><!-- /guide -->
+</div>
+</body>
+</html>
