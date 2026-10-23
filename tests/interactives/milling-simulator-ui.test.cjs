@@ -80,6 +80,35 @@ test('one prominent switch chooses the top and front views or the isometric', ()
   assert.match(page, /<em>Top and front<\/em>, the top view with its section, and <em>Isometric<\/em>/);
 });
 
+test('jog directions and orientation arrows follow the actual rotated tool projection', () => {
+  const expected = [
+    ['lower right', 'upper right'], ['lower left', 'lower right'],
+    ['upper left', 'lower left'], ['upper right', 'upper left']
+  ];
+  for (let rot = 0; rot < 4; rot++) {
+    for (const [i, axis] of ['x', 'y', 'z'].entries()) {
+      const a = U.isoProject(50, 30, 20, rot);
+      for (const sign of [-1, 1]) {
+        const b = U.isoProject(50 + (axis === 'x' ? 10 * sign : 0), 30 + (axis === 'y' ? 10 * sign : 0), 20 + (axis === 'z' ? 10 * sign : 0), rot);
+        const v = U.isoAxis(axis, rot);
+        assert.ok(Math.abs(b[0] - a[0] - v[0] * 10 * sign) < 1e-9);
+        assert.ok(Math.abs(b[1] - a[1] - v[1] * 10 * sign) < 1e-9);
+        const label = U.jogDirection(axis, sign, 'iso', rot);
+        assert.equal(label.includes('left'), b[0] < a[0] - 1e-9);
+        assert.equal(label.includes('right'), b[0] > a[0] + 1e-9);
+        assert.equal(/up/.test(label), b[1] < a[1]);
+        assert.equal(/low|down/.test(label), b[1] > a[1]);
+      }
+      if (i < 2) assert.equal(U.jogDirection(axis, 1, 'iso', rot), expected[rot][i] + ' on screen');
+    }
+    const cue = U.isoOrientation(rot);
+    for (const axis of ['X', 'Y', 'Z']) assert.match(cue, new RegExp('>' + axis + '\\+<'));
+    assert.ok(cue.includes('Positive machine directions:'));
+  }
+  assert.equal(U.jogDirection('x', 1, 'flat', 2), 'right in top view', 'the top view has its own fixed orientation');
+  assert.equal(U.jogDirection('y', 1, 'flat', 2), 'up in top view');
+});
+
 test('the overlay is strongest where most metal is still to come off', () => {
   const job = J.BY_ID.shoulder, s = M.create(), F = U.targetField(s, job);
   const k = (x, y) => Math.floor((x - s.stock.x0) / M.CELL) + Math.floor((y - s.stock.y0) / M.CELL) * s.nx;

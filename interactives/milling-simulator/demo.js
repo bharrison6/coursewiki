@@ -102,6 +102,31 @@
     var q = isoTurn(x, y, rot);
     return [(q[0] + q[1]) * COS30, (q[0] - q[1]) * 0.5 - z];
   }
+  // Directions use the same projection as the work and tool. Turning the
+  // camera changes these screen vectors, never the machine coordinates.
+  function isoAxis(axis, rot) {
+    var o = isoProject(50, 30, 0, rot);
+    var p = isoProject(50 + (axis === 'x' ? 1 : 0), 30 + (axis === 'y' ? 1 : 0), axis === 'z' ? 1 : 0, rot);
+    return [p[0] - o[0], p[1] - o[1]];
+  }
+  function jogDirection(axis, sign, layout, rot) {
+    if (layout !== 'iso') return axis === 'x' ? (sign > 0 ? 'right in top view' : 'left in top view') :
+      axis === 'y' ? (sign > 0 ? 'up in top view' : 'down in top view') : (sign > 0 ? 'up' : 'down');
+    var d = isoAxis(axis, rot), x = d[0] * sign, y = d[1] * sign;
+    return (Math.abs(x) < 1e-6 ? (y < 0 ? 'up' : 'down') :
+      (y < 0 ? 'upper ' : 'lower ') + (x < 0 ? 'left' : 'right')) + ' on screen';
+  }
+  function isoOrientation(rot) {
+    var label = ['x', 'y', 'z'].map(function (a) { return a.toUpperCase() + '+ ' + jogDirection(a, 1, 'iso', rot); }).join('; ');
+    var out = ['<svg viewBox="0 0 100 80" role="img" aria-label="Positive machine directions: ' + label + '">'];
+    ['x', 'y', 'z'].forEach(function (a) {
+      var d = isoAxis(a, rot), x = 50 + d[0] * 25, y = 46 + d[1] * 25;
+      var bx = x - d[0] * 5, by = y - d[1] * 5;
+      out.push('<path d="M50 46L' + x + ' ' + y + 'M' + (bx - d[1] * 2.5) + ' ' + (by + d[0] * 2.5) + 'L' + x + ' ' + y + 'L' + (bx + d[1] * 2.5) + ' ' + (by - d[0] * 2.5) + '"/>');
+      out.push('<text x="' + (50 + d[0] * 30) + '" y="' + (46 + d[1] * 30 + (d[1] > 0 ? 8 : 0)) + '" text-anchor="' + (d[0] > 0.1 ? 'start' : d[0] < -0.1 ? 'end' : 'middle') + '">' + a.toUpperCase() + '+</text>');
+    });
+    return out.join('') + '<circle cx="50" cy="46" r="2"/></svg>';
+  }
 
   /* ---- the finished part, cell by cell -----------------------------------
      For each raster cell: the band of heights the inspection accepts there
@@ -442,13 +467,24 @@
     });
     add(jogHead, stepRow, el('span', { class: 'ms-seg-unit', 'aria-hidden': 'true' }, 'mm'));
     var jog = el('div', { class: 'ms-jog' });
-    [['y', 1, 'Y+', 'ms-j-yp', 'away'], ['x', -1, 'X−', 'ms-j-xm', 'left'], ['x', 1, 'X+', 'ms-j-xp', 'right'], ['y', -1, 'Y−', 'ms-j-ym', 'toward you'],
-      ['z', 1, 'Z+', 'ms-j-zp', 'up'], ['z', -1, 'Z−', 'ms-j-zm', 'down']].forEach(function (d) {
-      var b = button('', { class: 'ms-jog-btn ' + d[3], 'aria-label': 'Move ' + d[0].toUpperCase() + (d[1] > 0 ? ' plus' : ' minus') + ', ' + d[4] + ', one step' });
-      add(b, el('span', { class: 'ms-jog-ax' }, d[2]), el('span', { class: 'ms-jog-sub', 'aria-hidden': 'true' }, d[4]));
+    var jogButtons = [];
+    [['y', 1, 'Y+', 'ms-j-yp'], ['x', -1, 'X−', 'ms-j-xm'], ['x', 1, 'X+', 'ms-j-xp'], ['y', -1, 'Y−', 'ms-j-ym'],
+      ['z', 1, 'Z+', 'ms-j-zp'], ['z', -1, 'Z−', 'ms-j-zm']].forEach(function (d) {
+      var b = button('', { class: 'ms-jog-btn ' + d[3] });
+      var sub = el('span', { class: 'ms-jog-sub', 'aria-hidden': 'true' });
+      add(b, el('span', { class: 'ms-jog-ax' }, d[2]), sub);
+      jogButtons.push({ button: b, sub: sub, axis: d[0], sign: d[1] });
       b.addEventListener('click', function () { jogBy(d[0], d[1]); });
       jog.appendChild(b);
     });
+    function syncJogDirections() {
+      jogButtons.forEach(function (j) {
+        var direction = jogDirection(j.axis, j.sign, state.layout, state.rot);
+        j.sub.textContent = direction;
+        j.button.setAttribute('aria-label', 'Move ' + j.axis.toUpperCase() + (j.sign > 0 ? ' plus' : ' minus') + ', ' + direction + ', one step');
+      });
+    }
+    syncJogDirections();
     add(jogBox, jogHead, jog);
     add(panel, toolBox, moveBox, jogBox);
 
@@ -467,11 +503,12 @@
     // the isometric takes the place of the top view and section, in the same space
     var vIso = el('figure', { class: 'ms-view ms-view-iso', hidden: true });
     var isoCanvas = el('canvas', { class: 'ms-canvas ms-iso-canvas', tabindex: '0', role: 'img', 'aria-describedby': uid + '-keys' });
+    var isoAxes = el('div', { class: 'ms-orientation' });
     var isoLegend = el('p', { class: 'ms-legend' });
     isoLegend.innerHTML = '<span class="ms-lg"><span class="ms-key ms-key-excess" aria-hidden="true"></span>still to remove</span>' +
       '<span class="ms-lg"><span class="ms-key ms-key-tool" aria-hidden="true"></span>the tool</span>' +
       '<span class="ms-lg"><span class="ms-key ms-key-over" aria-hidden="true"></span>cut past the drawing</span>';
-    add(vIso, isoCanvas, isoLegend);
+    add(vIso, isoCanvas, isoAxes, isoLegend);
     var vSide = el('figure', { class: 'ms-view ms-view-side' });
     var sideCap = el('figcaption', { class: 'ms-view-cap' });
     var sideName = el('span', { class: 'ms-view-title' });
@@ -484,7 +521,8 @@
     var help = el('div', { class: 'ms-help', id: uid + '-help', hidden: true });
     var keysNote = el('p', { id: uid + '-keys' },
       'Drag the tool’s circle in the top view to move X and Y (hold Shift to keep to one axis), or drag the tool in a section to move Z. ' +
-      'With the top view or the isometric selected, the arrow keys move X and Y and Page Up and Page Down move Z, one step at a time; [ and ] change the step. ' +
+      'With the top view or the isometric selected, Right/Left increase/decrease X, Up/Down increase/decrease Y, and Page Up/Page Down increase/decrease Z, one step at a time; [ and ] change the step. ' +
+      'These machine directions stay attached to the block when the view turns; the X+, Y+ and Z+ arrows show their directions in the current view. ' +
       'Ctrl+Z undoes; Escape stops a move part-way, keeping what it has cut.');
     var meaning = el('p', {}, 'The readout follows the centre of the tool in X and Y and its tip in Z, from work zero: X 0 Y 0 is the front left corner, Z 0 the finished top. ' +
       'The raw block stands 1 mm proud, at Z +1.00. Volumes are grid estimates, and the inspection is a set of sampled teaching checks, not certified measurement.');
@@ -717,6 +755,7 @@
         }
       }
       if (cv === isoCanvas && s.tool) drawIsoTool(ctx, s, rot, k, ox, oy);
+      if (cv === isoCanvas) isoAxes.innerHTML = isoOrientation(rot);
       cv.setAttribute('aria-label', 'The part in isometric, seen from ' + ['the front right', 'the back right', 'the back left', 'the front left'][rot] +
         '. ' + (s.tool ? M.toolLabel(s.tool) + ' at ' + where(s) + '. ' : '') + (state.report ? state.report.summary : ''));
     }
@@ -1259,13 +1298,14 @@
       vTop.hidden = vFront.hidden = l === 'iso';
       vIso.hidden = isoTurnRow.hidden = l !== 'iso';
       views.classList.toggle('is-iso', l === 'iso');
+      syncJogDirections();
       viewHow.textContent = l === 'iso' ? 'turn it to see every side' : 'drag the tool';
       drawTop(); scheduleSections(true); scheduleIso(true);
     }
     flatBtn.addEventListener('click', function () { setLayout('flat'); });
     isoBtn.addEventListener('click', function () { setLayout('iso'); });
-    turnL.addEventListener('click', function () { state.rot = (state.rot + 3) % 4; scheduleIso(true); });
-    turnR.addEventListener('click', function () { state.rot = (state.rot + 1) % 4; scheduleIso(true); });
+    turnL.addEventListener('click', function () { state.rot = (state.rot + 3) % 4; syncJogDirections(); scheduleIso(true); });
+    turnR.addEventListener('click', function () { state.rot = (state.rot + 1) % 4; syncJogDirections(); scheduleIso(true); });
     hintBtn.addEventListener('click', function () {
       var h = state.job.hints;
       if (state.hint < h.length) {
@@ -1340,7 +1380,8 @@
 
   return {
     boot: boot, parseColor: parseColor, mix: mix, cellColor: cellColor, readPalette: readPalette,
-    isoTurn: isoTurn, isoProject: isoProject, isoTint: isoTint, describeMove: describeMove, nextStep: nextStep, progressLine: progressLine,
+    isoTurn: isoTurn, isoProject: isoProject, isoAxis: isoAxis, isoOrientation: isoOrientation, jogDirection: jogDirection,
+    isoTint: isoTint, describeMove: describeMove, nextStep: nextStep, progressLine: progressLine,
     targetField: targetField, cellState: cellState, excessAlpha: excessAlpha, clearance: clearance,
     KINDS: KINDS, WIN: WIN, STEPS: STEPS
   };
