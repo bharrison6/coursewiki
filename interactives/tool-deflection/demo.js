@@ -42,7 +42,7 @@
     if (root.dataset.tdReady || !M || !D) return;
     root.dataset.tdReady = 'true';
     var id = 'td-' + (++sequence), current = Object.assign({}, M.DEFAULT), baseline = Object.assign({}, M.DEFAULT);
-    var chosen = 'length', guess = null, complete = false;
+    var chosen = 'length', guess = null;
     var lab = document.createElement('div'); lab.className = 'td-lab';
     lab.innerHTML = '<div class="td-start"><span class="td-kicker">TRY IT</span><strong>How much does a shorter tool help?</strong><span>Predict below, then test. Or move the stickout slider.</span></div>' +
       '<div class="td-workbench"><div class="td-observe"><div class="td-plot"></div>' +
@@ -63,6 +63,7 @@
       '<p class="td-boundary">Ideal static bending of a uniform solid round tool. Flutes, necks, holder motion and cutting dynamics are omitted.</p>';
     root.insertBefore(lab, root.firstChild);
     var q = function (s) { return lab.querySelector(s); }, inputs = {};
+    q('.td-controls').appendChild(q('.td-predict'));
     function control(key, title, unit, min, max, step, parent) {
       var labelId = id + '-' + key, box = document.createElement('div'); box.className = 'td-control';
       box.innerHTML = '<label for="' + labelId + '">' + title + '<output for="' + labelId + '"></output></label>' +
@@ -71,7 +72,7 @@
       parent.appendChild(box);
       var slider = box.querySelector('input'), output = box.querySelector('output');
       inputs[key] = { slider: slider, output: output, unit: unit };
-      slider.addEventListener('input', function () { current[key] = Number(slider.value); complete = false; update(); });
+      slider.addEventListener('input', function () { current[key] = Number(slider.value); update(); });
       slider.addEventListener('keydown', function (e) { e.stopPropagation(); });
       slider.addEventListener('change', function () { q('[data-td-feedback]').textContent = 'Your setup changed. ' + ratioText(M.compare(current, baseline)) + '. Use the baseline button to compare another change.'; });
     }
@@ -92,7 +93,7 @@
       q('[data-td-wall]').innerHTML = D.wall(current);
     }
     function prediction() {
-      var e = EXPERIMENTS[chosen]; guess = null; complete = false;
+      var e = EXPERIMENTS[chosen]; guess = null;
       q('[data-td-question]').textContent = e.question;
       q('[data-td-choices]').innerHTML = e.choices.map(function (v, i) {
         return '<label class="td-choice"><input type="radio" name="' + id + '-guess" value="' + v[0] + '"><span>' + v[1] + '</span></label>';
@@ -106,7 +107,7 @@
     q('[data-td-experiment]').addEventListener('keydown', function (e) { e.stopPropagation(); });
     q('[data-td-test]').addEventListener('click', function () {
       if (guess === null) return;
-      var setup = trial(chosen), e = EXPERIMENTS[chosen]; current = setup.current; baseline = setup.baseline; complete = true;
+      var setup = trial(chosen), e = EXPERIMENTS[chosen]; current = setup.current; baseline = setup.baseline;
       update();
       q('[data-td-feedback]').textContent = (guess === e.answer ? 'Prediction confirmed. ' : 'The result is ' + M.format(e.answer, 4) + '×, rather than ' + M.format(guess, 4) + '×. ') + e.reason;
     });

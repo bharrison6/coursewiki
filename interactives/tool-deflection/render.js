@@ -5,7 +5,7 @@
   if (node) module.exports = api; else root.CourseWikiDeflectionDraw = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
   'use strict';
-  var GEOMETRY_SCALE = 3, CLAMP = 100;
+  var GEOMETRY_SCALE = 2.8, CLAMP = 80;
   function n(v) { return M.format(v, 4); }
   function esc(v) { return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
   function txt(x, y, value, cls, anchor) {
@@ -33,23 +33,23 @@
     var r = s.diameter * GEOMETRY_SCALE / 2, end = CLAMP + s.length * GEOMETRY_SCALE;
     var dy = M.solve(s).tip * GEOMETRY_SCALE * scale, out = [];
     out.push(txt(16, y - 37, label, 'td-row-label'));
-    out.push(txt(590, y - 37, M.format(M.solve(s).micrometers) + ' µm', 'td-value', 'end'));
-    out.push('<rect class="td-holder" x="50" y="' + n(y - 28) + '" width="50" height="56" rx="3"/>');
-    for (var j = 0; j < 4; j++) out.push(path('M' + (55 + j * 11) + ' ' + (y - 27) + 'l-5 54', 'td-hatch'));
+    out.push(txt(480, y - 37, M.format(M.solve(s).micrometers) + ' µm', 'td-value', 'end'));
+    out.push('<rect class="td-holder" x="30" y="' + n(y - 28) + '" width="50" height="56" rx="3"/>');
+    for (var j = 0; j < 4; j++) out.push(path('M' + (35 + j * 11) + ' ' + (y - 27) + 'l-5 54', 'td-hatch'));
     out.push(path('M' + CLAMP + ' ' + (y - 29) + 'v58', 'td-clamp'));
     out.push(path(shape(s, y, scale), 'td-tool' + (live ? ' td-current' : ''),
       ' data-tip-mm="' + M.solve(s).tip + '" data-bend-scale="' + scale + '"'));
     // The unloaded outline and axis stay in place even when the loaded tool moves.
-    out.push(path('M100 ' + n(y - r) + 'H' + n(end) + 'V' + n(y + r) + 'H100', 'td-reference'));
-    out.push(path('M100 ' + y + 'H' + n(end + 12), 'td-axis'));
+    out.push(path('M' + CLAMP + ' ' + n(y - r) + 'H' + n(end) + 'V' + n(y + r) + 'H' + CLAMP, 'td-reference'));
+    out.push(path('M' + CLAMP + ' ' + y + 'H' + n(end + 12), 'td-axis'));
     if (s.force > 0) {
       out.push(path('M' + n(end + 11) + ' ' + n(y + dy - 27) + 'v23m-5-7l5 7 5-7', 'td-force'));
     }
     out.push(txt(end + 22, y + dy - 9, M.format(s.force) + ' N', 'td-small'));
-    out.push(path('M100 ' + (y + 77) + 'H' + n(end) + 'M100 ' + (y + 72) + 'v10M' + n(end) + ' ' + (y + 72) + 'v10', 'td-dimension'));
-    out.push(txt((100 + end) / 2, y + 96, 'L = ' + M.format(s.length) + ' mm', 'td-small', 'middle'));
-    out.push(txt(590, y + 77, 'Ø ' + M.format(s.diameter) + ' mm', 'td-small', 'end'));
-    out.push(txt(590, y + 96, 'E ' + M.format(s.modulus) + ' GPa', 'td-small', 'end'));
+    out.push(path('M' + CLAMP + ' ' + (y + 77) + 'H' + n(end) + 'M' + CLAMP + ' ' + (y + 72) + 'v10M' + n(end) + ' ' + (y + 72) + 'v10', 'td-dimension'));
+    out.push(txt((CLAMP + end) / 2, y + 96, 'L = ' + M.format(s.length) + ' mm', 'td-small', 'middle'));
+    out.push(txt(480, y + 77, 'Ø ' + M.format(s.diameter) + ' mm', 'td-small', 'end'));
+    out.push(txt(480, y + 96, 'E ' + M.format(s.modulus) + ' GPa', 'td-small', 'end'));
     return out.join('');
   }
   function pair(current, baseline) {
@@ -57,10 +57,10 @@
     var label = 'Solid round tools, side view. Baseline: ' + M.format(M.solve(baseline).micrometers) +
       ' micrometers tip displacement. Your setup: ' + M.format(M.solve(current).micrometers) +
       ' micrometers. Both bending displacements exaggerated by ' + M.format(scale, 1) + ' times.';
-    return '<svg class="td-beams" viewBox="0 0 620 376" role="img" aria-label="' + esc(label) + '" focusable="false">' +
-      txt(16, 19, 'IDEAL SOLID ROUND TOOL · SIDE VIEW', 'td-small') +
-      txt(590, 19, 'Bending ×' + M.format(scale, 1) + ' in both', 'td-small', 'end') +
-      beam(baseline, 78, scale, 'BASELINE', false) + beam(current, 251, scale, 'YOUR SETUP', true) +
+    return '<svg class="td-beams" viewBox="0 0 500 364" role="img" aria-label="' + esc(label) + '" focusable="false">' +
+      txt(16, 17, 'IDEAL SOLID ROUND TOOL', 'td-small') +
+      txt(480, 17, 'Bending ×' + M.format(scale, 1) + ' in both', 'td-small', 'end') +
+      beam(baseline, 80, scale, 'BASELINE', false) + beam(current, 250, scale, 'YOUR SETUP', true) +
       '</svg>';
   }
   function wall(s) {

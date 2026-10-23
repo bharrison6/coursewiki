@@ -59,8 +59,13 @@ test('both beams share scale, their paths come from the model, and reference sta
   assert.equal(paths.length, 2);
   near(Number(paths[0][1]), M.solve(long).tip); near(Number(paths[1][1]), M.solve(s).tip);
   assert.equal(paths[0][2], paths[1][2]);
-  assert.ok(svg.includes(D.shape(s, 251, scale)));
+  assert.ok(svg.includes(D.shape(s, 250, scale)));
+  const points = [...D.shape(s, 250, scale).matchAll(/[ML]([\d.-]+) ([\d.-]+)/g)].map(m => [Number(m[1]), Number(m[2])]);
+  near(points[0][0], 80); near(points[0][1], 250 - s.diameter * D.GEOMETRY_SCALE / 2);
+  near(points[40][0], 80 + s.length * D.GEOMETRY_SCALE);
+  near(points[40][1], 250 + M.solve(s).tip * D.GEOMETRY_SCALE * scale - s.diameter * D.GEOMETRY_SCALE / 2, .0001);
   const ref = x => [...x.matchAll(/class="td-reference" d="([^"]+)"/g)].map(m => m[1]);
+  assert.equal(ref(svg).length, 2);
   assert.deepEqual(ref(D.pair(s, s)), ref(D.pair({ ...s, force: 200 }, s)));
   const extreme = { length: 120, diameter: 4, force: 400, modulus: 200 };
   assert.ok(D.commonScale(extreme, long) < 100);
