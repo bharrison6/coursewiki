@@ -38,7 +38,7 @@ test('the page follows the module contract', () => {
 test('the printed figures in the page are the renderer\'s output', () => {
   const page = fs.readFileSync(PAGE, 'utf8');
   assert.ok(page.includes(R.staticScene('pin-turning')), 'the part-way scene is current');
-  for (const T of M.TARGETS) assert.ok(page.includes(R.drawing(T, { idPrefix: 'ts-static-d-' + T.id })), T.id + ' drawing is current');
+  for (const T of M.TARGETS) assert.ok(page.includes(R.drawingPair(T, { idPrefix: 'ts-static-d-' + T.id })), T.id + ' complete static views are current');
   const ids = [...page.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]);
   assert.equal(new Set(ids).size, ids.length, 'every SVG id on the page is unique');
   for (const m of page.matchAll(/(?:url\(#|href="#)([^)"]+)/g)) assert.ok(ids.includes(m[1]), 'reference resolves: ' + m[1]);
@@ -48,6 +48,35 @@ test('the printed figures in the page are the renderer\'s output', () => {
   assert.equal(st.tool, 'turn');
   assert.ok(st.tz < -0.2 && st.tz > -0.4, 'tool halfway along the first pin pass');
   assert.ok(Math.abs(st.work.ro[M.colAt(st.work, -1.0)] - 0.375) < 1e-9, 'body turned to 0.750');
+});
+
+test('target views show the whole exterior or whole section with the same dimensions', () => {
+  for (const T of M.TARGETS) {
+    const normal = R.drawing(T, { view: 'normal' }), section = R.drawing(T, { view: 'section' });
+    const outline = normal.match(/class="ts-ext" d="([^"]+)"/)[1];
+    const material = section.match(/class="ts-sec"[^>]+d="([^"]+)"/)[1];
+    assert.ok(material.startsWith(outline), T.id + ' full section has the same outside boundary');
+    const cy = +normal.match(/class="ts-axis" d="M[^ ]+ ([\d.]+)/)[1];
+    const yy = pairs(outline).map(p => p[1]);
+    assert.ok(Math.abs(Math.min(...yy) + Math.max(...yy) - 2 * cy) < .2, T.id + ' complete profile spans both sides of the axis');
+    assert.ok(!normal.includes('class="ts-sec"') && !section.includes('class="ts-ext"'), 'the views are not split');
+    assert.ok(!section.includes('class="ts-knurl"'), 'surface knurl texture is not cut-face hatching');
+    const dimensions = s => [...s.matchAll(/<text class="ts-dtxt ts-halo"[^>]*>(.*?)<\/text>/g)].map(m => m[1]);
+    assert.deepEqual(dimensions(normal), dimensions(section), T.id + ' view changes do not change dimensions');
+    if (T.inside.length) {
+      assert.match(normal, /class="ts-hidden" d="M[^"M]+M/, T.id + ' both hidden bore boundaries');
+      assert.match(section, /fill-rule="evenodd"/, T.id + ' actual hole excluded from hatched material');
+    }
+    if (T.outside.concat(T.inside).some(s => s.kind === 'thread')) {
+      assert.match(section, /Thread envelopes \(schematic\)/);
+      assert.match(section, /class="ts-thread-envelope" d="M[^"M]+M/);
+      assert.ok(!section.includes('class="ts-thread"'), 'no annular notch train in a section');
+    }
+    if (T.outside.some(s => s.kind === 'knurl')) {
+      assert.match(normal, /class="ts-knurl"/); assert.match(section, /Diamond knurl/);
+    }
+    for (const svg of [normal, section]) assert.ok(!/NaN|undefined|Infinity/.test(svg));
+  }
 });
 
 test('static target captions retain the same descriptions as the live targets', () => {
