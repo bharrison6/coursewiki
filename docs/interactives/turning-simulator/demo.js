@@ -858,9 +858,9 @@
     lab.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && busy) { busy.stop(); e.preventDefault(); e.stopPropagation(); }
     });
-    // a drag on the picture or a click into a box; buttons align after their action, above
-    el.bench.addEventListener('click', function (e) { if (!e.target.closest('button')) { keepBenchVisible(); } });
-    el.bench.addEventListener('keyup', keepBenchVisible);
+    // Editing and keyboard focus use the browser's visibility behavior. Align
+    // the workspace only on entry or an explicit action, not on a field click
+    // or key release: the learner may have deliberately scrolled it elsewhere.
     // Fit again when the lab's width or the window's height changes (a card opening, a rotated phone).
     var seen = '';
     function refit() {
