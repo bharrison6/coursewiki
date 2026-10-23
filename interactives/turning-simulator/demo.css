@@ -63,16 +63,18 @@
 
 /* ---- the lab surface -----------------------------------------------------*/
 .ts-lab {
-  container-type: inline-size;
+  container: ts-lab / inline-size;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: .6rem;
   min-width: 0;
-  padding: 1.15rem;
+  padding: .75rem;
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
 }
+.ts-lab [hidden] { display: none !important; }
+.ts-vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .ts-k, .ts-k2 {
   font-family: var(--f-display);
   font-size: .7rem;
@@ -84,12 +86,12 @@
 }
 .ts-k2 { font-size: .66rem; letter-spacing: .06em; }
 
-/* buttons: the fire-table tab look, at a 44 px tap height */
+/* buttons: the fire-table tab look; 44 px to tap, 40 px inside the bench */
 .ts-lab button {
   cursor: pointer;
   min-height: 2.75rem;
   margin: 0;
-  padding: .45rem .8rem;
+  padding: .4rem .55rem;
   border: 1.5px solid var(--rule);
   border-radius: var(--radius-xs);
   background: transparent;
@@ -98,66 +100,66 @@
   font-family: var(--f-display);
   font-size: .8rem;
   font-weight: 700;
-  letter-spacing: .05em;
+  letter-spacing: .03em;
   line-height: 1.2;
   text-transform: uppercase;
 }
 .ts-lab button:not(:disabled):hover { border-color: var(--accent); background: var(--surface-2); }
-.ts-lab button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--paper); }
-.ts-lab button[aria-pressed="true"]:not(:disabled):hover { border-color: var(--accent); background: var(--accent); color: var(--paper); }
+.ts-lab button[aria-pressed="true"], .ts-lab button[aria-expanded="true"] { border-color: var(--accent); background: var(--accent); color: var(--paper); }
+.ts-lab button[aria-pressed="true"]:not(:disabled):hover,
+.ts-lab button[aria-expanded="true"]:not(:disabled):hover { border-color: var(--accent); background: var(--accent); color: var(--paper); }
 .ts-lab button:disabled { cursor: not-allowed; opacity: .45; }
 .ts-lab :is(button, input, select, summary):focus-visible,
-.ts-view-wrap:focus-visible { outline: 3px solid var(--cat2); outline-offset: 2px; }
+.ts-view-wrap:focus-visible,
+.ts-steps label:has(input:focus-visible) { outline: 3px solid var(--cat2); outline-offset: 2px; }
 .ts-drawing-scroll:focus-visible { outline: 3px solid var(--cat2); outline-offset: -3px; }
+.ts-lab select, .ts-lab input[type="text"] {
+  min-height: 2.5rem; min-width: 0; padding: .3rem .5rem;
+  border: 1.5px solid var(--rule); border-radius: var(--radius-xs);
+  background: var(--paper); color: var(--ink);
+  font-family: var(--f-mono); font-size: 1rem;
+}
 
-.ts-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1.25rem; }
-.ts-parts { display: flex; flex-direction: column; gap: .4rem; min-width: 0; flex: 1 1 24rem; }
-.ts-row { display: flex; flex-wrap: wrap; gap: .4rem; }
-
-/* the drawing of the part to make */
+/* ---- the part, its goal and its drawing ---------------------------------------*/
+.ts-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem .6rem; }
+.ts-parts { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; min-width: 0; }
+.ts-parts .ts-k { margin-right: .25rem; }
+.ts-head-tools { display: flex; flex-wrap: wrap; gap: .3rem; }
+.ts-goal { margin: 0; font-size: .95rem; line-height: 1.4; }
+.ts-goal strong { font-family: var(--f-display); }
 .ts-drawing { margin: 0; display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
 .ts-drawing-scroll { max-width: 100%; overflow-x: auto; padding-bottom: .3rem; }
 .ts-drawing svg { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-sm); max-width: 40rem; }
 .ts-drawing-scroll svg { display: block; width: 100%; min-width: 34rem; }
-.ts-drawing-hint { display: block; margin-top: .35rem; font-size: .85rem; color: var(--ink-soft); }
+.ts-drawing-hint { display: block; margin-top: .25rem; font-size: .85rem; color: var(--ink-soft); }
 .ts-drawing figcaption { font-size: .95rem; color: var(--ink); }
 .ts-teaches { display: block; color: var(--ink-soft); font-size: .9rem; }
 
-/* the machine: readout over the view */
-div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
-/* The work and the active controls share one viewport-sized workspace.
-   Only the controls scroll, so they cannot disappear behind the work. */
+/* ---- the workbench: everything the hands need, on one screen ------------------
+   Narrow: the work, then its controls, then the tool rack, in one column.
+   36rem and up: the controls beside the work, the rack under both.
+   68rem and up (a projector): the rack, the work and the controls side by side.
+   demo.js sizes the picture so the bench fits between the app bar and the bottom
+   of the window; nothing in the bench scrolls. */
 .ts-workbench {
-  min-width: 0; height: min(54rem, calc(100svh - var(--appbar-h, 3.5rem) - 7rem));
-  display: flex; flex-direction: column; gap: .8rem;
+  display: grid; gap: .6rem; min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "machine" "panel" "rack";
 }
-.ts-workbench > .ts-machine {
-  flex: 0 0 auto; background: var(--surface);
+.ts-machine { grid-area: machine; display: flex; flex-direction: column; gap: .4rem; min-width: 0; container: ts-work / inline-size; }
+.ts-panel { grid-area: panel; display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
+.ts-rack { grid-area: rack; }
+@container ts-lab (min-width: 36rem) {
+  .ts-workbench { grid-template-columns: minmax(0, 1fr) 17.5rem; grid-template-areas: "machine panel" "rack rack"; align-items: start; }
 }
-.ts-workbench .ts-controls {
-  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
-  display: flex; flex-direction: column; gap: .8rem; padding: .65rem;
-  margin: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm);
+@container ts-lab (min-width: 68rem) {
+  .ts-workbench { grid-template-columns: 15.5rem minmax(0, 1fr) 18rem; grid-template-areas: "rack machine panel"; gap: .8rem; }
 }
-.ts-controls > * { flex-shrink: 0; }
-.ts-controls-hint { margin: 0; font-size: .8rem; order: -1; }
-.ts-run { order: 0; } .ts-feed { order: 1; } .ts-jog { order: 2; }
-.ts-tools { order: 3; } .ts-toolinfo { order: 4; }
-.ts-view-wrap svg { max-height: min(30svh, 24rem); }
-.ts-machine .ts-msg { max-height: 4.5rem; overflow-y: auto; }
-.ts-view-help { grid-column: 1 / -1; order: 10; font-size: .9rem; }
-.ts-view-help summary { cursor: pointer; font-family: var(--f-display); min-height: 2.75rem; }
-.ts-view-help .ts-legend, .ts-view-help .ts-keys { margin: .5rem 0; }
-@container (min-width: 40rem) {
-  .ts-workbench { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 1fr); gap: 1.2rem; align-items: start; }
-  .ts-workbench .ts-controls { height: 100%; }
-}
-@container (max-width: 30rem) {
-  .ts-dro-tool { display: none; }
-}
+
+/* the readout */
 .ts-dro {
-  display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem 1.1rem;
-  padding: .55rem .8rem;
+  display: flex; flex-wrap: nowrap; align-items: baseline; gap: .2rem 1rem;
+  padding: .45rem .75rem;
   background: var(--band); color: var(--band-ink);
   border-radius: var(--radius-sm);
 }
@@ -166,22 +168,173 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
 .ts-dro-v { white-space: nowrap; }
 .ts-dro-v b { display: inline-block; min-width: 4.6rem; text-align: right; }
 .ts-dro-tool, .ts-dro-spin { font-family: var(--f-display); font-size: .8rem; font-weight: 600; letter-spacing: .03em; }
-.ts-dro-spin { margin-left: auto; padding: .1rem .5rem; border: 1px solid currentColor; border-radius: var(--radius-xs); }
+/* one line always: a long tool name is cut short rather than adding a line */
+.ts-dro-tool { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ts-dro-spin { margin-left: auto; padding: .1rem .5rem; border: 1px solid currentColor; border-radius: var(--radius-xs); white-space: nowrap; }
 .is-running .ts-dro-spin { background: var(--flag); color: var(--flag-ink); border-color: var(--flag); }
+/* a narrow readout keeps to one line: the rack and the notes below name the tool */
+@container ts-work (max-width: 31rem) { .ts-dro-tool { display: none; } }
+@container ts-work (max-width: 20rem) {
+  .ts-dro { gap: .2rem .7rem; padding-inline: .6rem; }
+  .ts-dro-v b { min-width: 3.9rem; font-size: 1.05rem; }
+  .ts-dro-word { display: none; }
+}
+
+/* the picture: as wide as its column unless the screen is too short for that */
+.ts-view-box { position: relative; min-width: 0; width: 100%; max-width: var(--ts-view-w, none); margin-inline: auto; }
 .ts-view-wrap { min-width: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--paper); overflow: hidden; }
 .ts-view-wrap svg { border-radius: var(--radius-sm); }
-.ts-view-opts { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; font-family: var(--f-display); font-size: .85rem; font-weight: 600; }
-.ts-view-opts label { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.25rem; cursor: pointer; }
-.ts-view-opts input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
-.ts-legend { margin: 0; font-size: .85rem; color: var(--ink-soft); line-height: 1.9; }
-.ts-key { display: inline-block; width: 1.4rem; height: .8rem; margin: 0 .25rem 0 .6rem; vertical-align: -.05rem; border-radius: 2px; }
-.ts-key:first-child { margin-left: 0; }
+/* over the lower chuck jaw, which never moves, so it covers no work */
+.ts-lab .ts-zoom {
+  position: absolute; left: .3rem; bottom: .3rem;
+  min-height: 2.25rem; padding: .2rem .55rem; font-size: .72rem;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+}
+
+/* what the last move did, with Undo beside it. It keeps three lines, so the
+   bench never changes height under the hands; More opens a longer one. */
+.ts-feedback {
+  --ts-lines: 3;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: .5rem;
+  padding: .4rem .45rem .4rem .7rem;
+  background: var(--paper);
+  border: 1px solid var(--rule); border-inline-start: .3rem solid var(--rule);
+  border-radius: var(--radius-xs);
+}
+.ts-feedback.is-stop { border-color: var(--cat3); background: var(--cat3-soft); }
+.ts-feedback.is-cut { border-inline-start-color: var(--cat2); }
+.ts-feedback.is-form { border-color: var(--cat1); background: var(--cat1-soft); }
+.ts-feedback.is-done { border-color: var(--accent); background: var(--surface-2); }
+.ts-feedback.is-info { border-inline-start-color: var(--accent); }
+.ts-msg {
+  grid-column: 1; grid-row: 1;
+  min-height: calc(var(--ts-lines) * 1.38em);
+  font-size: .93rem; line-height: 1.38;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--ts-lines); overflow: hidden;
+}
+.ts-feedback.is-open .ts-msg { display: block; overflow: visible; }
+.ts-msg strong { font-family: var(--f-display); margin-right: .25rem; }
+.ts-fb-act { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; gap: .3rem; }
+.ts-lab .ts-fb-act button { min-height: 2.25rem; min-width: 5.2rem; padding: .2rem .5rem; background: var(--paper); }
+.ts-lab .ts-hold { border-color: var(--cat3); background: var(--cat3-soft); color: var(--cat-ink); }
+.ts-lab .ts-more { font-size: .72rem; }
+/* More keeps its place when a message is short, so the feedback is always one height */
+.ts-lab .ts-more[hidden] { display: block !important; visibility: hidden; }
+
+/* ---- the controls beside the work --------------------------------------------*/
+.ts-panel button, .ts-rack button { min-height: 2.5rem; }
+.ts-run { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: .35rem; }
+.ts-lab .ts-spindle { border-color: var(--accent); }
+.ts-lab .ts-spindle[aria-pressed="true"] { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
+.ts-lab .ts-spindle[aria-pressed="true"]:not(:disabled):hover { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
+
+.ts-feed { margin: 0; display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+.ts-feed .ts-k { margin: 0; }
+.ts-feed-row { display: grid; grid-template-columns: 2.9rem minmax(0, 1fr) 6.6rem; align-items: center; gap: .35rem; }
+.ts-feed-row label { font-family: var(--f-display); font-weight: 700; font-size: .85rem; line-height: 1.1; }
+.ts-feed-row input { width: 100%; }
+.ts-lab .ts-feed-row button { padding-inline: .3rem; }
+
+.ts-jog { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
+.ts-jog-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .3rem; }
+.ts-steps { display: flex; gap: .25rem; }
+.ts-steps label {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  min-height: 2.25rem; min-width: 3.6rem; padding: 0 .35rem; cursor: pointer;
+  border: 1.5px solid var(--rule); border-radius: var(--radius-xs);
+  font-family: var(--f-mono); font-size: .88rem; color: var(--ink);
+}
+.ts-steps input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.ts-steps label:hover { border-color: var(--accent); }
+.ts-steps label:has(input:checked) { border-color: var(--accent); background: var(--accent); color: var(--paper); }
+/* the handwheels as the arrow keys sit: X+ over Z-, X- and Z+ */
+.ts-pad {
+  display: grid; gap: .3rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas: ". up ." "left down right";
+}
+.ts-up { grid-area: up; } .ts-left { grid-area: left; } .ts-right { grid-area: right; } .ts-down { grid-area: down; }
+.ts-lab .ts-jogbtn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .05rem;
+  min-height: 2.9rem; padding: .2rem .25rem; line-height: 1.1;
+  touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+.ts-jog-ax { white-space: nowrap; }
+.ts-jog-sub { display: block; font-size: .64rem; font-weight: 600; letter-spacing: .02em; text-transform: none; color: var(--ink-soft); }
+.ts-jogbtn:disabled .ts-jog-sub { color: inherit; }
+
+/* ---- the tool rack ---------------------------------------------------------------*/
+.ts-rack {
+  margin: 0; padding: 0; border: 0; min-width: 0;
+  display: grid; gap: .3rem .6rem;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+  grid-template-areas: "post tail" "opt opt";
+}
+.ts-tool-post { grid-area: post; } .ts-tool-tail { grid-area: tail; } .ts-tool-opt { grid-area: opt; }
+.ts-tool-group { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
+.ts-tool-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: .3rem; }
+.ts-lab .ts-toolbtn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem;
+  padding: .25rem .15rem; text-transform: none; letter-spacing: 0; font-size: .72rem; line-height: 1.1;
+}
+.ts-toolbtn .ts-icon { width: 2.4rem; height: 1.5rem; }
+.ts-toolbtn[aria-pressed="true"] .ts-tool-body, .ts-toolbtn[aria-pressed="true"] .ts-tool-bar { fill: var(--paper); stroke: var(--paper); }
+.ts-toolbtn[aria-pressed="true"] .ts-tool-insert { fill: var(--surface-2); stroke: var(--paper); }
+/* drill size and thread pitch: set with the tool, shown only for the tool that uses them */
+.ts-tool-opt { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .3rem .8rem; }
+.ts-tool-opt:not(:has(label:not([hidden]))) { display: none; }
+.ts-tool-opt label { display: inline-flex; align-items: center; gap: .45rem; }
+@container ts-lab (min-width: 36rem) and (max-width: 67.99rem) {
+  /* beside the tailstock tools when one of them needs it */
+  .ts-rack { grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) auto; grid-template-areas: "post tail opt"; }
+  .ts-tool-opt { flex-direction: column; justify-content: flex-end; align-items: stretch; gap: .2rem; }
+  .ts-tool-opt label { flex-direction: column; align-items: flex-start; gap: .2rem; }
+}
+@container ts-lab (min-width: 68rem) {
+  .ts-rack { grid-template-columns: minmax(0, 1fr); grid-template-areas: "post" "tail" "opt"; align-content: start; }
+  .ts-tool-row { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ts-tool-opt { justify-content: flex-start; }
+}
+@container ts-lab (max-width: 35.99rem) {
+  /* one grid of five: the post tools, then the three on the tailstock */
+  .ts-rack { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-areas: none; gap: .3rem; }
+  .ts-tool-group, .ts-tool-row { display: contents; }
+  .ts-tool-group > .ts-k2 { display: none; }
+  .ts-tool-opt { grid-column: 1 / -1; }
+  .ts-pad { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "left up down right"; }
+  /* the height a phone needs back for the threading pass and its pitch */
+  .ts-feed > .ts-k { display: none; }
+  .ts-toolbtn .ts-icon { height: 1.15rem; }
+}
+
+/* ---- under the bench: the legend, view settings and keys ------------------------*/
+.ts-tray { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem .8rem; }
+.ts-tray-btns { display: flex; flex-wrap: wrap; gap: .3rem; }
+.ts-legend { margin: 0; display: flex; flex-wrap: wrap; gap: .1rem 1rem; font-size: .82rem; color: var(--ink-soft); line-height: 1.6; }
+.ts-lg { display: inline-flex; align-items: center; gap: .35rem; }
+.ts-key { display: inline-block; flex: none; width: 1.4rem; height: .8rem; border-radius: 2px; }
 .ts-key-ghost { border: 2px dashed var(--cat1); }
 .ts-key-excess { background: var(--cat2); opacity: .55; }
 .ts-key-under { border-top: 3px dashed var(--cat3); height: 0; }
 .ts-key-edge { border-top: 3px solid var(--cat2); height: 0; }
 .ts-key-ref { width: .8rem; border: 2px solid var(--cat3); border-radius: 50%; }
-.ts-keys { margin: 0; }
+.ts-keys { margin: 0; font-size: .9rem; color: var(--ink-soft); }
+
+/* the tool in use: what it does and what it cannot */
+.ts-toolinfo {
+  display: flex; flex-direction: column; gap: .3rem;
+  padding: .6rem .85rem;
+  background: var(--surface-2);
+  border-inline-start: .3rem solid var(--accent);
+  border-radius: var(--radius-xs);
+  font-size: .93rem;
+}
+.ts-toolinfo p { margin: 0; }
+.ts-tool-name { font-family: var(--f-display); }
+.ts-tag { display: inline-block; margin-left: .4rem; padding: .05rem .45rem; border: 1px solid var(--cat1); background: var(--cat1-soft); color: var(--cat-ink);
+  font-size: .72rem; font-weight: 700; letter-spacing: .04em; border-radius: var(--radius-xs); }
+.ts-cannot { color: var(--ink-soft); }
+.ts-cannot::before { content: "Cannot: "; font-family: var(--f-display); font-weight: 700; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; }
 
 /* the tool, draggable */
 .ts-tool { cursor: grab; touch-action: none; }
@@ -202,94 +355,6 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   from { transform: translate(var(--x), var(--y)); opacity: 1; }
   to { transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) rotate(220deg); opacity: 0; }
 }
-
-/* ---- controls --------------------------------------------------------------*/
-.ts-controls {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 1rem;
-  min-width: 0;
-}
-@container (min-width: 36rem) {
-  .ts-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
-  .ts-run, .ts-tools, .ts-toolinfo { grid-column: 1 / -1; }
-}
-.ts-tools { margin: 0; padding: 0; border: 0; min-width: 0; display: flex; flex-direction: column; gap: .5rem; }
-.ts-tools legend { padding: 0; margin-bottom: .4rem; }
-.ts-tool-group { display: flex; flex-direction: column; gap: .3rem; }
-.ts-tool-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(4.7rem, 1fr)); gap: .35rem; }
-.ts-lab .ts-toolbtn {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25rem;
-  padding: .3rem .3rem; text-transform: none; letter-spacing: 0; font-size: .74rem; line-height: 1.15;
-}
-.ts-toolbtn .ts-icon { width: 2.6rem; height: 1.7rem; }
-.ts-toolbtn[aria-pressed="true"] .ts-tool-body, .ts-toolbtn[aria-pressed="true"] .ts-tool-bar { fill: var(--paper); stroke: var(--paper); }
-.ts-toolbtn[aria-pressed="true"] .ts-tool-insert { fill: var(--surface-2); stroke: var(--paper); }
-
-.ts-toolinfo {
-  display: flex; flex-direction: column; gap: .35rem;
-  padding: .7rem .9rem;
-  background: var(--surface-2);
-  border-inline-start: .3rem solid var(--accent);
-  border-radius: var(--radius-xs);
-}
-.ts-toolinfo p { margin: 0; }
-.ts-tool-name { font-family: var(--f-display); }
-.ts-tag { display: inline-block; margin-left: .4rem; padding: .05rem .45rem; border: 1px solid var(--cat1); background: var(--cat1-soft); color: var(--cat-ink);
-  font-size: .72rem; font-weight: 700; letter-spacing: .04em; border-radius: var(--radius-xs); }
-.ts-cannot { color: var(--ink-soft); font-size: .93em; }
-.ts-cannot::before { content: "Cannot: "; font-family: var(--f-display); font-weight: 700; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; }
-.ts-opts { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; }
-.ts-opts label { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--f-display); font-weight: 600; font-size: .9rem; }
-.ts-opts [hidden] { display: none; }
-.ts-lab select, .ts-lab input[type="text"] {
-  min-height: 2.75rem; padding: .35rem .6rem;
-  border: 1.5px solid var(--rule); border-radius: var(--radius-xs);
-  background: var(--paper); color: var(--ink);
-  font-family: var(--f-mono); font-size: 1rem;
-}
-.ts-run { display: flex; flex-wrap: wrap; gap: .4rem; }
-.ts-lab .ts-spindle { border-color: var(--accent); }
-.ts-lab .ts-spindle[aria-pressed="true"] { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
-.ts-lab .ts-spindle[aria-pressed="true"]:not(:disabled):hover { background: var(--flag); border-color: var(--flag); color: var(--flag-ink); }
-
-.ts-jog { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
-.ts-steps { display: flex; flex-wrap: wrap; align-items: center; gap: .2rem .9rem; font-family: var(--f-mono); }
-.ts-steps label { display: inline-flex; align-items: center; gap: .35rem; min-height: 2.5rem; cursor: pointer; }
-.ts-steps input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
-.ts-pad {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-areas: "up up" "left right" "down down";
-  gap: .4rem;
-  max-width: 24rem;
-}
-.ts-up { grid-area: up; } .ts-left { grid-area: left; } .ts-right { grid-area: right; } .ts-down { grid-area: down; }
-.ts-lab .ts-jogbtn { min-height: 3rem; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
-.ts-jog-sub { display: block; font-size: .68rem; font-weight: 600; letter-spacing: .03em; text-transform: none; color: var(--ink-soft); }
-.ts-jogbtn:disabled .ts-jog-sub { color: inherit; }
-
-.ts-feed { display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
-.ts-feed-row { display: grid; grid-template-columns: 4.6rem minmax(0, 7rem) auto; align-items: center; gap: .45rem; }
-.ts-feed-row[hidden] { display: none; }
-.ts-feed-row label { font-family: var(--f-display); font-weight: 700; font-size: .85rem; }
-.ts-feed-row input { width: 100%; min-width: 0; }
-.ts-lab .ts-hold { border-color: var(--cat3); background: var(--cat3-soft); color: var(--cat-ink); }
-
-/* messages: a heading word always, not only a border */
-.ts-msg {
-  min-height: 2.9rem;
-  padding: .6rem .85rem;
-  border: 1px solid var(--rule);
-  border-inline-start-width: .3rem;
-  border-radius: var(--radius-xs);
-  background: var(--paper);
-}
-.ts-msg strong { font-family: var(--f-display); margin-right: .25rem; }
-.ts-msg.is-stop { border-color: var(--cat3); background: var(--cat3-soft); }
-.ts-msg.is-cut { border-color: var(--cat2); }
-.ts-msg.is-form { border-color: var(--cat1); background: var(--cat1-soft); }
-.ts-msg.is-done { border-color: var(--accent); background: var(--surface-2); }
 
 /* ---- inspection --------------------------------------------------------------*/
 .ts-inspect { display: flex; flex-direction: column; gap: .6rem; min-width: 0; }
@@ -330,7 +395,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
 .ts-notes:empty { display: none; }
 
 .ts-log summary { cursor: pointer; font-family: var(--f-display); font-weight: 700; font-size: .85rem; min-height: 2.5rem; display: flex; align-items: center; }
-.ts-log ol { margin: .3rem 0 0; padding-left: 1.6rem; font-size: .88rem; max-height: 14rem; overflow-y: auto; }
+.ts-log ol { margin: .3rem 0 0; padding-left: 1.6rem; font-size: .88rem; }
 
 /* ---- the static version (no JavaScript, and paper) ------------------------------*/
 .ts-static { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
@@ -341,6 +406,7 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
 
 /* ---- presentation mode: bigger targets and numbers ------------------------------*/
 .presenting .ts-lab button { min-height: 3rem; font-size: .9rem; }
+.presenting .ts-panel button, .presenting .ts-rack button { min-height: 2.75rem; }
 .presenting .ts-dro b { font-size: 1.45rem; }
 .presenting .ts-msg { font-size: 1.1rem; }
 
@@ -350,16 +416,17 @@ div.ts-machine { display: flex; flex-direction: column; gap: .5rem; min-width: 0
   .ts-static-parts { grid-template-columns: minmax(0, 1fr); }
   .ts-static-parts .ts-static-fig { break-inside: avoid; }
   .ts-static-parts svg { max-width: 36rem; }
-  .ts-workbench { display: block; height: auto; }
-  .ts-workbench > .ts-machine { position: static; }
-  .ts-view-wrap svg { max-height: none; }
-  .ts-view-help { display: none !important; }
+  .ts-workbench { display: block; }
+  .ts-view-box { max-width: none; }
+  .ts-lab .ts-drawing[hidden] { display: flex !important; }
   .ts-drawing-scroll { overflow: visible; }
   .ts-drawing-scroll svg { min-width: 0; max-width: 100%; }
-  .ts-bar, .ts-controls, .ts-view-opts, .ts-keys, .ts-log, .ts-hold { display: none !important; }
+  .ts-head, .ts-panel, .ts-rack, .ts-tray, .ts-keys, .ts-toolinfo, .ts-log, .ts-fb-act, .ts-zoom { display: none !important; }
+  .ts-feedback { display: block; }
+  .ts-msg { display: block; min-height: 0; overflow: visible; }
   .ts-lab { border-color: #777; }
   .ts-drawing, .ts-machine, .ts-inspect, .ts-static-fig { break-inside: avoid; }
-  .ts-view, .ts-drawing-svg, .ts-part-svg, .ts-dro, .ts-item, .ts-msg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .ts-view, .ts-drawing-svg, .ts-part-svg, .ts-dro, .ts-item, .ts-feedback { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .ts-live > .ts-static { display: flex; }
   .ts-chips { display: none; }
 }

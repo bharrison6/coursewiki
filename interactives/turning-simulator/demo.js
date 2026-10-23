@@ -23,16 +23,19 @@
 (function () {
   'use strict';
 
-  var M = (typeof window !== 'undefined') && window.CourseWikiTurning;
-  var R = (typeof window !== 'undefined') && window.CourseWikiTurningRender;
-  if (!M || !R || typeof document === 'undefined') { return; }
+  // In a page the engine and the renderer are globals. Under Node (the focused
+  // tests) they are required, and the markup is exported instead of booting.
+  var node = typeof module === 'object' && module && module.exports;
+  var M = node ? require('./model.js') : (typeof window !== 'undefined') && window.CourseWikiTurning;
+  var R = node ? require('./render.js') : (typeof window !== 'undefined') && window.CourseWikiTurningRender;
+  if (!M || !R) { return; }
 
   var instance = 0;
   var STEPS = [0.100, 0.010, 0.001];
   var SPEED = { feed: 0.7, rapid: 2.6, thread: 1.1 };   // in per second, for the picture only
-  var reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  var reduceMotion = (typeof window !== 'undefined' && window.matchMedia) ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
   var SHORT = { turn: 'Turn', chamfer: 'Chamfer', groove: 'Groove / part', thread: 'Thread', knurl: 'Knurl', bore: 'Bore',
-    ithread: 'Thread inside', center: 'Center drill', drill: 'Drill', csink: 'Countersink' };
+    ithread: 'Thread inside', center: 'Center drill', drill: 'Drill', csink: 'Counter\u00adsink' };
 
   function $(root, sel) { return root.querySelector(sel); }
   function $$(root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
@@ -54,7 +57,13 @@
     });
   }
 
-  /* ---- markup ----------------------------------------------------------------*/
+  /* ---- markup ----------------------------------------------------------------
+     One workbench holds everything the hands need: the work with its readout,
+     what the last move did and Undo; beside it the spindle, the feeds and the
+     handwheels; under both the tool rack. Nothing in it scrolls: fit() sizes
+     the picture so the whole bench stays on the screen. The drawing, the
+     legend and keys, the tool's notes and the inspection are reading, so they
+     sit outside the bench. */
   function markup(id) {
     var tools = function (mount) {
       return M.TOOL_ORDER.filter(function (t) { return M.TOOLS[t].mount === mount; }).map(function (t) {
@@ -62,86 +71,109 @@
           '<span>' + esc(SHORT[t]) + '</span></button>';
       }).join('');
     };
+    var jogBtn = function (j, cls, arrow, ax, sub) {
+      return '<button type="button" class="ts-jogbtn ' + cls + '" data-ts-jog="' + j + '" aria-label="' + ax + ', ' + sub + ', one step">' +
+        '<span class="ts-jog-ax"><span aria-hidden="true">' + arrow + '</span> ' + ax + '</span><span class="ts-jog-sub" aria-hidden="true">' + sub + '</span></button>';
+    };
     return '' +
       '<div class="ts-lab">' +
-        '<div class="ts-bar">' +
+        '<div class="ts-head">' +
           '<div class="ts-parts" role="group" aria-labelledby="' + id + '-parts">' +
-            '<span class="ts-k" id="' + id + '-parts">Part to make</span>' +
-            '<div class="ts-row">' + M.TARGETS.map(function (T) {
+            '<span class="ts-k" id="' + id + '-parts">Part</span>' +
+            M.TARGETS.map(function (T) {
               return '<button type="button" data-ts-part="' + T.id + '" aria-pressed="false">' + esc(T.title) + '</button>';
-            }).join('') + '</div>' +
+            }).join('') +
           '</div>' +
-          '<button type="button" class="ts-new" data-ts-act="new">New bar</button>' +
+          '<div class="ts-head-tools">' +
+            '<button type="button" data-ts-act="drawing" aria-expanded="false" aria-controls="' + id + '-drawing">Drawing</button>' +
+            '<button type="button" class="ts-new" data-ts-act="new">New bar</button>' +
+          '</div>' +
         '</div>' +
+        '<p class="ts-goal" data-ts-goal></p>' +
+        '<figure class="ts-drawing" id="' + id + '-drawing" data-ts-drawing hidden></figure>' +
 
-        '<figure class="ts-drawing" data-ts-drawing></figure>' +
-
-        '<div class="ts-workbench"><div class="ts-machine">' +
-          '<div class="ts-dro" aria-hidden="true">' +
-            '<span class="ts-dro-v"><span class="ts-k">X&nbsp;Ø</span><b data-ts-x></b></span>' +
-            '<span class="ts-dro-v"><span class="ts-k">Z</span><b data-ts-z></b></span>' +
-            '<span class="ts-dro-tool" data-ts-dro-tool></span>' +
-            '<span class="ts-dro-spin" data-ts-dro-spin></span>' +
-          '</div>' +
-          '<div class="ts-view-wrap" data-ts-viewwrap tabindex="0" aria-describedby="' + id + '-keys"></div>' +
-          '<div class="ts-msg" data-ts-msg role="status" aria-live="polite"></div>' +
-        '</div>' +
-        '<div class="ts-controls">' +
-          '<p class="ts-controls-hint aside">Scroll this panel for tools and movement controls.</p>' +
-          '<details class="ts-view-help"><summary>View and keyboard help</summary>' +
-          '<div class="ts-view-opts">' +
-            '<label><input type="checkbox" data-ts-opt="ghost" checked> Drawing outline and metal to remove</label>' +
-            '<label><input type="checkbox" data-ts-opt="zoom"> Close up on the tool</label>' +
-          '</div>' +
-          '<p class="ts-legend" data-ts-legend>' +
-            '<span class="ts-key ts-key-ghost" aria-hidden="true"></span> the drawing, placed at Z0 ' +
-            '<span class="ts-key ts-key-excess" aria-hidden="true"></span> metal still to come off ' +
-            '<span class="ts-key ts-key-under" aria-hidden="true"></span> already smaller than the drawing allows ' +
-            '<span class="ts-key ts-key-edge" aria-hidden="true"></span> the tool\'s cutting edge ' +
-            '<span class="ts-key ts-key-ref" aria-hidden="true"></span> the point the readout follows' +
-          '</p>' +
-          '<p class="ts-keys aside" id="' + id + '-keys">Drag the tool, one slide at a time. Or select the view and use the arrow keys: left and right move along Z, up and down move X. Keys 1, 2 and 3 set the step; S starts or stops the spindle; U undoes; M measures.</p>' +
-          '</details>' +
-          '<div class="ts-run">' +
-            '<button type="button" class="ts-spindle" data-ts-act="spindle" aria-pressed="false">Start spindle</button>' +
-            '<button type="button" data-ts-act="measure">Measure the part</button>' +
-            '<button type="button" data-ts-act="undo">Undo</button>' +
-          '</div>' +
-          '<div class="ts-jog">' +
-            '<div class="ts-steps" role="radiogroup" aria-label="Step for each move">' +
-              '<span class="ts-k" aria-hidden="true">Step</span>' +
-              STEPS.map(function (s, k) { return '<label><input type="radio" name="' + id + '-step" value="' + s + '"' + (k === 1 ? ' checked' : '') + '> ' + M.fmt(s) + '</label>'; }).join('') +
+        '<div class="ts-workbench" data-ts-bench>' +
+          '<div class="ts-machine">' +
+            '<div class="ts-dro" aria-hidden="true">' +
+              '<span class="ts-dro-v"><span class="ts-k">X&nbsp;Ø</span><b data-ts-x></b></span>' +
+              '<span class="ts-dro-v"><span class="ts-k">Z</span><b data-ts-z></b></span>' +
+              '<span class="ts-dro-tool" data-ts-dro-tool></span>' +
+              '<span class="ts-dro-spin" data-ts-dro-spin></span>' +
             '</div>' +
-            '<div class="ts-pad" role="group" aria-label="Move the tool one step">' +
-              '<button type="button" class="ts-jogbtn ts-up" data-ts-jog="x+"><span aria-hidden="true">▲</span> X+ <span class="ts-jog-sub">away from center</span></button>' +
-              '<button type="button" class="ts-jogbtn ts-left" data-ts-jog="z-"><span aria-hidden="true">◀</span> Z− <span class="ts-jog-sub">toward chuck</span></button>' +
-              '<button type="button" class="ts-jogbtn ts-right" data-ts-jog="z+">Z+ <span aria-hidden="true">▶</span> <span class="ts-jog-sub">toward tailstock</span></button>' +
-              '<button type="button" class="ts-jogbtn ts-down" data-ts-jog="x-"><span aria-hidden="true">▼</span> X− <span class="ts-jog-sub">toward center</span></button>' +
+            '<div class="ts-view-box" data-ts-viewbox>' +
+              '<div class="ts-view-wrap" data-ts-viewwrap tabindex="0" aria-describedby="' + id + '-keys"></div>' +
+              '<button type="button" class="ts-zoom" data-ts-act="zoom" aria-pressed="false">Close up</button>' +
+            '</div>' +
+            '<div class="ts-feedback" data-ts-feedback>' +
+              '<div class="ts-fb-act">' +
+                '<button type="button" class="ts-undo" data-ts-act="undo" aria-keyshortcuts="Control+Z">Undo</button>' +
+                '<button type="button" class="ts-hold" data-ts-act="hold" aria-keyshortcuts="Escape" hidden>Stop feed</button>' +
+                '<button type="button" class="ts-more" data-ts-act="more" aria-expanded="false" hidden>More</button>' +
+              '</div>' +
+              '<div class="ts-msg" data-ts-msg role="status" aria-live="polite"></div>' +
             '</div>' +
           '</div>' +
-          '<form class="ts-feed" data-ts-feed novalidate>' +
-            '<div class="ts-feed-row"><label for="' + id + '-fz">Z</label><input id="' + id + '-fz" type="text" inputmode="decimal" autocomplete="off" data-ts-in="z"><button type="button" data-ts-act="feed-z">Feed to Z</button></div>' +
-            '<div class="ts-feed-row" data-ts-xrow><label for="' + id + '-fx">X&nbsp;Ø</label><input id="' + id + '-fx" type="text" inputmode="decimal" autocomplete="off" data-ts-in="x"><button type="button" data-ts-act="feed-x">Feed to X</button></div>' +
-            '<div class="ts-feed-row" data-ts-threadrow><label for="' + id + '-fs">Stop at Z</label><input id="' + id + '-fs" type="text" inputmode="decimal" autocomplete="off" placeholder="such as -0.690" data-ts-in="stop"><button type="button" data-ts-act="thread">Threading pass</button></div>' +
-            '<button type="button" class="ts-hold" data-ts-act="hold" hidden>Stop the feed</button>' +
-          '</form>' +
-          '<fieldset class="ts-tools">' +
-            '<legend class="ts-k">Tool</legend>' +
-            '<div class="ts-tool-group"><span class="ts-k2">Tool post (cross slide)</span><div class="ts-tool-row">' + tools('post') + '</div></div>' +
-            '<div class="ts-tool-group"><span class="ts-k2">Tailstock (on the centerline)</span><div class="ts-tool-row">' + tools('tailstock') + '</div></div>' +
+
+          '<div class="ts-panel">' +
+            '<div class="ts-run">' +
+              '<button type="button" class="ts-spindle" data-ts-act="spindle" aria-pressed="false">Start spindle</button>' +
+              '<button type="button" data-ts-act="measure">Measure</button>' +
+            '</div>' +
+            '<form class="ts-feed" data-ts-feed novalidate aria-labelledby="' + id + '-feed-t">' +
+              '<p class="ts-k" id="' + id + '-feed-t">Feed to a position, in</p>' +
+              '<div class="ts-feed-row"><label for="' + id + '-fz">Z</label><input id="' + id + '-fz" type="text" inputmode="decimal" autocomplete="off" data-ts-in="z"><button type="button" data-ts-act="feed-z">Feed to Z</button></div>' +
+              '<div class="ts-feed-row" data-ts-xrow><label for="' + id + '-fx">X&nbsp;Ø</label><input id="' + id + '-fx" type="text" inputmode="decimal" autocomplete="off" data-ts-in="x"><button type="button" data-ts-act="feed-x">Feed to X</button></div>' +
+              '<div class="ts-feed-row" data-ts-threadrow><label for="' + id + '-fs">Stop at Z</label><input id="' + id + '-fs" type="text" inputmode="decimal" autocomplete="off" placeholder="-0.690" data-ts-in="stop"><button type="button" data-ts-act="thread">Thread pass</button></div>' +
+            '</form>' +
+            '<div class="ts-jog">' +
+              '<div class="ts-jog-head">' +
+                '<span class="ts-k" id="' + id + '-step-t">Handwheels, step</span>' +
+                '<div class="ts-steps" role="radiogroup" aria-labelledby="' + id + '-step-t">' +
+                  STEPS.map(function (s, k) { return '<label><input type="radio" name="' + id + '-step" value="' + s + '"' + (k === 1 ? ' checked' : '') + '><span>' + M.fmt(s) + '</span></label>'; }).join('') +
+                '</div>' +
+              '</div>' +
+              '<div class="ts-pad" role="group" aria-label="Move the tool one step">' +
+                jogBtn('x+', 'ts-up', '▲', 'X+', 'away from center') +
+                jogBtn('z-', 'ts-left', '◀', 'Z−', 'toward chuck') +
+                jogBtn('x-', 'ts-down', '▼', 'X−', 'toward center') +
+                jogBtn('z+', 'ts-right', '▶', 'Z+', 'toward tailstock') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<fieldset class="ts-rack">' +
+            '<legend class="ts-vh">Tool</legend>' +
+            '<div class="ts-tool-group ts-tool-post" role="group" aria-labelledby="' + id + '-post"><span class="ts-k2" id="' + id + '-post">Tool post</span><div class="ts-tool-row">' + tools('post') + '</div></div>' +
+            '<div class="ts-tool-group ts-tool-tail" role="group" aria-labelledby="' + id + '-tail"><span class="ts-k2" id="' + id + '-tail">Tailstock</span><div class="ts-tool-row">' + tools('tailstock') + '</div></div>' +
+            '<div class="ts-tool-opt" data-ts-opts>' +
+              '<label data-ts-drill-wrap><span class="ts-k2">Drill size</span><select data-ts-drill>' + M.DRILLS.map(function (d) { return '<option value="' + d.id + '">' + esc(d.label) + '</option>'; }).join('') + '</select></label>' +
+              '<label data-ts-tpi-wrap><span class="ts-k2">Threads per inch</span><select data-ts-tpi>' + M.PITCHES.map(function (p) { return '<option value="' + p + '">' + p + '</option>'; }).join('') + '</select></label>' +
+            '</div>' +
           '</fieldset>' +
-          '<div class="ts-toolinfo" data-ts-toolinfo>' +
-            '<p class="ts-tool-name" data-ts-toolname></p>' +
-            '<p data-ts-does></p>' +
-            '<p class="ts-cannot" data-ts-cannot></p>' +
-            '<div class="ts-opts">' +
-              '<label data-ts-drill-wrap>Drill size <select data-ts-drill>' + M.DRILLS.map(function (d) { return '<option value="' + d.id + '">' + esc(d.label) + '</option>'; }).join('') + '</select></label>' +
-              '<label data-ts-tpi-wrap>Threads per inch <select data-ts-tpi>' + M.PITCHES.map(function (p) { return '<option value="' + p + '">' + p + '</option>'; }).join('') + '</select></label>' +
-            '</div>' +
-          '</div>' +
         '</div>' +
 
-        '</div><div class="ts-inspect">' +
+        '<div class="ts-tray">' +
+          '<p class="ts-legend" data-ts-legend>' +
+            '<span class="ts-lg"><span class="ts-key ts-key-ghost" aria-hidden="true"></span>the drawing, placed at Z0</span>' +
+            '<span class="ts-lg"><span class="ts-key ts-key-excess" aria-hidden="true"></span>metal still to come off</span>' +
+            '<span class="ts-lg"><span class="ts-key ts-key-under" aria-hidden="true"></span>smaller than the drawing allows</span>' +
+            '<span class="ts-lg"><span class="ts-key ts-key-edge" aria-hidden="true"></span>cutting edge</span>' +
+            '<span class="ts-lg"><span class="ts-key ts-key-ref" aria-hidden="true"></span>the point the readout follows</span>' +
+          '</p>' +
+          '<div class="ts-tray-btns">' +
+            '<button type="button" data-ts-act="ghost" aria-pressed="true">Drawing on the work</button>' +
+            '<button type="button" data-ts-act="help" aria-expanded="false" aria-controls="' + id + '-help">Keys</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="ts-keys" id="' + id + '-help" hidden><span id="' + id + '-keys">Drag the tool, one slide at a time. Or select the view and use the arrow keys: left and right move along Z, up and down move X. Keys 1, 2 and 3 set the step; S starts or stops the spindle; U or Ctrl+Z undoes; M measures; Escape stops a feed.</span></p>' +
+
+        '<div class="ts-toolinfo" data-ts-toolinfo>' +
+          '<p class="ts-tool-name" data-ts-toolname></p>' +
+          '<p data-ts-does></p>' +
+          '<p class="ts-cannot" data-ts-cannot></p>' +
+        '</div>' +
+
+        '<div class="ts-inspect">' +
           '<div class="ts-inspect-head">' +
             '<span class="ts-k">The drawing and your part</span>' +
             '<p class="ts-verdict" data-ts-verdict></p>' +
@@ -166,13 +198,16 @@
     guardKeys(lab);
 
     var el = {
-      drawing: $(lab, '[data-ts-drawing]'), wrap: $(lab, '[data-ts-viewwrap]'),
+      drawing: $(lab, '[data-ts-drawing]'), goal: $(lab, '[data-ts-goal]'),
+      bench: $(lab, '[data-ts-bench]'), viewBox: $(lab, '[data-ts-viewbox]'), wrap: $(lab, '[data-ts-viewwrap]'), zoom: $(lab, '[data-ts-act="zoom"]'),
       x: $(lab, '[data-ts-x]'), z: $(lab, '[data-ts-z]'), droTool: $(lab, '[data-ts-dro-tool]'), droSpin: $(lab, '[data-ts-dro-spin]'),
       toolName: $(lab, '[data-ts-toolname]'), does: $(lab, '[data-ts-does]'), cannot: $(lab, '[data-ts-cannot]'),
       drill: $(lab, '[data-ts-drill]'), drillWrap: $(lab, '[data-ts-drill-wrap]'), tpi: $(lab, '[data-ts-tpi]'), tpiWrap: $(lab, '[data-ts-tpi-wrap]'),
-      spindle: $(lab, '[data-ts-act="spindle"]'), msg: $(lab, '[data-ts-msg]'),
+      spindle: $(lab, '[data-ts-act="spindle"]'), feedback: $(lab, '[data-ts-feedback]'), msg: $(lab, '[data-ts-msg]'),
+      undo: $(lab, '[data-ts-act="undo"]'), more: $(lab, '[data-ts-act="more"]'),
       inZ: $(lab, '[data-ts-in="z"]'), inX: $(lab, '[data-ts-in="x"]'), inStop: $(lab, '[data-ts-in="stop"]'),
       xRow: $(lab, '[data-ts-xrow]'), threadRow: $(lab, '[data-ts-threadrow]'), hold: $(lab, '[data-ts-act="hold"]'),
+      keys: $(lab, '#' + id + '-help'),
       verdict: $(lab, '[data-ts-verdict]'), items: $(lab, '[data-ts-items]'), notes: $(lab, '[data-ts-notes]'), partfig: $(lab, '[data-ts-partfig]'),
       log: $(lab, '[data-ts-log]'), logn: $(lab, '[data-ts-logn]')
     };
@@ -191,9 +226,9 @@
       if (busy) { return; }
       cur = partState(pid); st = cur.st; T = M.target(pid); f = R.frame(T);
       $$(lab, '[data-ts-part]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ts-part') === pid)); });
+      el.goal.innerHTML = '<strong>' + esc(T.title) + '.</strong> ' + esc(T.summary) + ' From ' + M.fmt(T.stock.dia) + ' in bar.';
       el.drawing.innerHTML = '<div class="ts-drawing-scroll" tabindex="0" role="region" aria-label="Dimensioned part drawing; scroll horizontally if needed">' + R.drawing(T, { idPrefix: id + '-d-' + pid }) + '</div>' +
-        '<figcaption><strong>' + esc(T.title) + '.</strong> ' + esc(T.summary) + ' Starts from ' + M.fmt(T.stock.dia) + ' in round bar. ' +
-        '<span class="ts-teaches">' + esc(T.teaches) + '</span><span class="ts-drawing-hint">Dimensions in inches. Scroll the drawing sideways on a narrow screen.</span></figcaption>';
+        '<figcaption><span class="ts-teaches">' + esc(T.teaches) + '</span><span class="ts-drawing-hint">Dimensions in inches. The dashed outline on the work is this drawing, placed at Z0.</span></figcaption>';
       buildView();
       toolUI();
       renderLog();
@@ -213,6 +248,7 @@
       P.tool.insertAdjacentHTML('beforeend', '<rect class="ts-handle" x="-46" y="-46" width="92" height="92"/>');
       wireDrag();
       draw();
+      fit();
     }
     function toolShape() {
       P.tool.innerHTML = R.toolShape(st.tool, { drill: M.drillSize(st) }) + '<rect class="ts-handle" x="-46" y="-46" width="92" height="92"/>';
@@ -233,12 +269,55 @@
       el.x.textContent = t.side === 'axial' ? 'center' : M.fmt(pos.x);
       el.z.textContent = M.fmt(pos.z);
       el.droTool.textContent = t.name + (st.tool === 'drill' ? ' ' + M.fmt(M.drillSize(st)) : '') + (t.action === 'thread' ? ', ' + st.tpi + ' per inch' : '');
-      el.droSpin.textContent = st.spindle ? 'Spindle running' : 'Spindle stopped';
+      el.droSpin.innerHTML = '<span class="ts-dro-word">Spindle </span>' + (st.spindle ? 'running' : 'stopped');
       lab.classList.toggle('is-running', st.spindle);
       view.setAttribute('aria-label', 'The work in the lathe, upper half cut away. ' + t.name + ' at ' + (t.side === 'axial' ? 'the centerline' : 'X ' + M.fmt(pos.x)) + ', Z ' + M.fmt(pos.z) + '. Spindle ' + (st.spindle ? 'running' : 'stopped') + '.' + (st.part ? ' A part has been cut off.' : ''));
       applyZoom();
     }
     function later() { if (dirty) { return; } dirty = true; requestAnimationFrame(function () { dirty = false; draw(); }); }
+
+    /* ---- one screen -----------------------------------------------------------------
+       The bench's controls have a fixed height, so the picture takes what the screen
+       has left between the app bar and any track bar, and never more than its width
+       allows. A fit that cannot be made (a very short window) is marked, not hidden. */
+    function screenRoom() {
+      var bar = document.querySelector('.appbar'), top = bar ? Math.max(0, bar.getBoundingClientRect().bottom) : 0;
+      var nav = document.querySelector('.seqbar'), nr = nav && nav.getBoundingClientRect();
+      var bottom = nr && nr.height ? Math.min(window.innerHeight, nr.top) : window.innerHeight;
+      return { top: top + 6, bottom: bottom - 6 };
+    }
+    /* Where it can without shrinking the picture below half its width-limited size,
+       it also leaves room above the bench for the card's heading and the part
+       buttons, so a link to the simulator lands on the whole bench. */
+    var fitting = false;
+    function fit() {
+      if (!view || fitting) { return; }
+      fitting = true;
+      var room = screenRoom(), h = room.bottom - room.top;
+      el.viewBox.style.removeProperty('--ts-view-w');
+      var b = el.bench.getBoundingClientRect();
+      if (b.height > 0) {
+        var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        var v0 = el.wrap.getBoundingClientRect().height, v = v0;
+        var card = lab.closest('.xcard');
+        var lead = card ? b.top - card.getBoundingClientRect().top - (el.drawing.hidden ? 0 : el.drawing.getBoundingClientRect().height) + 10 : 0;
+        if (b.height > h - lead) { v = v0 - (b.height - (h - lead)); }
+        if (v < Math.max(12 * rem, v0 / 2)) { v = b.height > h ? Math.max(7.5 * rem, v0 - (b.height - h)) : v0; }
+        if (v < v0 - 0.5) { el.viewBox.style.setProperty('--ts-view-w', Math.floor(v * f.W / f.H) + 'px'); }
+        lab.setAttribute('data-ts-fit', el.bench.getBoundingClientRect().height <= h + 1 ? 'fits' : 'over');
+      }
+      fitting = false;
+    }
+    /* After a control is used, bring the whole bench on screen, with the part
+       buttons above it when they fit too. Never while a pointer is down on a
+       control: moving it then would swallow the click. */
+    function keepBenchVisible() {
+      var room = screenRoom(), h = room.bottom - room.top, b = el.bench.getBoundingClientRect();
+      if (!b.height || b.height > h + 1 || (b.top >= room.top - 1 && b.bottom <= room.bottom + 1)) { return; }
+      var head = $(lab, '.ts-head').getBoundingClientRect();
+      var from = b.bottom - head.top <= h ? head.top : b.top;
+      window.scrollBy({ top: from - room.top, behavior: 'instant' });
+    }
     var win = null;          // the close-up window, [x0, y0, w, h]
     function applyZoom(recenter) {
       if (!opt.zoom) { win = null; view.setAttribute('viewBox', '0 0 ' + f.W + ' ' + f.H); return; }
@@ -276,9 +355,23 @@
     }
 
     /* ---- messages and the log ---------------------------------------------------------*/
+    /* The message keeps a fixed number of lines so the bench never changes height
+       under the hands; a longer one offers More, which opens it in place. */
     function say(kind, title, text) {
-      el.msg.className = 'ts-msg is-' + kind;
+      el.feedback.className = 'ts-feedback is-' + kind;
       el.msg.innerHTML = '<strong>' + esc(title) + '</strong> ' + esc(text || '');
+      el.more.setAttribute('aria-expanded', 'false');
+      el.more.textContent = 'More';
+      el.more.hidden = !(el.msg.scrollHeight > el.msg.clientHeight + 1);
+      if (wasOpen) { wasOpen = false; fit(); }
+    }
+    var wasOpen = false;
+    function toggleMore() {
+      var open = el.feedback.classList.toggle('is-open');
+      wasOpen = open;
+      el.more.setAttribute('aria-expanded', String(open));
+      el.more.textContent = open ? 'Less' : 'More';
+      fit();
     }
     function log(text) {
       cur.log.push(text);
@@ -339,6 +432,8 @@
       syncInputs();
       el.spindle.setAttribute('aria-pressed', String(st.spindle));
       el.spindle.textContent = st.spindle ? 'Stop spindle' : 'Start spindle';
+      // another tool can bring other feed rows and settings into the bench
+      fit();
     }
     function syncInputs() {
       var p = M.position(st);
@@ -484,7 +579,9 @@
     function setBusy(on) {
       lab.classList.toggle('is-busy', on);
       el.hold.hidden = !on;
-      $$(lab, '.ts-controls button, .ts-bar button').forEach(function (b) { if (b !== el.hold && b !== el.spindle) { b.disabled = on || (b.hasAttribute('data-ts-jog') && /^x/.test(b.getAttribute('data-ts-jog')) && M.TOOLS[st.tool].side === 'axial'); } });
+      el.undo.hidden = on;
+      // Everything that changes the work waits for the feed; the spindle can still be stopped.
+      $$(lab, '[data-ts-part], .ts-new, .ts-panel button, .ts-rack button, .ts-rack select').forEach(function (b) { if (b !== el.spindle) { b.disabled = on || (b.hasAttribute('data-ts-jog') && /^x/.test(b.getAttribute('data-ts-jog')) && M.TOOLS[st.tool].side === 'axial'); } });
       if (on) {
         returnFocus = document.activeElement;
         if (returnFocus && returnFocus.tagName === 'BUTTON') { el.hold.focus({ preventScroll: true }); }
@@ -566,7 +663,7 @@
           '</li>';
       }).join('');
       if (!ev) {
-        el.verdict.textContent = 'Not measured yet. Stop the spindle and press Measure the part.';
+        el.verdict.textContent = 'Not measured yet. Stop the spindle and press Measure.';
       } else if (cur.stale) {
         el.verdict.innerHTML = '<strong>Measurement out of date.</strong> The work changed after these readings. Stop the spindle and measure again before judging the current part.';
       } else if (ev.accepted) {
@@ -607,6 +704,11 @@
     lab.addEventListener('click', function (e) {
       var b = e.target.closest('button');
       if (!b || !lab.contains(b) || b.disabled) { return; }
+      act(b, e);
+      // after the action, which can change the bench (a new part, a tool with other rows)
+      if (el.bench.contains(b) || b.hasAttribute('data-ts-part') || b.classList.contains('ts-new')) { keepBenchVisible(); }
+    });
+    function act(b, e) {
       if (b.hasAttribute('data-ts-part')) { choosePart(b.getAttribute('data-ts-part')); return; }
       if (b.hasAttribute('data-ts-tool')) { changeTool(b.getAttribute('data-ts-tool')); return; }
       if (b.hasAttribute('data-ts-jog')) {
@@ -622,8 +724,13 @@
         case 'feed-x': feedTo('x'); break;
         case 'thread': threadPass(); break;
         case 'hold': if (busy) { busy.stop(); } break;
+        case 'more': toggleMore(); break;
+        case 'drawing': toggle(b, el.drawing); break;
+        case 'help': toggle(b, el.keys); break;
+        case 'zoom': opt.zoom = !opt.zoom; b.setAttribute('aria-pressed', String(opt.zoom)); applyZoom(true); break;
+        case 'ghost': opt.ghost = !opt.ghost; b.setAttribute('aria-pressed', String(opt.ghost)); buildView(); break;
       }
-    });
+    }
     // Jog buttons repeat while held, like a handwheel kept turning.
     $$(lab, '[data-ts-jog]').forEach(function (b) {
       var t1 = null, t2 = null;
@@ -636,12 +743,10 @@
       });
       ['pointerup', 'pointerleave', 'pointercancel', 'blur'].forEach(function (ev) { b.addEventListener(ev, stop); });
     });
-    $$(lab, '[data-ts-opt]').forEach(function (cb) {
-      cb.addEventListener('change', function () {
-        opt[cb.getAttribute('data-ts-opt')] = cb.checked;
-        if (cb.getAttribute('data-ts-opt') === 'ghost') { buildView(); } else { applyZoom(true); }
-      });
-    });
+    function toggle(b, panel) {
+      panel.hidden = !panel.hidden;
+      b.setAttribute('aria-expanded', String(!panel.hidden));
+    }
     $$(lab, 'input[name="' + id + '-step"]').forEach(function (r) {
       r.addEventListener('change', function () { if (r.checked) { opt.step = parseFloat(r.value); } });
     });
@@ -685,8 +790,27 @@
       if (handled) { e.preventDefault(); e.stopPropagation(); }
     });
 
-    // On a narrow surface, start close up on the tool; the box turns it off.
-    if (lab.getBoundingClientRect().width < 480) { opt.zoom = true; $(lab, '[data-ts-opt="zoom"]').checked = true; }
+    // Escape stops a running feed wherever focus is in the lab. Only then is it
+    // kept from the page, where it would otherwise leave presentation mode.
+    lab.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && busy) { busy.stop(); e.preventDefault(); e.stopPropagation(); }
+    });
+    // a drag on the picture or a click into a box; buttons align after their action, above
+    el.bench.addEventListener('click', function (e) { if (!e.target.closest('button')) { keepBenchVisible(); } });
+    el.bench.addEventListener('keyup', keepBenchVisible);
+    // Fit again when the lab's width or the window's height changes (a card opening, a rotated phone).
+    var seen = '';
+    function refit() {
+      var key = Math.round(lab.getBoundingClientRect().width) + 'x' + window.innerHeight;
+      if (key !== seen) { seen = key; fit(); }
+    }
+    if (window.ResizeObserver) { new ResizeObserver(refit).observe(lab); }
+    window.addEventListener('resize', refit);
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { seen = ''; refit(); }); }
+    window.addEventListener('load', function () { seen = ''; refit(); });
+
+    // On a narrow surface, start close up on the tool; Close up turns it off.
+    if (lab.getBoundingClientRect().width < 480) { opt.zoom = true; el.zoom.setAttribute('aria-pressed', 'true'); }
     choosePart(M.TARGETS[0].id);
   }
 
@@ -698,6 +822,9 @@
     });
   }
 
-  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot); }
-  else { boot(); }
+  if (node) { module.exports = { markup: markup, SHORT: SHORT, STEPS: STEPS }; }
+  else if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot); }
+    else { boot(); }
+  }
 })();
