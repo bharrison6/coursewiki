@@ -37,8 +37,7 @@
         var category=hv>f.hi[k]+1e-9?1:hv<f.lo[k]-1e-9?2:0;if(report&&report.status[k]===2)category=2;
         var c=category===1?P.excess:category===2?((k%model.nx+Math.floor(k/model.nx))%10<5?P.over:P.paper):P.metalTop;
         var dim=selection>=0&&f.owners[k]!==selection;
-        var shade=1-.18*Math.min(1,Math.max(0,((currentMeta.job&&currentMeta.job.top)||0)-f.nom[k])/8);
-        for(var n=0;n<3;n++){compare[k*4+n]=Math.round(c[n]);desired[k*4+n]=Math.round(dim?P.target[n]*.35+P.paper[n]*.65:P.target[n]*shade);}
+        for(var n=0;n<3;n++){compare[k*4+n]=Math.round(c[n]);desired[k*4+n]=Math.round(dim?P.target[n]*.35+P.paper[n]*.65:P.target[n]);}
         compare[k*4+3]=desired[k*4+3]=255;
       }
       function upload(texture,data){if(!texture){texture=new T.DataTexture(data,model.nx,model.ny);texture.colorSpace=T.SRGBColorSpace;}else texture.image.data=data;texture.needsUpdate=true;return texture;}
