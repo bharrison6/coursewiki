@@ -74,3 +74,12 @@ test('display budget rejects complex histories before meshing and ignores redund
   s.addPrim({ax:10,ay:30,bx:10,by:30,r:3.3,z:-18,cone:M.TOOL_BY_ID['dr6.6'].cone});
   assert.equal(Mesh.availability(s).cones,8,'a shallower peck adds no visible cone');
 });
+test('nominal 3D target reuses the inspection field with flat pocket, open holes and tolerant comparison',()=>{
+  const U=require('../../interactives/milling-simulator/demo.js'),J=require('../../interactives/milling-simulator/jobs.js'),I=require('../../interactives/milling-simulator/inspect.js'),Target=require('../../interactives/milling-simulator/target-mesh.js');
+  const s=M.create(),job=J.BY_ID.pocket,F=U.targetField(s,job),mesh=Target.build(F.nom,s.nx,s.ny,s.stock);
+  assert.equal(height(mesh,50,30),-6);assert.equal(height(mesh,29.9,30),0);assert.equal(height(mesh,70.1,30),0);
+  assert.equal(height(mesh,15,30),-Infinity);assert.equal(height(mesh,85,30),-Infinity);
+  assert.deepEqual(mesh.pitch,[.25,.25]);assert.ok(mesh.triangles<5000,'greedy planar faces keep the nominal guide compact');
+  const x=31.125,y=19.125,env={};I.envAt(job,x,y,env);assert.equal(I.nominalAt(job,x,y),0);
+  assert.equal(U.cellState(-6,env.lo,env.hi,s.stock.bottom),0,'a permitted smaller corner is not failed for differing from nominal R4');
+});

@@ -14,7 +14,7 @@ test('milling page uses the topic loader and has a real no-JavaScript lesson',()
   assert.doesNotMatch(page,/<script\b/);assert.match(page,/<noscript>/);
   const conf=fs.readFileSync(path.join(mod,'interactive.conf'),'utf8');
   const assets=[...conf.matchAll(/^@@(?:JS|CSS):\s*(.*)$/gm)].flatMap(m=>m[1].split(',').map(s=>s.trim()));
-  assert.deepEqual(assets,['demo.css','model.js','inspect.js','jobs.js','draw.js','demo.js']);
+  assert.deepEqual(assets,['demo.css','model.js','inspect.js','jobs.js','draw.js','geometry-bundle.js','mesh.js','mesh-worker-source.js','target-mesh.js','three-bundle.js','scene3d.js','demo.js']);
   for(const file of assets)assert.ok(fs.readdirSync(mod).includes(file),'case-sensitive asset '+file);
 });
 test('a deep link to the simulator lands on the machine, with the driving notes after it',()=>{
@@ -22,6 +22,6 @@ test('a deep link to the simulator lands on the machine, with the driving notes 
   const body=sec.slice(0,sec.indexOf('</section>'));
   assert.match(body,/^<h2>[^<]*<\/h2>\s*<div data-interactive="milling-simulator">/,'the simulator is the first thing in its card');
   assert.ok(body.indexOf('How to drive it')>body.indexOf('data-interactive="milling-simulator"'),'driving notes follow the machine');
-  for(const words of ['finished part is drawn over','gold is metal still to remove','striped red-orange'])assert.ok(body.includes(words),words);
+  for(const words of ['finished <em>Target</em>','gold is metal still to remove','striped red-orange'])assert.ok(body.includes(words),words);
   assert.doesNotMatch(page,/Show where it differs|Show the drawing on the work/,'no controls the simulator no longer has');
 });

@@ -78,7 +78,8 @@ test('one prominent switch chooses 3D or the existing top/front and isometric vi
   assert.match(css, /\.ms-viewbar \{ position: absolute;/, 'the switch adds no height to the bench');
   assert.match(css, /\.ms-iso-canvas \{ aspect-ratio: 190 \/ 181;/, 'the isometric takes the space of the pair');
   const page = fs.readFileSync(path.join(__dirname, '..', '..', 'collections', 'machining', 'pages', 'milling-operations.html'), 'utf8').replace(/\s+/g, ' ');
-  assert.match(page, /<em>Top and front<\/em>, the top view with its section, and <em>Isometric<\/em>/);
+  assert.match(page, /<em>Inspect \/ orbit<\/em>/);
+  assert.match(page, /<em>Home<\/em> restores the view/);
 });
 
 test('jog directions and orientation arrows follow the actual rotated tool projection', () => {
@@ -227,7 +228,7 @@ test('the rack offers every tool, by kind', () => {
 test('the interface keeps no target geometry or colours of its own', () => {
   const js = fs.readFileSync(path.join(MOD, 'demo.js'), 'utf8');
   for (const call of ['I.envAt(', 'I.nominalAt(', 'D.targetOutline(', 'D.renderSection(', 'I.inspect(']) assert.ok(js.includes(call), call);
-  assert.doesNotMatch(js, /\.features\b/, 'demo.js reads no drawing features itself');
+  assert.doesNotMatch(js, /\bf\.(?:x0|x1|y0|y1|cx|cy|floor|rMax|depth|width)\b/, 'feature choices read labels/ids, not a second geometry definition');
   assert.doesNotMatch(js, /#[0-9a-f]{3,6}\b/i, 'canvas colours come from theme tokens');
   for (const token of ['--cat1', '--cat2', '--cat3']) assert.ok(js.includes("'" + token + "'"), token);
   const cssText = fs.readFileSync(path.join(MOD, 'demo.css'), 'utf8');
