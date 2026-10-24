@@ -445,6 +445,23 @@
 .presenting [data-interactive="milling-simulator"] .ms-legend,
 .presenting [data-interactive="milling-simulator"] .ms-view-label { font-size: .8rem; }
 
+@container ms-app (max-width:35.99rem) {
+  /* Presentation's large type must not wrap a live coordinate onto a second
+     row or push operating controls behind the fixed navigation. */
+  .ms-dro-vals {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.25rem;}
+  .ms-dro-v {display:flex;align-items:baseline;min-width:0;}
+  [data-interactive="milling-simulator"] .ms-dro-val {min-width:0;flex:1;font-size:1rem;line-height:1.4;}
+  .ms-view-3d {min-height:140px;}
+  [data-interactive="milling-simulator"] .ms-go-in {min-height:2.5rem;line-height:1.2;}
+  /* Full text opens the optional explanation/suggested move. The compact
+     operating state keeps the outcome and recovery together in one row. */
+  .ms-feedback:not(.is-expanded) {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.3rem;align-items:center;}
+  .ms-feedback:not(.is-expanded) .ms-fb-act {grid-column:2;grid-row:1;float:none;flex-direction:row;margin:0;}
+  .ms-feedback:not(.is-expanded) .ms-status {grid-column:1;grid-row:1;font-size:.82rem;}
+  .ms-feedback:not(.is-expanded) .ms-next {display:none;}
+  .ms-feedback:has(.ms-stop:not([hidden])) .ms-undo {display:none;}
+}
+
 @media print {
   .ms-workbench { display: block; height: auto; }
   [data-interactive="milling-simulator"] {

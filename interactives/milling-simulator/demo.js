@@ -139,7 +139,8 @@
      (inspect.js envAt) and the drawing's nominal height (nominalAt). The
      overlay compares the metal that is actually left with these. */
   function targetField(sim, job) {
-    var n = sim.nx * sim.ny, lo = new Float32Array(n), hi = new Float32Array(n), nom = new Float32Array(n),owners=new Uint16Array(n),ids=['top'].concat(job.features.map(function(f){return f.id;}));
+    // Keep the canonical inspection's double precision at tolerance boundaries.
+    var n = sim.nx * sim.ny, lo = new Float64Array(n), hi = new Float64Array(n), nom = new Float64Array(n),owners=new Uint16Array(n),ids=['top'].concat(job.features.map(function(f){return f.id;}));
     var env = { lo: 0, hi: 0, owner: 'top', mode: 'set' };
     for (var j = 0; j < sim.ny; j++) {
       var y = sim.cellY(j);
@@ -530,10 +531,10 @@
     views.appendChild(vThree);
     viewBar.hidden=true;
     var comparisonBar=el('div',{class:'ms-comparison',role:'group','aria-label':'Compare your work with the target'}),compareButtons={};
-    [['work','Your work'],['target','Target'],['compare','Compare']].forEach(function(pair){var b=button(pair[1],{'data-ms-compare':pair[0],'aria-pressed':'false'});b.addEventListener('click',function(){state.comparison=pair[0];syncSceneControls();scheduleIso(true);});compareButtons[pair[0]]=b;comparisonBar.appendChild(b);});
+    [['work','Your work'],['target','Target'],['compare','Compare']].forEach(function(pair){var b=button(pair[1],{'data-ms-compare':pair[0],'aria-pressed':'false'});b.addEventListener('click',function(){state.comparison=pair[0];if(pair[0]==='target')state.interaction='inspect';syncSceneControls();scheduleIso(true);});compareButtons[pair[0]]=b;comparisonBar.appendChild(b);});
     var featureSelect=el('select',{'data-ms-feature':'','aria-label':'Target feature'});comparisonBar.appendChild(featureSelect);
     var cameraBar=el('div',{class:'ms-camera-controls'}),cameraSelect=el('select',{'data-ms-view':'','aria-label':'View'}),interactionSelect=el('select',{'data-ms-interaction':'','aria-label':'3D interaction'}),homeBtn=button('Home',{'aria-label':'Reset the 3D camera to Home'});
-    [['home','3D view'],['top','3D top'],['front','3D front'],['bottom','3D below'],['sections','2D sections']].forEach(function(p){cameraSelect.appendChild(el('option',{value:p[0]},p[1]));});
+    [['home','3D view'],['top','3D top'],['front','3D front'],['bottom','Below · fixtures hidden'],['sections','2D sections']].forEach(function(p){cameraSelect.appendChild(el('option',{value:p[0]},p[1]));});
     [['inspect','Inspect / orbit'],['x','Feed X'],['y','Feed Y'],['z','Feed Z'],['xy','Place XY']].forEach(function(p){interactionSelect.appendChild(el('option',{value:p[0]},p[1]));});
     add(cameraBar,cameraSelect,homeBtn,interactionSelect);
     var sceneHint=el('p',{class:'ms-scene-hint',id:uid+'-scene-help'});

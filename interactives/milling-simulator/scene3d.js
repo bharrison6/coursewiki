@@ -29,26 +29,28 @@
     function visibility(){if(meshObject)meshObject.visible=comparison!=='target'&&lastVersion>=0;if(targetObject)targetObject.visible=comparison==='target';if(targetEdges)targetEdges.visible=comparison==='compare';tool.visible=comparison!=='target';}
     function textures(P){
       var f=currentMeta.field;if(!f||!model)return;
-      if(textureVersion===model.version&&textureReport===currentMeta.report&&textureFeature===currentMeta.feature&&texturePalette===palette)return;
+      var version=comparison==='compare'?model.version:-1,activeReport=comparison==='compare'?currentMeta.report:null;
+      if(textureVersion===version&&textureReport===activeReport&&textureFeature===currentMeta.feature&&texturePalette===palette)return;
       var size=model.nx*model.ny,desired=new Uint8Array(size*4),compare=new Uint8Array(size*4),selection=f.ids.indexOf(currentMeta.feature),report=currentMeta.report;
       for(var k=0;k<size;k++){
         var z=model.raster[k],hv=z<=model.stock.bottom+1e-9?-Infinity:z;
         var category=hv>f.hi[k]+1e-9?1:hv<f.lo[k]-1e-9?2:0;if(report&&report.status[k]===2)category=2;
         var c=category===1?P.excess:category===2?((k%model.nx+Math.floor(k/model.nx))%10<5?P.over:P.paper):P.metalTop;
         var dim=selection>=0&&f.owners[k]!==selection;
-        for(var n=0;n<3;n++){compare[k*4+n]=Math.round(c[n]);desired[k*4+n]=Math.round(dim?P.target[n]*.35+P.paper[n]*.65:P.target[n]);}
+        var shade=1-.18*Math.min(1,Math.max(0,((currentMeta.job&&currentMeta.job.top)||0)-f.nom[k])/8);
+        for(var n=0;n<3;n++){compare[k*4+n]=Math.round(c[n]);desired[k*4+n]=Math.round(dim?P.target[n]*.35+P.paper[n]*.65:P.target[n]*shade);}
         compare[k*4+3]=desired[k*4+3]=255;
       }
       function upload(texture,data){if(!texture){texture=new T.DataTexture(data,model.nx,model.ny);texture.colorSpace=T.SRGBColorSpace;}else texture.image.data=data;texture.needsUpdate=true;return texture;}
       targetTexture=upload(targetTexture,desired);compareTexture=upload(compareTexture,compare);
       targetMaterial.map=targetTexture;targetMaterial.needsUpdate=true;
-      textureVersion=model.version;textureReport=report;textureFeature=currentMeta.feature;texturePalette=palette;
+      textureVersion=version;textureReport=activeReport;textureFeature=currentMeta.feature;texturePalette=palette;
     }
     function target(meta,P){
       currentMeta=meta||{};comparison=currentMeta.field?(currentMeta.comparison||'work'):'work';
       if(targetField!==currentMeta.field){
         if(targetObject){targetObject.geometry.dispose();scene.remove(targetObject);targetObject=null;}if(targetEdges){targetEdges.geometry.dispose();scene.remove(targetEdges);targetEdges=null;}
-        targetField=currentMeta.field;textureVersion=-1;
+        targetField=currentMeta.field;textureVersion=-2;
         if(targetField){var data=root.CourseWikiMillingTargetMesh.build(targetField.nom,model.nx,model.ny,model.stock),g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(data.positions,3));g.computeVertexNormals();uv(g);targetObject=new T.Mesh(g,targetMaterial);scene.add(targetObject);var eg=new T.BufferGeometry();eg.setAttribute('position',new T.BufferAttribute(data.edges,3));targetEdges=new T.LineSegments(eg,targetLineMaterial);targetEdges.renderOrder=10;scene.add(targetEdges);host.setAttribute('data-target-stats',JSON.stringify({triangles:data.triangles,pitch:data.pitch}));}
       }
       textures(P);metal.map=comparison==='compare'?compareTexture:null;metal.color.set(comparison==='compare'?'white':'rgb('+P.metalTop.map(Math.round).join(',')+')');metal.needsUpdate=true;
@@ -56,7 +58,8 @@
     }
     scene.add(new T.HemisphereLight(0xffffff,0x555555,2.4));
     var light=new T.DirectionalLight(0xffffff,3);light.position.set(-80,-70,160);scene.add(light);
-    function box(x0,x1,y0,y1,z0,z1,mat){var mesh=new T.Mesh(new T.BoxGeometry(x1-x0,y1-y0,z1-z0),mat);mesh.position.set((x0+x1)/2,(y0+y1)/2,(z0+z1)/2);scene.add(mesh);return mesh;}
+    var fixtureMeshes=[];
+    function box(x0,x1,y0,y1,z0,z1,mat){var mesh=new T.Mesh(new T.BoxGeometry(x1-x0,y1-y0,z1-z0),mat);mesh.position.set((x0+x1)/2,(y0+y1)/2,(z0+z1)/2);scene.add(mesh);fixtureMeshes.push(mesh);return mesh;}
     M.SETUP.jaws.forEach(function(j){box(j.x0,j.x1,j.y0,j.y1,-28,M.SETUP.jawTop,fixtureMat);});
     M.SETUP.parallels.forEach(function(j){box(j.x0,j.x1,j.y0,j.y1,-28,M.SETUP.parallelTop,fixtureMat);});
     box(-30,130,-14,74,-36,M.SETUP.viseFloor,fixtureMat);
@@ -64,7 +67,7 @@
     var axes=new T.Group();axes.position.set(-18,-22,0);scene.add(axes);
     var axisColors=[0x00a4e3,0xecac00,0xff4500];
     ['X','Y','Z'].forEach(function(label,i){var d=new T.Vector3(i===0?1:0,i===1?1:0,i===2?1:0);axes.add(new T.ArrowHelper(d,new T.Vector3(),20,axisColors[i],3,1.5));
-      var c=document.createElement('canvas');c.width=64;c.height=64;var ctx=c.getContext('2d');ctx.font='bold 40px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#'+axisColors[i].toString(16).padStart(6,'0');ctx.fillText(label+'+',32,32);
+      var c=document.createElement('canvas');c.width=64;c.height=64;var ctx=c.getContext('2d');ctx.font='bold 40px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ffffff';ctx.fillRect(0,8,64,48);ctx.fillStyle='#002144';ctx.fillText(label+'+',32,32);
       var texture=new T.CanvasTexture(c),sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:false}));sprite.position.copy(d.multiplyScalar(25));sprite.scale.set(10,10,1);axes.add(sprite);
     });
     var tool=new T.Group();scene.add(tool);var toolKey='';
@@ -102,8 +105,8 @@
     canvas.addEventListener('pointercancel',function(){pointer=null;previewLine.visible=false;pointerText.textContent='';request();});
     canvas.addEventListener('keydown',function(e){if(e.ctrlKey||e.metaKey||e.altKey)return;var used=true;
       if(e.key==='Escape'){pointer=null;previewLine.visible=false;pointerText.textContent='';if(options.onStop)options.onStop();}
-      else if(mode!=='inspect'&&/Arrow/.test(e.key)){var ax=mode==='xy'?(/Left|Right/.test(e.key)?'x':'y'):mode,sign=/Right|Up/.test(e.key)?1:-1;if(options.onJog)options.onJog(ax,sign);}
-      else if(mode==='inspect'&&/Arrow/.test(e.key)){var d=camera.position.clone().sub(controls.target),r=d.length(),az=Math.atan2(d.y,d.x),elev=Math.asin(d.z/r);az+=e.key==='ArrowLeft'?.15:e.key==='ArrowRight'?-.15:0;elev=Math.max(.06,Math.min(1.5,elev+(e.key==='ArrowUp'?.1:e.key==='ArrowDown'?-.1:0)));camera.position.set(controls.target.x+r*Math.cos(elev)*Math.cos(az),controls.target.y+r*Math.cos(elev)*Math.sin(az),controls.target.z+r*Math.sin(elev));controls.update();}
+      else if(mode!=='inspect'&&comparison!=='target'&&/Arrow/.test(e.key)){var ax=mode==='xy'?(/Left|Right/.test(e.key)?'x':'y'):mode,sign=/Right|Up/.test(e.key)?1:-1;if(options.onJog)options.onJog(ax,sign);}
+      else if((mode==='inspect'||comparison==='target')&&/Arrow/.test(e.key)){var d=camera.position.clone().sub(controls.target),r=d.length(),az=Math.atan2(d.y,d.x),elev=Math.asin(d.z/r);az+=e.key==='ArrowLeft'?.15:e.key==='ArrowRight'?-.15:0;elev=Math.max(.06,Math.min(1.5,elev+(e.key==='ArrowUp'?.1:e.key==='ArrowDown'?-.1:0)));camera.position.set(controls.target.x+r*Math.cos(elev)*Math.cos(az),controls.target.y+r*Math.cos(elev)*Math.sin(az),controls.target.z+r*Math.sin(elev));controls.update();}
       else if(e.key==='+'||e.key==='='||e.key==='-'){var d=camera.position.clone().sub(controls.target);camera.position.copy(controls.target).add(d.multiplyScalar(e.key==='-'?1.1:.9));controls.update();}
       else if(e.key==='Home')preset('home');else used=false;
       if(used){e.preventDefault();e.stopPropagation();request();}
@@ -114,13 +117,34 @@
       if(!t)return;
       function cyl(r1,r2,h,z,mat){var o=new T.Mesh(new T.CylinderGeometry(r1,r2,h,32),mat);o.rotation.x=Math.PI/2;o.position.z=z;tool.add(o);return o;}
       var cone=t.cone?t.dia/2*t.cone:0,reach=t.reach;
+      var insertMat=new T.MeshStandardMaterial({color:0xecac00,roughness:.5,metalness:.3});
+      if(t.kind==='face'){
+        cyl(t.dia*.44,t.dia*.44,18,reach+9,toolMat);
+        for(var i=0;i<t.teeth;i++){var a=i*2*Math.PI/t.teeth,o=new T.Mesh(new T.BoxGeometry(5,4,reach+1),insertMat);o.position.set((t.dia/2-2.5)*Math.cos(a),(t.dia/2-2.5)*Math.sin(a),(reach+1)/2);o.rotation.z=a;tool.add(o);}
+        cyl(10,10,16,reach+26,fixtureMat);return;
+      }
+      if(t.kind==='bore'){
+        // Match the offset bar and single cutting point in the canonical rack.
+        var bar=cyl((t.barDia-1.5)/2,(t.barDia-1.5)/2,reach-1.5,(reach+1.5)/2,toolMat);bar.position.x=t.dia/2-(t.barDia+1.5)/2;
+        var bit=new T.Mesh(new T.BoxGeometry(3,3,3),insertMat);bit.position.set(t.dia/2-1.5,0,1.5);tool.add(bit);
+        cyl(Math.max(18,t.dia/2+6),Math.max(18,t.dia/2+6),16,reach+8,fixtureMat);cyl(9,9,18,reach+25,toolMat);return;
+      }
+      insertMat.dispose();
+      if(t.kind==='tap'){
+        var thread=M.THREADS[t.thread],lead=t.lead*thread.pitch,minor=thread.tapDrill/2;
+        cyl(t.dia/2,minor,lead,lead/2,toolMat);cyl(t.dia/2,t.dia/2,reach-lead,(reach+lead)/2,toolMat);
+        var threadLine=new T.LineBasicMaterial({color:0xecac00}),pts=[];
+        for(var z=0;z<=Math.min(reach,16);z+=thread.pitch/20){var a=z/thread.pitch*2*Math.PI,r=minor+(t.dia/2-minor)*Math.min(1,z/lead);pts.push(new T.Vector3(r*Math.cos(a),r*Math.sin(a),z));}
+        tool.add(new T.Line(new T.BufferGeometry().setFromPoints(pts),threadLine));
+      }else{
       if(cone)cyl(t.dia/2,0,cone,cone/2,toolMat);
       cyl(t.dia/2,t.dia/2,Math.max(.1,reach-cone),cone+(reach-cone)/2,toolMat);
+      }
       cyl(t.kind==='face'?10:t.dia/2,t.kind==='face'?10:t.dia/2,15,reach+7.5,toolMat);
       cyl(13,10,15,reach+22.5,fixtureMat);
       // Flute grooves run round the cutting portion; the geometry's diameter
       // and cone come directly from the shared tool definition.
-      var lineMat=new T.LineBasicMaterial({color:0x002144});
+      var lineMat=new T.LineBasicMaterial({color:0xecac00});
       for(var k=0;k<(t.teeth||2);k++){
         var pts=[];for(var j=0;j<=32;j++){var z=cone+(reach-cone)*j/32,a=2*Math.PI*k/(t.teeth||2)+j/32*Math.PI;pts.push(new T.Vector3(Math.cos(a)*t.dia/2,Math.sin(a)*t.dia/2,z));}
         tool.add(new T.Line(new T.BufferGeometry().setFromPoints(pts),lineMat));
@@ -129,6 +153,7 @@
     function render(){frame=0;if(disposed||!host.clientWidth||!host.clientHeight)return;var w=host.clientWidth,h=host.clientHeight;
       if(canvas.width!==Math.floor(w*renderer.getPixelRatio())||canvas.height!==Math.floor(h*renderer.getPixelRatio())){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
       renderer.render(scene,camera);host.setAttribute('data-frame',String(Number(host.getAttribute('data-frame')||0)+1));
+      if(model){var points={tip:projected(model.pos)};['x','y','z'].forEach(function(a){var p=Object.assign({},model.pos);p[a]+=10;points[a]=projected(p);});host.setAttribute('data-tool-projection',JSON.stringify(points));}
     }
     function request(){if(!frame&&!disposed)frame=requestAnimationFrame(render);}
     controls.addEventListener('change',request);
@@ -168,7 +193,7 @@
       if(lastVersion!==sim.version&&(!workerBusy||requestedVersion!==sim.version)){if(force||performance.now()-lastBuild>80)rebuild();else if(!timer)timer=setTimeout(rebuild,80);}
       request();
     }
-    function preset(name){controls.target.set(50,30,-5);controls.maxPolarAngle=name==='bottom'?Math.PI-.02:Math.PI/2-.06;camera.position.set(name==='top'||name==='bottom'?50:name==='front'?50:-100,name==='top'||name==='bottom'?29.99:name==='front'?-190:-145,name==='top'?230:name==='bottom'?-230:name==='front'?10:130);camera.up.set(0,0,1);controls.update();request();}
+    function preset(name){controls.target.set(50,30,-5);controls.maxPolarAngle=name==='bottom'?Math.PI-.02:Math.PI/2-.06;camera.position.set(name==='top'||name==='bottom'?50:name==='front'?50:-100,name==='top'||name==='bottom'?29.99:name==='front'?-190:-145,name==='top'?230:name==='bottom'?-230:name==='front'?10:130);camera.up.set(0,0,1);fixtureMeshes.forEach(function(o){o.visible=name!=='bottom';});grid.visible=name!=='bottom';host.setAttribute('data-camera-view',name);controls.update();request();}
     function turn(sign){var d=camera.position.clone().sub(controls.target);d.applyAxisAngle(new T.Vector3(0,0,1),sign*Math.PI/4);camera.position.copy(controls.target).add(d);controls.update();request();}
     var ro=new ResizeObserver(request);ro.observe(host);
     canvas.addEventListener('webglcontextlost',function(e){e.preventDefault();host.setAttribute('data-renderer','lost');});

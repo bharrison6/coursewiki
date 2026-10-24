@@ -65,6 +65,28 @@ test('the isometric view marks every cell as the top view does', () => {
   assert.equal(U.isoTint(5, 0, 10, 0, -20, false), null);
 });
 
+test('shared display fields retain exact inspection boundaries, including curved limits', () => {
+  const s = M.create();
+  for (const job of JOBS) {
+    const f = U.targetField(s, job);
+    for (let j = 0; j < s.ny; j++) for (let i = 0; i < s.nx; i++) {
+      const k = i + j * s.nx, e = {};
+      I.envAt(job, s.cellX(i), s.cellY(j), e);
+      assert.equal(f.lo[k], e.lo, `${job.id} lower ${k}`);
+      assert.equal(f.hi[k], e.hi, `${job.id} upper ${k}`);
+      for (const bound of [e.lo, e.hi]) if (Number.isFinite(bound) && bound > s.stock.bottom) {
+        assert.equal(U.cellState(bound, f.lo[k], f.hi[k], s.stock.bottom), 0);
+        assert.equal(U.isoTint(bound, f.lo[k], f.hi[k], f.nom[k], s.stock.bottom, false), null);
+      }
+    }
+  }
+  for (const [id, x, y] of [['tapped', 14.375, 26.375], ['boss', 25.875, 15.875]]) {
+    const e = {};
+    I.envAt(J.BY_ID[id], x, y, e);
+    assert.equal(U.cellState(e.lo - 1e-6, e.lo, e.hi, s.stock.bottom), 2, 'a real excursion still fails');
+  }
+});
+
 test('one prominent switch chooses 3D or the existing top/front and isometric views', () => {
   const src = fs.readFileSync(path.join(MOD, 'demo.js'), 'utf8');
   assert.match(src, /button\('Top and front', \{ 'aria-pressed': 'true'/);
