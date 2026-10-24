@@ -123,12 +123,8 @@
 .ms-hints:empty { display: none; }
 .ms-hints li { padding-left: .2rem; }
 
-/* ---- the workbench: the work and its controls, one screen --------------
-   Wide: the work on the left, the controls beside it at the work's own
-   height (contain: size keeps the controls from making the row taller;
-   they scroll inside it only if a screen is too short).
-   Narrow: the work above, the controls scrolling under it, the whole
-   bench no taller than the screen, as the lathe lab does. */
+/* The operating controls keep their natural height. The picture takes the
+   remaining screen room; no control panel becomes a scrolling frame. */
 .ms-workbench { min-width: 0; display: flex; flex-direction: column; gap: .6rem; }
 .ms-machine { min-width: 0; display: flex; flex-direction: column; gap: .4rem; container: ms-work / inline-size; }
 .ms-panel { min-width: 0; display: flex; flex-direction: column; gap: .45rem; }
@@ -138,7 +134,7 @@
    link to the simulator lands on (about 30rem of page and bench around
    them; 181 mm of top view and section for every 190 mm across). */
 .ms-views { position: relative; display: flex; flex-direction: column; gap: .35rem; min-width: 0; container: ms-views / inline-size;
-  max-width: max(18rem, calc((100svh - 30rem) * 190 / 181)); width: 100%; margin-inline: auto; }
+  max-width: none; width: 100%; margin-inline: auto; }
 /* the view switch: two halves of one control, in the top left corner of the views */
 .ms-viewbar { position: absolute; z-index: 1; top: .3rem; left: .35rem; display: flex; flex-wrap: wrap; align-items: center; gap: .1rem .5rem; pointer-events: none; }
 .ms-viewbar-btns, .ms-viewbar .ms-turn { display: flex; pointer-events: auto; }
@@ -151,14 +147,13 @@
   padding: 0 .25rem; border-radius: 2px; background: color-mix(in srgb, var(--paper) 85%, transparent); }
 @container ms-app (min-width: 36rem) {
   .ms-workbench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(15.5rem, 18rem); gap: .6rem; align-items: stretch; }
-  .ms-panel { contain: size; overflow-y: auto; overscroll-behavior: contain; }
+  .ms-panel { align-self:start; }
 }
 @container ms-app (max-width: 35.99rem) {
-  .ms-workbench { height: min(54rem, calc(100svh - var(--appbar-h, 3.5rem) - 6rem)); }
+  .ms-workbench { gap:.35rem; }
   .ms-machine { flex: 0 0 auto; }
-  .ms-panel { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
-    padding: .35rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); }
-  .ms-views { width: min(100%, calc(var(--ms-view-h, 26svh) * 190 / 181)); margin-inline: auto; }
+  .ms-panel { flex:0 0 auto; gap:.3rem; }
+  .ms-views { width:100%; }
 }
 /* the readout */
 .ms-dro {
@@ -201,6 +196,21 @@
 .ms-top-canvas { aspect-ratio: 190 / 120; cursor: grab; }
 /* the isometric fills the space of the top view and section together */
 .ms-iso-canvas { aspect-ratio: 190 / 181; touch-action: auto; }
+.ms-view-3d { position:relative; width:100%; aspect-ratio:190 / 150; min-height:10rem; }
+.ms-webgl { display:block; width:100%; height:100%; touch-action:none; }
+.ms-surface-status { position:absolute; bottom:.3rem; left:.4rem; padding:.15rem .3rem; background:var(--paper); color:var(--ink); font: .7rem var(--f-display); pointer-events:none; }
+.ms-surface-status:empty { display:none; }
+.ms-render-note { margin:0; padding:.35rem; border-left:3px solid var(--cat2); color:var(--ink); font-size:.85rem; }
+.ms-pointer-preview {position:absolute;left:.3rem;right:.3rem;bottom:1.5rem;padding:.25rem;background:var(--paper);color:var(--ink);font:.72rem/1.2 var(--f-display);pointer-events:none;}
+.ms-pointer-preview:empty {display:none;}
+.ms-comparison,.ms-camera-controls {display:flex;align-items:center;gap:.3rem;min-width:0;}
+[data-interactive="milling-simulator"] .ms-comparison button {min-height:2.25rem;padding:.25rem .45rem;white-space:nowrap;font-size:.76rem;}
+.ms-comparison select {flex:1;min-width:0;max-width:24rem;}
+.ms-camera-controls select {flex:1;min-width:0;}
+.ms-camera-controls button {flex:none;}
+.ms-camera-controls select,.ms-comparison select {font: .78rem var(--f-display);min-height:2.25rem;padding:.25rem;border:1px solid var(--rule);border-radius:var(--radius-xs);color:var(--ink);background:var(--paper);}
+.ms-scene-hint {margin:0;min-height:2.3em;font:.76rem/1.15 var(--f-display);color:var(--ink-soft);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;}
+.ms-viewbar[hidden] {display:none!important;}
 .ms-orientation { position: absolute; left: .25rem; top: 2.7rem; width: 6.25rem; pointer-events: none;
   border-radius: var(--radius-xs); background: color-mix(in srgb, var(--paper) 90%, transparent); }
 .ms-orientation svg { display: block; width: 100%; height: auto; }
@@ -275,7 +285,8 @@
 .ms-status { margin: 0; font-size: .93rem; line-height: 1.38; }
 .ms-status strong { font-family: var(--f-display); }
 .ms-status:empty { display: none; }
-.ms-feedback-toggle { display: none; }
+.ms-feedback-toggle { display: block; }
+.ms-feedback:not(.is-expanded) .ms-status,.ms-feedback:not(.is-expanded) .ms-next-text {display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;}
 @container ms-app (max-width: 35.99rem) {
   .ms-feedback:not(.is-expanded) .ms-status:not(:empty),
   .ms-feedback:not(.is-expanded) .ms-next-text {
@@ -404,10 +415,55 @@
 /* presentation: the same machine, read from across the room */
 .presenting [data-interactive="milling-simulator"] .ms-dro-val { font-size: 1.5rem; }
 /* the panel title and the track bar take more of the screen here */
-.presenting [data-interactive="milling-simulator"] .ms-views { max-width: calc((100svh - var(--appbar-h, 3.5rem) - 26rem) * 190 / 181); }
+.presenting [data-interactive="milling-simulator"] .ms-views { max-width:none; }
+@container ms-app (max-width:35.99rem){
+  .ms-machine {gap:.25rem;}
+  .ms-dro {padding:.25rem .45rem;}
+  .ms-dro-note {display:none;}
+  .ms-box {padding:.25rem;gap:.2rem;}
+  .ms-toolbox>.ms-box-title,.ms-movebox>.ms-box-title {display:none;}
+  .ms-kinds {grid-template-columns:repeat(6,minmax(0,1fr));gap:.2rem;}
+  [data-interactive="milling-simulator"] .ms-kind {flex-direction:column;justify-content:center;padding:.15rem;font-size:.61rem;gap:.1rem;min-height:3.1rem;text-align:center;}
+  .ms-kind svg {height:18px;}
+  .ms-sizes-label {display:none;}
+  .ms-sizes,.ms-chips {gap:.2rem;}
+  [data-interactive="milling-simulator"] .ms-chip-btn {min-height:2.25rem;padding:.15rem .3rem;}
+  .ms-go-row {gap:.25rem;}
+  .ms-jog {grid-template-columns:repeat(6,minmax(0,1fr));grid-template-areas:none;gap:.2rem;}
+  .ms-jog>.ms-jog-btn {grid-area:auto;min-height:2.5rem;}
+  .ms-jog-sub {display:none;}
+  .ms-jog-head {gap:.25rem;}
+  .ms-feedback {padding:.3rem .4rem;}
+  .ms-next-text {font-size:.75rem;}
+  .ms-status {font-size:.82rem;}
+  [data-interactive="milling-simulator"] .ms-feedback button {min-height:2.1rem;font-size:.7rem;padding:.15rem .3rem;}
+  .ms-fb-act {gap:.2rem;margin-left:.35rem;}
+  .ms-camera-controls button {min-height:2.25rem;padding:.2rem .4rem;font-size:.76rem;}
+  .ms-comparison select {max-width:none;}
+}
 .presenting [data-interactive="milling-simulator"] .ms-status { font-size: 1.05rem; }
 .presenting [data-interactive="milling-simulator"] .ms-legend,
 .presenting [data-interactive="milling-simulator"] .ms-view-label { font-size: .8rem; }
+
+@container ms-app (max-width:35.99rem) {
+  /* Presentation's large type must not wrap a live coordinate onto a second
+     row or push operating controls behind the fixed navigation. */
+  .ms-dro-vals {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.25rem;}
+  .ms-dro-v {display:flex;align-items:baseline;min-width:0;}
+  [data-interactive="milling-simulator"] .ms-dro-val,
+  .presenting [data-interactive="milling-simulator"] .ms-dro-val {min-width:0;flex:1;font-size:1rem;line-height:1.4;}
+  .ms-dro {line-height:1.3;}
+  .ms-go-label {line-height:1.15;}
+  .ms-view-3d {min-height:140px;}
+  [data-interactive="milling-simulator"] .ms-go-in {min-height:2.5rem;line-height:1.2;}
+  /* Full text opens the optional explanation/suggested move. The compact
+     operating state keeps the outcome and recovery together in one row. */
+  .ms-feedback:not(.is-expanded) {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.3rem;align-items:center;}
+  .ms-feedback:not(.is-expanded) .ms-fb-act {grid-column:2;grid-row:1;float:none;flex-direction:row;margin:0;}
+  .ms-feedback:not(.is-expanded) .ms-status {grid-column:1;grid-row:1;font-size:.82rem;}
+  .ms-feedback:not(.is-expanded) .ms-next {display:none;}
+  .ms-feedback:has(.ms-stop:not([hidden])) .ms-undo {display:none;}
+}
 
 @media print {
   .ms-workbench { display: block; height: auto; }

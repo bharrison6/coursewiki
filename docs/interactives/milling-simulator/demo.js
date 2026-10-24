@@ -110,6 +110,7 @@
     return [p[0] - o[0], p[1] - o[1]];
   }
   function jogDirection(axis, sign, layout, rot) {
+    if(layout==='3d')return (sign>0?'increase ':'decrease ')+axis.toUpperCase()+' on the machine';
     if (layout !== 'iso') return axis === 'x' ? (sign > 0 ? 'right in top view' : 'left in top view') :
       axis === 'y' ? (sign > 0 ? 'up in top view' : 'down in top view') : (sign > 0 ? 'up' : 'down');
     var d = isoAxis(axis, rot), x = d[0] * sign, y = d[1] * sign;
@@ -138,7 +139,8 @@
      (inspect.js envAt) and the drawing's nominal height (nominalAt). The
      overlay compares the metal that is actually left with these. */
   function targetField(sim, job) {
-    var n = sim.nx * sim.ny, lo = new Float32Array(n), hi = new Float32Array(n), nom = new Float32Array(n);
+    // Keep the canonical inspection's double precision at tolerance boundaries.
+    var n = sim.nx * sim.ny, lo = new Float64Array(n), hi = new Float64Array(n), nom = new Float64Array(n),owners=new Uint16Array(n),ids=['top'].concat(job.features.map(function(f){return f.id;}));
     var env = { lo: 0, hi: 0, owner: 'top', mode: 'set' };
     for (var j = 0; j < sim.ny; j++) {
       var y = sim.cellY(j);
@@ -146,9 +148,10 @@
         var x = sim.cellX(i), k = i + j * sim.nx;
         I.envAt(job, x, y, env);
         lo[k] = env.lo; hi[k] = env.hi; nom[k] = I.nominalAt(job, x, y);
+        owners[k]=ids.indexOf(env.owner);
       }
     }
-    return { lo: lo, hi: hi, nom: nom };
+    return { lo: lo, hi: hi, nom: nom,owners:owners,ids:ids };
   }
   /* 0 matches, 1 metal still to remove, 2 cut too far: the inspection's
      cell rule (a column cut right through has no metal at all). */
@@ -302,7 +305,7 @@
     var sims = {}, fields = {}, jobs = J.JOBS;
     var state = {
       job: jobs[0], step: 1, speed: 'normal', target: true, rot: 0, hint: 0, kindShown: null, layout: 'flat',
-      report: null, queue: [], running: null, drag: null, raf: 0, last: 0, armReset: 0, edited: {}
+      report: null, queue: [], running: null, drag: null, raf: 0, last: 0, armReset: 0, edited: {},comparison:'target',feature:'all',interaction:'inspect'
     };
     function sim() { return sims[state.job.id] || (sims[state.job.id] = M.create()); }
     function field() {
@@ -357,11 +360,12 @@
     var viewBtns = el('div', { class: 'ms-viewbar-btns', role: 'group', 'aria-label': 'View of the work' });
     var flatBtn = button('Top and front', { 'aria-pressed': 'true', 'aria-controls': uid + '-views' });
     var isoBtn = button('Isometric', { 'aria-pressed': 'false', 'aria-controls': uid + '-views' });
+    var threeBtn = button('3D', { 'aria-pressed': 'false', 'aria-controls': uid + '-views' });
     var viewHow = el('span', { class: 'ms-view-how' }, 'drag the tool');
     var turnL = button('↶', { class: 'ms-mini', 'aria-label': 'Turn the part view left' });
     var turnR = button('↷', { class: 'ms-mini', 'aria-label': 'Turn the part view right' });
     var isoTurnRow = add(el('span', { class: 'ms-turn', hidden: true }), turnL, turnR);
-    add(viewBar, add(viewBtns, flatBtn, isoBtn), isoTurnRow, viewHow);
+    add(viewBar, add(viewBtns, threeBtn, flatBtn, isoBtn), isoTurnRow, viewHow);
     var views = el('div', { class: 'ms-views', id: uid + '-views' });
     views.appendChild(viewBar);
     var vTop = el('figure', { class: 'ms-view ms-view-top' });
@@ -522,6 +526,32 @@
     add(vSide, sideCap, sideHost);
     add(more, vSide);
     add(views, vIso);
+    var vThree=el('div',{class:'ms-view ms-view-3d',hidden:true}),webgl=null,webglTried=false,complexFallback=false;
+    var renderNotice=el('p',{class:'ms-render-note',hidden:true});machine.insertBefore(renderNotice,views);
+    views.appendChild(vThree);
+    viewBar.hidden=true;
+    var comparisonBar=el('div',{class:'ms-comparison',role:'group','aria-label':'Compare your work with the target'}),compareButtons={};
+    [['work','Your work'],['target','Target'],['compare','Compare']].forEach(function(pair){var b=button(pair[1],{'data-ms-compare':pair[0],'aria-pressed':'false'});b.addEventListener('click',function(){state.comparison=pair[0];if(pair[0]==='target')state.interaction='inspect';syncSceneControls();scheduleIso(true);});compareButtons[pair[0]]=b;comparisonBar.appendChild(b);});
+    var featureSelect=el('select',{'data-ms-feature':'','aria-label':'Target feature'});comparisonBar.appendChild(featureSelect);
+    var cameraBar=el('div',{class:'ms-camera-controls'}),cameraSelect=el('select',{'data-ms-view':'','aria-label':'View'}),interactionSelect=el('select',{'data-ms-interaction':'','aria-label':'3D interaction'}),homeBtn=button('Home',{'aria-label':'Reset the 3D camera to Home'});
+    [['home','3D view'],['top','3D top'],['front','3D front'],['bottom','Below · fixtures hidden'],['sections','2D sections']].forEach(function(p){cameraSelect.appendChild(el('option',{value:p[0]},p[1]));});
+    [['inspect','Inspect / orbit'],['x','Feed X'],['y','Feed Y'],['z','Feed Z'],['xy','Place XY']].forEach(function(p){interactionSelect.appendChild(el('option',{value:p[0]},p[1]));});
+    add(cameraBar,cameraSelect,homeBtn,interactionSelect);
+    var sceneHint=el('p',{class:'ms-scene-hint',id:uid+'-scene-help'});
+    machine.insertBefore(comparisonBar,views);machine.insertBefore(cameraBar,views);machine.insertBefore(sceneHint,feedback);
+    function syncSceneControls(){
+      Object.keys(compareButtons).forEach(function(k){compareButtons[k].setAttribute('aria-pressed',String(state.comparison===k));compareButtons[k].disabled=!!state.job.free;});
+      featureSelect.hidden=state.job.free;featureSelect.value=state.feature;interactionSelect.value=state.interaction;
+      var f=state.job.features.filter(function(f){return f.id===state.feature;})[0];
+      sceneHint.textContent=state.comparison==='target'?'Nominal target; inspection allows the drawing’s tolerances. '+(f?f.label:state.job.free?'Free practice':state.job.brief):
+        state.interaction==='inspect'?'Inspect: drag to orbit, two fingers or wheel to zoom. Arrow keys move the camera.':
+        'Feed '+state.interaction.toUpperCase()+': drag the tool and release to feed at the shown depth. Arrow keys feed machine axes; Escape stops.';
+      if(webgl)webgl.canvas.setAttribute('aria-describedby',uid+'-scene-help');
+    }
+    featureSelect.addEventListener('change',function(){state.feature=featureSelect.value;syncSceneControls();scheduleIso(true);});
+    cameraSelect.addEventListener('change',function(){var selected=cameraSelect.value;if(selected==='sections'){setLayout('flat');return;}setLayout('3d');cameraSelect.value=selected;if(webgl)webgl.preset(selected);});
+    homeBtn.addEventListener('click',function(){setLayout('3d');cameraSelect.value='home';if(webgl)webgl.preset('home');});
+    interactionSelect.addEventListener('change',function(){state.interaction=interactionSelect.value;if(state.interaction!=='inspect')state.comparison='work';setLayout('3d');syncSceneControls();scheduleIso(true);});
 
     var help = el('div', { class: 'ms-help', id: uid + '-help', hidden: true });
     var keysNote = el('p', { id: uid + '-keys' },
@@ -563,10 +593,23 @@
       var edge = r.bottom - g.top <= room ? g.top : r.top;
       window.scrollBy({ top: edge - top, behavior: 'instant' });
     }
+    var fittingWorkspace=false,toolFitKey='';
+    function fitWorkspace(){
+      if(fittingWorkspace||!app.clientWidth)return;fittingWorkspace=true;
+      var bar=document.querySelector('.appbar'),nav=document.querySelector('.seqbar'),exit=document.querySelector('.present-exit');
+      var top=(bar?bar.getBoundingClientRect().bottom:0)+8,bottom=window.innerHeight-8;
+      if(nav&&nav.getBoundingClientRect().height)bottom=Math.min(bottom,nav.getBoundingClientRect().top-8);
+      if(exit&&exit.getBoundingClientRect().height)bottom=Math.min(bottom,exit.getBoundingClientRect().top-8);
+      views.style.maxWidth='none';vThree.style.height=(app.clientWidth<576?260:440)+'px';
+      var available=bottom-top,b=workbench.getBoundingClientRect(),v=state.layout==='3d'?vThree.getBoundingClientRect().height:views.getBoundingClientRect().height;
+      var room=Math.max(140,available-(b.height-v));
+      if(state.layout==='3d')vThree.style.height=Math.floor(Math.min(v,room))+'px';
+      else views.style.maxWidth=Math.floor(Math.max(160,Math.min(views.clientWidth,room*190/181)))+'px';
+      app.setAttribute('data-ms-fit',workbench.getBoundingClientRect().height<=available+1?'fits':'over');fittingWorkspace=false;
+    }
     // Align after activation: moving a button between pointerdown/up would
     // swallow the click. Keyboard activation has no pointer coordinates.
-    panel.addEventListener('click', keepWorkspaceVisible);
-    panel.addEventListener('keyup', keepWorkspaceVisible);
+    panel.addEventListener('click', function(e){if(e.target.closest('button'))keepWorkspaceVisible();});
     host.appendChild(app);
     rootEl.appendChild(record);
     rootEl.classList.add('is-live');
@@ -791,6 +834,12 @@
       ctx.stroke();
     }
     function scheduleIso(now) {
+      if(state.layout==='3d') {
+        if(vThree.closest('details:not([open])') || (vThree.checkVisibility&&!vThree.checkVisibility()))return;
+        if(!webglTried){webglTried=true;try{webgl=window.CourseWikiMilling3D.create(vThree,{onFallback:function(reason){complexFallback=true;renderNotice.hidden=false;renderNotice.textContent=reason+' Your cuts and inspection are kept. Undo or start over to restore 3D.';setLayout('flat');},onMove:function(t,label){clearEdits();moveTo(t,label);},onJog:jogBy,onStop:stop,onFeature:function(id){state.feature=id;syncSceneControls();scheduleIso(true);}});}catch(e){vThree.textContent='3D is unavailable in this browser. Choose 2D sections to continue with the same tools and work.';vThree.setAttribute('data-renderer','unavailable');}}
+        if(webgl)webgl.update(sim(),P,!!now,{job:state.job,field:field(),comparison:state.comparison,feature:state.feature,report:state.report,interaction:state.interaction,step:state.step,busy:!!state.running||!!state.drag});
+        return;
+      }
       if (state.layout !== 'iso') return;
       if (now) { clearTimeout(isoTimer); isoTimer = 0; drawIso(); return; }
       if (isoTimer) return;
@@ -820,7 +869,7 @@
       STEPS.forEach(function (st) { stepButtons[st].setAttribute('aria-pressed', String(state.step === st)); });
       Object.keys(speedButtons).forEach(function (k) { speedButtons[k].setAttribute('aria-pressed', String(state.speed === k)); });
       targetBtn.setAttribute('aria-pressed', String(state.target));
-      targetBtn.hidden = state.job.free;
+      targetBtn.hidden = state.job.free||state.layout==='3d';
       legend.classList.toggle('is-plain', !showTarget());
       jobs.forEach(function (j) { jobButtons[j.id].setAttribute('aria-pressed', String(j === state.job)); });
     }
@@ -849,6 +898,7 @@
       Object.keys(sizeButtons).forEach(function (id) { sizeButtons[id].setAttribute('aria-pressed', String(!!t && t.id === id)); });
       boreRow.hidden = !(t && t.kind === 'bore');
       if (t && t.kind === 'bore' && document.activeElement !== boreInput) boreInput.value = fmt(t.dia, 2);
+      var fitKey=shown+':'+!!multi+':'+!boreRow.hidden+':'+app.clientWidth;if(fitKey!==toolFitKey){toolFitKey=fitKey;requestAnimationFrame(fitWorkspace);}
     }
     function syncInputs() {
       var s = sim();
@@ -986,6 +1036,7 @@
     /* Queue a move to a target; it runs leg by leg on the animation clock. */
     function moveTo(target, label) {
       var s = sim();
+      state.comparison='work';syncSceneControls();
       if (!s.tool) { say('stop', 'No tool.', 'Choose a tool first.'); return; }
       if (state.running || state.queue.length) {
         if (state.queue.length < 2) state.queue.push({ target: target, label: label });
@@ -1213,6 +1264,7 @@
       if (!r.ok) say('stop', 'No change.', r.message);
       else say('info', r.same ? '' : 'Tool changed.', r.message + (r.same ? '' : ' ' + toolCanDo(s.tool)));
       state.kindShown = null;
+      state.comparison='work';syncSceneControls();
       redrawMoving(); scheduleSections(true);
     }
     boreSet.addEventListener('click', function () {
@@ -1267,6 +1319,7 @@
       clearEdits();
       say('info', 'Undone.', (e.kind === 'tool' ? 'The ' + e.label.toLowerCase() : 'The last move') + ' is taken back; the tool is at ' + where(s) + '. In the shop, metal that is cut stays cut.');
       redrawAll(); scheduleInspect(true);
+      recover3D();
     }
     undoBtn.addEventListener('click', doUndo);
     resetBtn.addEventListener('click', function () {
@@ -1280,6 +1333,7 @@
       clearEdits();
       say('info', 'A fresh block.', 'It is 1 mm over on top, back in the vise, with no tool loaded.');
       redrawAll(); scheduleInspect(true);
+      recover3D();
     });
     function toggleRegion(btn, region, opened) {
       region.hidden = !opened;
@@ -1297,20 +1351,27 @@
     helpBtn.addEventListener('click', function () { toggleRegion(helpBtn, help, help.hidden); });
     targetBtn.addEventListener('click', function () { state.target = !state.target; syncSegs(); drawTop(); scheduleSections(true); scheduleIso(true); });
     function setLayout(l) {
+      if(l==='3d'&&window.CourseWikiMillingMesh&&window.CourseWikiMillingMesh.availability(sim()).ok){complexFallback=false;renderNotice.hidden=true;}
       state.layout = l;
+      threeBtn.setAttribute('aria-pressed',String(l==='3d'));
       flatBtn.setAttribute('aria-pressed', String(l === 'flat'));
       isoBtn.setAttribute('aria-pressed', String(l === 'iso'));
-      vTop.hidden = vFront.hidden = l === 'iso';
-      vIso.hidden = isoTurnRow.hidden = l !== 'iso';
-      views.classList.toggle('is-iso', l === 'iso');
+      vTop.hidden = vFront.hidden = l !== 'flat';
+      vIso.hidden = l !== 'iso';vThree.hidden=l!=='3d';isoTurnRow.hidden=l==='flat';
+      views.classList.toggle('is-iso', l !== 'flat');
       syncJogDirections();
-      viewHow.textContent = l === 'iso' ? 'turn it to see every side' : 'drag the tool';
+      viewHow.textContent = l==='3d'?'drag to orbit · wheel to zoom':l === 'iso' ? 'turn it to see every side' : 'drag the tool';
+      comparisonBar.hidden=l!=='3d';interactionSelect.disabled=l!=='3d';cameraSelect.value=l==='3d'?'home':'sections';
+      syncSceneControls();fitWorkspace();
+      syncSegs();
       drawTop(); scheduleSections(true); scheduleIso(true);
     }
+    function recover3D(){if(complexFallback&&window.CourseWikiMillingMesh.availability(sim()).ok)setLayout('3d');}
     flatBtn.addEventListener('click', function () { setLayout('flat'); });
     isoBtn.addEventListener('click', function () { setLayout('iso'); });
-    turnL.addEventListener('click', function () { state.rot = (state.rot + 3) % 4; syncJogDirections(); scheduleIso(true); });
-    turnR.addEventListener('click', function () { state.rot = (state.rot + 1) % 4; syncJogDirections(); scheduleIso(true); });
+    threeBtn.addEventListener('click',function(){setLayout('3d');});
+    turnL.addEventListener('click', function () { if(state.layout==='3d'&&webgl){webgl.turn(-1);return;}state.rot = (state.rot + 3) % 4; syncJogDirections(); scheduleIso(true); });
+    turnR.addEventListener('click', function () { if(state.layout==='3d'&&webgl){webgl.turn(1);return;}state.rot = (state.rot + 1) % 4; syncJogDirections(); scheduleIso(true); });
     hintBtn.addEventListener('click', function () {
       var h = state.job.hints;
       if (state.hint < h.length) {
@@ -1324,6 +1385,8 @@
     function setJob(j) {
       if (state.running || state.drag) stop();
       state.job = j; state.hint = 0; state.report = null; state.kindShown = null;
+      state.feature='all';state.comparison=j.free?'work':'target';state.interaction='inspect';
+      featureSelect.innerHTML='';featureSelect.appendChild(el('option',{value:'all'},'All features'));featureSelect.appendChild(el('option',{value:'top'},'Finished top at Z '+fmt(j.top||0,2)));j.features.forEach(function(f){featureSelect.appendChild(el('option',{value:f.id},f.label));});
       clearEdits();
       goal.innerHTML = '';
       add(goal, el('strong', {}, j.free ? j.title + '.' : 'Job ' + j.n + ': ' + j.title + '.'), document.createTextNode(' ' + j.brief));
@@ -1339,7 +1402,9 @@
       var s = sim();
       if (s.removed) say('info', 'Back to ' + (j.free ? 'free practice' : 'job ' + j.n) + '.', 'The block is as you left it.');
       else if (s.tool) say('info', '', M.toolLabel(s.tool) + ' in the spindle at ' + where(s) + '.');
-      else say('info', j.free ? 'Free practice.' : 'Ready.', 'A raw block 1 mm over on top is in the vise.' + (j.free ? '' : ' The finished part is drawn over it.'));
+      else say('info', j.free ? 'Free practice.' : 'Target shown.', j.free?'A raw block 1 mm over on top is in the vise.':'Make this part from the raw block. Choose a tool to show your work; start by facing the top at Z 0.');
+      syncSceneControls();fitWorkspace();
+      recover3D();
     }
 
     /* ---- theme, size, print ----------------------------------------------*/
@@ -1348,9 +1413,21 @@
     var dark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
     if (dark && dark.addEventListener) dark.addEventListener('change', rePalette);
     if (window.ResizeObserver) {
-      var ro = new ResizeObserver(function () { drawTop(); scheduleIso(true); });
+      var resizeKey='';var ro = new ResizeObserver(function () {
+        // Tool options and feedback can grow without changing the viewport.
+        // Observe their natural heights, not editing/focus events or scrollY.
+        var key=[app.clientWidth,window.innerHeight,panel.offsetHeight,feedback.offsetHeight,dro.offsetHeight,sceneHint.offsetHeight].join(':');
+        if(key!==resizeKey){resizeKey=key;fitWorkspace();}drawTop();scheduleIso(true);
+      });
       ro.observe(topCanvas); ro.observe(isoCanvas);
+      ro.observe(vThree);
+      ro.observe(panel);ro.observe(feedback);ro.observe(dro);ro.observe(sceneHint);
     } else addEventListener('resize', function () { drawTop(); scheduleIso(true); });
+    var containingCard=rootEl.closest('details');
+    if(containingCard)containingCard.addEventListener('toggle',function(){if(containingCard.open){fitWorkspace();scheduleIso(true);}});
+    window.addEventListener('resize',fitWorkspace);
+    function enterBench(){fitWorkspace();if(containingCard&&location.hash==='#'+containingCard.id){var bar=document.querySelector('.appbar'),top=(bar?bar.getBoundingClientRect().bottom:0)+8;window.scrollBy({top:workbench.getBoundingClientRect().top-top,behavior:'instant'});}}
+    if(document.readyState==='complete')requestAnimationFrame(enterBench);else window.addEventListener('load',function(){requestAnimationFrame(enterBench);},{once:true});
     addEventListener('beforeprint', function () {
       if (state.running || state.drag) stop();
       var job = state.job, rep = state.report;
@@ -1373,7 +1450,8 @@
     });
 
     setStep(1);
-    setJob(jobs[0]);
+    setJob(J.BY_ID.pocket);
+    setLayout('3d');
   }
 
   function boot() {
