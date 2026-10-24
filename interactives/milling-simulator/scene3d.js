@@ -2,7 +2,8 @@
 (function (root) {
   'use strict';
   var T = root.CourseWikiThree, M = root.CourseWikiMillingSim, Mesh = root.CourseWikiMillingMesh;
-  function create(host) {
+  function create(host,options) {
+    options=options||{};
     if (!T || !Mesh) throw new Error('3D assets unavailable');
     var renderer = new T.WebGLRenderer({ antialias:true, alpha:false });
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
@@ -15,6 +16,9 @@
     var controls=new T.OrbitControls(camera,canvas);controls.enableDamping=false;controls.minDistance=30;controls.maxDistance=600;
     controls.target.set(50,30,-5);camera.position.set(-100,-145,130);controls.update();
     var frame=0,disposed=false,meshObject=null,model=null,lastVersion=-1,lastSim=null,lastBuild=0,timer=0;
+    var epoch=0,requestId=0,workerBusy=false,queued=false,lastRemoved=0,lastCount=0,requestedVersion=-1;
+    var workerURL=URL.createObjectURL(new Blob([root.CourseWikiMillingWorkerSource],{type:'text/javascript'})),worker=new Worker(workerURL);
+    var surfaceStatus=document.createElement('span');surfaceStatus.className='ms-surface-status';surfaceStatus.setAttribute('role','status');host.appendChild(surfaceStatus);
     var palette=null,metal=new T.MeshStandardMaterial({roughness:.8,metalness:.15,vertexColors:true,side:T.DoubleSide});
     var fixtureMat=new T.MeshStandardMaterial({roughness:.85,metalness:.1}),toolMat=new T.MeshStandardMaterial({roughness:.45,metalness:.5});
     scene.add(new T.HemisphereLight(0xffffff,0x555555,2.4));
@@ -31,7 +35,7 @@
       var texture=new T.CanvasTexture(c),sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:false}));sprite.position.copy(d.multiplyScalar(25));sprite.scale.set(10,10,1);axes.add(sprite);
     });
     var tool=new T.Group();scene.add(tool);var toolKey='';
-    function disposeGroup(group){group.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material&&o.material.map)o.material.map.dispose();});group.clear();}
+    function disposeGroup(group){var owned=new Set();group.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material&&o.material!==toolMat&&o.material!==fixtureMat)owned.add(o.material);});owned.forEach(function(m){if(m.map)m.map.dispose();m.dispose();});group.clear();}
     function toolShape(t){
       var key=t?t.id+':'+t.dia:'';if(key===toolKey)return;toolKey=key;disposeGroup(tool);
       if(!t)return;
@@ -55,26 +59,42 @@
     }
     function request(){if(!frame&&!disposed)frame=requestAnimationFrame(render);}
     controls.addEventListener('change',request);
-    function rebuild(){
-      timer=0;if(!model||disposed)return;var start=performance.now(),data=Mesh.build(model,{color:function(){return[1,1,1];}});
+    function fallback(reason){epoch++;queued=false;surfaceStatus.textContent=reason;host.setAttribute('data-renderer','complexity-fallback');if(meshObject)meshObject.visible=false;if(options.onFallback)options.onFallback(reason);}
+    function install(data,version){
+      var start=performance.now();
       var geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.BufferAttribute(data.positions,3));geometry.setAttribute('color',new T.BufferAttribute(data.colors,3));geometry.computeVertexNormals();
       if(meshObject){meshObject.geometry.dispose();scene.remove(meshObject);}meshObject=new T.Mesh(geometry,metal);scene.add(meshObject);
-      lastSim=model;lastVersion=model.version;lastBuild=performance.now();
-      host.setAttribute('data-mesh-stats',JSON.stringify(Object.assign({},data.stats,{totalMilliseconds:lastBuild-start})));request();
+      lastVersion=version;lastBuild=performance.now();host.setAttribute('data-renderer','webgl2');host.setAttribute('data-mesh-version',String(version));
+      host.setAttribute('data-mesh-stats',JSON.stringify(Object.assign({},data.stats,{uploadMilliseconds:lastBuild-start,worker:true})));request();
+    }
+    worker.onmessage=function(event){var result=event.data;workerBusy=false;if(disposed)return;
+      if(result.epoch===epoch){if(result.error||result.mesh.unavailable)fallback(result.error||result.mesh.reason);else if(result.version>=lastVersion)install(result.mesh,result.version);}
+      surfaceStatus.textContent=model&&lastVersion!==model.version?'Updating cut surface…':'';
+      if(queued){queued=false;rebuild();}
+    };
+    worker.onerror=function(e){e.preventDefault();workerBusy=false;fallback('3D surface computation is unavailable. Continue in Top and front.');};
+    function rebuild(){
+      timer=0;if(!model||disposed)return;if(workerBusy){queued=true;return;}
+      var available=Mesh.availability(model);if(!available.ok){fallback(available.reason);return;}
+      var snapshot={stock:Object.assign({},model.stock),prims:model.prims.map(function(p){return{ax:p.ax,ay:p.ay,bx:p.bx,by:p.by,r:p.r,z:p.z,cone:p.cone};})};
+      requestedVersion=model.version;workerBusy=true;surfaceStatus.textContent='Updating cut surface…';
+      worker.postMessage({id:++requestId,epoch:epoch,version:model.version,snapshot:snapshot});
     }
     function update(sim,P,force){
       if(disposed)return;
-      model=sim;var key=JSON.stringify([P.paper,P.metalTop,P.jaw,P.accent]);
+      if(lastSim!==sim||sim.removed<lastRemoved-1e-7||sim.prims.length<lastCount){epoch++;lastVersion=-1;requestedVersion=-1;if(meshObject)meshObject.visible=false;}
+      model=sim;lastSim=sim;lastRemoved=sim.removed;lastCount=sim.prims.length;host.setAttribute('data-model-version',String(sim.version));
+      var key=JSON.stringify([P.paper,P.metalTop,P.jaw,P.accent]);
       if(palette!==key){palette=key;scene.background=new T.Color('rgb('+P.paper.map(Math.round).join(',')+')');metal.color.set('rgb('+P.metalTop.map(Math.round).join(',')+')');fixtureMat.color.set('rgb('+P.jaw.map(Math.round).join(',')+')');toolMat.color.set('rgb('+P.accent.map(Math.round).join(',')+')');}
       toolShape(sim.tool);tool.position.set(sim.pos.x,sim.pos.y,sim.pos.z);
-      if(lastSim!==sim||lastVersion!==sim.version){if(force||performance.now()-lastBuild>80)rebuild();else if(!timer)timer=setTimeout(rebuild,80);}
+      if(lastVersion!==sim.version&&(!workerBusy||requestedVersion!==sim.version)){if(force||performance.now()-lastBuild>80)rebuild();else if(!timer)timer=setTimeout(rebuild,80);}
       request();
     }
     function preset(name){controls.target.set(50,30,-5);camera.position.set(name==='top'?50:name==='front'?50:-100,name==='top'?30:name==='front'?-190:-145,name==='top'?230:name==='front'?10:130);camera.up.set(0,name==='top'?1:0,name==='top'?0:1);controls.update();request();}
     function turn(sign){var d=camera.position.clone().sub(controls.target);d.applyAxisAngle(new T.Vector3(0,0,1),sign*Math.PI/4);camera.position.copy(controls.target).add(d);controls.update();request();}
     var ro=new ResizeObserver(request);ro.observe(host);
     canvas.addEventListener('webglcontextlost',function(e){e.preventDefault();host.setAttribute('data-renderer','lost');});
-    function dispose(){if(disposed)return;disposed=true;cancelAnimationFrame(frame);clearTimeout(timer);ro.disconnect();removal.disconnect();controls.dispose();scene.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});renderer.dispose();renderer.forceContextLoss();canvas.remove();}
+    function dispose(){if(disposed)return;disposed=true;cancelAnimationFrame(frame);clearTimeout(timer);worker.terminate();URL.revokeObjectURL(workerURL);ro.disconnect();removal.disconnect();controls.dispose();scene.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});renderer.dispose();renderer.forceContextLoss();canvas.remove();}
     var removal=new MutationObserver(function(){if(!host.isConnected)dispose();});removal.observe(document.body,{childList:true,subtree:true});
     window.addEventListener('pagehide',dispose,{once:true});
     return {update:update,preset:preset,turn:turn,canvas:canvas,dispose:dispose};

@@ -13,6 +13,12 @@
 })(typeof self !== 'undefined' ? self : this, function (M, G) {
   'use strict';
   var ARC = 0.01, HEIGHT = 0.025;
+  function activeCones(sim){var cones=sim.prims.filter(function(p){return p.cone&&p.z<sim.stock.rawTop;});return cones.filter(function(p,i){return !cones.some(function(q,j){return i!==j&&(q.z<p.z||Math.hypot(q.bx-q.ax,q.by-q.ay)>Math.hypot(p.bx-p.ax,p.by-p.ay)+1e-9||j>i)&&q.z<=p.z&&q.cone===p.cone&&q.r>=p.r&&M.segDist(p.ax,p.ay,q.ax,q.ay,q.bx,q.by)<1e-9&&M.segDist(p.bx,p.by,q.ax,q.ay,q.bx,q.by)<1e-9;});});}
+  function availability(sim){
+    if(sim.prims.length>150)return{ok:false,reason:'This long cut history is shown in Top and front to keep controls responsive.'};
+    var count=activeCones(sim).length;
+    return count>8?{ok:false,reason:'This complex conical cut history is shown in Top and front to keep controls responsive.',cones:count}:{ok:true,cones:count};
+  }
   function arcSteps(p) { var r=p.r,t=Math.min(ARC, p.cone?HEIGHT*.3/p.cone:ARC);return Math.max(12,Math.ceil(Math.PI/Math.acos(Math.max(-1,1-Math.min(t,r/8)/r)))); }
   function capsule(p, radius) {
     var r = radius == null ? p.r : radius;
@@ -65,6 +71,7 @@
   }
   function build(sim, options) {
     var opt = options || {}, st = sim.stock, started = Date.now();
+    var available=availability(sim);if(!available.ok&&!opt.unbounded)return{unavailable:true,reason:available.reason};
     var stock = [[[[st.x0, st.y0], [st.x1, st.y0], [st.x1, st.y1], [st.x0, st.y1], [st.x0, st.y0]]]];
     var flats = {}, cones = [], through = [];
     sim.prims.forEach(function (p) {
@@ -86,7 +93,7 @@
     if (remain.length) regions.push({ shape: remain, flat: st.rawTop, cones: [] });
     // A plunge followed by a deeper/equal sweep on the same centreline adds no
     // visible surface. Remove that display redundancy without altering history.
-    cones=cones.filter(function(p,i){return !cones.some(function(q,j){return i!==j&&(q.z<p.z||j>i)&&q.z<=p.z&&q.cone===p.cone&&q.r>=p.r&&M.segDist(p.ax,p.ay,q.ax,q.ay,q.bx,q.by)<1e-9&&M.segDist(p.bx,p.by,q.ax,q.ay,q.bx,q.by)<1e-9;});});
+    cones=activeCones(sim);
     cones.forEach(function (p) {
       var next = [];
       regions.forEach(function (region) {
@@ -169,5 +176,5 @@
       stats:{regions:regions.length,triangles:pos.length/9,top:topCount,wall:wallCount,bottom:bottomCount,
         arcError:ARC,heightProbeError:maxError,unresolved:unresolved,milliseconds:Date.now()-started},open:open };
   }
-  return { build:build,capsule:capsule,ARC_ERROR:ARC,HEIGHT_ERROR:HEIGHT };
+  return { build:build,capsule:capsule,availability:availability,ARC_ERROR:ARC,HEIGHT_ERROR:HEIGHT };
 });

@@ -64,3 +64,13 @@ test('off-center conical envelope intersection is resolved between the refinemen
   assert.ok(Math.abs(height(mesh,x,y)-s.heightAt(x,y))<.025,'retain the lower-envelope ridge, rather than joining minimum corner samples');
   assert.equal(mesh.stats.unresolved,0);
 });
+test('display budget rejects complex histories before meshing and ignores redundant pecks',()=>{
+  const s=M.create();face(s);
+  for(let i=0;i<9;i++)s.addPrim({ax:10+i*9,ay:30,bx:10+i*9,by:30,r:3.3,z:-22,cone:M.TOOL_BY_ID['dr6.6'].cone});
+  const version=s.version,prims=s.prims.length;
+  assert.equal(Mesh.availability(s).ok,false);assert.equal(Mesh.build(s).unavailable,true);
+  assert.equal(s.prims.length,prims);assert.equal(s.version,version);
+  s.prims.pop();assert.equal(Mesh.availability(s).ok,true,'reducing history restores eligibility');
+  s.addPrim({ax:10,ay:30,bx:10,by:30,r:3.3,z:-18,cone:M.TOOL_BY_ID['dr6.6'].cone});
+  assert.equal(Mesh.availability(s).cones,8,'a shallower peck adds no visible cone');
+});

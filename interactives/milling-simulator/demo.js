@@ -524,7 +524,8 @@
     add(vSide, sideCap, sideHost);
     add(more, vSide);
     add(views, vIso);
-    var vThree=el('div',{class:'ms-view ms-view-3d',hidden:true}),webgl=null,webglTried=false;
+    var vThree=el('div',{class:'ms-view ms-view-3d',hidden:true}),webgl=null,webglTried=false,complexFallback=false;
+    var renderNotice=el('p',{class:'ms-render-note',hidden:true});machine.insertBefore(renderNotice,views);
     views.appendChild(vThree);
 
     var help = el('div', { class: 'ms-help', id: uid + '-help', hidden: true });
@@ -796,7 +797,7 @@
     function scheduleIso(now) {
       if(state.layout==='3d') {
         if(vThree.closest('details:not([open])') || (vThree.checkVisibility&&!vThree.checkVisibility()))return;
-        if(!webglTried){webglTried=true;try{webgl=window.CourseWikiMilling3D.create(vThree);webgl.canvas.addEventListener('keydown',wheelKeys);}catch(e){vThree.textContent='3D is unavailable in this browser. Use Top and front or Isometric to continue.';vThree.setAttribute('data-renderer','unavailable');}}
+        if(!webglTried){webglTried=true;try{webgl=window.CourseWikiMilling3D.create(vThree,{onFallback:function(reason){complexFallback=true;renderNotice.hidden=false;renderNotice.textContent=reason+' Your cuts and inspection are kept. Undo or start over to restore 3D.';setLayout('flat');}});webgl.canvas.addEventListener('keydown',wheelKeys);}catch(e){vThree.textContent='3D is unavailable in this browser. Use Top and front or Isometric to continue.';vThree.setAttribute('data-renderer','unavailable');}}
         if(webgl)webgl.update(sim(),P,!!now);
         return;
       }
@@ -1276,6 +1277,7 @@
       clearEdits();
       say('info', 'Undone.', (e.kind === 'tool' ? 'The ' + e.label.toLowerCase() : 'The last move') + ' is taken back; the tool is at ' + where(s) + '. In the shop, metal that is cut stays cut.');
       redrawAll(); scheduleInspect(true);
+      recover3D();
     }
     undoBtn.addEventListener('click', doUndo);
     resetBtn.addEventListener('click', function () {
@@ -1289,6 +1291,7 @@
       clearEdits();
       say('info', 'A fresh block.', 'It is 1 mm over on top, back in the vise, with no tool loaded.');
       redrawAll(); scheduleInspect(true);
+      recover3D();
     });
     function toggleRegion(btn, region, opened) {
       region.hidden = !opened;
@@ -1306,6 +1309,7 @@
     helpBtn.addEventListener('click', function () { toggleRegion(helpBtn, help, help.hidden); });
     targetBtn.addEventListener('click', function () { state.target = !state.target; syncSegs(); drawTop(); scheduleSections(true); scheduleIso(true); });
     function setLayout(l) {
+      if(l==='3d'&&window.CourseWikiMillingMesh&&window.CourseWikiMillingMesh.availability(sim()).ok){complexFallback=false;renderNotice.hidden=true;}
       state.layout = l;
       threeBtn.setAttribute('aria-pressed',String(l==='3d'));
       flatBtn.setAttribute('aria-pressed', String(l === 'flat'));
@@ -1317,6 +1321,7 @@
       viewHow.textContent = l==='3d'?'drag to orbit · wheel to zoom':l === 'iso' ? 'turn it to see every side' : 'drag the tool';
       drawTop(); scheduleSections(true); scheduleIso(true);
     }
+    function recover3D(){if(complexFallback&&window.CourseWikiMillingMesh.availability(sim()).ok)setLayout('3d');}
     flatBtn.addEventListener('click', function () { setLayout('flat'); });
     isoBtn.addEventListener('click', function () { setLayout('iso'); });
     threeBtn.addEventListener('click',function(){setLayout('3d');});
@@ -1351,6 +1356,7 @@
       if (s.removed) say('info', 'Back to ' + (j.free ? 'free practice' : 'job ' + j.n) + '.', 'The block is as you left it.');
       else if (s.tool) say('info', '', M.toolLabel(s.tool) + ' in the spindle at ' + where(s) + '.');
       else say('info', j.free ? 'Free practice.' : 'Ready.', 'A raw block 1 mm over on top is in the vise.' + (j.free ? '' : ' The finished part is drawn over it.'));
+      recover3D();
     }
 
     /* ---- theme, size, print ----------------------------------------------*/
