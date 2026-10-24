@@ -543,7 +543,7 @@
       Object.keys(compareButtons).forEach(function(k){compareButtons[k].setAttribute('aria-pressed',String(state.comparison===k));compareButtons[k].disabled=!!state.job.free;});
       featureSelect.hidden=state.job.free;featureSelect.value=state.feature;interactionSelect.value=state.interaction;
       var f=state.job.features.filter(function(f){return f.id===state.feature;})[0];
-      sceneHint.textContent=state.comparison==='target'?(f?f.label:state.job.free?'Free practice':state.job.brief)+' Target is nominal; inspection allows the drawing’s tolerances.':
+      sceneHint.textContent=state.comparison==='target'?'Nominal target; inspection allows the drawing’s tolerances. '+(f?f.label:state.job.free?'Free practice':state.job.brief):
         state.interaction==='inspect'?'Inspect: drag to orbit, two fingers or wheel to zoom. Arrow keys move the camera.':
         'Feed '+state.interaction.toUpperCase()+': drag the tool and release to feed at the shown depth. Arrow keys feed machine axes; Escape stops.';
       if(webgl)webgl.canvas.setAttribute('aria-describedby',uid+'-scene-help');
