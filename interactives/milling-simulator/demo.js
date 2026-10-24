@@ -1413,9 +1413,15 @@
     var dark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
     if (dark && dark.addEventListener) dark.addEventListener('change', rePalette);
     if (window.ResizeObserver) {
-      var resizeKey='';var ro = new ResizeObserver(function () {var key=app.clientWidth+':'+window.innerHeight;if(key!==resizeKey){resizeKey=key;fitWorkspace();}drawTop(); scheduleIso(true); });
+      var resizeKey='';var ro = new ResizeObserver(function () {
+        // Tool options and feedback can grow without changing the viewport.
+        // Observe their natural heights, not editing/focus events or scrollY.
+        var key=[app.clientWidth,window.innerHeight,panel.offsetHeight,feedback.offsetHeight,dro.offsetHeight,sceneHint.offsetHeight].join(':');
+        if(key!==resizeKey){resizeKey=key;fitWorkspace();}drawTop();scheduleIso(true);
+      });
       ro.observe(topCanvas); ro.observe(isoCanvas);
       ro.observe(vThree);
+      ro.observe(panel);ro.observe(feedback);ro.observe(dro);ro.observe(sceneHint);
     } else addEventListener('resize', function () { drawTop(); scheduleIso(true); });
     var containingCard=rootEl.closest('details');
     if(containingCard)containingCard.addEventListener('toggle',function(){if(containingCard.open){fitWorkspace();scheduleIso(true);}});
