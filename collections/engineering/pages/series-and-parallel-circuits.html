@@ -1,0 +1,54 @@
+@@ID: series-and-parallel-circuits
+@@TITLE: Series and Parallel Circuits
+@@SECTION: Electrical Systems
+@@SUMMARY: Trace current paths, combine resistances, and explore how opening a switch changes voltage, current and power.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Series has one path; parallel has separate branches</h2>
+  <p>In a <strong>series circuit</strong>, the same current passes through every element. The voltage drops around the loop add up to the source voltage. One break stops current everywhere in that loop.</p>
+  <p>In a <strong>parallel circuit</strong>, each branch connects to the same two supply nodes (a <strong>node</strong> is an electrically connected junction), so each complete branch has the same voltage. The branch currents add up to the supply current. A break in one branch leaves the other branches working, provided the source and shared wiring remain intact.</p>
+  <p>[[img:electrical-systems/series-parallel.svg|Comparison of two resistors in one series loop and two resistors in separate parallel branches across a DC source.]]</p>
+  <p>Equal resistance gives equal drops in series and equal currents in parallel. Different resistances make the drops or currents different. The formulas for each individual resistor are on [[current-voltage-and-resistance]].</p>
+</section>
+
+<section>
+  <h2>Add resistances in series; add their reciprocals in parallel</h2>
+  <p><strong>Equivalent resistance</strong> is the single resistance that would draw the same total current at the supply terminals.</p>
+  <ul>
+    <li>Series: <code>R<sub>eq</sub> = R<sub>1</sub> + R<sub>2</sub> + R<sub>3</sub></code>.</li>
+    <li>Parallel: <code>1/R<sub>eq</sub> = 1/R<sub>1</sub> + 1/R<sub>2</sub> + 1/R<sub>3</sub></code>. A <strong>reciprocal</strong> is <code>1 ÷ R</code>: one divided by the resistance. Include only connected branches.</li>
+    <li>Two parallel resistors: <code>R<sub>eq</sub> = R<sub>1</sub>R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>)</code>.</li>
+  </ul>
+  <p>Check the result: series resistance is greater than any one positive resistor; parallel resistance is smaller than the smallest connected resistor when two or more branches are connected. An open circuit has no conducting path and is represented by infinite equivalent resistance.</p>
+  <details class="deeper"><summary>Why the parallel formula uses reciprocals</summary>
+    <p>Each branch draws the supply voltage divided by its resistance. Add those branch currents, then divide by the common voltage. The result is a sum of <code>1/R</code> terms. This reciprocal of resistance is called conductance: parallel branches add ways for current to flow.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Change a resistor or open a switch and predict what changes</h2>
+  <p>Use this ideal DC model to compare two or three fixed resistors. Before moving a control, predict which current, voltage and power will change. Switches are ideal, wires have zero resistance and the source holds its set voltage.</p>
+  <div data-interactive="series-parallel-circuits">
+    <div class="circuit-controls" hidden></div>
+    <div class="circuit-live" hidden></div>
+    <div class="circuit-static">
+      <p><strong>Static example:</strong> a 15 V source and 30 &Omega; and 60 &Omega; resistors, with both switches closed.</p>
+      <table><caption>The same resistors in two connections</caption><thead><tr><th>Connection</th><th>Equivalent resistance</th><th>Total current</th><th>R1: current / voltage / power</th><th>R2: current / voltage / power</th></tr></thead><tbody>
+        <tr><th>Series</th><td>90 &Omega;</td><td>0.1667 A</td><td>0.1667 A / 5 V / 0.8333 W</td><td>0.1667 A / 10 V / 1.667 W</td></tr>
+        <tr><th>Parallel</th><td>20 &Omega;</td><td>0.75 A</td><td>0.5 A / 15 V / 7.5 W</td><td>0.25 A / 15 V / 3.75 W</td></tr>
+      </tbody></table>
+      <p>Opening either series switch makes both resistor currents and both resistor voltage drops zero. Opening the R1 parallel switch makes R1 current and power zero while R2 still draws 0.25 A. The voltage across the whole open branch remains 15 V; it falls across the open switch, not the resistor.</p>
+    </div>
+  </div>
+  <p>The live table reports voltage across each <em>resistor</em>, excluding its switch. In an open series loop the source voltage is across the break or breaks. With several open switches, this ideal model does not determine how that voltage divides between the breaks.</p>
+</section>
+
+<section>
+  <h2>Power explains the bulb comparison, within the model</h2>
+  <p>For fixed resistors in series, the larger resistance dissipates more power because both carry the same current. In parallel, the smaller resistance dissipates more power because both have the same voltage. Check the power column rather than assuming the same bulb wins in both arrangements.</p>
+  <p>Greater electrical power is a useful brightness comparison for otherwise comparable incandescent bulbs. Real filaments change resistance as they heat, and LED lamps contain additional circuitry. The fixed-resistor model is not a universal lamp-brightness predictor.</p>
+  <p>Build another circuit in <a href="https://phet.colorado.edu/sims/html/circuit-construction-kit-dc-virtual-lab/latest/circuit-construction-kit-dc-virtual-lab_en.html">PhET's Circuit Construction Kit: DC – Virtual Lab</a>. Try an unequal pair of resistors, predict the effect of a break, and then test your prediction.</p>
+  <p><a class="button" data-practice-add="circuits-series-current" href="../practice.html#circuits-series-current">Add a series-current problem to practice</a></p>
+</section>

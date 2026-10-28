@@ -1,0 +1,52 @@
+@@ID: ac-and-dc
+@@TITLE: AC and DC
+@@SECTION: Electrical Systems
+@@SUMMARY: Current direction, sine-wave voltage, transmission losses, and conversion between AC and DC.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>DC flows one way; AC reverses direction</h2>
+  <p>Direct current (DC) flows in one direction. Its magnitude can change without making it AC. Alternating current (AC) reverses direction repeatedly. A battery supplies DC; a wall receptacle supplies AC.</p>
+  <p>Electronics generally run from a DC supply. That does not mean a transistor cannot handle an AC signal: transistors can amplify changing signals and act as switches. The supply and the signal are different parts of the story.</p>
+  <p>Start with [[current-voltage-and-resistance]] for the quantities and equations used here. For measurement, see [[measuring-electric-circuits]].</p>
+</section>
+
+<section>
+  <h2>A 120 V sine wave peaks near positive and negative 170 V</h2>
+  <p>The nominal 120 V of a US receptacle is an <strong>RMS</strong> value: root mean square. For a sine wave, <code>V<sub>peak</sub> = V<sub>RMS</sub> &times; &radic;2</code>, and <code>V<sub>RMS</sub> = V<sub>peak</sub> / &radic;2</code>. Thus <code>120 &times; &radic;2 = 169.7 V</code>. The instantaneous voltage swings between about +170 V and &minus;170 V, or about 340 V peak to peak.</p>
+  <p>[[img:electrical-systems/ac-sine.svg|One cycle of a sine wave: positive peak 169.7 V, negative peak minus 169.7 V, and RMS reference 120 V. RMS is not the waveform's average voltage.]]</p>
+  <p><strong>Frequency</strong> counts complete cycles per second, in hertz (Hz). A 60 Hz waveform completes 60 whole cycles per second; a 50 Hz waveform completes 50. A cycle returns to the same phase, rather than ending at the opposite peak. US household mains is 60 Hz; many other countries use 50 Hz (<a href="https://www.energy.gov/oe/electricity-101">DOE, Electricity 101</a>).</p>
+  <details class="deeper"><summary>Why use RMS instead of the average voltage?</summary>
+    <p>A symmetrical sine wave averages to zero over a whole cycle, yet it still heats a resistor. RMS is the DC voltage that would produce the same average heating in that resistance. Square the instantaneous voltage, average those squares over a cycle, then take the square root. The square-root-of-two conversion applies to a sine wave; do not apply it to an arbitrary inverter waveform.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Higher transmission voltage reduces current and line loss</h2>
+  <p>For the same transmitted power, a higher voltage allows a lower current. The line's resistive heating is <code>P<sub>loss</sub> = I<sup>2</sup>R<sub>line</sub></code>. Halve the current and the loss becomes one quarter, if line resistance stays the same. Here <code>R<sub>line</sub></code> includes the complete current path.</p>
+  <p>Transformers made it practical to step AC voltage up for transmission and down for use. That advantage helped the AC systems associated with Westinghouse and Tesla prevail over Edison's early DC distribution system in the “war of the currents.” It was not one inventor winning every part of electrical engineering.</p>
+  <details class="deeper"><summary>A comparison with the same power and the same line</summary>
+    <p>In an ideal DC or unity-power-factor comparison, transmitting 8,000 W at 400 V requires 20 A. At 4,000 V it requires 2 A. If the complete line resistance is 0.5 &Omega;, the losses are 200 W and 2 W. Ten times the voltage gives one hundredth the resistive loss. This simplified comparison omits converter losses and voltage regulation; it is not a design for a real transmission line. For AC loads with a phase shift, see [[power-and-efficiency]].</p>
+    <p>The historical advantage belongs to the equipment available at the time. Modern converters also make high-voltage DC transmission practical.</p>
+  </details>
+</section>
+
+<section>
+  <h2>A rectifier is one stage of an AC-to-DC power supply</h2>
+  <p>A <strong>rectifier</strong> makes current flow in one direction from an AC input. Its output can still pulsate. Filtering smooths the output, and regulation controls the output voltage. A complete power supply may include all these functions as well as isolation.</p>
+  <ul>
+    <li><strong>Linear supply:</strong> commonly uses a line-frequency transformer, rectifier, filter, and linear regulator. The regulator dissipates excess voltage as heat.</li>
+    <li><strong>Switch-mode supply:</strong> switches current rapidly and uses energy-storage components to convert voltage efficiently. An AC-input version also rectifies its input. Not every switch-mode converter provides isolation.</li>
+  </ul>
+  <p>Power-supply manufacturer <a href="https://www.archcorp.com.tw/en/blog/ARCH-blog-014.html">ARCH gives illustrative typical efficiency categories</a>: linear supplies about 50–60%, conventional switching supplies 75–85%, and modern high-efficiency designs 90–95%.</p>
+  <p>Both lose some input energy as heat. Efficiency depends on the design, input voltage and load; compare published efficiency curves at the intended operating point rather than assuming one percentage for a whole category. See [[power-and-efficiency]] for the input/output calculation.</p>
+</section>
+
+<section>
+  <h2>An inverter makes AC from DC; the waveform matters</h2>
+  <p>A <strong>pure-sine inverter</strong> produces an output close to a sine wave. A <strong>modified-sine inverter</strong> produces a stepped approximation. Equipment may run differently, make more noise or heat, or fail to operate on a stepped waveform. Check the equipment manufacturer's compatibility guidance; equal RMS voltages do not make the waveforms interchangeable.</p>
+  <p>For grid-tied PV inverters, efficiency is typically above 95% under most operating conditions, according to <a href="https://pvpmc.sandia.gov/modeling-guide/dc-to-ac-conversion/cec-inverter-test-protocol/">Sandia PVPMC’s CEC Inverter Test Protocol</a>. Efficiency depends on AC output power, DC voltage and sometimes temperature.</p>
+  <p>Every real conversion loses some energy. Several conversions in a row multiply their efficiencies rather than adding them. Much of what we use today runs on DC internally, even when it plugs into AC. Phones, computers, and microcontroller electronics bring the instructor's closing question into focus: who gets the last laugh?</p>
+  <p>Motors, generation, and energy storage make use of both forms of electrical power.</p>
+</section>
