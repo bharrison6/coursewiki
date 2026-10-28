@@ -17,6 +17,10 @@
       A LINK is [[page-id]] or [[page-id|text]]. Ids are unique site-wide, and
       one authored link resolves to five destinations - see Resolve-Links.
 
+      A COLLECTION LINK is [[collection:id|text]] (label defaults to its title).
+      Site and practice views link to its index; standalone print aggregates
+      link to the published index, just like other links out of the aggregate.
+
       An IMAGE is [[img:file.png|Alt text]] - the same link syntax in an
       `img:` namespace, so it rides the same Resolve-Links seam and the same
       switch on output mode. Source files live in media\.
@@ -102,6 +106,7 @@ function Get-DataUri([string]$relPath) {
 # resolved is a report that can miss exactly the case it exists to catch.
 $script:linkRx = '\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]'
 $script:imgPrefix = 'img:'
+$script:collectionPrefix = 'collection:'
 
 # A token inside an HTML comment is not content, and must not resolve or be
 # validated. An author sketching a slot for artwork that does not exist yet -
@@ -758,6 +763,27 @@ function Resolve-Links([string]$html, $ctx, [string]$mode) {
       return New-ImageTag ($id.Substring($script:imgPrefix.Length).Trim()) $label $ctx $mode
     }
 
+    if ($id.StartsWith($script:collectionPrefix, [StringComparison]::Ordinal)) {
+      $cid = $id.Substring($script:collectionPrefix.Length).Trim()
+      if (-not $script:allCollections.Contains($cid)) {
+        $text = if ($label) { $label } else { $id }
+        return '<span class="xref-missing" title="No collection with id ' + (ConvertTo-HtmlText $cid) + '">' + (ConvertTo-HtmlText $text) + '</span>'
+      }
+      $collection = $script:allCollections[$cid]
+      $text = ConvertTo-HtmlText $(if ($label) { $label } else { $collection.Title })
+      # Use the canonical id so the destination has exact filesystem case.
+      $path = $collection.Id + '/index.html'
+      switch ($mode) {
+        'site-page' { $href = $ctx.Up + $path }
+        'practice-page' { $href = $ctx.Up + $path }
+        'aggregate' {
+          return '<a class="xref-out" href="' + $script:siteUrl + '/' + $path + '" target="_blank" rel="noopener">' + $text + '</a>'
+        }
+        default { throw "Resolve-Links: unknown mode '$mode'" }
+      }
+      return '<a class="xref-page" href="' + $href + '">' + $text + '</a>'
+    }
+
     if (-not $script:allPages.Contains($id)) {
       $text = if ($label) { $label } else { $id }
       return '<span class="xref-missing" title="No page with id ''' + $id + '''">' +
@@ -785,6 +811,7 @@ function Resolve-Links([string]$html, $ctx, [string]$mode) {
     }
   })
 }
+$script:allCollections = $collections
 $script:allPages = $pages
 $script:siteUrl  = $SiteUrl
 
@@ -2091,12 +2118,46 @@ if ($orphans.Count) {
 
 # ------------------------------------------------- link and image report -----
 # Every authored container, scanned once with the SAME regex the resolver used.
-# Page bodies and collection intros both carry [[tokens]], so both are scanned;
-# an intro's links used to go unchecked.
+# Scan page bodies, collection intros, and rendered practice items: every
+# container passed to Resolve-Links, without counting unpublished bank markup.
 $containers = @()
 foreach ($p in $pages.Values) { $containers += [pscustomobject]@{ Where = $p.Id; Text = $p.Body } }
 foreach ($c in $collections.Values) {
   if ($c.Intro) { $containers += [pscustomobject]@{ Where = "$($c.Id)\intro.html"; Text = $c.Intro } }
+}
+
+foreach ($item in $practiceItems) {
+  $containers += [pscustomobject]@{ Where = "practice\$($item.File)#$($item.Id)"; Text = $item.Html }
+}
+
+# Inspect original source, not trimmed/expanded bodies, to retain line numbers.
+# Match comments and tags whole so commented hrefs and data-href are not links.
+$hrefWarnings = @()
+$sourceFiles = @(
+  foreach ($c in $collections.Values) {
+    foreach ($id in $c.PageIds) { Join-Path $collDir "$($c.Id)/pages/$id.html" }
+    $introPath = Join-Path $collDir "$($c.Id)/intro.html"
+    if (Test-Path -LiteralPath $introPath) { $introPath }
+  }
+  if (Test-Path -LiteralPath $practiceDir) {
+    Get-ChildItem -LiteralPath $practiceDir -Filter '*.html' | ForEach-Object FullName
+  }
+)
+foreach ($file in $sourceFiles) {
+  $raw = [IO.File]::ReadAllText($file)
+  foreach ($tag in [regex]::Matches($raw, $script:commentRx + '|<[A-Za-z][^<>]*>')) {
+    if ($tag.Value.StartsWith('<!--', [StringComparison]::Ordinal)) { continue }
+    $href = Get-HtmlAttribute $tag.Value 'href'
+    if ($null -eq $href) { continue }
+    $href = [System.Net.WebUtility]::HtmlDecode($href).Trim()
+    $relative = $href -notmatch '^(?:[A-Za-z][A-Za-z0-9+.-]*:|#|\.\./|/)'
+    $selfSite = $href -match ('^' + [regex]::Escape($SiteUrl) + '(?:[/?#]|$)')
+    if ($relative -or $selfSite) {
+      $line = 1 + [regex]::Matches($raw.Substring(0, $tag.Index), "`n").Count
+      $where = [IO.Path]::GetRelativePath($root, $file)
+      $hrefWarnings += "${where}:${line} -> $href"
+    }
+  }
 }
 
 $dangling  = @()
@@ -2119,6 +2180,11 @@ foreach ($ct in $containers) {
     $id    = $m.Groups[1].Value.Trim()
     $label = if ($m.Groups[2].Success) { $m.Groups[2].Value.Trim() } else { '' }
 
+    if ($id.StartsWith($script:collectionPrefix, [StringComparison]::Ordinal)) {
+      $cid = $id.Substring($script:collectionPrefix.Length).Trim()
+      if (-not $collections.Contains($cid)) { $dangling += "$($ct.Where) -> $id" }
+      continue
+    }
     if (-not $id.StartsWith($script:imgPrefix, [StringComparison]::Ordinal)) {
       if (-not $pages.Contains($id)) { $dangling += "$($ct.Where) -> $id" }
       continue
@@ -2147,8 +2213,13 @@ foreach ($ct in $containers) {
 
 if ($dangling.Count) {
   Write-Host ''
-  Write-Host ("links to pages that do not exist yet ({0}):" -f $dangling.Count)
+  Write-Host ("links to pages that do not exist yet (or unknown collections) ({0}):" -f $dangling.Count)
   $dangling | Sort-Object -Unique | ForEach-Object { Write-Host "  $_" }
+}
+if ($hrefWarnings.Count) {
+  Write-Host ''
+  Write-Host ("WARNING - raw hrefs may break in other contexts ({0}):" -f $hrefWarnings.Count)
+  $hrefWarnings | Sort-Object -Unique | ForEach-Object { Write-Host "  $_" }
 }
 $orphans = @($pages.Values | Where-Object { $_.Decks.Count -eq 0 } | ForEach-Object Id)
 if ($orphans.Count) {
