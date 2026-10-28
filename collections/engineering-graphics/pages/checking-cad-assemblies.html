@@ -1,0 +1,51 @@
+@@ID: checking-cad-assemblies
+@@TITLE: Checking CAD Assemblies
+@@SECTION: Assemblies
+@@SUMMARY: Diagnose mate errors, inspect overlap and clearance, and test the intended motion before trusting an assembly model.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Judge remaining motion against the design intent</h2>
+  <p class="lede">A successful rebuild means the CAD system can solve the model. It does not mean the model describes the mechanism you intended. Try moving each component and name the motion that should remain.</p>
+  <p><strong>Under-mated</strong> means freedom remains. That is a defect for a loose cover, but rotation at a lever pivot can be intentional. <strong>Over-mated</strong> or conflicting constraints ask for relationships that the solver cannot satisfy together. A redundant constraint repeats an existing condition; it adds no useful location and can complicate diagnosis.</p>
+  <p>For a shaft with concentric axes and seated shoulder faces, one rotation remains. Adding another mate that merely keeps those axes parallel is redundant. Adding an angle mate to lock that remaining rotation may be correct for a stationary shaft and wrong for a rotating lever. Review [[assembly-files-and-mates]] for the geometry.</p>
+</section>
+
+<section>
+  <h2>Repair the cause of a mate error before adding more mates</h2>
+  <ul class="boxes">
+    <li>Read the reported mate error and identify the first failed relationship, rather than only the later errors it causes.</li>
+    <li>Check which component is grounded and whether a moving part was fixed accidentally.</li>
+    <li>Inspect selected faces and axes, alignment direction, offsets, and angle values.</li>
+    <li>Check whether an edit removed or replaced the geometry used by a mate.</li>
+    <li>Temporarily suppress a suspect mate to isolate the conflict, then repair or remove the unnecessary relationship.</li>
+    <li>Rebuild and test motion again, including motion inside subassemblies at the parent level.</li>
+  </ul>
+  <p>Do not force incompatible hole locations together by adding duplicate constraints. Determine whether the parts, the chosen references, or the intended fit are wrong.</p>
+</section>
+
+<section>
+  <h2>Check interference and clearance as different questions</h2>
+  <p><strong>Interference</strong> is shared volume: two solid parts occupy the same space. <strong>Clearance</strong> is the gap between parts. A model with no overlap may still lack enough room for movement, manufacturing variation, or tool access.</p>
+  <figure>[[img:engineering-graphics/assemblies/interference-clearance.svg|Three comparisons show overlapping parts, touching parts, and parts separated by a gap. No overlap alone does not prove adequate clearance.]]</figure>
+  <p>Run interference detection on the relevant components in the intended configuration and position. Inspect each result. An intentional press fit or simplified thread representation can produce overlap, but an unwanted bolt tip inside a moving path needs attention. Record the reason for any accepted interference.</p>
+  <details class="deeper"><summary>Selection scope can hide an interference</summary>
+    <p><a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_Interference_Detection.htm?id=7.14.3">SOLIDWORKS: Interference Detection</a> describes overlap volumes and options affecting subassemblies and ignored results. <a href="https://cad.onshape.com/help/Content/View/interference_detection.htm">Onshape: Interference Detection</a> includes options for standard content and internal subassembly checks. Include the parts you mean to test.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Move the mechanism through its intended range</h2>
+  <p>Move the input joint slowly and watch the connected parts. Test intermediate positions as well as endpoints: a lever can clear a housing at both ends and strike it halfway through. Check which mate limits apply and whether the model passes through solid geometry because collision checking is not active.</p>
+  <p>A motion preview checks the constraints represented in that preview. It does not automatically prove contact behavior, load capacity, friction, or real-world operation. In particular, a gear relation can drive two rotations even when the modeled teeth do not mesh correctly.</p>
+  <ul class="boxes">
+    <li>Confirm that the input moves and connected parts follow in the expected direction.</li>
+    <li>Inspect travel limits and intermediate positions for collisions and small gaps.</li>
+    <li>Check that the components can be assembled and tools can reach the fasteners.</li>
+    <li>Rebuild after changes and repeat the affected motion and interference checks.</li>
+    <li>Review the final [[exploded-views-and-bills-of-materials|drawing and BOM]] against the checked assembly.</li>
+  </ul>
+  <details class="deeper"><summary>A joint preview is not always a full-assembly test</summary><p><a href="https://cad.onshape.com/help/Content/Assembly/mates.htm">Onshape: Mates</a> distinguishes the mate-dialog preview, which can ignore other mates, from assembly animation. Use a whole-assembly check to assess the connected mechanism.</p></details>
+  <p><a class="button" data-practice-add="assemblies-redundant-mate" href="../practice.html#assemblies-redundant-mate">Spot a redundant mate</a> <a class="button" data-practice-add="assemblies-motion-check" href="../practice.html#assemblies-motion-check">Plan a motion check</a></p>
+</section>

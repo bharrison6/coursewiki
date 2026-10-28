@@ -1,0 +1,95 @@
+@@ID: assembly-files-and-mates
+@@TITLE: Assembly Files and Mates
+@@SECTION: Assemblies
+@@SUMMARY: Keep component references intact and choose mates that locate parts while preserving their intended motion.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>An assembly records which parts belong together and how they fit</h2>
+  <p class="lede">A part defines a component's shape. An assembly places instances of parts and subassemblies and records relationships between them. Two instances of one part can occupy different positions while using the same part definition.</p>
+  <p>In a file-based SOLIDWORKS assembly, the <code>.SLDASM</code> normally references external <code>.SLDPRT</code> and other assembly files. An assembly drawing references the assembly. Sending only the assembly file can leave the recipient without its components. Virtual components are an exception: their definitions can be stored inside the assembly.</p>
+  <p>Onshape organizes Part Studios, Assemblies, and Drawings as tabs in documents. Inserted instances reference their source definitions; a tab name is not a Windows filename. Share the document with the appropriate access and identify the intended version when a fixed design state matters.</p>
+  <details class="deeper"><summary>Definitions, instances, and design changes</summary>
+    <p>Changing a shared part definition can update several instances. Moving one instance in an assembly changes its placement, not the shape of every copy. A configuration can select a particular variant of a component; record the intended variant when sharing or drawing it.</p>
+    <p><a href="https://cad.onshape.com/help/Content/Collaboration/sharing_and_collaboration.htm">Onshape: Sharing and Collaboration</a> explains document access and permissions.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Rename and package files with their references</h2>
+  <p>Renaming or moving a component in ordinary File Explorer can leave an assembly looking for its old name or location. Use the CAD system's reference-aware rename or move workflow. Changing a display name in the tree is not necessarily changing the file name.</p>
+  <ul class="boxes">
+    <li>Save a recoverable copy before reorganizing an assembly's files.</li>
+    <li>Use the supported rename workflow, include affected assemblies and drawings, and save the referencing documents.</li>
+    <li>For file-based SOLIDWORKS sharing, use Pack and Go where available. Review the file list, drawing inclusion, library components, and destination.</li>
+    <li>Open the packaged assembly from its destination and inspect the resolved reference paths. Confirm it is not quietly loading parts from the original folders.</li>
+  </ul>
+  <details class="deeper"><summary>Vendor help for renaming and sharing</summary>
+    <p><a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/t_assembly_components_renaming_header.htm?id=7.1.11">SOLIDWORKS: Renaming Components</a> distinguishes display names from file names and explains updating references in closed documents. Saving an open assembly alone does not automatically repair every closed drawing. Availability differs for platform-connected installations.</p>
+    <p><a href="https://help.solidworks.com/2023/english/SolidWorks/sldworks/c_pack_and_go.htm?id=4.6.11">SOLIDWORKS: Pack and Go Overview</a> describes collecting related files into a folder or ZIP. Use your installed edition's help for the exact controls.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Ground a base, then count the motion you intend to keep</h2>
+  <p>A free rigid component in three-dimensional space has six degrees of freedom (DOF): translation along three axes and rotation about three axes. A degree of freedom is an independent motion, not a count of arrows or mates.</p>
+  <figure>[[img:engineering-graphics/assemblies/degrees-of-freedom.svg|A free block can translate along x, y, and z and rotate about x, y, and z. After grounding the same block, none of those motions remains.]]<figcaption>Grounding removes motion relative to the assembly reference frame.</figcaption></figure>
+  <p>Choose a base or housing as the reference. Fix it, or fully locate it to the assembly origin and planes. In SOLIDWORKS, insertion options include fixing only the first component, fixing inserted components, or leaving them floating. Check the actual state; do not assume that the first component is always fixed. Fixing a base away from the origin holds it there; it does not move it to the origin.</p>
+  <p>A lever should still rotate about its pivot. A cover should stay put. Fully locating every moving part would turn a mechanism into a rigid model.</p>
+  <details class="deeper"><summary>Check the insertion setting</summary><p><a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/HIDD_DVE_INSERT_COMPONENT.htm?id=7.1.1.0.4">SOLIDWORKS: Insert Components</a> documents the Fix / Float choices. Grounding the base and choosing the remaining joint motion are separate decisions.</p></details>
+</section>
+
+<section>
+  <h2>Use geometric mates to describe the intended contact</h2>
+  <p>Select the actual locating faces, axes, or reference planes. The same mate name can accept different geometry, so its effect depends on what you select. The diagrams below are schematic before/after comparisons, not complete constraints for whole assemblies.</p>
+  <dl class="dims">
+    <div><dt>Coincident</dt><dd>For two planar faces, put their supporting planes together. The faces can still slide in that plane and rotate about its normal. Coincident planes do not guarantee that finite faces overlap.</dd></div>
+    <div><dt>Concentric</dt><dd>Put two cylindrical axes on the same line. Without a rotation lock or other mates, a shaft can still slide along and rotate about that line.</dd></div>
+  </dl>
+  <figure>[[img:engineering-graphics/assemblies/coincident.svg|Before: two separated planar faces. After: their planes coincide; in-plane sliding and spin remain.]]</figure>
+  <figure>[[img:engineering-graphics/assemblies/concentric.svg|Before: a shaft axis is offset from a bore axis. After: the axes coincide; axial slide and spin remain.]]</figure>
+  <details class="deeper"><summary>Why subtracting one DOF per mate gives the wrong answer</summary>
+    <p>For one free rigid part relative to a grounded part, a planar-face coincident mate leaves three DOF. A cylindrical-axis concentric mate leaves two. Adding a shoulder-face coincident mate perpendicular to that axis removes axial sliding and leaves one rotation. A redundant mate may remove no new freedom. Count the independent motions that survive each step.</p>
+    <p>See <a href="https://help.solidworks.com/2026/English/SolidWorks/sldworks/r_Types_of_Mates_SWassy.htm">SOLIDWORKS: Types of Mates</a> for supported selections. These geometric names are not a one-to-one map to Onshape commands.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Parallel and perpendicular mates set orientation</h2>
+  <p><strong>Parallel</strong> keeps selected planes parallel without setting their separation. <strong>Perpendicular</strong> keeps selected planes at a right angle. Neither condition alone fully locates the part. These diagrams show the planes edge-on.</p>
+  <figure>[[img:engineering-graphics/assemblies/parallel.svg|Before: two planes have different orientations. After: the planes are parallel with a gap that is not fixed by this mate.]]</figure>
+  <figure>[[img:engineering-graphics/assemblies/perpendicular.svg|Before: two planes meet at an oblique angle. After: the planes are at 90 degrees, without a complete location constraint.]]</figure>
+</section>
+
+<section>
+  <h2>Distance, angle, and tangent mates control gaps and contact</h2>
+  <p><strong>Distance</strong> sets a separation between selected entities. For parallel planar faces, use the normal gap, not a slanted edge length. <strong>Angle</strong> sets the angle between selected entities; check alignment and direction so the model uses the intended side of the angle.</p>
+  <figure>[[img:engineering-graphics/assemblies/distance.svg|Before: parallel faces have an unspecified gap. After: the normal gap is the specified distance d.]]</figure>
+  <figure>[[img:engineering-graphics/assemblies/angle.svg|Before: planes have an unspecified angle. After: their angle is set to 30 degrees.]]</figure>
+  <p><strong>Tangent</strong> keeps compatible curved and planar or curved surfaces touching tangentially. Tangency alone does not enforce rolling without slipping.</p>
+  <figure>[[img:engineering-graphics/assemblies/tangent.svg|Before: a circular surface is separated from a plane. After: it touches the plane tangentially; rolling is not implied.]]</figure>
+</section>
+
+<section>
+  <h2>Choose a joint or mechanical relationship when motion is the point</h2>
+  <p>For a simple lever on a grounded pin, align the pivot axes and locate the lever axially. Leave rotation free. A hinge mate expresses this single rotational freedom directly. In Onshape, a <strong>Revolute</strong> mate serves that joint purpose; <strong>Cylindrical</strong> allows axial slide and spin, <strong>Slider</strong> allows one translation, and <strong>Fastened</strong> allows no relative motion. Mate connectors establish the joint frames.</p>
+  <p>A <strong>slot mate</strong> locates a pin or similar feature relative to a slot. Select free travel or a prescribed position to match the design; other motions depend on the selections and remaining mates. Onshape's <a href="https://cad.onshape.com/help/Content/Assembly/pin_slot_mate.htm?Highlight=PIN+SLOT+MATE">Pin Slot mate</a> allows rotation about the connector's Z axis and translation along its X axis. Set appropriate travel limits; it is not an identical set of SOLIDWORKS slot options.</p>
+  <p>A <strong>gear mate or gear relation</strong> couples rotations by a ratio. Locate the shafts first. The relation does not create teeth or prove they mesh without interference. Use [[gear-ratios]] for the ratio calculation and [[torque]] for the separate question of turning effort.</p>
+  <figure>[[img:engineering-graphics/assemblies/mechanical-mates.svg|Before and after comparisons: a loose lever becomes a hinge with only pivot rotation; an offset pin is guided into a slot; independently turning shafts become ratio-coupled.]]</figure>
+  <details class="deeper"><summary>Compare vendor joint vocabulary</summary>
+    <p><a href="https://cad.onshape.com/help/Content/Assembly/mates.htm">Onshape: Mates</a> describes joint motion through mate connectors. <a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_machine_desing_tools_overview.htm?id=3.2">SOLIDWORKS: Machine Design Tools</a> introduces mechanical mates. <a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/r_document_properties_mates.htm?id=3.7.3.24">SOLIDWORKS slot settings</a> distinguish free, centered, distance, and percentage positions.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Build reusable parts and subassemblies with deliberate dependencies</h2>
+  <p><strong>Bottom-up</strong> design starts with existing parts and brings them into an assembly. <strong>Top-down</strong> design starts with an overall layout or shared design references and develops parts around them. A mixed approach is common: use a shared layout for custom plates and insert purchased hardware.</p>
+  <p>A <strong>subassembly</strong> groups parts into a reusable unit. Give it a useful function, such as a pivot cartridge, rather than hiding unrelated parts in it. Check whether its internal joints are allowed to move at the parent level; a rigid subassembly can make a working joint appear locked.</p>
+  <p>Top-down references can keep mating holes aligned when the layout changes, but they also create dependencies. Keep the direction of those dependencies understandable and check them when copying or sharing the design.</p>
+  <details class="deeper"><summary>What makes a feature top-down?</summary><p><a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_Top-Down_Design_Overview.htm?id=7.6">SOLIDWORKS: Top-Down Design</a> explains how layout or other-component geometry controls a feature and creates external references. Merely editing a part while an assembly is visible does not by itself establish that dependency.</p></details>
+  <p>Use <strong>SOLIDWORKS Toolbox</strong> or <strong>Onshape Standard Content</strong>, where available, for standard hardware. Choose the standard, size, thread pitch, length, and material or grade deliberately. A visually similar bolt or an automatic size suggestion is not a completed fastener selection.</p>
+  <details class="deeper"><summary>Library hardware still needs checking</summary><p><a href="https://cad.onshape.com/help/Content/Assembly/standard_content.htm?Highlight=Standard+parts">Onshape: Standard Content</a> explains insertion and sizing. SOLIDWORKS Toolbox is an add-in described in its <a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_machine_desing_tools_overview.htm?id=3.2">machine-design overview</a>. Check the resulting model and BOM properties rather than modeling every thread from scratch.</p></details>
+  <p>For sketching and part-modeling topics, browse <a href="index.html">Engineering Graphics and CAD</a>. Continue with [[checking-cad-assemblies]] and [[exploded-views-and-bills-of-materials]].</p>
+  <p><a class="button" data-practice-add="assemblies-shaft-dof" href="../practice.html#assemblies-shaft-dof">Practice shaft freedom</a> <a class="button" data-practice-add="assemblies-locate-cover" href="../practice.html#assemblies-locate-cover">Choose locating mates</a></p>
+</section>
