@@ -19,3 +19,29 @@
     <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in [[current-voltage-and-resistance]] shows the calculation.</p>
   </details>
 </section>
+
+
+<section>
+  <h2>Count the return wire: explore voltage drop and heating</h2>
+  <p>A two-conductor circuit carries current out and back. Use <strong>twice the one-way run</strong> for its wire resistance. At the same current, longer or thinner wire drops more voltage and wastes more power as heat. Voltage drop is a separate check from ampacity: get the current rating from the applicable code table or manufacturer for the insulation and installation.</p>
+  <div data-interactive="wire-voltage-drop">
+    <div class="wvd-static">
+      <!-- WIRE-VOLTAGE-DROP-STATIC -->
+      <svg viewBox="0 0 300 160" role="img" aria-label="Current travels from source to load and returns on a second conductor. Both conductors contribute resistance."><path d="M45 90V35H255V90M255 110V135H45V110" fill="none" stroke="currentColor" stroke-width="3"/><path d="M140 30l10 5-10 5M160 130l-10 5 10 5" fill="none" stroke="currentColor" stroke-width="2"/><text x="150" y="23" text-anchor="middle">Out: 50 ft</text><text x="150" y="157" text-anchor="middle">Return: 50 ft</text><text x="8" y="106">Source</text><text x="228" y="106">Load</text><text x="150" y="75" text-anchor="middle">Loop = 30.48 m</text><text x="150" y="100" text-anchor="middle">AWG 18 · 5 A</text></svg><table><caption>AWG 18, 50 ft one way, 5 A, 24 V source</caption><tbody><tr><th scope="row">Single wire: Ω / 1000 ft</th><td>6.385</td></tr><tr><th scope="row">Single wire: Ω / km</th><td>20.95</td></tr><tr><th scope="row">Loop resistance (Ω)</th><td>0.6385</td></tr><tr><th scope="row">Voltage drop (V)</th><td>3.192</td></tr><tr><th scope="row">Source voltage lost (%)</th><td>13.3</td></tr><tr><th scope="row">Load voltage (V)</th><td>20.81</td></tr><tr><th scope="row">Wire heating loss (W)</th><td>15.96</td></tr></tbody></table><p>Worked example: 50 ft out + 50 ft back = 30.48 m of copper. R = ρL/A = 0.6385 Ω. At 5 A, IR = 3.192 V and I²R = 15.96 W.</p><figure><figcaption>Voltage drop: baseline 3.192 V; now 6.385 V</figcaption><svg viewBox="0 0 300 50" role="img" aria-label="Voltage drop, baseline 3.192, now 6.385 V"><rect x="0" y="3" width="145" height="16" fill="none" stroke="currentColor"/><rect x="0" y="28" width="290" height="16" fill="currentColor"/></svg></figure><figure><figcaption>Wire heating loss: baseline 15.96 W; now 63.85 W</figcaption><svg viewBox="0 0 300 50" role="img" aria-label="Wire heating loss, baseline 15.96, now 63.85 W"><rect x="0" y="3" width="72.5" height="16" fill="none" stroke="currentColor"/><rect x="0" y="28" width="290" height="16" fill="currentColor"/></svg></figure><p>Outline = baseline; filled = now. Each pair shares its own scale; compare within a pair. Loss is heating power, not wire temperature.</p><p>Doubling only current doubles the drop and quadruples heating loss. Doubling only length doubles both; a smaller AWG number lowers both at the same current.</p>
+      <!-- /WIRE-VOLTAGE-DROP-STATIC -->
+    </div>
+    <noscript><p>The worked table and comparison above work without JavaScript. Enable JavaScript to vary the inputs.</p></noscript>
+  </div>
+  <p>This model assumes solid copper at 20 °C, equal outgoing and return wires, and DC/resistive behavior. Current is an input, not a prediction of how a particular load responds. Heating loss is not a temperature prediction; copper resistance rises with temperature (approx. 0.393%/°C near 20 °C). Connections and AC reactance are omitted.</p>
+  <details class="deeper"><summary>Definitions used to calculate every result</summary>
+    <p>For AWG number n, diameter d = 0.127 × 92<sup>(36 − n)/39</sup> mm. Convert d to meters, then A = πd²/4 in m². Using annealed-copper resistivity ρ = 1.724 × 10<sup>−8</sup> Ω·m at 20 °C, R = ρL/A. One foot is exactly 0.3048 m.</p>
+    <p>With one-way run ℓ, L = 2ℓ and R<sub>loop</sub> = ρ(2ℓ)/A. V<sub>drop</sub> = IR<sub>loop</sub>; percent drop = 100V<sub>drop</sub>/V<sub>source</sub>; V<sub>load</sub> = V<sub>source</sub> − V<sub>drop</sub>; wire loss P = I²R<sub>loop</sub>. A two-wire single-phase resistive approximation uses the same return path, but this model does not include AC effects.</p>
+  </details>
+  <p>Practice:
+    <a data-practice-add="wire-loop-resistance" href="../practice.html#wire-loop-resistance">Loop resistance</a> ·
+    <a data-practice-add="wire-run-drop" href="../practice.html#wire-run-drop">Voltage drop</a> ·
+    <a data-practice-add="wire-percent-drop" href="../practice.html#wire-percent-drop">Percent drop</a> ·
+    <a data-practice-add="wire-load-voltage" href="../practice.html#wire-load-voltage">Load voltage</a> ·
+    <a data-practice-add="wire-smallest-gauge" href="../practice.html#wire-smallest-gauge">Choose a gauge</a>.
+  </p>
+</section>
