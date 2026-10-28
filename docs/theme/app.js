@@ -1675,17 +1675,19 @@
     dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
       '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
       '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
-      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"></div>';
     document.body.appendChild(dialog);
-    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var copy = null, scroller = $('.diagram-scroll', dialog);
     var source = null, width = 0, height = 0, zoom = 1;
     function size() {
+      if (!copy) return;
       copy.style.width = (width * zoom) + 'px';
       copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
     }
     function close() { if (dialog.open) dialog.close(); }
     $('[data-diagram-close]', dialog).addEventListener('click', close);
     dialog.addEventListener('close', function () {
+      if (copy) { copy.remove(); copy = null; }
       document.documentElement.classList.remove('diagram-viewer-open');
       if (source) source.focus({ preventScroll: true });
     });
@@ -1738,8 +1740,11 @@
       function open() {
         if (!active || matchMedia('print').matches) return;
         source = img; width = natural; height = naturalHeight; zoom = 1;
+        if (copy) copy.remove();
+        copy = document.createElement('img');
         copy.src = img.currentSrc || img.src;
         copy.alt = img.alt;
+        scroller.appendChild(copy);
         dialog.setAttribute('aria-label', img.alt);
         $$('[data-diagram-zoom]', dialog).forEach(function (b) {
           b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');

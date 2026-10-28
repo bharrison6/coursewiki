@@ -1273,8 +1273,22 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
-/* No wrappers or image sizing changes: print and the unenhanced page retain
-   their existing layout. The viewer alone owns oversized artwork. */
+/* Cap authored artwork in both dimensions, retaining its aspect ratio.
+   Direct figure SVGs cover inline artwork without reaching module SVGs. */
+@media screen {
+  body:not(.presenting) main :is(img.content-img, figure > svg):not([data-interactive] *, .ghs-pictogram *, .diagram-viewer *) {
+    max-height: 85vh; width: auto; height: auto; max-width: 100%;
+  }
+}
+@media print {
+  body:not(.presenting) main :is(img.content-img, figure > svg):not([data-interactive] *, .ghs-pictogram *, .diagram-viewer *) {
+    max-height: 8.5in; width: auto; height: auto; max-width: 100%;
+    break-inside: avoid;
+  }
+  body:not(.presenting) main :is(h2, h3):not([data-interactive] *) { break-after: avoid; }
+}
+
+/* The viewer restores natural size for artwork reduced by either cap. */
 .diagram-hint, .diagram-viewer { display: none; }
 @media screen {
   .diagram-expandable { cursor: zoom-in; }
@@ -7972,17 +7986,19 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
       '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
       '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
-      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"></div>';
     document.body.appendChild(dialog);
-    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var copy = null, scroller = $('.diagram-scroll', dialog);
     var source = null, width = 0, height = 0, zoom = 1;
     function size() {
+      if (!copy) return;
       copy.style.width = (width * zoom) + 'px';
       copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
     }
     function close() { if (dialog.open) dialog.close(); }
     $('[data-diagram-close]', dialog).addEventListener('click', close);
     dialog.addEventListener('close', function () {
+      if (copy) { copy.remove(); copy = null; }
       document.documentElement.classList.remove('diagram-viewer-open');
       if (source) source.focus({ preventScroll: true });
     });
@@ -8035,8 +8051,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       function open() {
         if (!active || matchMedia('print').matches) return;
         source = img; width = natural; height = naturalHeight; zoom = 1;
+        if (copy) copy.remove();
+        copy = document.createElement('img');
         copy.src = img.currentSrc || img.src;
         copy.alt = img.alt;
+        scroller.appendChild(copy);
         dialog.setAttribute('aria-label', img.alt);
         $$('[data-diagram-zoom]', dialog).forEach(function (b) {
           b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
