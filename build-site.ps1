@@ -312,6 +312,7 @@ foreach ($cid in $collOrder) {
       $flag = ''
       if ($inner -match '<div class="stop"') { $flag = 'is-stop' }
       elseif ($inner -match '<div class="gate"') { $flag = 'is-gate' }
+      elseif ($inner -match '\bdata-interactive\s*=') { $flag = 'is-interactive' }
 
       $secs += [pscustomobject]@{
         Mode = $mode; Html = $inner.Trim(); Head = $head; Slug = $slug; Flag = $flag
