@@ -45,6 +45,9 @@
       '<div class="gr-controls"><div class="gr-counts"></div>' +
       '<div class="gr-results"><div><span data-gr-output-title>Output B</span><strong data-gr-speed></strong><small data-gr-direction></small></div>' +
       '<div><span>Ideal output torque</span><strong data-gr-torque></strong><small data-gr-factor></small></div></div>' +
+      '<div class="gr-loss-control"></div><p class="gr-loss-note" data-gr-loss-note></p>' +
+      '<div class="gr-results gr-delivered"><div><span>Output torque with losses</span><strong data-gr-delivered-torque></strong></div>' +
+      '<div><span>Output power with losses</span><strong data-gr-delivered-power></strong><small data-gr-ideal-power></small></div></div>' +
       '<p class="gr-equation" data-gr-equation></p>' +
       '<details class="gr-settings"><summary>Input speed, torque and direction</summary><div class="gr-inputs"></div>' +
       '<label class="gr-reverse"><input type="checkbox" data-gr-reverse>Reverse A (counterclockwise)</label></details>' +
@@ -54,7 +57,7 @@
       '<select id="' + id + '-trial" data-gr-trial><option value="bigger">Make B larger</option><option value="idler">Add an idler</option><option value="compound">Add a second stage</option></select>' +
       '<fieldset class="gr-choices"><legend data-gr-question></legend><div data-gr-choices></div></fieldset>' +
       '<button type="button" data-gr-test disabled>Test prediction</button><p data-gr-feedback role="status">Choose a prediction.</p><div data-gr-comparison hidden></div></div></details>' +
-      '<p class="gr-limit">Ideal, lossless gears at steady load. Torque is a calculated tradeoff, not a strength rating. Real gears lose power and have load limits.</p>' +
+      '<p class="gr-limit">Positive drive at steady load: losses reduce torque and power; tooth counts still set speed. The stated mesh losses are the only losses modeled. Torque is a calculated tradeoff, not a strength rating.</p>' +
       '<span class="gr-sr" data-gr-status role="status"></span>';
     root.insertBefore(lab, root.firstChild);
     var q = function (selector) { return lab.querySelector(selector); }, controls = {};
@@ -73,18 +76,21 @@
     control('d', 'D · final driven', 'teeth', 20, 60, 1, q('.gr-counts'));
     control('rpm', 'Input speed', 'rpm', 0, 240, 10, q('.gr-inputs'));
     control('torque', 'Input torque', 'N·m', 0, 10, .5, q('.gr-inputs'));
+    control('efficiency', 'Efficiency per stage (one mesh)', '%', 80, 100, 1, q('.gr-loss-control'));
     // Keep the wiki's presentation arrow keys from navigating while a learner uses a control.
     lab.addEventListener('keydown', function (e) { if (e.target.closest('input, select, button, summary')) e.stopPropagation(); });
     function announce() {
       q('[data-gr-status]').textContent = 'Output ' + solution.output.id + ': ' + M.format(Math.abs(solution.output.rpm)) + ' rpm, ' +
-        M.direction(solution.output.rpm) + ', ' + M.format(solution.outputTorque) + ' newton meters ideally. Ratio ' + M.format(solution.ratio) + ' to one.';
+        M.direction(solution.output.rpm) + ', ' + M.format(solution.outputTorque) + ' newton meters ideally. ' +
+        (solution.deliveredTorque === null ? 'Loss model requires rotation. ' : M.format(solution.deliveredTorque) + ' newton meters with losses. ') +
+        'Ratio ' + M.format(solution.ratio) + ' to one.';
     }
     function clearPrediction() {
       q('[data-gr-comparison]').hidden = true;
       q('[data-gr-feedback]').textContent = 'Your setup changed. Each prediction test loads the stated starting setup.';
     }
     function changed(key) {
-      if (key !== 'rpm' && key !== 'torque' && key !== 'direction') inputTurns = 0;
+      if (key !== 'rpm' && key !== 'torque' && key !== 'direction' && key !== 'efficiency') inputTurns = 0;
       previous = null; clearPrediction(); update();
     }
     function tick(now) {
@@ -114,6 +120,7 @@
       controls.idler.box.hidden = state.mode !== 'idler';
       controls.c.box.hidden = controls.d.box.hidden = state.mode !== 'compound';
       controls.b.label.textContent = state.mode === 'compound' ? 'B · first driven' : 'B · driven';
+      controls.efficiency.label.textContent = state.mode === 'idler' ? 'Efficiency per actual mesh' : 'Efficiency per stage (one mesh)';
       Object.keys(controls).forEach(function (key) {
         var c = controls[key]; c.input.value = state[key]; c.output.textContent = M.format(state[key]) + ' ' + c.unit;
         c.input.setAttribute('aria-valuetext', M.format(state[key]) + ' ' + c.unit);
@@ -129,7 +136,14 @@
       q('[data-gr-direction]').textContent = state.rpm === 0 ? 'Stopped · ratio stays ' + M.format(solution.ratio) + ':1' : M.direction(solution.output.rpm) + ' · ' + solution.relation + ' direction as A';
       q('[data-gr-torque]').textContent = M.format(solution.outputTorque) + ' N·m';
       q('[data-gr-factor]').textContent = M.format(solution.torqueFactor, 3) + '× input torque';
-      q('[data-gr-equation]').textContent = state.rpm === 0 ? '0 rpm → 0 W. Torque shown is the ideal static balance, if loaded.' :
+      q('[data-gr-loss-note]').textContent = solution.meshes.length + ' mesh' + (solution.meshes.length === 1 ? '' : 'es') +
+        ': total efficiency = ' + Array(solution.meshes.length).fill(M.format(state.efficiency / 100)).join(' × ') +
+        ' = ' + M.format(solution.totalEfficiency * 100, 4) + '%.' +
+        (state.mode === 'idler' ? ' Here the idler adds one loss-bearing mesh, not a reduction stage.' : ' Keep the same teeth and change efficiency: rpm stays fixed.');
+      q('[data-gr-delivered-torque]').textContent = solution.deliveredTorque === null ? '—' : M.format(solution.deliveredTorque) + ' N·m';
+      q('[data-gr-delivered-power]').textContent = M.format(solution.deliveredPower) + ' W';
+      q('[data-gr-ideal-power]').textContent = M.format(solution.outputPower) + ' W ideal';
+      q('[data-gr-equation]').textContent = state.rpm === 0 ? '0 rpm → 0 W. Ideal torque is static balance, if loaded; efficiency does not determine holding torque.' :
         M.format(solution.inputPower) + ' W in = ' + M.format(solution.outputPower) + ' W out (ideal)';
       q('[data-gr-input]').textContent = 'Input: ' + state.rpm + ' rpm ' + M.direction(state.rpm * state.direction) + ' · ' + state.torque + ' N·m';
       q('[data-gr-insight]').textContent = D.explanation(state);

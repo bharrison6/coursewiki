@@ -7,7 +7,7 @@
   'use strict';
   var TAU = 2 * Math.PI;
   var DEFAULT = Object.freeze({ mode: 'pair', a: 20, b: 40, idler: 30, c: 20, d: 40,
-    rpm: 120, torque: 2, direction: 1 });
+    rpm: 120, torque: 2, direction: 1, efficiency: 100 });
   var MODES = Object.freeze(['pair', 'idler', 'compound']);
   function validate(s) {
     if (!s || MODES.indexOf(s.mode) < 0) throw new RangeError('Unknown gear train');
@@ -17,6 +17,8 @@
     if (!Number.isFinite(s.rpm) || s.rpm < 0 || s.rpm > 240) throw new RangeError('Input speed must be 0–240 rpm');
     if (!Number.isFinite(s.torque) || s.torque < 0 || s.torque > 10) throw new RangeError('Input torque must be 0–10 N·m');
     if (s.direction !== 1 && s.direction !== -1) throw new RangeError('Direction must be 1 or -1');
+    if (s.efficiency !== undefined && (!Number.isFinite(s.efficiency) || s.efficiency <= 0 || s.efficiency > 100))
+      throw new RangeError('Mesh efficiency must be greater than 0 and at most 100 percent');
     return s;
   }
   // Clockwise is positive, viewed from the front on every shaft. The phase sets a
@@ -44,7 +46,13 @@
     }
     var output = gears[gears.length - 1], ratio = 1 / Math.abs(output.ratio);
     gears.forEach(function (g) { g.rpm = g.ratio * s.rpm * s.direction; });
+    // One ordinary stage has one mesh. An idler adds a mesh, not a reduction
+    // stage. This lab explicitly charges the stated loss at EVERY actual mesh.
+    var totalEfficiency = Math.pow((s.efficiency === undefined ? 100 : s.efficiency) / 100, meshes.length);
     return { gears: gears, meshes: meshes, shafts: shafts, output: output, ratio: ratio,
+      totalEfficiency: totalEfficiency,
+      deliveredTorque: s.rpm === 0 ? null : s.torque * ratio * totalEfficiency,
+      deliveredPower: s.torque * s.rpm * TAU / 60 * totalEfficiency,
       speedFactor: Math.abs(output.ratio), torqueFactor: ratio, outputTorque: s.torque * ratio,
       inputPower: s.torque * s.rpm * TAU / 60,
       outputPower: s.torque * ratio * Math.abs(output.rpm) * TAU / 60,
