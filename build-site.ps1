@@ -1919,9 +1919,14 @@ foreach ($c in $collections.Values) {
   [void]$ci.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $c.Summary) + '</p>')
   [void]$ci.AppendLine('<aside class="card-legend" aria-label="Card markers"><h2>Card markers</h2><ul>')
   foreach ($marker in $script:cardMarkers) {
-    $sample = if ($marker.Token) { '<span class="marker-sample" aria-hidden="true" style="--card-marker:var(' + $marker.Token + ')"></span>' } else { '<small>label only</small> ' }
-    [void]$ci.AppendLine('<li>' + $sample + '<strong>' + $marker.Label + '</strong>: ' + (ConvertTo-HtmlText $marker.Meaning) + '</li>')
+    $sample = if ($marker.Token) { '<span class="marker-sample" aria-hidden="true" style="--card-marker:var(' + $marker.Token + ')"></span>' } else { '<span class="marker-sample is-label-only" aria-hidden="true"></span>' }
+    $meaning = (ConvertTo-HtmlText $marker.Meaning) + $(if ($marker.Token) { '' } else { ' <small>(label only, no edge)</small>' })
+    [void]$ci.AppendLine('<li>' + $sample + '<strong>' + $marker.Label + '</strong>: ' + $meaning + '</li>')
   }
+  # Not a card category: the navy-edged .deeper blocks INSIDE a card (operator, 2026-10-28,
+  # "keep the internal navy Extra information sections"). Same --accent the .deeper edge uses,
+  # so the sample matches in both themes.
+  [void]$ci.AppendLine('<li><span class="marker-sample" aria-hidden="true" style="--card-marker:var(--accent)"></span><strong>Extra information</strong>: Optional detail inside a card; open it for more.</li>')
   [void]$ci.AppendLine('</ul></aside>')
   if ($c.Intro) {
     # Up is this document's depth below docs\ - docs\<coll>\index.html - and is
