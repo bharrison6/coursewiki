@@ -1,14 +1,14 @@
-/* Optional browser check. Set CW_PLAYWRIGHT_MODULE and CW_CHROMIUM if not on default paths.
+/* Optional browser check. Set PLAYWRIGHT_MODULE and COURSEWIKI_BROWSER_EXECUTABLE if needed.
    No installation or generated-site mutation is performed by this test. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { chromium } = require(process.env.CW_PLAYWRIGHT_MODULE || 'playwright');
+const { skip, launch } = require('../../tests/support/browser.cjs');
 const read = file => fs.readFileSync(path.join(__dirname, file), 'utf8');
 
-test('two roots, keyboard, reset, repeat initialization, mobile, print and no-JS fallback', async () => {
-  const browser = await chromium.launch({ headless: true, ...(process.env.CW_CHROMIUM ? { executablePath: process.env.CW_CHROMIUM } : {}) });
+test('two roots, keyboard, reset, repeat initialization, mobile, print and no-JS fallback', { skip }, async () => {
+  const browser = await launch();
   try {
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
     const errors = [];

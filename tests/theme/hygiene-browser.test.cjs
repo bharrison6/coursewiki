@@ -1,21 +1,20 @@
 'use strict';
-/* Dependency-free Chromium integration checks. Build first, then run:
+/* Playwright Chromium integration checks. Build first, then run:
    node --test tests/theme/hygiene-browser.test.cjs
-   Set CHROME_PATH if Chromium is installed elsewhere. */
+   Set COURSEWIKI_BROWSER_URL and optionally COURSEWIKI_BROWSER_EXECUTABLE. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { pathToFileURL, fileURLToPath } = require('node:url');
-const { spawn } = require('node:child_process');
+const { skip, launchCDP } = require('../support/browser.cjs');
 const root = path.resolve(__dirname, '../..');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-test('theme hygiene at 375px: contrast, choice feedback and tiny conversion', { timeout: 120000 }, async () => {
-  const scratch = path.join(root, '.lane-scratch');
+test('theme hygiene at 375px: contrast, choice feedback and tiny conversion', { skip, timeout: 120000 }, async () => {
+  const scratch = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'coursewiki-theme-'));
   fs.mkdirSync(scratch, { recursive: true });
-  const profile = fs.mkdtempSync(path.join(scratch, 'chromium-'));
   const server = http.createServer((req, res) => {
     const relative = decodeURIComponent(new URL(req.url, 'http://localhost').pathname).replace(/^\/+/, '');
     if (relative === 'viewer-fixture.svg') {
@@ -47,40 +46,14 @@ test('theme hygiene at 375px: contrast, choice feedback and tiny conversion', { 
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const base = 'http://127.0.0.1:' + server.address().port;
-  const chrome = spawn(process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', [
-    '--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-background-networking',
-    '--remote-debugging-port=0', '--user-data-dir=' + profile, 'about:blank'
-  ], { stdio: 'ignore', windowsHide: true });
-  console.log('Owned Chromium PID:', chrome.pid);
-  let socket;
+  let browser;
   try {
-    const portFile = path.join(profile, 'DevToolsActivePort');
-    let port;
-    for (let i = 0; i < 100; i++) {
-      try {
-        port = fs.readFileSync(portFile, 'utf8').split('\n')[0].trim();
-        if (/^\d+$/.test(port)) break;
-      } catch (error) {
-        if (!['ENOENT', 'EBUSY', 'EACCES'].includes(error.code)) throw error;
-      }
-      await delay(100);
-    }
-    assert.match(port || '', /^\d+$/, 'Chromium published its debugging port');
-    const targets = await (await fetch('http://127.0.0.1:' + port + '/json')).json();
-    socket = new WebSocket(targets.find(t => t.type === 'page').webSocketDebuggerUrl);
-    await new Promise(resolve => socket.addEventListener('open', resolve, { once: true }));
-    let serial = 0;
-    const pending = new Map();
+    const launched = await launchCDP(); browser = launched.browser;
+    const session = launched.session;
     const requests = [];
     let protocol = 'http';
-    socket.addEventListener('message', event => {
-      const msg = JSON.parse(event.data);
-      if (msg.method === 'Network.requestWillBeSent') requests.push(msg.params);
-      if (pending.has(msg.id)) { const p = pending.get(msg.id); pending.delete(msg.id); msg.error ? p.reject(msg.error) : p.resolve(msg.result); }
-    });
-    const send = (method, params = {}) => new Promise((resolve, reject) => {
-      const id = ++serial; pending.set(id, { resolve, reject }); socket.send(JSON.stringify({ id, method, params }));
-    });
+    session.on('Network.requestWillBeSent', params => requests.push(params));
+    const send = (method, params = {}) => session.send(method, params);
     const evaluate = async expression => {
       const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
       if (r.exceptionDetails) throw new Error(JSON.stringify(r.exceptionDetails));
@@ -137,8 +110,7 @@ test('theme hygiene at 375px: contrast, choice feedback and tiny conversion', { 
       for(const c of contrasts) { assert.ok(c.focused); assert.ok(c.after>=3,JSON.stringify(c)); }
     }
   } finally {
-    if (socket) socket.close();
-    chrome.kill(); // Only the PID this test spawned.
+    if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));
   }
 });

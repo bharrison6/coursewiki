@@ -1,10 +1,6 @@
 const test = require('node:test');
-let chromium;
-try { ({ chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')); } catch (error) {
-  if (error.code !== 'MODULE_NOT_FOUND') throw error;
-}
-const browserURL = process.env.COURSEWIKI_BROWSER_URL;
-if (!chromium || !browserURL) {
+const { browserURL, skip, launch } = require('../../tests/support/browser.cjs');
+if (skip) {
   test('hole-callout browser acceptance', { skip: 'Requires Playwright and COURSEWIKI_BROWSER_URL' }, () => {});
 } else {
 // Run after build-site.ps1. Set PLAYWRIGHT_MODULE and CHROMIUM_PATH to installed tools.
@@ -17,7 +13,7 @@ const artifacts = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'coursew
 fs.mkdirSync(artifacts, { recursive: true });
 const url = file => new URL(file, browserURL.replace(/\/?$/, '/')).href;
 (async () => {
-  const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH });
+  const browser = await launch();
   try {
     const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
     const page = await context.newPage();

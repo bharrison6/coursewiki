@@ -1,47 +1,21 @@
-// Run after build-site.ps1. Uses Chrome's DevTools protocol without npm dependencies.
+const test = require('node:test');
+const { browserURL, skip, launchCDP } = require('../../tests/support/browser.cjs');
+// Run after build-site.ps1. Uses Playwright with a Chromium CDP session.
 const fs = require('node:fs');
 const path = require('node:path');
-const http = require('node:http');
-const { spawn } = require('node:child_process');
 const assert = require('node:assert/strict');
 const repo = path.resolve(__dirname, '../..');
-const output = path.join(__dirname, '.verification');
-fs.mkdirSync(output, { recursive: true });
-const chromePath = process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const server = http.createServer((req, res) => {
-  const file = path.resolve(repo, 'docs', '.' + decodeURIComponent(req.url.split('?')[0]));
-  if (!file.startsWith(path.resolve(repo, 'docs') + path.sep)) { res.writeHead(403).end(); return; }
-  try {
-    const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.svg':'image/svg+xml' };
-    res.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
-    res.end(fs.readFileSync(file));
-  } catch { res.writeHead(404).end(); }
-});
-let chrome, ws;
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-(async () => {
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  const base = `http://127.0.0.1:${server.address().port}`;
-  const profile = path.join(__dirname, '.browser', String(process.pid));
-  chrome = spawn(chromePath, ['--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check',
-    '--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'], { windowsHide: true, stdio:'ignore' });
-  const active = path.join(profile, 'DevToolsActivePort');
-  let port;
-  for(let i=0;i<100;i++) {
-    try { port=fs.readFileSync(active,'utf8').split('\n')[0]; if(port) break; } catch {}
-    await delay(100);
-  }
-  assert.ok(port,'Chrome debugging port is available');
-  const tabs = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-  ws = new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
-  await new Promise(resolve => ws.addEventListener('open',resolve,{once:true}));
-  let id=0; const pending=new Map(), errors=[];
-  ws.addEventListener('message',event=>{
-    const data=JSON.parse(event.data);
-    if(data.id) { const p=pending.get(data.id); pending.delete(data.id); data.error?p.reject(data.error):p.resolve(data.result); }
-    if(data.method==='Runtime.exceptionThrown') errors.push(data.params.exceptionDetails.text);
-  });
-  const call=(method,params={})=>new Promise((resolve,reject)=>{ pending.set(++id,{resolve,reject}); ws.send(JSON.stringify({id,method,params})); });
+test('view-projection browser acceptance', { skip }, async () => {
+  const output = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'coursewiki-view-projection-'));
+  let browser, call;
+  try {
+  const base = browserURL.replace(/\/$/, '');
+  const launched = await launchCDP();
+  browser = launched.browser;
+  const session = launched.session, errors = [];
+  session.on('Runtime.exceptionThrown', data => errors.push(data.exceptionDetails.text));
+  call = (method, params = {}) => session.send(method, params);
   const evaluate=async expression=>{
     const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});
     if(r.exceptionDetails) throw Error(JSON.stringify(r.exceptionDetails)); return r.result.value;
@@ -121,6 +95,5 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
   }
   assert.deepEqual(errors,[],'browser has no JavaScript exceptions');
   console.log('PASS: 4 pages, card/image coverage, light/dark 375px, overflow control, 18 explorer states, 2 independent roots, 21 practice keys and distractors, aggregate initialization, no-JS print generated.');
-})().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>{
-  if(ws) ws.close(); if(chrome) chrome.kill(); server.close();
+ } finally { if (browser) await browser.close(); }
 });

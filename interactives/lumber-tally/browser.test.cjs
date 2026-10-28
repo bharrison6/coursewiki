@@ -1,19 +1,22 @@
 // Run from the repository root; set PLAYWRIGHT_MODULE if Playwright is installed elsewhere.
-// Evidence and fixture files remain under .lane-scratch.
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+// Evidence and fixture files remain in OS temp.
+const test = require('node:test');
+const { skip, launch } = require('../../tests/support/browser.cjs');
 const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const { pathToFileURL } = require('node:url');
-fs.mkdirSync('.lane-scratch', { recursive: true });
-fs.writeFileSync('.lane-scratch/fixture.html', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../theme/msu-theme.css"><link rel="stylesheet" href="../interactives/lumber-tally/demo.css"><style>body{margin:0;padding:12px}*{box-sizing:border-box}</style></head><body><div data-interactive="lumber-tally"></div><div data-interactive="lumber-tally"></div><script src="../interactives/lumber-tally/model.js"></script><script src="../interactives/lumber-tally/demo.js"></script></body></html>`);
-(async () => {
+test('lumber-tally browser acceptance', { skip }, async () => {
+  const out = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'coursewiki-lumber-'));
+  const asset = file => pathToFileURL(path.resolve(__dirname, '../..', file)).href;
+  fs.writeFileSync(path.join(out, 'fixture.html'), `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${asset('theme/msu-theme.css')}"><link rel="stylesheet" href="${asset('interactives/lumber-tally/demo.css')}"><style>body{margin:0;padding:12px}*{box-sizing:border-box}</style></head><body><div data-interactive="lumber-tally"></div><div data-interactive="lumber-tally"></div><script src="${asset('interactives/lumber-tally/model.js')}"></script><script src="${asset('interactives/lumber-tally/demo.js')}"></script></body></html>`);
+
   console.log('Owned test process PID', process.pid);
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await launch();
   try {
     const page = await browser.newPage({ viewport: { width: 375, height: 812 } });
     const errors = []; page.on('pageerror', e => errors.push(e.message));
-    await page.goto(pathToFileURL(path.resolve('.lane-scratch/fixture.html')).href);
+    await page.goto(pathToFileURL(path.join(out, 'fixture.html')).href);
     const roots = page.locator('[data-interactive="lumber-tally"]');
     assert.equal(await roots.count(), 2);
     const first = roots.nth(0), second = roots.nth(1);
@@ -57,17 +60,17 @@ fs.writeFileSync('.lane-scratch/fixture.html', `<!doctype html><html lang="en"><
       await page.evaluate(() => { const probe = document.createElement('div'); probe.id='overflow-probe'; probe.style.cssText='height:10px;width:2000px!important;min-height:10px;width:2000px!important;max-width:none!important'; document.body.append(probe); });
       assert.equal(await fits(), false, 'overflow positive control');
       await page.locator('#overflow-probe').evaluate(e => e.remove());
-      await first.screenshot({ path: `.lane-scratch/${theme}.png` });
+      await first.screenshot({ path: path.join(out, `${theme}.png`) });
     }
     await page.emulateMedia({ media:'print' });
     assert.equal(await first.locator('[data-lt-add]').isVisible(), false);
     assert.equal(await first.locator('.lt-row-result').isVisible(), true);
     assert.match(await first.locator('.lt-row-result').innerText(), /108 in/);
-    await page.pdf({ path: '.lane-scratch/print.pdf' });
+    await page.pdf({ path: path.join(out, 'print.pdf') });
     assert.deepEqual(errors, []);
     console.log('PASS: two roots, idempotence, live totals, blank options, units, same-basis toggle, row add/remove, keyboard, invalid input, both themes at 375px, overflow control, print.');
   } finally { await browser.close(); }
-})().catch(e => { console.error(e); process.exitCode=1; });
+});
 
 
 

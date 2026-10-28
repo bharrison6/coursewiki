@@ -1,16 +1,17 @@
 /* Focused browser acceptance for the redesigned interaction surfaces.
    NODE_PATH may point to an existing Playwright install; CHROME_PATH overrides
    Playwright's bundled Chromium. No dependency is shipped with the demo. */
-const { chromium } = require('playwright');
+const test = require('node:test');
+const { skip, launch } = require('../../../tests/support/browser.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const { pathToFileURL } = require('node:url');
 const root = path.resolve(__dirname, '..');
-(async () => {
-  const browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
-  const out = process.env.QA_OUTPUT || fs.mkdtempSync(path.join(os.tmpdir(), 'acc-winters-ui-'));
+test('Two Winters UI browser acceptance', { skip }, async () => {
+  const browser = await launch();
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), 'acc-winters-ui-'));
   fs.mkdirSync(out, { recursive: true });
   let checks = 0;
   const check = (value, message) => { assert.ok(value, message); checks++; };
@@ -22,7 +23,12 @@ const root = path.resolve(__dirname, '..');
       page.on('request', r => { if (/^https?:/.test(r.url())) requests.push(r.url()); });
       await page.goto(pathToFileURL(path.join(root, 'index.html')).href);
       check(await page.locator('#guide').isVisible(), `${width}: Guide opens`);
+      const guideButtons = page.locator('#guide button');
+      await guideButtons.last().focus();
       await page.keyboard.press('Tab');
+      check(await guideButtons.first().evaluate(e => e === document.activeElement), 'Guide wraps forward');
+      await page.keyboard.press('Shift+Tab');
+      check(await guideButtons.last().evaluate(e => e === document.activeElement), 'Guide wraps backward');
       check(await page.evaluate(() => !!document.activeElement.closest('#guide')), 'Guide traps focus');
       check(await page.locator('#guide').evaluate(e => e.matches(':modal')), 'Native modal makes background inert');
       await page.keyboard.press('Escape');
@@ -91,4 +97,4 @@ const root = path.resolve(__dirname, '..');
     }
     console.log(`${checks} browser checks passed at 1280, 390 and 320px. Screenshots: ${out}`);
   } finally { await browser.close(); }
-})().catch(e => { console.error(e); process.exitCode = 1; });
+});

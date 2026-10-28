@@ -8,11 +8,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const base = process.env.COURSEWIKI_BROWSER_URL;
+const { browserURL: base, skip, launch } = require('../support/browser.cjs');
 
-test('visible lathe position fields retain scroll, focus, selection and edits', { skip: !base }, async () => {
-  const { chromium } = require('playwright');
-  const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
+test('visible lathe position fields retain scroll, focus, selection and edits', { skip }, async () => {
+  const browser = await launch();
   try {
     for (const [width, height] of [[1440, 900], [1366, 768], [375, 844], [390, 844]]) {
       for (const present of [false, true]) for (const theme of ['light', 'dark']) {

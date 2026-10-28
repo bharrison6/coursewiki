@@ -1,48 +1,24 @@
 const test = require('node:test');
-let chromium;
-try { ({ chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')); } catch (error) {
-  if (error.code !== 'MODULE_NOT_FOUND') throw error;
-}
-const browserURL = process.env.COURSEWIKI_BROWSER_URL;
-if (!chromium || !browserURL) {
-  test('wire-voltage-drop browser acceptance', { skip: 'Requires Playwright and COURSEWIKI_BROWSER_URL' }, () => {});
-} else {
+const { browserURL, skip, launchCDP } = require('../../tests/support/browser.cjs');
 // Run after build-site.ps1: node interactives/wire-voltage-drop/browser.test.cjs
 // Browser profiles, screenshots, PDFs, and logs stay in OS temp.
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawn } = require('node:child_process');
 const assert = require('node:assert/strict');
 const repo = path.resolve(__dirname, '../..');
-const out = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'coursewiki-wire-voltage-drop-'));
-fs.mkdirSync(out, { recursive: true });
 const docs = path.join(repo, 'docs');
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-let chrome, ws, call;
-(async () => {
+test('wire-voltage-drop browser acceptance', { skip }, async () => {
+  const out = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'coursewiki-wire-voltage-drop-'));
+  let browser, call;
+  try {
   const base = browserURL.replace(/\/$/, '');
-  const profile = path.join(out, `profile-${process.pid}`);
-  chrome = spawn(process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    ['--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],
-    { windowsHide: true, stdio: 'ignore' });
-  fs.writeFileSync(path.join(out, 'started-pid.txt'), String(chrome.pid));
-  let port;
-  for (let i=0; i<100; i++) {
-    try { port = fs.readFileSync(path.join(profile,'DevToolsActivePort'),'utf8').split('\n')[0]; if (port) break; } catch {}
-    await delay(100);
-  }
-  assert.ok(port, 'own Chrome debugging port');
-  const tabs = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-  ws = new WebSocket(tabs.find(tab => tab.type === 'page').webSocketDebuggerUrl);
-  await new Promise(resolve => ws.addEventListener('open',resolve,{once:true}));
-  let id=0; const pending=new Map(), errors=[];
-  ws.addEventListener('message',event => {
-    const data=JSON.parse(event.data);
-    if(data.id) { const p=pending.get(data.id); pending.delete(data.id); data.error ? p.reject(data.error) : p.resolve(data.result); }
-    if(data.method==='Runtime.exceptionThrown') errors.push(data.params.exceptionDetails.text);
-  });
-  call=(method,params={}) => new Promise((resolve,reject) => { pending.set(++id,{resolve,reject}); ws.send(JSON.stringify({id,method,params})); });
+  const launched = await launchCDP();
+  browser = launched.browser;
+  const session = launched.session, errors = [];
+  session.on('Runtime.exceptionThrown', data => errors.push(data.exceptionDetails.text));
+  call = (method, params = {}) => session.send(method, params);
   const evaluate=async expression => {
     const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});
     if(r.exceptionDetails) throw Error(JSON.stringify(r.exceptionDetails)); return r.result.value;
@@ -131,12 +107,5 @@ let chrome, ws, call;
   assert.deepEqual(errors,[]);
   console.log('PASS: 375 px light/dark, text size, positive overflow control, keyboard, unit conversion, two independent roots, invalid/impossible inputs, five practice checks, no-JS table, print PDFs and aggregate.');
 
-})().catch(error => { console.error(error); process.exitCode=1; }).finally(async () => {
-  if(call && ws?.readyState===1) { try { await call('Browser.close'); } catch {} }
-  if(ws) ws.close();
-  // Only the PID started above is eligible for this fallback.
-  if(chrome && chrome.exitCode===null) chrome.kill();
-
+ } finally { if (browser) await browser.close(); }
 });
-
-}

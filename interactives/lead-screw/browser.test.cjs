@@ -1,10 +1,6 @@
 const test = require('node:test');
-let chromium;
-try { ({ chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')); } catch (error) {
-  if (error.code !== 'MODULE_NOT_FOUND') throw error;
-}
-const browserURL = process.env.COURSEWIKI_BROWSER_URL;
-if (!chromium || !browserURL) {
+const { browserURL, skip, launch } = require('../../tests/support/browser.cjs');
+if (skip) {
   test('lead-screw browser acceptance', { skip: 'Requires Playwright and COURSEWIKI_BROWSER_URL' }, () => {});
 } else {
 // Run after build-site.ps1. Set PLAYWRIGHT_MODULE to an installed playwright package if needed.
@@ -19,7 +15,7 @@ const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/cs
 
 (async () => {
   const origin = browserURL.replace(/\/$/, '');
-  const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
+  const browser = await launch();
   const errors = [];
   try {
     const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });

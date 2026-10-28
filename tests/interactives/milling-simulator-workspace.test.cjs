@@ -4,7 +4,7 @@
    Pointer actions use visible coordinates, without driver auto-scrolling. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const base = process.env.COURSEWIKI_BROWSER_URL;
+const { browserURL: base, skip, launch } = require('../support/browser.cjs');
 
 function controlsFit() {
   const bench = document.querySelector('.ms-workbench');
@@ -30,9 +30,8 @@ function controlsFit() {
   return failures;
 }
 
-test('expanded milling controls fit and position edits preserve manual scroll', { skip: !base, timeout: 180000 }, async () => {
-  const { chromium } = require('playwright');
-  const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
+test('expanded milling controls fit and position edits preserve manual scroll', { skip, timeout: 180000 }, async () => {
+  const browser = await launch();
   try {
     for (const [width, height] of [[1440, 900], [1366, 768], [375, 844], [390, 844]]) {
       for (const present of [false, true]) for (const theme of ['light', 'dark']) {

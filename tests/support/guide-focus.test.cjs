@@ -1,0 +1,20 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+test('Guide wraps both Tab boundaries and excludes unavailable controls', () => {
+  const app = fs.readFileSync(path.join(__dirname, '../../activities/two-winters/src/app.js'), 'utf8');
+  const source = app.slice(app.indexOf('// Keep keyboard focus in the Guide'));
+  let keydown, prevented = false;
+  const document = { getElementById: () => guide };
+  const control = props => ({ tabIndex: 0, getClientRects: () => [1], focus() { document.activeElement = this; }, ...props });
+  const first = control(), last = control();
+  const guide = { open: true, addEventListener: (_, fn) => { keydown = fn; }, querySelectorAll: () => [control({ disabled: true }), first, last, control({ getClientRects: () => [] })] };
+  vm.runInNewContext(source, { document });
+  const press = shiftKey => { prevented = false; keydown({ key: 'Tab', shiftKey, preventDefault() { prevented = true; } }); };
+  document.activeElement = last; press(false); assert.equal(document.activeElement, first); assert.ok(prevented);
+  press(true); assert.equal(document.activeElement, last); assert.ok(prevented);
+  document.activeElement = first; press(false); assert.equal(prevented, false);
+  guide.open = false; document.activeElement = last; press(false); assert.equal(prevented, false);
+});
