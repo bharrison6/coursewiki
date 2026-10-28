@@ -771,13 +771,22 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
   .deeper { break-inside: avoid; background: none; }
 }
 
-/* a card whose content is a hard stop gets the danger edge */
-.xcard.is-stop { border-left: 3px solid var(--cat3); }
-.xcard.is-gate { border-left: 3px solid var(--flag); }
-/* a card that holds an interactive module gets the green edge, so a reader scanning
-   collapsed cards can see which ones have something to work with. Site-only colour
-   (not MSU palette), recorded in [official-document-branding]: 4.0:1 light, 3.9:1 dark. */
-.xcard.is-interactive { border-left: 3px solid var(--edge-interactive); }
+/* ---- card markers --------------------------------------------------------
+   A coloured left edge says what KIND of content a collapsed card holds, with
+   one meaning per colour site-wide. These colours are a semantic set of their
+   own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
+   2026-10-28): change the brand and the markers stay put, and the reverse.
+   The build sets the flag from the card's content (build-site.ps1, $flag),
+   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   surfaces (4.0:1 light, 3.9:1 dark).                                      */
+:root {
+  --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
+  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
+}
+.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
+.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
+.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
