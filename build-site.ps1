@@ -744,7 +744,49 @@ function New-ImageTag([string]$ref, [string]$alt, $ctx, [string]$mode) {
     }
     default { throw "New-ImageTag: unknown mode '$mode'" }
   }
-  '<img class="content-img" src="' + $src + '" alt="' + (ConvertTo-HtmlText $alt) + '"' +
+  $naturalSize = ''
+  if ($rec.Mime -eq 'image/svg+xml') {
+    # Resolve authored SVG dimensions at build time, including offline/data-URI
+    # output. Never resolve an external DTD or entity while reading artwork.
+    $settings = [System.Xml.XmlReaderSettings]::new()
+    $settings.DtdProcessing = [System.Xml.DtdProcessing]::Ignore
+    $settings.XmlResolver = $null
+    $reader = [System.Xml.XmlReader]::Create($rec.Full, $settings)
+    try {
+      $null = $reader.MoveToContent()
+      if ($reader.LocalName -eq 'svg') {
+        $culture = [Globalization.CultureInfo]::InvariantCulture
+        $dimensions = @()
+        $box = $reader.GetAttribute('viewBox')
+        if ($box) {
+          $parts = $box.Trim() -split '[\s,]+'
+          if ($parts.Count -eq 4) {
+            $numbers = @($parts | ForEach-Object {
+              $number = 0.0
+              if ([double]::TryParse($_, [Globalization.NumberStyles]::Float, $culture, [ref]$number) -and [double]::IsFinite($number)) { $number }
+            })
+            if ($numbers.Count -eq 4 -and $numbers[2] -gt 0 -and $numbers[3] -gt 0) { $dimensions = @($numbers[2], $numbers[3]) }
+          }
+        }
+        if ($dimensions.Count -ne 2) {
+          # Absolute CSS lengths have a fixed conversion to CSS pixels;
+          # percentages and relative lengths have no standalone natural size.
+          $units = @{ '' = 1.0; px = 1.0; in = 96.0; cm = 96.0/2.54; mm = 96.0/25.4; q = 96.0/101.6; pt = 96.0/72; pc = 16.0 }
+          $dimensions = @('width', 'height' | ForEach-Object {
+            $value = $reader.GetAttribute($_)
+            if ($value -match '^\s*(\+?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(px|in|cm|mm|q|pt|pc)?\s*$') {
+              $number = [double]::Parse($Matches[1], $culture) * $units[([string]$Matches[2]).ToLowerInvariant()]
+              if ([double]::IsFinite($number) -and $number -gt 0) { $number }
+            }
+          })
+        }
+        if ($dimensions.Count -eq 2) {
+          $naturalSize = ' data-natural-width="' + $dimensions[0].ToString('G', $culture) + '" data-natural-height="' + $dimensions[1].ToString('G', $culture) + '"'
+        }
+      }
+    } finally { $reader.Dispose() }
+  }
+  '<img class="content-img" src="' + $src + '" alt="' + (ConvertTo-HtmlText $alt) + '"' + $naturalSize +
   $(if ($alt) { '' } else { ' data-alt-missing="1"' }) + '>'
 }
 
