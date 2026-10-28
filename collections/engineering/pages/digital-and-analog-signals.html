@@ -1,0 +1,33 @@
+@@ID: digital-and-analog-signals
+@@TITLE: Digital and Analog Signals
+@@SECTION: Electrical Systems
+@@SUMMARY: Decide whether a sensor communicates with two logic states, a changing voltage, or the timing of pulses.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Digital uses two states; analog uses a range</h2>
+  <p>A <strong>digital</strong> input interprets two states: LOW/HIGH, or 0/1. The wire still carries a physical voltage; the receiving circuit decides which logic state it represents. A voltage in the undefined region between valid LOW and HIGH levels is not a useful third state.</p>
+  <p>An <strong>analog</strong> signal represents a quantity by a continuous range of values. A potentiometer wired between ground and 5 V can provide a changing voltage at its middle terminal. On a classic Uno R3, the usual analog measurement range is nominally 0–5 V with the default reference. That is not a universal sensor range.</p>
+  <p>[[img:electrical-systems/signal-waveforms.svg|Digital waveform switches between LOW and HIGH; analog waveform changes smoothly through intermediate voltages. Both are plotted against time.]]</p>
+</section>
+<section>
+  <h2>Classify the sensor's output circuit, not just its name</h2>
+  <div class="unit-table-wrap"><table class="unit-table"><caption>Common examples</caption><thead><tr><th>Device and connection</th><th>Signal at the input</th></tr></thead><tbody>
+    <tr><td>Button or switch with a pull-up</td><td>Digital open/closed state.</td></tr>
+    <tr><td>Quadrature encoder with compatible logic outputs</td><td>Two digital pulse trains; their order gives direction.</td></tr>
+    <tr><td>HC-SR04 ultrasonic module, Echo pin</td><td>A timed digital pulse. Its duration represents distance; its voltage height does not.</td></tr>
+    <tr><td>Potentiometer connected as a voltage divider</td><td>Analog voltage from its wiper (middle terminal).</td></tr>
+    <tr><td>Photoresistor in a voltage divider</td><td>Analog voltage as resistance changes with light.</td></tr>
+    <tr><td>Phototransistor with a load resistor</td><td>Analog response to light unless a threshold circuit converts it to digital.</td></tr>
+    <tr><td>Pressure or proximity sensor</td><td>Depends on the model: analog voltage, switching output, or digital data. Read its documentation.</td></tr>
+  </tbody></table></div>
+  <p>A bare resistive sensor does not generate a usable voltage by itself: its surrounding circuit matters. A module may offer both analog and thresholded digital outputs.</p>
+  <details class="deeper"><summary>Phototransistor circuits can measure light or switch at a threshold</summary><p>Vishay's <a href="https://www.vishay.com/docs/84154/appnotesensors.pdf">Ambient Light Sensors — Circuit and Window Design</a> shows both light-meter circuits and light-switch circuits. The phototransistor current changes with illumination; the surrounding circuit determines whether the output preserves a range or switches between logic states.</p></details>
+  <details class="deeper"><summary>Why an ultrasonic measurement can be digital</summary><p>The <a href="https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf">HC-SR04 manufacturer datasheet, hosted by SparkFun</a> describes an Echo pulse whose width represents the range. Digital describes the two voltage states; the information can be carried by their timing. A single <code>digitalRead</code> tells you the current state, not the pulse duration.</p></details>
+</section>
+<section>
+  <h2>The ADC reads voltage; PWM controls time</h2>
+  <p>[[analog-to-digital-conversion]] turns an analog input into a number the program can use. [[pulse-width-modulation]] switches a digital output on and off for a controlled fraction of each cycle. Neither operation changes the fact that the processor stores and works with digital data.</p>
+  <p><a class="button" data-practice-add="micro-ultrasonic-signal" href="../practice.html#micro-ultrasonic-signal">Practice identifying sensor signals</a></p>
+</section>

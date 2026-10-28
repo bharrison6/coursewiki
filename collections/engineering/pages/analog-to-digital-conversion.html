@@ -1,0 +1,25 @@
+@@ID: analog-to-digital-conversion
+@@TITLE: Analog-to-Digital Conversion
+@@SECTION: Electrical Systems
+@@SUMMARY: Relate an Uno R3's 10-bit ADC reading to its reference voltage, step size and approximate sampling time.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Ten bits give 1024 codes, numbered 0 through 1023</h2>
+  <p>An <strong>analog-to-digital converter (ADC)</strong> samples a voltage and reports a number. The classic Uno R3 has a 10-bit ADC: <code>2<sup>10</sup> = 1024</code> possible codes. <code>analogRead(A0)</code> reads analog input A0 and returns an integer from 0 to 1023.</p>
+  <p>The reference voltage sets the scale. With an assumed exact 5.000 V reference, one nominal step is <code>5/1024 = 0.0048828125 V = 4.883 mV</code>, or about 4.9 mV. Resolution describes the step size; it does not guarantee that a real voltage measurement is accurate to that amount.</p>
+  <details class="deeper"><summary>Arduino's resolution and timing figures</summary><p>The official <a href="https://github.com/arduino/reference-en/blob/master/Language/Functions/Analog%20IO/analogRead.adoc">analogRead reference source</a> gives “5 volts / 1024 units” and “about 100 microseconds (0.0001 s)”. That is roughly 10,000 reads per second on ATmega-based boards using the usual API, not an absolute ADC hardware limit or a guaranteed loop rate. Computation, communication and delays take additional time. The <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogRead/">published analogRead reference</a> is the learner's API lookup.</p></details>
+</section>
+<section>
+  <h2>Use 1024 for the nominal voltage step</h2>
+  <p>For these exercises, use a clearly defined <strong>ideal bin model</strong>: divide the 0–5 V span into 1024 equal bins, round down to the bin number, and limit the top code to 1023.</p>
+  <p><code>code = min(1023, floor(V<sub>in</sub> × 1024 / V<sub>ref</sub>))</code>. Here <code>floor</code> means round down. At 3.000 V with a 5.000 V reference: <code>floor(614.4) = 614</code>.</p>
+  <p>To report the nominal voltage represented by a code, use its lower bin edge: <code>V = code × V<sub>ref</sub>/1024</code>. Code 800 represents <code>800 × 5/1024 = 3.90625 V</code>. In this model its bin extends up to, but not including, 3.9111328125 V.</p>
+  <details class="deeper"><summary>Why dividing by 1023 answers a different question</summary><p>There are 1024 codes but only 1023 intervals between code labels 0 and 1023. Multiplying by 5/1023 stretches those endpoints to exactly 0 and 5 V; that is endpoint scaling, not the nominal ADC step. The explorer and practice consistently use 1024. Real converters have transition offsets, noise and reference error; their exact thresholds are not predicted by this classroom bin model. A code cannot recover the original voltage exactly.</p></details>
+</section>
+<section>
+  <h2>Explore the steps and check the units</h2>
+  <p>The two-way ADC controls in the [[pulse-width-modulation|PWM and ADC explorer]] let you enter a voltage or a code. Try nearby voltages within one bin, then cross its boundary. In reverse, code 1023 gives 4.9951171875 V as its lower edge, not proof that the input equals that value.</p>
+  <p><a class="button" data-practice-add="micro-adc-volts" href="../practice.html#micro-adc-volts">Practice converting a reading to volts</a></p>
+</section>
