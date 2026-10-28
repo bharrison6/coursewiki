@@ -1,0 +1,61 @@
+@@ID: sketch-entities-and-planes
+@@TITLE: Sketch Entities and Planes
+@@SECTION: CAD Modeling
+@@SUMMARY: Choose where a 2D sketch lives, then build its shape from simple entities and construction geometry.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Choose the sketch plane before drawing the shape</h2>
+  <p class="lede">A 2D sketch is a set of points and curves on one plane. The plane places the sketch in the model; the sketch's origin and axes give you references for locating its geometry.</p>
+  <ul>
+    <li><strong>Standard plane:</strong> Front, Top, or Right is a useful starting reference for a new part. Choose the view that makes the intended profile easiest to describe.</li>
+    <li><strong>Model face:</strong> use an existing <em>planar</em> face when the new sketch belongs on that face. A curved face is not itself a 2D sketch plane.</li>
+    <li><strong>Reference plane:</strong> an added plane can locate a sketch where the standard planes and existing faces do not.</li>
+  </ul>
+  <p>The <strong>origin is a point, not a plane</strong>. Starting a line or circle at the origin can anchor its position, but you still need a sketch plane. You may start elsewhere when that suits the design; then constrain the location relative to a deliberate reference.</p>
+  <p>Look normal to the sketch plane: straight at it, rather than at an angle. Horizontal and vertical refer to the sketch's axes, even when you rotate the model on screen.</p>
+  <details class="deeper"><summary>Sketch placement in Onshape</summary><p>Onshape creates sketches in a Part Studio and lets you choose a plane, a planar part face, or a mate connector that supplies a coordinate system. This page uses ordinary planes and faces. See <a href="https://cad.onshape.com/help/Content/Sketch/sketch_basics.htm">Onshape: Sketch Basics</a>.</p></details>
+</section>
+
+<section>
+  <h2>Use the simplest entity that describes the shape</h2>
+  <div class="unit-table-wrap"><table class="unit-table">
+    <caption>Sketch entities and the information they need</caption>
+    <thead><tr><th scope="col">Entity</th><th scope="col">What it describes</th><th scope="col">What to control</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Line</th><td>A straight segment between two endpoints.</td><td>Position, direction, and length.</td></tr>
+      <tr><th scope="row">Circle</th><td>A complete round curve.</td><td>Center position and radius or diameter.</td></tr>
+      <tr><th scope="row">Arc</th><td>Part of a circle.</td><td>Center, radius, and where the arc begins and ends.</td></tr>
+      <tr><th scope="row">Rectangle</th><td>Four connected lines with right-angle corners.</td><td>Position, orientation, width, and height. Tool-created relations often supply some of these.</td></tr>
+      <tr><th scope="row">Slot</th><td>A constant-width path with rounded ends. A simple straight slot has two parallel sides and two semicircular ends.</td><td>Path position and direction, width, and length. State whether length means overall length or distance between end centers.</td></tr>
+      <tr><th scope="row">Spline</th><td>A curve shaped by fit points or control points and handles.</td><td>Point locations and curve shape. Use it when a line or circular arc cannot express the intended contour.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Rectangle and slot tools create useful groups of geometry. They do not guarantee that the resulting sketch is fully defined. Inspect their relations before adding more.</p>
+  <details class="deeper"><summary>Find the tools by their software names</summary><p>Onshape names include <em>Line, Corner rectangle, Center point rectangle, Center point circle, 3 point circle, Tangent arc, 3 point arc, Spline, Point</em>, and <em>Construction</em>. Its Slot tool builds around selected sketch curves. See <a href="https://cad.onshape.com/help/Content/Sketch/sketch_tools.htm">Sketch Tools</a> and <a href="https://cad.onshape.com/help/Content/Sketch/slot.htm">Slot</a>. These names describe ways to create geometry, not different rules for constraining it.</p></details>
+</section>
+
+<section>
+  <h2>Construction geometry guides the sketch without outlining material</h2>
+  <p>A centerline is a common use of <strong>construction geometry</strong>: a reference for a center, symmetry, angle, or axis. Construction geometry participates in dimensions and relations, but does not serve as the ordinary boundary of a filled profile.</p>
+  <figure>
+    <svg viewBox="0 0 520 210" role="img" aria-labelledby="sep-guide-title sep-guide-desc" style="width:100%;height:auto">
+      <title id="sep-guide-title">A circular profile with a construction centerline</title>
+      <desc id="sep-guide-desc">A solid circle surrounds an origin cross. A dashed line through its center is labeled construction; the circle is labeled profile.</desc>
+      <g fill="none" stroke="currentColor" stroke-width="2"><circle cx="165" cy="100" r="65"/><path d="M50 100 H280" stroke-dasharray="13 5 3 5"/><path d="M157 100 H173 M165 92 V108 M215 55 L325 35 M260 100 L325 135"/></g>
+      <g fill="currentColor" font-size="18"><text x="335" y="40">Profile</text><text x="335" y="140">Construction</text><text x="130" y="195">Origin</text></g>
+    </svg>
+    <figcaption>The reference line and the profile have different jobs. A dashed line can still need constraints.</figcaption>
+  </figure>
+  <p>In SOLIDWORKS, Centerline creates construction geometry. In Onshape, use Construction to toggle selected sketch entities or to create construction geometry. Use a construction circle for a layout circle just as you would use a construction line for an axis.</p>
+  <details class="deeper"><summary>Vendor reference for construction geometry</summary><p><a href="https://cad.onshape.com/help/Content/Sketch/construction.htm">Onshape: Construction</a> explains the reference-only role. <a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_Construction_Geometry.htm">SOLIDWORKS: Construction Geometry</a> describes centerlines and converting sketch entities.</p></details>
+</section>
+
+<section>
+  <h2>Check connections before moving on to a feature</h2>
+  <p>Two endpoints that look joined may still be separate. A tiny gap can prevent a profile from closing. Use a coincident relation to make the connection intentional, then inspect the sketch.</p>
+  <p><strong>Closed and fully defined are different checks.</strong> A closed circle can still move or change size. A fully defined chain of lines can still be open. Later features such as extrude or revolve use sketches in different ways; choose the profile that the intended feature needs.</p>
+  <p>Continue with [[sketch-geometric-relations]] and [[fully-defined-sketches]]. For view interpretation, see [[orthographic-projection]]; for drawing dimensions, see [[dimension-anatomy-and-placement]].</p>
+  <p><a class="button" data-practice-add="sketch-origin-choice" href="../practice.html#sketch-origin-choice">Practice: choose a sketch reference</a></p>
+</section>

@@ -1,0 +1,85 @@
+@@ID: fully-defined-sketches
+@@TITLE: Fully Defined Sketches and Design Intent
+@@SECTION: CAD Modeling
+@@SUMMARY: Remove unwanted freedom with relations and dimensions, then test whether edits preserve the intended shape.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Count independent ways the geometry can still change</h2>
+  <p class="lede">A <strong>degree of freedom (DOF)</strong> is one independent variable still available to change. Constraints remove freedom. Count the geometry's possible motion, not the number of icons.</p>
+  <div class="unit-table-wrap"><table class="unit-table">
+    <caption>Simple, isolated 2D entities before any dimensions or relations</caption>
+    <thead><tr><th scope="col">Entity</th><th scope="col">Free variables</th><th scope="col">DOF</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Point</th><td>x and y position</td><td>2</td></tr>
+      <tr><th scope="row">Nonzero line segment</th><td>x and y for each endpoint</td><td>4</td></tr>
+      <tr><th scope="row">Circle</th><td>Center x, center y, radius</td><td>3</td></tr>
+      <tr><th scope="row">Circular arc</th><td>Center x, center y, radius, two endpoint angles</td><td>5</td></tr>
+    </tbody>
+  </table></div>
+  <p>A circle's diameter dimension removes one DOF; its center can still move in two directions. Making its center coincident with the origin removes those two. A line with one endpoint at the origin still has length and direction to determine.</p>
+  <details class="deeper"><summary>Why subtracting one per relation gives wrong answers</summary><p>Coinciding a free point with a fixed point supplies two coordinate conditions. Putting a free point on a fixed line supplies only one. A repeated rule may supply no new independent condition. These counts assume ordinary, nondegenerate geometry: nonzero line lengths and positive radii. At special configurations, independent equations and usable motion require more care; do not assign a universal DOF reduction to each icon.</p></details>
+</section>
+
+<section>
+  <h2>A driving dimension controls size; a driven dimension reports it</h2>
+  <p>A <strong>driving dimension</strong> is a constraint: changing its value asks the solver to change the geometry while keeping the other rules. Length, angle, radius, diameter, and location dimensions can all supply constraints.</p>
+  <p>A <strong>driven</strong> or reference dimension measures a result already controlled elsewhere. It does not remove another DOF. For example, a circle whose size is set by a 24 mm driving diameter already has a 12 mm radius; a second driving radius dimension duplicates that control.</p>
+  <p>Use a relation for an enduring geometric rule and a dimension for the independent value you intend to change. Two lengths that must remain equal need an equal relation and one driving length, rather than two unrelated numbers that happen to match today.</p>
+  <p>Onshape automatically makes a newly added dimension driven if it would over-define the sketch. Check whether a displayed value is driving before expecting it to control geometry.</p>
+  <details class="deeper"><summary>Software treatment of redundant dimensions</summary><p>SOLIDWORKS can make a redundant dimension driven; its geometry-status help describes the driven dimension as gray. Onshape's Dimension tool distinguishes driving from driven dimensions and documents the automatic conversion. See <a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_Sketch_Geometry_Status.htm">Sketch Geometry Status</a> and <a href="https://cad.onshape.com/help/Content/Sketch/dimension.htm">Onshape: Dimension</a>.</p></details>
+  <p>For drawing presentation and dimension placement, see [[dimension-anatomy-and-placement]].</p>
+</section>
+
+<section>
+  <h2>Read the sketch state in the software you are using</h2>
+  <ul>
+    <li><strong>Under-defined / underconstrained:</strong> some position, orientation, or size remains free.</li>
+    <li><strong>Fully defined / fully constrained:</strong> no free motion remains with the current driving values. Editing those values can still change the sketch.</li>
+    <li><strong>Over-defined / overconstrained:</strong> dimensions or relations conflict or add control the solver treats as redundant. Repair the conflicting set.</li>
+  </ul>
+  <div class="unit-table-wrap"><table class="unit-table">
+    <caption>Documented colors for sketch geometry while editing; selection and hover highlighting are separate</caption>
+    <thead><tr><th scope="col">Software</th><th scope="col">Under-defined</th><th scope="col">Fully defined</th><th scope="col">Problems</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">SOLIDWORKS 2026</th><td>Blue</td><td>Black</td><td>Geometry-status help identifies yellow for conflicting or invalid items and red for unsolvable items; a redundant driving dimension can be red.</td></tr>
+      <tr><th scope="row">Onshape</th><td>Blue</td><td>Black</td><td>Red geometry indicates a constraint problem. A problem constraint icon is white on red.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Read status messages and inspect relations as well as color. One black edge does not prove that the entire sketch is fully defined. An under-defined construction line or endpoint can be easy to overlook.</p>
+  <details class="deeper"><summary>Current vendor references for status colors</summary><p><a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_Sketch_Geometry_Status.htm">SOLIDWORKS: Sketch Geometry Status</a> distinguishes several error states. <a href="https://cad.onshape.com/help/Content/Sketch/troubleshooting_sketch_geometry.htm">Onshape: Troubleshooting Sketch Geometry</a> documents geometry and constraint-icon colors. These are editing-state conventions, not a universal color code for every CAD display.</p></details>
+</section>
+
+<section>
+  <h2>Fully define a sketch in a repeatable order</h2>
+  <ul class="boxes">
+    <li>State what must stay aligned, centered, equal, or tangent when the size changes.</li>
+    <li>Choose the plane and an origin reference that suit that intent. Confirm the working units.</li>
+    <li>Draw the simplest useful entities. Check the automatic relations and remove unintended ones.</li>
+    <li>Connect the intended endpoints and apply the geometric relations that describe the shape.</li>
+    <li>Anchor the sketch's position to the origin or other stable references; control its orientation.</li>
+    <li>Add independent driving dimensions for the remaining sizes and locations.</li>
+    <li>Inspect the remaining free points and curves. Drag gently to diagnose motion, then undo the diagnostic move.</li>
+    <li>Resolve conflicts before adding more constraints. Inspect the whole sketch, including construction geometry.</li>
+    <li>Change one intended driving value, check that the sketch behaves correctly, then restore the value.</li>
+  </ul>
+  <p><strong>Fully defined is a useful check, not proof of good design intent.</strong> Fixing a misplaced point can remove freedom without giving it the correct location. A sketch can be completely constrained by dimensions that make future edits awkward.</p>
+</section>
+
+<section>
+  <h2>Test design intent with a change, not just the starting shape</h2>
+  <p><strong>Fresh practice part: a circular inspection plate.</strong> Sketch two circular boundaries for an annular plate. Put their common center at the origin; use concentric and separate diameter dimensions of 46 mm and 18 mm. Increasing the outer diameter to 58 mm should leave the inner opening centered and unchanged in size.</p>
+  <p><strong>Fresh practice part: a rectangular label blank.</strong> Use an axis-aligned rectangle with its lower-left corner at the origin, width 64 mm, and height 22 mm. Increasing the width to 80 mm should move the right edge while the left edge stays at the origin. If the intended part must grow equally left and right, choose a centered construction instead.</p>
+  <p>These two origin choices describe different editing behavior. There is no single best anchor for every part. Decide what should stay put before dimensioning.</p>
+  <p><a class="button" data-practice-add="sketch-dof-circle-size" href="../practice.html#sketch-dof-circle-size">Practice: count remaining freedom</a> <a class="button" data-practice-add="sketch-over-radius" href="../practice.html#sketch-over-radius">Practice: spot duplicate control</a></p>
+</section>
+
+<section>
+  <h2>Repair the unwanted rule, then check the intended change again</h2>
+  <p>When an added dimension causes an error, inspect what already controls that measurement. Keep the relation or dimension that expresses the intended design. Remove the duplicate, or make a measurement driven if it is only there to report a result.</p>
+  <p>A horizontal line cannot also have a nonzero vertical separation between its endpoints. Equal circles cannot have different driving diameters. These are contradictions; adding still more dimensions will not solve them.</p>
+  <p>SOLIDWORKS offers Display/Delete Relations and SketchXpert for diagnosis. Onshape's Constraint manager filters constraints and dimensions to help locate problems. A suggested deletion is still a design decision: check what behavior you would lose.</p>
+  <details class="deeper"><summary>Redundancy is not the same as contradiction</summary><p>A repeated condition may agree mathematically yet be rejected as a second driving control. Some redundant geometric relations are tolerated: SOLIDWORKS documents a redundant perpendicular relation that leaves a sketch fully defined. Do not assume that every extra icon causes an error. See <a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_FAQ_Sketch_Relations.htm">SOLIDWORKS: FAQ Sketch Relations</a> and <a href="https://cad.onshape.com/help/Content/Sketch/working_with_constraints.htm">Onshape: Working with Constraints</a>.</p></details>
+  <p>Return to [[sketch-geometric-relations]] to compare rules, or [[sketch-entities-and-planes]] to review the geometry they act on.</p>
+</section>
