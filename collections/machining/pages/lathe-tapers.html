@@ -1,0 +1,57 @@
+@@ID: lathe-tapers
+@@TITLE: Turning Tapers
+@@SECTION: Turning
+@@SUMMARY: Calculate taper rate, compound angle and tailstock offset, then choose a method and check both slope and size.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>A taper changes diameter at a constant rate</h2>
+  <p>A straight taper is a cone, or part of one. Name the large diameter <strong>D</strong>, small diameter <strong>d</strong> and axial length of the tapered portion <strong>l</strong>. Use the same length unit for all three.</p>
+  <p><strong>Taper rate = (D &minus; d) / l.</strong> With inch dimensions, this is taper per inch, often abbreviated TPI. Here TPI means diameter change per inch of length; in [[single-point-threading]], the same abbreviation means <em>threads</em> per inch. Write the units to distinguish them.</p>
+  <p><strong>TPF = 12 &times; TPI</strong>, and <strong>TPI = TPF / 12</strong>. Taper per foot describes the diameter change over twelve inches; the actual tapered portion need not be a foot long.</p>
+  <details class="deeper"><summary>Check the rate with a fresh example</summary>
+    <p>A taper goes from 1.100 to 0.950 in over 3.000 in. Its diameter changes 0.150 in, so the rate is 0.050 in/in, or 0.600 in/ft. At half the length, the diameter has changed half as much: 0.075 in. These are teaching dimensions, not a standard machine taper.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Set the compound to the half-angle measured from the spindle axis</h2>
+  <p>The tool travels along one side of the cone. Its angle to the spindle axis is the <strong>half-angle &alpha;</strong>; the angle between the two sides is the <strong>included angle 2&alpha;</strong>.</p>
+  <p><strong>&alpha; = atan((D &minus; d) / (2l)) = atan(TPI / 2).</strong> Use degree mode for a setting in degrees. A rate of 0.050 in/in gives &alpha; = 1.432&deg;, while the included angle is 2.864&deg;.</p>
+  <p>Swivel the compound so its travel makes that half-angle with the spindle axis, then feed along the compound. The taper length is limited by compound travel. Check how the lathe labels its scale: a scale measured from cross-slide travel uses the complementary angle, 90&deg; &minus; &alpha;.</p>
+  <figure>[[img:lathe/compound-taper.svg|The taper half-angle has radial rise (D minus d) divided by two and axial run l; the included angle is twice the half-angle.]]<figcaption>The radius changes by half the diameter change. The drawing exaggerates the slope.</figcaption></figure>
+  <details class="deeper"><summary>Why the factor of two belongs in the angle formula</summary>
+    <p>Cut the cone through its axis. One side forms a right triangle whose rise is (D &minus; d)/2 and whose run is l. Tangent is rise divided by run. Using the whole diameter change as the rise gives the wrong tool path.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Tailstock offset uses the full supported work length</h2>
+  <p>For a shallow external taper turned between centers, offsetting the tailstock tilts the work while the carriage still travels parallel to the bed. The usual small-angle setup estimate is <strong>offset &asymp; TPI &times; L / 2 = (D &minus; d)L / (2l)</strong>.</p>
+  <p><strong>L is the total work length between the effective center support points</strong>, approximated by the total part length in elementary problems. It is not just the length l of the tapered portion. Center-hole geometry matters in an actual setup. Use inches for L when the taper rate is in in/in; if given TPF, first divide it by 12.</p>
+  <figure>[[img:lathe/tailstock-offset.svg|The full length L spans the two center supports; offset s shifts the tailstock sideways. A shorter taper length l does not replace L in the offset calculation.]]<figcaption>Plan view: offset is transverse to the spindle axis, not a vertical change in center height.</figcaption></figure>
+  <p>For a rate of 0.050 in/in and L = 8.000 in, the estimate is 0.200 in even if only 3.000 in is tapered. Machine offset capacity and the center arrangement limit this method. Check a trial cut and restore center alignment before straight turning.</p>
+  <details class="deeper"><summary>Why this is an estimate rather than an exact setting</summary>
+    <p>The taper gives tan(&alpha;) = TPI/2. If L is the actual distance along the tilted work between support points, the ideal geometric offset is L sin(&alpha;). At shallow angles sin(&alpha;) and tan(&alpha;) are nearly equal. The usual formula substitutes L tan(&alpha;); real center contact and setup error add further differences. It is not a method for steep cones.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Choose the taper method for length, access and support</h2>
+  <dl class="dims">
+    <div><dt>Compound rest</dt><dd>Useful for short external or internal tapers. The compound guides the tool at the half-angle, but its limited travel restricts length.</dd></div>
+    <div><dt>Tailstock offset</dt><dd>Useful for shallow external tapers between centers. It changes the work axis and does not provide a method for boring an internal taper.</dd></div>
+    <div><dt>Taper attachment</dt><dd>A guide coordinates cross-slide motion with carriage travel. It can produce internal or external tapers within its travel and angle limits while the work stays aligned with the spindle. Connection and cross-feed arrangements depend on the attachment.</dd></div>
+    <div><dt>Form tool</dt><dd>A shaped cutting edge produces a short taper by feeding across the axis. A wide edge engages much of the cut at once, increasing cutting load and the tendency to chatter.</dd></div>
+  </dl>
+  <p>Start with [[lathe-operations]] for the machine and workholding. Use [[feeds-and-speeds]] for cutting conditions and [[surface-texture]] for the finish left by the cut.</p>
+</section>
+
+<section>
+  <h2>A matching taper needs both the right slope and the right size</h2>
+  <p>Measure diameters at two known axial positions to check the rate. A correct rate can still leave the entire taper too large or too small. A suitable taper plug or ring gauge checks the mating geometry; contact pattern and seating position answer different questions.</p>
+  <p><strong>Morse</strong> tapers are commonly used for centers and tool shanks. <strong>Jacobs</strong> tapers commonly join a drill chuck to its arbor. They are separate families: identify the exact mating designation before selecting a tool or adapter. No dimensions or angles should be inferred from the family name alone.</p>
+  <p>No standard taper table is reproduced here. Use the specified component drawing and verified manufacturer or standard dimensions for a real fit; see [[tolerances-and-fits]].</p>
+  <p><a class="button" data-practice-add="lathe-taper-rate" href="../practice.html#lathe-taper-rate">Practice taper rate</a> <a class="button" data-practice-add="lathe-compound-angle" href="../practice.html#lathe-compound-angle">Practice half-angle</a> <a class="button" data-practice-add="lathe-tailstock-offset" href="../practice.html#lathe-tailstock-offset">Practice offset</a></p>
+</section>

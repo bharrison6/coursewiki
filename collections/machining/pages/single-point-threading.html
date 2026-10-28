@@ -1,0 +1,72 @@
+@@ID: single-point-threading
+@@TITLE: Single-Point Threading
+@@SECTION: Turning
+@@SUMMARY: Read thread geometry, distinguish pitch from lead, understand compound infeed and check thread size beyond the outside diameter.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Pitch spaces the teeth; lead sets carriage travel per revolution</h2>
+  <p>A thread follows a helix around a cylinder. <strong>Pitch P</strong> is the axial distance between corresponding points on adjacent teeth. For N threads per inch, <strong>P = 1/N inch</strong>. A 20-per-inch thread has a pitch of 0.050 in.</p>
+  <p><strong>Lead</strong> is the axial advance along one helix in one complete revolution. A single-start thread has one helix, so lead equals pitch. A two-start thread has two interleaved helices and lead equals 2P. In general, <strong>lead = number of starts &times; pitch</strong>. Threading feed follows lead; the examples here use single-start threads.</p>
+  <p>The <strong>crest</strong> is the top of a tooth and the <strong>root</strong> is the bottom of the groove. The sides are <strong>flanks</strong>. The <strong>thread angle</strong> is the included angle between flanks in an axial section. This page discusses 60&deg; profiles; other thread forms need other tools and geometry.</p>
+  <figure>[[img:lathe/thread-terms.svg|Axial section of an external thread showing crests, roots, pitch, flank angle and major, pitch and minor diameter levels.]]<figcaption>Schematic external thread, with only the upper half shown. Diameters span across the axis to the opposite side.</figcaption></figure>
+</section>
+
+<section>
+  <h2>Major diameter alone cannot tell you whether a thread fits</h2>
+  <dl class="dims">
+    <div><dt>Major diameter</dt><dd>The largest thread diameter: across external crests or internal roots.</dd></div>
+    <div><dt>Minor diameter</dt><dd>The smallest thread diameter: across external roots or internal crests.</dd></div>
+    <div><dt>Pitch diameter</dt><dd>The diameter of an imaginary cylinder at which thread tooth width and groove width are equal for the ideal profile. It strongly affects flank clearance and fit.</dd></div>
+  </dl>
+  <p>The outside of a screw can measure correctly while its flanks are still too thick. Use the thread designation and its specified limits, not just nominal outside diameter. [[tolerances-and-fits]] explains limits; [[lathe-operations]] explains what the simulator's simplified thread check measures.</p>
+</section>
+
+<section>
+  <h2>The tool stays square while the compound feeds near one flank</h2>
+  <p>For a 60&deg; thread, use a tool with the required 60&deg; profile and the specified tip shape. A <strong>center gauge</strong>, also called a fishtail gauge, checks a ground tool's angle and helps align its bisector perpendicular to the work axis. Set the cutting edge at spindle center height. Swiveling the compound does not mean turning the tool away from square.</p>
+  <p>A common manual arrangement sets compound travel about <strong>29&ndash;30&deg; from the radial cross-feed direction</strong> for this thread form. That is about 60&ndash;61&deg; from the spindle axis. Check the scale's zero reference before setting it.</p>
+  <figure>[[img:lathe/thread-infeed.svg|A square 60-degree tool advances diagonally about 29 degrees from radial travel, nearly parallel to one 30-degree flank, while its orientation remains unchanged.]]<figcaption>The angle describes the infeed path between passes, not the tool's included angle or the thread helix angle.</figcaption></figure>
+  <p>Near-flank infeed puts most of the cutting on one edge. Exactly 30&deg; is parallel to a flank in the ideal axial profile; slightly less also gives the other edge a small cut. Tool-maker guidance may call for a different infeed strategy.</p>
+  <details class="deeper"><summary>Radial depth and compound travel are different quantities</summary>
+    <p>If compound travel is c at angle &beta; from radial, its radial component is <strong>h = c cos(&beta;)</strong>; therefore <strong>c = h / cos(&beta;)</strong>. The corresponding diameter reduction is 2h. Check whether a dial reads actual slide travel or diameter change before using it.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Keep every pass synchronized with the same helix</h2>
+  <p>The gearbox establishes the relationship between spindle rotation and leadscrew rotation. Closing the <strong>half-nuts</strong> connects the carriage to the leadscrew so that each spindle revolution advances the tool by the selected lead. An ordinary power-feed setting is not a substitute for a threading setting.</p>
+  <p><strong>Check the machine's threading-dial chart</strong> before re-engaging the half-nuts. On an inch-leadscrew lathe, the engagement pattern depends on how the dial is graduated. With four numbered lines and unnumbered half-lines between them, common on older inch lathes with an 8-TPI leadscrew, an odd number of threads per inch (TPI) can usually be caught on any <strong>numbered line</strong>, but not on the half-lines (see <a href="https://leblondusa.com/threading-on-a-manual-lathe/">LeBlond's four-numbered-line chart</a>). On dials numbered 1&ndash;8, odd TPI are often restricted to lines of one parity (all odd or all even). Even TPI can usually be caught on any line, numbered or half. Fractional TPI may require returning to the same specified line or keeping the half-nuts engaged. These are examples, not universal dial settings: leadscrew pitch and dial gearing determine which marks work, and the machine's chart controls.</p>
+  <details class="deeper"><summary>Why only certain threading-dial positions return to the groove</summary>
+    <p>The <strong>threading dial</strong> is geared to the leadscrew and carried with the carriage. Its rotation tracks their relative position. For a selected thread, certain dial positions repeat the relationship that lets the tool enter the same helical groove when the half-nuts close. Other positions can put the tool between previous passes, cutting a second groove.</p>
+  </details>
+  <p>For some combinations, notably many metric threads on inch-leadscrew lathes, ordinary dial re-engagement will lose synchronization. Such setups commonly keep the half-nuts engaged and use the maker's prescribed return method. Confirm the machine and workholding permit that method; this page supplies no universal reversing procedure.</p>
+  <ul class="boxes">
+    <li>Identify the thread form, hand, pitch, number of starts and required limits on the drawing.</li>
+    <li>Check the machine chart for the gearing and permitted half-nut/dial procedure.</li>
+    <li>Check a light scratch pass with a pitch gauge before deepening the thread.</li>
+    <li>Plan the end of each pass and the return path before cutting to depth.</li>
+    <li>Measure as the thread approaches size; use the specified inspection method to decide when it is finished.</li>
+  </ul>
+  <p>Machine operation and hazards belong on [[machine-hazards]], [[ppe]] and [[metal-chips]].</p>
+</section>
+
+<section>
+  <h2>Calculate a profile depth only after naming the profile</h2>
+  <p>A 60&deg; angle and a pitch do not, by themselves, specify a finished thread depth. Crest flats, root shape, tip geometry and dimensional limits all matter. Use the actual thread specification and tooling data for a production cut, then measure the result. Total depth is not a per-pass infeed instruction.</p>
+  <p>For the <strong>ideal sharp-V teaching profile</strong> used in the practice bank, radial depth is <strong>H = P / (2 tan 30&deg;) = (&radic;3 / 2)P &asymp; 0.8660254P</strong>. This is the full sharp triangle height, <strong>not a finished Unified or metric thread depth</strong>. Actual truncated or rounded profiles remove less radial material than this sharp triangle.</p>
+  <details class="deeper"><summary>Verify the formula without a thread-depth table</summary>
+    <p>Split the symmetric 60&deg; tooth down the middle. The right triangle has axial width P/2 and radial height H. Its 30&deg; angle gives tan(30&deg;) = (P/2)/H. Rearranging gives the formula above. If a defined profile removes radial heights a at the crest and b at the root from this triangle, its height is H &minus; a &minus; b. Neither a nor b can be guessed from pitch alone.</p>
+    <p>For a hypothetical sharp-V, 20-per-inch thread, P = 0.050 in and H = 0.04330 in. At 29&deg; from radial, ideal compound travel would be H/cos(29&deg;) = 0.04951 in. These calculations isolate geometry; they are not settings for cutting a real 20-per-inch fastener.</p>
+  </details>
+  <p><a class="button" data-practice-add="lathe-thread-pitch" href="../practice.html#lathe-thread-pitch">Practice thread pitch</a> <a class="button" data-practice-add="lathe-thread-depth" href="../practice.html#lathe-thread-depth">Practice ideal profile depth</a> <a class="button" data-practice-add="lathe-thread-compound-travel" href="../practice.html#lathe-thread-compound-travel">Practice compound travel</a></p>
+</section>
+
+<section>
+  <h2>A pitch gauge checks spacing; wires help measure pitch diameter</h2>
+  <p>A <strong>pitch gauge</strong> has toothed leaves that compare with the thread spacing. It identifies pitch and helps detect a wrong gearbox selection, but it does not certify pitch diameter or fit.</p>
+  <p>In the <strong>three-wire method</strong> for an external thread, two calibrated wires sit in grooves on one side and a third on the opposite side. A micrometer measures over them. Because the wires contact the flanks, the measurement can be converted to pitch diameter using the correct relation for the thread form and wire size.</p>
+  <p>Use calibrated wire sizes and their applicable instructions or a verified table. Wire diameter, thread angle and lead-angle effects matter; this page does not supply an unchecked wire formula. A thread micrometer uses dedicated contacts for a similar purpose. Appropriate thread plug or ring gauges check functional acceptance against the specified gauge limits.</p>
+  <p>Trying a mating nut may reveal gross interference, but it does not establish conformance to a thread class.</p>
+</section>
