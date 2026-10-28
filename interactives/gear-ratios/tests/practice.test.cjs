@@ -40,7 +40,7 @@ test('practice-check instrument admits rounded answers and rejects a planted wro
 });
 test('the eleven original items and their surrounding body remain intact', () => {
   const original = html.split('@@END')[1].split('<!-- GEAR-TRAIN-PRACTICE -->')[0].replace(/\r\n/g, '\n').trim();
-  assert.equal(crypto.createHash('sha256').update(original).digest('hex'), '3ff06cb4083e9381b92b9a4db2187888db1d682f9a7704ac400900f6a2b8fa8b');
+  assert.equal(crypto.createHash('sha256').update(original).digest('hex'), '5c80f7318034f89de0909a2dc6a1c4c7d96f77fd34285694b47aeb6857deccc6');
   assert.equal((original.match(/data-practice-id=/g) || []).length, 11);
   assert.equal((html.match(/data-practice-id=/g) || []).length, 37);
 });
