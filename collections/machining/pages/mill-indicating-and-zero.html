@@ -1,0 +1,46 @@
+@@ID: mill-indicating-and-zero
+@@TITLE: Mill Indicators and Part Zero
+@@SECTION: Milling
+@@SUMMARY: Choose an indicator for alignment, account for edge-finder radius, and keep machine home, work zero and tool length separate.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>A test indicator sweeps with a lever; a dial indicator measures plunger travel</h2>
+  <table>
+    <thead><tr><th>Instrument</th><th>Contact motion</th><th>Setup use</th></tr></thead>
+    <tbody>
+      <tr><td>Test indicator</td><td>A short stylus pivots through a small angle.</td><td>Convenient for sweeping a vise jaw or a bore where access is tight.</td></tr>
+      <tr><td>Plunger dial indicator</td><td>A stem moves straight into the body.</td><td>Useful for displacement checks and alignment when the stem can face the measured motion.</td></tr>
+    </tbody>
+  </table>
+  <p>Both can compare alignment. “Dial” describes a display as well as a common instrument name, so identify the contact mechanism. Use the maker's stylus angle for a test indicator; on a common lever design the stylus lies nearly parallel to the measured surface. Align a plunger with the displacement being measured. Incorrect contact angles change the scale factor.</p>
+  <p>Keep the mounting rigid, preload within the instrument's range and confirm repeatability. During a [[milling-workholding|fixed-jaw sweep]], keep the spindle stopped and the contact geometry unchanged. For a bore-centering sweep, turn the spindle by hand using the approved setup method. Follow [[equipment-operating-procedure]] for the machine state during setup.</p>
+  <details class="deeper">
+    <summary>Contact angle affects the reading</summary>
+    <p><a href="https://www2.mitutoyo.co.jp/eng/useful/E11003/pdf/34.pdf">Mitutoyo: Dial Test Indicators and the Cosine Effect</a> shows the stylus geometry and correction. Do not apply a plunger-indicator correction rule to a lever indicator without checking its instructions.</p>
+  </details>
+</section>
+
+<section>
+  <h2>An edge finder locates the spindle center one tip radius from the edge</h2>
+  <p>A mechanical edge finder has a spring-loaded contact tip that becomes concentric and then kicks sideways at contact. Use its specified spindle speed and approach method. Electronic edge finders and probes use different signals and procedures; do not assume they rotate like a mechanical edge finder.</p>
+  <p>Use a clean, defined edge, repeat the approach and account for the <strong>contact-tip radius</strong>. If the tip is 10 mm in diameter, the spindle center is 5 mm outside the edge at the trigger point. Setting that center position to zero without the radius correction moves every feature by 5 mm.</p>
+  <p><strong>Example:</strong> the left face is X = 0 and positive X goes into the part to the right. At contact from the left with a 10 mm tip, the spindle center is X = −5 mm. Enter that position in the work-coordinate setting method for the control. On approach from a right-hand face, the sign changes. Sketch the spindle center and edge before choosing a sign.</p>
+  <details class="deeper">
+    <summary>Check both repeatability and the offset sign</summary>
+    <p>Repeat the touch from the same direction. On manual feed screws, account for backlash when reversing; a handwheel reading can change while the table has not yet moved. Do not use a rough saw edge as though it were a finished datum. The radius correction is geometry, independent of the control's button sequence.</p>
+    <p><a href="https://ocw.mit.edu/courses/2-670-mechanical-engineering-tools-january-iap-2004/69ddc43986801c51a7fbfa97d6b5b63f_mill.pdf">MIT's mill introduction</a> covers mechanical edge finding and feed-screw backlash.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Home the machine, locate the part, then account for each tool's length</h2>
+  <ul>
+    <li><strong>Machine home</strong> establishes the machine's reference positions. It does not locate the part.</li>
+    <li><strong>Work zero</strong> is the origin chosen on the part or fixture. Its work offset relates that origin to the machine coordinates.</li>
+    <li><strong>Tool length offset</strong> accounts for where a particular tool tip lies relative to the control's tool reference.</li>
+  </ul>
+  <p>Choose the origin used by the drawing and program, locate X and Y, and establish Z using the approved touch-off or probing method. Account for any gauge or touch plate thickness. Confirm the active work offset, tool number and tool length before a trial path. Recheck after moving the part or changing how a tool is seated.</p>
+  <p>Use [[mill-setup-checklist]] to check the sequence and [[gcode-and-toolpaths]] to connect coordinates to a program. Tormach's <a href="https://knowledgebase.tormach.com/pcnc-1100/basic-operation-pcnc-1100">basic-operation reference</a> provides links to work/tool offset instructions; select documentation matching the installed control.</p>
+</section>
