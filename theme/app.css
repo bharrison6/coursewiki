@@ -896,8 +896,22 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
-/* No wrappers or image sizing changes: print and the unenhanced page retain
-   their existing layout. The viewer alone owns oversized artwork. */
+/* Cap authored artwork in both dimensions, retaining its aspect ratio.
+   Direct figure SVGs cover inline artwork without reaching module SVGs. */
+@media screen {
+  body:not(.presenting) main :is(img.content-img, figure > svg):not([data-interactive] *, .ghs-pictogram *, .diagram-viewer *) {
+    max-height: 85vh; width: auto; height: auto; max-width: 100%;
+  }
+}
+@media print {
+  body:not(.presenting) main :is(img.content-img, figure > svg):not([data-interactive] *, .ghs-pictogram *, .diagram-viewer *) {
+    max-height: 8.5in; width: auto; height: auto; max-width: 100%;
+    break-inside: avoid;
+  }
+  body:not(.presenting) main :is(h2, h3):not([data-interactive] *) { break-after: avoid; }
+}
+
+/* The viewer restores natural size for artwork reduced by either cap. */
 .diagram-hint, .diagram-viewer { display: none; }
 @media screen {
   .diagram-expandable { cursor: zoom-in; }
