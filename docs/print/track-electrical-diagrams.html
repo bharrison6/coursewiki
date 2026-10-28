@@ -72,6 +72,13 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
   --cat3-soft:  #FFEDE5;
   --cat-ink:    #002144;
 
+  /* ---- card edges: site-only, NOT the MSU palette ----------------------
+     Recorded in the branding artifact first, as this file requires
+     (operator, 2026-10-28). An edge only, never text. One value passes
+     3:1 on both the light (#FBFAF8, 4.0:1) and dark (#1E2124, 3.9:1)
+     surfaces, so no dark-theme override.                                    */
+  --edge-interactive: #3A8C3F;
+
   /* ---- type -------------------------------------------------------------*/
   --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --f-body:    "Source Serif 4", Georgia, "Times New Roman", serif;
@@ -1151,6 +1158,10 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 /* a card whose content is a hard stop gets the danger edge */
 .xcard.is-stop { border-left: 3px solid var(--cat3); }
 .xcard.is-gate { border-left: 3px solid var(--flag); }
+/* a card that holds an interactive module gets the green edge, so a reader scanning
+   collapsed cards can see which ones have something to work with. Site-only colour
+   (not MSU palette), recorded in [official-document-branding]: 4.0:1 light, 3.9:1 dark. */
+.xcard.is-interactive { border-left: 3px solid var(--edge-interactive); }
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -3019,7 +3030,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Choose the drawing for the job</h2><p class="lede">One electrical system can need several drawings. Start with the question: What does the part look like? Where does this wire go? How does the circuit work? Where does the equipment fit?</p><div class="unit-table-wrap"><table class="unit-table"><caption>Choose the drawing for the question you need to answer.</caption><thead><tr><th scope="col">Type</th><th scope="col">Shows</th><th scope="col">Usually leaves out</th><th scope="col">Who uses it, and when</th></tr></thead><tbody><tr><th scope="row">Pictorial</th><td>Recognizable appearances of parts.</td><td>Exact electrical behavior and hidden connections may be omitted.</td><td>A beginner or assembler identifying parts before tracing connections.</td></tr><tr><th scope="row">Block</th><td>Functions and the direction of signal or power flow.</td><td>Individual terminals, component values, and return wires.</td><td>A designer explaining a system before working out its circuits.</td></tr><tr><th scope="row">Wiring</th><td>Connections between terminals; wire identifiers and routing where specified.</td><td>The reason the circuit behaves as it does; scale may be omitted.</td><td>An assembler or service technician connecting or tracing wires.</td></tr><tr><th scope="row">Schematic</th><td>Electrical function and connections using component symbols.</td><td>Actual component positions, wire lengths, and enclosure geometry.</td><td>A circuit designer or technician analyzing how a circuit works.</td></tr><tr><th scope="row">IC / PCB layout</th><td>Physical geometry: a PCB has footprints, pads and copper traces; an IC layout describes structures and interconnect on a chip.</td><td>A convenient explanation of circuit operation.</td><td>A board or chip designer checking placement and routing before manufacture.</td></tr><tr><th scope="row">Ladder</th><td>Relay or PLC control logic arranged in rungs between rails.</td><td>Exact equipment placement and wire routing.</td><td>A controls technician tracing the conditions for an output.</td></tr><tr><th scope="row">Logic</th><td>Gates and the relationships between logical inputs and outputs.</td><td>Power wiring, package pin locations, and physical placement unless added.</td><td>A digital designer following Boolean decisions through a circuit.</td></tr><tr><th scope="row">Electrical floor plan</th><td>Locations of outlets, switches and fixtures on a building plan, interpreted with its legend.</td><td>Internal circuit operation; complete routing may be on other drawings.</td><td>An installer or building designer locating devices within rooms.</td></tr><tr><th scope="row">Riser</th><td>Distribution between building levels and the equipment serving them.</td><td>Detailed room layouts and exact conduit paths unless specified.</td><td>A building electrical designer or installer coordinating distribution across floors.</td></tr></tbody></table></div><p>Read the drawing title, legend, revision, and notes before treating a line or mark as an instruction. The same habit applies to mechanical drawings; see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/choosing-drawing-views.html" target="_blank" rel="noopener">Choosing Drawing Views</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/alphabet-of-lines.html" target="_blank" rel="noopener">The Alphabet of Lines</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views" data-card="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views">
+  <details class="xcard deck-slide is-interactive" id="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views" data-card="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views">
     <summary>Compare one circuit in pictorial, wiring, and schematic views<span class="chev"></span></summary>
     <div class="body">
       <h2>Compare one circuit in pictorial, wiring, and schematic views</h2><p>This teaching example connects a battery, switch, resistor, and LED in one loop. The resistor is in series with the LED. The drawings explain identity and connections; they do not specify a buildable parts list, resistor value, battery rating, or package pinout.</p><div data-interactive="diagram-views">
