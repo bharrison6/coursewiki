@@ -2914,6 +2914,55 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
   .deeper-back { display: none; }
 }
+/* Module-local presentation, using the same tokens as the neighbouring labs. */
+[data-interactive="css-explorer"] { min-width: 0; }
+.cs-live > .cs-static { display: none; }
+.cs-lab { font-family: var(--f-display); line-height: 1.45; }
+.cs-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem 1rem; }
+.cs-controls > label { display: grid; align-content: start; gap: .4rem; }
+.cs-control { min-width: 0; margin-block: .6rem; }
+.cs-control label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem .6rem; }
+.cs-control output { font-family: var(--f-mono); color: var(--accent); font-weight: 700; }
+.cs-lab input[type="range"] { display: block; width: 100%; min-height: 44px; accent-color: var(--accent); margin: 0; }
+.cs-lab select, .cs-lab button { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .4rem .65rem; min-height: 44px; max-width: 100%; cursor: pointer; }
+.cs-lab :is(input, select, button):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.cs-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.cs-actions label { display: flex; align-items: center; gap: .4rem; min-height: 44px; }
+.cs-actions input { accent-color: var(--accent); }
+.cs-readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; }
+.cs-readouts > div { padding: .6rem; border: 1px solid var(--rule); background: var(--paper); }
+.cs-readouts strong { display: block; color: var(--accent); font-size: 1.15rem; }
+.cs-note { color: var(--ink-soft); font-size: .85rem; }
+.cs-plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: .8rem; }
+.cs-plots > *, .cs-part { min-width: 0; margin: 0; }
+.cs-plot, .cs-end { display: block; width: 100%; height: auto; background: var(--paper); border: 1px solid var(--rule); }
+.cs-part { max-width: 24rem; margin: .8rem auto; }
+.cs-plot text, .cs-end text { font-family: var(--f-display); font-size: 16px; fill: var(--ink); }
+.cs-axis, .cs-cross, .cs-limit { fill: none; stroke: var(--ink-soft); stroke-width: 1.3; }
+.cs-cross { stroke-dasharray: 2 4; }
+.cs-limit { stroke-dasharray: 7 5; }
+.cs-curve { fill: none; stroke: var(--accent); stroke-width: 3; }
+.cs-unclamped { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 2 3; }
+.cs-point { fill: var(--ink); stroke: var(--paper); stroke-width: 1.5; }
+.cs-stock { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 1.5; }
+.cs-tool { fill: var(--cat1-soft); stroke: var(--accent); stroke-width: 2; }
+.cs-static table { width: 100%; font-size: .9rem; }
+.cs-static th, .cs-static td { padding: .4rem; }
+.cs-static figure { break-inside: avoid; }
+.cs-static figcaption { font-size: .9rem; margin-top: .4rem; }
+.cs-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+@media (max-width: 34rem) {
+  .xcard:has([data-interactive="css-explorer"]) .body { padding: .7rem .5rem; }
+  .cs-controls { grid-template-columns: 1fr; gap: .2rem; }
+  .cs-readouts { grid-template-columns: 1fr; }
+}
+@media print {
+  .cs-lab { display: none !important; }
+  .cs-live > .cs-static { display: block !important; }
+  .cs-plot { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .cs-static table { break-inside: avoid; }
+}
+
 </style>
 </head>
 <body class="app skin-app aggregate" data-page="agg-track-cnc-turning" data-base="">
@@ -3023,8 +3072,17 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <pre><code>G50 S1800 (ILLUSTRATIVE RPM CEILING)
 G96 S90   (METRIC CSS: 90 METRES PER MINUTE)
 G97 S600  (LEAVE CSS: REQUEST 600 RPM)</code></pre>
-  <p>As diameter approaches zero during facing, CSS requests increasing RPM. Once the clamp is reached, RPM stays limited and surface speed falls. At the centre, a nonzero surface speed cannot be maintained at any finite RPM. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/cnc-program-proving.html" target="_blank" rel="noopener">CNC Programming and Prove-Out</a> and the <a href="../safety/index.html">Safety collection</a> for the required operating checks.</p>
+  <p>As diameter approaches zero during facing, CSS requests increasing RPM. Once the clamp is reached, RPM stays limited and surface speed falls. At the centre, a nonzero surface speed cannot be maintained at any finite RPM. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/cnc-program-proving.html" target="_blank" rel="noopener">CNC Programming and Prove-Out</a> and the <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/index.html" target="_blank" rel="noopener">Safety collection</a> for the required operating checks.</p>
   <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Calculate where a speed ceiling starts to matter.</p>
+  <div data-interactive="css-explorer">
+    <div class="cs-static">
+      <!-- CSS-EXPLORER-STATIC -->
+      <p><strong>Worked example:</strong> 240 SFM, 2 in stock outside diameter (OD), and a 1000 RPM clamp. These are teaching values, not cutting recommendations. D* = 240 × 12 / (π × 1000) = <strong>0.917 in</strong>.</p><div class="cs-plots"><figure><svg class="cs-plot" viewBox="0 0 320 242" role="img" aria-label="Spindle RPM against diameter; solid curve includes the clamp" focusable="false"><text x="12" y="22" text-anchor="start">Spindle RPM</text><path class="cs-axis" d="M48 40L48 180L300 180"/><text x="40" y="185" text-anchor="end">0</text><text x="48" y="207" text-anchor="middle">0</text><text x="300" y="207" text-anchor="end">2</text><text x="174" y="232" text-anchor="middle">Diameter (in)</text><path class="cs-limit" d="M48 68L300 68"/><text x="300" y="59" text-anchor="end">1000 clamp</text><path class="cs-curve" d="M48 68L51.15 68L54.3 68L57.45 68L60.6 68L63.75 68L66.9 68L70.05 68L73.2 68L76.35 68L79.5 68L82.65 68L85.8 68L88.95 68L92.1 68L95.25 68L98.4 68L101.55 68L104.7 68L107.85 68L111 68L114.15 68L117.3 68L120.45 68L123.6 68L126.75 68L129.9 68L133.05 68L136.2 68L139.35 68L142.5 68L145.65 68L148.8 68L151.95 68L155.1 68L158.25 68L161.4 68L163.5083 68L164.55 69.001L167.7 71.9221L170.85 74.6933L174 77.326L177.15 79.8302L180.3 82.2152L183.45 84.4893L186.6 86.66L189.75 88.7342L192.9 90.7182L196.05 92.6178L199.2 94.4383L202.35 96.1845L205.5 97.8608L208.65 99.4713L211.8 101.02L214.95 102.5102L218.1 103.9452L221.25 105.328L224.4 106.6614L227.55 107.948L230.7 109.1903L233.85 110.3905L237 111.5506L240.15 112.6728L243.3 113.7587L246.45 114.8101L249.6 115.8287L252.75 116.816L255.9 117.7733L259.05 118.7021L262.2 119.6035L265.35 120.4788L268.5 121.3291L271.65 122.1555L274.8 122.9589L277.95 123.7403L281.1 124.5005L284.25 125.2405L287.4 125.961L290.55 126.6628L293.7 127.3466L296.85 128.0131L300 128.663"/><path class="cs-cross" d="M163.5083 92L163.5083 180"/><text x="163.5083" y="114" text-anchor="middle">D*</text><circle class="cs-point" cx="111" cy="68" r="5"/></svg><figcaption>The dashed horizontal line is the RPM ceiling. The dot shows D = 0.5 in.</figcaption></figure><figure><svg class="cs-plot" viewBox="0 0 320 242" role="img" aria-label="Surface speed (SFM) against diameter; solid curve includes the clamp" focusable="false"><text x="12" y="22" text-anchor="start">Surface speed (SFM)</text><path class="cs-axis" d="M48 40L48 180L300 180"/><text x="40" y="185" text-anchor="end">0</text><text x="48" y="207" text-anchor="middle">0</text><text x="300" y="207" text-anchor="end">2</text><text x="174" y="232" text-anchor="middle">Diameter (in)</text><path class="cs-limit" d="M48 68L300 68"/><text x="300" y="59" text-anchor="end">240 setpoint</text><path class="cs-curve" d="M48 180L51.15 176.9457L54.3 173.8913L57.45 170.837L60.6 167.7827L63.75 164.7284L66.9 161.674L70.05 158.6197L73.2 155.5654L76.35 152.5111L79.5 149.4567L82.65 146.4024L85.8 143.3481L88.95 140.2938L92.1 137.2394L95.25 134.1851L98.4 131.1308L101.55 128.0765L104.7 125.0221L107.85 121.9678L111 118.9135L114.15 115.8591L117.3 112.8048L120.45 109.7505L123.6 106.6962L126.75 103.6418L129.9 100.5875L133.05 97.5332L136.2 94.4789L139.35 91.4245L142.5 88.3702L145.65 85.3159L148.8 82.2616L151.95 79.2072L155.1 76.1529L158.25 73.0986L161.4 70.0443L163.5083 68L164.55 68L167.7 68L170.85 68L174 68L177.15 68L180.3 68L183.45 68L186.6 68L189.75 68L192.9 68L196.05 68L199.2 68L202.35 68L205.5 68L208.65 68L211.8 68L214.95 68L218.1 68L221.25 68L224.4 68L227.55 68L230.7 68L233.85 68L237 68L240.15 68L243.3 68L246.45 68L249.6 68L252.75 68L255.9 68L259.05 68L262.2 68L265.35 68L268.5 68L271.65 68L274.8 68L277.95 68L281.1 68L284.25 68L287.4 68L290.55 68L293.7 68L296.85 68L300 68"/><path class="cs-cross" d="M163.5083 92L163.5083 180"/><text x="163.5083" y="114" text-anchor="middle">D*</text><circle class="cs-point" cx="111" cy="118.9135" r="5"/></svg><figcaption>Below D*, RPM stays at 1000 and surface speed falls linearly toward zero.</figcaption></figure></div><table><caption>One setpoint, three cutting diameters</caption><thead><tr><th scope="col">D (in)</th><th scope="col">RPM</th><th scope="col">SFM</th><th scope="col">Clamped?</th></tr></thead><tbody><tr><th scope="row">2</th><td>458.37</td><td>240</td><td>No</td></tr><tr><th scope="row">0.5</th><td>1000</td><td>130.9</td><td>Yes</td></tr><tr><th scope="row">0</th><td>1000</td><td>0</td><td>Yes</td></tr></tbody></table><p>At 2 in: 240 × 12 / (π × 2) = 458.37 RPM. At 0.5 in, CSS would request 1833.46 RPM; the clamp gives 1000 RPM and π × 0.5 × 1000 / 12 = 130.90 SFM. At D = 0, the model commands the clamp RPM and surface speed is zero.</p>
+      <!-- /CSS-EXPLORER-STATIC -->
+      <noscript><p>The live sliders need JavaScript. The plots and worked example above show the same model without it.</p></noscript>
+    </div>
+    <p class="cs-note">This ideal steady-state model uses π without rounding in the calculations. Displays round RPM and surface speed to two decimal places, diameters to three; trailing zeros are omitted. It assumes the commanded RPM is reached immediately and omits acceleration and other machine limits. Unit changes load a fresh teaching preset. For operating checks, see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/cnc-program-proving.html" target="_blank" rel="noopener">CNC Programming and Prove-Out</a> and the <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/index.html" target="_blank" rel="noopener">Safety collection</a>.</p>
+  </div>
   <p><a class="button" data-practice-add="turning-clamp-reason" href="../practice.html#turning-clamp-reason">Explain the RPM clamp</a></p>
     </div>
   </details>
@@ -4926,6 +4984,229 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     refresh();
   })();
 })();
+(function (root, factory) {
+  'use strict';
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiCSS = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  var DEFAULT = Object.freeze({ units: 'inch', speed: 240, diameter: 2, od: 2, clamp: 1000 });
+  function validate(s) {
+    if (!s || ['inch', 'metric'].indexOf(s.units) < 0) throw new RangeError('Choose inch or metric units');
+    ['speed', 'clamp', 'od'].forEach(function (k) {
+      if (!Number.isFinite(s[k]) || s[k] <= 0) throw new RangeError(k + ' must be finite and positive');
+    });
+    if (!Number.isFinite(s.diameter) || s.diameter < 0 || s.diameter > s.od)
+      throw new RangeError('Diameter must be between zero and stock OD');
+    return s;
+  }
+  function solve(s) {
+    validate(s);
+    var factor = s.units === 'inch' ? 12 : 1000;
+    var crossover = s.speed * factor / (Math.PI * s.clamp);
+    // null denotes the singular, undefined unclamped request at the centre.
+    var unrestricted = s.diameter === 0 ? null : s.speed * factor / (Math.PI * s.diameter);
+    var rpm = s.diameter === 0 ? s.clamp : Math.min(s.clamp, unrestricted);
+    return { rpm: rpm, surfaceSpeed: Math.PI * s.diameter * rpm / factor,
+      crossover: crossover, clampActive: s.diameter <= crossover, unrestricted: unrestricted };
+  }
+  function units(s) { return s.units === 'inch' ? { length: 'in', speed: 'SFM' } : { length: 'mm', speed: 'm/min' }; }
+  function format(v, digits) { return Number(v.toFixed(digits === undefined ? 2 : digits)).toString(); }
+  return { DEFAULT: DEFAULT, validate: validate, solve: solve, units: units, format: format };
+});
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiCSS);
+  if (node) module.exports = api; else root.CourseWikiCSSDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  function n(v) { return M.format(v, 4); }
+  function text(x, y, value, anchor) {
+    return '<text x="' + n(x) + '" y="' + n(y) + '" text-anchor="' + (anchor || 'start') + '">' + value + '</text>';
+  }
+  function path(points, cls) {
+    return '<path class="' + cls + '" d="' + points.map(function (p, i) { return (i ? 'L' : 'M') + n(p[0]) + ' ' + n(p[1]); }).join('') + '"/>';
+  }
+  function plot(s, kind, comparison) {
+    var r = M.solve(s), u = M.units(s), rpm = kind === 'rpm', max = (rpm ? s.clamp : s.speed) * 1.25;
+    var x = function (d) { return 48 + 252 * d / s.od; };
+    var y = function (v) { return 180 - 140 * v / max; };
+    var title = rpm ? 'Spindle RPM' : 'Surface speed (' + u.speed + ')';
+    var out = ['<svg class="cs-plot" viewBox="0 0 320 242" role="img" aria-label="' + title + ' against diameter; solid curve includes the clamp" focusable="false">'];
+    out.push(text(12, 22, title), path([[48, 40], [48, 180], [300, 180]], 'cs-axis'));
+    out.push(text(40, 185, '0', 'end'), text(48, 207, '0', 'middle'), text(300, 207, M.format(s.od), 'end'));
+    out.push(text(174, 232, 'Diameter (' + u.length + ')', 'middle'));
+    var ceiling = rpm ? s.clamp : s.speed;
+    out.push(path([[48, y(ceiling)], [300, y(ceiling)]], 'cs-limit'));
+    out.push(text(300, y(ceiling) - 9, M.format(ceiling) + (rpm ? ' clamp' : ' setpoint'), 'end'));
+    var diameters = Array.from({ length: 81 }, function (_, i) { return s.od * i / 80; });
+    if (r.crossover < s.od) diameters.push(r.crossover);
+    diameters.sort(function (a, b) { return a - b; });
+    var points = diameters.map(function (d) {
+      var v = M.solve(Object.assign({}, s, { diameter: d }));
+      return [x(d), y(rpm ? v.rpm : v.surfaceSpeed)];
+    });
+    out.push(path(points, 'cs-curve'));
+    if (r.crossover <= s.od) {
+      out.push(path([[x(r.crossover), 92], [x(r.crossover), 180]], 'cs-cross'));
+      out.push(text(Math.max(66, Math.min(282, x(r.crossover))), 114, 'D*', 'middle'));
+    }
+    if (rpm && comparison) {
+      // Draw only the visible segment, ending with an upward arrow at the chart boundary.
+      var entry = r.crossover * s.clamp / max;
+      if (entry <= s.od) {
+        var raw = Array.from({ length: 81 }, function (_, i) {
+          var d = entry + (s.od - entry) * i / 80;
+          return [x(d), y(M.solve(Object.assign({}, s, { diameter: d })).unrestricted)];
+        });
+        out.push(path(raw, 'cs-unclamped'));
+        out.push(path([[x(entry) - 5, 48], [x(entry), 40], [x(entry) + 5, 48]], 'cs-unclamped'));
+      } else out.push(text(174, 48, 'No-clamp curve above chart', 'middle'));
+    }
+    out.push('<circle class="cs-point" cx="' + n(x(s.diameter)) + '" cy="' + n(y(rpm ? r.rpm : r.surfaceSpeed)) + '" r="5"/>');
+    out.push('</svg>'); return out.join('');
+  }
+  function endView(s) {
+    M.validate(s);
+    var tip = 120 + 76 * s.diameter / s.od;
+    return '<svg class="cs-end" viewBox="0 0 320 216" role="img" aria-label="Part end view: tool tip is at radius D divided by two" focusable="false">' +
+      text(12, 22, 'End view · tool moves inward') + '<circle class="cs-stock" cx="120" cy="115" r="76"/>' +
+      path([[34, 115], [206, 115]], 'cs-cross') + path([[120, 32], [120, 198]], 'cs-cross') +
+      '<circle class="cs-point" cx="120" cy="115" r="3"/>' +
+      '<path class="cs-tool" d="M' + n(tip) + ' 115l22 -14h34v28h-34Z"/>' +
+      text(12, 211, 'Centre', 'start') + text(308, 211, 'Tip radius = D/2', 'end') + '</svg>';
+  }
+  function staticLesson() {
+    var s = Object.assign({}, M.DEFAULT, { diameter: .5 }), r = M.solve(s);
+    var rows = [2, .5, 0].map(function (diameter) {
+      var v = M.solve(Object.assign({}, s, { diameter: diameter }));
+      return '<tr><th scope="row">' + diameter + '</th><td>' + M.format(v.rpm) + '</td><td>' + M.format(v.surfaceSpeed) + '</td><td>' + (v.clampActive ? 'Yes' : 'No') + '</td></tr>';
+    }).join('');
+    return '<p><strong>Worked example:</strong> 240 SFM, 2 in stock outside diameter (OD), and a 1000 RPM clamp. These are teaching values, not cutting recommendations. D* = 240 × 12 / (π × 1000) = <strong>' + M.format(r.crossover, 3) + ' in</strong>.</p>' +
+      '<div class="cs-plots"><figure>' + plot(s, 'rpm', false) + '<figcaption>The dashed horizontal line is the RPM ceiling. The dot shows D = 0.5 in.</figcaption></figure><figure>' + plot(s, 'speed', false) + '<figcaption>Below D*, RPM stays at 1000 and surface speed falls linearly toward zero.</figcaption></figure></div>' +
+      '<table><caption>One setpoint, three cutting diameters</caption><thead><tr><th scope="col">D (in)</th><th scope="col">RPM</th><th scope="col">SFM</th><th scope="col">Clamped?</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<p>At 2 in: 240 × 12 / (π × 2) = 458.37 RPM. At 0.5 in, CSS would request 1833.46 RPM; the clamp gives 1000 RPM and π × 0.5 × 1000 / 12 = 130.90 SFM. At D = 0, the model commands the clamp RPM and surface speed is zero.</p>';
+  }
+  return { plot: plot, endView: endView, staticLesson: staticLesson };
+});
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiCSS,
+    node ? require('./render.js') : root.CourseWikiCSSDraw);
+  if (node) module.exports = api;
+  else if (typeof document !== 'undefined') document.querySelectorAll('[data-interactive="css-explorer"]').forEach(api.init);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M, D) {
+  'use strict';
+  var sequence = 0;
+  function init(root) {
+    if (root.dataset.csReady || !M || !D) return;
+    var id = 'cs-' + (++sequence), state = Object.assign({}, M.DEFAULT);
+    while (document.getElementById(id + '-units')) id = 'cs-' + (++sequence);
+    var running = false, frame = 0, previous = null;
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var lab = document.createElement('div'); lab.className = 'cs-lab';
+    lab.innerHTML = '<p><strong>Face toward centre.</strong> Predict where RPM will stop rising, then move the diameter slider.</p>' +
+      '<div class="cs-controls"><label for="' + id + '-units">Units<select id="' + id + '-units" data-cs-units><option value="inch">Inch · SFM, in</option><option value="metric">Metric · m/min, mm</option></select></label>' +
+      '<div data-cs-speed></div><div data-cs-od></div><div data-cs-clamp></div></div>' +
+      '<div data-cs-diameter></div><div class="cs-actions"><button type="button" data-cs-play aria-pressed="false">Face to centre</button>' +
+      '<button type="button" data-cs-reset>Return to OD</button><label><input type="checkbox" data-cs-compare> Show no-clamp comparison</label></div>' +
+      '<p class="cs-note" data-cs-motion></p><div class="cs-readouts"><div>Commanded RPM<strong data-cs-rpm></strong></div>' +
+      '<div>Actual surface speed (ideal)<strong data-cs-actual></strong></div><div>Crossover D*<strong data-cs-cross></strong></div></div>' +
+      '<p data-cs-insight></p><div class="cs-plots"><div data-cs-rpm-plot></div><div data-cs-speed-plot></div></div>' +
+      '<p class="cs-note">Solid curve: clamped result. Horizontal dashed line: clamp or setpoint. Vertical dotted line: crossover D*. Dot: current diameter. Centre is at the left of both plots.</p>' +
+      '<p data-cs-comparison hidden></p><div class="cs-part" data-cs-part></div><span class="cs-sr" role="status" data-cs-status></span>';
+    root.insertBefore(lab, root.firstChild);
+    var q = function (selector) { return lab.querySelector(selector); }, controls = {};
+    function control(key, label, min, max, step) {
+      var box = q('[data-cs-' + key + ']'); box.className = 'cs-control';
+      box.innerHTML = '<label for="' + id + '-' + key + '"><span>' + label + '</span><output for="' + id + '-' + key + '"></output></label>' +
+        '<input type="range" id="' + id + '-' + key + '" min="' + min + '" max="' + max + '" step="' + step + '" value="' + state[key] + '">';
+      controls[key] = { input: box.querySelector('input'), output: box.querySelector('output') };
+      controls[key].input.addEventListener('input', function () {
+        pause(); state[key] = Number(this.value);
+        if (key === 'od') state.diameter = Math.min(state.diameter, state.od);
+        update();
+      });
+      controls[key].input.addEventListener('change', announce);
+    }
+    control('speed', 'Surface speed setpoint', 20, 600, 1);
+    control('od', 'Stock outside diameter (OD)', .25, 6, .01);
+    control('clamp', 'maximum-RPM clamp (G50 on Fanuc-style controls; varies by control)', 100, 6000, 50);
+    control('diameter', 'Current cutting diameter D · 0 = centre', 0, state.od, .001);
+    function announce() {
+      q('[data-cs-status]').textContent = 'Diameter ' + M.format(state.diameter, 3) + ' ' + M.units(state).length + '. ' +
+        q('[data-cs-rpm]').textContent + ', surface speed ' + q('[data-cs-actual]').textContent + '. ' + q('[data-cs-insight]').textContent;
+    }
+    function pause() {
+      running = false; previous = null;
+      if (frame) cancelAnimationFrame(frame); frame = 0;
+      q('[data-cs-play]').textContent = 'Face to centre'; q('[data-cs-play]').setAttribute('aria-pressed', 'false');
+    }
+    function update() {
+      var r = M.solve(state), u = M.units(state), compare = q('[data-cs-compare]').checked;
+      controls.diameter.input.max = state.od;
+      Object.keys(controls).forEach(function (key) {
+        var c = controls[key], unit = key === 'speed' ? u.speed : key === 'clamp' ? 'RPM' : u.length;
+        c.input.value = state[key]; c.output.textContent = M.format(state[key], 3) + ' ' + unit;
+        c.input.setAttribute('aria-valuetext', M.format(state[key], 3) + ' ' + unit);
+      });
+      q('[data-cs-rpm]').textContent = M.format(r.rpm) + ' RPM';
+      q('[data-cs-actual]').textContent = M.format(r.surfaceSpeed) + ' ' + u.speed;
+      q('[data-cs-cross]').textContent = M.format(r.crossover, 3) + ' ' + u.length;
+      q('[data-cs-insight]').textContent = state.diameter === 0 ? 'At centre: clamp active, surface speed zero.' :
+        r.clampActive ? 'Clamp active: RPM holds at the ceiling. Moving farther inward reduces surface speed.' :
+          'Below the RPM ceiling: RPM rises as diameter shrinks, holding the surface speed setpoint.';
+      if (r.crossover > state.od) q('[data-cs-insight]').textContent += ' D* is beyond the stock OD; the entire plotted cut is clamped.';
+      q('[data-cs-rpm-plot]').innerHTML = D.plot(state, 'rpm', compare);
+      q('[data-cs-speed-plot]').innerHTML = D.plot(state, 'speed', false);
+      q('[data-cs-part]').innerHTML = D.endView(state);
+      q('[data-cs-comparison]').hidden = !compare;
+      q('[data-cs-comparison]').textContent = 'Dotted comparison with an arrow: without a clamp, the ideal CSS request rises beyond the chart as D approaches zero. At zero there is no finite RPM that maintains a nonzero surface speed. The solid curves and readouts still include the clamp.';
+      q('[data-cs-motion]').textContent = reduced.matches ? 'Reduced motion: Face to centre jumps to the endpoint. Use the slider to inspect intermediate diameters.' :
+        'The sweep takes 8 seconds from OD to centre. This is a teaching animation, not a feed-rate or spindle-acceleration simulation.';
+    }
+    function tick(now) {
+      frame = 0;
+      if (!running) return;
+      if (!root.isConnected || document.hidden || !lab.getClientRects().length) { pause(); return; }
+      var elapsed = previous === null ? 0 : Math.min((now - previous) / 1000, .1); previous = now;
+      state.diameter = Math.max(0, state.diameter - state.od * elapsed / 8); update();
+      if (state.diameter === 0) { pause(); announce(); } else frame = requestAnimationFrame(tick);
+    }
+    q('[data-cs-play]').addEventListener('click', function () {
+      if (running) { pause(); announce(); return; }
+      state.diameter = reduced.matches ? 0 : state.od; update();
+      if (reduced.matches) { announce(); return; }
+      running = true; previous = null; this.textContent = 'Pause'; this.setAttribute('aria-pressed', 'true');
+      frame = requestAnimationFrame(tick);
+    });
+    q('[data-cs-reset]').addEventListener('click', function () { pause(); state.diameter = state.od; update(); announce(); });
+    q('[data-cs-compare]').addEventListener('change', update);
+    q('[data-cs-units]').addEventListener('change', function () {
+      pause();
+      // Unit choices load explicit teaching presets; they do not silently reinterpret old values.
+      state = this.value === 'metric' ? { units: 'metric', speed: 120, od: 40, diameter: 40, clamp: 1000 } : Object.assign({}, M.DEFAULT);
+      var metric = state.units === 'metric';
+      [['speed', metric ? 10 : 20, metric ? 200 : 600, 1], ['od', metric ? 5 : .25, metric ? 150 : 6, metric ? .1 : .01]].forEach(function (v) {
+        var input = controls[v[0]].input; input.min = v[1]; input.max = v[2]; input.step = v[3];
+      });
+      controls.diameter.input.step = metric ? .01 : .001; update();
+      q('[data-cs-status]').textContent = 'Loaded ' + (metric ? '120 m/min, 40 mm' : '240 SFM, 2 in') + ' teaching preset with a 1000 RPM clamp.';
+    });
+    lab.addEventListener('keydown', function (e) { if (e.target.closest('input, select, button')) e.stopPropagation(); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) pause(); });
+    window.addEventListener('beforeprint', pause);
+    reduced.addEventListener('change', function () { pause(); update(); });
+    update(); root.dataset.csReady = 'true'; root.classList.add('cs-live');
+  }
+  return { init: init };
+});
+
 </script>
 </body>
 </html>
