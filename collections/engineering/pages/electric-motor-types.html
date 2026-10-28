@@ -1,0 +1,58 @@
+@@ID: electric-motor-types
+@@TITLE: Electric Motor Types
+@@SECTION: Electrical Systems
+@@SUMMARY: Compare how motors switch their fields, what wears, and how they control motion.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Brushed DC: simple supply, wearing contacts</h2>
+  <p>A small permanent-magnet brushed DC motor has stationary magnets and rotating electromagnets. Carbon brushes press against a segmented copper <strong>commutator</strong>. As the segments rotate past the brushes, the connections change and reverse current in rotor windings. The torque keeps acting in the intended direction.</p>
+  <p>[[img:electrical-systems/brushed-commutator.svg|Simplified two-segment commutator: fixed positive and negative brushes touch rotating copper segments A and B. After half a turn the segments exchange brushes, reversing current in the attached coil.]]</p>
+  <p><strong>Strength:</strong> inexpensive and simple to run from DC, useful in small toys, pumps, and actuators. <strong>Weak points:</strong> brushes wear through contact and electrical arcing; the commutator and spring contact system can also deteriorate. Switching current at the contacts can cause sparks and electrical noise. Permanent-magnet construction is common in small motors; some brushed motors use field windings instead.</p>
+  <p>A microcontroller can command a power driver with pulse-width modulation (PWM), switching the supply on and off rapidly to control the motor. The driver handles motor current; a logic output is not a motor power supply.</p>
+</section>
+
+<section>
+  <h2>AC induction: the rotor follows a rotating field with slip</h2>
+  <p>Stator windings arranged around the motor produce a rotating magnetic field. In a three-phase motor, the currents reach their peaks at different times, moving the combined field around the stator. That moving field induces current in conducting rotor bars. The rotor current and stator field interact to produce torque.</p>
+  <p><strong>The rotor runs slightly slower than the field during normal motoring.</strong> The difference is called <strong>slip</strong>. If the rotor caught the field exactly, there would be no relative motion to induce the rotor current needed for torque. For example, a field at 1,800 rpm and a rotor at 1,740 rpm differ by 60 rpm, or 3.33% of field speed.</p>
+  <p><strong>Strength:</strong> a squirrel-cage induction rotor needs neither brushes nor permanent magnets, making it useful for pumps, fans, and conveyors. <strong>Weak points:</strong> speed changes with load and slip; a variable-frequency drive is normally used when adjustable speed is needed.</p>
+  <details class="deeper"><summary>Why alternating current alone is not the full explanation</summary><p>A single winding supplied by single-phase AC makes a field that pulses back and forth; that alone does not establish a starting direction. Single-phase induction motors use an additional starting arrangement. The rotating field, rotor current, and relative speed explain rotation more clearly than saying the rotor field simply opposes the stator field.</p></details>
+</section>
+
+<section>
+  <h2>Brushless permanent-magnet motors: switch the stator current</h2>
+  <p>Here the rotor carries permanent magnets and the stator carries windings. A drive switches the stator currents in sequence so the magnetic field turns. There are no commutator brushes to wear.</p>
+  <p><strong>BLDC</strong> means brushless DC; <strong>PMSM</strong> means permanent-magnet synchronous motor. A DC supply can feed an inverter, an electronic circuit that creates changing phase currents. Most BLDC/PMSM drive systems use this electronic switching. The labels often distinguish waveform and control choices; they do not mean one rotor needs AC magnets and the other needs DC magnets.</p>
+  <p>A suitably designed line-fed synchronous motor instead follows a rotating field set by the AC supply frequency and pole count. It needs an appropriate starting arrangement. Do not assume an arbitrary BLDC motor can connect directly to an AC line.</p>
+  <p><strong>Strengths:</strong> no brush contact wear and controllable speed; common uses include cooling fans, drones, and controlled machine drives. <strong>Weak points:</strong> drive electronics and correctly timed switching are needed; bearings still wear and winding temperature still limits output.</p>
+</section>
+
+<section>
+  <h2>Inner-rotor and outer-rotor describe what rotates</h2>
+  <p>[[img:electrical-systems/inner-outer-rotor.svg|Side-by-side cross-sections: an inner-rotor motor has rotating magnets inside fixed windings; an outer-rotor motor has a rotating magnet ring outside fixed windings.]]</p>
+  <p>An <strong>inner-rotor</strong> motor, also called an <strong>inrunner</strong>, rotates inside the stator. An <strong>outer-rotor</strong> motor, or <strong>outrunner</strong>, rotates around the stator. These are the arrangements sometimes called “inboard” and “outboard.” Use inner-/outer-rotor when describing the construction.</p>
+  <p>An inner rotor can have low rotational inertia, useful for rapid speed changes. An outer rotor puts magnetic force at a larger radius, useful for producing torque in fan and propeller drives, but its rotating shell contributes inertia. Dimensions and design still decide the actual performance.</p>
+</section>
+
+<section>
+  <h2>Stepper: count commanded steps, but allow for missed motion</h2>
+  <p>A stepper drive energizes stator phases in a sequence of magnetic positions. As a first approximation, picture an inner-rotor brushless motor with many magnetic poles or teeth. That helps explain the small steps; it is a simplification, since stepper constructions differ.</p>
+  <p><strong>Open loop</strong> means the controller sends a move without measuring whether it happened. A stepper can position and hold without feedback while energized and within its torque capability. It is useful for printer axes and small indexing mechanisms. Holding position still uses current and produces heat.</p>
+  <p><strong>The weak point is missed steps.</strong> Excessive load or acceleration can prevent commanded motion. Without feedback, the controller keeps counting commands and does not know the shaft fell behind. Step count is not a guarantee of exact position, and holding torque is not a guarantee against any load.</p>
+  <p><a class="button" data-practice-add="motor-open-loop-hold" href="../practice.html#motor-open-loop-hold">Practice motor selection</a></p>
+</section>
+
+<section>
+  <h2>Servo: measure motion and correct the error</h2>
+  <p>A <strong>servo</strong> is a motor used with feedback and closed-loop control, not one particular magnetic construction. A sensor such as an encoder measures motion. The controller compares measured position or speed with the command and adjusts the drive to reduce the error.</p>
+  <p><strong>Strength:</strong> responds to a load disturbance and detects position error, useful for robot joints and machine axes. <strong>Weak points:</strong> adds sensor, controller, tuning, and cost. Feedback does not create extra torque; a servo can still reach its limits. A brushed, brushless, or other suitable motor can be part of a servo system.</p>
+</section>
+
+<section>
+  <h2>Linear motors move directly along a track</h2>
+  <p>Think of the magnetic layout of a rotary motor opened out into a straight line. A traveling field pushes or pulls a moving member along a track, producing linear force instead of shaft torque. One permanent-magnet arrangement uses a magnet track and a moving coil assembly. Linear induction designs also exist; a magnetized rail is not universal.</p>
+  <p><strong>Strength:</strong> direct linear motion without a rotary-to-linear screw or belt, useful for positioning stages and transport systems. <strong>Weak points:</strong> the magnetic track, drive, cooling, and position measurement can add cost. Separate guides support and constrain the moving assembly; a motor does not replace the guide system.</p>
+  <p>Compare the basic field picture in [[electric-motor-principles]] and the load calculation in [[dc-motor-curves]].</p>
+</section>

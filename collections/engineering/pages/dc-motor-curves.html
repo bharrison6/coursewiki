@@ -1,0 +1,58 @@
+@@ID: dc-motor-curves
+@@TITLE: DC Motor Torque, Speed, and Power
+@@SECTION: Electrical Systems
+@@SUMMARY: Use an ideal linear torque-speed curve to find a load point and see why peak output power occurs halfway to no-load speed.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>More load torque means less speed on this curve</h2>
+  <p>This model approximates a permanent-magnet DC motor at a fixed supply voltage with a straight line between two endpoints. <strong>Stall torque</strong> is the torque at zero speed. <strong>No-load speed</strong> is the speed at zero external shaft load. It is not a universal curve for induction motors, steppers, or regulated drives.</p>
+  <p>Let <code>T<sub>s</sub></code> be stall torque, <code>n<sub>0</sub></code> no-load speed, and <code>T</code> the constant resisting load torque. The steady operating point is where motor torque equals load torque:</p>
+  <p><code>n = n<sub>0</sub>(1 − T/T<sub>s</sub>)</code>.</p>
+  <p>This is an assumed linear approximation, not a measured motor rating. It omits acceleration, current limiting, temperature changes, and supply voltage drop. At stall it predicts zero shaft power, not zero electrical input. A stall rating is not a continuous operating rating.</p>
+  <details class="deeper"><summary>Manufacturer basis for the straight line</summary><p>maxon's <a href="https://www.maxongroup.com.tw/medias/sys_master/8798985748510.pdf?attachment=true#page=10">Motor Data and Operating Ranges, p. 10</a>, states: <q>Enhancing the load torque leads to a linear reduction of the speed.</q> It identifies no-load speed and stall torque as the endpoints and specifies fixed applied voltage.</p></details>
+</section>
+
+<section>
+  <h2>Explore the load point and the peak-power point</h2>
+  <div data-interactive="dc-motor-curve">
+    <div class="dmc-static">
+      <p><strong>Predict first:</strong> a model motor has 0.8 N·m stall torque and 3,000 rpm no-load speed. A constant load asks for 0.2 N·m. Does the motor run above or below half speed?</p>
+      <p>[[img:electrical-systems/dc-motor-curve.svg|Normalized torque falls from one at stall to zero at no-load speed. Normalized output power peaks at half no-load speed. A load of one-quarter stall torque operates at three-quarters no-load speed.]]</p>
+      <p><strong>Static example:</strong> n = 3,000(1 − 0.2/0.8) = 2,250 rpm. Angular speed is 2,250 × 2π/60 = 235.6 rad/s, so output power is <strong>47.12 W</strong>. Peak power is <strong>62.83 W</strong> at 1,500 rpm and 0.4 N·m.</p>
+    </div>
+    <div class="dmc-live" hidden>
+      <fieldset><legend>Ideal motor and constant load</legend>
+        <label>Stall torque (N·m) <input data-stall type="number" min="0.001" max="1000" step="any" value="0.8"></label>
+        <label>No-load speed (rpm) <input data-speed type="number" min="1" max="100000" step="any" value="3000"></label>
+        <label>Load torque (N·m) <input data-load type="number" min="0" max="1000" step="any" value="0.2"></label>
+      </fieldset>
+      <p data-result role="status" aria-live="polite"></p>
+      <div data-plot></div>
+      <p>The solid line is torque / stall torque; the dashed curve is power / peak power. The circle marks load torque; the diamond marks output power. The square marks peak power.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Peak power is halfway, not at either endpoint</h2>
+  <p>Use <code>P = Tω</code>, with torque in N·m and angular speed in rad/s. Convert rpm using <code>ω = 2πn/60</code>. The definitions and units are on [[power-and-efficiency]] and [[angular-motion]].</p>
+  <p>At stall there is torque but no speed. At no load there is speed but no external load torque. Both endpoints therefore have zero shaft output power. Between them, torque times speed reaches a maximum.</p>
+  <details class="deeper"><summary>Derive the halfway result from the straight line</summary><p>Put x = n/n<sub>0</sub>. Then T = T<sub>s</sub>(1 − x), so P = T<sub>s</sub>ω<sub>0</sub>x(1 − x). Since x(1 − x) = 1/4 − (x − 1/2)<sup>2</sup>, the largest value is 1/4 at x = 1/2. Thus peak power = T<sub>s</sub>ω<sub>0</sub>/4, at half no-load speed and half stall torque. The two endpoint maxima cannot occur at the same time.</p></details>
+  <details class="deeper"><summary>Manufacturer check on peak power</summary><p>Portescap's <a href="https://www.portescap.com/-/media/project/automation-specialty/portescap/portescap/pdf/whitepapers/ed_wp_brush_dc_motor_basics.pdf#page=1">Brush DC Motor Basics, p. 1, point 4</a>, places maximum mechanical power at <q>half the stall torque</q>. On the linear curve, this also means half no-load speed, as derived above.</p></details>
+  <p><a class="button" data-practice-add="motor-load-speed" href="../practice.html#motor-load-speed">Practice operating speed</a> <a class="button" data-practice-add="motor-load-power" href="../practice.html#motor-load-power">Practice output power</a></p>
+</section>
+
+<section>
+  <h2>Peak efficiency needs electrical input as well as shaft output</h2>
+  <p>Efficiency is output power divided by input power. Peak output power and peak efficiency answer different questions. The torque-speed line alone does not give electrical input or losses, so this explorer deliberately does not calculate efficiency.</p>
+  <p>For the brushed coreless DC motors described by Portescap, peak efficiency occurs at a lighter load and higher speed than peak output power. Its exact position needs loss or current data. No external load means no useful shaft output, even though a real motor draws current to overcome its internal losses. Consult the actual motor's efficiency and continuous-operation data before selecting a load point.</p>
+  <details class="deeper"><summary>Manufacturer basis for the efficiency comparison</summary><p>Portescap's <a href="https://www.portescap.com/-/media/project/automation-specialty/portescap/portescap/pdf/whitepapers/ed_wp_brush_dc_motor_basics.pdf#page=1">Brush DC Motor Basics, p. 1, point 3</a>, states: <q>The maximum efficiency is obtained at high speed.</q> Its accompanying torque plot places the efficiency peak below the torque of peak power; the descending speed line therefore puts it at higher speed.</p></details>
+</section>
+
+<section>
+  <h2>A gearbox changes the load seen by the motor</h2>
+  <p>A gearbox can move the operating point by changing the torque demanded at the motor shaft for the same output load. Reduction trades output speed for output torque; it does not add power. Use [[gear-ratios]] for the ratio calculation, then bring the resulting motor-shaft torque back to this curve.</p>
+  <p>Real loads may demand different torque at different speeds. Their operating point is an intersection of a load curve and a motor curve. This explorer uses a constant load so that the first calculation stays visible.</p>
+</section>
