@@ -61,8 +61,9 @@ test('all 12 practice keys recompute; printed rounding is accepted and wrong met
     ['drive-timing-speed', 1440 * 28 / 60, 672, [1440 * 60 / 28]],
     ['drive-friction-speed', 1680 * 90 / 210, 720, [1680 * 210 / 90]]
   ];
-  const blocks = [...bank.matchAll(/<div\b[^>]*data-practice-id="([^"]+)"[^>]*>/g)];
-  assert.equal(blocks.length, checks.length, 'positive control: all authored problems parsed');
+  // Scoped to this module's drive-* items: the bank also carries belt-geometry's belt-* items.
+  const blocks = [...bank.matchAll(/<div\b[^>]*data-practice-id="([^"]+)"[^>]*>/g)].filter(m => m[1].startsWith('drive-'));
+  assert.equal(blocks.length, checks.length, 'positive control: all authored drive problems parsed');
   for (const [id, expected, rounded, wrong] of checks) {
     const block = blocks.find(m => m[1] === id);
     assert.ok(block, id);
