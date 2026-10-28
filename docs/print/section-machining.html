@@ -5904,6 +5904,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><a href="#p-cnc-control-fundamentals">CNC Control Fundamentals</a></li>
     <li><a href="#p-cnc-program-structure">CNC Program Structure</a></li>
     <li><a href="#p-cnc-program-proving">CNC Programming and Prove-Out</a></li>
+    <li><a href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a></li>
+    <li><a href="#p-cnc-turning-program">CNC Turning Program Walkthrough</a></li>
+    <li><a href="#p-cnc-turning-setup">CNC Turning Setup and Offsets</a></li>
+    <li><a href="#p-cnc-turning-speeds-and-feeds">CNC Turning Spindle and Feed Modes</a></li>
     <li><a href="#p-bench-work">Bench Work with Hand Tools</a></li>
     <li><a href="#p-cutoff-sawing">Cutoff Sawing</a></li>
     <li><a href="#p-grinding-wheels">Grinding Wheels and Abrasives</a></li>
@@ -8592,6 +8596,263 @@ M30</code></pre>
 </div>
 
 </article>
+<article class="article bundled" id="p-cnc-turning-profiles">
+  <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span></div>
+  <h1>CNC Turning Profiles and Cycles</h1>
+  <p class="lede">Account for a rounded tool nose on tapers and arcs, then distinguish roughing, finishing, grooving and threading cycles.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="cnc-turning-profiles--a-rounded-tool-nose-does-not-cut-at-the-imaginary-sharp-tip" data-card="cnc-turning-profiles--a-rounded-tool-nose-does-not-cut-at-the-imaginary-sharp-tip">
+    <summary>A rounded tool nose does not cut at the imaginary sharp tip<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A rounded tool nose does not cut at the imaginary sharp tip</h2>
+  <p>A turning insert has a rounded corner, called its <strong>nose radius</strong>. Touching off along X and Z establishes an <strong>imaginary tip</strong>: the intersection of the two tangent reference lines. There is no cutting material at that intersection. The actual contact point moves around the nose as the direction of the surface changes.</p>
+  <p>Axis-parallel cuts can reach the measured diameter or face with the corresponding touch-offs. On a taper, chamfer or arc, simply driving the imaginary tip along the desired surface leaves a profile error. Account for the nose radius with a calculated toolpath or the control's tool nose compensation. See <a class="xref-page" href="#p-lathe-tapers">Turning Tapers</a> for taper geometry.</p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkltYWdpbmFyeSB0aXAgdmVyc3VzIHJvdW5kZWQgbm9zZSBvbiBhIHRhcGVyPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+VGhlIGxlZnQgYW5kIGJvdHRvbSB0YW5nZW50cyB0byBhIGNpcmN1bGFyIHRvb2wgbm9zZSBtZWV0IGF0IGFuIGltYWdpbmFyeSB0aXAuIEEgZGVzaXJlZCB0YXBlciB0aHJvdWdoIHRoYXQgdGlwIGlzIHBhcmFsbGVsIHRvLCBidXQgc2VwYXJhdGVkIGZyb20sIHRoZSBhY3R1YWwgdGFuZ2VudCBjdXQgYnkgdGhlIG5vc2UuIFRoZSBnYXAgaWxsdXN0cmF0ZXMgdW5jb21wZW5zYXRlZCBwcm9maWxlIGVycm9yLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2NTAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjI1IiB5PSI0MiI+VW5jb21wZW5zYXRlZCBub3NlIMK3IGVubGFyZ2VkPC90ZXh0Pgo8Y2lyY2xlIGN4PSI0MTAiIGN5PSIyMjAiIHI9IjgwIiBmaWxsPSIjZTVlZGYzIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNMzMwIDExNVYzNDAgTTI5MCAzMDBINTMwIiBzdHJva2U9IiM2YjcyODAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTAgOCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMTkwIDE2MEw1MzAgNTAwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMTkwIDExMy4xNEw1MzAgNDUzLjE0IiBzdHJva2U9IiMwMDY0OTMiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMDAiIHI9IjciIGZpbGw9IiNhNjM4MDAiLz4KPHBhdGggZD0iTTQxMCAyMjBMMzUzLjQzIDI3Ni41NyIgc3Ryb2tlPSIjMTQyZDRlIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSI0MzAiIHk9IjIxOCI+cjwvdGV4dD4KPHBhdGggZD0iTTMzNSAzMTBMMTQ1IDM1NSIgc3Ryb2tlPSIjYTYzODAwIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSIyNSIgeT0iMzk1Ij5JbWFnaW5hcnkgdGlwPC90ZXh0Pgo8cGF0aCBkPSJNNDcwIDQ0MEw0OTMuNDMgNDE2LjU3IiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjUzNSIgeT0iMzkwIj5Qcm9maWxlPC90ZXh0Pjx0ZXh0IHg9IjUzNSIgeT0iNDMwIj5lcnJvcjwvdGV4dD4KPHRleHQgeD0iNTI1IiB5PSIxNjAiPlJvdW5kZWQ8L3RleHQ+PHRleHQgeD0iNTI1IiB5PSIyMDAiPm5vc2U8L3RleHQ+CjxwYXRoIGQ9Ik0zMCA1NDVIOTUiIHN0cm9rZT0iI2E2MzgwMCIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iMTE1IiB5PSI1NTUiPkRlc2lyZWQgdGFwZXIgdGhyb3VnaCB0aXA8L3RleHQ+CjxwYXRoIGQ9Ik0zMCA1OTVIOTUiIHN0cm9rZT0iIzAwNjQ5MyIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iMTE1IiB5PSI2MDUiPkFjdHVhbCB0YW5nZW50IGN1dDwvdGV4dD4KPC9nPjwvc3ZnPgo=" alt="A rounded nose touches the X and Z reference lines, whose intersection is the imaginary tip. A taper through that tip misses the rounded edge; a parallel tangent line shows the resulting surface without compensation."></p>
+  <p class="deeper-ref" id="deeper-ref-41">Supporting detail: <a href="#deeper-addendum-41"><strong>Addendum 41</strong></a> &mdash; Why a good diameter measurement does not prove a taper is correct.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-profiles--compensation-needs-nose-radius-tip-orientation-and-a-clear-entry-and-exit" data-card="cnc-turning-profiles--compensation-needs-nose-radius-tip-orientation-and-a-clear-entry-and-exit">
+    <summary>Compensation needs nose radius, tip orientation and a clear entry and exit<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compensation needs nose radius, tip orientation and a clear entry and exit</h2>
+  <p>In common Fanuc-style usage, G41 selects compensation to the left of the programmed direction of travel and G42 to the right; G40 cancels it. Judge the side in the control's XZ-plane convention. Do not choose a code from the screen's apparent left or right, or assume one code means every outside cut.</p>
+  <p>Enter the actual nose radius and the control's <strong>tip orientation</strong>, which tells it where the imaginary tip sits relative to the nose centre. Select the correct tool-offset register, use the manual's lead-in and lead-out requirements, and check the resulting path with <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a>. Tip numbers differ by control; there is no universal number table here.</p>
+  <p>Do not apply full nose-radius compensation again to a path already corrected for that radius. Check whether a CAM post expects full geometry compensation, wear-only compensation or no control compensation.</p>
+  <p class="deeper-ref" id="deeper-ref-42">Supporting detail: <a href="#deeper-addendum-42"><strong>Addendum 42</strong></a> &mdash; Where to check the control behavior.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-profiles--a-roughing-cycle-removes-layers-while-leaving-stock-for-finishing" data-card="cnc-turning-profiles--a-roughing-cycle-removes-layers-while-leaving-stock-for-finishing">
+    <summary>A roughing cycle removes layers while leaving stock for finishing<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A roughing cycle removes layers while leaving stock for finishing</h2>
+  <p>A <strong>G71-type roughing cycle</strong> uses a defined final profile to generate repeated stock-removal passes, commonly along Z for outside or inside turning. The programmer supplies the applicable cut depth, retract and finish allowance. A <strong>G70-type finishing cycle</strong> follows the defined profile to remove the remaining allowance.</p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlJvdWdoaW5nIGxheWVycyBhbmQgZmluaXNoIGFsbG93YW5jZTwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlVwcGVyIGhhbGYgb2Ygc3RvY2sgc2hvd24gc2NoZW1hdGljYWxseS4gVGhyZWUgcm91Z2hpbmcgcGFzc2VzIHRyYXZlbCBsZWZ0IGFsb25nIFouIEEgcmVtYWluaW5nIGJhbmQgYWJvdmUgYSBzdGVwcGVkIGZpbmFsIG91dGxpbmUgaXMgcmVtb3ZlZCBieSBmaW5pc2hpbmcuIE5vdCBhIGN5Y2xlIHBhcmFtZXRlciBkaWFncmFtLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1ODAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjI1IiB5PSI0NSI+Um91Z2ggZmlyc3Qg4oaSIGZpbmlzaCB0aGUgcHJvZmlsZTwvdGV4dD4KPHBhdGggZD0iTTkwIDEyNUg2NzBWNDIwSDkwWiIgZmlsbD0iI2YwZjNmNiIgc3Ryb2tlPSIjMTQyZDRlIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTkwIDI1NUgzNDBWMzI1SDY3MFY0MjBIOTBaIiBmaWxsPSIjZjlkOTc0Ii8+CjxwYXRoIGQ9Ik05MCAyODBIMzY1VjM1MEg2NzBWNDIwSDkwWiIgZmlsbD0iI2M5ZGNlOCIvPgo8cGF0aCBkPSJNOTAgMjgwSDM2NVYzNTBINjcwIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNOTAgMjU1SDM0MFYzMjVINjcwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTAgNiIgZmlsbD0ibm9uZSIvPgo8ZyBzdHJva2U9IiMwMDY0OTMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTY1MCAxNjVIMTIwTDEzNyAxNTUgTTEyMCAxNjVMMTM3IDE3NSBNNjUwIDIwNUgxMjBMMTM3IDE5NSBNMTIwIDIwNUwxMzcgMjE1IE02NTAgMjQ1SDM4MEwzOTcgMjM1IE0zODAgMjQ1TDM5NyAyNTUiLz48L2c+Cjx0ZXh0IHg9IjE3MCIgeT0iMTA1Ij5PcmlnaW5hbCBzdG9jayBzdXJmYWNlPC90ZXh0Pgo8dGV4dCB4PSI0MDAiIHk9IjMwNyI+QWxsb3dhbmNlPC90ZXh0Pjx0ZXh0IHg9IjEwNSIgeT0iMzkwIj5GaW5pc2hlZCBtYXRlcmlhbDwvdGV4dD4KPHBhdGggZD0iTTU1IDQyMEg3MjAiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDQwIiB5PSI0NjIiPkNlbnRyZWxpbmU8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1MTAiPuKGkCBUb3dhcmQgaGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjU4MCIgeT0iNTEwIj4rWiDihpI8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1NTUiPlVwcGVyIGhhbGYgb25seSDCtyBub3QgdG8gc2NhbGU8L3RleHQ+CjwvZz48L3N2Zz4K" alt="Upper half of turning stock: successive roughing passes run along Z toward the headstock and leave an allowance above a stepped finished profile. Finishing follows the final outline."></p>
+  <p>Read the control's cycle definition before entering parameters. One-block and two-block formats differ. A depth word may be radial while an X allowance is diametral; the same letter can mean different things in different blocks. P and Q commonly identify the first and last numbered profile blocks. Check the referenced blocks, permitted profile direction changes, return path and compensation rules.</p>
+  <p class="deeper-ref" id="deeper-ref-43">Supporting detail: <a href="#deeper-addendum-43"><strong>Addendum 43</strong></a> &mdash; Why no universal cycle template is shown.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-profiles--grooving-repeats-plunges-threading-synchronizes-feed-with-rotation" data-card="cnc-turning-profiles--grooving-repeats-plunges-threading-synchronizes-feed-with-rotation">
+    <summary>Grooving repeats plunges; threading synchronizes feed with rotation<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Grooving repeats plunges; threading synchronizes feed with rotation</h2>
+  <p>A <strong>grooving or peck cycle</strong> divides a plunge into smaller advances and retracts. Some formats repeat the plunge at different Z positions to make a wider groove. G75 is one common outside/inside grooving family; face-grooving and peck-drilling families may use other codes. Check peck size, final depth, groove width and tool-width convention separately.</p>
+  <p>A <strong>G76-type threading cycle</strong> makes repeated synchronized passes with increasing depth. The thread lead determines the axial advance per spindle revolution. The cycle also needs control-specific information about final size, infeed, pass depth and runout. Use <a class="xref-page" href="#p-single-point-threading">Single-Point Threading</a> for pitch, lead and thread form; a threading cycle does not choose those dimensions for you.</p>
+  <p>Formats differ by control, so no complete parameter syntax is universal. See the <a href="https://www.haascnc.com/service/codes-settings.type%3Dgcode.machine%3Dlathe.value%3DG75.html">Haas G75 reference</a> and the G70/G76 entries in its <a href="https://www.haascnc.com/content/dam/haascnc/en/service/reference/programming-workbooks/lathe---programming-workbook.pdf">lathe workbook</a> as examples. <a class="xref-page" href="#p-cnc-turning-program">CNC Turning Program Walkthrough</a> spells out ordinary moves so the sequence can be read without decoding a cycle.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-cnc-turning-program">
+  <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span></div>
+  <h1>CNC Turning Program Walkthrough</h1>
+  <p class="lede">Trace an original facing, outside roughing, chamfering, finishing and cutoff sequence with every block explained.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="cnc-turning-program--read-the-setup-assumptions-before-the-first-block" data-card="cnc-turning-program--read-the-setup-assumptions-before-the-first-block">
+    <summary>Read the setup assumptions before the first block<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read the setup assumptions before the first block</h2>
+  <p><strong>Illustrative; check your control's manual.</strong> This is a reading example in a common Fanuc-style lathe dialect, not a machine-ready file. Read <a class="xref-page" href="#p-cnc-program-structure">CNC Program Structure</a> for blocks and modes, <a class="xref-page" href="#p-cnc-turning-setup">CNC Turning Setup and Offsets</a> for offsets, and <a class="xref-page" href="#p-cnc-turning-speeds-and-feeds">CNC Turning Spindle and Feed Modes</a> for S and F. The mill simulator in <a class="xref-page" href="#p-gcode-and-toolpaths">G-code and Toolpaths</a> cannot validate this lathe program.</p>
+  <p>The invented part is 20 mm in diameter and 25 mm long, with a 1 mm × 45° front chamfer. The chamfer runs from X18 Z0 to X20 Z−1: the 2 mm diameter change is a 1 mm radial change. Stock is 24 mm diameter with its raw face at Z+0.5. G54 has Z0 at the finished face and X0 on the spindle centreline. Stock and clearance extend beyond Z−28; workholding is farther toward negative Z.</p>
+  <p>Assume diameter programming and absolute X/Z endpoints; this dialect does not need G90 for absolute moves. T0101 selects station 1 and offset 1: a right-hand OD/facing tool with a 0.4 mm nose radius, suitable for the illustrated cuts. Its imaginary tip and radius are set, and G42 is the correct side for this setup's finish contour. T0202 selects a 2 mm wide cutoff tool and offset 2. Its Z reference is the edge toward positive Z, so Z−25 puts the blade in the interval Z−27 to Z−25. The cutoff tool is capable of the illustrated small travel past centre.</p>
+  <p>The example assumes X60 Z10 is an already-verified tool-change clearance location for both tools and the turret sweep, and starts there with spindle and coolant off. These coordinates are not a general clearance rule. All speeds, feeds and the 1800 RPM ceiling are teaching values, not material recommendations. Verify the real setup, tool calls, compensation entry/exit, centre crossing and file delimiters using <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a> and the <a href="../safety/index.html">Safety collection</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-program--face-the-end-then-leave-a-small-allowance-on-the-outside-diameter" data-card="cnc-turning-program--face-the-end-then-leave-a-small-allowance-on-the-outside-diameter">
+    <summary>Face the end, then leave a small allowance on the outside diameter<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Face the end, then leave a small allowance on the outside diameter</h2>
+  <p>Every parenthesized comment explains its block. G01 remains active until G00 replaces it; X/Z values here are destinations. Facing travels slightly past the centre to account for the rounded nose. Roughing uses two explicit lengthwise passes rather than a control-specific canned-cycle format.</p>
+  <pre><code>O2460 (IDENTIFY THIS EXAMPLE PROGRAM)
+G18 G21 G40 G80 G99 (XZ PLANE, MM, COMP OFF, CYCLES OFF, MM/REV)
+G54 (SELECT THE PRESET PART WORK OFFSET)
+T0101 (SELECT OD TOOL 1 WITH OFFSET 1 AT VERIFIED CLEARANCE)
+G50 S1800 (SET THE EXAMPLE MAXIMUM SPINDLE RPM)
+G97 S600 M03 (FIXED 600 RPM, START SPINDLE IN SETUP DIRECTION)
+G00 X26.0 (APPROACH OUTSIDE THE 24 MM STOCK AT Z10)
+G00 Z0.0 (MOVE TO FINISHED FACE PLANE WHILE OUTSIDE STOCK)
+M08 (TURN ON THE ASSUMED FLOOD COOLANT SYSTEM)
+G96 S90 (SELECT 90 M/MIN CSS WITH THE RPM CEILING ACTIVE)
+G01 X-0.8 F0.10 (FACE THROUGH CENTRE: 0.4 MM RADIAL OVERTRAVEL)
+G00 Z2.0 (RETRACT AXIALLY BEYOND THE FACED END)
+G00 X22.0 (POSITION FOR THE FIRST OD ROUGHING PASS IN AIR)
+G01 Z-28.0 F0.20 (ROUGH LENGTHWISE TO 22 MM DIAMETER)
+G00 X26.0 (RETRACT RADIALLY OUTSIDE THE ORIGINAL STOCK)
+G00 Z2.0 (RETURN TO THE FRONT AT CLEAR X)
+G00 X20.6 (POSITION FOR THE SECOND OD ROUGHING PASS)
+G01 Z-28.0 F0.20 (LEAVE 0.6 MM ON DIAMETER FOR FINISHING)
+G00 X26.0 (RETRACT OUTSIDE STOCK AGAIN)
+G00 Z2.0 (RETURN AHEAD OF THE FACE FOR FINISHING)</code></pre>
+  <p class="deeper-ref" id="deeper-ref-44">Supporting detail: <a href="#deeper-addendum-44"><strong>Addendum 44</strong></a> &mdash; Check roughing depth and remaining material.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-program--compensate-the-chamfer-and-finish-then-cut-off-at-fixed-rpm" data-card="cnc-turning-program--compensate-the-chamfer-and-finish-then-cut-off-at-fixed-rpm">
+    <summary>Compensate the chamfer and finish, then cut off at fixed RPM<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compensate the chamfer and finish, then cut off at fixed RPM</h2>
+  <p>The finish contour uses the same tool at a smaller feed. Nose compensation is active for the chamfer and OD; it is entered ahead of the face and cancelled after departing the finished contour. See <a class="xref-page" href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a> for why a sharp-point assumption would give the wrong chamfer.</p>
+  <pre><code>G00 X16.0 (POSITION AHEAD OF THE FACE FOR THE COMPENSATED ENTRY)
+G01 G42 X18.0 Z0.0 F0.10 (ENGAGE RIGHT COMP ON THE FACE APPROACH)
+G01 X20.0 Z-1.0 (CUT THE 1 MM RADIAL BY 1 MM AXIAL CHAMFER)
+G01 Z-26.0 (FINISH THE 20 MM OD PAST THE CUTOFF FACE)
+G01 X22.0 Z-27.0 (FEED OUT FROM THE OD BEHIND THE FINISHED PART)
+G01 G40 X26.0 (CANCEL COMPENSATION ON THE OUTWARD DEPARTURE)
+G97 S600 (CANCEL CSS AND REQUEST FIXED 600 RPM)
+G00 X60.0 (RETRACT RADIALLY TO THE ASSUMED CLEARANCE X)
+G00 Z10.0 (RETURN AXIALLY TO THE VERIFIED TOOL-CHANGE LOCATION)
+M09 (COOLANT OFF)
+M05 (STOP THE SPINDLE BEFORE THE TOOL CHANGE)
+T0202 (SELECT CUTOFF TOOL 2 AND ITS EDGE-REFERENCED OFFSET 2)
+G97 S500 M03 (START AT FIXED 500 RPM FOR THIS CUTOFF EXAMPLE)
+G00 X26.0 (POSITION OUTSIDE THE STOCK WITH THE NEW TOOL)
+G00 Z-25.0 (LOCATE THE POSITIVE-Z BLADE EDGE AT THE REAR FACE)
+M08 (COOLANT ON)
+G01 X-0.2 F0.05 (PART OFF WITH THE ASSUMED 0.1 MM RADIAL OVERTRAVEL)
+G00 X60.0 (WITHDRAW RADIALLY FROM THE CUTOFF SLOT)
+G00 Z10.0 (RETURN TO THE ASSUMED CLEARANCE Z)
+M09 (COOLANT OFF)
+M05 (SPINDLE STOP)
+M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
+  <p>File-start/end percent delimiters, tool-call behavior and supported startup codes must be supplied or adapted as required by the target control. No bar-feeder or parts-catcher sequence is implied.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-program--trace-the-modal-state-and-finished-dimensions-on-paper" data-card="cnc-turning-program--trace-the-modal-state-and-finished-dimensions-on-paper">
+    <summary>Trace the modal state and finished dimensions on paper<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Trace the modal state and finished dimensions on paper</h2>
+  <ul class="boxes">
+    <li>Mark where S means RPM and where it means metres per minute; locate the preceding RPM clamp.</li>
+    <li>Confirm that every F value is interpreted in mm/rev under G99.</li>
+    <li>Calculate the radial depth of each OD pass and the two chamfer endpoints.</li>
+    <li>Locate the nose-compensation entry and departure, and identify the selected offset register.</li>
+    <li>Check that the cutoff blade's positive-Z edge leaves the intended 25 mm length.</li>
+  </ul>
+  <p>The syntax conventions can be compared with the <a href="https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---programming.html">Haas lathe programming reference</a>. This original example is not copied from a manufacturer program. A paper trace establishes intended geometry and modal state; actual prove-out still follows <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a>.</p>
+  <p><a class="button" data-practice-add="turning-error-feed" href="../practice.html#turning-error-feed">Spot a feed-mode error</a></p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-cnc-turning-setup">
+  <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span></div>
+  <h1>CNC Turning Setup and Offsets</h1>
+  <p class="lede">Read lathe X and Z coordinates, identify tooling and workholding, and separate part location from tool geometry and wear.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="cnc-turning-setup--read-x-as-a-size-and-z-as-a-position-along-the-spindle" data-card="cnc-turning-setup--read-x-as-a-size-and-z-as-a-position-along-the-spindle">
+    <summary>Read X as a size and Z as a position along the spindle<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read X as a size and Z as a position along the spindle</h2>
+  <p>Start with <a class="xref-page" href="#p-cnc-control-fundamentals">CNC Control Fundamentals</a> for how CNC works and <a class="xref-page" href="#p-lathe-operations">Lathe Operations</a> for the cuts a lathe makes. Here the work rotates and the ordinary turning tool moves in the XZ plane. Z runs along the spindle; positive Z is away from the headstock in the basic arrangement shown. X moves radially, even when its displayed value is a diameter. A slant bed or rear turret changes the view, so check the machine's axis diagram.</p>
+  <p>Confirm <strong>diameter or radius programming</strong> before reading an X value. For a 28 mm diameter, diameter mode uses X28 and radius mode uses X14. Moving from X28 to X24 in diameter mode removes 2 mm radially. Z is not halved. Confirm incremental and arc-centre conventions separately.</p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkxhdGhlIGNvb3JkaW5hdGVzIGluIGRpYW1ldGVyIG1vZGU8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5BIDI4IG1tIGRpYW1ldGVyIGJhciBleHRlbmRzIGxlZnQgZnJvbSB0aGUgZmFjZS4gV29yayB6ZXJvIGxpZXMgYXQgdGhlIGZhY2Ugb24gdGhlIHNwaW5kbGUgY2VudHJlbGluZS4gWDI4IGlzIDE0IG1tIHJhZGlhbGx5IGZyb20gdGhhdCBsaW5lOyBwb3NpdGl2ZSBaIGlzIHJpZ2h0LjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MjAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjMwIiB5PSI0NSI+RGlhbWV0ZXIgbW9kZSDCtyBzaWRlIHZpZXc8L3RleHQ+CjxyZWN0IHg9IjU1IiB5PSIxMzUiIHdpZHRoPSIxMTUiIGhlaWdodD0iMjYwIiBmaWxsPSIjYzhkMGRhIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIvPgo8cmVjdCB4PSIxNzAiIHk9IjE4NSIgd2lkdGg9IjMzMCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiNlNWVkZjMiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxwYXRoIGQ9Ik0yNSAyNjVINzQwIE01MDAgMjY1VjgwIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNNzI1IDI1NUw3NDUgMjY1TDcyNSAyNzUgTTQ5MCAxMDBMNTAwIDgwTDUxMCAxMDAiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjY2NSIgeT0iMjQ1Ij4rWjwvdGV4dD48dGV4dCB4PSI1MjAiIHk9IjEwNSI+K1ggb3V0d2FyZDwvdGV4dD4KPGNpcmNsZSBjeD0iNTAwIiBjeT0iMjY1IiByPSI3IiBmaWxsPSIjYTYzODAwIi8+CjxwYXRoIGQ9Ik01MDAgMTg1SDYzMCBNNTAwIDI2NUg2MzAgTTYxNSAxODVWMjY1IE02MDYgMTk1TDYxNSAxODVMNjI0IDE5NSBNNjA2IDI1NUw2MTUgMjY1TDYyNCAyNTUiIHN0cm9rZT0iIzAwNjQ5MyIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjY0MCIgeT0iMTk1Ij4xNCBtbTwvdGV4dD48dGV4dCB4PSIxOTAiIHk9IjE2NSI+w5gyOCDihpIgWDI4PC90ZXh0Pgo8cGF0aCBkPSJNNTA1IDI3NUw1NjAgMzcwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjM5MCIgeT0iNDEwIj5GYWNlOiBaMDwvdGV4dD48dGV4dCB4PSIzOTAiIHk9IjQ1MyI+V29yayB6ZXJvOiBYMCBaMDwvdGV4dD4KPHRleHQgeD0iMzUiIHk9IjQ0NSI+SGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI0ODUiPkNlbnRyZWxpbmUg4oaSPC90ZXh0Pgo8L2c+PC9zdmc+Cg==" alt="Lathe side view: work zero is at the face on the spindle centreline. Positive Z points away from the headstock; X28 in diameter mode represents a surface 14 mm from the centreline."></p>
+  <p>Use <a class="xref-page" href="#p-absolute-and-incremental-positioning">Absolute and Incremental Positioning</a> for coordinate arithmetic. On many Fanuc-style lathes X/Z are absolute endpoints and U/W are increments; G90 can be a turning cycle. Do not paste a mill's G90/G91 startup into a lathe program.</p>
+  <p><a class="button" data-practice-add="turning-x-diameter" href="../practice.html#turning-x-diameter">Practice lathe X commands</a></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-setup--the-tool-arrangement-determines-how-the-next-cutter-reaches-the-work" data-card="cnc-turning-setup--the-tool-arrangement-determines-how-the-next-cutter-reaches-the-work">
+    <summary>The tool arrangement determines how the next cutter reaches the work<span class="chev"></span></summary>
+    <div class="body">
+      <h2>The tool arrangement determines how the next cutter reaches the work</h2>
+  <p>A <strong>turret</strong> indexes a selected tool station into working position. <strong>Gang tooling</strong> mounts several tools on a slide; moving the slide brings the selected tool into position without turret indexing. Each tool still needs the correct offsets and a checked approach path.</p>
+  <p><strong>Live tooling</strong> powers a rotating cutter on the lathe for operations such as drilling or milling. A <strong>C axis</strong> controls the spindle's angular position, allowing the work to be indexed or rotated under position control. These are options, not features of every CNC lathe. Some machines also add a Y axis. Live-tool and spindle-mode commands belong to the machine's manual.</p>
+  <p class="deeper-ref" id="deeper-ref-45">Supporting detail: <a href="#deeper-addendum-45"><strong>Addendum 45</strong></a> &mdash; Why an extra axis changes the work a turning center can do.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-setup--match-the-workholding-and-automation-to-the-part" data-card="cnc-turning-setup--match-the-workholding-and-automation-to-the-part">
+    <summary>Match the workholding and automation to the part<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Match the workholding and automation to the part</h2>
+  <ul>
+    <li>A <strong>chuck</strong> grips with jaws. A self-centering chuck moves its jaws together; independent jaws permit individual adjustment. Jaw style and setup determine which shapes can be held.</li>
+    <li>A <strong>collet</strong> closes around a matching stock size and shape. Its useful size range depends on the collet design.</li>
+    <li>A <strong>tailstock center</strong> supports the free end of suitable work. It does not replace the chuck or collet that drives the work.</li>
+    <li>A <strong>bar feeder</strong> advances bar stock for successive parts. A <strong>parts catcher</strong> receives a separated part. Their timing and interlocks are machine-specific; neither is assumed in an ordinary two-axis program.</li>
+  </ul>
+  <p>For operating requirements use the <a href="../safety/index.html">Safety collection</a> and <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a>. No particular shop machine or installed option is assumed here.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-setup--locate-the-part-face-once-then-locate-each-tool-relative-to-it" data-card="cnc-turning-setup--locate-the-part-face-once-then-locate-each-tool-relative-to-it">
+    <summary>Locate the part face once, then locate each tool relative to it<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Locate the part face once, then locate each tool relative to it</h2>
+  <p>Use <a class="xref-page" href="#p-cnc-axes-and-offsets">CNC Axes and Offsets</a> for machine zero, work zero and the general offset relationship. On a lathe, a common part datum is <strong>Z0 at the finished face and X0 on the spindle centreline</strong>. Establish the Z work shift using the control's documented reference-tool, probe or touch-off method. Allow for any material still to be faced away.</p>
+  <p>For X touch-off, the reference is a measured diameter. In a trial-cut method, a tool cuts a short cylindrical surface and that diameter is measured; the control's measurement function uses the known size to establish that tool's X geometry. Use the manual's procedure for the actual machine, including which table receives the value. Do not enter the measured diameter as though it were automatically the raw geometry-offset value.</p>
+  <table><thead><tr><th>Stored information</th><th>What it describes</th></tr></thead><tbody>
+    <tr><td>Work shift or work offset</td><td>The part datum, especially its Z location.</td></tr>
+    <tr><td>X and Z tool geometry</td><td>The position of each tool's reference tip relative to the established reference system.</td></tr>
+    <tr><td>X and Z wear</td><td>Small dimensional corrections after measurement, separate from the basic tool setup.</td></tr>
+    <tr><td>Nose radius and tip orientation</td><td>The rounded cutting corner and how its imaginary tip relates to it; see <a class="xref-page" href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a>.</td></tr>
+  </tbody></table>
+  <p>Check whether an X wear entry is interpreted radially or diametrally, its sign, and whether the control adds to or replaces the existing value. A work-offset change affects the shared datum; a tool correction addresses one tool. Selecting G54 does not measure or store a new zero. G53 does not erase the offset table.</p>
+  <p class="deeper-ref" id="deeper-ref-46">Supporting detail: <a href="#deeper-addendum-46"><strong>Addendum 46</strong></a> &mdash; Control example: separate geometry and wear fields.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-cnc-turning-speeds-and-feeds">
+  <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span></div>
+  <h1>CNC Turning Spindle and Feed Modes</h1>
+  <p class="lede">Calculate constant-surface-speed RPM, apply an RPM ceiling, and distinguish feed per revolution from feed per minute.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="cnc-turning-speeds-and-feeds--g96-changes-rpm-with-diameter-g97-holds-a-requested-rpm" data-card="cnc-turning-speeds-and-feeds--g96-changes-rpm-with-diameter-g97-holds-a-requested-rpm">
+    <summary>G96 changes RPM with diameter; G97 holds a requested RPM<span class="chev"></span></summary>
+    <div class="body">
+      <h2>G96 changes RPM with diameter; G97 holds a requested RPM</h2>
+  <p>In the Fanuc-style lathe convention used here, <strong>G96</strong> selects constant surface speed (CSS). S gives cutting speed: surface feet per minute with inch units, or metres per minute with metric units. <strong>G97</strong> cancels CSS and makes S an RPM value. Confirm the actual control's units and code meanings.</p>
+  <p>Use the <strong>work diameter at the cutting point</strong>, not the insert size. From <a class="xref-page" href="#p-feeds-and-speeds">Feeds and Speeds</a>:</p>
+  <ul>
+    <li>Inch: RPM = SFM × 12 / (π × diameter in inches).</li>
+    <li>Metric: RPM = cutting speed in m/min × 1000 / (π × diameter in mm).</li>
+  </ul>
+  <p>At 180 SFM on a 1.5 in diameter, RPM = 180 × 12 / (π × 1.5) = <strong>458 RPM</strong>, rounded to a whole RPM. At 90 m/min on a 30 mm diameter, the result is <strong>955 RPM</strong>. These are arithmetic examples, not recommended cutting data.</p>
+  <p><a class="button" data-practice-add="turning-css-inch-a" href="../practice.html#turning-css-inch-a">Practice CSS calculations</a></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-speeds-and-feeds--set-the-maximum-rpm-before-enabling-constant-surface-speed" data-card="cnc-turning-speeds-and-feeds--set-the-maximum-rpm-before-enabling-constant-surface-speed">
+    <summary>Set the maximum RPM before enabling constant surface speed<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Set the maximum RPM before enabling constant surface speed</h2>
+  <p>Establish an appropriate spindle-speed ceiling for the actual setup <strong>before G96</strong>. On the Fanuc-style lathe convention here, <code>G50 S1800</code> limits requested speed to 1800 RPM. The number is only an illustration; determine the permissible limit from the machine, workholding, tooling and setup documentation. Other controls use different commands or parameters.</p>
+  <pre><code>G50 S1800 (ILLUSTRATIVE RPM CEILING)
+G96 S90   (METRIC CSS: 90 METRES PER MINUTE)
+G97 S600  (LEAVE CSS: REQUEST 600 RPM)</code></pre>
+  <p>As diameter approaches zero during facing, CSS requests increasing RPM. Once the clamp is reached, RPM stays limited and surface speed falls. At the centre, a nonzero surface speed cannot be maintained at any finite RPM. Use <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a> and the <a href="../safety/index.html">Safety collection</a> for the required operating checks.</p>
+  <p class="deeper-ref" id="deeper-ref-47">Supporting detail: <a href="#deeper-addendum-47"><strong>Addendum 47</strong></a> &mdash; Calculate where a speed ceiling starts to matter.</p>
+  <p><a class="button" data-practice-add="turning-clamp-reason" href="../practice.html#turning-clamp-reason">Explain the RPM clamp</a></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-speeds-and-feeds--read-the-feed-mode-before-interpreting-f" data-card="cnc-turning-speeds-and-feeds--read-the-feed-mode-before-interpreting-f">
+    <summary>Read the feed mode before interpreting F<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read the feed mode before interpreting F</h2>
+  <p>In this common Fanuc-style lathe convention, <strong>G99 means feed per spindle revolution</strong> and <strong>G98 means feed per minute</strong>. With inch units, G99 F0.006 means 0.006 in/rev; G98 F0.006 means 0.006 in/min. With metric units, the corresponding lengths are millimetres. Codes vary: the milling return-level meanings of G98/G99 do not apply here.</p>
+  <p><strong>Feed per minute = feed per revolution × RPM.</strong> At 800 RPM, 0.006 in/rev gives 4.8 in/min. If CSS increases RPM while G99 holds F constant, the feed per minute increases too. If G98 holds feed per minute constant, feed per revolution changes with RPM.</p>
+  <p>Set the intended feed mode explicitly. See <a class="xref-page" href="#p-cnc-program-structure">CNC Program Structure</a> for modal behavior and <a class="xref-page" href="#p-cnc-turning-program">CNC Turning Program Walkthrough</a> for a commented turning example.</p>
+  <p class="deeper-ref" id="deeper-ref-48">Supporting detail: <a href="#deeper-addendum-48"><strong>Addendum 48</strong></a> &mdash; Reference for the code convention used here.</p>
+  <p><a class="button" data-practice-add="turning-feed-inch" href="../practice.html#turning-feed-inch">Practice feed conversion</a></p>
+    </div>
+  </details>
+</div>
+
+</article>
 <article class="article bundled" id="p-bench-work">
   <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span></div>
   <h1>Bench Work with Hand Tools</h1>
@@ -8636,7 +8897,7 @@ M30</code></pre>
   <p>Fit a suitable handle to a tanged file. For ordinary forward filing, guide the file with both hands, keep it level, apply pressure on the cutting stroke, and ease pressure on the return. Rocking rounds the edges of a surface intended to stay flat. Check progress frequently rather than filing past size.</p>
   <p>For <strong>draw filing</strong>, hold a suitable single-cut file crosswise to the work and move it along the surface, with its length across the direction of travel. Use light, controlled pressure and orient it so the teeth cut on the working stroke. This helps blend marks and refine a flat surface.</p>
   <p>Chips lodged in the teeth are called <strong>pinning</strong>; they can scratch the work. Clean with a file card, brushing with the tooth grooves to clear trapped chips. Store files so their teeth do not rub against other tools.</p>
-  <p class="deeper-ref" id="deeper-ref-41">Supporting detail: <a href="#deeper-addendum-41"><strong>Addendum 41</strong></a> &mdash; File selection and care resources.</p>
+  <p class="deeper-ref" id="deeper-ref-49">Supporting detail: <a href="#deeper-addendum-49"><strong>Addendum 49</strong></a> &mdash; File selection and care resources.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="bench-work--remove-the-burr-without-changing-the-required-edge" data-card="bench-work--remove-the-burr-without-changing-the-required-edge">
@@ -8716,7 +8977,7 @@ M30</code></pre>
   <p><strong>Band speed</strong> is the distance the blade travels per minute, usually stated in feet/min or m/min. <strong>Feed</strong> is the rate or force that advances the blade into the work. They are different adjustments. Material grade and hardness, blade material, tooth geometry, and section shape all affect the starting settings.</p>
   <p>Use the blade maker's cutting chart for the actual material, then follow the machine manual for setting it. Follow the blade maker's break-in procedure for a new blade. There is no single speed table or fixed percentage adjustment that fits every saw. Connect these terms to <a class="xref-page" href="#p-feeds-and-speeds">Feeds and Speeds</a>.</p>
   <p>On a saw designed to use cutting fluid, the fluid helps lubricate the cut, carry away heat, and clear chips. Use the approved fluid, concentration, and delivery method. Some abrasive cutoff systems are dry and others are wet; do not add coolant to a dry-only setup.</p>
-  <p class="deeper-ref" id="deeper-ref-42">Supporting detail: <a href="#deeper-addendum-42"><strong>Addendum 42</strong></a> &mdash; Why finer teeth do not fix every bad cut.</p>
+  <p class="deeper-ref" id="deeper-ref-50">Supporting detail: <a href="#deeper-addendum-50"><strong>Addendum 50</strong></a> &mdash; Why finer teeth do not fix every bad cut.</p>
     </div>
   </details>
 </div>
@@ -8753,7 +9014,7 @@ M30</code></pre>
     </tbody>
   </table>
   <p>These are selection starting points, not permission to use any wheel containing that abrasive. In particular, a standard bench wheel for steel is not a wheel for aluminum. Confirm the manufacturer's application listing.</p>
-  <p class="deeper-ref" id="deeper-ref-43">Supporting detail: <a href="#deeper-addendum-43"><strong>Addendum 43</strong></a> &mdash; Manufacturer resources for abrasive selection.</p>
+  <p class="deeper-ref" id="deeper-ref-51">Supporting detail: <a href="#deeper-addendum-51"><strong>Addendum 51</strong></a> &mdash; Manufacturer resources for abrasive selection.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="grinding-wheels--grit-is-grain-size-grade-is-how-firmly-grains-are-held" data-card="grinding-wheels--grit-is-grain-size-grade-is-how-firmly-grains-are-held">
@@ -8773,7 +9034,7 @@ M30</code></pre>
   <p>The usual core sequence is <strong>abrasive → grit → grade → structure → bond</strong>. Prefixes and suffixes may identify a manufacturer's particular abrasive or bond. Some markings omit a structure field. Superabrasive specifications may include concentration and use a different format.</p>
   <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkNvbnZlbnRpb25hbCB3aGVlbCBtYXJraW5nIHNlcXVlbmNlPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+UmVhZCBmaXZlIGZpZWxkcyBmcm9tIHRvcCB0byBib3R0b206IGFicmFzaXZlLCBncml0LCBncmFkZSwgc3RydWN0dXJlLCBib25kLiBBbiBpbGx1c3RyYXRpdmUgc3VwcGxpZXIga2V5IGlzIEEsIDYwLCBKLCA3LCBWLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1OTAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMTAyYjQ5Ij4KPHRleHQgeD0iMzAiIHk9IjQ4Ij5JbGx1c3RyYXRpdmUgbWFya2luZzogQSA2MCBKIDcgVjwvdGV4dD4KPGcgZmlsbD0iI2VlZjRmYSIgc3Ryb2tlPSIjMTAyYjQ5IiBzdHJva2Utd2lkdGg9IjIiPjxyZWN0IHg9IjMwIiB5PSI3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjE3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjI3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjM3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjQ3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PC9nPgo8dGV4dCB4PSI1MCIgeT0iMTI1Ij5BIMK3IEFicmFzaXZlOiBjdXR0aW5nIG1hdGVyaWFsPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSIyMjUiPjYwIMK3IEdyaXQ6IGdyYWluIHNpemU8L3RleHQ+PHRleHQgeD0iNTAiIHk9IjMyNSI+SiDCtyBHcmFkZTogZ3JhaW4gcmV0ZW50aW9uPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI0MjUiPjcgwrcgU3RydWN0dXJlOiBncmFpbiBzcGFjaW5nPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI1MjUiPlYgwrcgQm9uZDogYmluZGVyPC90ZXh0Pgo8L2c+PHBhdGggZD0iTTQwMCAxNTR2MjBtLTctOCA3IDggNy04TTQwMCAyNTR2MjBtLTctOCA3IDggNy04TTQwMCAzNTR2MjBtLTctOCA3IDggNy04TTQwMCA0NTR2MjBtLTctOCA3IDggNy04IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMDJiNDkiIHN0cm9rZS13aWR0aD0iMyIvPgo8L3N2Zz4K" alt="Five fields in order: abrasive identifies the cutting material, grit its size, grade grain retention, structure grain spacing, and bond the binder."></p><figcaption>Read the meaning of each field before interpreting a manufacturer's code.</figcaption></figure>
   <p>For a teaching example, suppose a supplier defines <strong>A 60 J 7 V</strong> as aluminum oxide, grit 60, grade J, structure 7 and vitrified bond. The 60 is not an RPM limit; the J is not the hardness of aluminum oxide. Use that supplier's key to interpret J and 7 rather than assuming all manufacturers' grades behave alike.</p>
-  <p class="deeper-ref" id="deeper-ref-44">Supporting detail: <a href="#deeper-addendum-44"><strong>Addendum 44</strong></a> &mdash; A manufacturer's explanation of the marking.</p>
+  <p class="deeper-ref" id="deeper-ref-52">Supporting detail: <a href="#deeper-addendum-52"><strong>Addendum 52</strong></a> &mdash; A manufacturer's explanation of the marking.</p>
   <p><a class="button" data-practice-add="grinding-marking-fields" href="../practice.html#grinding-marking-fields">Practice decoding a wheel</a> <a class="button" data-practice-add="grinding-grit-comparison" href="../practice.html#grinding-grit-comparison">Practice grit selection</a></p>
     </div>
   </details>
@@ -8805,7 +9066,7 @@ M30</code></pre>
   <p>The <strong>tool rest</strong> supports the work near the wheel. The <strong>tongue guard</strong> is the adjustable part of the surrounding guard above the working opening; it is not the transparent eye shield. As the wheel becomes smaller, both clearances need checking and adjustment to the applicable machine instructions and requirements.</p>
   <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkJlbmNoIGdyaW5kZXIgcmVzdCBhbmQgdG9uZ3VlIGd1YXJkPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+U2lkZSB2aWV3OiB0aGUgZ3VhcmQgc3Vycm91bmRzIHRoZSBiYWNrIG9mIHRoZSB3aGVlbC4gVGhlIHRvbmd1ZSBndWFyZCBlbmRzIGFib3ZlIHRoZSBvcGVuaW5nIG9uIHRoZSByaWdodC4gVGhlIHRvb2wgcmVzdCBlbmRzIG5lYXIgdGhlIGxvd2VyIHBhcnQgb2YgdGhhdCBvcGVuaW5nLiBMZWFkZXJzIGlkZW50aWZ5IGVhY2ggZ2FwIHdpdGhvdXQgZGltZW5zaW9ucy48L2Rlc2M+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiBmaWxsPSIjZmZmIi8+CjxwYXRoIGQ9Ik0zNjUgMTIwQTIxMCAyMTAgMCAxIDAgMzY1IDQ4MEwzMzUgNDM1QTE1NSAxNTUgMCAxIDEgMzM1IDE2NVoiIGZpbGw9IiNjZWQ4ZTIiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxjaXJjbGUgY3g9IjI2MCIgY3k9IjMwMCIgcj0iMTU1IiBmaWxsPSIjZWVmNGZhIiBzdHJva2U9IiMxMDJiNDkiIHN0cm9rZS13aWR0aD0iNCIvPjxjaXJjbGUgY3g9IjI2MCIgY3k9IjMwMCIgcj0iMjIiIGZpbGw9IiMxMDJiNDkiLz4KPHBhdGggZD0iTTM0MCAxMzBoODh2NDJoLTY1IiBmaWxsPSIjZWNhYzAwIiBzdHJva2U9IiMxMDJiNDkiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNNDE0IDM3NWgxNTV2MzBINDQ0djY1aC0zMFoiIGZpbGw9IiNlY2FjMDAiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSIzIj48cGF0aCBkPSJNNDI1IDE0NSA0OTAgODBoMjYwTTQwMCAxOTMgNDkwIDI0NWgyNjBNNDA4IDM2MSA0OTAgMzIwaDI2ME01NDUgMzk4djkyaDIwNU0xNTAgMTQ1IDcwIDgwTTIwMCAzMzBsLTg1IDE5MCIvPjwvZz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMTAyYjQ5Ij48dGV4dCB4PSI0NzAiIHk9IjY1Ij5Ub25ndWUgZ3VhcmQ8L3RleHQ+PHRleHQgeD0iNDc1IiB5PSIyMzAiPlVwcGVyIGdhcDwvdGV4dD48dGV4dCB4PSI0NzUiIHk9IjMwNSI+UmVzdCBnYXA8L3RleHQ+PHRleHQgeD0iNTYwIiB5PSI0NzUiPlRvb2wgcmVzdDwvdGV4dD48dGV4dCB4PSIzMCIgeT0iNjUiPkd1YXJkPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI1NTUiPldoZWVsPC90ZXh0Pjx0ZXh0IHg9IjQwMCIgeT0iNTY1Ij5TaWRlIHZpZXcgwrcgbm90IHRvIHNjYWxlPC90ZXh0PjwvZz4KPC9zdmc+Cg==" alt="Side-view schematic with the wheel inside a surrounding guard, a tongue guard above the opening, and a tool rest below it; the two clearances are separately labeled."></p><figcaption>Positions only, not a scale drawing or a gap-setting gauge. The eye shield is omitted for clarity.</figcaption></figure>
   <p>Make these adjustments with the wheel stopped and the machine secured according to its operating procedure. Recheck after dressing or wheel replacement. Use the specified clearance limits, not the proportions in the drawing.</p>
-  <p class="deeper-ref" id="deeper-ref-45">Supporting detail: <a href="#deeper-addendum-45"><strong>Addendum 45</strong></a> &mdash; Where to check the clearance requirements.</p>
+  <p class="deeper-ref" id="deeper-ref-53">Supporting detail: <a href="#deeper-addendum-53"><strong>Addendum 53</strong></a> &mdash; Where to check the clearance requirements.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="offhand-grinding--inspection-ring-testing-and-dressing-do-different-jobs" data-card="offhand-grinding--inspection-ring-testing-and-dressing-do-different-jobs">
@@ -8815,7 +9076,7 @@ M30</code></pre>
   <p><strong>Inspection</strong> checks condition and suitability before mounting. A <strong>ring test</strong> is an additional pre-mounting check for applicable vitrified wheels: a light nonmetallic tap produces a sound that a trained person evaluates for indications of cracking. Wheel size, shape and composition limit where the test applies. A clear ring does not replace the other checks.</p>
   <p><strong>Truing</strong> restores the required wheel shape and concentric running. <strong>Dressing</strong> renews the cutting surface by removing unwanted material and exposing useful abrasive. An appropriate dressing operation may do both. Use the dresser and method specified for the wheel.</p>
   <p><strong>Loading</strong> means work material fills the wheel's spaces. <strong>Glazing</strong> means dull abrasive remains at the surface and rubs instead of cutting effectively. Either condition calls for correction, not simply more pressure.</p>
-  <p class="deeper-ref" id="deeper-ref-46">Supporting detail: <a href="#deeper-addendum-46"><strong>Addendum 46</strong></a> &mdash; Why a wheel can glaze, and where ring testing applies.</p>
+  <p class="deeper-ref" id="deeper-ref-54">Supporting detail: <a href="#deeper-addendum-54"><strong>Addendum 54</strong></a> &mdash; Why a wheel can glaze, and where ring testing applies.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="offhand-grinding--shape-an-hss-tool-bit-without-overheating-its-edge" data-card="offhand-grinding--shape-an-hss-tool-bit-without-overheating-its-edge">
@@ -8825,7 +9086,7 @@ M30</code></pre>
   <p>Grinding a high-speed steel tool bit creates the faces that meet at the cutting edge. Clearance behind the edge lets it cut without the adjacent tool face rubbing; rake influences chip flow. The required angles come from the intended tool and work material, not one universal sharpening angle.</p>
   <p>Use light, controlled contact and check the shape frequently. Periodic dipping of a warm HSS bit in water can control temperature when the tool's instructions permit it. This is cooling during sharpening, not heat-treatment quenching; do not heat the bit severely and then plunge it into water.</p>
   <p>Do not transfer that dipping method to a hot cemented-carbide tip. Sudden cooling can crack carbide. Use the specified dry method or a compatible continuous wet-grinding process. Intermittently quenching hot carbide is not equivalent to supplying coolant throughout the cut.</p>
-  <p class="deeper-ref" id="deeper-ref-47">Supporting detail: <a href="#deeper-addendum-47"><strong>Addendum 47</strong></a> &mdash; Carbide needs consistent temperature control.</p>
+  <p class="deeper-ref" id="deeper-ref-55">Supporting detail: <a href="#deeper-addendum-55"><strong>Addendum 55</strong></a> &mdash; Carbide needs consistent temperature control.</p>
   <p>Aluminum and other soft, ductile metals can smear into and load a standard wheel intended for steel. Use equipment and abrasives specifically approved for the material. Changing from aluminum oxide to silicon carbide by itself does not establish that the whole setup is suitable.</p>
     </div>
   </details>
@@ -8877,7 +9138,7 @@ M30</code></pre>
   <p>A magnetic chuck uses magnetic attraction to hold suitable material such as many steels. It does not directly hold aluminum, brass or every stainless steel. Holding depends on material, contact area, thickness and the chuck's pole arrangement, not simply whether a magnet attracts one corner.</p>
   <p>Clean mating surfaces and remove burrs that would lift the part. Use an approved fixture for parts that the chuck cannot hold adequately. A thin part can be pulled flat during grinding and spring back after release, so check the finished condition after removing the holding force.</p>
   <p>Follow the chuck's release procedure after grinding. Residual magnetism may require demagnetizing so particles do not cling to the work. Demagnetizing is not the act that secures the work for grinding.</p>
-  <p class="deeper-ref" id="deeper-ref-48">Supporting detail: <a href="#deeper-addendum-48"><strong>Addendum 48</strong></a> &mdash; Magnetic holding and release are equipment-specific.</p>
+  <p class="deeper-ref" id="deeper-ref-56">Supporting detail: <a href="#deeper-addendum-56"><strong>Addendum 56</strong></a> &mdash; Magnetic holding and release are equipment-specific.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="precision-grinding--count-downfeed-increments-separately-from-table-strokes" data-card="precision-grinding--count-downfeed-increments-separately-from-table-strokes">
@@ -8886,7 +9147,7 @@ M30</code></pre>
       <h2>Count downfeed increments separately from table strokes</h2>
   <p>For an ideal plan with constant downfeed, <strong>number of increments = total thickness to remove / downfeed per increment</strong>. One increment may require many table strokes and crossfeed steps to cover the entire face. State what a “pass” means before using the equation.</p>
   <p>Example: removing 0.024 in from one face at an assumed 0.002 in per full-face layer takes <strong>12 downfeed increments</strong>. These are arithmetic teaching values, not machine settings. If the division is not exact, use a smaller final increment rather than removing extra stock.</p>
-  <p class="deeper-ref" id="deeper-ref-49">Supporting detail: <a href="#deeper-addendum-49"><strong>Addendum 49</strong></a> &mdash; Why a real grinding plan needs more than the quotient.</p>
+  <p class="deeper-ref" id="deeper-ref-57">Supporting detail: <a href="#deeper-addendum-57"><strong>Addendum 57</strong></a> &mdash; Why a real grinding plan needs more than the quotient.</p>
   <p><a class="button" data-practice-add="grinding-downfeed-count" href="../practice.html#grinding-downfeed-count">Practice downfeed counts</a></p>
     </div>
   </details>
@@ -8936,7 +9197,7 @@ M30</code></pre>
   <p>Use thickness measured <em>along the tooth line through solid material</em>, not automatically the height of the part. For 0.25 in of continuous contact at 12 TPI, the estimate is 0.25 × 12 = <strong>3 teeth</strong>. At the same thickness, the three-tooth calculation gives 3 ÷ 0.25 = <strong>12 TPI</strong>.</p>
   <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgogIDx0aXRsZSBpZD0idGl0bGUiPlRoaW4gYW5kIHRoaWNrIHN0b2NrIGF0IHRoZSBzYW1lIHRvb3RoIHBpdGNoPC90aXRsZT4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgZmlsbD0iI2ZmZiIvPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MjYzZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDQiIGZvbnQtd2VpZ2h0PSJib2xkIj5TYW1lIGJsYWRlOiA4IHRlZXRoIHBlciBpbmNoPC90ZXh0PgogICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDAgMTApIj4KPHJlY3QgeD0iMTgwIiB5PSI3MCIgd2lkdGg9IjgwIiBoZWlnaHQ9Ijk2IiBmaWxsPSIjZjRkNzc4IiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iMiIgLz48cGF0aCBkPSJNNjAgMTQzVjg4TDgwIDExM0g5MEwxMDAgODhMMTIwIDExM0gxMzBMMTQwIDg4TDE2MCAxMTNIMTcwTDE4MCA4OEwyMDAgMTEzSDIxMEwyMjAgODhMMjQwIDExM0gyNTBMMjYwIDg4TDI4MCAxMTNIMjkwTDMwMCA4OEwzMjAgMTEzSDMzMEwzNDAgODhMMzYwIDExM0gzNzBMMzgwIDg4TDQwMCAxMTNINDEwTDQyMCA4OEw0NDAgMTEzSDQ1MEw0NjAgODhMNDgwIDExM0g0OTBMNTAwIDg4TDUyMCAxMTNINTMwTDU0MCA4OEw1NjAgMTEzSDU3MEw1ODAgODhMNjAwIDExM0g2MTBMNjIwIDg4VjE0M1oiIGZpbGw9IiNkYmU1ZWYiIGZpbGwtb3BhY2l0eT0iMC44NSIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjIiIC8+ICAgIDwvZz4KICAgIDx0ZXh0IHg9IjMyIiB5PSIyMjAiPjAuMjUgaW4gY29udGFjdDwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSIyNjIiPjAuMjUgw5cgOCA9IGFib3V0IDIgdGVldGg8L3RleHQ+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MCA3MCkiPgo8cmVjdCB4PSIxODAiIHk9IjIzMCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI5NiIgZmlsbD0iI2Y0ZDc3OCIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjIiIC8+PHBhdGggZD0iTTYwIDMwM1YyNDhMODAgMjczSDkwTDEwMCAyNDhMMTIwIDI3M0gxMzBMMTQwIDI0OEwxNjAgMjczSDE3MEwxODAgMjQ4TDIwMCAyNzNIMjEwTDIyMCAyNDhMMjQwIDI3M0gyNTBMMjYwIDI0OEwyODAgMjczSDI5MEwzMDAgMjQ4TDMyMCAyNzNIMzMwTDM0MCAyNDhMMzYwIDI3M0gzNzBMMzgwIDI0OEw0MDAgMjczSDQxMEw0MjAgMjQ4TDQ0MCAyNzNINDUwTDQ2MCAyNDhMNDgwIDI3M0g0OTBMNTAwIDI0OEw1MjAgMjczSDUzMEw1NDAgMjQ4TDU2MCAyNzNINTcwTDU4MCAyNDhMNjAwIDI3M0g2MTBMNjIwIDI0OFYzMDNaIiBmaWxsPSIjZGJlNWVmIiBmaWxsLW9wYWNpdHk9IjAuODUiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPiAgICA8L2c+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDQwIj4wLjc1IGluIGNvbnRhY3Q8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDgyIj4wLjc1IMOXIDggPSBhYm91dCA2IHRlZXRoPC90ZXh0PgogICAgPHRleHQgeD0iMzIiIHk9IjU0NCI+R29sZCA9IGNvbnRpbnVvdXMgbWF0ZXJpYWwgY3Jvc3NlZDwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSI1ODYiPmFsb25nIHRoZSB0b290aCBsaW5lLjwvdGV4dD4KICA8L2c+Cjwvc3ZnPgo=" alt="At the same 8 TPI, a 0.25 inch contact length spans about two teeth and a 0.75 inch contact length spans about six teeth."><figcaption>Same tooth spacing, different contact length. The thinner section needs a finer pitch to meet the three-tooth estimate.</figcaption></figure>
   <p>A calculated minimum is a screening value, not a blade specification. If it falls between available pitches, select a suitable finer option from the maker's chart rather than rounding down. Excessively fine teeth can run out of chip space in thick stock.</p>
-  <p class="deeper-ref" id="deeper-ref-50">Supporting detail: <a href="#deeper-addendum-50"><strong>Addendum 50</strong></a> &mdash; Why the answer can be a fraction of a tooth.</p>
+  <p class="deeper-ref" id="deeper-ref-58">Supporting detail: <a href="#deeper-addendum-58"><strong>Addendum 58</strong></a> &mdash; Why the answer can be a fraction of a tooth.</p>
   <p><a class="button" data-practice-add="saw-teeth-quarter" href="../practice.html#saw-teeth-quarter">Practice teeth in the cut</a> <a class="button" data-practice-add="saw-minimum-pitch" href="../practice.html#saw-minimum-pitch">Practice minimum TPI</a></p>
     </div>
   </details>
@@ -8978,7 +9239,7 @@ M30</code></pre>
     <li><strong>Carbide-tipped:</strong> carbide cutting tips for applications needing greater wear resistance, with a compatible machine and cutting conditions.</li>
   </ul>
   <p>Match blade length and thickness to the machine. Blade width, measured from tooth tip to back, also affects contouring; see <a class="xref-page" href="#p-vertical-band-machining">Vertical Band Machining</a>. Material name alone does not establish a blade's hardness limit or speed. Use the maker's product chart for the actual alloy and condition.</p>
-  <p class="deeper-ref" id="deeper-ref-51">Supporting detail: <a href="#deeper-addendum-51"><strong>Addendum 51</strong></a> &mdash; Manufacturer resources for the next selection step.</p>
+  <p class="deeper-ref" id="deeper-ref-59">Supporting detail: <a href="#deeper-addendum-59"><strong>Addendum 59</strong></a> &mdash; Manufacturer resources for the next selection step.</p>
     </div>
   </details>
 </div>
@@ -9007,7 +9268,7 @@ M30</code></pre>
       <h2>The tightest curve sets the blade-width limit</h2>
   <p><strong>A narrow blade can turn a tighter curve; a wide blade better resists wandering in a straight cut.</strong> Find the smallest radius on the intended saw path, then use the blade maker's width-versus-minimum-radius chart. Choose a width that fits both that path and the machine.</p>
   <p>Radius is measured from the center of a curve to its edge; diameter is twice the radius. A chart's minimum radius is not a guarantee for every blade with that width: blade thickness and kerf clearance matter too. Do not force a wide blade around a tighter corner than its chart permits.</p>
-  <p class="deeper-ref" id="deeper-ref-52">Supporting detail: <a href="#deeper-addendum-52"><strong>Addendum 52</strong></a> &mdash; Why relief cuts help with some outlines.</p>
+  <p class="deeper-ref" id="deeper-ref-60">Supporting detail: <a href="#deeper-addendum-60"><strong>Addendum 60</strong></a> &mdash; Why relief cuts help with some outlines.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="vertical-band-machining--blade-welding-closes-the-loop-for-some-internal-cuts" data-card="vertical-band-machining--blade-welding-closes-the-loop-for-some-internal-cuts">
@@ -9016,7 +9277,7 @@ M30</code></pre>
       <h2>Blade welding closes the loop for some internal cuts</h2>
   <p>Blades may arrive as ready-welded loops. On equipment designed for it, a suitable open band can pass through a starting hole in the work and then be joined, making an internal contour accessible without a slot from the outside edge.</p>
   <p>In general, blade joining involves preparing and aligning the ends, making a butt weld, heat-treating the joint as specified, finishing the weld flush, and inspecting it. The joint must flex around the wheels and pass through the guides. Follow the welder and blade maker's instructions for the exact sequence and settings; not every blade construction is suitable for a shop blade welder.</p>
-  <p class="deeper-ref" id="deeper-ref-53">Supporting detail: <a href="#deeper-addendum-53"><strong>Addendum 53</strong></a> &mdash; Why joining includes more than making a weld.</p>
+  <p class="deeper-ref" id="deeper-ref-61">Supporting detail: <a href="#deeper-addendum-61"><strong>Addendum 61</strong></a> &mdash; Why joining includes more than making a weld.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="vertical-band-machining--filing-and-polishing-require-their-own-bands-and-guides" data-card="vertical-band-machining--filing-and-polishing-require-their-own-bands-and-guides">
@@ -9056,7 +9317,7 @@ M30</code></pre>
     <figcaption>Read the boundary: <strong>3.2 Brix</strong>. With an invented teaching factor of 1.5, concentration is 3.2 × 1.5 = <strong>4.8%</strong>. That factor is not a shop recommendation.</figcaption>
   </figure>
   <p><strong>There is no universal factor or target range.</strong> The SDS explains hazards and handling; the product's technical data sheet supplies the mixing and measurement information. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a>.</p>
-  <p class="deeper-ref" id="deeper-ref-54">Supporting detail: <a href="#deeper-addendum-54"><strong>Addendum 54</strong></a> &mdash; Measurement references.</p>
+  <p class="deeper-ref" id="deeper-ref-62">Supporting detail: <a href="#deeper-addendum-62"><strong>Addendum 62</strong></a> &mdash; Measurement references.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="coolant-concentration--add-concentrate-to-water-and-state-what-the-ratio-means" data-card="coolant-concentration--add-concentrate-to-water-and-state-what-the-ratio-means">
@@ -9066,7 +9327,7 @@ M30</code></pre>
   <p><strong>Water first; add concentrate while mixing.</strong> Follow the product's mixing instructions in a clean container or approved mixing system. For emulsions, this lets the emulsifier disperse oil into the water. Adding water to a body of concentrate can form an unstable or inverted mixture that does not disperse properly.</p>
   <p>Write the order of a ratio. <strong>24 parts water to 1 part concentrate</strong> contains 25 total parts, so its concentrate percentage is <strong>100 × 1 ÷ (24 + 1) = 4.00%</strong>. It is not 100 ÷ 24. For water:concentrate = W:1, use <strong>C = 100 ÷ (W + 1)</strong>.</p>
   <p>To make 12 L of that 4.00% premix, measure 0.48 L concentrate and 11.52 L water. Put the water in first. This is a volume-based teaching example with additive volumes, not a product recommendation.</p>
-  <p class="deeper-ref" id="deeper-ref-55">Supporting detail: <a href="#deeper-addendum-55"><strong>Addendum 55</strong></a> &mdash; Why mixing order matters.</p>
+  <p class="deeper-ref" id="deeper-ref-63">Supporting detail: <a href="#deeper-addendum-63"><strong>Addendum 63</strong></a> &mdash; Why mixing order matters.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="coolant-concentration--a-falling-level-does-not-tell-you-how-strong-the-coolant-is" data-card="coolant-concentration--a-falling-level-does-not-tell-you-how-strong-the-coolant-is">
@@ -9092,7 +9353,7 @@ M30</code></pre>
   <p>Check the balance: the tank contains 1.44 L concentrate, the addition supplies 1.20 L, and 2.64 ÷ 48 × 100 = <strong>5.5%</strong>. These assumed values teach the calculation; the product must permit the proposed makeup mix.</p>
   <p><strong>Stop when the result cannot be made.</strong> A must be positive. A negative P means even plain water cannot achieve the target at that final level; P above 100% asks for more concentrate than the addition can contain. A full tank has no top-up space. Seek an approved partial replacement or other correction instead of overfilling. Even a mathematical result between 0 and 100% may be outside the product's permitted mixing method.</p>
   <p>Mix the approved addition separately, add it, circulate as specified, then measure again. The calculation assumes accurate volumes, uniform mixing and no losses during the adjustment.</p>
-  <p class="deeper-ref" id="deeper-ref-56">Supporting detail: <a href="#deeper-addendum-56"><strong>Addendum 56</strong></a> &mdash; Derive the balance, or solve for an unknown addition volume.</p>
+  <p class="deeper-ref" id="deeper-ref-64">Supporting detail: <a href="#deeper-addendum-64"><strong>Addendum 64</strong></a> &mdash; Derive the balance, or solve for an unknown addition volume.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="coolant-concentration--practice-the-reading-the-ratio-and-the-top-up-balance" data-card="coolant-concentration--practice-the-reading-the-ratio-and-the-top-up-balance">
@@ -9129,7 +9390,7 @@ M30</code></pre>
     <li><strong>Foam:</strong> check concentration, water quality, contamination and air entering the delivery system. Foam is not a reliable concentration measurement.</li>
     <li><strong>Skin irritation:</strong> an overly strong mix can irritate skin; an overly weak mix can lose protection against microbial growth. Irritation is a reason to report exposure and investigate, not to guess a dilution.</li>
   </ul>
-  <p class="deeper-ref" id="deeper-ref-57">Supporting detail: <a href="#deeper-addendum-57"><strong>Addendum 57</strong></a> &mdash; Why inspection and measurement belong together.</p>
+  <p class="deeper-ref" id="deeper-ref-65">Supporting detail: <a href="#deeper-addendum-65"><strong>Addendum 65</strong></a> &mdash; Why inspection and measurement belong together.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="coolant-maintenance--top-up-a-serviceable-tank-replace-fluid-that-cannot-be-restored" data-card="coolant-maintenance--top-up-a-serviceable-tank-replace-fluid-that-cannot-be-restored">
@@ -9162,7 +9423,7 @@ M30</code></pre>
     <li>Restore and circulate the system according to its procedure. Check flow and leaks, measure concentration after mixing, and record the fluid condition, result and service performed.</li>
   </ul>
   <p>For a public demonstration, watch Haas's <a href="https://www.haascnc.com/video/tips/nvynun2sp3q.html">Machine Tool Coolant: Cleaning Your Tank</a>. Its examples distinguish a routine tank cleanout from cleaning an extensively contaminated coolant system. Haas's <a href="https://www.haascnc.com/video/tips/itqop_jjilm.html">Machine Tool Coolant: Tools of Coolant</a> is a companion resource.</p>
-  <p class="deeper-ref" id="deeper-ref-58">Supporting detail: <a href="#deeper-addendum-58"><strong>Addendum 58</strong></a> &mdash; Supplier instructions determine the cleaning treatment.</p>
+  <p class="deeper-ref" id="deeper-ref-66">Supporting detail: <a href="#deeper-addendum-66"><strong>Addendum 66</strong></a> &mdash; Supplier instructions determine the cleaning treatment.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="coolant-maintenance--use-the-safety-pages-for-contact-ppe-and-waste-handling" data-card="coolant-maintenance--use-the-safety-pages-for-contact-ppe-and-waste-handling">
@@ -9171,7 +9432,7 @@ M30</code></pre>
       <h2>Use the safety pages for contact, PPE and waste handling</h2>
   <p>Minimize skin contact with coolant and cleaning liquid. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">the SDS</a> for the actual products and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">the PPE guidance</a> for exposure control. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/metal-chips.html" target="_blank" rel="noopener">Metal Chips and Swarf</a> for removing and handling solids; this maintenance page does not replace those rules.</p>
   <p><strong>Manage spent coolant, removed oil, sludge and cleaning liquid through the approved regulated-waste process.</strong> Do not pour them down a drain or onto the ground. The responsible waste handler must determine the applicable classification and disposal route from the fluid, contaminants and local requirements. “Water-based” or “biodegradable” is not disposal permission.</p>
-  <p class="deeper-ref" id="deeper-ref-59">Supporting detail: <a href="#deeper-addendum-59"><strong>Addendum 59</strong></a> &mdash; Why the waste route depends on what is in the tank.</p>
+  <p class="deeper-ref" id="deeper-ref-67">Supporting detail: <a href="#deeper-addendum-67"><strong>Addendum 67</strong></a> &mdash; Why the waste route depends on what is in the tank.</p>
     </div>
   </details>
 </div>
@@ -9210,7 +9471,7 @@ M30</code></pre>
     </tbody>
   </table>
   <p><strong>Concentrate and working fluid are different.</strong> A supplier's oil-content figure for the concentrate is not the percentage to put in the tank. The working concentration comes from that product's technical data sheet.</p>
-  <p class="deeper-ref" id="deeper-ref-60">Supporting detail: <a href="#deeper-addendum-60"><strong>Addendum 60</strong></a> &mdash; Why the family name does not settle performance.</p>
+  <p class="deeper-ref" id="deeper-ref-68">Supporting detail: <a href="#deeper-addendum-68"><strong>Addendum 68</strong></a> &mdash; Why the family name does not settle performance.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="cutting-fluids--run-dry-mist-or-flood-according-to-the-cutting-setup" data-card="cutting-fluids--run-dry-mist-or-flood-according-to-the-cutting-setup">
@@ -9223,7 +9484,7 @@ M30</code></pre>
     <li><strong>Flood:</strong> a continuous flow can remove heat and wash chips from the cut when the setup calls for wet machining. Supply enough flow to reach the edge consistently; a weak, intermittent splash is not the same thing.</li>
   </ul>
   <p>Oil mist is liquid droplets carried by air, not a residue-free gas. Neither “all carbide runs dry” nor “more coolant is always better” is a useful rule. Follow the tool and machine guidance for the actual cut.</p>
-  <p class="deeper-ref" id="deeper-ref-61">Supporting detail: <a href="#deeper-addendum-61"><strong>Addendum 61</strong></a> &mdash; Why some milling runs dry while other milling needs fluid.</p>
+  <p class="deeper-ref" id="deeper-ref-69">Supporting detail: <a href="#deeper-addendum-69"><strong>Addendum 69</strong></a> &mdash; Why some milling runs dry while other milling needs fluid.</p>
   <p>Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/metal-chips.html" target="_blank" rel="noopener">Metal Chips and Swarf</a> for exposure and chip-handling rules. Continue with <a class="xref-page" href="#p-coolant-concentration">Coolant Concentration and Mixing</a> and <a class="xref-page" href="#p-coolant-maintenance">Coolant Condition and Tank Maintenance</a>.</p>
     </div>
   </details>
@@ -9303,7 +9564,7 @@ M30</code></pre>
   <p>A <strong>dial indicator</strong> commonly has a plunger moving along its axis. A <strong>test indicator</strong> has a pivoting lever stylus and usually a shorter measuring range. Both are useful for alignment, comparing heights, and observing runout as a part turns.</p>
   <p>Read the marked graduation and count revolutions where needed. Zeroing the bezel sets a reference; it does not turn the indicator into an absolute diameter tool. Total indicator reading, or <strong>TIR</strong>, is the maximum indication minus the minimum during a sweep. From &minus;0.001 to +0.002 in, TIR is 0.003 in.</p>
   <p>Use a rigid stand. A magnetic base needs a suitable magnetic support; it will not attach magnetically to granite. For plunger indicators, align motion with the plunger. For lever test indicators, follow the maker's stylus-angle instructions; the lever is normally close to parallel with the surface. These are different geometries.</p>
-  <p class="deeper-ref" id="deeper-ref-62">Supporting detail: <a href="#deeper-addendum-62"><strong>Addendum 62</strong></a> &mdash; What a sweep can and cannot establish.</p>
+  <p class="deeper-ref" id="deeper-ref-70">Supporting detail: <a href="#deeper-addendum-70"><strong>Addendum 70</strong></a> &mdash; What a sweep can and cannot establish.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="measurement-tools--gauge-blocks-supply-a-reference-transfer-gauges-carry-a-size" data-card="measurement-tools--gauge-blocks-supply-a-reference-transfer-gauges-carry-a-size">
@@ -9315,7 +9576,7 @@ M30</code></pre>
   <p>A <strong>telescoping gauge</strong> transfers a bore size to an outside micrometer. With light locking friction, set the contacts slightly across the bore at an angle and sweep gently through the diameter; withdraw without changing the setting, then measure across the contacts. Follow the tool's instructions for locking and repeat until the technique is consistent.</p>
   <p>A <strong>small-hole gauge</strong> expands rounded contacts inside a smaller opening. Adjust for light drag, withdraw as its design permits, and measure across the contacts with a micrometer. Neither transfer tool has its own numerical readout. Take readings at several depths and directions; keep them separate to reveal taper or out-of-roundness rather than averaging the shape away.</p>
   <p><a class="button" data-practice-add="measurement-tool-od" href="../practice.html#measurement-tool-od">Practice choosing a tool</a></p>
-  <p class="deeper-ref" id="deeper-ref-63">Supporting detail: <a href="#deeper-addendum-63"><strong>Addendum 63</strong></a> &mdash; Instrument references.</p>
+  <p class="deeper-ref" id="deeper-ref-71">Supporting detail: <a href="#deeper-addendum-71"><strong>Addendum 71</strong></a> &mdash; Instrument references.</p>
     </div>
   </details>
 </div>
@@ -9382,7 +9643,7 @@ M30</code></pre>
   <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+QSB2ZXJuaWVyIHR1cm5zIGEgc21hbGwgc3BhY2luZyBkaWZmZXJlbmNlIGludG8gYSB2aXNpYmxlIGFsaWdubWVudDwvdGl0bGU+CiAgPGRlc2MgaWQ9ImRlc2MiPlR3byBzaG9ydGVuZWQgdmlld3Mgb2YgYSAyNS1kaXZpc2lvbiBpbmNoIHZlcm5pZXIuIFVwcGVyIG1haW4tc2NhbGUgbGluZXMgYXJlIDAuMDI1IGluY2ggYXBhcnQsIGxvd2VyIHZlcm5pZXIgbGluZXMgMC4wMjQgaW5jaCBhcGFydC4gSW4gdGhlIGZpcnN0IHZpZXcgYm90aCB6ZXJvcyBhbGlnbi4gSW4gdGhlIHNlY29uZCB0aGUgdmVybmllciBzaGlmdHMgMC4wMDMgaW5jaCwgc28gdGhlIHRoaXJkIHZlcm5pZXIgbGluZSBhbGlnbnMgd2l0aCBtYWluIGxpbmUgdGhyZWUuPC9kZXNjPgogIDxyZWN0IHdpZHRoPSI5MDAiIGhlaWdodD0iNDQwIiBmaWxsPSIjZmZmIi8+CiAgPGcgZmlsbD0iIzAwMjE0NCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiPgogICAgPHRleHQgeD0iMzAiIHk9IjMyIj4xLiBaZXJvcyBhbGlnbmVkOiByZWFkaW5nIDAuMDAwIGluPC90ZXh0PgogICAgPHRleHQgeD0iMzAiIHk9IjI0NSI+Mi4gVmVybmllciBzaGlmdGVkIDAuMDAzIGluOiBkaXZpc2lvbiAzIGFsaWduczwvdGV4dD4KICA8L2c+CiAgPGcgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjIiPgogICAgPHBhdGggZD0iTTcwIDExMCBIODIwIE03MCAxMDAgVjExMCBNMTcwIDc1IFYxMTAgTTI3MCA3NSBWMTEwIE0zNzAgNzUgVjExMCBNNDcwIDc1IFYxMTAgTTU3MCA3NSBWMTEwIE02NzAgNzUgVjExMCBNNzcwIDc1IFYxMTAgTTcwIDc1IFYxMTAiLz4KICAgIDxwYXRoIGQ9Ik03MCAxMTggSDc5MCBNNzAgMTE4IFYxNTMgTTE2NiAxMTggVjE1MyBNMjYyIDExOCBWMTUzIE0zNTggMTE4IFYxNTMgTTQ1NCAxMTggVjE1MyBNNTUwIDExOCBWMTUzIE02NDYgMTE4IFYxNTMgTTc0MiAxMTggVjE1MyIvPgogICAgPHBhdGggZD0iTTcwIDMyMCBIODIwIE03MCAyODUgVjMyMCBNMTcwIDI4NSBWMzIwIE0yNzAgMjg1IFYzMjAgTTM3MCAyODUgVjMyMCBNNDcwIDI4NSBWMzIwIE01NzAgMjg1IFYzMjAgTTY3MCAyODUgVjMyMCBNNzcwIDI4NSBWMzIwIi8+CiAgICA8cGF0aCBkPSJNODIgMzI4IEg4MDIgTTgyIDMyOCBWMzYzIE0xNzggMzI4IFYzNjMgTTI3NCAzMjggVjM2MyBNMzcwIDMyOCBWMzYzIE00NjYgMzI4IFYzNjMgTTU2MiAzMjggVjM2MyBNNjU4IDMyOCBWMzYzIE03NTQgMzI4IFYzNjMiLz4KICA8L2c+CiAgPGcgc3Ryb2tlPSIjYmI0YTAwIiBzdHJva2Utd2lkdGg9IjQiPjxwYXRoIGQ9Ik03MCA3NSBWMTUzIE0zNzAgMjg1IFYzNjMiLz48L2c+CiAgPGcgZmlsbD0iIzAwMjE0NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPgogICAgPHRleHQgeD0iNzAiIHk9IjY1Ij4wPC90ZXh0Pjx0ZXh0IHg9IjE3MCIgeT0iNjUiPi4wMjU8L3RleHQ+PHRleHQgeD0iMjcwIiB5PSI2NSI+LjA1MDwvdGV4dD48dGV4dCB4PSIzNzAiIHk9IjY1Ij4uMDc1PC90ZXh0Pjx0ZXh0IHg9IjQ3MCIgeT0iNjUiPi4xMDA8L3RleHQ+CiAgICA8dGV4dCB4PSI3MCIgeT0iMTc3Ij4wPC90ZXh0Pjx0ZXh0IHg9IjE2NiIgeT0iMTc3Ij4xPC90ZXh0Pjx0ZXh0IHg9IjI2MiIgeT0iMTc3Ij4yPC90ZXh0Pjx0ZXh0IHg9IjM1OCIgeT0iMTc3Ij4zPC90ZXh0Pjx0ZXh0IHg9IjQ1NCIgeT0iMTc3Ij40PC90ZXh0Pjx0ZXh0IHg9IjU1MCIgeT0iMTc3Ij41PC90ZXh0Pjx0ZXh0IHg9IjY0NiIgeT0iMTc3Ij42PC90ZXh0Pjx0ZXh0IHg9Ijc0MiIgeT0iMTc3Ij43PC90ZXh0PgogICAgPHRleHQgeD0iNzAiIHk9IjI3NSI+MDwvdGV4dD48dGV4dCB4PSIxNzAiIHk9IjI3NSI+LjAyNTwvdGV4dD48dGV4dCB4PSIyNzAiIHk9IjI3NSI+LjA1MDwvdGV4dD48dGV4dCB4PSIzNzAiIHk9IjI3NSI+LjA3NTwvdGV4dD48dGV4dCB4PSI0NzAiIHk9IjI3NSI+LjEwMDwvdGV4dD4KICAgIDx0ZXh0IHg9IjgyIiB5PSIzODciPjA8L3RleHQ+PHRleHQgeD0iMTc4IiB5PSIzODciPjE8L3RleHQ+PHRleHQgeD0iMjc0IiB5PSIzODciPjI8L3RleHQ+PHRleHQgeD0iMzcwIiB5PSIzODciPjM8L3RleHQ+PHRleHQgeD0iNDY2IiB5PSIzODciPjQ8L3RleHQ+PHRleHQgeD0iNTYyIiB5PSIzODciPjU8L3RleHQ+PHRleHQgeD0iNjU4IiB5PSIzODciPjY8L3RleHQ+PHRleHQgeD0iNzU0IiB5PSIzODciPjc8L3RleHQ+CiAgPC9nPgogIDxnIGZpbGw9IiMwMDIxNDQiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4Ij48dGV4dCB4PSI1NTAiIHk9IjY1Ij5NYWluOiAwLjAyNSBpbiBzcGFjZXM8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjIwNyI+VmVybmllcjogMC4wMjQgaW4gc3BhY2VzOyBvbmx5IHRoZSBmaXJzdCA3IG9mIDI1IHNwYWNlcyBzaG93bi48L3RleHQ+PHRleHQgeD0iNzAiIHk9IjQyNSI+QXQgZGl2aXNpb24gMzogMC4wMDMgKyAzIMOXIDAuMDI0ID0gMyDDlyAwLjAyNSA9IDAuMDc1IGluLjwvdGV4dD48L2c+Cjwvc3ZnPgo=" alt="Two original scale diagrams compare aligned zeros with a vernier shifted 0.003 inch. Main spaces are 0.025 inch and vernier spaces are 0.024 inch; after the shift the third vernier line aligns."><figcaption>The shortened diagram shows the first few lines of a 25-division scale. The mismatch accumulates by 0.001 in per division.</figcaption></figure>
   <ol><li>Read the last main-scale line at or before the vernier zero.</li><li>Find the vernier division that lines up with a main-scale line.</li><li>Add its division number &times; 0.001 in.</li></ol>
   <p>Vernier zero just beyond 1.325 in, with division 17 aligned, gives <code>1.325 + 0.017 = <strong>1.342 in</strong></code>. It is the <em>vernier zero</em>, not the right end of the slider, that locates the coarse reading.</p>
-  <p class="deeper-ref" id="deeper-ref-64">Supporting detail: <a href="#deeper-addendum-64"><strong>Addendum 64</strong></a> &mdash; Other 0.001 in verniers can have different spacing.</p>
+  <p class="deeper-ref" id="deeper-ref-72">Supporting detail: <a href="#deeper-addendum-72"><strong>Addendum 72</strong></a> &mdash; Other 0.001 in verniers can have different spacing.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="reading-measuring-scales--a-dial-caliper-adds-the-beam-reading-and-the-dial-remainder" data-card="reading-measuring-scales--a-dial-caliper-adds-the-beam-reading-and-the-dial-remainder">
@@ -9408,7 +9669,7 @@ M30</code></pre>
     </div>
   </div>
   <p><a class="button" data-practice-add="measurement-micrometer-368" href="../practice.html#measurement-micrometer-368">Add a micrometer reading to practice</a> <a class="button" data-practice-add="measurement-caliper-342" href="../practice.html#measurement-caliper-342">Add a vernier reading to practice</a></p>
-  <p class="deeper-ref" id="deeper-ref-65">Supporting detail: <a href="#deeper-addendum-65"><strong>Addendum 65</strong></a> &mdash; Reading references.</p>
+  <p class="deeper-ref" id="deeper-ref-73">Supporting detail: <a href="#deeper-addendum-73"><strong>Addendum 73</strong></a> &mdash; Reading references.</p>
     </div>
   </details>
 </div>
@@ -9465,7 +9726,7 @@ M30</code></pre>
   <p>The scale on a caliper runs along the beam, while the part often touches farther down the jaws. If the moving jaw tilts a little, its tip moves more than the scale location does. The scale misses that extra motion. This is <strong>Abbe error</strong>.</p>
   <p>Picture a door: a small rotation moves the handle much farther than a point near the hinge. Greater distance between the measurement line and the scale line gives tilt more room to create error.</p>
   <p>Keep the part near the beam when access permits, use light contact, and avoid loose or worn sliders. An ordinary outside micrometer puts its measurement and screw axes in line, reducing this particular source of error. Alignment still matters.</p>
-  <p class="deeper-ref" id="deeper-ref-66">Supporting detail: <a href="#deeper-addendum-66"><strong>Addendum 66</strong></a> &mdash; The offset-and-angle relationship.</p>
+  <p class="deeper-ref" id="deeper-ref-74">Supporting detail: <a href="#deeper-addendum-74"><strong>Addendum 74</strong></a> &mdash; The offset-and-angle relationship.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="reliable-shop-measurement--temperature-and-surface-condition-can-move-the-result" data-card="reliable-shop-measurement--temperature-and-surface-condition-can-move-the-result">
@@ -9508,7 +9769,7 @@ M30</code></pre>
   <p>A <strong>scriber</strong> scratches a narrow line through the coating. Hold the guide firmly and draw the point along it with light, consistent pressure. Repeated passes can make a wide, ambiguous mark. Scribe only where the drawing and process allow a permanent scratch.</p>
   <p>A <strong>surface gage</strong> carries an adjustable scriber at a fixed height above its base. Set it from a separate height reference, then move the base along the plate to scribe a line parallel to that plane. A surface gage ordinarily has no direct height scale.</p>
   <p>A <strong>height gage</strong> adds a scale or readout. Set its reference correctly, seat the base flat, set and lock the height as intended, and make the line. With a suitable probe it can compare or measure heights. It is not simply another name for a depth gage.</p>
-  <p class="deeper-ref" id="deeper-ref-67">Supporting detail: <a href="#deeper-addendum-67"><strong>Addendum 67</strong></a> &mdash; Finding the middle of two heights.</p>
+  <p class="deeper-ref" id="deeper-ref-75">Supporting detail: <a href="#deeper-addendum-75"><strong>Addendum 75</strong></a> &mdash; Finding the middle of two heights.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="layout-and-angle-measurement--dividers-and-trammels-carry-a-distance-into-an-arc" data-card="layout-and-angle-measurement--dividers-and-trammels-carry-a-distance-into-an-arc">
@@ -9527,7 +9788,7 @@ M30</code></pre>
   <p>A <strong>prick punch</strong> has a sharper point for a small, precise location mark at intersecting layout lines. A <strong>center punch</strong> makes a wider depression to help start a drilling operation. Point angles vary by tool; the important distinction here is the fine locating mark versus the wider starting mark.</p>
   <p>Locate the point carefully, bring the punch upright, and make a light mark. Check the location before enlarging it. A heavy first mark is difficult to correct. Support the work on a suitable punching support, away from the precision surface plate.</p>
   <p>A punch mark is not a substitute for the machine setup or spotting method needed to locate a hole accurately. Check the finished feature with a suitable measuring method. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> for the applicable shop rules.</p>
-  <p class="deeper-ref" id="deeper-ref-68">Supporting detail: <a href="#deeper-addendum-68"><strong>Addendum 68</strong></a> &mdash; Punch types and their uses.</p>
+  <p class="deeper-ref" id="deeper-ref-76">Supporting detail: <a href="#deeper-addendum-76"><strong>Addendum 76</strong></a> &mdash; Punch types and their uses.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="layout-and-angle-measurement--a-combination-set-uses-one-blade-with-three-different-heads" data-card="layout-and-angle-measurement--a-combination-set-uses-one-blade-with-three-different-heads">
@@ -9552,7 +9813,7 @@ M30</code></pre>
   <p>Example: 32 whole degrees and the seventh matching vernier division give <code>32&deg; + 7 &times; 5&prime; = <strong>32&deg;35&prime;</strong></code>. That is 32 + 35/60 = 32.5833&hellip;&deg;, not 32.35&deg;.</p>
   <p>Check the contact geometry before reporting an obtuse angle. If the instrument has measured the acute supplement, a reading of 32&deg;35&prime; corresponds to <code>180&deg; &minus; 32&deg;35&prime; = 147&deg;25&prime;</code> for the required obtuse angle. Do not automatically subtract every reading from 180&deg;.</p>
   <p><a class="button" data-practice-add="measurement-bevel-35" href="../practice.html#measurement-bevel-35">Practice bevel-protractor readings</a></p>
-  <p class="deeper-ref" id="deeper-ref-69">Supporting detail: <a href="#deeper-addendum-69"><strong>Addendum 69</strong></a> &mdash; Why the 5-minute vernier works.</p>
+  <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; Why the 5-minute vernier works.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="layout-and-angle-measurement--check-the-layout-before-making-a-permanent-cut" data-card="layout-and-angle-measurement--check-the-layout-before-making-a-permanent-cut">
@@ -10218,7 +10479,7 @@ M30</code></pre>
       <h2>A manufacturing cell coordinates machines and handling</h2>
   <p>A <strong>flexible manufacturing cell</strong> combines machining and handling resources arranged to produce a planned family of parts. Flexibility comes from suitable programs, tools, fixtures and scheduling; it does not mean any part can be run without preparation.</p>
   <p>A loading robot uses a programmed manipulator and a gripping device to transfer parts between defined positions. The cell must confirm conditions such as part presence, clamp state and machine readiness before the next action. A robot's repeatable motion does not compensate for a wrongly seated part.</p>
-  <p class="deeper-ref" id="deeper-ref-70">Supporting detail: <a href="#deeper-addendum-70"><strong>Addendum 70</strong></a> &mdash; Cell, system and integration describe different scopes.</p>
+  <p class="deeper-ref" id="deeper-ref-78">Supporting detail: <a href="#deeper-addendum-78"><strong>Addendum 78</strong></a> &mdash; Cell, system and integration describe different scopes.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="automated-manufacturing--lights-out-production-requires-a-plan-for-faults-and-variation" data-card="automated-manufacturing--lights-out-production-requires-a-plan-for-faults-and-variation">
@@ -10249,7 +10510,7 @@ M30</code></pre>
   <p>In conventional broaching, a tool moves in a straight line relative to the work. Successive cutting teeth reach farther into the material. <strong>Rise per tooth</strong> is that increase in cutting height between successive teeth; it is not the tooth spacing along the tool. The spaces between teeth hold chips.</p>
   <p>Roughing teeth remove most of the allowance. Semi-finishing teeth approach the final profile with smaller cuts. Finishing teeth establish size and finish; several may have the same height. The exact arrangement depends on the tool.</p>
   <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5Qcm9ncmVzc2l2ZSBicm9hY2ggdG9vdGggaGVpZ2h0czwvdGl0bGU+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2NDAiIGZpbGw9IiNmZmYiLz4KPHN0eWxlPnRleHR7Zm9udDozNHB4IEFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMTQyYjQxfSAubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9IC5tZXRhbHtmaWxsOiNkYmU2ZWQ7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9PC9zdHlsZT4KCjx0ZXh0IHg9IjMwIiB5PSI0OCI+U2lkZSBwcm9maWxlIOKAlCBoZWlnaHQgcmlzZSBleGFnZ2VyYXRlZDwvdGV4dD4KPHBhdGggY2xhc3M9Im1ldGFsIiBkPSJNNDAgMzEwIEw0MCAyNDAgTDY1IDI0MCBMOTAgMjkwIEwxMDUgMjkwIEwxMjUgMjE1IEwxNTAgMjE1IEwxNzUgMjkwIEwxOTAgMjkwIEwyMTAgMTkwIEwyMzUgMTkwIEwyNjAgMjkwIEwyNzUgMjkwIEwyOTUgMTY1IEwzMjAgMTY1IEwzNDUgMjkwIEwzNjAgMjkwIEwzODAgMTUwIEw0MDUgMTUwIEw0MzAgMjkwIEw0NDUgMjkwIEw0NjUgMTQwIEw0OTAgMTQwIEw1MTUgMjkwIEw1MzAgMjkwIEw1NTAgMTQwIEw1NzUgMTQwIEw2MDAgMjkwIEw2MTUgMjkwIEw2MzUgMTQwIEw2NjAgMTQwIEw2ODUgMjkwIEw3MTUgMjkwIEw3MTUgMzEwIFoiLz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik00MCAzNDAgSDMyNSBNNDAgMzMyIFYzNDggTTMyNSAzMzIgVjM0OCBNMzYwIDM0MCBINDkwIE0zNjAgMzMyIFYzNDggTTQ5MCAzMzIgVjM0OCBNNTMwIDM0MCBINzE1IE01MzAgMzMyIFYzNDggTTcxNSAzMzIgVjM0OCIvPgo8dGV4dCB4PSI0NSIgeT0iMzg3Ij5Sb3VnaGluZzwvdGV4dD48dGV4dCB4PSIzMzgiIHk9IjM4NyI+U2VtaS08L3RleHQ+PHRleHQgeD0iMzM4IiB5PSI0MjUiPmZpbmlzaGluZzwvdGV4dD48dGV4dCB4PSI1MzUiIHk9IjM4NyI+RmluaXNoaW5nPC90ZXh0Pgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTMwMCA5MCBINjAgTDgwIDc4IE02MCA5MCBMODAgMTAyIi8+PHRleHQgeD0iMzMwIiB5PSIxMDAiPlRvb2wgdHJhdmVsPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iNDc4Ij5Ud28gcm91Z2hpbmcgdGVldGggZW5sYXJnZWQ6PC90ZXh0Pgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTQwIDYwMCBMNzUgNTQ1IEgxMDUgTDE0NSA2MDAgTDE3NSA1MTAgSDIwNSBMMjQ1IDYwMCBNMTA1IDU0NSBIMjk1IE0yMDUgNTEwIEgyOTUgTTI4MCA1MTAgVjU0NSBNMjcwIDUxMCBIMjkwIE0yNzAgNTQ1IEgyOTAiLz4KPHRleHQgeD0iMzIwIiB5PSI1NDAiPlJpc2UgcGVyIHRvb3RoPC90ZXh0Pgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTc1IDYyMCBIMTc1IE03NSA2MTIgVjYyOCBNMTc1IDYxMiBWNjI4Ii8+PHRleHQgeD0iMzIwIiB5PSI2MjAiPlNwYWNpbmcgaXMgYWxvbmcgdGhlIHRvb2w8L3RleHQ+Cjwvc3ZnPg==" alt="Broach teeth increase in height through roughing and semi-finishing, then repeat the final height. An enlarged pair distinguishes rise per tooth from tooth spacing."></p><figcaption>Schematic side profile. Tooth heights are exaggerated; the small teeth enter first.</figcaption></figure>
-  <p class="deeper-ref" id="deeper-ref-71">Supporting detail: <a href="#deeper-addendum-71"><strong>Addendum 71</strong></a> &mdash; Why the finishing teeth need not keep getting taller.</p>
+  <p class="deeper-ref" id="deeper-ref-79">Supporting detail: <a href="#deeper-addendum-79"><strong>Addendum 79</strong></a> &mdash; Why the finishing teeth need not keep getting taller.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="broaching--push-or-pull-describes-the-drive-internal-or-external-describes-the-surface" data-card="broaching--push-or-pull-describes-the-drive-internal-or-external-describes-the-surface">
@@ -10259,7 +10520,7 @@ M30</code></pre>
   <p>A <strong>push broach</strong> is driven from behind; a <strong>pull broach</strong> is drawn through by its leading end. An <strong>internal broach</strong> works inside a prepared opening. An <strong>external broach</strong> works on an outside surface, such as a flat or an external spline. These are separate distinctions: internal does not mean pull-only.</p>
   <p>A suitable hole broach can produce a square, hexagon or internal spline; a keyway broach cuts a slot in an existing bore. Conventional through broaching needs an exit path. Choose the tool from the required finished profile and starting-hole specification, not just a nominal shape name.</p>
   <p>Repeated parts can justify dedicated tooling because many cutting edges complete the profile in a short cycle. A small keyway set can also suit repair or short-run work. Compare <a class="xref-page" href="#p-material-removal-processes">Material-Removal Process Families</a> and <a class="xref-page" href="#p-selecting-a-removal-process">Selecting a Material-Removal Process</a>; <a class="xref-page" href="#p-vertical-band-machining">Vertical Band Machining</a> covers cutting contours with a continuous band instead.</p>
-  <p class="deeper-ref" id="deeper-ref-72">Supporting detail: <a href="#deeper-addendum-72"><strong>Addendum 72</strong></a> &mdash; Production advantages depend on the job.</p>
+  <p class="deeper-ref" id="deeper-ref-80">Supporting detail: <a href="#deeper-addendum-80"><strong>Addendum 80</strong></a> &mdash; Production advantages depend on the job.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="broaching--a-bushing-guides-the-keyway-broach-shims-move-its-cutting-edge-outward" data-card="broaching--a-bushing-guides-the-keyway-broach-shims-move-its-cutting-edge-outward">
@@ -10278,7 +10539,7 @@ M30</code></pre>
     <li>Repeat with the specified shim stack for each remaining pass. Stop at the prescribed final setup; deburr and inspect as described in <a class="xref-page" href="#p-keys-and-keyseats">Keys, Keyways and Shaft Keyseats</a>.</li>
   </ol>
   <p>Do not add a shim after the final pass. One-pass tools and some small broaches require none. Adding arbitrary shims is not a way to correct an uncertain dimension.</p>
-  <p class="deeper-ref" id="deeper-ref-73">Supporting detail: <a href="#deeper-addendum-73"><strong>Addendum 73</strong></a> &mdash; Manufacturer reference for the pass sequence.</p>
+  <p class="deeper-ref" id="deeper-ref-81">Supporting detail: <a href="#deeper-addendum-81"><strong>Addendum 81</strong></a> &mdash; Manufacturer reference for the pass sequence.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="broaching--count-the-first-pass-separately-from-the-added-shim-passes" data-card="broaching--count-the-first-pass-separately-from-the-added-shim-passes">
@@ -10297,7 +10558,7 @@ M30</code></pre>
       <h2>Rotary broaching uses an angled end-cutting tool</h2>
   <p>Rotary broaching can make polygon forms such as a hex socket using a special holder on a suitable lathe or mill. A small angular offset makes successive portions of the tool's end engage as the tool and work move relative to one another. It does not use the long row of progressively taller teeth shown above.</p>
   <p>It needs a prepared opening for internal work. Tool form, available thrust, material, depth and chip clearance limit the application; a blind socket needs a planned place for the chips. This is a process overview, not a setup procedure.</p>
-  <p class="deeper-ref" id="deeper-ref-74">Supporting detail: <a href="#deeper-addendum-74"><strong>Addendum 74</strong></a> &mdash; How the rotary holder produces the cutting motion.</p>
+  <p class="deeper-ref" id="deeper-ref-82">Supporting detail: <a href="#deeper-addendum-82"><strong>Addendum 82</strong></a> &mdash; How the rotary holder produces the cutting motion.</p>
     </div>
   </details>
 </div>
@@ -10325,7 +10586,7 @@ M30</code></pre>
     <div class="body">
       <h2>Allow for sideways etching beneath the mask</h2>
   <p>Etching can spread sideways beneath the mask edge as well as into the surface. This <strong>undercut</strong> limits narrow lands, corner sharpness and dimensional control, especially as etch depth increases. The mask design must compensate for the etching behavior. Surface finish depends on the material and chemistry. Chemical removal avoids a cutting-induced thermal HAZ, but that is not the same as saying the chemical bath has no temperature requirements.</p>
-  <p class="deeper-ref" id="deeper-ref-75">Supporting detail: <a href="#deeper-addendum-75"><strong>Addendum 75</strong></a> &mdash; Why thin-sheet patterns are a useful application.</p>
+  <p class="deeper-ref" id="deeper-ref-83">Supporting detail: <a href="#deeper-addendum-83"><strong>Addendum 83</strong></a> &mdash; Why thin-sheet patterns are a useful application.</p>
   <p>Compare <a class="xref-page" href="#p-electrochemical-machining">Electrochemical Machining</a> and <a class="xref-page" href="#p-selecting-a-removal-process">Selecting a Material-Removal Process</a>. Safety reference: <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
@@ -10347,7 +10608,7 @@ M30</code></pre>
       <h2>EDM needs an electrically conductive workpiece</h2>
   <p>Electrical discharge machining (EDM) removes material with repeated electrical discharges across a small gap. Local heating melts and vaporizes tiny amounts of material. The electrode does not cut by rubbing against the work.</p>
   <p><strong>Check conductivity before considering EDM.</strong> Hardened tool steel is a candidate; ordinary nonconductive glass or ceramic is not. Hardness is less restrictive than in cutting with a conventional tool, but composition and electrical and thermal properties still affect machining behavior.</p>
-  <p class="deeper-ref" id="deeper-ref-76">Supporting detail: <a href="#deeper-addendum-76"><strong>Addendum 76</strong></a> &mdash; Why the fluid and the gap matter.</p>
+  <p class="deeper-ref" id="deeper-ref-84">Supporting detail: <a href="#deeper-addendum-84"><strong>Addendum 84</strong></a> &mdash; Why the fluid and the gap matter.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="electrical-discharge-machining--use-sinker-edm-for-cavities-and-wire-edm-for-through-profiles" data-card="electrical-discharge-machining--use-sinker-edm-for-cavities-and-wire-edm-for-through-profiles">
@@ -10367,7 +10628,7 @@ M30</code></pre>
   <p><code>Center-path offset = wire radius + spark gap</code>. Measure this distance from the finished contour toward the material being removed. In a simple straight cut, the full cut width (kerf) is wire diameter plus twice the gap.</p>
   <p>For an illustrative radius of 0.120 mm and a one-sided gap of 0.018 mm, the offset is <strong>0.138 mm</strong>. These are teaching inputs, not machine settings. A control may apply compensation to a programmed part contour; do not also offset the geometry a second time.</p>
   <p><a class="button" data-practice-add="nt-wire-offset" href="../practice.html#nt-wire-offset">Practice a wire offset</a></p>
-  <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; Why one offset does not describe every pass.</p>
+  <p class="deeper-ref" id="deeper-ref-85">Supporting detail: <a href="#deeper-addendum-85"><strong>Addendum 85</strong></a> &mdash; Why one offset does not describe every pass.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="electrical-discharge-machining--low-cutting-force-does-not-mean-no-thermal-change" data-card="electrical-discharge-machining--low-cutting-force-does-not-mean-no-thermal-change">
@@ -10375,7 +10636,7 @@ M30</code></pre>
     <div class="body">
       <h2>Low cutting force does not mean no thermal change</h2>
   <p>EDM can hold fine features and produce a fine finish with suitable finishing passes, but its surface contains small discharge craters. Melted material can solidify again as a <strong>recast layer</strong>. Heat can alter nearby material, so surface integrity and any required finishing belong in process selection.</p>
-  <p class="deeper-ref" id="deeper-ref-78">Supporting detail: <a href="#deeper-addendum-78"><strong>Addendum 78</strong></a> &mdash; Further reading on EDM surfaces and wire systems.</p>
+  <p class="deeper-ref" id="deeper-ref-86">Supporting detail: <a href="#deeper-addendum-86"><strong>Addendum 86</strong></a> &mdash; Further reading on EDM surfaces and wire systems.</p>
   <p>Compare <a class="xref-page" href="#p-electrochemical-machining">Electrochemical Machining</a>. Safety references: <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a>, <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
@@ -10410,7 +10671,7 @@ M30</code></pre>
     <tr><th scope="row">What surface results?</th><td>Can be smooth and burr-free, without a thermal recast layer</td><td>Discharge craters and possible recast material</td></tr>
   </tbody></table></div>
   <p>ECM is not a melting process and normally avoids a heat-affected zone. That does not mean the electrolyte stays cold: current flow heats it. Flow, temperature, chemistry and gap control all matter.</p>
-  <p class="deeper-ref" id="deeper-ref-79">Supporting detail: <a href="#deeper-addendum-79"><strong>Addendum 79</strong></a> &mdash; Why hardness alone does not set ECM performance.</p>
+  <p class="deeper-ref" id="deeper-ref-87">Supporting detail: <a href="#deeper-addendum-87"><strong>Addendum 87</strong></a> &mdash; Why hardness alone does not set ECM performance.</p>
   <p>Compare <a class="xref-page" href="#p-electrical-discharge-machining">Electrical Discharge Machining</a>. Safety references: <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a>.</p>
     </div>
   </details>
@@ -10495,7 +10756,7 @@ M30</code></pre>
       <h2>Laser cutting concentrates light into a small region</h2>
   <p>A focused laser beam supplies thermal energy; cutting gas commonly helps remove material. Laser cutting is a candidate for fine profiles in sheet material. Metals, wood and selected plastics require suitable laser systems; a machine that cuts acrylic is not automatically a metal cutter.</p>
   <p>A narrow kerf and fine detail are possible, particularly in thinner material. Edge finish, taper and dimensional accuracy depend on material, thickness, focus, gas and cutting speed. Melting, discoloration or charring may affect the edge. Do not assume the HAZ is zero.</p>
-  <p class="deeper-ref" id="deeper-ref-80">Supporting detail: <a href="#deeper-addendum-80"><strong>Addendum 80</strong></a> &mdash; Why the material and laser must be matched.</p>
+  <p class="deeper-ref" id="deeper-ref-88">Supporting detail: <a href="#deeper-addendum-88"><strong>Addendum 88</strong></a> &mdash; Why the material and laser must be matched.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="beam-and-jet-cutting--waterjet-cuts-soft-materials-added-abrasive-cuts-hard-materials" data-card="beam-and-jet-cutting--waterjet-cuts-soft-materials-added-abrasive-cuts-hard-materials">
@@ -10505,7 +10766,7 @@ M30</code></pre>
   <p><strong>Pure waterjet</strong> uses a high-speed water stream for materials such as foam, rubber and other soft sheet. <strong>Abrasive waterjet</strong> adds hard particles to erode metals, stone, non-tempered glass and many ceramics. Electrical conductivity is not required.</p>
   <p>Waterjet normally creates no thermal HAZ. It is a candidate for thick stock or a heat-sensitive edge, but thickness still affects speed and cut quality. Taper, where the cut width changes through the thickness, and striations, visible lines down the cut face, can limit accuracy and finish. Slower quality cuts may reduce these effects. Brittle edges may chip and need finishing.</p>
   <p>Identify the glass type before choosing a process: tempered glass is not a candidate for ordinary waterjet cutting. A no-HAZ process is not a promise of no mechanical damage.</p>
-  <p class="deeper-ref" id="deeper-ref-81">Supporting detail: <a href="#deeper-addendum-81"><strong>Addendum 81</strong></a> &mdash; Further reading on glass and waterjet limits.</p>
+  <p class="deeper-ref" id="deeper-ref-89">Supporting detail: <a href="#deeper-addendum-89"><strong>Addendum 89</strong></a> &mdash; Further reading on glass and waterjet limits.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="beam-and-jet-cutting--plasma-is-a-thermal-cutting-candidate-for-conductive-metal" data-card="beam-and-jet-cutting--plasma-is-a-thermal-cutting-candidate-for-conductive-metal">
@@ -10514,7 +10775,7 @@ M30</code></pre>
       <h2>Plasma is a thermal cutting candidate for conductive metal</h2>
   <p>A plasma cutter uses an electric arc through ionized gas to melt metal; the gas stream expels it. The work must conduct electricity. Steel, stainless steel and aluminum are candidates; ordinary glass and wood are not.</p>
   <p>Plasma often suits productive plate cutting where its edge quality meets the drawing or later machining is planned. Compared with a fine laser cut in thin sheet, small details can be harder to hold. Edge bevel, attached solidified metal (dross) and a HAZ may need attention. Equipment and thickness determine actual capability; plasma is not automatically a rough-only process.</p>
-  <p class="deeper-ref" id="deeper-ref-82">Supporting detail: <a href="#deeper-addendum-82"><strong>Addendum 82</strong></a> &mdash; Compare capability on the actual thickness.</p>
+  <p class="deeper-ref" id="deeper-ref-90">Supporting detail: <a href="#deeper-addendum-90"><strong>Addendum 90</strong></a> &mdash; Compare capability on the actual thickness.</p>
   <p>Continue with <a class="xref-page" href="#p-selecting-a-removal-process">Selecting a Material-Removal Process</a>. Safety references: <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a>, <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a>, <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/fire-safety.html" target="_blank" rel="noopener">Fire Safety</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
@@ -10606,7 +10867,7 @@ M30</code></pre>
     <li><strong>Midpoint of the limits:</strong> (24.95 + 25.05) / 2 = <strong>25.00 mm</strong>. This sample mean is centred on that midpoint, and all five values are inside the limits.</li>
   </ul>
   <p>Now add 0.04 mm to every reading. The mean becomes 25.04 mm and the range remains 0.04 mm, but the largest reading becomes 25.06 mm and fails. Centre and spread answer different questions.</p>
-  <p class="deeper-ref" id="deeper-ref-83">Supporting detail: <a href="#deeper-addendum-83"><strong>Addendum 83</strong></a> &mdash; Why a small sample range is not the full process spread.</p>
+  <p class="deeper-ref" id="deeper-ref-91">Supporting detail: <a href="#deeper-addendum-91"><strong>Addendum 91</strong></a> &mdash; Why a small sample range is not the full process spread.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="process-capability--passing-parts-are-evidence-not-proof-of-a-capable-process" data-card="process-capability--passing-parts-are-evidence-not-proof-of-a-capable-process">
@@ -10615,7 +10876,7 @@ M30</code></pre>
       <h2>Passing parts are evidence, not proof of a capable process</h2>
   <p>Capability concerns a process over time, not a single successful part. First establish that the measurement method is suitable and the process is stable enough to describe meaningfully. Collect representative readings across the conditions the conclusion is meant to cover.</p>
   <p>A stable process can still be too wide for the tolerance. An unstable process can happen to produce five passing parts. Neither case is resolved by averaging away the problem. Investigate a trend or sudden change using the inspection plan.</p>
-  <p class="deeper-ref" id="deeper-ref-84">Supporting detail: <a href="#deeper-addendum-84"><strong>Addendum 84</strong></a> &mdash; Where capability indices fit.</p>
+  <p class="deeper-ref" id="deeper-ref-92">Supporting detail: <a href="#deeper-addendum-92"><strong>Addendum 92</strong></a> &mdash; Where capability indices fit.</p>
   <p><a class="button" data-practice-add="inspection-sample-mean" href="../practice.html#inspection-sample-mean">Practice mean</a> <a class="button" data-practice-add="inspection-sample-range" href="../practice.html#inspection-sample-range">Practice range</a> <a class="button" data-practice-add="inspection-sample-centre" href="../practice.html#inspection-sample-centre">Check sample centring</a></p>
     </div>
   </details>
@@ -10706,7 +10967,7 @@ M30</code></pre>
   <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idCBkIj4KICA8dGl0bGUgaWQ9InQiPlBsYWluIEdPIGFuZCBOTy1HTyBwbHVnIGdhdWdlPC90aXRsZT4KICA8ZGVzYyBpZD0iZCI+VGhlIEdPIHBsdWcgaXMgc21hbGxlciBpbiBkaWFtZXRlciBhbmQgY2hlY2tzIHRoZSBsb3dlciBob2xlIGxpbWl0LiBUaGUgTk8tR08gcGx1ZyBpcyBsYXJnZXIgYW5kIGNoZWNrcyB0aGUgdXBwZXIgaG9sZSBsaW1pdC48L2Rlc2M+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0MzAiIGZpbGw9IiNmZmYiLz4KICA8ZyBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMyI+CiAgICA8cmVjdCB4PSIyODAiIHk9IjE2MCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjZThlZGYyIi8+CiAgICA8cmVjdCB4PSIxMTAiIHk9IjE0NSIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI5MCIgZmlsbD0iI2I5ZGVlZiIvPgogICAgPHJlY3QgeD0iNTIwIiB5PSIxMjUiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTMwIiBmaWxsPSIjZjVkYzlhIi8+CiAgPC9nPgogIDxnIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjMyIiBmaWxsPSIjMDAyMTQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgIDx0ZXh0IHg9IjE5NSIgeT0iNDUiPkdPPC90ZXh0PgogICAgPHRleHQgeD0iMTk1IiB5PSI4NSI+U21hbGxlciBkaWFtZXRlcjwvdGV4dD4KICAgIDx0ZXh0IHg9IjU4MCIgeT0iNDUiPk5PLUdPPC90ZXh0PgogICAgPHRleHQgeD0iNTgwIiB5PSI4NSI+TGFyZ2VyIGRpYW1ldGVyPC90ZXh0PgogICAgPHRleHQgeD0iNDAwIiB5PSIyMDEiPkhhbmRsZTwvdGV4dD4KICAgIDx0ZXh0IHg9IjE5NSIgeT0iMzA1Ij5TaG91bGQgZW50ZXI8L3RleHQ+CiAgICA8dGV4dCB4PSI1ODAiIHk9IjMwNSI+U2hvdWxkIG5vdCBlbnRlcio8L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjM2NSI+KlVzZSB0aGUgc3BlY2lmaWVkIGVuZ2FnZW1lbnQgcnVsZS48L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjQwNSI+TmV2ZXIgZm9yY2UgYSBnYXVnZS48L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt="Two ends of a plain plug gauge: the smaller GO end should enter the hole; the larger NO-GO end should not enter under the specified gauging procedure."></p><figcaption>Conceptual plain plug gauge. The diameter difference is exaggerated; these are not gauge manufacturing dimensions.</figcaption></figure>
   <p>A GO plug that will not enter is a failed check, not proof of one particular cause: an undersize hole, burr, dirt, poor alignment or form error can obstruct it. Clean and investigate using the approved method. A NO-GO plug that enters beyond the permitted engagement is also a failed check.</p>
   <p>Use the correctly identified gauge with current calibration status. Do not derive gauge sizes directly from workpiece limits. This plain-gauge explanation does not supply the engagement rules for threaded gauges.</p>
-  <p class="deeper-ref" id="deeper-ref-85">Supporting detail: <a href="#deeper-addendum-85"><strong>Addendum 85</strong></a> &mdash; Why the gauge itself needs limits and wear checks.</p>
+  <p class="deeper-ref" id="deeper-ref-93">Supporting detail: <a href="#deeper-addendum-93"><strong>Addendum 93</strong></a> &mdash; Why the gauge itself needs limits and wear checks.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="shop-inspection--build-a-clean-repeatable-surface-plate-setup" data-card="shop-inspection--build-a-clean-repeatable-surface-plate-setup">
@@ -10777,7 +11038,7 @@ M30</code></pre>
       <h2>No thermal HAZ does not mean a perfect surface</h2>
   <p>Ultrasonic impact machining normally avoids a thermal heat-affected zone. Abrasive size, tool wear, slurry access and feature depth affect dimensional control and finish. Fine abrasive can improve the surface, but removal may be slow; edge chipping and subsurface damage remain possible in brittle work.</p>
   <p>Distinguish this process from <strong>ultrasonic-assisted cutting</strong>, where vibration is added to another cutting or grinding process. The two names do not imply identical tooling or removal mechanisms.</p>
-  <p class="deeper-ref" id="deeper-ref-86">Supporting detail: <a href="#deeper-addendum-86"><strong>Addendum 86</strong></a> &mdash; Why a shaped tool does not give an exact-size copy.</p>
+  <p class="deeper-ref" id="deeper-ref-94">Supporting detail: <a href="#deeper-addendum-94"><strong>Addendum 94</strong></a> &mdash; Why a shaped tool does not give an exact-size copy.</p>
   <p>Compare <a class="xref-page" href="#p-electrical-discharge-machining">Electrical Discharge Machining</a> and <a class="xref-page" href="#p-selecting-a-removal-process">Selecting a Material-Removal Process</a>. Safety references: <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
@@ -11187,371 +11448,435 @@ M30</code></pre>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-41" value="41">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-bench-work">Bench Work with Hand Tools</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 41.</span> File selection and care resources</h2>
-        <p>The <a href="https://www.crescenttool.com/sites/crescenttool/files/2021-12/Nicholson%20File%20Selection%20Guide%20-%20ATG-4154_0.PDF">Crescent Nicholson file selection guide</a> covers filing methods and selection. Its <a href="https://www.crescenttool.com/all-tools/cutting-material-removal/files-material-removal/accessories-handles/21458-10-file-card">file card documentation</a> describes cleaning the teeth.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 41.</span> Why a good diameter measurement does not prove a taper is correct</h2>
+        <p>The two axis touch-offs locate tangent lines, not every possible contact point on the nose. The normal to an angled surface points in another direction, so its tangency requires another offset. <a href="https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---programming.html">Haas's tool nose compensation discussion</a> describes the resulting undercut or overcut on tapered and curved profiles.</p>
         <p class="deeper-back"><a href="#deeper-ref-41">Back to reference 41</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-42" value="42">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-cutoff-sawing">Cutoff Sawing</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 42.</span> Why finer teeth do not fix every bad cut</h2>
-        <p>More teeth share the load, but smaller gullets have less room for chips. Too much feed can overload the teeth; too little can make them rub. A wandering cut also calls for checking the blade condition, tension, guides, and workholding against the manuals. Changing speed alone cannot correct loose work or a worn guide.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 42.</span> Where to check the control behavior</h2>
+        <p>The <a href="https://www.haascnc.com/service/codes-settings.type%3Dgcode.machine%3Dlathe.value%3DG42.html">Haas G41/G42 entry</a> connects the compensation side to the selected tool offsets. Its <a href="https://service.haascnc.com/sites/default/files/Locked/Manuals/Operator/1999/Lathe/SL_OP.PDF">archived SL manual</a>, Tool Nose Compensation, explains imaginary-tip direction and approach/depart moves. Use the current manual for the installed control when programming.</p>
         <p class="deeper-back"><a href="#deeper-ref-42">Back to reference 42</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-43" value="43">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-grinding-wheels">Grinding Wheels and Abrasives</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 43.</span> Manufacturer resources for abrasive selection</h2>
-        <p><a href="https://www.nortonabrasives.com/en-gb/resources/expertise/which-grinding-wheel-should-i-choose">Norton: choosing a grinding wheel</a> discusses conventional abrasives. <a href="https://www.3m.com/3M/en_US/metalworking-us/applications/precision-grinding/technology/superabrasives/">3M: CBN and diamond superabrasives</a> covers the superabrasive families. Use product-specific data for a real selection.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 43.</span> Why no universal cycle template is shown</h2>
+        <p>The <a href="https://www.haascnc.com/service/codes-settings.type%3Dgcode.machine%3Dlathe.value%3DG71.html">Haas G71 reference</a> distinguishes path types and radial cut depth from diametral finish allowance. The <a href="https://support.hurco.com/wp-content/uploads/hurco_lathe/WinMaxLatheBook/WML_NCBook/WML_NC_ISNC_GC/G71_-_Stock_Removal_in_Turning.htm">Hurco ISNC G71 reference</a> supplies its own two-block definition. A familiar cycle number does not establish compatible parameter meanings.</p>
         <p class="deeper-back"><a href="#deeper-ref-43">Back to reference 43</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-44" value="44">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-grinding-wheels">Grinding Wheels and Abrasives</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 44.</span> A manufacturer's explanation of the marking</h2>
-        <p><a href="https://www.nortonabrasives.com/en-us/grinding-wheel-basics">Norton: Grinding Wheel Basics</a> explains the five fields and manufacturer-specific variations. A wheel specification and its separately marked maximum operating speed answer different questions.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-program">CNC Turning Program Walkthrough</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 44.</span> Check roughing depth and remaining material</h2>
+        <p>The first pass changes diameter from 24 to 22 mm, a 1 mm radial cut. The second changes 22 to 20.6 mm, a 0.7 mm radial cut. Finishing from 20.6 to 20 removes 0.3 mm radially. Extending the OD cuts beyond Z−25 leaves room for the cutoff blade and places the finishing departure on material that will not belong to the finished part.</p>
         <p class="deeper-back"><a href="#deeper-ref-44">Back to reference 44</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-45" value="45">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-offhand-grinding">Offhand Grinding</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 45.</span> Where to check the clearance requirements</h2>
-        <p><a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.215">OSHA's abrasive-wheel machinery requirements</a> address work rests and adjustable guards. Consult the applicable text and the machine manual for the dimensions and scope.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-setup">CNC Turning Setup and Offsets</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 45.</span> Why an extra axis changes the work a turning center can do</h2>
+        <p>Ordinary turning produces surfaces around the spindle axis. A powered tool plus controlled work angle can reach features at selected angular positions. See the <a href="https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---options-programming.html">Haas options programming reference</a> for one manufacturer's C-axis implementation.</p>
         <p class="deeper-back"><a href="#deeper-ref-45">Back to reference 45</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-46" value="46">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-offhand-grinding">Offhand Grinding</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 46.</span> Why a wheel can glaze, and where ring testing applies</h2>
-        <p>Glazing depends on the wheel grade and operating conditions as well as the work material. Hard material alone does not diagnose it. <a href="https://www.nortonabrasives.com/en-us/resources/expertise/how-perform-ring-test-grinding-wheel">Norton's ring-test guidance</a> explains the method's application and limitations; follow the full manufacturer procedure before mounting.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-setup">CNC Turning Setup and Offsets</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 46.</span> Control example: separate geometry and wear fields</h2>
+        <p>The <a href="https://www.haascnc.com/content/dam/haascnc/en/service/manual/operator/english---lathe-ngc---operator%27s-manual---2025.pdf">Haas lathe manual</a>, Operation, describes separate X/Z geometry wear, radius and tip-direction fields. Its button sequences and offset conventions must not be assumed on another control.</p>
         <p class="deeper-back"><a href="#deeper-ref-46">Back to reference 46</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-47" value="47">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-offhand-grinding">Offhand Grinding</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 47.</span> Carbide needs consistent temperature control</h2>
-        <p><a href="https://generalcarbide.com/wp-content/uploads/2024/06/GC-Designers-Guide-to-Tungsten-Carbide.pdf">General Carbide: The Designer's Guide to Tungsten Carbide</a>, page 50, explains thermal shock and the effects of interrupted coolant during grinding. Follow the tool manufacturer's cooling guidance for HSS as well; permission to cool a warm bit is not permission to quench an overheated one.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-speeds-and-feeds">CNC Turning Spindle and Feed Modes</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 47.</span> Calculate where a speed ceiling starts to matter</h2>
+        <p>With 90 m/min and a ceiling of 1800 RPM, the crossover diameter is 90 × 1000 / (π × 1800) = 15.92 mm. At 10 mm, unrestricted CSS would request 2865 RPM, so the simplified steady-state result is 1800 RPM. Acceleration and other machine limits can reduce actual speed further. See <a href="https://www.haascnc.com/content/dam/haascnc/en/service/reference/programming-workbooks/lathe---programming-workbook.pdf">Haas's spindle-speed commands workbook</a> for its G50/G96/G97 implementation.</p>
         <p class="deeper-back"><a href="#deeper-ref-47">Back to reference 47</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-48" value="48">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-precision-grinding">Precision Grinding</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 48.</span> Magnetic holding and release are equipment-specific</h2>
-        <p><a href="https://www.magnetics.com/products/grinding-chucks">Industrial Magnetics: grinding chucks</a> shows different chuck arrangements. <a href="https://www.magnetics.com/products/electromagnet-chuck-controllers">Industrial Magnetics: electromagnet chuck controllers</a> describes an automatic release cycle that replaces manual demagnetizing. Use the manual for the installed chuck and control, not a generic switch sequence.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-speeds-and-feeds">CNC Turning Spindle and Feed Modes</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 48.</span> Reference for the code convention used here</h2>
+        <p>The G96–G99 entries in the <a href="https://www.haascnc.com/content/dam/haascnc/en/service/manual/operator/english---lathe-ngc---operator%27s-manual---2024.pdf">Haas lathe manual</a> describe S in CSS versus RPM and F per minute versus per revolution. Consult the manual for your own control before transferring these meanings.</p>
         <p class="deeper-back"><a href="#deeper-ref-48">Back to reference 48</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-49" value="49">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-precision-grinding">Precision Grinding</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 49.</span> Why a real grinding plan needs more than the quotient</h2>
-        <p>The calculation assumes a flat starting face and no wheel wear or elastic error. A real plan may reserve material for lighter finish cuts, include dressing and spark-out, and stop to measure. Stock removal from two faces must be assigned to each face; do not silently count it twice.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-bench-work">Bench Work with Hand Tools</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 49.</span> File selection and care resources</h2>
+        <p>The <a href="https://www.crescenttool.com/sites/crescenttool/files/2021-12/Nicholson%20File%20Selection%20Guide%20-%20ATG-4154_0.PDF">Crescent Nicholson file selection guide</a> covers filing methods and selection. Its <a href="https://www.crescenttool.com/all-tools/cutting-material-removal/files-material-removal/accessories-handles/21458-10-file-card">file card documentation</a> describes cleaning the teeth.</p>
         <p class="deeper-back"><a href="#deeper-ref-49">Back to reference 49</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-50" value="50">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-saw-blade-selection">Saw Blade Selection</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 50.</span> Why the answer can be a fraction of a tooth</h2>
-        <p>The product counts tooth spacings across the contact length. Actual engaged tooth tips are discrete, and the number changes as the blade moves. Entry, exit, variable pitch, and curved sections also change contact. This estimate explains the selection principle; it does not guarantee a fixed count throughout a real cut.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-cutoff-sawing">Cutoff Sawing</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 50.</span> Why finer teeth do not fix every bad cut</h2>
+        <p>More teeth share the load, but smaller gullets have less room for chips. Too much feed can overload the teeth; too little can make them rub. A wandering cut also calls for checking the blade condition, tension, guides, and workholding against the manuals. Changing speed alone cannot correct loose work or a worn guide.</p>
         <p class="deeper-back"><a href="#deeper-ref-50">Back to reference 50</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-51" value="51">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-saw-blade-selection">Saw Blade Selection</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 51.</span> Manufacturer resources for the next selection step</h2>
-        <p>Consult the chart supplied with the blade. Public starting points include <a href="https://www.starrett.com/products/band-saw-blades/carbon/duratec-sfb/">Starrett's carbon blade range</a> and <a href="https://www.doallsaws.com/faq/blades">DoALL's blade FAQ</a>. Product-specific recommendations govern; the estimates here are teaching calculations.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-grinding-wheels">Grinding Wheels and Abrasives</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 51.</span> Manufacturer resources for abrasive selection</h2>
+        <p><a href="https://www.nortonabrasives.com/en-gb/resources/expertise/which-grinding-wheel-should-i-choose">Norton: choosing a grinding wheel</a> discusses conventional abrasives. <a href="https://www.3m.com/3M/en_US/metalworking-us/applications/precision-grinding/technology/superabrasives/">3M: CBN and diamond superabrasives</a> covers the superabrasive families. Use product-specific data for a real selection.</p>
         <p class="deeper-back"><a href="#deeper-ref-51">Back to reference 51</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-52" value="52">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-vertical-band-machining">Vertical Band Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 52.</span> Why relief cuts help with some outlines</h2>
-        <p>A relief cut runs in from a scrap edge toward the outline, allowing waste to separate in smaller pieces. Plan relief cuts on the waste side and preserve the finishing allowance. They can provide room to approach a contour from another direction; they do not make the blade itself capable of a smaller turning radius.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-grinding-wheels">Grinding Wheels and Abrasives</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 52.</span> A manufacturer's explanation of the marking</h2>
+        <p><a href="https://www.nortonabrasives.com/en-us/grinding-wheel-basics">Norton: Grinding Wheel Basics</a> explains the five fields and manufacturer-specific variations. A wheel specification and its separately marked maximum operating speed answer different questions.</p>
         <p class="deeper-back"><a href="#deeper-ref-52">Back to reference 52</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-53" value="53">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-vertical-band-machining">Vertical Band Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 53.</span> Why joining includes more than making a weld</h2>
-        <p>Alignment keeps the band running straight. The prescribed annealing or tempering cycle restores suitable flexibility at the joint, and finishing removes raised weld material. A sound-looking joint alone is not proof that the loop is ready to run. <a href="https://www.doallsaws.com/sawing-machines/specialty-products/portable-blade-welders">DoALL's blade welder range</a> is a starting point for equipment-specific documentation.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-offhand-grinding">Offhand Grinding</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 53.</span> Where to check the clearance requirements</h2>
+        <p><a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.215">OSHA's abrasive-wheel machinery requirements</a> address work rests and adjustable guards. Consult the applicable text and the machine manual for the dimensions and scope.</p>
         <p class="deeper-back"><a href="#deeper-ref-53">Back to reference 53</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-54" value="54">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-concentration">Coolant Concentration and Mixing</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 54.</span> Measurement references</h2>
-        <p><a href="https://www.cimcool.ca/english/faqs">Cimcool's refractometer FAQ</a> covers zeroing, the boundary and factor conversion. <a href="https://www.masterfluids.com/blog/2026/10/04/how-to-measure-and-correct-metalworking-fluid-concentration-the-guide-to-keeping-metalworking-fluid-productive/">Master Fluids' concentration guide</a> discusses product factors and contamination. A refractometer is a concentration estimate, not a bacteria test or proof that the fluid is fit for reuse.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-offhand-grinding">Offhand Grinding</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 54.</span> Why a wheel can glaze, and where ring testing applies</h2>
+        <p>Glazing depends on the wheel grade and operating conditions as well as the work material. Hard material alone does not diagnose it. <a href="https://www.nortonabrasives.com/en-us/resources/expertise/how-perform-ring-test-grinding-wheel">Norton's ring-test guidance</a> explains the method's application and limitations; follow the full manufacturer procedure before mounting.</p>
         <p class="deeper-back"><a href="#deeper-ref-54">Back to reference 54</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-55" value="55">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-concentration">Coolant Concentration and Mixing</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 55.</span> Why mixing order matters</h2>
-        <p>The aim is small oil droplets dispersed throughout the water, rather than water trapped inside an oil-rich mixture. <a href="https://www.cimcool.ca/english/faqs">Cimcool's mixing explanation</a> describes the emulsifier's role. Mixing order is separate from the arithmetic: the right measured amounts still need the right preparation method.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-offhand-grinding">Offhand Grinding</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 55.</span> Carbide needs consistent temperature control</h2>
+        <p><a href="https://generalcarbide.com/wp-content/uploads/2024/06/GC-Designers-Guide-to-Tungsten-Carbide.pdf">General Carbide: The Designer's Guide to Tungsten Carbide</a>, page 50, explains thermal shock and the effects of interrupted coolant during grinding. Follow the tool manufacturer's cooling guidance for HSS as well; permission to cool a warm bit is not permission to quench an overheated one.</p>
         <p class="deeper-back"><a href="#deeper-ref-55">Back to reference 55</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-56" value="56">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-concentration">Coolant Concentration and Mixing</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 56.</span> Derive the balance, or solve for an unknown addition volume</h2>
-        <p>Concentrate already in the tank plus concentrate added equals concentrate in the final tank: <strong>VC/100 + AP/100 = FT/100</strong>. Multiply through by 100 and solve for P. This tracks concentrate, not the Brix number.</p>
-    <p>If a premix concentration P is already chosen, solve for its addition volume: <strong>A = V(T − C) ÷ (P − T)</strong>. Check that A is positive and that V + A fits within the allowed fill level. If P = T and C differs from T, no finite addition reaches T exactly. If C = T already, adding premix at T preserves it.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-precision-grinding">Precision Grinding</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 56.</span> Magnetic holding and release are equipment-specific</h2>
+        <p><a href="https://www.magnetics.com/products/grinding-chucks">Industrial Magnetics: grinding chucks</a> shows different chuck arrangements. <a href="https://www.magnetics.com/products/electromagnet-chuck-controllers">Industrial Magnetics: electromagnet chuck controllers</a> describes an automatic release cycle that replaces manual demagnetizing. Use the manual for the installed chuck and control, not a generic switch sequence.</p>
         <p class="deeper-back"><a href="#deeper-ref-56">Back to reference 56</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-57" value="57">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-maintenance">Coolant Condition and Tank Maintenance</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 57.</span> Why inspection and measurement belong together</h2>
-        <p>Concentration alone does not describe contamination or biological condition. <a href="https://www.hse.gov.uk/metalworking/about.htm">HSE's metalworking-fluid guidance</a> calls for maintaining fluid quality and checking bacterial contamination. A supplier-directed fluid-management program may include pH and microbial checks as well as concentration; use its methods and action limits. <a href="https://www.masterfluids.com/na/en-us/technical-information/faqs.php">Master Fluid Solutions' FAQ</a> explains odor, residue and concentration-related skin irritation.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-precision-grinding">Precision Grinding</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 57.</span> Why a real grinding plan needs more than the quotient</h2>
+        <p>The calculation assumes a flat starting face and no wheel wear or elastic error. A real plan may reserve material for lighter finish cuts, include dressing and spark-out, and stop to measure. Stock removal from two faces must be assigned to each face; do not silently count it twice.</p>
         <p class="deeper-back"><a href="#deeper-ref-57">Back to reference 57</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-58" value="58">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-maintenance">Coolant Condition and Tank Maintenance</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 58.</span> Supplier instructions determine the cleaning treatment</h2>
-        <p><a href="https://www.hse.gov.uk/pubns/guidance/mw3.pdf">HSE's sump-cleaning guidance</a> emphasizes supplier-selected cleaner and circulation times. An extensively contaminated system may need treatment before draining and additional cleaning cycles; the general checklist is not a microbial decontamination recipe.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-saw-blade-selection">Saw Blade Selection</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 58.</span> Why the answer can be a fraction of a tooth</h2>
+        <p>The product counts tooth spacings across the contact length. Actual engaged tooth tips are discrete, and the number changes as the blade moves. Entry, exit, variable pitch, and curved sections also change contact. This estimate explains the selection principle; it does not guarantee a fixed count throughout a real cut.</p>
         <p class="deeper-back"><a href="#deeper-ref-58">Back to reference 58</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-59" value="59">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-maintenance">Coolant Condition and Tank Maintenance</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 59.</span> Why the waste route depends on what is in the tank</h2>
-        <p><a href="https://apps.ecology.wa.gov/publications/documents/2104006.pdf">Washington State Department of Ecology's metalworking-fluid guide</a>, pages 12–13, illustrates how formulation and contamination change waste management. Its state-specific rules are not a disposal authorization elsewhere. <a href="https://www.epa.gov/hw/managing-used-oil-answers-frequent-questions-businesses">EPA's used-oil guidance</a> also distinguishes qualifying used oil from other wastes and notes that state requirements can be stricter. The product SDS is a starting point; used coolant also contains material picked up during machining.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-saw-blade-selection">Saw Blade Selection</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 59.</span> Manufacturer resources for the next selection step</h2>
+        <p>Consult the chart supplied with the blade. Public starting points include <a href="https://www.starrett.com/products/band-saw-blades/carbon/duratec-sfb/">Starrett's carbon blade range</a> and <a href="https://www.doallsaws.com/faq/blades">DoALL's blade FAQ</a>. Product-specific recommendations govern; the estimates here are teaching calculations.</p>
         <p class="deeper-back"><a href="#deeper-ref-59">Back to reference 59</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-60" value="60">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-cutting-fluids">Cutting Fluids and Application Methods</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 60.</span> Why the family name does not settle performance</h2>
-        <p>Base fluid, additives, dilution and water quality all affect the result. A neat oil can use mineral, vegetable or other base oils; “straight” describes using it undiluted. A synthetic is not automatically harmless or maintenance-free. See the fluid-family comparison on page 7 of <a href="https://apps.ecology.wa.gov/publications/documents/2104006.pdf">Washington State Department of Ecology's metalworking-fluid guide</a> and <a href="https://www.hse.gov.uk/metalworking/about.htm">HSE's exposure overview</a>.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-vertical-band-machining">Vertical Band Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 60.</span> Why relief cuts help with some outlines</h2>
+        <p>A relief cut runs in from a scrap edge toward the outline, allowing waste to separate in smaller pieces. Plan relief cuts on the waste side and preserve the finishing allowance. They can provide room to approach a contour from another direction; they do not make the blade itself capable of a smaller turning radius.</p>
         <p class="deeper-back"><a href="#deeper-ref-60">Back to reference 60</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-61" value="61">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-cutting-fluids">Cutting Fluids and Application Methods</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 61.</span> Why some milling runs dry while other milling needs fluid</h2>
-        <p>A milling tooth repeatedly enters and leaves the material. Coolant can increase its temperature swing and promote thermal cracking in susceptible edges. Other operations need lubrication to limit adhesion, cooling to control distortion, or flow to clear chips. <a href="https://www.sandvik.coromant.com/en-us/knowledge/milling/dry-milling-or-with-cutting-fluid">Sandvik Coromant's dry and wet milling guidance</a> explains these competing demands.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Sawing and Grinding</span><span class="sep">/</span><a href="#p-vertical-band-machining">Vertical Band Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 61.</span> Why joining includes more than making a weld</h2>
+        <p>Alignment keeps the band running straight. The prescribed annealing or tempering cycle restores suitable flexibility at the joint, and finishing removes raised weld material. A sound-looking joint alone is not proof that the loop is ready to run. <a href="https://www.doallsaws.com/sawing-machines/specialty-products/portable-blade-welders">DoALL's blade welder range</a> is a starting point for equipment-specific documentation.</p>
         <p class="deeper-back"><a href="#deeper-ref-61">Back to reference 61</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-62" value="62">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-measurement-tools">Choosing Shop Measuring Tools</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 62.</span> What a sweep can and cannot establish</h2>
-        <p>A sweep combines the part's shape with its orientation and support. Runout is not a direct measurement of formal concentricity. A height sweep relative to a plate can reveal variation, but calling it a flatness inspection requires the proper setup and evaluation. Follow the drawing's specified inspection method.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-concentration">Coolant Concentration and Mixing</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 62.</span> Measurement references</h2>
+        <p><a href="https://www.cimcool.ca/english/faqs">Cimcool's refractometer FAQ</a> covers zeroing, the boundary and factor conversion. <a href="https://www.masterfluids.com/blog/2026/10/04/how-to-measure-and-correct-metalworking-fluid-concentration-the-guide-to-keeping-metalworking-fluid-productive/">Master Fluids' concentration guide</a> discusses product factors and contamination. A refractometer is a concentration estimate, not a bacteria test or proof that the fluid is fit for reuse.</p>
         <p class="deeper-back"><a href="#deeper-ref-62">Back to reference 62</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-63" value="63">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-measurement-tools">Choosing Shop Measuring Tools</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 63.</span> Instrument references</h2>
-        <p>Consult the actual tool's instructions and specifications. The <a href="https://www2.mitutoyo.co.jp/eng/products/menu/quick_guide.pdf">Mitutoyo Quick Guide</a> covers micrometers, calipers, height gages, gauge blocks, and indicators. The <a href="https://www.starrett.com/dms/flipbooks/Cat-33/inc/pdf/flipbook.pdf">Starrett catalog</a> separates graduations from accuracy and illustrates several instrument arrangements. The <a href="https://www.mitutoyo.com/products/small-tool-instruments-and-data-management/calipers/digimatic-calipers/absolute-digimatic-caliper/">Mitutoyo ABSOLUTE caliper specifications</a> provide examples of 0.0005 in / 0.01 mm display increments.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-concentration">Coolant Concentration and Mixing</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 63.</span> Why mixing order matters</h2>
+        <p>The aim is small oil droplets dispersed throughout the water, rather than water trapped inside an oil-rich mixture. <a href="https://www.cimcool.ca/english/faqs">Cimcool's mixing explanation</a> describes the emulsifier's role. Mixing order is separate from the arithmetic: the right measured amounts still need the right preparation method.</p>
         <p class="deeper-back"><a href="#deeper-ref-63">Back to reference 63</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-64" value="64">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-reading-measuring-scales">Reading Measuring Scales</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 64.</span> Other 0.001 in verniers can have different spacing</h2>
-        <p>A 50-division vernier can span 49 main-scale spaces of 0.050 in. Each vernier space is 0.049 in, again leaving a 0.001 in difference. Read the actual main scale; do not apply the trainer's 0.025 in spacing to that tool. The <a href="https://www.starrett.com/dms/flipbooks/Cat-33/inc/pdf/flipbook.pdf">Starrett catalog, page 102</a>, illustrates the 50-division arrangement.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-concentration">Coolant Concentration and Mixing</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 64.</span> Derive the balance, or solve for an unknown addition volume</h2>
+        <p>Concentrate already in the tank plus concentrate added equals concentrate in the final tank: <strong>VC/100 + AP/100 = FT/100</strong>. Multiply through by 100 and solve for P. This tracks concentrate, not the Brix number.</p>
+    <p>If a premix concentration P is already chosen, solve for its addition volume: <strong>A = V(T − C) ÷ (P − T)</strong>. Check that A is positive and that V + A fits within the allowed fill level. If P = T and C differs from T, no finite addition reaches T exactly. If C = T already, adding premix at T preserves it.</p>
         <p class="deeper-back"><a href="#deeper-ref-64">Back to reference 64</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-65" value="65">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-reading-measuring-scales">Reading Measuring Scales</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 65.</span> Reading references</h2>
-        <p>The <a href="https://www.starrett.com/dms/flipbooks/Cat-33/inc/pdf/flipbook.pdf">Starrett catalog, page 22</a>, explains inch and vernier micrometer scales. The <a href="https://www2.mitutoyo.co.jp/eng/products/menu/quick_guide.pdf">Mitutoyo Quick Guide, page 9</a>, explains the metric micrometer. The examples and diagrams here are original teaching examples.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-maintenance">Coolant Condition and Tank Maintenance</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 65.</span> Why inspection and measurement belong together</h2>
+        <p>Concentration alone does not describe contamination or biological condition. <a href="https://www.hse.gov.uk/metalworking/about.htm">HSE's metalworking-fluid guidance</a> calls for maintaining fluid quality and checking bacterial contamination. A supplier-directed fluid-management program may include pH and microbial checks as well as concentration; use its methods and action limits. <a href="https://www.masterfluids.com/na/en-us/technical-information/faqs.php">Master Fluid Solutions' FAQ</a> explains odor, residue and concentration-related skin irritation.</p>
         <p class="deeper-back"><a href="#deeper-ref-65">Back to reference 65</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-66" value="66">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-reliable-shop-measurement">Reliable Shop Measurement</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 66.</span> The offset-and-angle relationship</h2>
-        <p>For a small angle, the error is approximately the offset multiplied by the tilt in radians. An offset of 2 in and a tilt of 0.0005 rad give about 0.001 in of error. This is distinct from simply looking at the scale from an angle. See the Abbe discussion in the <a href="https://www2.mitutoyo.co.jp/eng/products/menu/quick_guide.pdf">Mitutoyo Quick Guide, page 11</a>.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-maintenance">Coolant Condition and Tank Maintenance</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 66.</span> Supplier instructions determine the cleaning treatment</h2>
+        <p><a href="https://www.hse.gov.uk/pubns/guidance/mw3.pdf">HSE's sump-cleaning guidance</a> emphasizes supplier-selected cleaner and circulation times. An extensively contaminated system may need treatment before draining and additional cleaning cycles; the general checklist is not a microbial decontamination recipe.</p>
         <p class="deeper-back"><a href="#deeper-ref-66">Back to reference 66</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-67" value="67">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-layout-and-angle-measurement">Shop Layout and Angle Measurement</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 67.</span> Finding the middle of two heights</h2>
-        <p>If the lower edge of a slot is 0.600 in above the reference and the upper edge is 0.900 in above it, the center is <code>(0.600 + 0.900) / 2 = 0.750 in</code> above that reference. Half the difference, 0.150 in, is half the slot height; it still must be added to the lower height.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-coolant-maintenance">Coolant Condition and Tank Maintenance</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 67.</span> Why the waste route depends on what is in the tank</h2>
+        <p><a href="https://apps.ecology.wa.gov/publications/documents/2104006.pdf">Washington State Department of Ecology's metalworking-fluid guide</a>, pages 12–13, illustrates how formulation and contamination change waste management. Its state-specific rules are not a disposal authorization elsewhere. <a href="https://www.epa.gov/hw/managing-used-oil-answers-frequent-questions-businesses">EPA's used-oil guidance</a> also distinguishes qualifying used oil from other wastes and notes that state requirements can be stricter. The product SDS is a starting point; used coolant also contains material picked up during machining.</p>
         <p class="deeper-back"><a href="#deeper-ref-67">Back to reference 67</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-68" value="68">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-layout-and-angle-measurement">Shop Layout and Angle Measurement</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 68.</span> Punch types and their uses</h2>
-        <p><a href="https://www.starrett.com/products/precision-shop-tools/punches--an-overview-of-types-and-uses">Starrett's punch guide</a> explains the sharper prick punch, the wider center punch, and why the locating mark is checked before it is enlarged.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-cutting-fluids">Cutting Fluids and Application Methods</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 68.</span> Why the family name does not settle performance</h2>
+        <p>Base fluid, additives, dilution and water quality all affect the result. A neat oil can use mineral, vegetable or other base oils; “straight” describes using it undiluted. A synthetic is not automatically harmless or maintenance-free. See the fluid-family comparison on page 7 of <a href="https://apps.ecology.wa.gov/publications/documents/2104006.pdf">Washington State Department of Ecology's metalworking-fluid guide</a> and <a href="https://www.hse.gov.uk/metalworking/about.htm">HSE's exposure overview</a>.</p>
         <p class="deeper-back"><a href="#deeper-ref-68">Back to reference 68</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-69" value="69">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-layout-and-angle-measurement">Shop Layout and Angle Measurement</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 69.</span> Why the 5-minute vernier works</h2>
-        <p>On the arrangement described in the <a href="https://www.starrett.com/dms/flipbooks/Cat-33/inc/pdf/flipbook.pdf">Starrett catalog, page 306</a>, 12 vernier spaces span 23 main-scale degrees. Each vernier space is 23/12 degrees, or 1&deg;55&prime;: 5 minutes short of two degrees. The line alignment reveals that difference. Page 308 distinguishes a plain universal bevel from the graduated protractor used with it.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Cutting Fluids</span><span class="sep">/</span><a href="#p-cutting-fluids">Cutting Fluids and Application Methods</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 69.</span> Why some milling runs dry while other milling needs fluid</h2>
+        <p>A milling tooth repeatedly enters and leaves the material. Coolant can increase its temperature swing and promote thermal cracking in susceptible edges. Other operations need lubrication to limit adhesion, cooling to control distortion, or flow to clear chips. <a href="https://www.sandvik.coromant.com/en-us/knowledge/milling/dry-milling-or-with-cutting-fluid">Sandvik Coromant's dry and wet milling guidance</a> explains these competing demands.</p>
         <p class="deeper-back"><a href="#deeper-ref-69">Back to reference 69</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-70" value="70">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-automated-manufacturing">Automated Manufacturing Cells</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 70.</span> Cell, system and integration describe different scopes</h2>
-        <p>A flexible manufacturing system may coordinate multiple machines or cells with material handling and scheduling. Computer-integrated manufacturing is the broader idea of connecting manufacturing information and activities. These terms overlap in use, but are not interchangeable names for one machine configuration.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-measurement-tools">Choosing Shop Measuring Tools</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 70.</span> What a sweep can and cannot establish</h2>
+        <p>A sweep combines the part's shape with its orientation and support. Runout is not a direct measurement of formal concentricity. A height sweep relative to a plate can reveal variation, but calling it a flatness inspection requires the proper setup and evaluation. Follow the drawing's specified inspection method.</p>
         <p class="deeper-back"><a href="#deeper-ref-70">Back to reference 70</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-71" value="71">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-broaching">Broaching</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 71.</span> Why the finishing teeth need not keep getting taller</h2>
-        <p>Once the intended profile is reached, further rise would make the feature larger. Repeated finishing teeth can maintain the final size as earlier teeth wear. See <a href="https://www.nidec-machinetoolamerica.com/wp-content/uploads/2025/04/Precision-Cutting-Tools-en.pdf">Nidec's precision cutting tools reference</a> for broach terminology.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-measurement-tools">Choosing Shop Measuring Tools</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 71.</span> Instrument references</h2>
+        <p>Consult the actual tool's instructions and specifications. The <a href="https://www2.mitutoyo.co.jp/eng/products/menu/quick_guide.pdf">Mitutoyo Quick Guide</a> covers micrometers, calipers, height gages, gauge blocks, and indicators. The <a href="https://www.starrett.com/dms/flipbooks/Cat-33/inc/pdf/flipbook.pdf">Starrett catalog</a> separates graduations from accuracy and illustrates several instrument arrangements. The <a href="https://www.mitutoyo.com/products/small-tool-instruments-and-data-management/calipers/digimatic-calipers/absolute-digimatic-caliper/">Mitutoyo ABSOLUTE caliper specifications</a> provide examples of 0.0005 in / 0.01 mm display increments.</p>
         <p class="deeper-back"><a href="#deeper-ref-71">Back to reference 71</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-72" value="72">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-broaching">Broaching</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 72.</span> Production advantages depend on the job</h2>
-        <p>Tool cost, material, cut length, machine capacity and required finish determine the economics. Broaching is not automatically the cheapest process. <a href="https://pilotprecision.com/keyway-broaches/">Pilot Precision's broach overview</a> includes both short-run sets and one-pass production tools. <a class="xref-page" href="#p-cutting-fluids">Cutting Fluids and Application Methods</a> explains lubrication choices.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-reading-measuring-scales">Reading Measuring Scales</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 72.</span> Other 0.001 in verniers can have different spacing</h2>
+        <p>A 50-division vernier can span 49 main-scale spaces of 0.050 in. Each vernier space is 0.049 in, again leaving a 0.001 in difference. Read the actual main scale; do not apply the trainer's 0.025 in spacing to that tool. The <a href="https://www.starrett.com/dms/flipbooks/Cat-33/inc/pdf/flipbook.pdf">Starrett catalog, page 102</a>, illustrates the 50-division arrangement.</p>
         <p class="deeper-back"><a href="#deeper-ref-72">Back to reference 72</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-73" value="73">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-broaching">Broaching</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 73.</span> Manufacturer reference for the pass sequence</h2>
-        <p><a href="https://pilotprecision.com/wp-content/uploads/2020/05/1904013-C-PPP-catalog-pages-v1.pdf">Pilot Precision, Engineering Section: How to Use Broaches, printed page 35</a> describes guided keyway broaching and the successive shim stack. The tool's own instructions govern the actual setup.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-reading-measuring-scales">Reading Measuring Scales</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 73.</span> Reading references</h2>
+        <p>The <a href="https://www.starrett.com/dms/flipbooks/Cat-33/inc/pdf/flipbook.pdf">Starrett catalog, page 22</a>, explains inch and vernier micrometer scales. The <a href="https://www2.mitutoyo.co.jp/eng/products/menu/quick_guide.pdf">Mitutoyo Quick Guide, page 9</a>, explains the metric micrometer. The examples and diagrams here are original teaching examples.</p>
         <p class="deeper-back"><a href="#deeper-ref-73">Back to reference 73</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-74" value="74">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-broaching">Broaching</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 74.</span> How the rotary holder produces the cutting motion</h2>
-        <p><a href="https://www.slatertools.com/catalogs/rotary-broaching/files/assets/basic-html/page3.html">Slater Tools' rotary broaching explanation</a> describes the holder's angled spindle and the different tool/work motions on a lathe and mill. Its <a href="https://www.slatertools.com/resources/eight-steps-to-successful-broaching">application guide</a> covers preparation and operating requirements.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-reliable-shop-measurement">Reliable Shop Measurement</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 74.</span> The offset-and-angle relationship</h2>
+        <p>For a small angle, the error is approximately the offset multiplied by the tilt in radians. An offset of 2 in and a tilt of 0.0005 rad give about 0.001 in of error. This is distinct from simply looking at the scale from an angle. See the Abbe discussion in the <a href="https://www2.mitutoyo.co.jp/eng/products/menu/quick_guide.pdf">Mitutoyo Quick Guide, page 11</a>.</p>
         <p class="deeper-back"><a href="#deeper-ref-74">Back to reference 74</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-75" value="75">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-chemical-machining">Chemical Milling and Etching</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 75.</span> Why thin-sheet patterns are a useful application</h2>
-        <p>A mask can define many features at once without a separate shaped cutting tool for each opening. <a href="https://fotofab.com/chemical-etching-services/">Fotofab describes partial and through etching</a>.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-layout-and-angle-measurement">Shop Layout and Angle Measurement</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 75.</span> Finding the middle of two heights</h2>
+        <p>If the lower edge of a slot is 0.600 in above the reference and the upper edge is 0.900 in above it, the center is <code>(0.600 + 0.900) / 2 = 0.750 in</code> above that reference. Half the difference, 0.150 in, is half the slot height; it still must be added to the lower height.</p>
         <p class="deeper-back"><a href="#deeper-ref-75">Back to reference 75</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-76" value="76">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 76.</span> Why the fluid and the gap matter</h2>
-        <p>The dielectric fluid normally insulates the gap. A voltage pulse breaks down that insulation locally and permits a discharge. Between pulses, the fluid helps cool the region and flush debris. Debris removal and gap control help keep discharges stable. Sinker EDM commonly uses dielectric oil; wire EDM commonly uses controlled deionized water, though oil-based wire machines also exist.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-layout-and-angle-measurement">Shop Layout and Angle Measurement</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 76.</span> Punch types and their uses</h2>
+        <p><a href="https://www.starrett.com/products/precision-shop-tools/punches--an-overview-of-types-and-uses">Starrett's punch guide</a> explains the sharper prick punch, the wider center punch, and why the locating mark is checked before it is enlarged.</p>
         <p class="deeper-back"><a href="#deeper-ref-76">Back to reference 76</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-77" value="77">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 77.</span> Why one offset does not describe every pass</h2>
-        <p>Discharge energy, flushing and finishing passes change the working gap and surface. Actual compensation comes from the machine's process data and inspection. <a href="https://help.autodesk.com/cloudhelp/2024/ENU/FCAM/files/GUID-84AE09F1-379D-461C-950F-66824F60914F.htm">Autodesk FeatureCAM help on the wire EDM offset method</a> describes the compensation value as wire radius plus spark gap plus any finishing allowance.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Measurement and Fit</span><span class="sep">/</span><a href="#p-layout-and-angle-measurement">Shop Layout and Angle Measurement</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 77.</span> Why the 5-minute vernier works</h2>
+        <p>On the arrangement described in the <a href="https://www.starrett.com/dms/flipbooks/Cat-33/inc/pdf/flipbook.pdf">Starrett catalog, page 306</a>, 12 vernier spaces span 23 main-scale degrees. Each vernier space is 23/12 degrees, or 1&deg;55&prime;: 5 minutes short of two degrees. The line alignment reveals that difference. Page 308 distinguishes a plain universal bevel from the graduated protractor used with it.</p>
         <p class="deeper-back"><a href="#deeper-ref-77">Back to reference 77</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-78" value="78">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 78.</span> Further reading on EDM surfaces and wire systems</h2>
-        <p><a href="https://www.makino.com/resources/content-library/article/archive/the-case-for-additive-technology-in-edm-/299">Makino discusses thermal surface effects</a>; <a href="https://sodick.eu/about-sodick/sodicks-technology/wire-edm-technology">Sodick explains wire EDM</a>. Low mechanical force is not a guarantee of zero distortion or an unchanged surface.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-automated-manufacturing">Automated Manufacturing Cells</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 78.</span> Cell, system and integration describe different scopes</h2>
+        <p>A flexible manufacturing system may coordinate multiple machines or cells with material handling and scheduling. Computer-integrated manufacturing is the broader idea of connecting manufacturing information and activities. These terms overlap in use, but are not interchangeable names for one machine configuration.</p>
         <p class="deeper-back"><a href="#deeper-ref-78">Back to reference 78</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-79" value="79">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrochemical-machining">Electrochemical Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 79.</span> Why hardness alone does not set ECM performance</h2>
-        <p>The reaction removes metal without requiring a harder cutting edge. Metal chemistry and current conditions still affect dissolution, so “all metals machine at the same rate” is not a valid selection rule. Tooling and electrolyte control can make ECM attractive for repeated parts, while adding development effort for a one-off feature.</p><p>Further reading: <a href="https://www.emag.com/industries-solutions/technologies/ecm-technologies/ecm-electro-chemical-machining/">EMAG's ECM overview</a> and the <a href="https://knowledge.electrochem.org/encycl/art-m03-machining.htm">Electrochemical Society's machining explanation</a>.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-broaching">Broaching</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 79.</span> Why the finishing teeth need not keep getting taller</h2>
+        <p>Once the intended profile is reached, further rise would make the feature larger. Repeated finishing teeth can maintain the final size as earlier teeth wear. See <a href="https://www.nidec-machinetoolamerica.com/wp-content/uploads/2025/04/Precision-Cutting-Tools-en.pdf">Nidec's precision cutting tools reference</a> for broach terminology.</p>
         <p class="deeper-back"><a href="#deeper-ref-79">Back to reference 79</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-80" value="80">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 80.</span> Why the material and laser must be matched</h2>
-        <p>Different materials absorb different wavelengths differently. Power and beam delivery also limit the usable thickness and quality. See <a href="https://www.trumpf.com/en_GB/solutions/applications/laser-cutting/">TRUMPF's laser-cutting overview</a>.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-broaching">Broaching</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 80.</span> Production advantages depend on the job</h2>
+        <p>Tool cost, material, cut length, machine capacity and required finish determine the economics. Broaching is not automatically the cheapest process. <a href="https://pilotprecision.com/keyway-broaches/">Pilot Precision's broach overview</a> includes both short-run sets and one-pass production tools. <a class="xref-page" href="#p-cutting-fluids">Cutting Fluids and Application Methods</a> explains lubrication choices.</p>
         <p class="deeper-back"><a href="#deeper-ref-80">Back to reference 80</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-81" value="81">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 81.</span> Further reading on glass and waterjet limits</h2>
-        <p><a href="https://www.omax.com/en/learn/waterjet-cutting/">OMAX explains waterjet materials and cold cutting</a>; its <a href="https://www.omax.com/en/media-center/tips/cutting-glass-waterjet/">glass-cutting notes</a> distinguish glass types and edge damage.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-broaching">Broaching</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 81.</span> Manufacturer reference for the pass sequence</h2>
+        <p><a href="https://pilotprecision.com/wp-content/uploads/2020/05/1904013-C-PPP-catalog-pages-v1.pdf">Pilot Precision, Engineering Section: How to Use Broaches, printed page 35</a> describes guided keyway broaching and the successive shim stack. The tool's own instructions govern the actual setup.</p>
         <p class="deeper-back"><a href="#deeper-ref-81">Back to reference 81</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-82" value="82">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 82.</span> Compare capability on the actual thickness</h2>
-        <p><a href="https://www.hypertherm.com/solutions/technology/cutting-process-overview/">Hypertherm describes the energy sources</a> and <a href="https://www.hypertherm.com/solutions/technology/choosing-a-cutting-process/">selection by material, thickness and cut quality</a>. Qualitative comparisons narrow candidates; they do not replace a supplier's capability check.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-broaching">Broaching</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 82.</span> How the rotary holder produces the cutting motion</h2>
+        <p><a href="https://www.slatertools.com/catalogs/rotary-broaching/files/assets/basic-html/page3.html">Slater Tools' rotary broaching explanation</a> describes the holder's angled spindle and the different tool/work motions on a lathe and mill. Its <a href="https://www.slatertools.com/resources/eight-steps-to-successful-broaching">application guide</a> covers preparation and operating requirements.</p>
         <p class="deeper-back"><a href="#deeper-ref-82">Back to reference 82</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-83" value="83">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-process-capability">Process Capability and Variation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 83.</span> Why a small sample range is not the full process spread</h2>
-        <p>The range uses only the two extremes observed in this sample. More readings, different tools, temperature changes and later production may reveal variation not present in these five parts. Standard deviation is another measure of spread that uses every reading's distance from the mean; no standard-deviation calculation is needed for this example.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-chemical-machining">Chemical Milling and Etching</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 83.</span> Why thin-sheet patterns are a useful application</h2>
+        <p>A mask can define many features at once without a separate shaped cutting tool for each opening. <a href="https://fotofab.com/chemical-etching-services/">Fotofab describes partial and through etching</a>.</p>
         <p class="deeper-back"><a href="#deeper-ref-83">Back to reference 83</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-84" value="84">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-process-capability">Process Capability and Variation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 84.</span> Where capability indices fit</h2>
-        <p>Indices such as Cp and Cpk compare estimated process variation and its position with specification limits. Their interpretation depends on the data, stability, distribution and application requirements. A single threshold is not a universal acceptance rule, and a five-reading classroom example is not a capability study.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 84.</span> Why the fluid and the gap matter</h2>
+        <p>The dielectric fluid normally insulates the gap. A voltage pulse breaks down that insulation locally and permits a discharge. Between pulses, the fluid helps cool the region and flush debris. Debris removal and gap control help keep discharges stable. Sinker EDM commonly uses dielectric oil; wire EDM commonly uses controlled deionized water, though oil-based wire machines also exist.</p>
         <p class="deeper-back"><a href="#deeper-ref-84">Back to reference 84</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-85" value="85">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-shop-inspection">Shop Inspection and Quality Control</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 85.</span> Why the gauge itself needs limits and wear checks</h2>
-        <p>Gauges cannot be manufactured to an infinitely exact size. Their own tolerances and wear allowances are selected under the applicable gauging specification. Repeated use can shrink a plug or enlarge a ring and change its decision.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 85.</span> Why one offset does not describe every pass</h2>
+        <p>Discharge energy, flushing and finishing passes change the working gap and surface. Actual compensation comes from the machine's process data and inspection. <a href="https://help.autodesk.com/cloudhelp/2024/ENU/FCAM/files/GUID-84AE09F1-379D-461C-950F-66824F60914F.htm">Autodesk FeatureCAM help on the wire EDM offset method</a> describes the compensation value as wire radius plus spark gap plus any finishing allowance.</p>
         <p class="deeper-back"><a href="#deeper-ref-85">Back to reference 85</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-86" value="86">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-ultrasonic-machining">Ultrasonic Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 86.</span> Why a shaped tool does not give an exact-size copy</h2>
-        <p>Abrasive particles occupy space around the tool and also wear it. The finished cavity therefore depends on the tool, abrasive action and process control, not simply on copying the tool's nominal dimensions. <a href="https://www.bullentech.com/ultrasonic-machining/">Bullen describes loose-abrasive ultrasonic machining</a>.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 86.</span> Further reading on EDM surfaces and wire systems</h2>
+        <p><a href="https://www.makino.com/resources/content-library/article/archive/the-case-for-additive-technology-in-edm-/299">Makino discusses thermal surface effects</a>; <a href="https://sodick.eu/about-sodick/sodicks-technology/wire-edm-technology">Sodick explains wire EDM</a>. Low mechanical force is not a guarantee of zero distortion or an unchanged surface.</p>
         <p class="deeper-back"><a href="#deeper-ref-86">Back to reference 86</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-87" value="87">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrochemical-machining">Electrochemical Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 87.</span> Why hardness alone does not set ECM performance</h2>
+        <p>The reaction removes metal without requiring a harder cutting edge. Metal chemistry and current conditions still affect dissolution, so “all metals machine at the same rate” is not a valid selection rule. Tooling and electrolyte control can make ECM attractive for repeated parts, while adding development effort for a one-off feature.</p><p>Further reading: <a href="https://www.emag.com/industries-solutions/technologies/ecm-technologies/ecm-electro-chemical-machining/">EMAG's ECM overview</a> and the <a href="https://knowledge.electrochem.org/encycl/art-m03-machining.htm">Electrochemical Society's machining explanation</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-87">Back to reference 87</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-88" value="88">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 88.</span> Why the material and laser must be matched</h2>
+        <p>Different materials absorb different wavelengths differently. Power and beam delivery also limit the usable thickness and quality. See <a href="https://www.trumpf.com/en_GB/solutions/applications/laser-cutting/">TRUMPF's laser-cutting overview</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-88">Back to reference 88</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-89" value="89">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 89.</span> Further reading on glass and waterjet limits</h2>
+        <p><a href="https://www.omax.com/en/learn/waterjet-cutting/">OMAX explains waterjet materials and cold cutting</a>; its <a href="https://www.omax.com/en/media-center/tips/cutting-glass-waterjet/">glass-cutting notes</a> distinguish glass types and edge damage.</p>
+        <p class="deeper-back"><a href="#deeper-ref-89">Back to reference 89</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-90" value="90">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 90.</span> Compare capability on the actual thickness</h2>
+        <p><a href="https://www.hypertherm.com/solutions/technology/cutting-process-overview/">Hypertherm describes the energy sources</a> and <a href="https://www.hypertherm.com/solutions/technology/choosing-a-cutting-process/">selection by material, thickness and cut quality</a>. Qualitative comparisons narrow candidates; they do not replace a supplier's capability check.</p>
+        <p class="deeper-back"><a href="#deeper-ref-90">Back to reference 90</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-91" value="91">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-process-capability">Process Capability and Variation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 91.</span> Why a small sample range is not the full process spread</h2>
+        <p>The range uses only the two extremes observed in this sample. More readings, different tools, temperature changes and later production may reveal variation not present in these five parts. Standard deviation is another measure of spread that uses every reading's distance from the mean; no standard-deviation calculation is needed for this example.</p>
+        <p class="deeper-back"><a href="#deeper-ref-91">Back to reference 91</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-92" value="92">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-process-capability">Process Capability and Variation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 92.</span> Where capability indices fit</h2>
+        <p>Indices such as Cp and Cpk compare estimated process variation and its position with specification limits. Their interpretation depends on the data, stability, distribution and application requirements. A single threshold is not a universal acceptance rule, and a five-reading classroom example is not a capability study.</p>
+        <p class="deeper-back"><a href="#deeper-ref-92">Back to reference 92</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-93" value="93">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-shop-inspection">Shop Inspection and Quality Control</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 93.</span> Why the gauge itself needs limits and wear checks</h2>
+        <p>Gauges cannot be manufactured to an infinitely exact size. Their own tolerances and wear allowances are selected under the applicable gauging specification. Repeated use can shrink a plug or enlarge a ring and change its decision.</p>
+        <p class="deeper-back"><a href="#deeper-ref-93">Back to reference 93</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-94" value="94">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-ultrasonic-machining">Ultrasonic Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 94.</span> Why a shaped tool does not give an exact-size copy</h2>
+        <p>Abrasive particles occupy space around the tool and also wear it. The finished cavity therefore depends on the tool, abrasive action and process control, not simply on copying the tool's nominal dimensions. <a href="https://www.bullentech.com/ultrasonic-machining/">Bullen describes loose-abrasive ultrasonic machining</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-94">Back to reference 94</a></p>
       </article>
     </li>
   </ol>

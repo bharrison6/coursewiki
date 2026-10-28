@@ -6084,6 +6084,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><a href="#p-absolute-and-incremental-positioning">Absolute and Incremental Positioning</a></li>
     <li><a href="#p-cnc-program-structure">CNC Program Structure</a></li>
     <li><a href="#p-cnc-program-proving">CNC Programming and Prove-Out</a></li>
+    <li><a href="#p-cnc-turning-setup">CNC Turning Setup and Offsets</a></li>
+    <li><a href="#p-cnc-turning-speeds-and-feeds">CNC Turning Spindle and Feed Modes</a></li>
+    <li><a href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a></li>
+    <li><a href="#p-cnc-turning-program">CNC Turning Program Walkthrough</a></li>
     <li><a href="#p-shop-inspection">Shop Inspection and Quality Control</a></li>
     <li><a href="#p-process-capability">Process Capability and Variation</a></li>
     <li><a href="#p-jigs-and-fixtures">Jigs, Fixtures and Repeatable Location</a></li>
@@ -12510,6 +12514,263 @@ M30</code></pre>
 </div>
 
 </article>
+<article class="article bundled" id="p-cnc-turning-setup">
+  <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span></div>
+  <h1>CNC Turning Setup and Offsets</h1>
+  <p class="lede">Read lathe X and Z coordinates, identify tooling and workholding, and separate part location from tool geometry and wear.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="cnc-turning-setup--read-x-as-a-size-and-z-as-a-position-along-the-spindle" data-card="cnc-turning-setup--read-x-as-a-size-and-z-as-a-position-along-the-spindle">
+    <summary>Read X as a size and Z as a position along the spindle<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read X as a size and Z as a position along the spindle</h2>
+  <p>Start with <a class="xref-page" href="#p-cnc-control-fundamentals">CNC Control Fundamentals</a> for how CNC works and <a class="xref-page" href="#p-lathe-operations">Lathe Operations</a> for the cuts a lathe makes. Here the work rotates and the ordinary turning tool moves in the XZ plane. Z runs along the spindle; positive Z is away from the headstock in the basic arrangement shown. X moves radially, even when its displayed value is a diameter. A slant bed or rear turret changes the view, so check the machine's axis diagram.</p>
+  <p>Confirm <strong>diameter or radius programming</strong> before reading an X value. For a 28 mm diameter, diameter mode uses X28 and radius mode uses X14. Moving from X28 to X24 in diameter mode removes 2 mm radially. Z is not halved. Confirm incremental and arc-centre conventions separately.</p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkxhdGhlIGNvb3JkaW5hdGVzIGluIGRpYW1ldGVyIG1vZGU8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5BIDI4IG1tIGRpYW1ldGVyIGJhciBleHRlbmRzIGxlZnQgZnJvbSB0aGUgZmFjZS4gV29yayB6ZXJvIGxpZXMgYXQgdGhlIGZhY2Ugb24gdGhlIHNwaW5kbGUgY2VudHJlbGluZS4gWDI4IGlzIDE0IG1tIHJhZGlhbGx5IGZyb20gdGhhdCBsaW5lOyBwb3NpdGl2ZSBaIGlzIHJpZ2h0LjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MjAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjMwIiB5PSI0NSI+RGlhbWV0ZXIgbW9kZSDCtyBzaWRlIHZpZXc8L3RleHQ+CjxyZWN0IHg9IjU1IiB5PSIxMzUiIHdpZHRoPSIxMTUiIGhlaWdodD0iMjYwIiBmaWxsPSIjYzhkMGRhIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIvPgo8cmVjdCB4PSIxNzAiIHk9IjE4NSIgd2lkdGg9IjMzMCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiNlNWVkZjMiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxwYXRoIGQ9Ik0yNSAyNjVINzQwIE01MDAgMjY1VjgwIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNNzI1IDI1NUw3NDUgMjY1TDcyNSAyNzUgTTQ5MCAxMDBMNTAwIDgwTDUxMCAxMDAiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjY2NSIgeT0iMjQ1Ij4rWjwvdGV4dD48dGV4dCB4PSI1MjAiIHk9IjEwNSI+K1ggb3V0d2FyZDwvdGV4dD4KPGNpcmNsZSBjeD0iNTAwIiBjeT0iMjY1IiByPSI3IiBmaWxsPSIjYTYzODAwIi8+CjxwYXRoIGQ9Ik01MDAgMTg1SDYzMCBNNTAwIDI2NUg2MzAgTTYxNSAxODVWMjY1IE02MDYgMTk1TDYxNSAxODVMNjI0IDE5NSBNNjA2IDI1NUw2MTUgMjY1TDYyNCAyNTUiIHN0cm9rZT0iIzAwNjQ5MyIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjY0MCIgeT0iMTk1Ij4xNCBtbTwvdGV4dD48dGV4dCB4PSIxOTAiIHk9IjE2NSI+w5gyOCDihpIgWDI4PC90ZXh0Pgo8cGF0aCBkPSJNNTA1IDI3NUw1NjAgMzcwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjM5MCIgeT0iNDEwIj5GYWNlOiBaMDwvdGV4dD48dGV4dCB4PSIzOTAiIHk9IjQ1MyI+V29yayB6ZXJvOiBYMCBaMDwvdGV4dD4KPHRleHQgeD0iMzUiIHk9IjQ0NSI+SGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI0ODUiPkNlbnRyZWxpbmUg4oaSPC90ZXh0Pgo8L2c+PC9zdmc+Cg==" alt="Lathe side view: work zero is at the face on the spindle centreline. Positive Z points away from the headstock; X28 in diameter mode represents a surface 14 mm from the centreline."></p>
+  <p>Use <a class="xref-page" href="#p-absolute-and-incremental-positioning">Absolute and Incremental Positioning</a> for coordinate arithmetic. On many Fanuc-style lathes X/Z are absolute endpoints and U/W are increments; G90 can be a turning cycle. Do not paste a mill's G90/G91 startup into a lathe program.</p>
+  <p><a class="button" data-practice-add="turning-x-diameter" href="../practice.html#turning-x-diameter">Practice lathe X commands</a></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-setup--the-tool-arrangement-determines-how-the-next-cutter-reaches-the-work" data-card="cnc-turning-setup--the-tool-arrangement-determines-how-the-next-cutter-reaches-the-work">
+    <summary>The tool arrangement determines how the next cutter reaches the work<span class="chev"></span></summary>
+    <div class="body">
+      <h2>The tool arrangement determines how the next cutter reaches the work</h2>
+  <p>A <strong>turret</strong> indexes a selected tool station into working position. <strong>Gang tooling</strong> mounts several tools on a slide; moving the slide brings the selected tool into position without turret indexing. Each tool still needs the correct offsets and a checked approach path.</p>
+  <p><strong>Live tooling</strong> powers a rotating cutter on the lathe for operations such as drilling or milling. A <strong>C axis</strong> controls the spindle's angular position, allowing the work to be indexed or rotated under position control. These are options, not features of every CNC lathe. Some machines also add a Y axis. Live-tool and spindle-mode commands belong to the machine's manual.</p>
+  <p class="deeper-ref" id="deeper-ref-92">Supporting detail: <a href="#deeper-addendum-92"><strong>Addendum 92</strong></a> &mdash; Why an extra axis changes the work a turning center can do.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-setup--match-the-workholding-and-automation-to-the-part" data-card="cnc-turning-setup--match-the-workholding-and-automation-to-the-part">
+    <summary>Match the workholding and automation to the part<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Match the workholding and automation to the part</h2>
+  <ul>
+    <li>A <strong>chuck</strong> grips with jaws. A self-centering chuck moves its jaws together; independent jaws permit individual adjustment. Jaw style and setup determine which shapes can be held.</li>
+    <li>A <strong>collet</strong> closes around a matching stock size and shape. Its useful size range depends on the collet design.</li>
+    <li>A <strong>tailstock center</strong> supports the free end of suitable work. It does not replace the chuck or collet that drives the work.</li>
+    <li>A <strong>bar feeder</strong> advances bar stock for successive parts. A <strong>parts catcher</strong> receives a separated part. Their timing and interlocks are machine-specific; neither is assumed in an ordinary two-axis program.</li>
+  </ul>
+  <p>For operating requirements use the <a href="../safety/index.html">Safety collection</a> and <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a>. No particular shop machine or installed option is assumed here.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-setup--locate-the-part-face-once-then-locate-each-tool-relative-to-it" data-card="cnc-turning-setup--locate-the-part-face-once-then-locate-each-tool-relative-to-it">
+    <summary>Locate the part face once, then locate each tool relative to it<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Locate the part face once, then locate each tool relative to it</h2>
+  <p>Use <a class="xref-page" href="#p-cnc-axes-and-offsets">CNC Axes and Offsets</a> for machine zero, work zero and the general offset relationship. On a lathe, a common part datum is <strong>Z0 at the finished face and X0 on the spindle centreline</strong>. Establish the Z work shift using the control's documented reference-tool, probe or touch-off method. Allow for any material still to be faced away.</p>
+  <p>For X touch-off, the reference is a measured diameter. In a trial-cut method, a tool cuts a short cylindrical surface and that diameter is measured; the control's measurement function uses the known size to establish that tool's X geometry. Use the manual's procedure for the actual machine, including which table receives the value. Do not enter the measured diameter as though it were automatically the raw geometry-offset value.</p>
+  <table><thead><tr><th>Stored information</th><th>What it describes</th></tr></thead><tbody>
+    <tr><td>Work shift or work offset</td><td>The part datum, especially its Z location.</td></tr>
+    <tr><td>X and Z tool geometry</td><td>The position of each tool's reference tip relative to the established reference system.</td></tr>
+    <tr><td>X and Z wear</td><td>Small dimensional corrections after measurement, separate from the basic tool setup.</td></tr>
+    <tr><td>Nose radius and tip orientation</td><td>The rounded cutting corner and how its imaginary tip relates to it; see <a class="xref-page" href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a>.</td></tr>
+  </tbody></table>
+  <p>Check whether an X wear entry is interpreted radially or diametrally, its sign, and whether the control adds to or replaces the existing value. A work-offset change affects the shared datum; a tool correction addresses one tool. Selecting G54 does not measure or store a new zero. G53 does not erase the offset table.</p>
+  <p class="deeper-ref" id="deeper-ref-93">Supporting detail: <a href="#deeper-addendum-93"><strong>Addendum 93</strong></a> &mdash; Control example: separate geometry and wear fields.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-cnc-turning-speeds-and-feeds">
+  <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span></div>
+  <h1>CNC Turning Spindle and Feed Modes</h1>
+  <p class="lede">Calculate constant-surface-speed RPM, apply an RPM ceiling, and distinguish feed per revolution from feed per minute.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="cnc-turning-speeds-and-feeds--g96-changes-rpm-with-diameter-g97-holds-a-requested-rpm" data-card="cnc-turning-speeds-and-feeds--g96-changes-rpm-with-diameter-g97-holds-a-requested-rpm">
+    <summary>G96 changes RPM with diameter; G97 holds a requested RPM<span class="chev"></span></summary>
+    <div class="body">
+      <h2>G96 changes RPM with diameter; G97 holds a requested RPM</h2>
+  <p>In the Fanuc-style lathe convention used here, <strong>G96</strong> selects constant surface speed (CSS). S gives cutting speed: surface feet per minute with inch units, or metres per minute with metric units. <strong>G97</strong> cancels CSS and makes S an RPM value. Confirm the actual control's units and code meanings.</p>
+  <p>Use the <strong>work diameter at the cutting point</strong>, not the insert size. From <a class="xref-page" href="#p-feeds-and-speeds">Feeds and Speeds</a>:</p>
+  <ul>
+    <li>Inch: RPM = SFM × 12 / (π × diameter in inches).</li>
+    <li>Metric: RPM = cutting speed in m/min × 1000 / (π × diameter in mm).</li>
+  </ul>
+  <p>At 180 SFM on a 1.5 in diameter, RPM = 180 × 12 / (π × 1.5) = <strong>458 RPM</strong>, rounded to a whole RPM. At 90 m/min on a 30 mm diameter, the result is <strong>955 RPM</strong>. These are arithmetic examples, not recommended cutting data.</p>
+  <p><a class="button" data-practice-add="turning-css-inch-a" href="../practice.html#turning-css-inch-a">Practice CSS calculations</a></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-speeds-and-feeds--set-the-maximum-rpm-before-enabling-constant-surface-speed" data-card="cnc-turning-speeds-and-feeds--set-the-maximum-rpm-before-enabling-constant-surface-speed">
+    <summary>Set the maximum RPM before enabling constant surface speed<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Set the maximum RPM before enabling constant surface speed</h2>
+  <p>Establish an appropriate spindle-speed ceiling for the actual setup <strong>before G96</strong>. On the Fanuc-style lathe convention here, <code>G50 S1800</code> limits requested speed to 1800 RPM. The number is only an illustration; determine the permissible limit from the machine, workholding, tooling and setup documentation. Other controls use different commands or parameters.</p>
+  <pre><code>G50 S1800 (ILLUSTRATIVE RPM CEILING)
+G96 S90   (METRIC CSS: 90 METRES PER MINUTE)
+G97 S600  (LEAVE CSS: REQUEST 600 RPM)</code></pre>
+  <p>As diameter approaches zero during facing, CSS requests increasing RPM. Once the clamp is reached, RPM stays limited and surface speed falls. At the centre, a nonzero surface speed cannot be maintained at any finite RPM. Use <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a> and the <a href="../safety/index.html">Safety collection</a> for the required operating checks.</p>
+  <p class="deeper-ref" id="deeper-ref-94">Supporting detail: <a href="#deeper-addendum-94"><strong>Addendum 94</strong></a> &mdash; Calculate where a speed ceiling starts to matter.</p>
+  <p><a class="button" data-practice-add="turning-clamp-reason" href="../practice.html#turning-clamp-reason">Explain the RPM clamp</a></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-speeds-and-feeds--read-the-feed-mode-before-interpreting-f" data-card="cnc-turning-speeds-and-feeds--read-the-feed-mode-before-interpreting-f">
+    <summary>Read the feed mode before interpreting F<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read the feed mode before interpreting F</h2>
+  <p>In this common Fanuc-style lathe convention, <strong>G99 means feed per spindle revolution</strong> and <strong>G98 means feed per minute</strong>. With inch units, G99 F0.006 means 0.006 in/rev; G98 F0.006 means 0.006 in/min. With metric units, the corresponding lengths are millimetres. Codes vary: the milling return-level meanings of G98/G99 do not apply here.</p>
+  <p><strong>Feed per minute = feed per revolution × RPM.</strong> At 800 RPM, 0.006 in/rev gives 4.8 in/min. If CSS increases RPM while G99 holds F constant, the feed per minute increases too. If G98 holds feed per minute constant, feed per revolution changes with RPM.</p>
+  <p>Set the intended feed mode explicitly. See <a class="xref-page" href="#p-cnc-program-structure">CNC Program Structure</a> for modal behavior and <a class="xref-page" href="#p-cnc-turning-program">CNC Turning Program Walkthrough</a> for a commented turning example.</p>
+  <p class="deeper-ref" id="deeper-ref-95">Supporting detail: <a href="#deeper-addendum-95"><strong>Addendum 95</strong></a> &mdash; Reference for the code convention used here.</p>
+  <p><a class="button" data-practice-add="turning-feed-inch" href="../practice.html#turning-feed-inch">Practice feed conversion</a></p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-cnc-turning-profiles">
+  <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span></div>
+  <h1>CNC Turning Profiles and Cycles</h1>
+  <p class="lede">Account for a rounded tool nose on tapers and arcs, then distinguish roughing, finishing, grooving and threading cycles.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="cnc-turning-profiles--a-rounded-tool-nose-does-not-cut-at-the-imaginary-sharp-tip" data-card="cnc-turning-profiles--a-rounded-tool-nose-does-not-cut-at-the-imaginary-sharp-tip">
+    <summary>A rounded tool nose does not cut at the imaginary sharp tip<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A rounded tool nose does not cut at the imaginary sharp tip</h2>
+  <p>A turning insert has a rounded corner, called its <strong>nose radius</strong>. Touching off along X and Z establishes an <strong>imaginary tip</strong>: the intersection of the two tangent reference lines. There is no cutting material at that intersection. The actual contact point moves around the nose as the direction of the surface changes.</p>
+  <p>Axis-parallel cuts can reach the measured diameter or face with the corresponding touch-offs. On a taper, chamfer or arc, simply driving the imaginary tip along the desired surface leaves a profile error. Account for the nose radius with a calculated toolpath or the control's tool nose compensation. See <a class="xref-page" href="#p-lathe-tapers">Turning Tapers</a> for taper geometry.</p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkltYWdpbmFyeSB0aXAgdmVyc3VzIHJvdW5kZWQgbm9zZSBvbiBhIHRhcGVyPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+VGhlIGxlZnQgYW5kIGJvdHRvbSB0YW5nZW50cyB0byBhIGNpcmN1bGFyIHRvb2wgbm9zZSBtZWV0IGF0IGFuIGltYWdpbmFyeSB0aXAuIEEgZGVzaXJlZCB0YXBlciB0aHJvdWdoIHRoYXQgdGlwIGlzIHBhcmFsbGVsIHRvLCBidXQgc2VwYXJhdGVkIGZyb20sIHRoZSBhY3R1YWwgdGFuZ2VudCBjdXQgYnkgdGhlIG5vc2UuIFRoZSBnYXAgaWxsdXN0cmF0ZXMgdW5jb21wZW5zYXRlZCBwcm9maWxlIGVycm9yLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2NTAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjI1IiB5PSI0MiI+VW5jb21wZW5zYXRlZCBub3NlIMK3IGVubGFyZ2VkPC90ZXh0Pgo8Y2lyY2xlIGN4PSI0MTAiIGN5PSIyMjAiIHI9IjgwIiBmaWxsPSIjZTVlZGYzIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNMzMwIDExNVYzNDAgTTI5MCAzMDBINTMwIiBzdHJva2U9IiM2YjcyODAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTAgOCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMTkwIDE2MEw1MzAgNTAwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMTkwIDExMy4xNEw1MzAgNDUzLjE0IiBzdHJva2U9IiMwMDY0OTMiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMDAiIHI9IjciIGZpbGw9IiNhNjM4MDAiLz4KPHBhdGggZD0iTTQxMCAyMjBMMzUzLjQzIDI3Ni41NyIgc3Ryb2tlPSIjMTQyZDRlIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSI0MzAiIHk9IjIxOCI+cjwvdGV4dD4KPHBhdGggZD0iTTMzNSAzMTBMMTQ1IDM1NSIgc3Ryb2tlPSIjYTYzODAwIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSIyNSIgeT0iMzk1Ij5JbWFnaW5hcnkgdGlwPC90ZXh0Pgo8cGF0aCBkPSJNNDcwIDQ0MEw0OTMuNDMgNDE2LjU3IiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjUzNSIgeT0iMzkwIj5Qcm9maWxlPC90ZXh0Pjx0ZXh0IHg9IjUzNSIgeT0iNDMwIj5lcnJvcjwvdGV4dD4KPHRleHQgeD0iNTI1IiB5PSIxNjAiPlJvdW5kZWQ8L3RleHQ+PHRleHQgeD0iNTI1IiB5PSIyMDAiPm5vc2U8L3RleHQ+CjxwYXRoIGQ9Ik0zMCA1NDVIOTUiIHN0cm9rZT0iI2E2MzgwMCIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iMTE1IiB5PSI1NTUiPkRlc2lyZWQgdGFwZXIgdGhyb3VnaCB0aXA8L3RleHQ+CjxwYXRoIGQ9Ik0zMCA1OTVIOTUiIHN0cm9rZT0iIzAwNjQ5MyIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iMTE1IiB5PSI2MDUiPkFjdHVhbCB0YW5nZW50IGN1dDwvdGV4dD4KPC9nPjwvc3ZnPgo=" alt="A rounded nose touches the X and Z reference lines, whose intersection is the imaginary tip. A taper through that tip misses the rounded edge; a parallel tangent line shows the resulting surface without compensation."></p>
+  <p class="deeper-ref" id="deeper-ref-96">Supporting detail: <a href="#deeper-addendum-96"><strong>Addendum 96</strong></a> &mdash; Why a good diameter measurement does not prove a taper is correct.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-profiles--compensation-needs-nose-radius-tip-orientation-and-a-clear-entry-and-exit" data-card="cnc-turning-profiles--compensation-needs-nose-radius-tip-orientation-and-a-clear-entry-and-exit">
+    <summary>Compensation needs nose radius, tip orientation and a clear entry and exit<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compensation needs nose radius, tip orientation and a clear entry and exit</h2>
+  <p>In common Fanuc-style usage, G41 selects compensation to the left of the programmed direction of travel and G42 to the right; G40 cancels it. Judge the side in the control's XZ-plane convention. Do not choose a code from the screen's apparent left or right, or assume one code means every outside cut.</p>
+  <p>Enter the actual nose radius and the control's <strong>tip orientation</strong>, which tells it where the imaginary tip sits relative to the nose centre. Select the correct tool-offset register, use the manual's lead-in and lead-out requirements, and check the resulting path with <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a>. Tip numbers differ by control; there is no universal number table here.</p>
+  <p>Do not apply full nose-radius compensation again to a path already corrected for that radius. Check whether a CAM post expects full geometry compensation, wear-only compensation or no control compensation.</p>
+  <p class="deeper-ref" id="deeper-ref-97">Supporting detail: <a href="#deeper-addendum-97"><strong>Addendum 97</strong></a> &mdash; Where to check the control behavior.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-profiles--a-roughing-cycle-removes-layers-while-leaving-stock-for-finishing" data-card="cnc-turning-profiles--a-roughing-cycle-removes-layers-while-leaving-stock-for-finishing">
+    <summary>A roughing cycle removes layers while leaving stock for finishing<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A roughing cycle removes layers while leaving stock for finishing</h2>
+  <p>A <strong>G71-type roughing cycle</strong> uses a defined final profile to generate repeated stock-removal passes, commonly along Z for outside or inside turning. The programmer supplies the applicable cut depth, retract and finish allowance. A <strong>G70-type finishing cycle</strong> follows the defined profile to remove the remaining allowance.</p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlJvdWdoaW5nIGxheWVycyBhbmQgZmluaXNoIGFsbG93YW5jZTwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlVwcGVyIGhhbGYgb2Ygc3RvY2sgc2hvd24gc2NoZW1hdGljYWxseS4gVGhyZWUgcm91Z2hpbmcgcGFzc2VzIHRyYXZlbCBsZWZ0IGFsb25nIFouIEEgcmVtYWluaW5nIGJhbmQgYWJvdmUgYSBzdGVwcGVkIGZpbmFsIG91dGxpbmUgaXMgcmVtb3ZlZCBieSBmaW5pc2hpbmcuIE5vdCBhIGN5Y2xlIHBhcmFtZXRlciBkaWFncmFtLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1ODAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjI1IiB5PSI0NSI+Um91Z2ggZmlyc3Qg4oaSIGZpbmlzaCB0aGUgcHJvZmlsZTwvdGV4dD4KPHBhdGggZD0iTTkwIDEyNUg2NzBWNDIwSDkwWiIgZmlsbD0iI2YwZjNmNiIgc3Ryb2tlPSIjMTQyZDRlIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTkwIDI1NUgzNDBWMzI1SDY3MFY0MjBIOTBaIiBmaWxsPSIjZjlkOTc0Ii8+CjxwYXRoIGQ9Ik05MCAyODBIMzY1VjM1MEg2NzBWNDIwSDkwWiIgZmlsbD0iI2M5ZGNlOCIvPgo8cGF0aCBkPSJNOTAgMjgwSDM2NVYzNTBINjcwIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNOTAgMjU1SDM0MFYzMjVINjcwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTAgNiIgZmlsbD0ibm9uZSIvPgo8ZyBzdHJva2U9IiMwMDY0OTMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTY1MCAxNjVIMTIwTDEzNyAxNTUgTTEyMCAxNjVMMTM3IDE3NSBNNjUwIDIwNUgxMjBMMTM3IDE5NSBNMTIwIDIwNUwxMzcgMjE1IE02NTAgMjQ1SDM4MEwzOTcgMjM1IE0zODAgMjQ1TDM5NyAyNTUiLz48L2c+Cjx0ZXh0IHg9IjE3MCIgeT0iMTA1Ij5PcmlnaW5hbCBzdG9jayBzdXJmYWNlPC90ZXh0Pgo8dGV4dCB4PSI0MDAiIHk9IjMwNyI+QWxsb3dhbmNlPC90ZXh0Pjx0ZXh0IHg9IjEwNSIgeT0iMzkwIj5GaW5pc2hlZCBtYXRlcmlhbDwvdGV4dD4KPHBhdGggZD0iTTU1IDQyMEg3MjAiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDQwIiB5PSI0NjIiPkNlbnRyZWxpbmU8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1MTAiPuKGkCBUb3dhcmQgaGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjU4MCIgeT0iNTEwIj4rWiDihpI8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1NTUiPlVwcGVyIGhhbGYgb25seSDCtyBub3QgdG8gc2NhbGU8L3RleHQ+CjwvZz48L3N2Zz4K" alt="Upper half of turning stock: successive roughing passes run along Z toward the headstock and leave an allowance above a stepped finished profile. Finishing follows the final outline."></p>
+  <p>Read the control's cycle definition before entering parameters. One-block and two-block formats differ. A depth word may be radial while an X allowance is diametral; the same letter can mean different things in different blocks. P and Q commonly identify the first and last numbered profile blocks. Check the referenced blocks, permitted profile direction changes, return path and compensation rules.</p>
+  <p class="deeper-ref" id="deeper-ref-98">Supporting detail: <a href="#deeper-addendum-98"><strong>Addendum 98</strong></a> &mdash; Why no universal cycle template is shown.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-profiles--grooving-repeats-plunges-threading-synchronizes-feed-with-rotation" data-card="cnc-turning-profiles--grooving-repeats-plunges-threading-synchronizes-feed-with-rotation">
+    <summary>Grooving repeats plunges; threading synchronizes feed with rotation<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Grooving repeats plunges; threading synchronizes feed with rotation</h2>
+  <p>A <strong>grooving or peck cycle</strong> divides a plunge into smaller advances and retracts. Some formats repeat the plunge at different Z positions to make a wider groove. G75 is one common outside/inside grooving family; face-grooving and peck-drilling families may use other codes. Check peck size, final depth, groove width and tool-width convention separately.</p>
+  <p>A <strong>G76-type threading cycle</strong> makes repeated synchronized passes with increasing depth. The thread lead determines the axial advance per spindle revolution. The cycle also needs control-specific information about final size, infeed, pass depth and runout. Use <a class="xref-page" href="#p-single-point-threading">Single-Point Threading</a> for pitch, lead and thread form; a threading cycle does not choose those dimensions for you.</p>
+  <p>Formats differ by control, so no complete parameter syntax is universal. See the <a href="https://www.haascnc.com/service/codes-settings.type%3Dgcode.machine%3Dlathe.value%3DG75.html">Haas G75 reference</a> and the G70/G76 entries in its <a href="https://www.haascnc.com/content/dam/haascnc/en/service/reference/programming-workbooks/lathe---programming-workbook.pdf">lathe workbook</a> as examples. <a class="xref-page" href="#p-cnc-turning-program">CNC Turning Program Walkthrough</a> spells out ordinary moves so the sequence can be read without decoding a cycle.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-cnc-turning-program">
+  <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span></div>
+  <h1>CNC Turning Program Walkthrough</h1>
+  <p class="lede">Trace an original facing, outside roughing, chamfering, finishing and cutoff sequence with every block explained.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="cnc-turning-program--read-the-setup-assumptions-before-the-first-block" data-card="cnc-turning-program--read-the-setup-assumptions-before-the-first-block">
+    <summary>Read the setup assumptions before the first block<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read the setup assumptions before the first block</h2>
+  <p><strong>Illustrative; check your control's manual.</strong> This is a reading example in a common Fanuc-style lathe dialect, not a machine-ready file. Read <a class="xref-page" href="#p-cnc-program-structure">CNC Program Structure</a> for blocks and modes, <a class="xref-page" href="#p-cnc-turning-setup">CNC Turning Setup and Offsets</a> for offsets, and <a class="xref-page" href="#p-cnc-turning-speeds-and-feeds">CNC Turning Spindle and Feed Modes</a> for S and F. The mill simulator in <a class="xref-page" href="#p-gcode-and-toolpaths">G-code and Toolpaths</a> cannot validate this lathe program.</p>
+  <p>The invented part is 20 mm in diameter and 25 mm long, with a 1 mm × 45° front chamfer. The chamfer runs from X18 Z0 to X20 Z−1: the 2 mm diameter change is a 1 mm radial change. Stock is 24 mm diameter with its raw face at Z+0.5. G54 has Z0 at the finished face and X0 on the spindle centreline. Stock and clearance extend beyond Z−28; workholding is farther toward negative Z.</p>
+  <p>Assume diameter programming and absolute X/Z endpoints; this dialect does not need G90 for absolute moves. T0101 selects station 1 and offset 1: a right-hand OD/facing tool with a 0.4 mm nose radius, suitable for the illustrated cuts. Its imaginary tip and radius are set, and G42 is the correct side for this setup's finish contour. T0202 selects a 2 mm wide cutoff tool and offset 2. Its Z reference is the edge toward positive Z, so Z−25 puts the blade in the interval Z−27 to Z−25. The cutoff tool is capable of the illustrated small travel past centre.</p>
+  <p>The example assumes X60 Z10 is an already-verified tool-change clearance location for both tools and the turret sweep, and starts there with spindle and coolant off. These coordinates are not a general clearance rule. All speeds, feeds and the 1800 RPM ceiling are teaching values, not material recommendations. Verify the real setup, tool calls, compensation entry/exit, centre crossing and file delimiters using <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a> and the <a href="../safety/index.html">Safety collection</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-program--face-the-end-then-leave-a-small-allowance-on-the-outside-diameter" data-card="cnc-turning-program--face-the-end-then-leave-a-small-allowance-on-the-outside-diameter">
+    <summary>Face the end, then leave a small allowance on the outside diameter<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Face the end, then leave a small allowance on the outside diameter</h2>
+  <p>Every parenthesized comment explains its block. G01 remains active until G00 replaces it; X/Z values here are destinations. Facing travels slightly past the centre to account for the rounded nose. Roughing uses two explicit lengthwise passes rather than a control-specific canned-cycle format.</p>
+  <pre><code>O2460 (IDENTIFY THIS EXAMPLE PROGRAM)
+G18 G21 G40 G80 G99 (XZ PLANE, MM, COMP OFF, CYCLES OFF, MM/REV)
+G54 (SELECT THE PRESET PART WORK OFFSET)
+T0101 (SELECT OD TOOL 1 WITH OFFSET 1 AT VERIFIED CLEARANCE)
+G50 S1800 (SET THE EXAMPLE MAXIMUM SPINDLE RPM)
+G97 S600 M03 (FIXED 600 RPM, START SPINDLE IN SETUP DIRECTION)
+G00 X26.0 (APPROACH OUTSIDE THE 24 MM STOCK AT Z10)
+G00 Z0.0 (MOVE TO FINISHED FACE PLANE WHILE OUTSIDE STOCK)
+M08 (TURN ON THE ASSUMED FLOOD COOLANT SYSTEM)
+G96 S90 (SELECT 90 M/MIN CSS WITH THE RPM CEILING ACTIVE)
+G01 X-0.8 F0.10 (FACE THROUGH CENTRE: 0.4 MM RADIAL OVERTRAVEL)
+G00 Z2.0 (RETRACT AXIALLY BEYOND THE FACED END)
+G00 X22.0 (POSITION FOR THE FIRST OD ROUGHING PASS IN AIR)
+G01 Z-28.0 F0.20 (ROUGH LENGTHWISE TO 22 MM DIAMETER)
+G00 X26.0 (RETRACT RADIALLY OUTSIDE THE ORIGINAL STOCK)
+G00 Z2.0 (RETURN TO THE FRONT AT CLEAR X)
+G00 X20.6 (POSITION FOR THE SECOND OD ROUGHING PASS)
+G01 Z-28.0 F0.20 (LEAVE 0.6 MM ON DIAMETER FOR FINISHING)
+G00 X26.0 (RETRACT OUTSIDE STOCK AGAIN)
+G00 Z2.0 (RETURN AHEAD OF THE FACE FOR FINISHING)</code></pre>
+  <p class="deeper-ref" id="deeper-ref-99">Supporting detail: <a href="#deeper-addendum-99"><strong>Addendum 99</strong></a> &mdash; Check roughing depth and remaining material.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-program--compensate-the-chamfer-and-finish-then-cut-off-at-fixed-rpm" data-card="cnc-turning-program--compensate-the-chamfer-and-finish-then-cut-off-at-fixed-rpm">
+    <summary>Compensate the chamfer and finish, then cut off at fixed RPM<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compensate the chamfer and finish, then cut off at fixed RPM</h2>
+  <p>The finish contour uses the same tool at a smaller feed. Nose compensation is active for the chamfer and OD; it is entered ahead of the face and cancelled after departing the finished contour. See <a class="xref-page" href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a> for why a sharp-point assumption would give the wrong chamfer.</p>
+  <pre><code>G00 X16.0 (POSITION AHEAD OF THE FACE FOR THE COMPENSATED ENTRY)
+G01 G42 X18.0 Z0.0 F0.10 (ENGAGE RIGHT COMP ON THE FACE APPROACH)
+G01 X20.0 Z-1.0 (CUT THE 1 MM RADIAL BY 1 MM AXIAL CHAMFER)
+G01 Z-26.0 (FINISH THE 20 MM OD PAST THE CUTOFF FACE)
+G01 X22.0 Z-27.0 (FEED OUT FROM THE OD BEHIND THE FINISHED PART)
+G01 G40 X26.0 (CANCEL COMPENSATION ON THE OUTWARD DEPARTURE)
+G97 S600 (CANCEL CSS AND REQUEST FIXED 600 RPM)
+G00 X60.0 (RETRACT RADIALLY TO THE ASSUMED CLEARANCE X)
+G00 Z10.0 (RETURN AXIALLY TO THE VERIFIED TOOL-CHANGE LOCATION)
+M09 (COOLANT OFF)
+M05 (STOP THE SPINDLE BEFORE THE TOOL CHANGE)
+T0202 (SELECT CUTOFF TOOL 2 AND ITS EDGE-REFERENCED OFFSET 2)
+G97 S500 M03 (START AT FIXED 500 RPM FOR THIS CUTOFF EXAMPLE)
+G00 X26.0 (POSITION OUTSIDE THE STOCK WITH THE NEW TOOL)
+G00 Z-25.0 (LOCATE THE POSITIVE-Z BLADE EDGE AT THE REAR FACE)
+M08 (COOLANT ON)
+G01 X-0.2 F0.05 (PART OFF WITH THE ASSUMED 0.1 MM RADIAL OVERTRAVEL)
+G00 X60.0 (WITHDRAW RADIALLY FROM THE CUTOFF SLOT)
+G00 Z10.0 (RETURN TO THE ASSUMED CLEARANCE Z)
+M09 (COOLANT OFF)
+M05 (SPINDLE STOP)
+M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
+  <p>File-start/end percent delimiters, tool-call behavior and supported startup codes must be supplied or adapted as required by the target control. No bar-feeder or parts-catcher sequence is implied.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="cnc-turning-program--trace-the-modal-state-and-finished-dimensions-on-paper" data-card="cnc-turning-program--trace-the-modal-state-and-finished-dimensions-on-paper">
+    <summary>Trace the modal state and finished dimensions on paper<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Trace the modal state and finished dimensions on paper</h2>
+  <ul class="boxes">
+    <li>Mark where S means RPM and where it means metres per minute; locate the preceding RPM clamp.</li>
+    <li>Confirm that every F value is interpreted in mm/rev under G99.</li>
+    <li>Calculate the radial depth of each OD pass and the two chamfer endpoints.</li>
+    <li>Locate the nose-compensation entry and departure, and identify the selected offset register.</li>
+    <li>Check that the cutoff blade's positive-Z edge leaves the intended 25 mm length.</li>
+  </ul>
+  <p>The syntax conventions can be compared with the <a href="https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---programming.html">Haas lathe programming reference</a>. This original example is not copied from a manufacturer program. A paper trace establishes intended geometry and modal state; actual prove-out still follows <a class="xref-page" href="#p-cnc-program-proving">CNC Programming and Prove-Out</a>.</p>
+  <p><a class="button" data-practice-add="turning-error-feed" href="../practice.html#turning-error-feed">Spot a feed-mode error</a></p>
+    </div>
+  </details>
+</div>
+
+</article>
 <article class="article bundled" id="p-shop-inspection">
   <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span></div>
   <h1>Shop Inspection and Quality Control</h1>
@@ -12541,7 +12802,7 @@ M30</code></pre>
   <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idCBkIj4KICA8dGl0bGUgaWQ9InQiPlBsYWluIEdPIGFuZCBOTy1HTyBwbHVnIGdhdWdlPC90aXRsZT4KICA8ZGVzYyBpZD0iZCI+VGhlIEdPIHBsdWcgaXMgc21hbGxlciBpbiBkaWFtZXRlciBhbmQgY2hlY2tzIHRoZSBsb3dlciBob2xlIGxpbWl0LiBUaGUgTk8tR08gcGx1ZyBpcyBsYXJnZXIgYW5kIGNoZWNrcyB0aGUgdXBwZXIgaG9sZSBsaW1pdC48L2Rlc2M+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0MzAiIGZpbGw9IiNmZmYiLz4KICA8ZyBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMyI+CiAgICA8cmVjdCB4PSIyODAiIHk9IjE2MCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjZThlZGYyIi8+CiAgICA8cmVjdCB4PSIxMTAiIHk9IjE0NSIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI5MCIgZmlsbD0iI2I5ZGVlZiIvPgogICAgPHJlY3QgeD0iNTIwIiB5PSIxMjUiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTMwIiBmaWxsPSIjZjVkYzlhIi8+CiAgPC9nPgogIDxnIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjMyIiBmaWxsPSIjMDAyMTQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgIDx0ZXh0IHg9IjE5NSIgeT0iNDUiPkdPPC90ZXh0PgogICAgPHRleHQgeD0iMTk1IiB5PSI4NSI+U21hbGxlciBkaWFtZXRlcjwvdGV4dD4KICAgIDx0ZXh0IHg9IjU4MCIgeT0iNDUiPk5PLUdPPC90ZXh0PgogICAgPHRleHQgeD0iNTgwIiB5PSI4NSI+TGFyZ2VyIGRpYW1ldGVyPC90ZXh0PgogICAgPHRleHQgeD0iNDAwIiB5PSIyMDEiPkhhbmRsZTwvdGV4dD4KICAgIDx0ZXh0IHg9IjE5NSIgeT0iMzA1Ij5TaG91bGQgZW50ZXI8L3RleHQ+CiAgICA8dGV4dCB4PSI1ODAiIHk9IjMwNSI+U2hvdWxkIG5vdCBlbnRlcio8L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjM2NSI+KlVzZSB0aGUgc3BlY2lmaWVkIGVuZ2FnZW1lbnQgcnVsZS48L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjQwNSI+TmV2ZXIgZm9yY2UgYSBnYXVnZS48L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt="Two ends of a plain plug gauge: the smaller GO end should enter the hole; the larger NO-GO end should not enter under the specified gauging procedure."></p><figcaption>Conceptual plain plug gauge. The diameter difference is exaggerated; these are not gauge manufacturing dimensions.</figcaption></figure>
   <p>A GO plug that will not enter is a failed check, not proof of one particular cause: an undersize hole, burr, dirt, poor alignment or form error can obstruct it. Clean and investigate using the approved method. A NO-GO plug that enters beyond the permitted engagement is also a failed check.</p>
   <p>Use the correctly identified gauge with current calibration status. Do not derive gauge sizes directly from workpiece limits. This plain-gauge explanation does not supply the engagement rules for threaded gauges.</p>
-  <p class="deeper-ref" id="deeper-ref-92">Supporting detail: <a href="#deeper-addendum-92"><strong>Addendum 92</strong></a> &mdash; Why the gauge itself needs limits and wear checks.</p>
+  <p class="deeper-ref" id="deeper-ref-100">Supporting detail: <a href="#deeper-addendum-100"><strong>Addendum 100</strong></a> &mdash; Why the gauge itself needs limits and wear checks.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="shop-inspection--build-a-clean-repeatable-surface-plate-setup" data-card="shop-inspection--build-a-clean-repeatable-surface-plate-setup">
@@ -12619,7 +12880,7 @@ M30</code></pre>
     <li><strong>Midpoint of the limits:</strong> (24.95 + 25.05) / 2 = <strong>25.00 mm</strong>. This sample mean is centred on that midpoint, and all five values are inside the limits.</li>
   </ul>
   <p>Now add 0.04 mm to every reading. The mean becomes 25.04 mm and the range remains 0.04 mm, but the largest reading becomes 25.06 mm and fails. Centre and spread answer different questions.</p>
-  <p class="deeper-ref" id="deeper-ref-93">Supporting detail: <a href="#deeper-addendum-93"><strong>Addendum 93</strong></a> &mdash; Why a small sample range is not the full process spread.</p>
+  <p class="deeper-ref" id="deeper-ref-101">Supporting detail: <a href="#deeper-addendum-101"><strong>Addendum 101</strong></a> &mdash; Why a small sample range is not the full process spread.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="process-capability--passing-parts-are-evidence-not-proof-of-a-capable-process" data-card="process-capability--passing-parts-are-evidence-not-proof-of-a-capable-process">
@@ -12628,7 +12889,7 @@ M30</code></pre>
       <h2>Passing parts are evidence, not proof of a capable process</h2>
   <p>Capability concerns a process over time, not a single successful part. First establish that the measurement method is suitable and the process is stable enough to describe meaningfully. Collect representative readings across the conditions the conclusion is meant to cover.</p>
   <p>A stable process can still be too wide for the tolerance. An unstable process can happen to produce five passing parts. Neither case is resolved by averaging away the problem. Investigate a trend or sudden change using the inspection plan.</p>
-  <p class="deeper-ref" id="deeper-ref-94">Supporting detail: <a href="#deeper-addendum-94"><strong>Addendum 94</strong></a> &mdash; Where capability indices fit.</p>
+  <p class="deeper-ref" id="deeper-ref-102">Supporting detail: <a href="#deeper-addendum-102"><strong>Addendum 102</strong></a> &mdash; Where capability indices fit.</p>
   <p><a class="button" data-practice-add="inspection-sample-mean" href="../practice.html#inspection-sample-mean">Practice mean</a> <a class="button" data-practice-add="inspection-sample-range" href="../practice.html#inspection-sample-range">Practice range</a> <a class="button" data-practice-add="inspection-sample-centre" href="../practice.html#inspection-sample-centre">Check sample centring</a></p>
     </div>
   </details>
@@ -12722,7 +12983,7 @@ M30</code></pre>
       <h2>A manufacturing cell coordinates machines and handling</h2>
   <p>A <strong>flexible manufacturing cell</strong> combines machining and handling resources arranged to produce a planned family of parts. Flexibility comes from suitable programs, tools, fixtures and scheduling; it does not mean any part can be run without preparation.</p>
   <p>A loading robot uses a programmed manipulator and a gripping device to transfer parts between defined positions. The cell must confirm conditions such as part presence, clamp state and machine readiness before the next action. A robot's repeatable motion does not compensate for a wrongly seated part.</p>
-  <p class="deeper-ref" id="deeper-ref-95">Supporting detail: <a href="#deeper-addendum-95"><strong>Addendum 95</strong></a> &mdash; Cell, system and integration describe different scopes.</p>
+  <p class="deeper-ref" id="deeper-ref-103">Supporting detail: <a href="#deeper-addendum-103"><strong>Addendum 103</strong></a> &mdash; Cell, system and integration describe different scopes.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="automated-manufacturing--lights-out-production-requires-a-plan-for-faults-and-variation" data-card="automated-manufacturing--lights-out-production-requires-a-plan-for-faults-and-variation">
@@ -12760,7 +13021,7 @@ M30</code></pre>
       <h2>Metallic bonding helps explain conduction and forming</h2>
   <p>In a metal, some electrons are shared throughout the structure rather than tied to one bond between two atoms. Their mobility helps metals conduct electricity and heat. Metallic bonding can remain intact while atoms rearrange during permanent deformation, which helps explain why many metals can be rolled or drawn.</p>
   <p>Most engineering metals contain many tiny crystals called <strong>grains</strong>. Atoms have an ordered arrangement inside each grain; adjacent grains have different orientations. Grain size, alloy chemistry and processing history all influence properties.</p>
-  <p class="deeper-ref" id="deeper-ref-96">Supporting detail: <a href="#deeper-addendum-96"><strong>Addendum 96</strong></a> &mdash; Why two pieces of the same alloy can behave differently.</p>
+  <p class="deeper-ref" id="deeper-ref-104">Supporting detail: <a href="#deeper-addendum-104"><strong>Addendum 104</strong></a> &mdash; Why two pieces of the same alloy can behave differently.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="metals-and-their-properties--strength-hardness-ductility-and-toughness-answer-different-questions" data-card="metals-and-their-properties--strength-hardness-ductility-and-toughness-answer-different-questions">
@@ -12787,7 +13048,7 @@ M30</code></pre>
   <p><strong>Density</strong> is mass per volume. Compare equal volumes when comparing densities; a large aluminum part can still weigh more than a small steel part. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/geometry-mass-and-force.html" target="_blank" rel="noopener">Geometry, Mass, and Force</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/dimensional-analysis.html" target="_blank" rel="noopener">Dimensional Analysis</a> for mass, weight and unit calculations.</p>
   <p><strong>Conductivity</strong> describes how readily heat or current travels through a material. Metals vary widely: choosing a good conductor is different from choosing a high-strength alloy.</p>
   <p><strong>Corrosion resistance</strong> depends on the metal and its surroundings. Stainless steel and aluminum can corrode. Water, salts, trapped moisture and contact with other metals can change performance. A protective surface film helps only while the environment allows it to remain effective.</p>
-  <p class="deeper-ref" id="deeper-ref-97">Supporting detail: <a href="#deeper-addendum-97"><strong>Addendum 97</strong></a> &mdash; Why connecting two different metals can change corrosion.</p>
+  <p class="deeper-ref" id="deeper-ref-105">Supporting detail: <a href="#deeper-addendum-105"><strong>Addendum 105</strong></a> &mdash; Why connecting two different metals can change corrosion.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="metals-and-their-properties--ferrous-means-iron-based-a-magnet-does-not-identify-the-grade" data-card="metals-and-their-properties--ferrous-means-iron-based-a-magnet-does-not-identify-the-grade">
@@ -12877,7 +13138,7 @@ M30</code></pre>
   </table>
   <p><strong>304 and 316 stainless:</strong> their chemistries are similar, but 316 has an added alloying element, molybdenum. This improves resistance to chloride exposure and urban or industrial pollution compared with 304.</p>
   <p><strong>Tool-steel groups:</strong> O1 is an oil-hardening grade, A2 is an air-hardening grade, and D2 is a high-carbon, high-chromium grade. These labels describe different tool-steel groups; they are not carbon-percentage codes.</p>
-  <p class="deeper-ref" id="deeper-ref-98">Supporting detail: <a href="#deeper-addendum-98"><strong>Addendum 98</strong></a> &mdash; Sources and quoted designation meanings.</p>
+  <p class="deeper-ref" id="deeper-ref-106">Supporting detail: <a href="#deeper-addendum-106"><strong>Addendum 106</strong></a> &mdash; Sources and quoted designation meanings.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="types-of-steel--cast-iron-is-a-separate-iron-based-material-and-it-can-be-machined" data-card="types-of-steel--cast-iron-is-a-separate-iron-based-material-and-it-can-be-machined">
@@ -12959,7 +13220,7 @@ M30</code></pre>
       <tr><th scope="row">7xxx</th><td>Zinc.</td></tr>
     </tbody>
   </table>
-  <p class="deeper-ref" id="deeper-ref-99">Supporting detail: <a href="#deeper-addendum-99"><strong>Addendum 99</strong></a> &mdash; Source for the series table.</p>
+  <p class="deeper-ref" id="deeper-ref-107">Supporting detail: <a href="#deeper-addendum-107"><strong>Addendum 107</strong></a> &mdash; Source for the series table.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="nonferrous-metals--6061-favors-fabrication-7075-offers-higher-strength-in-the-t6-condition" data-card="nonferrous-metals--6061-favors-fabrication-7075-offers-higher-strength-in-the-t6-condition">
@@ -12975,7 +13236,7 @@ M30</code></pre>
       <tr><th scope="row">7075</th><td>Aircraft components, molds and industrial tooling.</td><td>Good machinability, but generally considered unsuitable for welding because of cracking susceptibility.</td></tr>
     </tbody>
   </table>
-  <p class="deeper-ref" id="deeper-ref-100">Supporting detail: <a href="#deeper-addendum-100"><strong>Addendum 100</strong></a> &mdash; Sources and comparison limits.</p>
+  <p class="deeper-ref" id="deeper-ref-108">Supporting detail: <a href="#deeper-addendum-108"><strong>Addendum 108</strong></a> &mdash; Sources and comparison limits.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="nonferrous-metals--brass-and-bronze-trade-some-of-copper-s-conductivity-for-other-properties" data-card="nonferrous-metals--brass-and-bronze-trade-some-of-copper-s-conductivity-for-other-properties">
@@ -13006,7 +13267,7 @@ M30</code></pre>
       <h2>Heat treatment is conditioning: change structure to change properties</h2>
   <p>Heat treatment uses controlled heating, holding and cooling to change a metal's internal structure. It belongs to <strong>Conditioning</strong> in <a class="xref-out" href="https://bharrison6.github.io/coursewiki/materials-and-processes/manufacturing-process-categories.html" target="_blank" rel="noopener">Manufacturing Process Categories</a>. It can change properties without intentionally changing the overall shape, although distortion can occur.</p>
   <p>The result depends on alloy, starting condition, section thickness and the complete cycle. Heating more or cooling faster is not automatically better. A treatment that strengthens one alloy can soften another.</p>
-  <p class="deeper-ref" id="deeper-ref-101">Supporting detail: <a href="#deeper-addendum-101"><strong>Addendum 101</strong></a> &mdash; Steel microstructures are not the four steel families.</p>
+  <p class="deeper-ref" id="deeper-ref-109">Supporting detail: <a href="#deeper-addendum-109"><strong>Addendum 109</strong></a> &mdash; Steel microstructures are not the four steel families.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="heat-treating-metals--anneal-to-soften-normalize-suitable-steels-to-refine-structure" data-card="heat-treating-metals--anneal-to-soften-normalize-suitable-steels-to-refine-structure">
@@ -13053,7 +13314,7 @@ M30</code></pre>
   <p>Some aluminum alloys can be strengthened by solution treatment, quenching and aging. Solution treatment puts selected elements into solid solution; subsequent aging develops small particles that obstruct deformation. Aging can occur naturally or through controlled heating, depending on the alloy and required condition.</p>
   <p><strong>Solid-solution strengthening and precipitation strengthening are different mechanisms.</strong> Dissolved atoms provide the first; particles of another phase provide the second. Other aluminum alloys obtain much of their strength through cold work. Annealing can soften cold-worked material.</p>
   <p>An aluminum <strong>temper</strong> describes its processing condition. It is not synonymous with the steel process called tempering. Preserve suffixes such as -O and -T6 when reading or writing a material description; consult the relevant alloy-temper specification for their exact meanings.</p>
-  <p class="deeper-ref" id="deeper-ref-102">Supporting detail: <a href="#deeper-addendum-102"><strong>Addendum 102</strong></a> &mdash; Further reading on conditioning processes.</p>
+  <p class="deeper-ref" id="deeper-ref-110">Supporting detail: <a href="#deeper-addendum-110"><strong>Addendum 110</strong></a> &mdash; Further reading on conditioning processes.</p>
     </div>
   </details>
 </div>
@@ -13090,7 +13351,7 @@ M30</code></pre>
   <p>Heat builds up near the cut because plastics generally conduct heat poorly. Softened chips can stick to the tool or weld back onto the edge. The symptoms are smeared surfaces, strings of softened material and chips packed into the cutter.</p>
   <p><strong>Slowing the feed alone can make melting worse.</strong> Feed is how quickly the tool advances through the work; spindle speed is how quickly it turns. Too little advance per tooth lets the edge rub instead of taking a useful chip. Start with cutting data for the resin and tool, keep the tool sharp, and maintain chip clearance. Reducing excessive spindle speed may help, but feed, speed and cut depth must be considered together.</p>
   <p>Deep holes need a planned way to clear chips. Coolants and cleaners must be compatible with the plastic; an unsuitable liquid can cause fine cracks called <em>crazing</em>. Use <a class="xref-page" href="#p-feeds-and-speeds">Feeds and Speeds</a> for the relationships, not its metal cutting values as plastic settings.</p>
-  <p class="deeper-ref" id="deeper-ref-103">Supporting detail: <a href="#deeper-addendum-103"><strong>Addendum 103</strong></a> &mdash; Why a slower cut can produce more heat.</p>
+  <p class="deeper-ref" id="deeper-ref-111">Supporting detail: <a href="#deeper-addendum-111"><strong>Addendum 111</strong></a> &mdash; Why a slower cut can produce more heat.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="cutting-and-machining-plastics--acrylic-pvc-and-polycarbonate-behave-differently-under-a-laser" data-card="cutting-and-machining-plastics--acrylic-pvc-and-polycarbonate-behave-differently-under-a-laser">
@@ -13101,7 +13362,7 @@ M30</code></pre>
   <p><strong>PVC is not a laser-cutting substitute for acrylic.</strong> Heating PVC can release hydrogen chloride; with moisture it forms hydrochloric acid, creating an exposure and corrosion concern. This is a chemical incompatibility, not simply a poor-looking edge.</p>
   <p><strong>Polycarbonate is often a poor choice for a clean CO₂-laser-cut sheet edge.</strong> It can yellow, char and leave a degraded edge instead of acrylic's clear finish. Specialized processes can cut some polycarbonate, so “polycarbonate cannot be laser processed” is too broad. Routing or sawing is often the better starting choice for a clear polycarbonate profile. Do not assign PVC's chlorine chemistry to polycarbonate.</p>
   <p>Material approval and operating controls belong with <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a> and <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>. Appearance or a trade name is not enough to identify an unknown sheet.</p>
-  <p class="deeper-ref" id="deeper-ref-104">Supporting detail: <a href="#deeper-addendum-104"><strong>Addendum 104</strong></a> &mdash; Manufacturer references and the limits of a material list.</p>
+  <p class="deeper-ref" id="deeper-ref-112">Supporting detail: <a href="#deeper-addendum-112"><strong>Addendum 112</strong></a> &mdash; Manufacturer references and the limits of a material list.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="cutting-and-machining-plastics--trim-the-molding-excess-without-cutting-into-the-part" data-card="cutting-and-machining-plastics--trim-the-molding-excess-without-cutting-into-the-part">
@@ -13131,7 +13392,7 @@ M30</code></pre>
       <h2>EDM needs an electrically conductive workpiece</h2>
   <p>Electrical discharge machining (EDM) removes material with repeated electrical discharges across a small gap. Local heating melts and vaporizes tiny amounts of material. The electrode does not cut by rubbing against the work.</p>
   <p><strong>Check conductivity before considering EDM.</strong> Hardened tool steel is a candidate; ordinary nonconductive glass or ceramic is not. Hardness is less restrictive than in cutting with a conventional tool, but composition and electrical and thermal properties still affect machining behavior.</p>
-  <p class="deeper-ref" id="deeper-ref-105">Supporting detail: <a href="#deeper-addendum-105"><strong>Addendum 105</strong></a> &mdash; Why the fluid and the gap matter.</p>
+  <p class="deeper-ref" id="deeper-ref-113">Supporting detail: <a href="#deeper-addendum-113"><strong>Addendum 113</strong></a> &mdash; Why the fluid and the gap matter.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="electrical-discharge-machining--use-sinker-edm-for-cavities-and-wire-edm-for-through-profiles" data-card="electrical-discharge-machining--use-sinker-edm-for-cavities-and-wire-edm-for-through-profiles">
@@ -13151,7 +13412,7 @@ M30</code></pre>
   <p><code>Center-path offset = wire radius + spark gap</code>. Measure this distance from the finished contour toward the material being removed. In a simple straight cut, the full cut width (kerf) is wire diameter plus twice the gap.</p>
   <p>For an illustrative radius of 0.120 mm and a one-sided gap of 0.018 mm, the offset is <strong>0.138 mm</strong>. These are teaching inputs, not machine settings. A control may apply compensation to a programmed part contour; do not also offset the geometry a second time.</p>
   <p><a class="button" data-practice-add="nt-wire-offset" href="../practice.html#nt-wire-offset">Practice a wire offset</a></p>
-  <p class="deeper-ref" id="deeper-ref-106">Supporting detail: <a href="#deeper-addendum-106"><strong>Addendum 106</strong></a> &mdash; Why one offset does not describe every pass.</p>
+  <p class="deeper-ref" id="deeper-ref-114">Supporting detail: <a href="#deeper-addendum-114"><strong>Addendum 114</strong></a> &mdash; Why one offset does not describe every pass.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="electrical-discharge-machining--low-cutting-force-does-not-mean-no-thermal-change" data-card="electrical-discharge-machining--low-cutting-force-does-not-mean-no-thermal-change">
@@ -13159,7 +13420,7 @@ M30</code></pre>
     <div class="body">
       <h2>Low cutting force does not mean no thermal change</h2>
   <p>EDM can hold fine features and produce a fine finish with suitable finishing passes, but its surface contains small discharge craters. Melted material can solidify again as a <strong>recast layer</strong>. Heat can alter nearby material, so surface integrity and any required finishing belong in process selection.</p>
-  <p class="deeper-ref" id="deeper-ref-107">Supporting detail: <a href="#deeper-addendum-107"><strong>Addendum 107</strong></a> &mdash; Further reading on EDM surfaces and wire systems.</p>
+  <p class="deeper-ref" id="deeper-ref-115">Supporting detail: <a href="#deeper-addendum-115"><strong>Addendum 115</strong></a> &mdash; Further reading on EDM surfaces and wire systems.</p>
   <p>Compare <a class="xref-page" href="#p-electrochemical-machining">Electrochemical Machining</a>. Safety references: <a class="xref-page" href="#p-electrical-safety">Electrical Safety</a>, <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a> and <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
@@ -13194,7 +13455,7 @@ M30</code></pre>
     <tr><th scope="row">What surface results?</th><td>Can be smooth and burr-free, without a thermal recast layer</td><td>Discharge craters and possible recast material</td></tr>
   </tbody></table></div>
   <p>ECM is not a melting process and normally avoids a heat-affected zone. That does not mean the electrolyte stays cold: current flow heats it. Flow, temperature, chemistry and gap control all matter.</p>
-  <p class="deeper-ref" id="deeper-ref-108">Supporting detail: <a href="#deeper-addendum-108"><strong>Addendum 108</strong></a> &mdash; Why hardness alone does not set ECM performance.</p>
+  <p class="deeper-ref" id="deeper-ref-116">Supporting detail: <a href="#deeper-addendum-116"><strong>Addendum 116</strong></a> &mdash; Why hardness alone does not set ECM performance.</p>
   <p>Compare <a class="xref-page" href="#p-electrical-discharge-machining">Electrical Discharge Machining</a>. Safety references: <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a> and <a class="xref-page" href="#p-electrical-safety">Electrical Safety</a>.</p>
     </div>
   </details>
@@ -13224,7 +13485,7 @@ M30</code></pre>
       <h2>Laser cutting concentrates light into a small region</h2>
   <p>A focused laser beam supplies thermal energy; cutting gas commonly helps remove material. Laser cutting is a candidate for fine profiles in sheet material. Metals, wood and selected plastics require suitable laser systems; a machine that cuts acrylic is not automatically a metal cutter.</p>
   <p>A narrow kerf and fine detail are possible, particularly in thinner material. Edge finish, taper and dimensional accuracy depend on material, thickness, focus, gas and cutting speed. Melting, discoloration or charring may affect the edge. Do not assume the HAZ is zero.</p>
-  <p class="deeper-ref" id="deeper-ref-109">Supporting detail: <a href="#deeper-addendum-109"><strong>Addendum 109</strong></a> &mdash; Why the material and laser must be matched.</p>
+  <p class="deeper-ref" id="deeper-ref-117">Supporting detail: <a href="#deeper-addendum-117"><strong>Addendum 117</strong></a> &mdash; Why the material and laser must be matched.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="beam-and-jet-cutting--waterjet-cuts-soft-materials-added-abrasive-cuts-hard-materials" data-card="beam-and-jet-cutting--waterjet-cuts-soft-materials-added-abrasive-cuts-hard-materials">
@@ -13234,7 +13495,7 @@ M30</code></pre>
   <p><strong>Pure waterjet</strong> uses a high-speed water stream for materials such as foam, rubber and other soft sheet. <strong>Abrasive waterjet</strong> adds hard particles to erode metals, stone, non-tempered glass and many ceramics. Electrical conductivity is not required.</p>
   <p>Waterjet normally creates no thermal HAZ. It is a candidate for thick stock or a heat-sensitive edge, but thickness still affects speed and cut quality. Taper, where the cut width changes through the thickness, and striations, visible lines down the cut face, can limit accuracy and finish. Slower quality cuts may reduce these effects. Brittle edges may chip and need finishing.</p>
   <p>Identify the glass type before choosing a process: tempered glass is not a candidate for ordinary waterjet cutting. A no-HAZ process is not a promise of no mechanical damage.</p>
-  <p class="deeper-ref" id="deeper-ref-110">Supporting detail: <a href="#deeper-addendum-110"><strong>Addendum 110</strong></a> &mdash; Further reading on glass and waterjet limits.</p>
+  <p class="deeper-ref" id="deeper-ref-118">Supporting detail: <a href="#deeper-addendum-118"><strong>Addendum 118</strong></a> &mdash; Further reading on glass and waterjet limits.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="beam-and-jet-cutting--plasma-is-a-thermal-cutting-candidate-for-conductive-metal" data-card="beam-and-jet-cutting--plasma-is-a-thermal-cutting-candidate-for-conductive-metal">
@@ -13243,7 +13504,7 @@ M30</code></pre>
       <h2>Plasma is a thermal cutting candidate for conductive metal</h2>
   <p>A plasma cutter uses an electric arc through ionized gas to melt metal; the gas stream expels it. The work must conduct electricity. Steel, stainless steel and aluminum are candidates; ordinary glass and wood are not.</p>
   <p>Plasma often suits productive plate cutting where its edge quality meets the drawing or later machining is planned. Compared with a fine laser cut in thin sheet, small details can be harder to hold. Edge bevel, attached solidified metal (dross) and a HAZ may need attention. Equipment and thickness determine actual capability; plasma is not automatically a rough-only process.</p>
-  <p class="deeper-ref" id="deeper-ref-111">Supporting detail: <a href="#deeper-addendum-111"><strong>Addendum 111</strong></a> &mdash; Compare capability on the actual thickness.</p>
+  <p class="deeper-ref" id="deeper-ref-119">Supporting detail: <a href="#deeper-addendum-119"><strong>Addendum 119</strong></a> &mdash; Compare capability on the actual thickness.</p>
   <p>Continue with <a class="xref-page" href="#p-selecting-a-removal-process">Selecting a Material-Removal Process</a>. Safety references: <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>, <a class="xref-page" href="#p-electrical-safety">Electrical Safety</a>, <a class="xref-page" href="#p-fire-safety">Fire Safety</a> and <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
@@ -13273,7 +13534,7 @@ M30</code></pre>
       <h2>No thermal HAZ does not mean a perfect surface</h2>
   <p>Ultrasonic impact machining normally avoids a thermal heat-affected zone. Abrasive size, tool wear, slurry access and feature depth affect dimensional control and finish. Fine abrasive can improve the surface, but removal may be slow; edge chipping and subsurface damage remain possible in brittle work.</p>
   <p>Distinguish this process from <strong>ultrasonic-assisted cutting</strong>, where vibration is added to another cutting or grinding process. The two names do not imply identical tooling or removal mechanisms.</p>
-  <p class="deeper-ref" id="deeper-ref-112">Supporting detail: <a href="#deeper-addendum-112"><strong>Addendum 112</strong></a> &mdash; Why a shaped tool does not give an exact-size copy.</p>
+  <p class="deeper-ref" id="deeper-ref-120">Supporting detail: <a href="#deeper-addendum-120"><strong>Addendum 120</strong></a> &mdash; Why a shaped tool does not give an exact-size copy.</p>
   <p>Compare <a class="xref-page" href="#p-electrical-discharge-machining">Electrical Discharge Machining</a> and <a class="xref-page" href="#p-selecting-a-removal-process">Selecting a Material-Removal Process</a>. Safety references: <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a> and <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
@@ -13302,7 +13563,7 @@ M30</code></pre>
     <div class="body">
       <h2>Allow for sideways etching beneath the mask</h2>
   <p>Etching can spread sideways beneath the mask edge as well as into the surface. This <strong>undercut</strong> limits narrow lands, corner sharpness and dimensional control, especially as etch depth increases. The mask design must compensate for the etching behavior. Surface finish depends on the material and chemistry. Chemical removal avoids a cutting-induced thermal HAZ, but that is not the same as saying the chemical bath has no temperature requirements.</p>
-  <p class="deeper-ref" id="deeper-ref-113">Supporting detail: <a href="#deeper-addendum-113"><strong>Addendum 113</strong></a> &mdash; Why thin-sheet patterns are a useful application.</p>
+  <p class="deeper-ref" id="deeper-ref-121">Supporting detail: <a href="#deeper-addendum-121"><strong>Addendum 121</strong></a> &mdash; Why thin-sheet patterns are a useful application.</p>
   <p>Compare <a class="xref-page" href="#p-electrochemical-machining">Electrochemical Machining</a> and <a class="xref-page" href="#p-selecting-a-removal-process">Selecting a Material-Removal Process</a>. Safety reference: <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
@@ -14485,179 +14746,243 @@ M30</code></pre>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-92" value="92">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-shop-inspection">Shop Inspection and Quality Control</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 92.</span> Why the gauge itself needs limits and wear checks</h2>
-        <p>Gauges cannot be manufactured to an infinitely exact size. Their own tolerances and wear allowances are selected under the applicable gauging specification. Repeated use can shrink a plug or enlarge a ring and change its decision.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-setup">CNC Turning Setup and Offsets</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 92.</span> Why an extra axis changes the work a turning center can do</h2>
+        <p>Ordinary turning produces surfaces around the spindle axis. A powered tool plus controlled work angle can reach features at selected angular positions. See the <a href="https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---options-programming.html">Haas options programming reference</a> for one manufacturer's C-axis implementation.</p>
         <p class="deeper-back"><a href="#deeper-ref-92">Back to reference 92</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-93" value="93">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-process-capability">Process Capability and Variation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 93.</span> Why a small sample range is not the full process spread</h2>
-        <p>The range uses only the two extremes observed in this sample. More readings, different tools, temperature changes and later production may reveal variation not present in these five parts. Standard deviation is another measure of spread that uses every reading's distance from the mean; no standard-deviation calculation is needed for this example.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-setup">CNC Turning Setup and Offsets</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 93.</span> Control example: separate geometry and wear fields</h2>
+        <p>The <a href="https://www.haascnc.com/content/dam/haascnc/en/service/manual/operator/english---lathe-ngc---operator%27s-manual---2025.pdf">Haas lathe manual</a>, Operation, describes separate X/Z geometry wear, radius and tip-direction fields. Its button sequences and offset conventions must not be assumed on another control.</p>
         <p class="deeper-back"><a href="#deeper-ref-93">Back to reference 93</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-94" value="94">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-process-capability">Process Capability and Variation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 94.</span> Where capability indices fit</h2>
-        <p>Indices such as Cp and Cpk compare estimated process variation and its position with specification limits. Their interpretation depends on the data, stability, distribution and application requirements. A single threshold is not a universal acceptance rule, and a five-reading classroom example is not a capability study.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-speeds-and-feeds">CNC Turning Spindle and Feed Modes</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 94.</span> Calculate where a speed ceiling starts to matter</h2>
+        <p>With 90 m/min and a ceiling of 1800 RPM, the crossover diameter is 90 × 1000 / (π × 1800) = 15.92 mm. At 10 mm, unrestricted CSS would request 2865 RPM, so the simplified steady-state result is 1800 RPM. Acceleration and other machine limits can reduce actual speed further. See <a href="https://www.haascnc.com/content/dam/haascnc/en/service/reference/programming-workbooks/lathe---programming-workbook.pdf">Haas's spindle-speed commands workbook</a> for its G50/G96/G97 implementation.</p>
         <p class="deeper-back"><a href="#deeper-ref-94">Back to reference 94</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-95" value="95">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-automated-manufacturing">Automated Manufacturing Cells</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 95.</span> Cell, system and integration describe different scopes</h2>
-        <p>A flexible manufacturing system may coordinate multiple machines or cells with material handling and scheduling. Computer-integrated manufacturing is the broader idea of connecting manufacturing information and activities. These terms overlap in use, but are not interchangeable names for one machine configuration.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-speeds-and-feeds">CNC Turning Spindle and Feed Modes</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 95.</span> Reference for the code convention used here</h2>
+        <p>The G96–G99 entries in the <a href="https://www.haascnc.com/content/dam/haascnc/en/service/manual/operator/english---lathe-ngc---operator%27s-manual---2024.pdf">Haas lathe manual</a> describe S in CSS versus RPM and F per minute versus per revolution. Consult the manual for your own control before transferring these meanings.</p>
         <p class="deeper-back"><a href="#deeper-ref-95">Back to reference 95</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-96" value="96">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-metals-and-their-properties">Metals and Their Properties</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 96.</span> Why two pieces of the same alloy can behave differently</h2>
-        <p>Permanent deformation involves movement of crystal defects called dislocations. Grain boundaries, dissolved alloying atoms and small particles can obstruct that movement. Cold working and heat treatment change these obstacles. Composition alone therefore cannot tell you the strength of a finished piece.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 96.</span> Why a good diameter measurement does not prove a taper is correct</h2>
+        <p>The two axis touch-offs locate tangent lines, not every possible contact point on the nose. The normal to an angled surface points in another direction, so its tangency requires another offset. <a href="https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---programming.html">Haas's tool nose compensation discussion</a> describes the resulting undercut or overcut on tapered and curved profiles.</p>
         <p class="deeper-back"><a href="#deeper-ref-96">Back to reference 96</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-97" value="97">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-metals-and-their-properties">Metals and Their Properties</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 97.</span> Why connecting two different metals can change corrosion</h2>
-        <p>When dissimilar metals are electrically connected in a conducting liquid, such as salty water, galvanic corrosion can accelerate attack on the more active metal. Material pairing, exposed areas and the environment matter. Isolation and drainage can be as important as the alloy choice.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 97.</span> Where to check the control behavior</h2>
+        <p>The <a href="https://www.haascnc.com/service/codes-settings.type%3Dgcode.machine%3Dlathe.value%3DG42.html">Haas G41/G42 entry</a> connects the compensation side to the selected tool offsets. Its <a href="https://service.haascnc.com/sites/default/files/Locked/Manuals/Operator/1999/Lathe/SL_OP.PDF">archived SL manual</a>, Tool Nose Compensation, explains imaginary-tip direction and approach/depart moves. Use the current manual for the installed control when programming.</p>
         <p class="deeper-back"><a href="#deeper-ref-97">Back to reference 97</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-98" value="98">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-types-of-steel">Types of Steel</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 98.</span> Sources and quoted designation meanings</h2>
-        <p>The <a href="https://www.msci.org/topic/the-aisi-numbering-system/">Metals Service Center Institute</a> identifies the first digit as “family of steel,” the second as “additional elements,” and the third and fourth as “nominal carbon content”; its example is 1018 at 0.18% carbon. <a href="https://fmcarbide.com/pages/aisi-sae-steel-numbering-system">FM Carbide's AISI/SAE guide</a> calls 10 the “series (alloy family)” and gives carbon in “hundredths of a percent,” with 1045 and 4140 examples.</p>
-    <p>The <a href="https://www.imoa.info/molybdenum-uses/molybdenum-grade-stainless-steels/molybdenum-grade-stainless-steel-faq.php">International Molybdenum Association's 304/316 comparison</a> states that “Type 316 contains a molybdenum addition” and explains the corrosion benefit. <a href="https://hudsontoolsteel.com/technical-data/steelA2">Hudson Tool Steel's A2 data sheet</a> describes O1 as “oil-hardening,” A2 as “air-hardening,” and D2 as “high-carbon, high-chromium.” These are introductory meanings, not complete material specifications.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-profiles">CNC Turning Profiles and Cycles</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 98.</span> Why no universal cycle template is shown</h2>
+        <p>The <a href="https://www.haascnc.com/service/codes-settings.type%3Dgcode.machine%3Dlathe.value%3DG71.html">Haas G71 reference</a> distinguishes path types and radial cut depth from diametral finish allowance. The <a href="https://support.hurco.com/wp-content/uploads/hurco_lathe/WinMaxLatheBook/WML_NCBook/WML_NC_ISNC_GC/G71_-_Stock_Removal_in_Turning.htm">Hurco ISNC G71 reference</a> supplies its own two-block definition. A familiar cycle number does not establish compatible parameter meanings.</p>
         <p class="deeper-back"><a href="#deeper-ref-98">Back to reference 98</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-99" value="99">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-nonferrous-metals">Nonferrous Metals</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 99.</span> Source for the series table</h2>
-        <p>The <a href="https://www.aluminum.org/standards">Aluminum Association's aluminum-alloy overview</a> identifies these series and their principal additions. It describes 1xxx as “aluminum 99 percent or higher purity.” The series names do not list every element in an individual alloy; for example, the Association also identifies magnesium and possible copper and chromium additions in 7xxx alloys.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>CNC</span><span class="sep">/</span><a href="#p-cnc-turning-program">CNC Turning Program Walkthrough</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 99.</span> Check roughing depth and remaining material</h2>
+        <p>The first pass changes diameter from 24 to 22 mm, a 1 mm radial cut. The second changes 22 to 20.6 mm, a 0.7 mm radial cut. Finishing from 20.6 to 20 removes 0.3 mm radially. Extending the OD cuts beyond Z−25 leaves room for the cutoff blade and places the finishing departure on material that will not belong to the finished part.</p>
         <p class="deeper-back"><a href="#deeper-ref-99">Back to reference 99</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-100" value="100">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-nonferrous-metals">Nonferrous Metals</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 100.</span> Sources and comparison limits</h2>
-        <p>The <a href="https://www.aluminum.org/standards">Aluminum Association</a> identifies 6061 use in truck and marine frames and 7075 use in aircraft. <a href="https://www.metalsupermarkets.com/differences-6061-and-7075-aluminum/">Metal Supermarkets' 6061/7075 comparison</a> supports the T6 tensile-strength comparison, tank and tooling uses, machinability and welding differences. Its fabrication discussion notes that restoring the weld area's original temper in 6061 may require further heat treatment and aging. Compare the supplier's data for the actual temper and product form.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-shop-inspection">Shop Inspection and Quality Control</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 100.</span> Why the gauge itself needs limits and wear checks</h2>
+        <p>Gauges cannot be manufactured to an infinitely exact size. Their own tolerances and wear allowances are selected under the applicable gauging specification. Repeated use can shrink a plug or enlarge a ring and change its decision.</p>
         <p class="deeper-back"><a href="#deeper-ref-100">Back to reference 100</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-101" value="101">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-heat-treating-metals">Heat Treating Metals</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 101.</span> Steel microstructures are not the four steel families</h2>
-        <p>Ferrite and austenite are different iron-based crystal phases. Cementite is iron carbide, Fe₃C, a hard, brittle phase. Pearlite is a layered arrangement of ferrite and cementite. Martensite can form from austenite during sufficiently rapid cooling in suitable steel. These terms describe structure, not the buying categories carbon, alloy, stainless and tool steel.</p><p>Carbon can diffuse during slower transformations. Quenching can suppress those transformations and produce martensite. The outcome is not determined by cooling speed alone: chemistry and section size affect what forms throughout the part.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-process-capability">Process Capability and Variation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 101.</span> Why a small sample range is not the full process spread</h2>
+        <p>The range uses only the two extremes observed in this sample. More readings, different tools, temperature changes and later production may reveal variation not present in these five parts. Standard deviation is another measure of spread that uses every reading's distance from the mean; no standard-deviation calculation is needed for this example.</p>
         <p class="deeper-back"><a href="#deeper-ref-101">Back to reference 101</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-102" value="102">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-heat-treating-metals">Heat Treating Metals</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 102.</span> Further reading on conditioning processes</h2>
-        <p><a href="https://www.bodycote.com/what-we-do/precision-heat-treatment/">Bodycote's heat-treatment overview</a> provides entry points for annealing, hardening, tempering, stress relief and solution-and-age treatments. <a href="https://aec.org/alloys-tempers">AEC's alloy and temper guide</a> is a starting point for aluminum terminology. Neither an overview nor a qualitative sketch replaces a material-specific process specification.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-process-capability">Process Capability and Variation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 102.</span> Where capability indices fit</h2>
+        <p>Indices such as Cp and Cpk compare estimated process variation and its position with specification limits. Their interpretation depends on the data, stability, distribution and application requirements. A single threshold is not a universal acceptance rule, and a five-reading classroom example is not a capability study.</p>
         <p class="deeper-back"><a href="#deeper-ref-102">Back to reference 102</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-103" value="103">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Plastics</span><span class="sep">/</span><a href="#p-cutting-and-machining-plastics">Cutting and Machining Plastics</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 103.</span> Why a slower cut can produce more heat</h2>
-        <p>A tooth that advances too little spends more time sliding against the work. The next tooth may also recut trapped chips. Useful chips carry some heat away, so reducing chip thickness without reducing rubbing is not a reliable cooling strategy. ACRYLITE's <a href="https://www.acrylite.co/resources/fabrication-manuals/drilling-acrylite-acrylic-sheet">drilling guidance</a> identifies low feed or excessive RPM as causes of melted chips; its <a href="https://www.acrylite.co/resources/fabrication-manuals/routing-premium-acrylite-acrylic-sheet">routing guidance</a> treats feed, cutting edges and RPM together.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-automated-manufacturing">Automated Manufacturing Cells</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 103.</span> Cell, system and integration describe different scopes</h2>
+        <p>A flexible manufacturing system may coordinate multiple machines or cells with material handling and scheduling. Computer-integrated manufacturing is the broader idea of connecting manufacturing information and activities. These terms overlap in use, but are not interchangeable names for one machine configuration.</p>
         <p class="deeper-back"><a href="#deeper-ref-103">Back to reference 103</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-104" value="104">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Plastics</span><span class="sep">/</span><a href="#p-cutting-and-machining-plastics">Cutting and Machining Plastics</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 104.</span> Manufacturer references and the limits of a material list</h2>
-        <p><a href="https://www.troteclaser.com/en-us/resources/faqs/unsuitable-materials-laser-processing">Trotec's unsuitable-material guidance</a> lists PVC and explains why composition matters. Boss Laser describes <a href="https://team.bosslaser.com/learn/materials/acrylic/">acrylic's cut behavior</a>, <a href="https://team.bosslaser.com/learn/materials/materials-to-never-laser/">PVC decomposition concerns</a> and <a href="https://team.bosslaser.com/applications/acrylic/">polycarbonate edge discoloration</a>. Universal Laser Systems' <a href="https://cdn.ulsinc.com/assets/pdf/materials_subordinate/583606c097d4dd53e131cdab/polycarbonate__processing_guide.pdf">polycarbonate processing guide</a> discusses reducing char through a specialized cutting method. A material name on a capability list does not establish a suitable setup for a particular sheet.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-metals-and-their-properties">Metals and Their Properties</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 104.</span> Why two pieces of the same alloy can behave differently</h2>
+        <p>Permanent deformation involves movement of crystal defects called dislocations. Grain boundaries, dissolved alloying atoms and small particles can obstruct that movement. Cold working and heat treatment change these obstacles. Composition alone therefore cannot tell you the strength of a finished piece.</p>
         <p class="deeper-back"><a href="#deeper-ref-104">Back to reference 104</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-105" value="105">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 105.</span> Why the fluid and the gap matter</h2>
-        <p>The dielectric fluid normally insulates the gap. A voltage pulse breaks down that insulation locally and permits a discharge. Between pulses, the fluid helps cool the region and flush debris. Debris removal and gap control help keep discharges stable. Sinker EDM commonly uses dielectric oil; wire EDM commonly uses controlled deionized water, though oil-based wire machines also exist.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-metals-and-their-properties">Metals and Their Properties</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 105.</span> Why connecting two different metals can change corrosion</h2>
+        <p>When dissimilar metals are electrically connected in a conducting liquid, such as salty water, galvanic corrosion can accelerate attack on the more active metal. Material pairing, exposed areas and the environment matter. Isolation and drainage can be as important as the alloy choice.</p>
         <p class="deeper-back"><a href="#deeper-ref-105">Back to reference 105</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-106" value="106">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 106.</span> Why one offset does not describe every pass</h2>
-        <p>Discharge energy, flushing and finishing passes change the working gap and surface. Actual compensation comes from the machine's process data and inspection. <a href="https://help.autodesk.com/cloudhelp/2024/ENU/FCAM/files/GUID-84AE09F1-379D-461C-950F-66824F60914F.htm">Autodesk FeatureCAM help on the wire EDM offset method</a> describes the compensation value as wire radius plus spark gap plus any finishing allowance.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-types-of-steel">Types of Steel</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 106.</span> Sources and quoted designation meanings</h2>
+        <p>The <a href="https://www.msci.org/topic/the-aisi-numbering-system/">Metals Service Center Institute</a> identifies the first digit as “family of steel,” the second as “additional elements,” and the third and fourth as “nominal carbon content”; its example is 1018 at 0.18% carbon. <a href="https://fmcarbide.com/pages/aisi-sae-steel-numbering-system">FM Carbide's AISI/SAE guide</a> calls 10 the “series (alloy family)” and gives carbon in “hundredths of a percent,” with 1045 and 4140 examples.</p>
+    <p>The <a href="https://www.imoa.info/molybdenum-uses/molybdenum-grade-stainless-steels/molybdenum-grade-stainless-steel-faq.php">International Molybdenum Association's 304/316 comparison</a> states that “Type 316 contains a molybdenum addition” and explains the corrosion benefit. <a href="https://hudsontoolsteel.com/technical-data/steelA2">Hudson Tool Steel's A2 data sheet</a> describes O1 as “oil-hardening,” A2 as “air-hardening,” and D2 as “high-carbon, high-chromium.” These are introductory meanings, not complete material specifications.</p>
         <p class="deeper-back"><a href="#deeper-ref-106">Back to reference 106</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-107" value="107">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 107.</span> Further reading on EDM surfaces and wire systems</h2>
-        <p><a href="https://www.makino.com/resources/content-library/article/archive/the-case-for-additive-technology-in-edm-/299">Makino discusses thermal surface effects</a>; <a href="https://sodick.eu/about-sodick/sodicks-technology/wire-edm-technology">Sodick explains wire EDM</a>. Low mechanical force is not a guarantee of zero distortion or an unchanged surface.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-nonferrous-metals">Nonferrous Metals</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 107.</span> Source for the series table</h2>
+        <p>The <a href="https://www.aluminum.org/standards">Aluminum Association's aluminum-alloy overview</a> identifies these series and their principal additions. It describes 1xxx as “aluminum 99 percent or higher purity.” The series names do not list every element in an individual alloy; for example, the Association also identifies magnesium and possible copper and chromium additions in 7xxx alloys.</p>
         <p class="deeper-back"><a href="#deeper-ref-107">Back to reference 107</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-108" value="108">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrochemical-machining">Electrochemical Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 108.</span> Why hardness alone does not set ECM performance</h2>
-        <p>The reaction removes metal without requiring a harder cutting edge. Metal chemistry and current conditions still affect dissolution, so “all metals machine at the same rate” is not a valid selection rule. Tooling and electrolyte control can make ECM attractive for repeated parts, while adding development effort for a one-off feature.</p><p>Further reading: <a href="https://www.emag.com/industries-solutions/technologies/ecm-technologies/ecm-electro-chemical-machining/">EMAG's ECM overview</a> and the <a href="https://knowledge.electrochem.org/encycl/art-m03-machining.htm">Electrochemical Society's machining explanation</a>.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-nonferrous-metals">Nonferrous Metals</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 108.</span> Sources and comparison limits</h2>
+        <p>The <a href="https://www.aluminum.org/standards">Aluminum Association</a> identifies 6061 use in truck and marine frames and 7075 use in aircraft. <a href="https://www.metalsupermarkets.com/differences-6061-and-7075-aluminum/">Metal Supermarkets' 6061/7075 comparison</a> supports the T6 tensile-strength comparison, tank and tooling uses, machinability and welding differences. Its fabrication discussion notes that restoring the weld area's original temper in 6061 may require further heat treatment and aging. Compare the supplier's data for the actual temper and product form.</p>
         <p class="deeper-back"><a href="#deeper-ref-108">Back to reference 108</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-109" value="109">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 109.</span> Why the material and laser must be matched</h2>
-        <p>Different materials absorb different wavelengths differently. Power and beam delivery also limit the usable thickness and quality. See <a href="https://www.trumpf.com/en_GB/solutions/applications/laser-cutting/">TRUMPF's laser-cutting overview</a>.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-heat-treating-metals">Heat Treating Metals</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 109.</span> Steel microstructures are not the four steel families</h2>
+        <p>Ferrite and austenite are different iron-based crystal phases. Cementite is iron carbide, Fe₃C, a hard, brittle phase. Pearlite is a layered arrangement of ferrite and cementite. Martensite can form from austenite during sufficiently rapid cooling in suitable steel. These terms describe structure, not the buying categories carbon, alloy, stainless and tool steel.</p><p>Carbon can diffuse during slower transformations. Quenching can suppress those transformations and produce martensite. The outcome is not determined by cooling speed alone: chemistry and section size affect what forms throughout the part.</p>
         <p class="deeper-back"><a href="#deeper-ref-109">Back to reference 109</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-110" value="110">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 110.</span> Further reading on glass and waterjet limits</h2>
-        <p><a href="https://www.omax.com/en/learn/waterjet-cutting/">OMAX explains waterjet materials and cold cutting</a>; its <a href="https://www.omax.com/en/media-center/tips/cutting-glass-waterjet/">glass-cutting notes</a> distinguish glass types and edge damage.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-heat-treating-metals">Heat Treating Metals</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 110.</span> Further reading on conditioning processes</h2>
+        <p><a href="https://www.bodycote.com/what-we-do/precision-heat-treatment/">Bodycote's heat-treatment overview</a> provides entry points for annealing, hardening, tempering, stress relief and solution-and-age treatments. <a href="https://aec.org/alloys-tempers">AEC's alloy and temper guide</a> is a starting point for aluminum terminology. Neither an overview nor a qualitative sketch replaces a material-specific process specification.</p>
         <p class="deeper-back"><a href="#deeper-ref-110">Back to reference 110</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-111" value="111">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 111.</span> Compare capability on the actual thickness</h2>
-        <p><a href="https://www.hypertherm.com/solutions/technology/cutting-process-overview/">Hypertherm describes the energy sources</a> and <a href="https://www.hypertherm.com/solutions/technology/choosing-a-cutting-process/">selection by material, thickness and cut quality</a>. Qualitative comparisons narrow candidates; they do not replace a supplier's capability check.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Plastics</span><span class="sep">/</span><a href="#p-cutting-and-machining-plastics">Cutting and Machining Plastics</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 111.</span> Why a slower cut can produce more heat</h2>
+        <p>A tooth that advances too little spends more time sliding against the work. The next tooth may also recut trapped chips. Useful chips carry some heat away, so reducing chip thickness without reducing rubbing is not a reliable cooling strategy. ACRYLITE's <a href="https://www.acrylite.co/resources/fabrication-manuals/drilling-acrylite-acrylic-sheet">drilling guidance</a> identifies low feed or excessive RPM as causes of melted chips; its <a href="https://www.acrylite.co/resources/fabrication-manuals/routing-premium-acrylite-acrylic-sheet">routing guidance</a> treats feed, cutting edges and RPM together.</p>
         <p class="deeper-back"><a href="#deeper-ref-111">Back to reference 111</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-112" value="112">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-ultrasonic-machining">Ultrasonic Machining</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 112.</span> Why a shaped tool does not give an exact-size copy</h2>
-        <p>Abrasive particles occupy space around the tool and also wear it. The finished cavity therefore depends on the tool, abrasive action and process control, not simply on copying the tool's nominal dimensions. <a href="https://www.bullentech.com/ultrasonic-machining/">Bullen describes loose-abrasive ultrasonic machining</a>.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Plastics</span><span class="sep">/</span><a href="#p-cutting-and-machining-plastics">Cutting and Machining Plastics</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 112.</span> Manufacturer references and the limits of a material list</h2>
+        <p><a href="https://www.troteclaser.com/en-us/resources/faqs/unsuitable-materials-laser-processing">Trotec's unsuitable-material guidance</a> lists PVC and explains why composition matters. Boss Laser describes <a href="https://team.bosslaser.com/learn/materials/acrylic/">acrylic's cut behavior</a>, <a href="https://team.bosslaser.com/learn/materials/materials-to-never-laser/">PVC decomposition concerns</a> and <a href="https://team.bosslaser.com/applications/acrylic/">polycarbonate edge discoloration</a>. Universal Laser Systems' <a href="https://cdn.ulsinc.com/assets/pdf/materials_subordinate/583606c097d4dd53e131cdab/polycarbonate__processing_guide.pdf">polycarbonate processing guide</a> discusses reducing char through a specialized cutting method. A material name on a capability list does not establish a suitable setup for a particular sheet.</p>
         <p class="deeper-back"><a href="#deeper-ref-112">Back to reference 112</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-113" value="113">
       <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-chemical-machining">Chemical Milling and Etching</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 113.</span> Why thin-sheet patterns are a useful application</h2>
-        <p>A mask can define many features at once without a separate shaped cutting tool for each opening. <a href="https://fotofab.com/chemical-etching-services/">Fotofab describes partial and through etching</a>.</p>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 113.</span> Why the fluid and the gap matter</h2>
+        <p>The dielectric fluid normally insulates the gap. A voltage pulse breaks down that insulation locally and permits a discharge. Between pulses, the fluid helps cool the region and flush debris. Debris removal and gap control help keep discharges stable. Sinker EDM commonly uses dielectric oil; wire EDM commonly uses controlled deionized water, though oil-based wire machines also exist.</p>
         <p class="deeper-back"><a href="#deeper-ref-113">Back to reference 113</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-114" value="114">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 114.</span> Why one offset does not describe every pass</h2>
+        <p>Discharge energy, flushing and finishing passes change the working gap and surface. Actual compensation comes from the machine's process data and inspection. <a href="https://help.autodesk.com/cloudhelp/2024/ENU/FCAM/files/GUID-84AE09F1-379D-461C-950F-66824F60914F.htm">Autodesk FeatureCAM help on the wire EDM offset method</a> describes the compensation value as wire radius plus spark gap plus any finishing allowance.</p>
+        <p class="deeper-back"><a href="#deeper-ref-114">Back to reference 114</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-115" value="115">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrical-discharge-machining">Electrical Discharge Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 115.</span> Further reading on EDM surfaces and wire systems</h2>
+        <p><a href="https://www.makino.com/resources/content-library/article/archive/the-case-for-additive-technology-in-edm-/299">Makino discusses thermal surface effects</a>; <a href="https://sodick.eu/about-sodick/sodicks-technology/wire-edm-technology">Sodick explains wire EDM</a>. Low mechanical force is not a guarantee of zero distortion or an unchanged surface.</p>
+        <p class="deeper-back"><a href="#deeper-ref-115">Back to reference 115</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-116" value="116">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-electrochemical-machining">Electrochemical Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 116.</span> Why hardness alone does not set ECM performance</h2>
+        <p>The reaction removes metal without requiring a harder cutting edge. Metal chemistry and current conditions still affect dissolution, so “all metals machine at the same rate” is not a valid selection rule. Tooling and electrolyte control can make ECM attractive for repeated parts, while adding development effort for a one-off feature.</p><p>Further reading: <a href="https://www.emag.com/industries-solutions/technologies/ecm-technologies/ecm-electro-chemical-machining/">EMAG's ECM overview</a> and the <a href="https://knowledge.electrochem.org/encycl/art-m03-machining.htm">Electrochemical Society's machining explanation</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-116">Back to reference 116</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-117" value="117">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 117.</span> Why the material and laser must be matched</h2>
+        <p>Different materials absorb different wavelengths differently. Power and beam delivery also limit the usable thickness and quality. See <a href="https://www.trumpf.com/en_GB/solutions/applications/laser-cutting/">TRUMPF's laser-cutting overview</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-117">Back to reference 117</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-118" value="118">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 118.</span> Further reading on glass and waterjet limits</h2>
+        <p><a href="https://www.omax.com/en/learn/waterjet-cutting/">OMAX explains waterjet materials and cold cutting</a>; its <a href="https://www.omax.com/en/media-center/tips/cutting-glass-waterjet/">glass-cutting notes</a> distinguish glass types and edge damage.</p>
+        <p class="deeper-back"><a href="#deeper-ref-118">Back to reference 118</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-119" value="119">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-beam-and-jet-cutting">Laser, Waterjet and Plasma Cutting</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 119.</span> Compare capability on the actual thickness</h2>
+        <p><a href="https://www.hypertherm.com/solutions/technology/cutting-process-overview/">Hypertherm describes the energy sources</a> and <a href="https://www.hypertherm.com/solutions/technology/choosing-a-cutting-process/">selection by material, thickness and cut quality</a>. Qualitative comparisons narrow candidates; they do not replace a supplier's capability check.</p>
+        <p class="deeper-back"><a href="#deeper-ref-119">Back to reference 119</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-120" value="120">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-ultrasonic-machining">Ultrasonic Machining</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 120.</span> Why a shaped tool does not give an exact-size copy</h2>
+        <p>Abrasive particles occupy space around the tool and also wear it. The finished cavity therefore depends on the tool, abrasive action and process control, not simply on copying the tool's nominal dimensions. <a href="https://www.bullentech.com/ultrasonic-machining/">Bullen describes loose-abrasive ultrasonic machining</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-120">Back to reference 120</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-121" value="121">
+      <article>
+        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Production and Nontraditional Processes</span><span class="sep">/</span><a href="#p-chemical-machining">Chemical Milling and Etching</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 121.</span> Why thin-sheet patterns are a useful application</h2>
+        <p>A mask can define many features at once without a separate shaped cutting tool for each opening. <a href="https://fotofab.com/chemical-etching-services/">Fotofab describes partial and through etching</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-121">Back to reference 121</a></p>
       </article>
     </li>
   </ol>
