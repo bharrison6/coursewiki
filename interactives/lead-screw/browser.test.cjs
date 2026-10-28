@@ -1,22 +1,24 @@
+const test = require('node:test');
+let chromium;
+try { ({ chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')); } catch (error) {
+  if (error.code !== 'MODULE_NOT_FOUND') throw error;
+}
+const browserURL = process.env.COURSEWIKI_BROWSER_URL;
+if (!chromium || !browserURL) {
+  test('lead-screw browser acceptance', { skip: 'Requires Playwright and COURSEWIKI_BROWSER_URL' }, () => {});
+} else {
 // Run after build-site.ps1. Set PLAYWRIGHT_MODULE to an installed playwright package if needed.
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const http = require('node:http');
 const docs = path.resolve(__dirname, '../../docs');
-const evidence = path.join(__dirname, '.verification');
+const evidence = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'coursewiki-lead-screw-'));
 fs.mkdirSync(evidence, { recursive: true });
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png' };
-const server = http.createServer((req, res) => {
-  const file = path.resolve(docs, '.' + decodeURIComponent(new URL(req.url, 'http://localhost').pathname));
-  if (!file.startsWith(docs + path.sep) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404).end(); return; }
-  res.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
-  res.end(fs.readFileSync(file));
-});
+
 (async () => {
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  const origin = `http://127.0.0.1:${server.address().port}`;
+  const origin = browserURL.replace(/\/$/, '');
   const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
   const errors = [];
   try {
@@ -116,5 +118,7 @@ const server = http.createServer((req, res) => {
     await print.pdf({ path: path.join(evidence, 'engineering-open.pdf'), format: 'Letter', printBackground: true });
     assert.deepEqual(errors, []);
     console.log('PASS: 11 cards, 14 practice checks, wrong methods, light/dark at 375/1280 px, unit conversion, invalid input, independent roots, no-JS aggregate and PDFs.');
-  } finally { await browser.close(); server.close(); }
-})().catch(e => { console.error(e); server.close(); process.exitCode = 1; });
+  } finally { await browser.close();  }
+})().catch(e => { console.error(e);  process.exitCode = 1; });
+
+}

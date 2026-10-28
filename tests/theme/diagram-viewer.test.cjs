@@ -171,9 +171,9 @@ test('content diagrams: measured scale, modal controls, exclusions and practice'
     await waitFor('document.querySelector("#small img").hasAttribute("tabindex")');
     await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 1, mobile: false });
     await evaluate('document.querySelector("#small img").click()');
-    const small = await evaluate(`(() => { const img = document.querySelector('.diagram-viewer img'), scroller = document.querySelector('.diagram-scroll'); return {width: img.getBoundingClientRect().width, left: img.getBoundingClientRect().left, viewport: scroller.clientWidth}; })()`);
+    const small = await evaluate(`(() => { const img = document.querySelector('.diagram-viewer img'), scroller = document.querySelector('.diagram-scroll'); return {width: img.getBoundingClientRect().width, left: img.getBoundingClientRect().left, viewport: scroller.clientWidth, contentLeft: scroller.getBoundingClientRect().left + scroller.clientLeft}; })()`);
     assert.equal(small.width, 120, '1x must not upscale a naturally small image');
-    assert.ok(Math.abs(small.left - (small.viewport - 120) / 2) < 1, 'small image centered');
+    assert.ok(Math.abs(small.left - small.contentLeft - (small.viewport - 120) / 2) < 1, 'small image centered');
     await evaluate(`document.querySelector('[data-diagram-zoom="2"]').click()`);
     assert.equal(await evaluate('document.querySelector(".diagram-viewer img").getBoundingClientRect().width'), 240);
     console.log('SMALL IMAGE', JSON.stringify(small));

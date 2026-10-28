@@ -1,13 +1,21 @@
+const test = require('node:test');
+let chromium;
+try { ({ chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')); } catch (error) {
+  if (error.code !== 'MODULE_NOT_FOUND') throw error;
+}
+const browserURL = process.env.COURSEWIKI_BROWSER_URL;
+if (!chromium || !browserURL) {
+  test('hole-callout browser acceptance', { skip: 'Requires Playwright and COURSEWIKI_BROWSER_URL' }, () => {});
+} else {
 // Run after build-site.ps1. Set PLAYWRIGHT_MODULE and CHROMIUM_PATH to installed tools.
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { pathToFileURL } = require('node:url');
 const root = path.resolve(__dirname, '../..');
-const artifacts = path.join(__dirname, '.verification');
+const artifacts = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'coursewiki-hole-callout-'));
 fs.mkdirSync(artifacts, { recursive: true });
-const url = file => pathToFileURL(path.join(root, 'docs', file)).href;
+const url = file => new URL(file, browserURL.replace(/\/?$/, '/')).href;
 (async () => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH });
   try {
@@ -115,3 +123,5 @@ const url = file => pathToFileURL(path.join(root, 'docs', file)).href;
     await context.close(); await nojs.close();
   } finally { await browser.close(); }
 })().catch(e=>{console.error(e);process.exitCode=1;});
+
+}

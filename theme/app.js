@@ -938,7 +938,6 @@
 
     function format(value) {
       if (!isFinite(value)) return '\u2014';
-      if (Math.abs(value) < 1e-12) value = 0;
       if (value === 0) return '0';
       var absolute = Math.abs(value);
       var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
@@ -1015,7 +1014,6 @@
 
     function format(value) {
       if (!isFinite(value)) return '\u2014';
-      if (Math.abs(value) < 1e-12) value = 0;
       if (value === 0) return '0';
       var absolute = Math.abs(value);
       var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
@@ -1165,7 +1163,6 @@
 
     function format(value) {
       if (!isFinite(value)) return '\u2014';
-      if (Math.abs(value) < 1e-12) value = 0;
       if (value === 0) return '0';
       var absolute = Math.abs(value);
       var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
@@ -1266,7 +1263,6 @@
 
     function format(value) {
       if (!isFinite(value)) return '\u2014';
-      if (Math.abs(value) < 1e-12) value = 0;
       if (value === 0) return '0';
       var absolute = Math.abs(value);
       var text = (absolute >= 1e-6 && absolute < 1e9) ? value.toPrecision(6) : value.toExponential(5);
@@ -1384,6 +1380,7 @@
         var answer = Number(root.getAttribute('data-answer'));
         var tolerance = Number(root.getAttribute('data-tolerance'));
         var unit = root.getAttribute('data-unit') || '';
+        var categorical = input && (input.tagName === 'SELECT' || unit === 'choice');
         if (feedback && !feedback.hasAttribute('aria-live')) feedback.setAttribute('aria-live', 'polite');
 
         function say(message, state) {
@@ -1394,7 +1391,7 @@
         function check() {
           var attempt = readNumber(input);
           if (attempt === null) {
-            say('Enter a number before checking your work.', 'error');
+            say(categorical ? 'Choose an answer before checking your work.' : 'Enter a number before checking your work.', 'error');
             return;
           }
           if (!isFinite(answer) || !isFinite(tolerance) || tolerance < 0) {
@@ -1402,9 +1399,9 @@
             return;
           }
           if (Math.abs(attempt - answer) <= tolerance) {
-            say('Correct \u2014 your answer is within the accepted tolerance' + (unit ? ' in ' + unit : '') + '.', 'correct');
+            say(categorical ? 'Correct \u2014 your choice is correct.' : 'Correct \u2014 your answer is within the accepted tolerance' + (unit ? ' in ' + unit : '') + '.', 'correct');
           } else {
-            say('Not yet \u2014 check the units, conversion factor, and arithmetic, then try again.', 'incorrect');
+            say(categorical ? 'Not yet \u2014 review the choices and try again.' : 'Not yet \u2014 check the units, conversion factor, and arithmetic, then try again.', 'incorrect');
           }
         }
 

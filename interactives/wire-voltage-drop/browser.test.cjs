@@ -1,27 +1,27 @@
+const test = require('node:test');
+let chromium;
+try { ({ chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')); } catch (error) {
+  if (error.code !== 'MODULE_NOT_FOUND') throw error;
+}
+const browserURL = process.env.COURSEWIKI_BROWSER_URL;
+if (!chromium || !browserURL) {
+  test('wire-voltage-drop browser acceptance', { skip: 'Requires Playwright and COURSEWIKI_BROWSER_URL' }, () => {});
+} else {
 // Run after build-site.ps1: node interactives/wire-voltage-drop/browser.test.cjs
-// Browser profiles, screenshots, PDFs, and logs stay in the lane scratch folder.
+// Browser profiles, screenshots, PDFs, and logs stay in OS temp.
 const fs = require('node:fs');
 const path = require('node:path');
-const http = require('node:http');
 const { spawn } = require('node:child_process');
 const assert = require('node:assert/strict');
 const repo = path.resolve(__dirname, '../..');
-const out = path.join(repo, '.lane-scratch', 'wire-browser');
+const out = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'coursewiki-wire-voltage-drop-'));
 fs.mkdirSync(out, { recursive: true });
 const docs = path.join(repo, 'docs');
-const server = http.createServer((req, res) => {
-  const file = path.resolve(docs, '.' + decodeURIComponent(req.url.split('?')[0]));
-  if (!file.startsWith(docs + path.sep)) { res.writeHead(403).end(); return; }
-  try {
-    res.setHeader('Content-Type', ({'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml'})[path.extname(file)] || 'application/octet-stream');
-    res.end(fs.readFileSync(file));
-  } catch { res.writeHead(404).end(); }
-});
+
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 let chrome, ws, call;
 (async () => {
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  const base = `http://127.0.0.1:${server.address().port}`;
+  const base = browserURL.replace(/\/$/, '');
   const profile = path.join(out, `profile-${process.pid}`);
   chrome = spawn(process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     ['--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],
@@ -136,5 +136,7 @@ let chrome, ws, call;
   if(ws) ws.close();
   // Only the PID started above is eligible for this fallback.
   if(chrome && chrome.exitCode===null) chrome.kill();
-  server.close();
+
 });
+
+}
