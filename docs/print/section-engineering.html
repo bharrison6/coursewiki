@@ -3160,6 +3160,35 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="dc-motor-curve"] .dmc-static { display: block !important; }
 }
 
+[data-interactive="diagram-views"] svg { display: block; width: 100%; height: auto; max-width: 46rem; margin: auto; }
+[data-interactive="diagram-views"] figure { margin: 1rem 0; break-inside: avoid; }
+[data-interactive="diagram-views"] .dv-views,
+[data-interactive="diagram-views"] .dv-parts { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
+[data-interactive="diagram-views"] button { font: inherit; padding: .5rem .75rem; color: inherit; background: transparent; border: 1px solid currentColor; border-radius: .25rem; cursor: pointer; }
+[data-interactive="diagram-views"] button[aria-pressed="true"] { outline: 3px solid currentColor; outline-offset: 2px; font-weight: bold; }
+[data-interactive="diagram-views"] button:focus-visible { outline: 3px dashed currentColor; outline-offset: 3px; }
+[data-interactive="diagram-views"] [data-component] { cursor: pointer; }
+[data-interactive="diagram-views"] .dv-status { min-height: 3em; }
+@media print {
+  [data-interactive="diagram-views"] .dv-controls { display: none !important; }
+  [data-interactive="diagram-views"] figure[hidden] { display: block !important; }
+  [data-interactive="diagram-views"] .dv-highlight { visibility: hidden !important; }
+}
+
+[data-interactive="diagram-views"] .dv-drawings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; }
+[data-interactive="diagram-views"] .dv-drawings > figure[hidden] { display: none; }
+@media print {
+  [data-interactive="diagram-views"] .dv-drawings { display: block; }
+  [data-interactive="diagram-views"] .dv-drawings > figure[hidden] { display: block !important; }
+}
+
+@media print {
+  /* The block view is tall (320x490); at full width it outgrows a Letter page and splits. Cap every drawing's printed height so heading, drawing and caption fit on one page. */
+  [data-interactive="diagram-views"] svg { width: auto; max-width: 100%; max-height: 6in; }
+  [data-interactive="diagram-views"] figure { break-inside: avoid; page-break-inside: avoid; }
+  [data-interactive="diagram-views"] figure h3 { break-after: avoid; page-break-after: avoid; }
+}
+
 [data-interactive="pwm-and-adc"] { min-width: 0; }
 [data-interactive="pwm-and-adc"] [hidden] { display: none !important; }
 [data-interactive="pwm-and-adc"] fieldset { min-width: 0; border: 1px solid var(--rule); border-radius: .4rem; margin: 1rem 0; padding: 1rem; }
@@ -3241,12 +3270,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><a href="#p-digital-and-analog-signals">Digital and Analog Signals</a></li>
     <li><a href="#p-electric-motor-principles">Electric Motor Principles</a></li>
     <li><a href="#p-electric-motor-types">Electric Motor Types</a></li>
+    <li><a href="#p-electrical-diagram-types">Electrical Diagram Types</a></li>
     <li><a href="#p-electrical-generation">Electrical Generation</a></li>
     <li><a href="#p-energy-storage-methods">Energy Storage Methods</a></li>
     <li><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></li>
     <li><a href="#p-measuring-electric-circuits">Measuring Electric Circuits</a></li>
     <li><a href="#p-microcontroller-basics">Microcontroller Basics</a></li>
     <li><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></li>
+    <li><a href="#p-reading-electrical-connections">Reading Electrical Connections</a></li>
     <li><a href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a></li>
     <li><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></li>
     <li><a href="#p-soldering-wires-and-pcbs">Soldering Wire Splices and Through-Hole PCBs</a></li>
@@ -3642,7 +3673,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Average is an interval; instantaneous is a moment</h2>
   <p>Average acceleration is calculated over stated start and end conditions. An accelerometer or
-  control system can report instantaneous acceleration at one moment. They match only when the
+  control system can report instantaneous acceleration at one moment. They match at every moment only when the
   acceleration stays constant through the interval.</p>
   <h3>Machine arm example</h3>
   <p>A machine arm starts from rest and reaches 3 m/s in 4 s:</p>
@@ -3735,7 +3766,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div><dt>Degree (&deg;)</dt><dd>One revolution cut into 360 parts. This is what a drawing and a
     protractor use.</dd></div>
     <div><dt>Radian (rad)</dt><dd>The angle whose arc is exactly as long as the radius. This is the
-    SI unit, and it is the one every rotation formula expects.</dd></div>
+    SI unit, and it is the one formulas such as <code>v = &omega;r</code> expect.</dd></div>
   </dl>
   <figure>
     <svg viewBox="0 0 330 250" width="330" role="img" aria-labelledby="radian-title radian-desc"
@@ -3744,10 +3775,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <desc id="radian-desc">A sector drawn from the centre of a circle. Two radii of equal length
       open out from the centre, and the curved arc between their tips is drawn the same length as
       one radius. The angle enclosed at the centre is labelled one radian.</desc>
-      <path d="M 220 205 A 150 150 0 0 0 141 78.8" stroke-width="5"/>
+      <path d="M 220 205 A 150 150 0 0 0 151.04535 78.77935" stroke-width="5"/>
       <path d="M 70 205 L 220 205"/>
-      <path d="M 70 205 L 141 78.8"/>
-      <path d="M 115 205 A 45 45 0 0 0 90.7 167.1" stroke-width="1.5"/>
+      <path d="M 70 205 L 151.04535 78.77935"/>
+      <path d="M 115 205 A 45 45 0 0 0 94.31360 167.13381" stroke-width="1.5"/>
       <text x="145" y="228" fill="currentColor" stroke="none" font-size="15" text-anchor="middle">radius r</text>
       <text x="86" y="140" fill="currentColor" stroke="none" font-size="15" text-anchor="middle" transform="rotate(-60 86 140)">radius r</text>
       <text x="222" y="60" fill="currentColor" stroke="none" font-size="15" text-anchor="middle">arc length = r</text>
@@ -3783,8 +3814,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Angular velocity is how fast it turns</h2>
   <p><strong>Angular velocity</strong> uses the symbol <strong>&omega;</strong> (omega), and it is
-  angle divided by time:</p>
-  <p><code>&omega; = &theta; / t</code></p>
+  directed angle change per time interval for rotation about a fixed axis:</p>
+  <p><code>&omega;<sub>avg</sub> = &Delta;&theta; / &Delta;t</code>. Instantaneous angular
+  velocity is the rate at one moment; it equals this average throughout the interval only for
+  constant angular velocity.</p>
   <dl class="dims">
     <div><dt>rad/s</dt><dd>Radian per second. The SI unit, and the form every formula on
     <a class="xref-page" href="#p-rotation-and-linear-speed">Rotation and Linear Speed</a> needs.</dd></div>
@@ -3795,7 +3828,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <p><strong>Nameplates speak rpm; formulas speak rad/s.</strong> Convert before you calculate,
     and convert back before you set a machine.</p>
   </div>
-  <p>The exact pair, either way round:</p>
+  <p>The conversion pair, rounded, either way round:</p>
   <p><code>1 r/min = 0.1047198 rad/s</code> &nbsp;&middot;&nbsp;
   <code>1 rad/s = 9.549297 r/min</code></p>
   <h3>Worked example</h3>
@@ -3812,10 +3845,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Angular acceleration is how fast the turning changes</h2>
   <p><strong>Angular acceleration</strong> uses the symbol <strong>&alpha;</strong> (alpha), and it
   is change in angular velocity divided by the time it took:</p>
-  <p><code>&alpha; = &Delta;&omega; / &Delta;t</code></p>
+  <p><code>&alpha;<sub>avg</sub> = &Delta;&omega; / &Delta;t</code></p>
   <p>Its SI unit is <code>rad/s<sup>2</sup></code>. Everything true of straight-line acceleration on
   <a class="xref-page" href="#p-acceleration-and-squared-time">Acceleration and Squared Time</a> is true here as well: it is a <em>change</em>, so a shaft
-  slowing down has a negative angular acceleration in whichever direction you called positive, and
+  slowing down has angular acceleration opposite its angular velocity (negative if it is turning
+  in the positive direction), and
   the squared second means a squared factor whenever the time unit changes.</p>
   <h3>Worked example: a motor speeding up</h3>
   <p>A motor shaft is turning at 17 rpm. Power to the motor is increased, and 1.1 s later it is
@@ -4118,6 +4152,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   speeds are not the same number, and the thing that converts one into the other is the
   <strong>radius</strong>.</p>
   <p><code>v = &omega;r</code> &nbsp;&middot;&nbsp; <code>a = &alpha;r</code></p>
+  <p>Here <code>a</code> is the tangential acceleration, not the rim point&rsquo;s total
+  acceleration: it also has an inward component <code>&omega;<sup>2</sup>r</code>. Belt and
+  vehicle speeds match rim speed only when there is no slipping.</p>
   <dl class="dims">
     <div><dt>v</dt><dd>The straight-line speed of a point on the rim &mdash; the speed of the belt,
     the sheet, the vehicle.</dd></div>
@@ -4413,7 +4450,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Power is how fast work gets done</h2>
   <p class="lede">Two hoists that lift the same load to the same height do the same
   <em>work</em>. The one that does it in half the time needs twice the <strong>power</strong>.</p>
-  <p><code>P = W / t</code> &nbsp;&mdash;&nbsp; power equals work divided by time.</p>
+  <p><code>P = W / t</code> &nbsp;&mdash;&nbsp; average power equals work divided by elapsed time.</p>
   <div class="unit-table-wrap">
   <table class="unit-table">
     <caption>The two power units and the factors between them.</caption>
@@ -4426,8 +4463,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
   <p class="aside">The symbol <code>W</code> does double duty: upright <code>W</code> after a number
   is the watt, while <code>W</code> standing in a formula for a quantity is usually work. Context
-  separates them, and <code>1 W = 1 J/s</code> is the sentence where both meanings appear at
-  once.</p>
+  separates them: <code>P = W/t</code> uses <code>W</code> for work, while
+  <code>1 W = 1 J/s</code> uses it for the watt.</p>
   <h3>Worked example: powering the lift</h3>
   <p>On <a class="xref-page" href="#p-work-and-energy">Work and Energy</a>, lifting 2,000 lbf through 10 ft took 20,000 ft&middot;lbf, or 27.1 kJ.
   How much power does doing it in 4 s require?</p>
@@ -4447,7 +4484,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>The same power, three ways to reach it</h2>
   <p>Which form you use depends on what you have been given, not on which is more correct. All three
-  produce watts.</p>
+  produce watts in SI. In <code>P = Fv</code>, force and velocity must be parallel;
+  otherwise use the force component along the velocity.</p>
   <div class="unit-table-wrap">
   <table class="unit-table">
     <caption>Three routes to a power, in each system.</caption>
@@ -4487,7 +4525,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   horsepower.</p>
   <div class="panel">
     <p><strong>The hidden condition is in the first step.</strong> Volts times amps gives real power
-    in watts for a direct-current circuit or a purely resistive load. On alternating current it
+    in watts for a direct-current circuit or a purely resistive load. For single-phase AC, RMS volts times RMS amps
     gives <em>apparent</em> power, in volt-amperes; the real power in watts is that multiplied by
     the <strong>power factor</strong>, the ratio of real power to apparent power. Use the shortcut
     on an AC motor without its power factor and the answer comes out high. See
@@ -4514,7 +4552,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>It is a ratio of two like quantities, so the units cancel: efficiency is a plain number, usually
   quoted as a percentage.</p>
   <div class="gate">
-    <p><strong>For any real machine &eta; &lt; 1.</strong> You cannot get more power out than you
+    <p><strong>For a real machine in steady operation, &eta; &lt; 1; the ideal lossless limit is 1.</strong> You cannot get more power out than you
     put in, and some of every input always leaves as heat, noise, or friction rather than as useful
     output. A calculated efficiency above 1 means an error in the numbers, not a remarkable
     machine.</p>
@@ -4527,8 +4565,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <code>1,000 N &times; 0.45 m/s = 450 W</code>.</li>
     <li><code>&eta; = 450 W &divide; 500 W = 0.90</code>, or <strong>90%</strong>.</li>
   </ol>
-  <p>The missing 50 W has not vanished. It has gone into heating the windings, the gearbox, and the
-  bearings.</p>
+  <p>The missing 50 W has not vanished. It is power lost rather than delivered to the load, typically as heat in the motor and drive.</p>
   <p class="aside">Efficiency figures are only comparable when the boundary is the same. A
   <em>motor</em> efficiency, a <em>drive</em> efficiency, and a <em>system</em> efficiency measured
   from the wall socket to the load are three different numbers for the same machine, and the largest
@@ -4604,7 +4641,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>The unit, and the word order that identifies it</h2>
   <div class="unit-table-wrap">
   <table class="unit-table">
-    <caption>Torque units and the exact factors between them.</caption>
+    <caption>Torque units and rounded conversion factors between them.</caption>
     <thead><tr><th scope="col">System</th><th scope="col">Unit</th><th scope="col">Symbol</th><th scope="col">Conversion</th></tr></thead>
     <tbody>
       <tr><td>SI</td><td>newton metre</td><td><code>N&middot;m</code></td><td>1 N&middot;m = 0.7375621 lbf&middot;ft</td></tr>
@@ -4613,17 +4650,16 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </table>
   </div>
   <p class="aside"><strong>Case matters, and this one bites.</strong> The SI torque unit is
-  <code>N&middot;m</code> with a <em>lower-case</em> m. Written <code>N&middot;M</code> it reads as
-  newton times mega, because <code>M</code> is the prefix for 10<sup>6</sup> &mdash; a million times
-  wrong. The same trap catches <code>Kg</code> for <code>kg</code> and <code>S</code> for
+  <code>N&middot;m</code> with a <em>lower-case</em> m. Written <code>N&middot;M</code> it is not a valid SI torque unit: <code>M</code> is the
+  prefix for 10<sup>6</sup>, but a prefix cannot stand alone as a unit. The same trap catches <code>Kg</code> for <code>kg</code> and <code>S</code> for
   <code>s</code>. See <a class="xref-page" href="#p-measurement-language">Measurement Language</a>.</p>
   <div class="panel">
-    <p><strong>Torque is <code>lbf&middot;ft</code>; energy is <code>ft&middot;lbf</code>.</strong>
+    <p><strong>Here torque is written <code>lbf&middot;ft</code>; energy is written <code>ft&middot;lbf</code>.</strong>
     The same two units, the same numerical factor, written in the opposite order &mdash; and NIST
     prints them that way round on purpose: pound-force foot converts to the newton metre, foot
     pound-force converts to the joule. They are different physical quantities that happen to share
-    a unit combination, and the order is the only thing on the page telling you which one you are
-    looking at. SI avoids the ambiguity by giving energy its own name, the joule; a torque is never
+    a unit combination. Word order is a convention, not a mathematical distinction; use the
+    quantity and context to tell them apart. SI avoids the ambiguity by giving energy its own name, the joule; a torque is never
     written in joules. See <a class="xref-page" href="#p-work-and-energy">Work and Energy</a>.</p>
   </div>
     </div>
@@ -4691,8 +4727,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Work is a force moving something through a distance</h2>
   <p class="lede">Holding a heavy box still is exhausting, and in this sense it is zero work. Work
-  needs the force <em>and</em> movement in the direction the force is pushing.</p>
-  <p><code>W = Fs</code> &nbsp;&mdash;&nbsp; work equals force times displacement.</p>
+  needs a component of force along the displacement; work is negative when that component
+  opposes the movement.</p>
+  <p><code>W = Fs</code> &nbsp;&mdash;&nbsp; work equals force times displacement for a constant force parallel to the motion.</p>
   <p>Work is one of the ways energy moves from one place to another, so it is measured in energy
   units and is often written <code>E</code> when what matters is the energy delivered rather than
   the act of delivering it.</p>
@@ -4722,18 +4759,18 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   in the formula.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="work-and-energy--work-and-torque-share-a-unit-the-word-order-tells-them-apart" data-card="work-and-energy--work-and-torque-share-a-unit-the-word-order-tells-them-apart">
-    <summary>Work and torque share a unit - the word order tells them apart<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="work-and-energy--work-and-torque-share-dimensions-word-order-is-a-convention" data-card="work-and-energy--work-and-torque-share-dimensions-word-order-is-a-convention">
+    <summary>Work and torque share dimensions - word order is a convention<span class="chev"></span></summary>
     <div class="body">
-      <h2>Work and torque share a unit - the word order tells them apart</h2>
-  <p>Multiply a force by a distance and you get work. Multiply a force by a radius and you get
+      <h2>Work and torque share dimensions - word order is a convention</h2>
+  <p>Multiply a constant force by displacement along that force and you get work. Multiply a force by a radius and you get
   torque. Both are a force times a length, so in the foot&ndash;pound system both come out as some
   arrangement of feet and pounds-force.</p>
   <div class="gate">
-    <p><strong>Torque is written <code>lbf&middot;ft</code>. Energy is written
+    <p><strong>Here torque is written <code>lbf&middot;ft</code>. Energy is written
     <code>ft&middot;lbf</code>.</strong> The numerical factor is identical &mdash; 1.355818 of
-    either &mdash; so the order of the two words is the only thing distinguishing a turning effort
-    from an amount of energy.</p>
+    either &mdash; but word order alone does not establish the physical quantity. Torque describes turning
+    effort; work describes energy transferred through displacement.</p>
   </div>
   <p>SI removes the ambiguity by naming the energy unit separately. A torque stays
   <code>N&middot;m</code>; energy becomes the <strong>joule</strong>. Numerically
@@ -5487,13 +5524,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Two equations, and everything else follows<span class="chev"></span></summary>
     <div class="body">
       <h2>Two equations, and everything else follows</h2>
-  <p>The whole set is generated by two relationships:</p>
+  <p>For an ohmic resistor (constant resistance under the stated conditions), the set is generated
+  by Ohm&rsquo;s law and the power relationship:</p>
   <p><code>V = IR</code> &nbsp;&mdash;&nbsp; <code>P = VI</code></p>
   <p>Rearranging and substituting gives three expressions for each of the four quantities. There is
   nothing to memorise beyond the two above; the table is a lookup, not a list of new facts.</p>
   <div class="unit-table-wrap">
   <table class="unit-table">
-    <caption>Solve for any one quantity from any two of the others.</caption>
+    <caption>Resistive-load magnitudes: steady DC, or RMS voltage and current for AC.</caption>
     <thead><tr><th scope="col">To find</th><th scope="col">From V and I or R</th><th scope="col">Using power</th><th scope="col">Using power</th></tr></thead>
     <tbody>
       <tr><th scope="row">Voltage, V</th><td><code>V = IR</code></td><td><code>V = P/I</code></td><td><code>V = &radic;(PR)</code></td></tr>
@@ -5504,7 +5542,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </table>
   </div>
   <p class="aside"><code>P = VI</code> gives real power in watts on direct current or a purely
-  resistive load. On alternating current, volts times amps is <em>apparent</em> power in
+  resistive load. For single-phase AC, RMS volts times RMS amps is <em>apparent</em> power in
   volt-amperes, and the real power is that multiplied by the power factor &mdash; see
   <a class="xref-page" href="#p-power-and-efficiency">Power and Efficiency</a>.</p>
     </div>
@@ -5513,7 +5551,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Worked example: what a lamp draws<span class="chev"></span></summary>
     <div class="body">
       <h2>Worked example: what a lamp draws</h2>
-  <p>How much current does a 100 W lamp draw on a 120 V supply?</p>
+  <p>How much current does a 100 W resistive lamp draw on a 120 V supply (RMS for AC)?</p>
   <ol>
     <li>Pick the form with the two quantities you have: <code>I = P/V</code>.</li>
     <li><code>I = 100 W &divide; 120 V = 0.833 A</code>.</li>
@@ -5526,13 +5564,13 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Worked example: voltage drop along a cord<span class="chev"></span></summary>
     <div class="body">
       <h2>Worked example: voltage drop along a cord</h2>
-  <p>A 100 ft extension cord has a resistance of 0.1588 &Omega;. What is the voltage drop across the
-  cord when 10 A flows through it?</p>
+  <p>A 100 ft extension cord has a total out-and-back conductor resistance of 0.1588 &Omega;.
+  What is the resistive voltage drop across that path when 10 A flows through it?</p>
   <ol>
     <li><code>V = IR = 10 A &times; 0.1588 &Omega; = 1.588 V</code>.</li>
   </ol>
-  <div class="gate"><p><strong>About 1.6 V.</strong> That is 1.6 V that never reaches the tool: the
-  supply is divided between the cord and the load, and the cord takes its share first.</p></div>
+  <div class="gate"><p><strong>About 1.6 V.</strong> That is 1.6 V that never reaches the tool: for DC or an AC resistive load,
+  the supply voltage equals the cord drop plus the load voltage.</p></div>
   <p class="deeper-ref" id="deeper-ref-46">Supporting detail: <a href="#deeper-addendum-46"><strong>Addendum 46</strong></a> &mdash; The dropped voltage does not disappear.</p>
     </div>
   </details>
@@ -6043,6 +6081,53 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 
 </article>
+<article class="article bundled" id="p-electrical-diagram-types">
+  <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span></div>
+  <h1>Electrical Diagram Types</h1>
+  <p class="lede">Choose a drawing by the question it answers: appearance, connections, function, control logic, or physical location.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="electrical-diagram-types--choose-the-drawing-for-the-job" data-card="electrical-diagram-types--choose-the-drawing-for-the-job">
+    <summary>Choose the drawing for the job<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Choose the drawing for the job</h2><p class="lede">One electrical system can need several drawings. Start with the question: What does the part look like? Where does this wire go? How does the circuit work? Where does the equipment fit?</p><div class="unit-table-wrap"><table class="unit-table"><caption>Choose the drawing for the question you need to answer.</caption><thead><tr><th scope="col">Type</th><th scope="col">Shows</th><th scope="col">Usually leaves out</th><th scope="col">Who uses it, and when</th></tr></thead><tbody><tr><th scope="row">Pictorial</th><td>Recognizable appearances of parts.</td><td>Exact electrical behavior and hidden connections may be omitted.</td><td>A beginner or assembler identifying parts before tracing connections.</td></tr><tr><th scope="row">Block</th><td>Functions and the direction of signal or power flow.</td><td>Individual terminals, component values, and return wires.</td><td>A designer explaining a system before working out its circuits.</td></tr><tr><th scope="row">Wiring</th><td>Connections between terminals; wire identifiers and routing where specified.</td><td>The reason the circuit behaves as it does; scale may be omitted.</td><td>An assembler or service technician connecting or tracing wires.</td></tr><tr><th scope="row">Schematic</th><td>Electrical function and connections using component symbols.</td><td>Actual component positions, wire lengths, and enclosure geometry.</td><td>A circuit designer or technician analyzing how a circuit works.</td></tr><tr><th scope="row">IC / PCB layout</th><td>Physical geometry: a PCB has footprints, pads and copper traces; an IC layout describes structures and interconnect on a chip.</td><td>A convenient explanation of circuit operation.</td><td>A board or chip designer checking placement and routing before manufacture.</td></tr><tr><th scope="row">Ladder</th><td>Relay or PLC control logic arranged in rungs between rails.</td><td>Exact equipment placement and wire routing.</td><td>A controls technician tracing the conditions for an output.</td></tr><tr><th scope="row">Logic</th><td>Gates and the relationships between logical inputs and outputs.</td><td>Power wiring, package pin locations, and physical placement unless added.</td><td>A digital designer following Boolean decisions through a circuit.</td></tr><tr><th scope="row">Electrical floor plan</th><td>Locations of outlets, switches and fixtures on a building plan, interpreted with its legend.</td><td>Internal circuit operation; complete routing may be on other drawings.</td><td>An installer or building designer locating devices within rooms.</td></tr><tr><th scope="row">Riser</th><td>Distribution between building levels and the equipment serving them.</td><td>Detailed room layouts and exact conduit paths unless specified.</td><td>A building electrical designer or installer coordinating distribution across floors.</td></tr></tbody></table></div><p>Read the drawing title, legend, revision, and notes before treating a line or mark as an instruction. The same habit applies to mechanical drawings; see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/choosing-drawing-views.html" target="_blank" rel="noopener">Choosing Drawing Views</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/alphabet-of-lines.html" target="_blank" rel="noopener">The Alphabet of Lines</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views" data-card="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views">
+    <summary>Compare one circuit in pictorial, wiring, and schematic views<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compare one circuit in pictorial, wiring, and schematic views</h2><p>This teaching example connects a battery, switch, resistor, and LED in one loop. The resistor is in series with the LED. The drawings explain identity and connections; they do not specify a buildable parts list, resistor value, battery rating, or package pinout.</p><div data-interactive="diagram-views">
+<div class="dv-controls" hidden><p>Choose a view. Choose a component to keep it marked when you change views.</p><div class="dv-views" aria-label="Drawing view"></div><div class="dv-parts" aria-label="Component selection"></div><p class="dv-status" aria-live="polite"></p></div>
+<div class="dv-drawings"><figure data-view="pictorial"><h3>Pictorial view</h3><svg viewBox="0 0 500 340" role="img" aria-label="Pictorial view of B1, S1, R1 and D1" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2"><path d="M150 85H320 M420 85H460V245H420 M320 245H150 M50 245H20V85H50"/><g data-component="battery"><rect class="dv-highlight" x="38" y="40" width="124" height="90" rx="8" stroke-dasharray="5 3" visibility="hidden"/><rect x="57" y="61" width="86" height="48" rx="4"/><path d="M50 85h7 M143 85h7"/><text x="100" y="149" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">B1 battery</text></g><g data-component="switch"><rect class="dv-highlight" x="308" y="40" width="124" height="90" rx="8" stroke-dasharray="5 3" visibility="hidden"/><rect x="330" y="65" width="80" height="40" rx="6"/><rect x="360" y="71" width="20" height="28"/><path d="M320 85h10 M410 85h10"/><text x="370" y="149" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">S1 switch</text></g><g data-component="resistor"><rect class="dv-highlight" x="308" y="200" width="124" height="90" rx="8" stroke-dasharray="5 3" visibility="hidden"/><rect x="340" y="231" width="60" height="28" rx="10"/><path d="M320 245h20 M400 245h20 M356 231v28 M370 231v28 M384 231v28"/><text x="370" y="309" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">R1 resistor</text></g><g data-component="led"><rect class="dv-highlight" x="38" y="200" width="124" height="90" rx="8" stroke-dasharray="5 3" visibility="hidden"/><path d="M75 260v-20a25 25 0 0 1 50 0v20z M75 245h-25 M125 245h25"/><text x="100" y="309" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">D1 LED</text></g></g></svg><figcaption>Recognize the parts. These simplified silhouettes are not package dimensions or a lead-identification guide.</figcaption></figure>
+<figure data-view="wiring"><h3>Wiring view</h3><svg viewBox="0 0 500 340" role="img" aria-label="Wiring view of B1, S1, R1 and D1" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2"><path d="M150 85H320 M420 85H460V245H420 M320 245H150 M50 245H20V85H50"/><g data-component="battery"><rect class="dv-highlight" x="38" y="40" width="124" height="90" rx="8" stroke-dasharray="5 3" visibility="hidden"/><rect x="50" y="58" width="100" height="54" rx="3"/><text x="100" y="149" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">B1 battery</text><text x="61" y="90" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">−</text><text x="139" y="90" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">+</text></g><g data-component="switch"><rect class="dv-highlight" x="308" y="40" width="124" height="90" rx="8" stroke-dasharray="5 3" visibility="hidden"/><rect x="320" y="58" width="100" height="54" rx="3"/><text x="370" y="149" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">S1 switch</text><text x="331" y="90" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">1</text><text x="409" y="90" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">2</text></g><g data-component="resistor"><rect class="dv-highlight" x="308" y="200" width="124" height="90" rx="8" stroke-dasharray="5 3" visibility="hidden"/><rect x="320" y="218" width="100" height="54" rx="3"/><text x="370" y="309" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">R1 resistor</text><text x="331" y="250" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">2</text><text x="409" y="250" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">1</text></g><g data-component="led"><rect class="dv-highlight" x="38" y="200" width="124" height="90" rx="8" stroke-dasharray="5 3" visibility="hidden"/><rect x="50" y="218" width="100" height="54" rx="3"/><text x="100" y="309" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">D1 LED</text><text x="61" y="250" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">K</text><text x="139" y="250" fill="currentColor" stroke="none" text-anchor="middle" font-size="26">A</text></g></g></svg><figcaption>Follow terminals: B1+ → S1.1; S1.2 → R1.1; R1.2 → D1.A; D1.K → B1−. A means anode; K means cathode. Terminal names here belong to this example.</figcaption></figure>
+<figure data-view="schematic"><h3>Schematic view</h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 290" role="img" aria-label="Schematic: B1 positive to open S1, then R1, D1 anode, D1 cathode and B1 negative"><g fill="none" stroke="currentColor" stroke-width="2"><path d="M20 60H68 M92 60H215 M265 60H300V200H270 M210 200H105 M55 200H20V60"/><g data-component="battery"><rect class="dv-highlight" x="26" y="23" width="108" height="98" rx="5" visibility="hidden" stroke-dasharray="5 3"/><path d="M68 45V75 M76 35V85 M84 45V75 M92 35V85"/><text x="106" y="42" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">+</text><text x="80" y="114" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">B1 battery</text></g><g data-component="switch"><rect class="dv-highlight" x="186" y="23" width="108" height="98" rx="5" visibility="hidden" stroke-dasharray="5 3"/><circle cx="215" cy="60" r="3"/><circle cx="265" cy="60" r="3"/><path d="M218 58L259 35"/><text x="240" y="114" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">S1 open</text></g><g data-component="resistor"><rect class="dv-highlight" x="186" y="163" width="108" height="98" rx="5" visibility="hidden" stroke-dasharray="5 3"/><path d="M210 200l5-10 10 20 10-20 10 20 10-20 10 20 5-10"/><text x="240" y="254" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">R1 resistor</text></g><g data-component="led"><rect class="dv-highlight" x="26" y="163" width="108" height="98" rx="5" visibility="hidden" stroke-dasharray="5 3"/><path d="M105 200H95 M95 183V217L65 200Z M65 183V217 M65 200H55 M83 176l-15-18m0 8v-8h8 M100 176l-15-18m0 8v-8h8"/><text x="80" y="254" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">D1 LED</text></g></g></svg><figcaption>Common symbols preserve the wiring connections. S1 is shown open. The LED cathode is the bar on the battery-negative side; the outward arrows identify light emission.</figcaption></figure><figure data-view="block"><h3>Block view</h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 490" role="img" aria-label="Block diagram: battery supplies energy, switch controls the path, resistor limits current, LED produces light"><g fill="none" stroke="currentColor" stroke-width="2"><g data-component="battery"><rect class="dv-highlight" x="56" y="16" width="208" height="82" rx="5" visibility="hidden" stroke-dasharray="5 3"/><rect x="65" y="25" width="190" height="58" rx="4"/><text x="160" y="49" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">B1 battery</text><text x="160" y="73" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">Supplies energy</text></g><g data-component="switch"><rect class="dv-highlight" x="56" y="146" width="208" height="82" rx="5" visibility="hidden" stroke-dasharray="5 3"/><rect x="65" y="155" width="190" height="58" rx="4"/><text x="160" y="179" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">S1 switch</text><text x="160" y="203" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">Controls the path</text></g><g data-component="resistor"><rect class="dv-highlight" x="56" y="276" width="208" height="82" rx="5" visibility="hidden" stroke-dasharray="5 3"/><rect x="65" y="285" width="190" height="58" rx="4"/><text x="160" y="309" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">R1 resistor</text><text x="160" y="333" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">Limits current</text></g><g data-component="led"><rect class="dv-highlight" x="56" y="406" width="208" height="82" rx="5" visibility="hidden" stroke-dasharray="5 3"/><rect x="65" y="415" width="190" height="58" rx="4"/><text x="160" y="439" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">D1 LED</text><text x="160" y="463" font-family="sans-serif" font-size="18" text-anchor="middle" fill="currentColor" stroke="none">Produces light</text></g><path d="M160 86v62m-6-8 6 8 6-8 M160 216v62m-6-8 6 8 6-8 M160 346v62m-6-8 6 8 6-8"/></g></svg><figcaption>Arrows show functional order, not individual conductors. The return conductor is omitted.</figcaption></figure></div>
+</div><p>The wiring view retains every terminal connection. The block view deliberately removes that detail to explain each part's job. The schematic retains those connections while replacing part pictures with common symbols. Compare the three drawings together, or select one view to trace a part. On narrow screens the comparison stacks vertically.</p><p>For the electrical quantities and circuit behavior, continue to <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a>, <a class="xref-page" href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a>, and <a class="xref-page" href="#p-ac-and-dc">AC and DC</a>. For programmable control, see <a class="xref-page" href="#p-microcontroller-basics">Microcontroller Basics</a>. For work on real equipment, use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="electrical-diagram-types--a-layout-floor-plan-and-riser-answer-different-location-questions" data-card="electrical-diagram-types--a-layout-floor-plan-and-riser-answer-different-location-questions">
+    <summary>A layout, floor plan, and riser answer different location questions<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A layout, floor plan, and riser answer different location questions</h2><p>A PCB footprint is the land pattern where a component attaches to a board. Traces are the board's conductive paths. An IC is a chip; its internal layout is not the same drawing as the board that holds it.</p><p>A floor plan places devices in rooms. Its legend tells you what each mark means. A riser makes the relationship between building levels easier to follow. Neither should be treated as a complete installation instruction by itself.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="electrical-diagram-types--read-control-logic-without-assuming-physical-placement" data-card="electrical-diagram-types--read-control-logic-without-assuming-physical-placement">
+    <summary>Read control logic without assuming physical placement<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read control logic without assuming physical placement</h2><p>A ladder diagram arranges control conditions and outputs in horizontal rungs between two vertical rails. A relay drawing and a PLC program may use a similar ladder shape, but a PLC instruction tests a stored state; it is not a picture of a physical contact.</p><figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlR3byBydW5nIHJlbGF5IGxhZGRlciwgc3dpdGNoIHRvIGNvaWwgYW5kIHJlbGF5IGNvbnRhY3QgdG8gbGFtcCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxNzJiNGQiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTMwIDQwVjI2MCBNMjkwIDQwVjI2MCBNMzAgOTBIOTUgTTE0NSA5MEgyMjUgTTI2NSA5MEgyOTAgTTMwIDIxNUgxMDggTTEzMiAyMTVIMjI1IE0yNjUgMjE1SDI5MCBNMTA4IDE5OFYyMzIgTTEzMiAxOThWMjMyIi8+PGNpcmNsZSBjeD0iOTUiIGN5PSI5MCIgcj0iMyIvPjxjaXJjbGUgY3g9IjE0NSIgY3k9IjkwIiByPSIzIi8+PHBhdGggZD0iTTk4IDg4bDQwLTI0Ii8+PGNpcmNsZSBjeD0iMjQ1IiBjeT0iOTAiIHI9IjIwIi8+PGNpcmNsZSBjeD0iMjQ1IiBjeT0iMjE1IiByPSIyMCIvPjxwYXRoIGQ9Ik0yMzEgMjAxbDI4IDI4bTAtMjgtMjggMjgiLz48dGV4dCB4PSIzMCIgeT0iMjciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkwxPC90ZXh0Pjx0ZXh0IHg9IjI5MCIgeT0iMjciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkwyPC90ZXh0Pjx0ZXh0IHg9IjEyMCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlMxPC90ZXh0Pjx0ZXh0IHg9IjI0NSIgeT0iNTAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPksxIGNvaWw8L3RleHQ+PHRleHQgeD0iMTIwIiB5PSIxNzUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPksxIGNvbnRhY3Q8L3RleHQ+PHRleHQgeD0iMjQ1IiB5PSIxNzUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkgxIGxhbXA8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="L1 and L2 rails: S1 controls relay coil K1 on rung one; a normally open K1 contact controls lamp H1 on rung two."></p><figcaption>Common relay forms, shown with S1 open and K1 de-energized. Closing S1 energizes K1; its normally open contact closes and H1 lights. Opening S1 releases K1 and turns H1 off. The shared K1 label links the coil and its contact; it is not a wire between rungs. This is a functional example, not an installation drawing.</figcaption></figure><p>A logic diagram emphasizes operations such as AND, OR, and NOT. It helps answer which combinations of inputs produce an output. The diagram may omit supply connections and package pin numbers, so it does not replace a wiring drawing.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="electrical-diagram-types--practice-selecting-a-useful-drawing" data-card="electrical-diagram-types--practice-selecting-a-useful-drawing">
+    <summary>Practice selecting a useful drawing<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Practice selecting a useful drawing</h2><p><a class="button" data-practice-add="diagram-job-terminals" href="../practice.html#diagram-job-terminals">Practice diagram selection</a></p><p>Continue with <a class="xref-page" href="#p-reading-electrical-connections">Reading Electrical Connections</a> to recognize common component symbols, distinguish a joined wire from a crossing, and count electrical nodes.</p>
+    </div>
+  </details>
+</div>
+
+</article>
 <article class="article bundled" id="p-electrical-generation">
   <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span></div>
   <h1>Electrical Generation</h1>
@@ -6383,6 +6468,62 @@ void loop() {
 </div>
 
 </article>
+<article class="article bundled" id="p-reading-electrical-connections">
+  <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span></div>
+  <h1>Reading Electrical Connections</h1>
+  <p class="lede">Follow conductors and node labels instead of judging connections by where components sit on the page.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="reading-electrical-connections--read-the-connection-convention-before-tracing-a-wire" data-card="reading-electrical-connections--read-the-connection-convention-before-tracing-a-wire">
+    <summary>Read the connection convention before tracing a wire<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read the connection convention before tracing a wire</h2><p>A schematic organizes electrical relationships, not the positions of parts on a bench. Stretching or bending a drawn wire does not change its connections. Moving a line onto a different terminal does.</p><p>For the examples on this page, a filled dot at a crossing means the wires join. A crossing with no dot means they do not join. Other drawings may use a bridge or different conventions. Check the legend; an unclear or damaged junction mark is a reason to consult the drawing source.</p><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjA1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkxlZnQgZG90dGVkIGNyb3NzaW5nIGlzIGpvaW5lZDsgcmlnaHQgdW5kb3R0ZWQgY3Jvc3NpbmcgaXMgbm90IGpvaW5lZCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxNzJiNGQiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTEwIDgwSDE1MCBNODAgMjVWMTM1IE0xNzAgODBIMzEwIE0yNDAgMjVWMTM1Ii8+PGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iNSIgZmlsbD0iIzE3MmI0ZCIvPjx0ZXh0IHg9IjgwIiB5PSIxNjIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkRvdDogam9pbmVkPC90ZXh0Pjx0ZXh0IHg9IjgwIiB5PSIxODYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPjEgbm9kZTwvdGV4dD48dGV4dCB4PSIyNDAiIHk9IjE2MiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+Tm8gZG90OiBjcm9zc2luZzwvdGV4dD48dGV4dCB4PSIyNDAiIHk9IjE4NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+MiBub2RlczwvdGV4dD48L2c+PC9zdmc+Cg==" alt="Two crossing-wire examples: the dotted intersection is one node; the undotted intersection is two separate nodes under this drawing's convention."></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="reading-electrical-connections--count-connected-conductors-not-corners-or-dots" data-card="reading-electrical-connections--count-connected-conductors-not-corners-or-dots">
+    <summary>Count connected conductors, not corners or dots<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Count connected conductors, not corners or dots</h2><p>A <strong>node</strong> is a set of points joined by ideal conductors. Every point along an uninterrupted wire belongs to the same node, including its bends and branches. A dot marks a connection; it is not a separate component or an extra node.</p><p>In the figure, the dotted cross is one node. The undotted cross is two nodes: the horizontal conductor and the vertical conductor. This count concerns the wires drawn in the figure; no connection elsewhere is implied.</p><p>Do not trace through a resistor, diode, or open switch as if it were wire. If an ideal switch closes, its two sides become connected; state the switch position before counting nodes. Matching net labels can also indicate a connection without a continuous line across the page. Check the label scope and drawing notes before joining similarly named nets.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="reading-electrical-connections--read-component-identity-separately-from-its-value" data-card="reading-electrical-connections--read-component-identity-separately-from-its-value">
+    <summary>Read component identity separately from its value<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read component identity separately from its value</h2><p>A reference such as R1 identifies a particular part; a value such as 1 kΩ describes its resistance. D1 can identify a diode or LED, so its symbol and parts information still matter. A ground label identifies a reference or connection according to the drawing; it does not by itself establish a connection to protective earth.</p><p>US practice (IEEE 315 / ANSI Y32.2) and international practice (IEC 60617) draw some symbols differently. Use the drawing legend; the forms below are teaching examples, not a claim of compliance with a standard.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="reading-electrical-connections--trace-a-connection-one-terminal-at-a-time" data-card="reading-electrical-connections--trace-a-connection-one-terminal-at-a-time">
+    <summary>Trace a connection one terminal at a time<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Trace a connection one terminal at a time</h2><ul class="boxes"><li>Read the legend, notes, revision, and stated switch positions.</li><li>Find the source and the named return or reference node.</li><li>Follow each conductor to a component terminal, junction, or net label.</li><li>Mark each uninterrupted group of conductors as one node.</li><li>Check crossings and similarly named labels before assuming they join.</li><li>Use the wiring drawing and parts documentation when physical terminal locations matter.</li></ul><p><a class="button" data-practice-add="diagram-crossing" href="../practice.html#diagram-crossing">Practice crossing wires</a></p><p>See <a class="xref-page" href="#p-electrical-diagram-types">Electrical Diagram Types</a> for choosing a drawing and <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> for the quantities measured between and through components.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="reading-electrical-connections--recognize-common-symbols-before-tracing-their-connections" data-card="reading-electrical-connections--recognize-common-symbols-before-tracing-their-connections">
+    <summary>Recognize common symbols before tracing their connections<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Recognize common symbols before tracing their connections</h2>
+<p>Use the symbol to identify the kind of component, then read its reference and value. The sheet includes both resistor forms and an unpolarized capacitor. A battery is one kind of DC source; other DC supplies may use a circle marked with polarity.</p>
+<figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNvbW1vbiBzeW1ib2xzLCBwYW5lbCAxOiBiYXR0ZXJ5LCBib3RoIHJlc2lzdG9yIGZvcm1zLCBzd2l0Y2gsIGxhbXAgYW5kIExFRCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxNzJiNGQiIHN0cm9rZS13aWR0aD0iMiI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHBhdGggZD0iTTMwIDQ1SDU4IE01OCAyOFY2MiBNNjggMThWNzIgTTc4IDI4VjYyIE04OCAxOFY3MiBNODggNDVIMTE1Ii8+PHRleHQgeD0iMTA1IiB5PSIyNSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+KzwvdGV4dD48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5CYXR0ZXJ5IC8gREMgc291cmNlPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEwNSkiPjxwYXRoIGQ9Ik0zMCA0NUg0OGw1LTEyIDEwIDI0IDEwLTI0IDEwIDI0IDEwLTI0IDEwIDI0IDUtMTJoMTIiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5SZXNpc3RvcjogVVMgemlnemFnPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDIxMCkiPjxwYXRoIGQ9Ik0zMCA0NUg1MiBNOTggNDVIMTIwIi8+PHJlY3QgeD0iNTIiIHk9IjMyIiB3aWR0aD0iNDYiIGhlaWdodD0iMjYiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5SZXNpc3RvcjogSUVDIHJlY3RhbmdsZTwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAzMTUpIj48cGF0aCBkPSJNMzAgNDVINTUgTTk1IDQ1SDEyMCBNNTUgNDVMOTAgMjAiLz48Y2lyY2xlIGN4PSI1NSIgY3k9IjQ1IiByPSIzIi8+PGNpcmNsZSBjeD0iOTUiIGN5PSI0NSIgcj0iMyIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlN3aXRjaCAob3Blbik8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNDIwKSI+PHBhdGggZD0iTTMwIDQ1SDU1IE05NSA0NUgxMjAgTTYxIDMxbDI4IDI4bTAtMjgtMjggMjgiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjQ1IiByPSIyMCIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkxhbXA8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTI1KSI+PHBhdGggZD0iTTMwIDQ1SDU1IE01NSAyNVY2NUw5MCA0NVogTTkwIDI1VjY1IE05MCA0NUgxMjAgTTY1IDIwbDE1LTE1bS04IDBoOHY4IE04NSAyMGwxNS0xNW0tOCAwaDh2OCIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkxFRDwvdGV4dD48L2c+PC9nPjwvc3ZnPgo=" alt="Common symbols panel 1: battery, US and IEC resistors, open switch, lamp and LED."></p><figcaption>Common teaching forms, panel 1 of 2.</figcaption></figure>
+<figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNvbW1vbiBzeW1ib2xzLCBwYW5lbCAyOiBidXp6ZXIsIGdyb3VuZCwgZnVzZSwgbW90b3IsIGNhcGFjaXRvciBhbmQgZGlvZGUiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IndoaXRlIi8+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTcyYjRkIiBzdHJva2Utd2lkdGg9IjIiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkiPjxwYXRoIGQ9Ik0zMCAzNUg1OCBNMzAgNTVINTggTTU4IDI1VjY1SDc0UTk4IDQ1IDc0IDI1WiBNMTAwIDI5UTExNCA0NSAxMDAgNjEgTTExMCAyMFExMzAgNDUgMTEwIDcwIi8+PHRleHQgeD0iMTYwIiB5PSI5NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+QnV6emVyIChjb21tb24gZm9ybSk8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMTA1KSI+PHBhdGggZD0iTTc1IDE1VjQ1IE00NSA0NUgxMDUgTTU1IDU3SDk1IE02NSA2OUg4NSIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkdyb3VuZCAvIHJlZmVyZW5jZTwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyMTApIj48cGF0aCBkPSJNMzAgNDVIMTIwIi8+PHJlY3QgeD0iNTIiIHk9IjMyIiB3aWR0aD0iNDYiIGhlaWdodD0iMjYiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5GdXNlIChjb21tb24gZm9ybSk8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMzE1KSI+PHBhdGggZD0iTTMwIDQ1SDU1IE05NSA0NUgxMjAiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjQ1IiByPSIyMCIvPjx0ZXh0IHg9Ijc1IiB5PSI1MiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+TTwvdGV4dD48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5Nb3RvcjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCA0MjApIj48cGF0aCBkPSJNMzAgNDVINjggTTY4IDIyVjY4IE04MiAyMlY2OCBNODIgNDVIMTIwIi8+PHRleHQgeD0iMTYwIiB5PSI5NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+Q2FwYWNpdG9yICh1bnBvbGFyaXplZCk8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTI1KSI+PHBhdGggZD0iTTMwIDQ1SDU1IE01NSAyNVY2NUw5MCA0NVogTTkwIDI1VjY1IE05MCA0NUgxMjAiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5EaW9kZTwvdGV4dD48L2c+PC9nPjwvc3ZnPgo=" alt="Common symbols panel 2: buzzer, ground, fuse, motor, unpolarized capacitor and diode."></p><figcaption>Common teaching forms, panel 2 of 2. Buzzer and fuse shapes vary, so check the legend. The ground mark's meaning depends on the drawing; it does not establish protective earth by itself. The diode bar marks its cathode; the LED adds outward arrows for light.</figcaption></figure>
+<p><a class="button" data-practice-add="diagram-symbol-led" href="../practice.html#diagram-symbol-led">Practice symbol identification</a></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="reading-electrical-connections--count-four-nodes-with-the-switch-open-three-with-it-closed" data-card="reading-electrical-connections--count-four-nodes-with-the-switch-open-three-with-it-closed">
+    <summary>Count four nodes with the switch open, three with it closed<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Count four nodes with the switch open, three with it closed</h2>
+<p>Trace this small component schematic with S1 open. Stop at each component terminal; do not count through the battery, resistor, or LED.</p>
+<figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlNjaGVtYXRpYzogQjEgcG9zaXRpdmUgdG8gb3BlbiBTMSwgdGhlbiBSMSwgRDEgYW5vZGUsIEQxIGNhdGhvZGUgYW5kIEIxIG5lZ2F0aXZlIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3MmI0ZCIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNMjAgNjBINjggTTkyIDYwSDIxNSBNMjY1IDYwSDMwMFYyMDBIMjcwIE0yMTAgMjAwSDEwNSBNNTUgMjAwSDIwVjYwIi8+PGcgZGF0YS1jb21wb25lbnQ9ImJhdHRlcnkiPjxwYXRoIGQ9Ik02OCA0NVY3NSBNNzYgMzVWODUgTTg0IDQ1Vjc1IE05MiAzNVY4NSIvPjx0ZXh0IHg9IjEwNiIgeT0iNDIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPis8L3RleHQ+PHRleHQgeD0iODAiIHk9IjExNCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+QjEgYmF0dGVyeTwvdGV4dD48L2c+PGcgZGF0YS1jb21wb25lbnQ9InN3aXRjaCI+PGNpcmNsZSBjeD0iMjE1IiBjeT0iNjAiIHI9IjMiLz48Y2lyY2xlIGN4PSIyNjUiIGN5PSI2MCIgcj0iMyIvPjxwYXRoIGQ9Ik0yMTggNThMMjU5IDM1Ii8+PHRleHQgeD0iMjQwIiB5PSIxMTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlMxIG9wZW48L3RleHQ+PC9nPjxnIGRhdGEtY29tcG9uZW50PSJyZXNpc3RvciI+PHBhdGggZD0iTTIxMCAyMDBsNS0xMCAxMCAyMCAxMC0yMCAxMCAyMCAxMC0yMCAxMCAyMCA1LTEwIi8+PHRleHQgeD0iMjQwIiB5PSIyNTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlIxIHJlc2lzdG9yPC90ZXh0PjwvZz48ZyBkYXRhLWNvbXBvbmVudD0ibGVkIj48cGF0aCBkPSJNMTA1IDIwMEg5NSBNOTUgMTgzVjIxN0w2NSAyMDBaIE02NSAxODNWMjE3IE02NSAyMDBINTUgTTgzIDE3NmwtMTUtMThtMCA4di04aDggTTEwMCAxNzZsLTE1LTE4bTAgOHYtOGg4Ii8+PHRleHQgeD0iODAiIHk9IjI1NCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+RDEgTEVEPC90ZXh0PjwvZz48L2c+PC9zdmc+Cg==" alt="Battery B1, open switch S1, resistor R1 and LED D1 form a loop."></p><figcaption>The same generic circuit as the drawing comparison. No off-page connections are implied.</figcaption></figure>
+<p class="deeper-ref" id="deeper-ref-70">Supporting detail: <a href="#deeper-addendum-70"><strong>Addendum 70</strong></a> &mdash; Check the node count terminal by terminal.</p>
+<p><a class="button" data-practice-add="diagram-component-nodes" href="../practice.html#diagram-component-nodes">Practice counting schematic nodes</a></p>
+    </div>
+  </details>
+</div>
+
+</article>
 <article class="article bundled" id="p-series-and-parallel-circuits">
   <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span></div>
   <h1>Series and Parallel Circuits</h1>
@@ -6413,7 +6554,7 @@ void loop() {
     <li>Two parallel resistors: <code>R<sub>eq</sub> = R<sub>1</sub>R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>)</code>.</li>
   </ul>
   <p>Check the result: series resistance is greater than any one positive resistor; parallel resistance is smaller than the smallest connected resistor when two or more branches are connected. An open circuit has no conducting path and is represented by infinite equivalent resistance.</p>
-  <p class="deeper-ref" id="deeper-ref-70">Supporting detail: <a href="#deeper-addendum-70"><strong>Addendum 70</strong></a> &mdash; Why the parallel formula uses reciprocals.</p>
+  <p class="deeper-ref" id="deeper-ref-71">Supporting detail: <a href="#deeper-addendum-71"><strong>Addendum 71</strong></a> &mdash; Why the parallel formula uses reciprocals.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="series-and-parallel-circuits--change-a-resistor-or-open-a-switch-and-predict-what-changes" data-card="series-and-parallel-circuits--change-a-resistor-or-open-a-switch-and-predict-what-changes">
@@ -6473,7 +6614,7 @@ void loop() {
       <h2>Choose the tip for contact, not just access</h2>
   <p>A temperature-controlled station regulates the iron's tip temperature. A basic iron may have no temperature control; a cordless iron changes how it is powered, not how a joint is made. Check the tool's instructions and choose settings suitable for the solder and components.</p>
   <p>Tip shape and size matter. A fine point reaches small spaces, but a chisel's broad face often transfers heat more effectively. Use the largest tinned contact face that fits the joint without touching neighboring connections. Interchangeable tips let one iron handle different work; change them according to the tool's instructions.</p>
-  <p class="deeper-ref" id="deeper-ref-71">Supporting detail: <a href="#deeper-addendum-71"><strong>Addendum 71</strong></a> &mdash; What the iron's “sweet spot” means.</p>
+  <p class="deeper-ref" id="deeper-ref-72">Supporting detail: <a href="#deeper-addendum-72"><strong>Addendum 72</strong></a> &mdash; What the iron's “sweet spot” means.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-equipment--match-the-solder-and-flux-to-electrical-work" data-card="soldering-equipment--match-the-solder-and-flux-to-electrical-work">
@@ -6497,9 +6638,9 @@ void loop() {
   <p>Helping hands or a PCB vise hold the parts still while your hands hold the iron and solder. Keep a proper stand or cradle within reach. Use a damp soldering sponge or brass wool for tip cleaning, and have solder wick (copper braid) or a desoldering pump available for removing excess solder.</p>
   <p><strong>It gets hot. Really hot.</strong> Park the iron in its stand, and allow the work to cool before touching it. Use ventilation or fume extraction that keeps the plume away from your face and other people; most visible fume comes from flux. Wash your hands after handling leaded solder, and do not eat or drink at the bench.</p>
   <p><strong>SHOP RULE: NEVER SOLDER BATTERIES.</strong></p>
-  <p class="deeper-ref" id="deeper-ref-72">Supporting detail: <a href="#deeper-addendum-72"><strong>Addendum 72</strong></a> &mdash; Why the battery rule stays absolute.</p>
+  <p class="deeper-ref" id="deeper-ref-73">Supporting detail: <a href="#deeper-addendum-73"><strong>Addendum 73</strong></a> &mdash; Why the battery rule stays absolute.</p>
   <p>Work on disconnected circuits. Follow <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a>; flux and fume handling belongs with <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a>.</p>
-  <p class="deeper-ref" id="deeper-ref-73">Supporting detail: <a href="#deeper-addendum-73"><strong>Addendum 73</strong></a> &mdash; Further reading on flux fume.</p>
+  <p class="deeper-ref" id="deeper-ref-74">Supporting detail: <a href="#deeper-addendum-74"><strong>Addendum 74</strong></a> &mdash; Further reading on flux fume.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-equipment--clean-tin-and-keep-the-working-face-coated" data-card="soldering-equipment--clean-tin-and-keep-the-working-face-coated">
@@ -6508,7 +6649,7 @@ void loop() {
       <h2>Clean, tin, and keep the working face coated</h2>
   <p>With the iron at working temperature, briefly clean the tip on brass wool or a damp soldering sponge. Apply fresh solder to coat its working face, then remove the excess on the cleaner. Leave a thin coating; do not wipe it bare and let it sit hot. Re-tin as needed and before storage as directed by the tool manufacturer.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkNsZWFuLCBjb2F0LCBhbmQgcmV0YWluIGEgdGhpbiBsYXllciBvZiBzb2xkZXI8L3RpdGxlPjxyZWN0IHdpZHRoPSIzNjAiIGhlaWdodD0iODQwIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MThweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0ZH0gLmhlYWR7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MjJweH0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojOWE1MTE5O3N0cm9rZS13aWR0aDo5O3N0cm9rZS1saW5lY2FwOnJvdW5kfSAubGVhZHtmaWxsOiNjY2M7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5zb2xkZXJ7ZmlsbDojYjhkOWVhO3N0cm9rZTojMTcyYjRkO3N0cm9rZS13aWR0aDoyfSAucGFke2ZpbGw6I2I4NzMzMztzdHJva2U6IzE3MmI0ZH0gLmJvYXJke2ZpbGw6I2UyZWRkZjtzdHJva2U6IzE3MmI0ZH08L3N0eWxlPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjEuIENsZWFuIGJyaWVmbHk8L3RleHQ+PHBhdGggZD0iTTgwIDE5NUgyODBWMjIwSDgwWiIgZmlsbD0iI2VjYWMwMCIgc3Ryb2tlPSIjMTcyYjRkIi8+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjUwIj5EYW1wIHNwb25nZSBvciBicmFzcyB3b29sLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj4yLiBBcHBseSBmcmVzaCBzb2xkZXI8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48cGF0aCBkPSJNMzAwIDkwTDIxMCAxODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyNmI4MyIgc3Ryb2tlLXdpZHRoPSI3Ii8+PHRleHQgeD0iMjAiIHk9IjI1MCI+Q29hdCB0aGUgaG90IHdvcmtpbmcgZmFjZS48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gTGVhdmUgYSB0aGluIGNvYXRpbmc8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5SZW1vdmUgZXhjZXNzIG9uIHRoZSBjbGVhbmVyLjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjcwIj5EbyBub3QgbGVhdmUgdGhlIGhvdCBmYWNlIGJhcmUuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Three stages: clean the working face, melt fresh solder onto it, and leave a thin solder coating after removing excess."></p>
-  <p class="deeper-ref" id="deeper-ref-74">Supporting detail: <a href="#deeper-addendum-74"><strong>Addendum 74</strong></a> &mdash; Why tinning helps heat transfer.</p>
+  <p class="deeper-ref" id="deeper-ref-75">Supporting detail: <a href="#deeper-addendum-75"><strong>Addendum 75</strong></a> &mdash; Why tinning helps heat transfer.</p>
     </div>
   </details>
 </div>
@@ -6544,7 +6685,7 @@ void loop() {
       <h2>Put heat-shrink on before closing the splice</h2>
   <p>Slide suitable heat-shrink tubing onto a wire before joining it, and keep it away from the soldering heat. After soldering, allow the joint to cool and inspect it. Move the tubing over all exposed conductor, overlapping intact insulation at both ends of an inline splice, then shrink it with the appropriate heat source according to its instructions.</p>
   <p>Choose tubing whose unshrunk size passes over the splice and whose recovered size fits the wire. Avoid sharp wire ends that could puncture it. Ordinary heat-shrink provides insulation; do not assume it makes a waterproof connection or replaces strain relief.</p>
-  <p class="deeper-ref" id="deeper-ref-75">Supporting detail: <a href="#deeper-addendum-75"><strong>Addendum 75</strong></a> &mdash; When pre-tinning helps.</p>
+  <p class="deeper-ref" id="deeper-ref-76">Supporting detail: <a href="#deeper-addendum-76"><strong>Addendum 76</strong></a> &mdash; When pre-tinning helps.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together" data-card="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together">
@@ -6584,7 +6725,7 @@ void loop() {
       <h2>A smaller AWG number means a thicker conductor</h2>
   <p><strong>American Wire Gauge (AWG)</strong> uses smaller numbers for larger conductor cross sections. For the same material, length and temperature, a thicker conductor has less resistance. See <a href="https://learn.adafruit.com/wires-and-connections/wire-gauges">Adafruit’s wire-gauge explanation</a>. Under comparable installation and temperature conditions, it can carry more current without exceeding its temperature limit.</p>
   <p><strong>Ampacity</strong> means the allowable current under specified conditions. Gauge alone is not an ampacity rating: material, insulation temperature rating, ambient temperature, bundling and installation all matter. Use the applicable manufacturer data and installation requirements for a real selection; this page is not a wire-sizing table. <a href="https://www.iewc.com/resources/technical-guide/suggested-ampacities">IEWC explains these ampacity factors</a>. Choosing a wire involves voltage drop as well as allowable current.</p>
-  <p class="deeper-ref" id="deeper-ref-76">Supporting detail: <a href="#deeper-addendum-76"><strong>Addendum 76</strong></a> &mdash; Why a long wire can matter even below its current limit.</p>
+  <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; Why a long wire can matter even below its current limit.</p>
     </div>
   </details>
 </div>
@@ -6640,8 +6781,8 @@ void loop() {
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Units and Measurement</span><span class="sep">/</span><a href="#p-measurement-language">Measurement Language</a></div>
         <h2><span class="deeper-addendum-number">Addendum 4.</span> Why technical writing cares about the space</h2>
         <p>Leave a space between a numerical value and its unit symbol: <code>8 m</code>,
-    <code>15.0 kg</code>, and <code>0.50 s</code>. The degree Celsius and percent sign have their
-    own conventions, but those are not the quantities used in this unit. Consistent notation is a
+    <code>15.0 kg</code>, and <code>0.50 s</code>. SI also uses a space before
+    <code>&deg;C</code> and <code>%</code>. Consistent notation is a
     low-cost way to keep a drawing, a spreadsheet, and a controller reading the same thing.</p>
         <p class="deeper-back"><a href="#deeper-ref-4">Back to reference 4</a></p>
       </article>
@@ -6691,7 +6832,7 @@ void loop() {
         <p>One revolution is <code>2&pi;</code> radians and one minute is 60 seconds, so one revolution
     per minute is <code>2&pi;/60 = 0.104719755&hellip;</code> radians per second. It is not a
     measured constant; it falls straight out of the two definitions. Turning it over gives
-    <code>60/2&pi; = 9.5492966&hellip;</code> revolutions per minute in one radian per second.</p>
+    <code>60/(2&pi;) = 9.5492966&hellip;</code> revolutions per minute in one radian per second.</p>
         <p class="deeper-back"><a href="#deeper-ref-8">Back to reference 8</a></p>
       </article>
     </li>
@@ -6895,7 +7036,7 @@ void loop() {
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Force and Power</span><span class="sep">/</span><a href="#p-work-and-energy">Work and Energy</a></div>
         <h2><span class="deeper-addendum-number">Addendum 24.</span> Turning a torque into work, and where the radian goes</h2>
-        <p>A torque that turns through an angle does work: <code>W = &tau;&theta;</code>, with the angle
+        <p>A constant torque about a fixed axis that turns through an angle does work: <code>W = &tau;&theta;</code>, with the angle
     in radians. Because the radian is a ratio of two lengths, NIST gives its base-unit expression as
     <code>m/m</code> and its value as <code>1</code>. Nothing is added to the units, so:</p>
     <p><code>1 J = 1 N&middot;m (torque) &times; 1 rad</code> &nbsp;&middot;&nbsp;
@@ -7324,59 +7465,67 @@ void loop() {
     </li>
     <li class="deeper-addendum" id="deeper-addendum-70" value="70">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 70.</span> Why the parallel formula uses reciprocals</h2>
-        <p>Each branch draws the supply voltage divided by its resistance. Add those branch currents, then divide by the common voltage. The result is a sum of <code>1/R</code> terms. This reciprocal of resistance is called conductance: parallel branches add ways for current to flow.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-reading-electrical-connections">Reading Electrical Connections</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 70.</span> Check the node count terminal by terminal</h2>
+        <p>The four separate conductor groups are B1+ to S1; the other side of S1 to R1; the other side of R1 to D1 anode; and D1 cathode to B1−. Closing an ideal S1 merges the first two groups into one, leaving three nodes. None of the component bodies is an extra node.</p>
         <p class="deeper-back"><a href="#deeper-ref-70">Back to reference 70</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-71" value="71">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 71.</span> What the iron's “sweet spot” means</h2>
-        <p>Use the broad, clean, solder-coated working face of the tip against both parts. Do not interpret “side of the iron” as the barrel or an uncoated surface. The useful contact area, not the sharpest point or the highest temperature setting, delivers heat into the joint. A tiny point can be hot and still transfer heat poorly.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 71.</span> Why the parallel formula uses reciprocals</h2>
+        <p>Each branch draws the supply voltage divided by its resistance. Add those branch currents, then divide by the common voltage. The result is a sum of <code>1/R</code> terms. This reciprocal of resistance is called conductance: parallel branches add ways for current to flow.</p>
         <p class="deeper-back"><a href="#deeper-ref-71">Back to reference 71</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-72" value="72">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 72.</span> Why the battery rule stays absolute</h2>
-        <p>Heat applied to a cell can damage its seals and internal parts. Lithium cells in particular can fail dangerously if damaged. Use the intended battery holder or connector instead of applying a soldering iron to a battery.</p>
+        <h2><span class="deeper-addendum-number">Addendum 72.</span> What the iron's “sweet spot” means</h2>
+        <p>Use the broad, clean, solder-coated working face of the tip against both parts. Do not interpret “side of the iron” as the barrel or an uncoated surface. The useful contact area, not the sharpest point or the highest temperature setting, delivers heat into the joint. A tiny point can be hot and still transfer heat poorly.</p>
         <p class="deeper-back"><a href="#deeper-ref-72">Back to reference 72</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-73" value="73">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 73.</span> Further reading on flux fume</h2>
-        <p>The UK Health and Safety Executive's <a href="https://www.hse.gov.uk/asthma/solderers.htm">guidance for solderers</a> describes rosin-based flux fume and recommends extraction and keeping your head out of the plume.</p>
+        <h2><span class="deeper-addendum-number">Addendum 73.</span> Why the battery rule stays absolute</h2>
+        <p>Heat applied to a cell can damage its seals and internal parts. Lithium cells in particular can fail dangerously if damaged. Use the intended battery holder or connector instead of applying a soldering iron to a battery.</p>
         <p class="deeper-back"><a href="#deeper-ref-73">Back to reference 73</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-74" value="74">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 74.</span> Why tinning helps heat transfer</h2>
-        <p>A hot tip oxidizes. Oxide interferes with wetting, while a solder coating protects the working face and helps make thermal contact with the joint. Tinning the tip is the time to feed solder onto the tip. Making a joint is different: feed solder into the heated joint.</p>
-    <p>See HAKKO's <a href="https://www.hakko.com/english/support/maintenance/detail.php?seq=163">tip-life guidance</a> for the construction of plated tips and the effects of oxidation.</p>
+        <h2><span class="deeper-addendum-number">Addendum 74.</span> Further reading on flux fume</h2>
+        <p>The UK Health and Safety Executive's <a href="https://www.hse.gov.uk/asthma/solderers.htm">guidance for solderers</a> describes rosin-based flux fume and recommends extraction and keeping your head out of the plume.</p>
         <p class="deeper-back"><a href="#deeper-ref-74">Back to reference 74</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-75" value="75">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-wires-and-pcbs">Soldering Wire Splices and Through-Hole PCBs</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 75.</span> When pre-tinning helps</h2>
-        <p>Some wires and terminals are pre-tinned: a small amount of solder wets the surface before final assembly. This can help the final joint flow, but too much solder makes a wire end stiff and bulky. Follow the connection's assembly method and still heat both parts when making the final bond.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 75.</span> Why tinning helps heat transfer</h2>
+        <p>A hot tip oxidizes. Oxide interferes with wetting, while a solder coating protects the working face and helps make thermal contact with the joint. Tinning the tip is the time to feed solder onto the tip. Making a joint is different: feed solder into the heated joint.</p>
+    <p>See HAKKO's <a href="https://www.hakko.com/english/support/maintenance/detail.php?seq=163">tip-life guidance</a> for the construction of plated tips and the effects of oxidation.</p>
         <p class="deeper-back"><a href="#deeper-ref-75">Back to reference 75</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-76" value="76">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 76.</span> Why a long wire can matter even below its current limit</h2>
-        <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> shows the calculation.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-wires-and-pcbs">Soldering Wire Splices and Through-Hole PCBs</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 76.</span> When pre-tinning helps</h2>
+        <p>Some wires and terminals are pre-tinned: a small amount of solder wets the surface before final assembly. This can help the final joint flow, but too much solder makes a wire end stiff and bulky. Follow the connection's assembly method and still heat both parts when making the final bond.</p>
         <p class="deeper-back"><a href="#deeper-ref-76">Back to reference 76</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-77" value="77">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 77.</span> Why a long wire can matter even below its current limit</h2>
+        <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> shows the calculation.</p>
+        <p class="deeper-back"><a href="#deeper-ref-77">Back to reference 77</a></p>
       </article>
     </li>
   </ol>
@@ -9919,6 +10068,72 @@ void loop() {
   function initAll() { document.querySelectorAll('[data-interactive="dc-motor-curve"]').forEach(init); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll, { once: true });
   else initAll();
+})();
+
+(function (root) {
+  'use strict';
+  const views = Object.freeze(['comparison', 'pictorial', 'wiring', 'schematic', 'block']);
+  const components = Object.freeze(['battery', 'switch', 'resistor', 'led']);
+  const descriptions = Object.freeze({
+    battery: 'B1 battery: supplies energy to the circuit.',
+    switch: 'S1 switch: opens or closes the conducting path.',
+    resistor: 'R1 resistor: limits the LED current.',
+    led: 'D1 LED: produces light when operated with suitable forward current.'
+  });
+  const connections = Object.freeze([
+    Object.freeze(['B1+', 'S1.1']), Object.freeze(['S1.2', 'R1.1']),
+    Object.freeze(['R1.2', 'D1.A']), Object.freeze(['D1.K', 'B1-'])
+  ]);
+  function initial() { return { view: 'comparison', component: 'battery' }; }
+  function select(state, field, value) {
+    const allowed = field === 'view' ? views : field === 'component' ? components : [];
+    if (!allowed.includes(value)) throw new RangeError('Unknown drawing selection');
+    return { ...state, [field]: value };
+  }
+  const api = Object.freeze({ views, components, descriptions, connections, initial, select });
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.CourseWikiDiagramViews = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+(function () {
+  'use strict';
+  const model = window.CourseWikiDiagramViews;
+  document.querySelectorAll('[data-interactive="diagram-views"]').forEach(root => {
+    if (root.dataset.diagramReady) return;
+    root.dataset.diagramReady = 'true';
+    let state = model.initial();
+    const controls = root.querySelector('.dv-controls');
+    const status = root.querySelector('.dv-status');
+    function render() {
+      root.querySelectorAll('[data-view]').forEach(figure => {
+        figure.hidden = state.view === 'comparison' ? figure.dataset.view === 'block' : figure.dataset.view !== state.view;
+      });
+      root.querySelectorAll('[data-component]').forEach(part => {
+        part.querySelector('.dv-highlight').setAttribute('visibility', part.dataset.component === state.component ? 'visible' : 'hidden');
+      });
+      controls.querySelectorAll('button').forEach(button => {
+        button.setAttribute('aria-pressed', String(state[button.dataset.field] === button.dataset.value));
+      });
+      status.textContent = model.descriptions[state.component];
+    }
+    function choose(field, value) { state = model.select(state, field, value); render(); }
+    for (const [field, values, host] of [['view', model.views, '.dv-views'], ['component', model.components, '.dv-parts']]) {
+      values.forEach(value => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.field = field;
+        button.dataset.value = value;
+        button.textContent = value === 'led' ? 'LED' : value[0].toUpperCase() + value.slice(1);
+        button.addEventListener('click', () => choose(field, value));
+        root.querySelector(host).appendChild(button);
+      });
+    }
+    root.querySelectorAll('[data-component]').forEach(part => {
+      part.addEventListener('click', () => choose('component', part.dataset.component));
+    });
+    controls.hidden = false;
+    render();
+  });
 })();
 
 (function (root) {

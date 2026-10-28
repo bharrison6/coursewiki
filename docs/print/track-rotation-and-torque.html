@@ -3099,7 +3099,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div><dt>Degree (&deg;)</dt><dd>One revolution cut into 360 parts. This is what a drawing and a
     protractor use.</dd></div>
     <div><dt>Radian (rad)</dt><dd>The angle whose arc is exactly as long as the radius. This is the
-    SI unit, and it is the one every rotation formula expects.</dd></div>
+    SI unit, and it is the one formulas such as <code>v = &omega;r</code> expect.</dd></div>
   </dl>
   <figure>
     <svg viewBox="0 0 330 250" width="330" role="img" aria-labelledby="radian-title radian-desc"
@@ -3108,10 +3108,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <desc id="radian-desc">A sector drawn from the centre of a circle. Two radii of equal length
       open out from the centre, and the curved arc between their tips is drawn the same length as
       one radius. The angle enclosed at the centre is labelled one radian.</desc>
-      <path d="M 220 205 A 150 150 0 0 0 141 78.8" stroke-width="5"/>
+      <path d="M 220 205 A 150 150 0 0 0 151.04535 78.77935" stroke-width="5"/>
       <path d="M 70 205 L 220 205"/>
-      <path d="M 70 205 L 141 78.8"/>
-      <path d="M 115 205 A 45 45 0 0 0 90.7 167.1" stroke-width="1.5"/>
+      <path d="M 70 205 L 151.04535 78.77935"/>
+      <path d="M 115 205 A 45 45 0 0 0 94.31360 167.13381" stroke-width="1.5"/>
       <text x="145" y="228" fill="currentColor" stroke="none" font-size="15" text-anchor="middle">radius r</text>
       <text x="86" y="140" fill="currentColor" stroke="none" font-size="15" text-anchor="middle" transform="rotate(-60 86 140)">radius r</text>
       <text x="222" y="60" fill="currentColor" stroke="none" font-size="15" text-anchor="middle">arc length = r</text>
@@ -3147,8 +3147,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Angular velocity is how fast it turns</h2>
   <p><strong>Angular velocity</strong> uses the symbol <strong>&omega;</strong> (omega), and it is
-  angle divided by time:</p>
-  <p><code>&omega; = &theta; / t</code></p>
+  directed angle change per time interval for rotation about a fixed axis:</p>
+  <p><code>&omega;<sub>avg</sub> = &Delta;&theta; / &Delta;t</code>. Instantaneous angular
+  velocity is the rate at one moment; it equals this average throughout the interval only for
+  constant angular velocity.</p>
   <dl class="dims">
     <div><dt>rad/s</dt><dd>Radian per second. The SI unit, and the form every formula on
     <a class="xref-page" href="#p-rotation-and-linear-speed">Rotation and Linear Speed</a> needs.</dd></div>
@@ -3159,7 +3161,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <p><strong>Nameplates speak rpm; formulas speak rad/s.</strong> Convert before you calculate,
     and convert back before you set a machine.</p>
   </div>
-  <p>The exact pair, either way round:</p>
+  <p>The conversion pair, rounded, either way round:</p>
   <p><code>1 r/min = 0.1047198 rad/s</code> &nbsp;&middot;&nbsp;
   <code>1 rad/s = 9.549297 r/min</code></p>
   <h3>Worked example</h3>
@@ -3176,10 +3178,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Angular acceleration is how fast the turning changes</h2>
   <p><strong>Angular acceleration</strong> uses the symbol <strong>&alpha;</strong> (alpha), and it
   is change in angular velocity divided by the time it took:</p>
-  <p><code>&alpha; = &Delta;&omega; / &Delta;t</code></p>
+  <p><code>&alpha;<sub>avg</sub> = &Delta;&omega; / &Delta;t</code></p>
   <p>Its SI unit is <code>rad/s<sup>2</sup></code>. Everything true of straight-line acceleration on
   <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/acceleration-and-squared-time.html" target="_blank" rel="noopener">Acceleration and Squared Time</a> is true here as well: it is a <em>change</em>, so a shaft
-  slowing down has a negative angular acceleration in whichever direction you called positive, and
+  slowing down has angular acceleration opposite its angular velocity (negative if it is turning
+  in the positive direction), and
   the squared second means a squared factor whenever the time unit changes.</p>
   <h3>Worked example: a motor speeding up</h3>
   <p>A motor shaft is turning at 17 rpm. Power to the motor is increased, and 1.1 s later it is
@@ -3230,6 +3233,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   speeds are not the same number, and the thing that converts one into the other is the
   <strong>radius</strong>.</p>
   <p><code>v = &omega;r</code> &nbsp;&middot;&nbsp; <code>a = &alpha;r</code></p>
+  <p>Here <code>a</code> is the tangential acceleration, not the rim point&rsquo;s total
+  acceleration: it also has an inward component <code>&omega;<sup>2</sup>r</code>. Belt and
+  vehicle speeds match rim speed only when there is no slipping.</p>
   <dl class="dims">
     <div><dt>v</dt><dd>The straight-line speed of a point on the rim &mdash; the speed of the belt,
     the sheet, the vehicle.</dd></div>
@@ -3410,7 +3416,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>The unit, and the word order that identifies it</h2>
   <div class="unit-table-wrap">
   <table class="unit-table">
-    <caption>Torque units and the exact factors between them.</caption>
+    <caption>Torque units and rounded conversion factors between them.</caption>
     <thead><tr><th scope="col">System</th><th scope="col">Unit</th><th scope="col">Symbol</th><th scope="col">Conversion</th></tr></thead>
     <tbody>
       <tr><td>SI</td><td>newton metre</td><td><code>N&middot;m</code></td><td>1 N&middot;m = 0.7375621 lbf&middot;ft</td></tr>
@@ -3419,17 +3425,16 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </table>
   </div>
   <p class="aside"><strong>Case matters, and this one bites.</strong> The SI torque unit is
-  <code>N&middot;m</code> with a <em>lower-case</em> m. Written <code>N&middot;M</code> it reads as
-  newton times mega, because <code>M</code> is the prefix for 10<sup>6</sup> &mdash; a million times
-  wrong. The same trap catches <code>Kg</code> for <code>kg</code> and <code>S</code> for
+  <code>N&middot;m</code> with a <em>lower-case</em> m. Written <code>N&middot;M</code> it is not a valid SI torque unit: <code>M</code> is the
+  prefix for 10<sup>6</sup>, but a prefix cannot stand alone as a unit. The same trap catches <code>Kg</code> for <code>kg</code> and <code>S</code> for
   <code>s</code>. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/measurement-language.html" target="_blank" rel="noopener">Measurement Language</a>.</p>
   <div class="panel">
-    <p><strong>Torque is <code>lbf&middot;ft</code>; energy is <code>ft&middot;lbf</code>.</strong>
+    <p><strong>Here torque is written <code>lbf&middot;ft</code>; energy is written <code>ft&middot;lbf</code>.</strong>
     The same two units, the same numerical factor, written in the opposite order &mdash; and NIST
     prints them that way round on purpose: pound-force foot converts to the newton metre, foot
     pound-force converts to the joule. They are different physical quantities that happen to share
-    a unit combination, and the order is the only thing on the page telling you which one you are
-    looking at. SI avoids the ambiguity by giving energy its own name, the joule; a torque is never
+    a unit combination. Word order is a convention, not a mathematical distinction; use the
+    quantity and context to tell them apart. SI avoids the ambiguity by giving energy its own name, the joule; a torque is never
     written in joules. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/work-and-energy.html" target="_blank" rel="noopener">Work and Energy</a>.</p>
   </div>
     </div>
@@ -3645,7 +3650,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
         <p>One revolution is <code>2&pi;</code> radians and one minute is 60 seconds, so one revolution
     per minute is <code>2&pi;/60 = 0.104719755&hellip;</code> radians per second. It is not a
     measured constant; it falls straight out of the two definitions. Turning it over gives
-    <code>60/2&pi; = 9.5492966&hellip;</code> revolutions per minute in one radian per second.</p>
+    <code>60/(2&pi;) = 9.5492966&hellip;</code> revolutions per minute in one radian per second.</p>
         <p class="deeper-back"><a href="#deeper-ref-2">Back to reference 2</a></p>
       </article>
     </li>
