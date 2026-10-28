@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3008,8 +3031,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-1">Supporting detail: <a href="#deeper-addendum-1"><strong>Addendum 1</strong></a> &mdash; Definitions, instances, and design changes.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="assembly-files-and-mates--rename-and-package-files-with-their-references" data-card="assembly-files-and-mates--rename-and-package-files-with-their-references">
-    <summary>Rename and package files with their references<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="assembly-files-and-mates--rename-and-package-files-with-their-references" data-card="assembly-files-and-mates--rename-and-package-files-with-their-references" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Rename and package files with their references<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rename and package files with their references</h2>
   <p>Renaming or moving a component in ordinary File Explorer can leave an assembly looking for its old name or location. Use the CAD system's reference-aware rename or move workflow. Changing a display name in the tree is not necessarily changing the file name.</p>
@@ -3079,7 +3102,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="assembly-files-and-mates--build-reusable-parts-and-subassemblies-with-deliberate-dependencies" data-card="assembly-files-and-mates--build-reusable-parts-and-subassemblies-with-deliberate-dependencies">
-    <summary>Build reusable parts and subassemblies with deliberate dependencies<span class="chev"></span></summary>
+    <summary>Build reusable parts and subassemblies with deliberate dependencies<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Build reusable parts and subassemblies with deliberate dependencies</h2>
   <p><strong>Bottom-up</strong> design starts with existing parts and brings them into an assembly. <strong>Top-down</strong> design starts with an overall layout or shared design references and develops parts around them. A mixed approach is common: use a shared layout for custom plates and insert purchased hardware.</p>
@@ -3113,8 +3136,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>For a shaft with concentric axes and seated shoulder faces, one rotation remains. Adding another mate that merely keeps those axes parallel is redundant. Adding an angle mate to lock that remaining rotation may be correct for a stationary shaft and wrong for a rotating lever. Review <a class="xref-page" href="#p-assembly-files-and-mates">Assembly Files and Mates</a> for the geometry.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="checking-cad-assemblies--repair-the-cause-of-a-mate-error-before-adding-more-mates" data-card="checking-cad-assemblies--repair-the-cause-of-a-mate-error-before-adding-more-mates">
-    <summary>Repair the cause of a mate error before adding more mates<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="checking-cad-assemblies--repair-the-cause-of-a-mate-error-before-adding-more-mates" data-card="checking-cad-assemblies--repair-the-cause-of-a-mate-error-before-adding-more-mates" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Repair the cause of a mate error before adding more mates<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Repair the cause of a mate error before adding more mates</h2>
   <ul class="boxes">
@@ -3138,8 +3161,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; Selection scope can hide an interference.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="checking-cad-assemblies--move-the-mechanism-through-its-intended-range" data-card="checking-cad-assemblies--move-the-mechanism-through-its-intended-range">
-    <summary>Move the mechanism through its intended range<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="checking-cad-assemblies--move-the-mechanism-through-its-intended-range" data-card="checking-cad-assemblies--move-the-mechanism-through-its-intended-range" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Move the mechanism through its intended range<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Move the mechanism through its intended range</h2>
   <p>Move the input joint slowly and watch the connected parts. Test intermediate positions as well as endpoints: a lever can clear a housing at both ends and strike it halfway through. Check which mate limits apply and whether the model passes through solid geometry because collision checking is not active.</p>
@@ -3202,8 +3225,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-12">Supporting detail: <a href="#deeper-addendum-12"><strong>Addendum 12</strong></a> &mdash; Subassembly display changes what the table means.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="exploded-views-and-bills-of-materials--review-the-assembly-drawing-as-an-identification-tool" data-card="exploded-views-and-bills-of-materials--review-the-assembly-drawing-as-an-identification-tool">
-    <summary>Review the assembly drawing as an identification tool<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="exploded-views-and-bills-of-materials--review-the-assembly-drawing-as-an-identification-tool" data-card="exploded-views-and-bills-of-materials--review-the-assembly-drawing-as-an-identification-tool" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Review the assembly drawing as an identification tool<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Review the assembly drawing as an identification tool</h2>
   <ul class="boxes">

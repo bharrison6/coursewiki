@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3030,8 +3053,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-1">Supporting detail: <a href="#deeper-addendum-1"><strong>Addendum 1</strong></a> &mdash; How to check a center when a caliper touches the hole edge.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture" data-card="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture">
-    <summary>Dimension the part so it can be made without measuring the picture<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture" data-card="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Dimension the part so it can be made without measuring the picture<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Dimension the part so it can be made without measuring the picture</h2>
   <p>Include the part identity, revision, material, units, overall dimensions, feature sizes and locations, thickness, and required finish. Supply enough views to remove ambiguity. Call a hole “through” when it passes through the material; otherwise specify depth.</p>
@@ -3094,8 +3117,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Buying one strip and one pack costs $21, even for one assembly. Unused material remains inventory; do not confuse that purchase total with $1.20 of allocated consumption.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="bills-of-materials--check-quantities-units-and-waste-before-totaling-the-bom" data-card="bills-of-materials--check-quantities-units-and-waste-before-totaling-the-bom">
-    <summary>Check quantities, units and waste before totaling the BOM<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="bills-of-materials--check-quantities-units-and-waste-before-totaling-the-bom" data-card="bills-of-materials--check-quantities-units-and-waste-before-totaling-the-bom" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check quantities, units and waste before totaling the BOM<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check quantities, units and waste before totaling the BOM</h2>
   <ul class="boxes">
@@ -3180,8 +3203,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>For three assemblies, the serial estimate is 10 + (3 × 13) = <strong>49 minutes</strong>, assuming each setup is done once and all operations run one after another. Record waiting, interruptions and repeated setups separately when comparing with actual elapsed time.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="operation-method-sheets--replace-make-it-right-with-an-action-and-an-acceptance-test" data-card="operation-method-sheets--replace-make-it-right-with-an-action-and-an-acceptance-test">
-    <summary>Replace “make it right” with an action and an acceptance test<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="operation-method-sheets--replace-make-it-right-with-an-action-and-an-acceptance-test" data-card="operation-method-sheets--replace-make-it-right-with-an-action-and-an-acceptance-test" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Replace “make it right” with an action and an acceptance test<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Replace “make it right” with an action and an acceptance test</h2>
   <p>“Drill the holes neatly” leaves the next person guessing. “Drill two through holes at the drawing coordinates; check diameter and location against revision A” gives an action and a result, but still needs the equipment, support, tooling and settings in the row.</p>
@@ -3235,8 +3258,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Remove unwanted layer ridges and support marks without losing important dimensions. Choose pattern preparation, any sealer and any release agent for the specific print, silicone and casting material. Follow the manufacturers' compatibility instructions and test a small prepared sample before committing the full mold.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="making-silicone-molds-from-a-printed-pattern--read-the-technical-data-sheet-before-choosing-a-mix-or-cure-schedule" data-card="making-silicone-molds-from-a-printed-pattern--read-the-technical-data-sheet-before-choosing-a-mix-or-cure-schedule">
-    <summary>Read the technical data sheet before choosing a mix or cure schedule<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="making-silicone-molds-from-a-printed-pattern--read-the-technical-data-sheet-before-choosing-a-mix-or-cure-schedule" data-card="making-silicone-molds-from-a-printed-pattern--read-the-technical-data-sheet-before-choosing-a-mix-or-cure-schedule" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Read the technical data sheet before choosing a mix or cure schedule<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Read the technical data sheet before choosing a mix or cure schedule</h2>
   <p>The <strong>technical data sheet (TDS)</strong> supplies processing instructions. The safety data sheet (SDS) supplies handling information; use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a> for that guidance. Neither a generic lesson nor a familiar-looking container replaces the instructions for the actual product.</p>
@@ -3252,7 +3275,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume" data-card="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume">
-    <summary>A ratio by weight is not automatically a ratio by volume<span class="chev"></span></summary>
+    <summary>A ratio by weight is not automatically a ratio by volume<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A ratio by weight is not automatically a ratio by volume</h2>
   <p>For a specified <strong>A:B = a:b by weight</strong> and total mixed mass M:</p>

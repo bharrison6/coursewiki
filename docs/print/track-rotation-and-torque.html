@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3201,8 +3224,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-1">Supporting detail: <a href="#deeper-addendum-1"><strong>Addendum 1</strong></a> &mdash; Why a radian is barely a unit at all.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="angular-motion--angular-velocity-is-how-fast-it-turns" data-card="angular-motion--angular-velocity-is-how-fast-it-turns">
-    <summary>Angular velocity is how fast it turns<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="angular-motion--angular-velocity-is-how-fast-it-turns" data-card="angular-motion--angular-velocity-is-how-fast-it-turns" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Angular velocity is how fast it turns<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Angular velocity is how fast it turns</h2>
   <p><strong>Angular velocity</strong> uses the symbol <strong>&omega;</strong> (omega), and it is
@@ -3231,8 +3254,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Where 0.1047198 comes from.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="angular-motion--angular-acceleration-is-how-fast-the-turning-changes" data-card="angular-motion--angular-acceleration-is-how-fast-the-turning-changes">
-    <summary>Angular acceleration is how fast the turning changes<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="angular-motion--angular-acceleration-is-how-fast-the-turning-changes" data-card="angular-motion--angular-acceleration-is-how-fast-the-turning-changes" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Angular acceleration is how fast the turning changes<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Angular acceleration is how fast the turning changes</h2>
   <p><strong>Angular acceleration</strong> uses the symbol <strong>&alpha;</strong> (alpha), and it
@@ -3284,8 +3307,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-gate" id="rotation-and-linear-speed--the-radius-is-what-links-turning-to-travelling" data-card="rotation-and-linear-speed--the-radius-is-what-links-turning-to-travelling">
-    <summary>The radius is what links turning to travelling<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="rotation-and-linear-speed--the-radius-is-what-links-turning-to-travelling" data-card="rotation-and-linear-speed--the-radius-is-what-links-turning-to-travelling" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>The radius is what links turning to travelling<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>The radius is what links turning to travelling</h2>
   <p class="lede">A roller turns; the belt on it travels. A wheel turns; the vehicle moves. The two
@@ -3314,8 +3337,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Why the radian is the only angle unit that works.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="rotation-and-linear-speed--worked-example-a-conveyor-drive-roller" data-card="rotation-and-linear-speed--worked-example-a-conveyor-drive-roller">
-    <summary>Worked example: a conveyor drive roller<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="rotation-and-linear-speed--worked-example-a-conveyor-drive-roller" data-card="rotation-and-linear-speed--worked-example-a-conveyor-drive-roller" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Worked example: a conveyor drive roller<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Worked example: a conveyor drive roller</h2>
   <p>A conveyor belt runs over a drive roller 200 mm in diameter, turning at 45 rpm. What is the
@@ -3376,8 +3399,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   what it describes.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="rotation-and-linear-speed--rim-speed-is-why-wheel-size-changes-the-safe-rpm" data-card="rotation-and-linear-speed--rim-speed-is-why-wheel-size-changes-the-safe-rpm">
-    <summary>Rim speed is why wheel size changes the safe rpm<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="rotation-and-linear-speed--rim-speed-is-why-wheel-size-changes-the-safe-rpm" data-card="rotation-and-linear-speed--rim-speed-is-why-wheel-size-changes-the-safe-rpm" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Rim speed is why wheel size changes the safe rpm<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rim speed is why wheel size changes the safe rpm</h2>
   <p>A grinding wheel is limited by how fast its <em>rim</em> moves, not by how fast its centre
@@ -3425,8 +3448,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-gate" id="torque--torque-is-force-applied-at-a-radius" data-card="torque--torque-is-force-applied-at-a-radius">
-    <summary>Torque is force applied at a radius<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="torque--torque-is-force-applied-at-a-radius" data-card="torque--torque-is-force-applied-at-a-radius" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Torque is force applied at a radius<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Torque is force applied at a radius</h2>
   <p class="lede">A force pushes. A <strong>torque</strong> turns. The same force produces more
@@ -3498,8 +3521,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="torque--worked-example-can-the-motor-hold-the-arm-up" data-card="torque--worked-example-can-the-motor-hold-the-arm-up">
-    <summary>Worked example: can the motor hold the arm up?<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="torque--worked-example-can-the-motor-hold-the-arm-up" data-card="torque--worked-example-can-the-motor-hold-the-arm-up" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Worked example: can the motor hold the arm up?<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Worked example: can the motor hold the arm up?</h2>
   <p>A robot-arm joint motor produces 15 N&middot;m. The arm segment is 0.35 m long and carries a
@@ -3556,8 +3579,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-interactive" id="gear-ratios--experiment-trade-speed-for-turning-effort" data-card="gear-ratios--experiment-trade-speed-for-turning-effort">
-    <summary>Experiment: trade speed for turning effort<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="gear-ratios--experiment-trade-speed-for-turning-effort" data-card="gear-ratios--experiment-trade-speed-for-turning-effort" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Experiment: trade speed for turning effort<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Experiment: trade speed for turning effort</h2>
   <div data-interactive="gear-ratios">
@@ -3660,8 +3683,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><strong>Follow the loss assumption in the problem.</strong> Real meshes lose some power, but a problem may explicitly ignore it. If every actual mesh is 96% efficient, A → I → B has <code>η<sub>total</sub> = 0.96²</code>. If a whole stage including its idler is assigned 96%, use that stage value once. If η = 1.00 is stated, ignore losses. Do not infer the loss count from the reduction-stage count when an idler is present.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="gear-ratios--choose-teeth-then-check-both-output-limits" data-card="gear-ratios--choose-teeth-then-check-both-output-limits">
-    <summary>Choose teeth, then check both output limits<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="gear-ratios--choose-teeth-then-check-both-output-limits" data-card="gear-ratios--choose-teeth-then-check-both-output-limits" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Choose teeth, then check both output limits<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose teeth, then check both output limits</h2>
   <ul class="boxes">

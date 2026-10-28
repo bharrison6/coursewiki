@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3017,7 +3040,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-equipment--match-the-solder-and-flux-to-electrical-work" data-card="soldering-equipment--match-the-solder-and-flux-to-electrical-work">
-    <summary>Match the solder and flux to electrical work<span class="chev"></span></summary>
+    <summary>Match the solder and flux to electrical work<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Match the solder and flux to electrical work</h2>
   <ul>
@@ -3072,8 +3095,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; A one-second count is a rhythm, not a temperature test.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="soldering-joints--work-through-the-joint-in-this-order" data-card="soldering-joints--work-through-the-joint-in-this-order">
-    <summary>Work through the joint in this order<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="soldering-joints--work-through-the-joint-in-this-order" data-card="soldering-joints--work-through-the-joint-in-this-order" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Work through the joint in this order<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Work through the joint in this order</h2>
   <ul class="boxes">
@@ -3090,7 +3113,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-joints--look-for-wetting-and-shape-shine-alone-is-not-a-verdict" data-card="soldering-joints--look-for-wetting-and-shape-shine-alone-is-not-a-verdict">
-    <summary>Look for wetting and shape; shine alone is not a verdict<span class="chev"></span></summary>
+    <summary>Look for wetting and shape; shine alone is not a verdict<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Look for wetting and shape; shine alone is not a verdict</h2>
   <p>A good joint flows onto both surfaces. On a typical through-hole pad, look for a smooth transition from pad to lead, often a concave fillet (an inward-curving slope). Tin-lead joints are often shiny. A sound lead-free joint may be dull; dullness alone does not diagnose a cold joint.</p>
@@ -3128,7 +3151,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="soldering-wires-and-pcbs--make-the-splice-mechanically-sound-before-soldering" data-card="soldering-wires-and-pcbs--make-the-splice-mechanically-sound-before-soldering">
-    <summary>Make the splice mechanically sound before soldering<span class="chev"></span></summary>
+    <summary>Make the splice mechanically sound before soldering<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Make the splice mechanically sound before soldering</h2>
   <p>Solder should not be the only thing holding loose wires in position. Form a stable splice, support it during soldering, and provide strain relief so pulling or bending the cable does not load the soldered joint. Follow the wire and assembly requirements; these sketches show splice shapes, not a qualification standard.</p>
@@ -3152,7 +3175,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together" data-card="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together">
-    <summary>On a PCB, heat the copper pad and component lead together<span class="chev"></span></summary>
+    <summary>On a PCB, heat the copper pad and component lead together<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>On a PCB, heat the copper pad and component lead together</h2>
   <p>A <strong>pad</strong> is the exposed copper connection area on a printed circuit board. A component's <strong>lead</strong> is its metal leg. In through-hole assembly, the lead passes through a hole in the board. Insert the correct component in the correct orientation and support the board and component before heating.</p>

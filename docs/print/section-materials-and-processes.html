@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3086,8 +3109,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p class="deeper-ref" id="deeper-ref-1">Supporting detail: <a href="#deeper-addendum-1"><strong>Addendum 1</strong></a> &mdash; Why the loosest tolerance is not automatically cheapest.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="design-for-manufacturing--reduce-material-loss-without-shortening-useful-life" data-card="design-for-manufacturing--reduce-material-loss-without-shortening-useful-life">
-    <summary>Reduce material loss without shortening useful life<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="design-for-manufacturing--reduce-material-loss-without-shortening-useful-life" data-card="design-for-manufacturing--reduce-material-loss-without-shortening-useful-life" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Reduce material loss without shortening useful life<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Reduce material loss without shortening useful life</h2>
 <p>Use <a class="xref-page" href="#p-material-utilization-and-cost">Material Utilization and Cost</a> to compare layouts. Also consider energy, durability, repair, disassembly and practical material recovery at end of life. A lighter part that fails early may consume more resources over its service life.</p>
@@ -3122,8 +3145,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p>Standard parts often favor buying; distinctive capabilities may favor making. Neither is a rule based on volume alone.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="make-or-buy--check-assumptions-before-committing-resources" data-card="make-or-buy--check-assumptions-before-committing-resources">
-    <summary>Check assumptions before committing resources<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="make-or-buy--check-assumptions-before-committing-resources" data-card="make-or-buy--check-assumptions-before-committing-resources" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check assumptions before committing resources<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check assumptions before committing resources</h2>
 <ul class="boxes"><li>Define matching requirements, quantity and timing.</li><li>List relevant costs and identify charges already included in rates.</li><li>Check capacity, quality evidence, lead time and supplier dependence.</li><li>Repeat the comparison at lower and higher plausible demand.</li><li>Record what would change the decision.</li></ul>
@@ -3152,7 +3175,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="manufacturing-cost-and-volume--spread-fixed-cost-over-the-quantity-actually-needed" data-card="manufacturing-cost-and-volume--spread-fixed-cost-over-the-quantity-actually-needed">
-    <summary>Spread fixed cost over the quantity actually needed<span class="chev"></span></summary>
+    <summary>Spread fixed cost over the quantity actually needed<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Spread fixed cost over the quantity actually needed</h2>
 <p>For a simple batch model, <code>C = F + vQ</code> and <code>u = C/Q = F/Q + v</code>. C is total cost, F is fixed batch cost, v is variable cost per part, Q is the number of acceptable parts, and u is average unit cost. Use Q greater than zero.</p>
@@ -3163,7 +3186,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="manufacturing-cost-and-volume--set-total-costs-equal-to-find-process-break-even" data-card="manufacturing-cost-and-volume--set-total-costs-equal-to-find-process-break-even">
-    <summary>Set total costs equal to find process break-even<span class="chev"></span></summary>
+    <summary>Set total costs equal to find process break-even<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Set total costs equal to find process break-even</h2>
 <p>Compare routes that meet the same requirements at the same quantity. From <code>F_A + v_A Q = F_B + v_B Q</code>, obtain <code>Q* = (F_B − F_A)/(v_A − v_B)</code>.</p>
@@ -3173,8 +3196,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p><a class="button" data-practice-add="economics-break-even" href="../practice.html#economics-break-even">Practice break-even</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="manufacturing-cost-and-volume--move-the-volume-slider-and-predict-which-process-wins" data-card="manufacturing-cost-and-volume--move-the-volume-slider-and-predict-which-process-wins">
-    <summary>Move the volume slider and predict which process wins<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="manufacturing-cost-and-volume--move-the-volume-slider-and-predict-which-process-wins" data-card="manufacturing-cost-and-volume--move-the-volume-slider-and-predict-which-process-wins" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Move the volume slider and predict which process wins<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Move the volume slider and predict which process wins</h2>
 <p>Predict the cheaper process at 60 and 240 parts. Fixed costs are spread over different quantities while variable cost per part stays constant.</p>
@@ -3278,7 +3301,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="manufacturing-process-categories--for-overlapping-processes-state-the-purpose-and-pick-the-primary-category" data-card="manufacturing-process-categories--for-overlapping-processes-state-the-purpose-and-pick-the-primary-category">
-    <summary>For overlapping processes, state the purpose and pick the primary category<span class="chev"></span></summary>
+    <summary>For overlapping processes, state the purpose and pick the primary category<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>For overlapping processes, state the purpose and pick the primary category</h2>
   <ol>
@@ -3360,7 +3383,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="material-families--compare-typical-behavior-then-check-the-specific-material" data-card="material-families--compare-typical-behavior-then-check-the-specific-material">
-    <summary>Compare typical behavior, then check the specific material<span class="chev"></span></summary>
+    <summary>Compare typical behavior, then check the specific material<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Compare typical behavior, then check the specific material</h2>
   <figure class="fig-narrow">
@@ -3453,8 +3476,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Use <a class="xref-page" href="#p-manufacturing-process-categories">Manufacturing Process Categories</a> to describe the required operations. Detailed manufacturing economics and design for manufacturing extend the cost comparison.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="material-properties--choose-a-candidate-give-a-reason-and-name-what-still-needs-checking" data-card="material-properties--choose-a-candidate-give-a-reason-and-name-what-still-needs-checking">
-    <summary>Choose a candidate, give a reason, and name what still needs checking<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="material-properties--choose-a-candidate-give-a-reason-and-name-what-still-needs-checking" data-card="material-properties--choose-a-candidate-give-a-reason-and-name-what-still-needs-checking" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Choose a candidate, give a reason, and name what still needs checking<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose a candidate, give a reason, and name what still needs checking</h2>
   <ul class="boxes">
@@ -3481,7 +3504,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="material-utilization-and-cost--prove-the-parts-fit-before-dividing-areas" data-card="material-utilization-and-cost--prove-the-parts-fit-before-dividing-areas">
-    <summary>Prove the parts fit before dividing areas<span class="chev"></span></summary>
+    <summary>Prove the parts fit before dividing areas<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Prove the parts fit before dividing areas</h2>
 <p><strong>Stock</strong> is material purchased for further work. <strong>Nesting</strong> arranges part outlines on stock to reduce waste. An area ratio cannot prove a layout fits. Check dimensions, orientation, grain direction where relevant, edge margins and spacing.</p>
@@ -3491,7 +3514,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="material-utilization-and-cost--use-a-consistent-physical-basis-for-utilization" data-card="material-utilization-and-cost--use-a-consistent-physical-basis-for-utilization">
-    <summary>Use a consistent physical basis for utilization<span class="chev"></span></summary>
+    <summary>Use a consistent physical basis for utilization<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use a consistent physical basis for utilization</h2>
 <p><code>Utilization = material in acceptable parts / material purchased × 100%</code>. Compare length for the same cross-section, area for the same thickness, or mass on a consistent basis.</p>
@@ -3501,7 +3524,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="material-utilization-and-cost--charge-each-part-its-share-of-stock-and-waste" data-card="material-utilization-and-cost--charge-each-part-its-share-of-stock-and-waste">
-    <summary>Charge each part its share of stock and waste<span class="chev"></span></summary>
+    <summary>Charge each part its share of stock and waste<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Charge each part its share of stock and waste</h2>
 <p><code>Part material cost = share of stock charged to the part × stock price</code>. A $48 sheet yielding eight identical acceptable blanks gives $48 × 1/8 = <strong>$6.00 per blank</strong> when the whole sheet is charged to those blanks. This includes their share of kerf and unusable offcuts.</p>
@@ -3598,8 +3621,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="choosing-a-plastic-forming-process--check-geometry-and-material-before-comparing-prices" data-card="choosing-a-plastic-forming-process--check-geometry-and-material-before-comparing-prices">
-    <summary>Check geometry and material before comparing prices<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="choosing-a-plastic-forming-process--check-geometry-and-material-before-comparing-prices" data-card="choosing-a-plastic-forming-process--check-geometry-and-material-before-comparing-prices" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check geometry and material before comparing prices<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check geometry and material before comparing prices</h2>
   <p>A low quoted price is irrelevant if the process cannot make the required shape or use the required material. Start with <a class="xref-page" href="#p-plastics-as-materials">Plastics as Materials</a> and the capability cards in <a class="xref-page" href="#p-plastic-forming-processes">Plastic Forming Processes</a>.</p>
@@ -3613,7 +3636,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="choosing-a-plastic-forming-process--use-part-shape-to-build-a-short-list" data-card="choosing-a-plastic-forming-process--use-part-shape-to-build-a-short-list">
-    <summary>Use part shape to build a short list<span class="chev"></span></summary>
+    <summary>Use part shape to build a short list<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use part shape to build a short list</h2>
   <table>
@@ -3635,7 +3658,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="choosing-a-plastic-forming-process--spread-tooling-cost-over-the-number-of-acceptable-parts" data-card="choosing-a-plastic-forming-process--spread-tooling-cost-over-the-number-of-acceptable-parts">
-    <summary>Spread tooling cost over the number of acceptable parts<span class="chev"></span></summary>
+    <summary>Spread tooling cost over the number of acceptable parts<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Spread tooling cost over the number of acceptable parts</h2>
   <p>A simple comparison is <code>average cost per part = tooling cost / quantity + variable cost per part</code>. Variable cost includes the costs that grow with production, such as material and processing time. Tooling cost is paid even if only a few parts are made.</p>
@@ -3653,7 +3676,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="choosing-a-plastic-forming-process--cycle-time-and-cavity-count-set-the-ideal-production-rate" data-card="choosing-a-plastic-forming-process--cycle-time-and-cavity-count-set-the-ideal-production-rate">
-    <summary>Cycle time and cavity count set the ideal production rate<span class="chev"></span></summary>
+    <summary>Cycle time and cavity count set the ideal production rate<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cycle time and cavity count set the ideal production rate</h2>
   <p>A <strong>cavity</strong> makes one part per cycle. With cycle time in seconds, <code>ideal parts per hour = 3600 / cycle time × cavities</code>.</p>
@@ -3729,7 +3752,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="conditioning-and-finishing-plastics--coatings-need-adhesion-as-well-as-the-right-appearance" data-card="conditioning-and-finishing-plastics--coatings-need-adhesion-as-well-as-the-right-appearance">
-    <summary>Coatings need adhesion as well as the right appearance<span class="chev"></span></summary>
+    <summary>Coatings need adhesion as well as the right appearance<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Coatings need adhesion as well as the right appearance</h2>
   <p>For paint, remove contamination with a compatible cleaner, prepare the surface as specified and use a primer or adhesion promoter when the coating system calls for one. PE and PP often need special preparation or products because of low surface energy. A primer is not automatically compatible with every plastic. Trial the complete system, including cure, on a representative sample.</p>
@@ -3788,7 +3811,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="cutting-and-machining-plastics--trim-the-molding-excess-without-cutting-into-the-part" data-card="cutting-and-machining-plastics--trim-the-molding-excess-without-cutting-into-the-part">
-    <summary>Trim the molding excess without cutting into the part<span class="chev"></span></summary>
+    <summary>Trim the molding excess without cutting into the part<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Trim the molding excess without cutting into the part</h2>
   <p>A <strong>gate</strong> is the entry from a molding flow channel into the part cavity. Degating separates the part from that feed connection. <strong>Flash</strong> is a thin unwanted fin, often at a mold joint; trimming removes it. A <strong>burr</strong> is a raised edge left by cutting. These are different defects, even when the same trimming tool can remove them.</p>
@@ -3827,8 +3850,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><strong>Simple layer-count example:</strong> for a 24 mm height with every layer 0.20 mm thick, 24 ÷ 0.20 = 120 layers. Real slicers may use a different first-layer height or variable layers. Halving layer height roughly doubles the layer count, not necessarily the total print time.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="3d-printing-fdm--orient-for-the-load-as-well-as-for-fewer-supports" data-card="3d-printing-fdm--orient-for-the-load-as-well-as-for-fewer-supports">
-    <summary>Orient for the load as well as for fewer supports<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="3d-printing-fdm--orient-for-the-load-as-well-as-for-fewer-supports" data-card="3d-printing-fdm--orient-for-the-load-as-well-as-for-fewer-supports" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Orient for the load as well as for fewer supports<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Orient for the load as well as for fewer supports</h2>
   <p>FDM parts are <strong>anisotropic</strong>: properties depend on direction. A load that pulls layers apart can expose a weaker bond than a load carried along continuous deposited roads. Avoid placing the main tensile load across layer interfaces when an orientation can carry it along the layers. This is a design starting point, not a strength rating.</p>
@@ -3853,7 +3876,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="3d-printing-fdm--estimate-mass-from-deposited-volume-not-infill-alone" data-card="3d-printing-fdm--estimate-mass-from-deposited-volume-not-infill-alone">
-    <summary>Estimate mass from deposited volume, not infill alone<span class="chev"></span></summary>
+    <summary>Estimate mass from deposited volume, not infill alone<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Estimate mass from deposited volume, not infill alone</h2>
   <p>Mass = deposited volume × density. If a simplified model has 8 cm³ of solid walls and skins plus a 32 cm³ interior at 25% infill, its estimated deposited volume is 8 + (32 × 0.25) = 16 cm³. At an assumed density of 1.24 g/cm³, that is <strong>19.84 g</strong>. Supports, brims and purge material add more.</p>
@@ -3873,8 +3896,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="joining-plastics--start-with-both-plastics-and-what-the-joint-must-do" data-card="joining-plastics--start-with-both-plastics-and-what-the-joint-must-do">
-    <summary>Start with both plastics and what the joint must do<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="joining-plastics--start-with-both-plastics-and-what-the-joint-must-do" data-card="joining-plastics--start-with-both-plastics-and-what-the-joint-must-do" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Start with both plastics and what the joint must do<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Start with both plastics and what the joint must do</h2>
   <p>Fabricating joins pieces into a useful assembly. Name <strong>both</strong> materials, then state the load, service temperature, appearance and whether the assembly must come apart. A leak-tight seam, a removable cover and a clear display corner need different joints.</p>
@@ -3916,7 +3939,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="joining-plastics--use-mechanical-joints-when-access-and-disassembly-matter" data-card="joining-plastics--use-mechanical-joints-when-access-and-disassembly-matter">
-    <summary>Use mechanical joints when access and disassembly matter<span class="chev"></span></summary>
+    <summary>Use mechanical joints when access and disassembly matter<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use mechanical joints when access and disassembly matter</h2>
   <p>A <strong>snap fit</strong> bends a feature during assembly so it catches behind another feature. It needs room to flex, rounded transitions and a resin that tolerates the required strain. Some snap fits release repeatedly; others are intentionally difficult to undo.</p>
@@ -3983,7 +4006,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="plastic-forming-processes--uniform-walls-reduce-sink-marks-and-uneven-shrinkage" data-card="plastic-forming-processes--uniform-walls-reduce-sink-marks-and-uneven-shrinkage">
-    <summary>Uniform walls reduce sink marks and uneven shrinkage<span class="chev"></span></summary>
+    <summary>Uniform walls reduce sink marks and uneven shrinkage<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Uniform walls reduce sink marks and uneven shrinkage</h2>
   <p>Aim for a reasonably uniform wall thickness, with gradual transitions where thickness must change. A thick mass cools differently from an adjacent thin wall. Its shrinkage can pull the surface inward, leaving a <strong>sink mark</strong>, or contribute to distortion.</p>
@@ -4163,7 +4186,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="plastics-as-materials--resin-codes-identify-plastic-they-do-not-promise-recycling" data-card="plastics-as-materials--resin-codes-identify-plastic-they-do-not-promise-recycling">
-    <summary>Resin codes identify plastic; they do not promise recycling<span class="chev"></span></summary>
+    <summary>Resin codes identify plastic; they do not promise recycling<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Resin codes identify plastic; they do not promise recycling</h2>
   <p>The number on a container is a <strong>resin identification code (RIC)</strong>. It can help sorting, but it does not say whether the local recycling program accepts that product.</p>
@@ -4227,7 +4250,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="bending-and-laminating-wood--bent-lamination-uses-thin-strips-and-adhesive-to-retain-a-curve" data-card="bending-and-laminating-wood--bent-lamination-uses-thin-strips-and-adhesive-to-retain-a-curve">
-    <summary>Bent lamination uses thin strips and adhesive to retain a curve<span class="chev"></span></summary>
+    <summary>Bent lamination uses thin strips and adhesive to retain a curve<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Bent lamination uses thin strips and adhesive to retain a curve</h2>
   <p>Thin strips bend more easily than one solid piece of the same total thickness. Bent lamination brings prepared strips together with adhesive over a form, then restrains them until the bond has developed as specified for that adhesive. The strips commonly run with their grain along the curve. Alternating grain direction is not a requirement of bent lamination.</p>
@@ -4267,7 +4290,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="buying-lumber-and-board-feet--nominal-size-is-a-name-actual-size-is-what-fits" data-card="buying-lumber-and-board-feet--nominal-size-is-a-name-actual-size-is-what-fits">
-    <summary>Nominal size is a name; actual size is what fits<span class="chev"></span></summary>
+    <summary>Nominal size is a name; actual size is what fits<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Nominal size is a name; actual size is what fits</h2>
 <p>A nominal lumber size identifies a product category. Dry, surfaced construction lumber sold as a <strong>2 × 4</strong> commonly measures <strong>1-1/2 × 3-1/2 in</strong> in cross-section. Rough, green, specialty, and reclaimed stock can differ. Measure the piece when fit matters.</p>
@@ -4296,8 +4319,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p><strong>State the measuring convention.</strong> A physical-volume calculation uses actual dimensions. A sales tally may use nominal thickness or other trade rules and may round individual board measurements. Ask the seller; do not replace a quoted tally basis with finished dimensions without saying so. The examples here explicitly specify their basis and use unrounded arithmetic until the final answer.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="buying-lumber-and-board-feet--keep-purchase-tally-and-finished-volume-separate" data-card="buying-lumber-and-board-feet--keep-purchase-tally-and-finished-volume-separate">
-    <summary>Keep purchase tally and finished volume separate<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="buying-lumber-and-board-feet--keep-purchase-tally-and-finished-volume-separate" data-card="buying-lumber-and-board-feet--keep-purchase-tally-and-finished-volume-separate" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Keep purchase tally and finished volume separate<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Keep purchase tally and finished volume separate</h2>
 <p>Suppose a seller specifies a tally using nominal 1 in thickness, measured 7 in width, and 9 ft length. The tally is <code>1 × 7 × 9 / 12 = <strong>5.25 BF</strong></code>.</p>
@@ -4328,8 +4351,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="choosing-a-woodworking-machine--choose-the-required-geometry-before-choosing-the-machine" data-card="choosing-a-woodworking-machine--choose-the-required-geometry-before-choosing-the-machine">
-    <summary>Choose the required geometry before choosing the machine<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="choosing-a-woodworking-machine--choose-the-required-geometry-before-choosing-the-machine" data-card="choosing-a-woodworking-machine--choose-the-required-geometry-before-choosing-the-machine" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Choose the required geometry before choosing the machine<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose the required geometry before choosing the machine</h2>
   <p>A machine name does not describe a finished part. First state the result: a straight edge, a curved outline, a flat face, a hole or a round profile. Then consider the workpiece dimensions, accuracy, surface quality and available tooling. The machines below remove material and belong to <strong>Separating</strong>.</p>
@@ -4338,7 +4361,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="choosing-a-woodworking-machine--match-the-cut-to-a-suitable-starting-machine" data-card="choosing-a-woodworking-machine--match-the-cut-to-a-suitable-starting-machine">
-    <summary>Match the cut to a suitable starting machine<span class="chev"></span></summary>
+    <summary>Match the cut to a suitable starting machine<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Match the cut to a suitable starting machine</h2>
   <table>
@@ -4363,7 +4386,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="choosing-a-woodworking-machine--router-bits-make-profiles-and-channels-templates-repeat-shapes" data-card="choosing-a-woodworking-machine--router-bits-make-profiles-and-channels-templates-repeat-shapes">
-    <summary>Router bits make profiles and channels; templates repeat shapes<span class="chev"></span></summary>
+    <summary>Router bits make profiles and channels; templates repeat shapes<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Router bits make profiles and channels; templates repeat shapes</h2>
   <p>A router spins a <strong>router bit</strong>. Straight or spiral bits make channels and pockets; roundover and chamfer bits change an edge's profile. A bearing-guided bit or guide bushing can follow a template, which is a pattern used to reproduce an outline.</p>
@@ -4381,7 +4404,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="choosing-a-woodworking-machine--choose-a-drill-bit-for-the-hole-s-bottom-edge-and-diameter" data-card="choosing-a-woodworking-machine--choose-a-drill-bit-for-the-hole-s-bottom-edge-and-diameter">
-    <summary>Choose a drill bit for the hole's bottom, edge and diameter<span class="chev"></span></summary>
+    <summary>Choose a drill bit for the hole's bottom, edge and diameter<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose a drill bit for the hole's bottom, edge and diameter</h2>
   <table>
@@ -4437,8 +4460,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Radio-frequency and microwave systems both use electromagnetic energy for dielectric heating, but the terms are not synonyms. Industrial systems control frequency, power and moisture removal; this is a process overview, not a household-microwave procedure.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="drying-and-conditioning-wood--acclimate-stock-with-airflow-and-repeated-measurements" data-card="drying-and-conditioning-wood--acclimate-stock-with-airflow-and-repeated-measurements">
-    <summary>Acclimate stock with airflow and repeated measurements<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="drying-and-conditioning-wood--acclimate-stock-with-airflow-and-repeated-measurements" data-card="drying-and-conditioning-wood--acclimate-stock-with-airflow-and-repeated-measurements" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Acclimate stock with airflow and repeated measurements<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Acclimate stock with airflow and repeated measurements</h2>
   <p>Acclimating means giving lumber time to approach the conditions in the intended working or service environment. There is no reliable fixed number of days for every board. Thickness, initial moisture, species and humidity all affect the time required.</p>
@@ -4453,7 +4476,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="drying-and-conditioning-wood--calculate-moisture-content-using-oven-dry-mass-as-the-denominator" data-card="drying-and-conditioning-wood--calculate-moisture-content-using-oven-dry-mass-as-the-denominator">
-    <summary>Calculate moisture content using oven-dry mass as the denominator<span class="chev"></span></summary>
+    <summary>Calculate moisture content using oven-dry mass as the denominator<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Calculate moisture content using oven-dry mass as the denominator</h2>
   <p>On the oven-dry basis used for wood, <code>MC (%) = (initial mass − oven-dry mass) / oven-dry mass × 100</code>. Both masses must refer to the same sample and use the same units. “Initial” means the sample's mass before the moisture determination; it need not be freshly cut green wood.</p>
@@ -4503,7 +4526,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="engineered-wood-products--choose-the-sheet-by-its-structure-and-service-conditions" data-card="engineered-wood-products--choose-the-sheet-by-its-structure-and-service-conditions">
-    <summary>Choose the sheet by its structure and service conditions<span class="chev"></span></summary>
+    <summary>Choose the sheet by its structure and service conditions<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose the sheet by its structure and service conditions</h2>
 <table><caption>Sheet goods: useful differences</caption><thead><tr><th scope="col">Product</th><th scope="col">Structure and strengths</th><th scope="col">Limits and typical uses</th></tr></thead><tbody>
@@ -4554,7 +4577,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="gluing-and-clamping-wood--choose-the-adhesive-for-fit-exposure-and-repair-needs" data-card="gluing-and-clamping-wood--choose-the-adhesive-for-fit-exposure-and-repair-needs">
-    <summary>Choose the adhesive for fit, exposure and repair needs<span class="chev"></span></summary>
+    <summary>Choose the adhesive for fit, exposure and repair needs<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose the adhesive for fit, exposure and repair needs</h2>
   <table>
@@ -4583,8 +4606,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-48">Supporting detail: <a href="#deeper-addendum-48"><strong>Addendum 48</strong></a> &mdash; Where to find product-specific instructions.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="gluing-and-clamping-wood--use-clamps-to-close-the-joint-not-to-repair-a-bad-fit" data-card="gluing-and-clamping-wood--use-clamps-to-close-the-joint-not-to-repair-a-bad-fit">
-    <summary>Use clamps to close the joint, not to repair a bad fit<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="gluing-and-clamping-wood--use-clamps-to-close-the-joint-not-to-repair-a-bad-fit" data-card="gluing-and-clamping-wood--use-clamps-to-close-the-joint-not-to-repair-a-bad-fit" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Use clamps to close the joint, not to repair a bad fit<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use clamps to close the joint, not to repair a bad fit</h2>
   <p>Apply enough pressure to seat the surfaces and maintain alignment, following the adhesive instructions. Excess force can dent the wood, bow a panel or force out too much adhesive. A gap that closes only under severe force is a fitting problem.</p>
@@ -4642,8 +4665,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p>Choose and acclimate material for its intended service environment. Use measurements to judge readiness; a fixed number of days cannot guarantee equilibrium for every thickness and starting condition.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="grain-and-moisture-movement--most-movement-is-across-the-grain" data-card="grain-and-moisture-movement--most-movement-is-across-the-grain">
-    <summary>Most movement is across the grain<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="grain-and-moisture-movement--most-movement-is-across-the-grain" data-card="grain-and-moisture-movement--most-movement-is-across-the-grain" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Most movement is across the grain<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Most movement is across the grain</h2>
 <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPlRhbmdlbnRpYWwsIHJhZGlhbCBhbmQgbG9uZ2l0dWRpbmFsIGRpcmVjdGlvbnMgaW4gd29vZDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZmRmNyIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHRleHQgeD0iMzAiIHk9IjM1IiBmb250LXNpemU9IjIzIj5Nb3ZlbWVudCBkaXJlY3Rpb25zIGluIG5vcm1hbCBzdHJhaWdodC1ncmFpbmVkIHdvb2Q8L3RleHQ+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxNTUiIGZpbGw9IiNmNWRlYjAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSI4NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIyNDUiIHI9IjUwIiBmaWxsPSJub25lIiBzdHJva2U9IiM4MDU5MjkiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjIzMCIgY3k9IjI0NSIgcj0iNSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNIDIzMCAyNDUgTCAzNDUgMjQ1IE0gMzM0IDIzNyBMIDM0NSAyNDUgTCAzMzQgMjUzIiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjI0NyIgeT0iMjMyIiBmb250LXNpemU9IjIwIj5SYWRpYWw8L3RleHQ+PHBhdGggZD0iTSAxMDYgMjA4IEEgMTMwIDEzMCAwIDAgMSAyMzAgMTE1IE0gMjE3IDEwOCBMIDIzMCAxMTUgTCAyMTkgMTI0IiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI3MCIgZm9udC1zaXplPSIxOSI+VGFuZ2VudGlhbDogYXJvdW5kIGEgcmluZzwvdGV4dD48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTgyZDQwIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjQiIGZpbGw9IiMxODJkNDAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDUwIiB5PSIxNDAiIGZvbnQtc2l6ZT0iMjIiPlRhbmdlbnRpYWw6IGdyZWF0ZXN0IG1vdmVtZW50PC90ZXh0Pjx0ZXh0IHg9IjQ1MCIgeT0iMTg1IiBmb250LXNpemU9IjIyIj5SYWRpYWw6IHNtYWxsZXIgbW92ZW1lbnQ8L3RleHQ+PHRleHQgeD0iNDUwIiB5PSIyMzAiIGZvbnQtc2l6ZT0iMjEiPkxvbmdpdHVkaW5hbDogdXN1YWxseSBtdWNoIHNtYWxsZXI8L3RleHQ+PHBhdGggZD0iTSAyNDYgMzE1IEggNDI1IiBzdHJva2U9IiMxODJkNDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQ1MCIgeT0iMzIwIiBmb250LXNpemU9IjIxIj5Mb25naXR1ZGluYWw6IG91dCBvZiB0aGlzIHZpZXc8L3RleHQ+PHRleHQgeD0iNDAiIHk9IjQ0NSIgZm9udC1zaXplPSIxOCI+Q29tcGFyZSBkaXJlY3Rpb25zLCBub3QgYXJyb3cgbGVuZ3RoczogdGhpcyBkaWFncmFtIGlzIG5vdCBhIHNocmlua2FnZSBzY2FsZS48L3RleHQ+PC9nPjwvc3ZnPg==" alt="End-grain view labels tangential direction around a growth ring and radial direction toward the center; longitudinal direction is along the trunk, out of the view. Typical movement is greatest tangentially, then radially, and much smaller longitudinally." data-natural-width="900" data-natural-height="480"></p></figure>
@@ -4660,7 +4683,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="grain-and-moisture-movement--name-the-distortion-before-deciding-what-to-do" data-card="grain-and-moisture-movement--name-the-distortion-before-deciding-what-to-do">
-    <summary>Name the distortion before deciding what to do<span class="chev"></span></summary>
+    <summary>Name the distortion before deciding what to do<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Name the distortion before deciding what to do</h2>
 <table><caption>Defects described by shape</caption><thead><tr><th scope="col">Defect</th><th scope="col">What you see</th></tr></thead><tbody>
@@ -4674,8 +4697,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p><a class="button" data-practice-add="wood-identify-cup" href="../practice.html#wood-identify-cup">Practice: cup</a> <a class="button" data-practice-add="wood-identify-bow" href="../practice.html#wood-identify-bow">Practice: bow</a> <a class="button" data-practice-add="wood-identify-crook" href="../practice.html#wood-identify-crook">Practice: crook</a> <a class="button" data-practice-add="wood-identify-twist" href="../practice.html#wood-identify-twist">Practice: twist</a> <a class="button" data-practice-add="wood-identify-check" href="../practice.html#wood-identify-check">Practice: check</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card="grain-and-moisture-movement--allow-solid-wood-to-change-width">
-    <summary>Allow solid wood to change width<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Allow solid wood to change width<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Allow solid wood to change width</h2>
 <p>A solid-wood tabletop needs room to expand and contract across its grain. Suitable slotted attachments let it move relative to a supporting frame. A panel held in grooves needs clearance rather than rigid restraint across its full width. Details depend on the joint and expected movement.</p>
@@ -4734,7 +4757,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="how-saws-cut-wood--count-cuts-before-calculating-strip-yield" data-card="how-saws-cut-wood--count-cuts-before-calculating-strip-yield">
-    <summary>Count cuts before calculating strip yield<span class="chev"></span></summary>
+    <summary>Count cuts before calculating strip yield<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Count cuts before calculating strip yield</h2>
   <p>Start with the usable width after any edge preparation. Let <code>W</code> be usable board width, <code>s</code> the required strip width and <code>k</code> the kerf, all in the same units. These ideal layouts assume straight cuts, exact dimensions and no extra finishing allowance.</p>
@@ -4767,7 +4790,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="milling-rough-lumber-square--build-reference-surfaces-in-order-face-edge-thickness-width-length" data-card="milling-rough-lumber-square--build-reference-surfaces-in-order-face-edge-thickness-width-length">
-    <summary>Build reference surfaces in order: face, edge, thickness, width, length<span class="chev"></span></summary>
+    <summary>Build reference surfaces in order: face, edge, thickness, width, length<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Build reference surfaces in order: face, edge, thickness, width, length</h2>
   <p>This is the geometry sequence for preparing rough stock. It assumes enough material remains for the finished dimensions and that the stock fits the equipment. It is not a machine setup guide; use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a> for operation.</p>
@@ -4783,8 +4806,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><a class="button" data-practice-add="wood-milling-order" href="../practice.html#wood-milling-order">Practice the milling order</a> <a class="button" data-practice-add="wood-planer-reference" href="../practice.html#wood-planer-reference">Practice the reference face</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="milling-rough-lumber-square--check-geometry-instead-of-counting-machine-passes" data-card="milling-rough-lumber-square--check-geometry-instead-of-counting-machine-passes">
-    <summary>Check geometry instead of counting machine passes<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="milling-rough-lumber-square--check-geometry-instead-of-counting-machine-passes" data-card="milling-rough-lumber-square--check-geometry-instead-of-counting-machine-passes" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check geometry instead of counting machine passes<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check geometry instead of counting machine passes</h2>
   <p>One pass is not proof that a surface is ready. The result of each stage is the reference for the next. Flatness means a surface lies in a plane; parallel faces maintain a constant separation; square surfaces meet at 90°.</p>
@@ -4805,7 +4828,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="wood-finishes--remove-each-grit-s-scratches-before-moving-to-a-finer-abrasive" data-card="wood-finishes--remove-each-grit-s-scratches-before-moving-to-a-finer-abrasive">
-    <summary>Remove each grit's scratches before moving to a finer abrasive<span class="chev"></span></summary>
+    <summary>Remove each grit's scratches before moving to a finer abrasive<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Remove each grit's scratches before moving to a finer abrasive</h2>
   <p>Start with the least coarse abrasive that removes the actual defects efficiently. Higher grit numbers generally mean finer particles within the same grading system. A possible bare-wood sequence is <strong>80 → 120 → 150 → 180</strong>, but sound, smooth stock may start later. Stop at the grit recommended for the chosen stain or finish; 220 is not a universal destination.</p>
@@ -4869,8 +4892,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Build the recommended coats and observe the recoat window. Sand between coats only as directed, with the specified abrasive and after sufficient drying. A fixed 320-grit rule does not fit every coating. Dry-to-touch is not full cure; allow the specified cure before service or final rubbing to adjust sheen.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="wood-finishes--choose-with-a-sample-board-and-the-expected-wear-in-mind" data-card="wood-finishes--choose-with-a-sample-board-and-the-expected-wear-in-mind">
-    <summary>Choose with a sample board and the expected wear in mind<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="wood-finishes--choose-with-a-sample-board-and-the-expected-wear-in-mind" data-card="wood-finishes--choose-with-a-sample-board-and-the-expected-wear-in-mind" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Choose with a sample board and the expected wear in mind<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose with a sample board and the expected wear in mind</h2>
   <p>A frequently wiped surface needs a finish rated for that use; a lightly handled decorative object may favor appearance and easy renewal. Compare resistance to water, cleaning products, abrasion and heat, then consider color, sheen, repairability and available application equipment. A durable film is useful only if it adheres and cures properly.</p>
@@ -4929,7 +4952,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="wood-joinery--add-glue-area-alignment-or-mechanical-interlock-where-needed" data-card="wood-joinery--add-glue-area-alignment-or-mechanical-interlock-where-needed">
-    <summary>Add glue area, alignment or mechanical interlock where needed<span class="chev"></span></summary>
+    <summary>Add glue area, alignment or mechanical interlock where needed<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Add glue area, alignment or mechanical interlock where needed</h2>
   <table>
@@ -4958,8 +4981,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>For repeated disassembly, consider bolts with nuts, cross-dowels, threaded inserts or cam connectors. These <strong>knock-down fittings</strong> use reusable mating hardware. Capacity still depends on the wood bearing around the fitting, edge distance and the specific hardware, not merely on having metal threads.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="wood-joinery--let-a-wide-solid-wood-part-move-across-its-grain" data-card="wood-joinery--let-a-wide-solid-wood-part-move-across-its-grain">
-    <summary>Let a wide solid-wood part move across its grain<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="wood-joinery--let-a-wide-solid-wood-part-move-across-its-grain" data-card="wood-joinery--let-a-wide-solid-wood-part-move-across-its-grain" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Let a wide solid-wood part move across its grain<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Let a wide solid-wood part move across its grain</h2>
   <p>A tabletop fastened rigidly across its width can split or distort as moisture changes. Use a connection designed to permit movement, such as tabletop clips or correctly oriented slotted screw holes. Locate the part while leaving travel in the direction it needs; a screw tightened so hard that nothing can slide defeats the slot.</p>
@@ -5010,7 +5033,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="wood-structure-and-species--hardwood-and-softwood-describe-the-tree-not-its-hardness" data-card="wood-structure-and-species--hardwood-and-softwood-describe-the-tree-not-its-hardness">
-    <summary>Hardwood and softwood describe the tree, not its hardness<span class="chev"></span></summary>
+    <summary>Hardwood and softwood describe the tree, not its hardness<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Hardwood and softwood describe the tree, not its hardness</h2>
 <p><strong>Hardwoods come from angiosperm trees; softwoods come from gymnosperm trees, commonly conifers.</strong> Leaf shedding is not the defining test: some hardwood trees are evergreen, and some conifers shed their needles.</p>
@@ -5075,7 +5098,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="heat-treating-metals--quench-hardening-usually-needs-tempering-afterward" data-card="heat-treating-metals--quench-hardening-usually-needs-tempering-afterward">
-    <summary>Quench hardening usually needs tempering afterward<span class="chev"></span></summary>
+    <summary>Quench hardening usually needs tempering afterward<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Quench hardening usually needs tempering afterward</h2>
   <p><strong>Quench hardening</strong> heats suitable steel to form austenite, holds as required, then cools fast enough to obtain the intended hardened structure. It commonly raises hardness and strength but can reduce ductility and toughness. Cracking and distortion are possible.</p>
@@ -5094,7 +5117,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="heat-treating-metals--cold-work-strengthens-stress-relief-addresses-locked-in-stresses" data-card="heat-treating-metals--cold-work-strengthens-stress-relief-addresses-locked-in-stresses">
-    <summary>Cold work strengthens; stress relief addresses locked-in stresses<span class="chev"></span></summary>
+    <summary>Cold work strengthens; stress relief addresses locked-in stresses<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cold work strengthens; stress relief addresses locked-in stresses</h2>
   <p><strong>Work hardening</strong>, also called strain hardening, occurs as metal is permanently deformed during cold working. It commonly raises strength and hardness while reducing remaining ductility. “Cold” here means below the relevant recrystallization range, not necessarily cold to the touch.</p>
@@ -5166,8 +5189,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-59">Supporting detail: <a href="#deeper-addendum-59"><strong>Addendum 59</strong></a> &mdash; Why an attractive surface can still be the wrong purchase.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="metal-stock-forms--a-purchase-description-must-preserve-alloy-condition-form-and-size" data-card="metal-stock-forms--a-purchase-description-must-preserve-alloy-condition-form-and-size">
-    <summary>A purchase description must preserve alloy, condition, form and size<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="metal-stock-forms--a-purchase-description-must-preserve-alloy-condition-form-and-size" data-card="metal-stock-forms--a-purchase-description-must-preserve-alloy-condition-form-and-size" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>A purchase description must preserve alloy, condition, form and size<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A purchase description must preserve alloy, condition, form and size</h2>
   <p>An illustrative request is: <strong>6061-T6 aluminum round bar, 25 mm nominal diameter × 500 mm cut length, quantity 2</strong>. Before purchasing, add the governing product specification, diameter and cut-length tolerances, finish and certification requirements that the design needs. This example is not a complete engineering specification.</p>
@@ -5183,7 +5206,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="metal-stock-forms--estimate-mass-from-cross-sectional-area-length-and-density" data-card="metal-stock-forms--estimate-mass-from-cross-sectional-area-length-and-density">
-    <summary>Estimate mass from cross-sectional area, length and density<span class="chev"></span></summary>
+    <summary>Estimate mass from cross-sectional area, length and density<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Estimate mass from cross-sectional area, length and density</h2>
   <p>For uniform stock, <strong>mass = cross-sectional area × length × density</strong>. For a solid round bar, area = πd²/4. For round tube, area = π(D² − d²)/4, where D is outside diameter and d is inside diameter. Subtract the opening before multiplying by length.</p>
@@ -5248,7 +5271,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="metals-and-their-properties--ferrous-means-iron-based-a-magnet-does-not-identify-the-grade" data-card="metals-and-their-properties--ferrous-means-iron-based-a-magnet-does-not-identify-the-grade">
-    <summary>Ferrous means iron-based; a magnet does not identify the grade<span class="chev"></span></summary>
+    <summary>Ferrous means iron-based; a magnet does not identify the grade<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Ferrous means iron-based; a magnet does not identify the grade</h2>
   <p><strong>Ferrous metals</strong> have iron as their base: steels and cast irons belong here. <strong>Nonferrous metals</strong> have another base, such as aluminum, copper or titanium. Nonferrous does not mean that no trace of iron can be present.</p>
@@ -5339,7 +5362,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="nonferrous-metals--brass-and-bronze-trade-some-of-copper-s-conductivity-for-other-properties" data-card="nonferrous-metals--brass-and-bronze-trade-some-of-copper-s-conductivity-for-other-properties">
-    <summary>Brass and bronze trade some of copper's conductivity for other properties<span class="chev"></span></summary>
+    <summary>Brass and bronze trade some of copper's conductivity for other properties<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Brass and bronze trade some of copper's conductivity for other properties</h2>
   <p><strong>Brass</strong> is principally a copper-zinc alloy. Depending on grade, it can offer useful forming or machining behavior for fittings, hardware and decorative parts. Do not assume every brass has the same machinability or suitability for contact with drinking water.</p>
@@ -5438,7 +5461,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="types-of-steel--watch-the-steel-family-series-at-its-original-publisher" data-card="types-of-steel--watch-the-steel-family-series-at-its-original-publisher">
-    <summary>Watch the steel-family series at its original publisher<span class="chev"></span></summary>
+    <summary>Watch the steel-family series at its original publisher<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Watch the steel-family series at its original publisher</h2>
   <p>Metal Supermarkets hosts the five-part series: <a href="https://www.metalsupermarkets.com/video-blog-four-types-steel-part-1/">overview</a>, <a href="https://www.metalsupermarkets.com/video-blog-four-types-steel-part-2-carbon-steel/">carbon steel</a>, <a href="https://www.metalsupermarkets.com/video-four-types-steel-part-3-alloy-steel/">alloy steel</a>, <a href="https://www.metalsupermarkets.com/video-four-types-of-steel-part-4-stainless-steel/">stainless steel</a> and <a href="https://www.metalsupermarkets.com/video-blog-four-types-steel-part-5-tool-steel/">tool steel</a>. These are external learning resources, not specifications for purchasing or heat treatment.</p>
@@ -5493,8 +5516,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Buying one strip and one pack costs $21, even for one assembly. Unused material remains inventory; do not confuse that purchase total with $1.20 of allocated consumption.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="bills-of-materials--check-quantities-units-and-waste-before-totaling-the-bom" data-card="bills-of-materials--check-quantities-units-and-waste-before-totaling-the-bom">
-    <summary>Check quantities, units and waste before totaling the BOM<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="bills-of-materials--check-quantities-units-and-waste-before-totaling-the-bom" data-card="bills-of-materials--check-quantities-units-and-waste-before-totaling-the-bom" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check quantities, units and waste before totaling the BOM<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check quantities, units and waste before totaling the BOM</h2>
   <ul class="boxes">
@@ -5552,8 +5575,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-66">Supporting detail: <a href="#deeper-addendum-66"><strong>Addendum 66</strong></a> &mdash; How to check a center when a caliper touches the hole edge.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture" data-card="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture">
-    <summary>Dimension the part so it can be made without measuring the picture<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture" data-card="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Dimension the part so it can be made without measuring the picture<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Dimension the part so it can be made without measuring the picture</h2>
   <p>Include the part identity, revision, material, units, overall dimensions, feature sizes and locations, thickness, and required finish. Supply enough views to remove ambiguity. Call a hole “through” when it passes through the material; otherwise specify depth.</p>
@@ -5593,8 +5616,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Remove unwanted layer ridges and support marks without losing important dimensions. Choose pattern preparation, any sealer and any release agent for the specific print, silicone and casting material. Follow the manufacturers' compatibility instructions and test a small prepared sample before committing the full mold.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="making-silicone-molds-from-a-printed-pattern--read-the-technical-data-sheet-before-choosing-a-mix-or-cure-schedule" data-card="making-silicone-molds-from-a-printed-pattern--read-the-technical-data-sheet-before-choosing-a-mix-or-cure-schedule">
-    <summary>Read the technical data sheet before choosing a mix or cure schedule<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="making-silicone-molds-from-a-printed-pattern--read-the-technical-data-sheet-before-choosing-a-mix-or-cure-schedule" data-card="making-silicone-molds-from-a-printed-pattern--read-the-technical-data-sheet-before-choosing-a-mix-or-cure-schedule" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Read the technical data sheet before choosing a mix or cure schedule<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Read the technical data sheet before choosing a mix or cure schedule</h2>
   <p>The <strong>technical data sheet (TDS)</strong> supplies processing instructions. The safety data sheet (SDS) supplies handling information; use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a> for that guidance. Neither a generic lesson nor a familiar-looking container replaces the instructions for the actual product.</p>
@@ -5610,7 +5633,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume" data-card="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume">
-    <summary>A ratio by weight is not automatically a ratio by volume<span class="chev"></span></summary>
+    <summary>A ratio by weight is not automatically a ratio by volume<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A ratio by weight is not automatically a ratio by volume</h2>
   <p>For a specified <strong>A:B = a:b by weight</strong> and total mixed mass M:</p>
@@ -5722,8 +5745,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>For three assemblies, the serial estimate is 10 + (3 × 13) = <strong>49 minutes</strong>, assuming each setup is done once and all operations run one after another. Record waiting, interruptions and repeated setups separately when comparing with actual elapsed time.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="operation-method-sheets--replace-make-it-right-with-an-action-and-an-acceptance-test" data-card="operation-method-sheets--replace-make-it-right-with-an-action-and-an-acceptance-test">
-    <summary>Replace “make it right” with an action and an acceptance test<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="operation-method-sheets--replace-make-it-right-with-an-action-and-an-acceptance-test" data-card="operation-method-sheets--replace-make-it-right-with-an-action-and-an-acceptance-test" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Replace “make it right” with an action and an acceptance test<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Replace “make it right” with an action and an acceptance test</h2>
   <p>“Drill the holes neatly” leaves the next person guessing. “Drill two through holes at the drawing coordinates; check diameter and location against revision A” gives an action and a result, but still needs the equipment, support, tooling and settings in the row.</p>

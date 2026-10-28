@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3211,8 +3234,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Positive engagement does not mean perfect positioning. Tooth clearance, elastic deflection and chain speed ripple still matter. For ratios, compound trains and losses, use <a class="xref-page" href="#p-gear-ratios">Gear Ratios</a>. For turning effort and power, use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/torque.html" target="_blank" rel="noopener">Torque</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/power-and-efficiency.html" target="_blank" rel="noopener">Power and Efficiency</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="belt-chain-and-gear-drives--explore-which-drives-fit-the-job" data-card="belt-chain-and-gear-drives--explore-which-drives-fit-the-job">
-    <summary>Explore which drives fit the job<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="belt-chain-and-gear-drives--explore-which-drives-fit-the-job" data-card="belt-chain-and-gear-drives--explore-which-drives-fit-the-job" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Explore which drives fit the job<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Explore which drives fit the job</h2>
   <div data-interactive="drive-selection">
@@ -3246,8 +3269,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Read the parts in detail: <a class="xref-page" href="#p-belt-drives">Belt Drives</a>, <a class="xref-page" href="#p-chain-drives">Chain Drives</a> and <a class="xref-page" href="#p-gear-drives">Gear Drives and Tooth Geometry</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="belt-chain-and-gear-drives--turn-a-shortlist-into-a-rated-drive" data-card="belt-chain-and-gear-drives--turn-a-shortlist-into-a-rated-drive">
-    <summary>Turn a shortlist into a rated drive<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="belt-chain-and-gear-drives--turn-a-shortlist-into-a-rated-drive" data-card="belt-chain-and-gear-drives--turn-a-shortlist-into-a-rated-drive" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Turn a shortlist into a rated drive<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Turn a shortlist into a rated drive</h2>
   <ul class="boxes">
@@ -3314,7 +3337,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="belt-drives--use-the-wear-pattern-to-find-the-cause" data-card="belt-drives--use-the-wear-pattern-to-find-the-cause">
-    <summary>Use the wear pattern to find the cause<span class="chev"></span></summary>
+    <summary>Use the wear pattern to find the cause<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use the wear pattern to find the cause</h2>
   <div class="unit-table-wrap"><table class="unit-table">
@@ -3332,8 +3355,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Manufacturer references for belt geometry and faults.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="belt-drives--explore-how-pulley-size-and-spacing-change-belt-length-and-wrap" data-card="belt-drives--explore-how-pulley-size-and-spacing-change-belt-length-and-wrap">
-    <summary>Explore how pulley size and spacing change belt length and wrap<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="belt-drives--explore-how-pulley-size-and-spacing-change-belt-length-and-wrap" data-card="belt-drives--explore-how-pulley-size-and-spacing-change-belt-length-and-wrap" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Explore how pulley size and spacing change belt length and wrap<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Explore how pulley size and spacing change belt length and wrap</h2>
   <p>Use pitch diameters D (large) and d (small), and center distance C in one length unit. For an open belt, the approximate pitch length is <strong>L ≈ 2C + π(D + d)/2 + (D − d)²/(4C)</strong>. The last term is the correction for unequal pulleys. Increasing C increases length and brings small-pulley wrap closer to 180°; the no-slip speed ratio stays D/d.</p>
@@ -3418,7 +3441,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="chain-drives--positive-engagement-still-permits-wear-and-speed-ripple" data-card="chain-drives--positive-engagement-still-permits-wear-and-speed-ripple">
-    <summary>Positive engagement still permits wear and speed ripple<span class="chev"></span></summary>
+    <summary>Positive engagement still permits wear and speed ripple<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Positive engagement still permits wear and speed ripple</h2>
   <p>Chain is worth considering when separated shafts need a fixed average ratio and lubricant and noise are acceptable. Select it for the actual power, speed, starts, shock loads and environment. Tensile breaking strength is <strong>not</strong> an allowable continuous working load.</p>
@@ -3518,8 +3541,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-interactive" id="gear-ratios--experiment-trade-speed-for-turning-effort" data-card="gear-ratios--experiment-trade-speed-for-turning-effort">
-    <summary>Experiment: trade speed for turning effort<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="gear-ratios--experiment-trade-speed-for-turning-effort" data-card="gear-ratios--experiment-trade-speed-for-turning-effort" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Experiment: trade speed for turning effort<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Experiment: trade speed for turning effort</h2>
   <div data-interactive="gear-ratios">
@@ -3622,8 +3645,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><strong>Follow the loss assumption in the problem.</strong> Real meshes lose some power, but a problem may explicitly ignore it. If every actual mesh is 96% efficient, A → I → B has <code>η<sub>total</sub> = 0.96²</code>. If a whole stage including its idler is assigned 96%, use that stage value once. If η = 1.00 is stated, ignore losses. Do not infer the loss count from the reduction-stage count when an idler is present.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="gear-ratios--choose-teeth-then-check-both-output-limits" data-card="gear-ratios--choose-teeth-then-check-both-output-limits">
-    <summary>Choose teeth, then check both output limits<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="gear-ratios--choose-teeth-then-check-both-output-limits" data-card="gear-ratios--choose-teeth-then-check-both-output-limits" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Choose teeth, then check both output limits<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose teeth, then check both output limits</h2>
   <ul class="boxes">

@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3007,8 +3030,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>This page focuses on filament printing. Resin printing uses a different process and requires its own preparation, handling, and finishing procedures.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="3d-printing-from-cad--export-the-model-then-check-its-size-in-the-slicer" data-card="3d-printing-from-cad--export-the-model-then-check-its-size-in-the-slicer">
-    <summary>Export the model, then check its size in the slicer<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="3d-printing-from-cad--export-the-model-then-check-its-size-in-the-slicer" data-card="3d-printing-from-cad--export-the-model-then-check-its-size-in-the-slicer" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Export the model, then check its size in the slicer<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Export the model, then check its size in the slicer</h2>
   <ul class="boxes">
@@ -3034,7 +3057,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="3d-printing-from-cad--orient-for-load-direction-surface-quality-and-support-removal" data-card="3d-printing-from-cad--orient-for-load-direction-surface-quality-and-support-removal">
-    <summary>Orient for load direction, surface quality, and support removal<span class="chev"></span></summary>
+    <summary>Orient for load direction, surface quality, and support removal<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Orient for load direction, surface quality, and support removal</h2>
   <p>Ask which way the part will be pulled or bent. Filament prints are often weaker when a load pulls adjacent layers apart. For a straight bar pulled along its length, laying its length in the build plane is usually a better starting point than printing it upright. Test a representative part before relying on it under load.</p>
@@ -3069,7 +3092,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="laser-cutting-and-engraving-from-cad--use-vector-paths-for-outlines-and-raster-scans-for-filled-marks" data-card="laser-cutting-and-engraving-from-cad--use-vector-paths-for-outlines-and-raster-scans-for-filled-marks">
-    <summary>Use vector paths for outlines and raster scans for filled marks<span class="chev"></span></summary>
+    <summary>Use vector paths for outlines and raster scans for filled marks<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use vector paths for outlines and raster scans for filled marks</h2>
   <p class="lede">A vector operation follows lines and curves. A raster operation scans across an area to make a surface image or filled mark.</p>
@@ -3078,8 +3101,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><a class="button" data-practice-add="fabrication-cut-or-engrave" href="../practice.html#fabrication-cut-or-engrave">Practice choosing cut or engrave</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="laser-cutting-and-engraving-from-cad--prepare-a-full-size-profile-and-assign-each-operation-deliberately" data-card="laser-cutting-and-engraving-from-cad--prepare-a-full-size-profile-and-assign-each-operation-deliberately">
-    <summary>Prepare a full-size profile and assign each operation deliberately<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="laser-cutting-and-engraving-from-cad--prepare-a-full-size-profile-and-assign-each-operation-deliberately" data-card="laser-cutting-and-engraving-from-cad--prepare-a-full-size-profile-and-assign-each-operation-deliberately" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Prepare a full-size profile and assign each operation deliberately<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Prepare a full-size profile and assign each operation deliberately</h2>
   <ul class="boxes">
@@ -3094,7 +3117,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="laser-cutting-and-engraving-from-cad--offset-the-path-toward-the-waste-by-half-the-kerf" data-card="laser-cutting-and-engraving-from-cad--offset-the-path-toward-the-waste-by-half-the-kerf">
-    <summary>Offset the path toward the waste by half the kerf<span class="chev"></span></summary>
+    <summary>Offset the path toward the waste by half the kerf<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Offset the path toward the waste by half the kerf</h2>
   <p><strong>Kerf</strong> is the width of material removed by a cut. In the simple model below, the laser follows the center of a constant-width kerf. Half the removed width lies on each side of the path.</p>
@@ -3163,8 +3186,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Why there is no universal minimum wall or perfect press-fit allowance.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="choosing-a-fabrication-process--test-the-critical-feature-before-making-the-full-part" data-card="choosing-a-fabrication-process--test-the-critical-feature-before-making-the-full-part">
-    <summary>Test the critical feature before making the full part<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="choosing-a-fabrication-process--test-the-critical-feature-before-making-the-full-part" data-card="choosing-a-fabrication-process--test-the-critical-feature-before-making-the-full-part" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Test the critical feature before making the full part<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Test the critical feature before making the full part</h2>
   <ul class="boxes">

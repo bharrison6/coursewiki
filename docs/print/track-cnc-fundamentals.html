@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3909,7 +3932,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="cnc-axes-and-offsets--a-lathe-x-value-may-describe-diameter-or-radius" data-card="cnc-axes-and-offsets--a-lathe-x-value-may-describe-diameter-or-radius">
-    <summary>A lathe X value may describe diameter or radius<span class="chev"></span></summary>
+    <summary>A lathe X value may describe diameter or radius<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A lathe X value may describe diameter or radius</h2>
   <p>In <strong>diameter programming</strong>, X24 describes a surface 24 mm in diameter, 12 mm from the spindle centreline. In <strong>radius programming</strong>, the same surface is X12. Z distances are not halved.</p>
@@ -3963,7 +3986,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="absolute-and-incremental-positioning--one-path-can-be-written-as-points-or-as-moves" data-card="absolute-and-incremental-positioning--one-path-can-be-written-as-points-or-as-moves">
-    <summary>One path can be written as points or as moves<span class="chev"></span></summary>
+    <summary>One path can be written as points or as moves<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>One path can be written as points or as moves</h2>
   <p>Start at A = (6,4) mm. Visit B = (26,4), C = (26,19), then D = (11,19). Z is unchanged; these are coordinate exercises with no cutting setup implied.</p>
@@ -3978,7 +4001,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="absolute-and-incremental-positioning--trace-the-active-mode-before-evaluating-each-block" data-card="absolute-and-incremental-positioning--trace-the-active-mode-before-evaluating-each-block">
-    <summary>Trace the active mode before evaluating each block<span class="chev"></span></summary>
+    <summary>Trace the active mode before evaluating each block<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Trace the active mode before evaluating each block</h2>
   <p>Assume millimetres, one unchanged work coordinate system, no compensation and an initial position (6,4,12). This is a paper trace, not a machine-ready program. F120 is an arithmetic example.</p>
@@ -4034,7 +4057,7 @@ M30</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="cnc-program-structure--separate-spindle-tool-and-coolant-commands-from-motion" data-card="cnc-program-structure--separate-spindle-tool-and-coolant-commands-from-motion">
-    <summary>Separate spindle, tool and coolant commands from motion<span class="chev"></span></summary>
+    <summary>Separate spindle, tool and coolant commands from motion<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Separate spindle, tool and coolant commands from motion</h2>
   <p>These are common Fanuc-style meanings, not a promise for every machine.</p>
@@ -4175,7 +4198,7 @@ M30</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="gcode-and-toolpaths--g2-turns-clockwise-and-g3-counterclockwise-seen-from-above" data-card="gcode-and-toolpaths--g2-turns-clockwise-and-g3-counterclockwise-seen-from-above">
-    <summary>G2 turns clockwise and G3 counterclockwise, seen from above<span class="chev"></span></summary>
+    <summary>G2 turns clockwise and G3 counterclockwise, seen from above<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>G2 turns clockwise and G3 counterclockwise, seen from above</h2>
   <p>An arc move cuts along part of a circle in the XY plane (<code>G17</code>) at the feed rate. Its
@@ -4244,8 +4267,8 @@ M30</code></pre>
   <a class="xref-page" href="#p-cnc-axes-and-offsets">CNC Axes and Offsets</a> explains left/right compensation and tool-length offsets.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="gcode-and-toolpaths--simulator-build-a-program-from-blocks-and-watch-it-run" data-card="gcode-and-toolpaths--simulator-build-a-program-from-blocks-and-watch-it-run">
-    <summary>Simulator: build a program from blocks and watch it run<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="gcode-and-toolpaths--simulator-build-a-program-from-blocks-and-watch-it-run" data-card="gcode-and-toolpaths--simulator-build-a-program-from-blocks-and-watch-it-run" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Simulator: build a program from blocks and watch it run<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Simulator: build a program from blocks and watch it run</h2>
   <p class="lede">Pick a program, change it, and run it on a simulated block of metal in a vise. Every
@@ -4274,8 +4297,8 @@ M30</code></pre>
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="gcode-and-toolpaths--things-to-try-in-the-g-code-simulator" data-card="gcode-and-toolpaths--things-to-try-in-the-g-code-simulator">
-    <summary>Things to try in the G-code simulator<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="gcode-and-toolpaths--things-to-try-in-the-g-code-simulator" data-card="gcode-and-toolpaths--things-to-try-in-the-g-code-simulator" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Things to try in the G-code simulator<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Things to try in the G-code simulator</h2>
   <ul class="boxes">
@@ -4385,8 +4408,8 @@ M30</code></pre>
   </tbody></table>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cnc-program-proving--review-the-program-against-the-setup-before-a-supervised-trial" data-card="cnc-program-proving--review-the-program-against-the-setup-before-a-supervised-trial">
-    <summary>Review the program against the setup before a supervised trial<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="cnc-program-proving--review-the-program-against-the-setup-before-a-supervised-trial" data-card="cnc-program-proving--review-the-program-against-the-setup-before-a-supervised-trial" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Review the program against the setup before a supervised trial<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Review the program against the setup before a supervised trial</h2>
   <ul class="boxes">

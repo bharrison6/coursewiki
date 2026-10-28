@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3191,7 +3214,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-wiki-only" id="measurement-language--practice-and-sources" data-card="measurement-language--practice-and-sources">
-    <summary>Practice and sources<span class="chev"></span></summary>
+    <summary>Practice and sources<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Practice and sources</h2>
   <div class="panel">
@@ -3213,8 +3236,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-gate" id="dimensional-analysis--convert-by-multiplying-by-one" data-card="dimensional-analysis--convert-by-multiplying-by-one">
-    <summary>Convert by multiplying by one<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="dimensional-analysis--convert-by-multiplying-by-one" data-card="dimensional-analysis--convert-by-multiplying-by-one" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Convert by multiplying by one<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Convert by multiplying by one</h2>
   <p class="lede">A conversion factor is a ratio of two <strong>exactly equal physical quantities</strong>
@@ -3315,8 +3338,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="dimensional-analysis--cnc-production-calculation" data-card="dimensional-analysis--cnc-production-calculation">
-    <summary>CNC production calculation<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="dimensional-analysis--cnc-production-calculation" data-card="dimensional-analysis--cnc-production-calculation" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>CNC production calculation<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>CNC production calculation</h2>
   <p>A CNC program estimates <strong>4 min 15 s</strong> per part. The operator uses 30 min of an
@@ -3333,7 +3356,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-wiki-only" id="dimensional-analysis--practice-and-sources" data-card="dimensional-analysis--practice-and-sources">
-    <summary>Practice and sources<span class="chev"></span></summary>
+    <summary>Practice and sources<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Practice and sources</h2>
   <div class="panel">
@@ -3453,7 +3476,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-wiki-only" id="motion-quantities--practice-and-sources" data-card="motion-quantities--practice-and-sources">
-    <summary>Practice and sources<span class="chev"></span></summary>
+    <summary>Practice and sources<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Practice and sources</h2>
   <div class="panel">
@@ -3514,8 +3537,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <code>10 ft/s<sup>2</sup> &times; (0.3048 m / 1 ft) = 3.048 m/s<sup>2</sup></code>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="acceleration-and-squared-time--squared-time-needs-a-squared-factor" data-card="acceleration-and-squared-time--squared-time-needs-a-squared-factor">
-    <summary>Squared time needs a squared factor<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="acceleration-and-squared-time--squared-time-needs-a-squared-factor" data-card="acceleration-and-squared-time--squared-time-needs-a-squared-factor" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Squared time needs a squared factor<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Squared time needs a squared factor</h2>
   <p>Acceleration has time in the denominator twice. When converting an acceleration unit, convert
@@ -3559,7 +3582,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-wiki-only" id="acceleration-and-squared-time--practice-and-sources" data-card="acceleration-and-squared-time--practice-and-sources">
-    <summary>Practice and sources<span class="chev"></span></summary>
+    <summary>Practice and sources<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Practice and sources</h2>
   <div class="panel">
@@ -3581,8 +3604,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-gate" id="geometry-mass-and-force--scale-changes-area-and-volume-by-powers" data-card="geometry-mass-and-force--scale-changes-area-and-volume-by-powers">
-    <summary>Scale changes area and volume by powers<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="geometry-mass-and-force--scale-changes-area-and-volume-by-powers" data-card="geometry-mass-and-force--scale-changes-area-and-volume-by-powers" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Scale changes area and volume by powers<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Scale changes area and volume by powers</h2>
   <p class="lede">If every linear dimension of a model is multiplied by a scale factor <code>s</code>,
@@ -3718,7 +3741,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-wiki-only" id="geometry-mass-and-force--practice-and-sources" data-card="geometry-mass-and-force--practice-and-sources">
-    <summary>Practice and sources<span class="chev"></span></summary>
+    <summary>Practice and sources<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Practice and sources</h2>
   <div class="panel">

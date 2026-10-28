@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3010,8 +3033,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Complete <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a> before using this reminder. Guarding, entanglement and power isolation are covered in <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="table-saw--before-starting-check-the-blade-guide-and-feed-path" data-card="table-saw--before-starting-check-the-blade-guide-and-feed-path">
-    <summary>Before starting: check the blade, guide and feed path<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="table-saw--before-starting-check-the-blade-guide-and-feed-path" data-card="table-saw--before-starting-check-the-blade-guide-and-feed-path" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Before starting: check the blade, guide and feed path<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Before starting: check the blade, guide and feed path</h2>
   <ul class="boxes">
@@ -3065,8 +3088,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Complete <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a>. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a> for guards, entanglement and isolation, and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/metal-chips.html" target="_blank" rel="noopener">Metal Chips and Swarf</a> when cutting metal.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="band-saw--before-starting-match-the-blade-and-stabilize-the-work" data-card="band-saw--before-starting-match-the-blade-and-stabilize-the-work">
-    <summary>Before starting: match the blade and stabilize the work<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="band-saw--before-starting-match-the-blade-and-stabilize-the-work" data-card="band-saw--before-starting-match-the-blade-and-stabilize-the-work" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Before starting: match the blade and stabilize the work<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Before starting: match the blade and stabilize the work</h2>
   <ul class="boxes">
@@ -3114,8 +3137,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><strong>Category 3 in the <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/woods-lab-equipment.html" target="_blank" rel="noopener">Woods / Construction lab</a>.</strong> Follow <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-categories.html" target="_blank" rel="noopener">category permission and supervision requirements</a>. Complete <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a>, <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a> and the guard and isolation requirements in <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="miter-saw--before-starting-set-angles-support-the-board-and-check-clearance" data-card="miter-saw--before-starting-set-angles-support-the-board-and-check-clearance">
-    <summary>Before starting: set angles, support the board and check clearance<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="miter-saw--before-starting-set-angles-support-the-board-and-check-clearance" data-card="miter-saw--before-starting-set-angles-support-the-board-and-check-clearance" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Before starting: set angles, support the board and check clearance<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Before starting: set angles, support the board and check clearance</h2>
   <ul class="boxes">
@@ -3167,8 +3190,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><strong>Category 3 in the <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/woods-lab-equipment.html" target="_blank" rel="noopener">Woods / Construction lab</a>.</strong> Follow <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-categories.html" target="_blank" rel="noopener">category permission and supervision requirements</a>. Complete <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a>; see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a> for guarding and isolation.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="jointer--before-starting-check-the-stock-guard-and-depth-of-cut" data-card="jointer--before-starting-check-the-stock-guard-and-depth-of-cut">
-    <summary>Before starting: check the stock, guard and depth of cut<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="jointer--before-starting-check-the-stock-guard-and-depth-of-cut" data-card="jointer--before-starting-check-the-stock-guard-and-depth-of-cut" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Before starting: check the stock, guard and depth of cut<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Before starting: check the stock, guard and depth of cut</h2>
   <p><strong>In our labs:</strong></p>
@@ -3224,8 +3247,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Complete <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a>. The exposed chuck and bit are an entanglement hazard (see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a>). Before you start, check the <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">clothing and hair rules</a>: long hair secured back, no long sleeves, hoodies or jackets near the spindle, no jewelry except a silicone wedding ring, and nothing dangling.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="drill-press--before-starting-secure-the-bit-work-and-vise" data-card="drill-press--before-starting-secure-the-bit-work-and-vise">
-    <summary>Before starting: secure the bit, work and vise<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="drill-press--before-starting-secure-the-bit-work-and-vise" data-card="drill-press--before-starting-secure-the-bit-work-and-vise" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Before starting: secure the bit, work and vise<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Before starting: secure the bit, work and vise</h2>
   <ul class="boxes">
@@ -3294,8 +3317,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="aside">The preview checks the programmed cut; it does not prove that the real clamps are clear. The material position and zero settings at the router must match the job.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="axiom-cnc-router--before-running-secure-the-cutter-material-and-every-cut-piece" data-card="axiom-cnc-router--before-running-secure-the-cutter-material-and-every-cut-piece">
-    <summary>Before running: secure the cutter, material and every cut piece<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="axiom-cnc-router--before-running-secure-the-cutter-material-and-every-cut-piece" data-card="axiom-cnc-router--before-running-secure-the-cutter-material-and-every-cut-piece" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Before running: secure the cutter, material and every cut piece<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Before running: secure the cutter, material and every cut piece</h2>
   <ul class="boxes">

@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3088,7 +3111,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="energy-storage-methods--choose-storage-for-the-load-and-the-site" data-card="energy-storage-methods--choose-storage-for-the-load-and-the-site">
-    <summary>Choose storage for the load and the site<span class="chev"></span></summary>
+    <summary>Choose storage for the load and the site<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose storage for the load and the site</h2>
   <p>A small portable instrument needs a compact energy supply, so a battery is a practical fit. A site with suitable upper and lower reservoirs can consider pumped hydro for large stationary storage. A solar thermal plant needing heat after sunset can store heat without first converting it to electricity.</p>
@@ -3185,7 +3208,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="battery-capacity-and-packs--ampere-hours-measure-charge-watt-hours-measure-energy" data-card="battery-capacity-and-packs--ampere-hours-measure-charge-watt-hours-measure-energy">
-    <summary>Ampere-hours measure charge; watt-hours measure energy<span class="chev"></span></summary>
+    <summary>Ampere-hours measure charge; watt-hours measure energy<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Ampere-hours measure charge; watt-hours measure energy</h2>
   <p class="lede">A 2 Ah cell and a 2 Ah battery can store very different amounts of energy if their voltages differ. Ah tells you charge. To estimate energy, you also need voltage.</p>
@@ -3197,7 +3220,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="battery-capacity-and-packs--c-rate-sets-a-current-scale-load-current-sets-ideal-runtime" data-card="battery-capacity-and-packs--c-rate-sets-a-current-scale-load-current-sets-ideal-runtime">
-    <summary>C-rate sets a current scale; load current sets ideal runtime<span class="chev"></span></summary>
+    <summary>C-rate sets a current scale; load current sets ideal runtime<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>C-rate sets a current scale; load current sets ideal runtime</h2>
   <p>A discharge rate of <strong>1C</strong> means a current numerically equal to the capacity in Ah divided by one hour. The rate has units of <code>h<sup>−1</sup></code>. Here C is a rate notation, not the coulomb symbol.</p>
@@ -3218,8 +3241,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>This is an electrical model, not a pack assembly procedure. It assumes matched cells, balanced series operation and equal current sharing between parallel strings. Real packs need appropriate cell matching, interconnections and protection. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/series-and-parallel-circuits.html" target="_blank" rel="noopener">Series and Parallel Circuits</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="battery-capacity-and-packs--explore-a-pack-by-changing-one-input-at-a-time" data-card="battery-capacity-and-packs--explore-a-pack-by-changing-one-input-at-a-time">
-    <summary>Explore a pack by changing one input at a time<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="battery-capacity-and-packs--explore-a-pack-by-changing-one-input-at-a-time" data-card="battery-capacity-and-packs--explore-a-pack-by-changing-one-input-at-a-time" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Explore a pack by changing one input at a time<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Explore a pack by changing one input at a time</h2>
   <p>First double the series count: voltage and energy double, but Ah and runtime at the same pack current do not. Reset it, then double the parallel count: Ah, energy, rated current and ideal runtime double. The load current below is measured at the pack terminals.</p>

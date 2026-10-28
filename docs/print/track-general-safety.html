@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3049,8 +3072,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="equipment-categories--category-3" data-card="equipment-categories--category-3">
-    <summary><span class="cat cat-3">Category 3</span><span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="equipment-categories--category-3" data-card="equipment-categories--category-3" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary><span class="cat cat-3">Category 3</span><span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="cat cat-3">Category 3</span></h2>
   <div class="stop">
@@ -3266,8 +3289,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="equipment-operating-procedure--before-operating-any-equipment" data-card="equipment-operating-procedure--before-operating-any-equipment">
-    <summary><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="equipment-operating-procedure--before-operating-any-equipment" data-card="equipment-operating-procedure--before-operating-any-equipment" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment</h2>
   <ul class="boxes">
@@ -3293,8 +3316,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   are covered in <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="equipment-operating-procedure--after-operating-any-equipment" data-card="equipment-operating-procedure--after-operating-any-equipment">
-    <summary><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="equipment-operating-procedure--after-operating-any-equipment" data-card="equipment-operating-procedure--after-operating-any-equipment" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment</h2>
   <ul class="boxes">
@@ -3335,8 +3358,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="ppe--eye-protection" data-card="ppe--eye-protection">
-    <summary>Eye protection<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="ppe--eye-protection" data-card="ppe--eye-protection" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Eye protection<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Eye protection</h2>
   <div class="gate">
@@ -3356,8 +3379,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="ppe--hearing-protection" data-card="ppe--hearing-protection">
-    <summary>Hearing protection<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="ppe--hearing-protection" data-card="ppe--hearing-protection" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Hearing protection<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Hearing protection</h2>
   <p><strong>Industry standard:</strong> shop tools nearly always require hearing protection in
@@ -3424,8 +3447,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   supportive and comfortable.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection" data-card="ppe--respiratory-protection">
-    <summary>Respiratory protection<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection" data-card="ppe--respiratory-protection" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Respiratory protection<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection</h2>
   <div class="stop">
@@ -3443,8 +3466,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   same protection. The next section is the one that decides which you need.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection-what-to-wear" data-card="ppe--respiratory-protection-what-to-wear">
-    <summary>Respiratory protection &mdash; what to wear<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection-what-to-wear" data-card="ppe--respiratory-protection-what-to-wear" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Respiratory protection &mdash; what to wear<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection &mdash; what to wear</h2>
   <div class="stop">
@@ -3474,8 +3497,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   see <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="ppe--clothing-and-jewelry" data-card="ppe--clothing-and-jewelry">
-    <summary>Clothing and jewelry<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="ppe--clothing-and-jewelry" data-card="ppe--clothing-and-jewelry" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Clothing and jewelry<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Clothing and jewelry</h2>
   <div class="stop">
@@ -3520,8 +3543,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-gate" id="lifting-and-carrying--lifting-rules" data-card="lifting-and-carrying--lifting-rules">
-    <summary>Lifting Rules<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="lifting-and-carrying--lifting-rules" data-card="lifting-and-carrying--lifting-rules" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Lifting Rules<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Lifting Rules</h2>
   <div class="gate">
@@ -3555,8 +3578,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   that point just sits somewhere different for every person and every shape.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="lifting-and-carrying--proper-lifting-technique" data-card="lifting-and-carrying--proper-lifting-technique">
-    <summary>Proper lifting technique<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="lifting-and-carrying--proper-lifting-technique" data-card="lifting-and-carrying--proper-lifting-technique" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Proper lifting technique<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Proper lifting technique</h2>
   <ul class="boxes">
@@ -3609,8 +3632,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-shock-hazard" data-card="electrical-safety--electrical-shock-hazard">
-    <summary>Electrical &mdash; Shock Hazard<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-shock-hazard" data-card="electrical-safety--electrical-shock-hazard" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Electrical &mdash; Shock Hazard<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical &mdash; Shock Hazard</h2>
   <p class="lede">There is no magic voltage at which shock suddenly becomes possible. A shock can be
@@ -3647,8 +3670,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-burn-hazard" data-card="electrical-safety--electrical-burn-hazard">
-    <summary>Electrical &mdash; Burn Hazard<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-burn-hazard" data-card="electrical-safety--electrical-burn-hazard" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Electrical &mdash; Burn Hazard<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical &mdash; Burn Hazard</h2>
   <p class="lede">Below 50&nbsp;V, the primary concern often shifts from shock to
@@ -3720,8 +3743,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   not by the number printed on the front of the supply.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-conductors" data-card="electrical-safety--electrical-conductors">
-    <summary>Electrical Conductors<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-conductors" data-card="electrical-safety--electrical-conductors" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Electrical Conductors<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical Conductors</h2>
   <p class="lede">Inspect every cord, every time, <strong>before it goes into the receptacle</strong>.
@@ -3841,8 +3864,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you">
-    <summary>Cords on the floor &mdash; the one most likely to get you<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Cords on the floor &mdash; the one most likely to get you<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cords on the floor &mdash; the one most likely to get you</h2>
   <p class="lede">Nothing else on this page is as likely to actually injure someone as a cord
@@ -3932,8 +3955,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-5s-workplace-organization">5S</a>. The safety case and the lean case are the same case.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--if-someone-is-shocked" data-card="electrical-safety--if-someone-is-shocked">
-    <summary>If someone is shocked<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--if-someone-is-shocked" data-card="electrical-safety--if-someone-is-shocked" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>If someone is shocked<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>If someone is shocked</h2>
   <div class="stop">
@@ -4065,8 +4088,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="machine-hazards--rotating-machinery" data-card="machine-hazards--rotating-machinery">
-    <summary>Rotating machinery<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="machine-hazards--rotating-machinery" data-card="machine-hazards--rotating-machinery" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Rotating machinery<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rotating machinery</h2>
   <p class="lede">Rotating machinery injures you by <strong>catching hold of something and pulling
@@ -4186,8 +4209,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; What the investigations actually describe.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="machine-hazards--moving-machinery-and-pinch-points" data-card="machine-hazards--moving-machinery-and-pinch-points">
-    <summary>Moving machinery and pinch points<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="machine-hazards--moving-machinery-and-pinch-points" data-card="machine-hazards--moving-machinery-and-pinch-points" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Moving machinery and pinch points<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Moving machinery and pinch points</h2>
   <p class="lede">Moving machinery injures you <strong>without ever catching hold of you</strong>.
@@ -4282,8 +4305,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Why belts and chains count as rotating, not pinching.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call">
-    <summary>Guards stay on, and taking one off is not your call<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Guards stay on, and taking one off is not your call<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Guards stay on, and taking one off is not your call</h2>
   <p class="lede">A guard is the thing standing between you and everything the two sections above
@@ -4307,8 +4330,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Why the rule has no exceptions in it.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine">
-    <summary>Lockout/Tagout &mdash; before anyone works on a machine<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Lockout/Tagout &mdash; before anyone works on a machine<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Lockout/Tagout &mdash; before anyone works on a machine</h2>
   <p class="lede">Everything on a machine that turns or travels does so because something is
@@ -4383,8 +4406,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="fire-safety--decide-before-you-reach-for-anything" data-card="fire-safety--decide-before-you-reach-for-anything">
-    <summary>Decide before you reach for anything<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="fire-safety--decide-before-you-reach-for-anything" data-card="fire-safety--decide-before-you-reach-for-anything" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Decide before you reach for anything<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Decide before you reach for anything</h2>
   <p class="lede">An extinguisher is for a <strong>small fire you caught early</strong>.</p>
@@ -4468,8 +4491,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   on it.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card="fire-safety--metal-fires-and-what-it-takes-to-start-one">
-    <summary>Metal fires, and what it takes to start one<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Metal fires, and what it takes to start one<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Metal fires, and what it takes to start one</h2>
   <p class="lede">Metal burns only when it is divided finely enough, and then only when several
@@ -4585,8 +4608,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-wiki-only" id="fire-safety--know-these-before-you-need-them" data-card="fire-safety--know-these-before-you-need-them">
-    <summary>Know these before you need them<span class="chev"></span></summary>
+  <details class="xcard deck-wiki-only is-checklist" id="fire-safety--know-these-before-you-need-them" data-card="fire-safety--know-these-before-you-need-them" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Know these before you need them<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Know these before you need them</h2>
   <p>None of the above helps if you are looking for equipment while a fire grows. On your first
@@ -4632,8 +4655,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="metal-chips--never-clear-chips-with-your-hands" data-card="metal-chips--never-clear-chips-with-your-hands">
-    <summary>Never clear chips with your hands<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="metal-chips--never-clear-chips-with-your-hands" data-card="metal-chips--never-clear-chips-with-your-hands" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Never clear chips with your hands<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Never clear chips with your hands</h2>
   <div class="stop">
@@ -4656,8 +4679,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="metal-chips--compressed-air-there-are-limits-on-this" data-card="metal-chips--compressed-air-there-are-limits-on-this">
-    <summary>Compressed air &mdash; there are limits on this<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="metal-chips--compressed-air-there-are-limits-on-this" data-card="metal-chips--compressed-air-there-are-limits-on-this" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Compressed air &mdash; there are limits on this<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Compressed air &mdash; there are limits on this</h2>
   <div class="gate">
@@ -4689,8 +4712,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="metal-chips--cleaning-up" data-card="metal-chips--cleaning-up">
-    <summary>Cleaning up<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="metal-chips--cleaning-up" data-card="metal-chips--cleaning-up" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Cleaning up<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cleaning up</h2>
   <ul class="boxes">
@@ -4756,8 +4779,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="conduct-and-emergency--prohibited-behavior" data-card="conduct-and-emergency--prohibited-behavior">
-    <summary>Prohibited behavior<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="conduct-and-emergency--prohibited-behavior" data-card="conduct-and-emergency--prohibited-behavior" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Prohibited behavior<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Prohibited behavior</h2>
   <div class="stop">
@@ -4782,8 +4805,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="conduct-and-emergency--emergency-procedures" data-card="conduct-and-emergency--emergency-procedures">
-    <summary>Emergency procedures<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="conduct-and-emergency--emergency-procedures" data-card="conduct-and-emergency--emergency-procedures" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Emergency procedures<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Emergency procedures</h2>
   <ul class="boxes">

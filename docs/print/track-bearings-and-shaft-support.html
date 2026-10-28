@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3087,7 +3110,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="bearing-types-and-loads--rings-carry-the-load-the-cage-spaces-the-rolling-elements" data-card="bearing-types-and-loads--rings-carry-the-load-the-cage-spaces-the-rolling-elements">
-    <summary>Rings carry the load; the cage spaces the rolling elements<span class="chev"></span></summary>
+    <summary>Rings carry the load; the cage spaces the rolling elements<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rings carry the load; the cage spaces the rolling elements</h2>
 <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMzY1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkJhbGwgYmVhcmluZyByaW5ncywgYmFsbHMsIGNhZ2UgYW5kIHJhY2V3YXlzIj48dGl0bGU+QmFsbCBiZWFyaW5nIHJpbmdzLCBiYWxscywgY2FnZSBhbmQgcmFjZXdheXM8L3RpdGxlPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iMzY1IiBmaWxsPSIjZmZmIi8+PGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOCIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEwWiIgZmlsbD0iIzE3NDc2YiIvPjwvbWFya2VyPjwvZGVmcz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE3MmIzYSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48Y2lyY2xlIGN4PSIyMTAiIGN5PSIxNzUiIHI9IjEyNSIgZmlsbD0iI2I1YzdkNCIgc3Ryb2tlPSIjMTc0NzZiIiBzdHJva2Utd2lkdGg9IjMiLz48Y2lyY2xlIGN4PSIyMTAiIGN5PSIxNzUiIHI9IjEwMSIgZmlsbD0id2hpdGUiIHN0cm9rZT0iIzE3NDc2YiIgc3Ryb2tlLXdpZHRoPSIzIi8+PGNpcmNsZSBjeD0iMjEwIiBjeT0iMTc1IiByPSI2NCIgZmlsbD0iI2I1YzdkNCIgc3Ryb2tlPSIjMTc0NzZiIiBzdHJva2Utd2lkdGg9IjMiLz48Y2lyY2xlIGN4PSIyMTAiIGN5PSIxNzUiIHI9IjQzIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTc0NzZiIiBzdHJva2Utd2lkdGg9IjMiLz48Y2lyY2xlIGN4PSIyMTAiIGN5PSIxNzUiIHI9IjgzIiBmaWxsPSJub25lIiBzdHJva2U9IiNiNTdkMDAiIHN0cm9rZS13aWR0aD0iOCIvPjxjaXJjbGUgY3g9IjI5My4wMCIgY3k9IjE3NS4wMCIgcj0iMTgiIGZpbGw9IiNlNmYzZmEiIHN0cm9rZT0iIzE3NDc2YiIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjY4LjY5IiBjeT0iMjMzLjY5IiByPSIxOCIgZmlsbD0iI2U2ZjNmYSIgc3Ryb2tlPSIjMTc0NzZiIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMTAuMDAiIGN5PSIyNTguMDAiIHI9IjE4IiBmaWxsPSIjZTZmM2ZhIiBzdHJva2U9IiMxNzQ3NmIiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjE1MS4zMSIgY3k9IjIzMy42OSIgcj0iMTgiIGZpbGw9IiNlNmYzZmEiIHN0cm9rZT0iIzE3NDc2YiIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMTI3LjAwIiBjeT0iMTc1LjAwIiByPSIxOCIgZmlsbD0iI2U2ZjNmYSIgc3Ryb2tlPSIjMTc0NzZiIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIxNTEuMzEiIGN5PSIxMTYuMzEiIHI9IjE4IiBmaWxsPSIjZTZmM2ZhIiBzdHJva2U9IiMxNzQ3NmIiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjIxMC4wMCIgY3k9IjkyLjAwIiByPSIxOCIgZmlsbD0iI2U2ZjNmYSIgc3Ryb2tlPSIjMTc0NzZiIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyNjguNjkiIGN5PSIxMTYuMzEiIHI9IjE4IiBmaWxsPSIjZTZmM2ZhIiBzdHJva2U9IiMxNzQ3NmIiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0zMTAgMTAwTDQzMCA1NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTc0NzZiIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSI0NDAiIHk9IjYwIj5PdXRlciByaW5nOiBob3VzaW5nIHNlYXQ8L3RleHQ+PHBhdGggZD0iTTI1MCAxNTVMNDMwIDEyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTc0NzZiIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSI0NDAiIHk9IjEyNSI+SW5uZXIgcmluZzogc2hhZnQgc2VhdDwvdGV4dD48cGF0aCBkPSJNMjkzIDE3NUw0MzAgMTgwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNzQ3NmIiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjQ0MCIgeT0iMTg1Ij5CYWxsOiByb2xsaW5nIGVsZW1lbnQ8L3RleHQ+PHBhdGggZD0iTTI4NyAyMDVMNDMwIDI0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTc0NzZiIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSI0NDAiIHk9IjI0NSI+Q2FnZTogc3BhY2VzIHRoZSBiYWxscyAoZ29sZCk8L3RleHQ+PHBhdGggZD0iTTIxMCA3NEw0MzAgMjk1IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNzQ3NmIiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjQ0MCIgeT0iMzAwIj5SYWNld2F5OiBjb250YWN0IHRyYWNrIG9uIHJpbmc8L3RleHQ+PHRleHQgeD0iNTUiIHk9IjM0MCI+U2VhbHMgb21pdHRlZDsgc2NoZW1hdGljIGZyb250IHZpZXc8L3RleHQ+PC9nPjwvc3ZnPg==" alt="Front view of a ball bearing identifying the inner ring, outer ring, balls, cage and ring raceway surfaces." data-natural-width="800" data-natural-height="365"><figcaption>Schematic with seals omitted. A raceway is the track on a ring that the rolling elements contact; ring and raceway are not quite the same thing.</figcaption></figure>
@@ -3098,8 +3121,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p><a class="button" data-practice-add="bearing-load-direction" href="../practice.html#bearing-load-direction">Practice identifying the load</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="bearing-types-and-loads--double-a-ball-bearing-s-load-and-its-basic-rating-life-falls-to-one-eighth" data-card="bearing-types-and-loads--double-a-ball-bearing-s-load-and-its-basic-rating-life-falls-to-one-eighth">
-    <summary>Double a ball bearing's load and its basic rating life falls to one eighth<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="bearing-types-and-loads--double-a-ball-bearing-s-load-and-its-basic-rating-life-falls-to-one-eighth" data-card="bearing-types-and-loads--double-a-ball-bearing-s-load-and-its-basic-rating-life-falls-to-one-eighth" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Double a ball bearing's load and its basic rating life falls to one eighth<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Double a ball bearing's load and its basic rating life falls to one eighth</h2>
 <p><strong>L10 is the life that 90% of a large group of identical bearings are expected to reach or exceed.</strong> It is neither a guaranteed life nor an average. Change one input below and watch the life curve.</p>
@@ -3147,8 +3170,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Why two locating supports can create unwanted load.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="shaft-support-and-adjustment--heat-the-shaft-and-compare-free-travel-with-restraint" data-card="shaft-support-and-adjustment--heat-the-shaft-and-compare-free-travel-with-restraint">
-    <summary>Heat the shaft and compare free travel with restraint<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="shaft-support-and-adjustment--heat-the-shaft-and-compare-free-travel-with-restraint" data-card="shaft-support-and-adjustment--heat-the-shaft-and-compare-free-travel-with-restraint" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Heat the shaft and compare free travel with restraint<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Heat the shaft and compare free travel with restraint</h2>
 <div data-interactive="shaft-thermal-expansion">
@@ -3174,8 +3197,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p>Avoid burrs and rubbing contact that could release debris. Use the material and placement specified for the assembly.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="shaft-support-and-adjustment--a-spring-maintains-force-over-travel-a-shim-sets-distance" data-card="shaft-support-and-adjustment--a-spring-maintains-force-over-travel-a-shim-sets-distance">
-    <summary>A spring maintains force over travel; a shim sets distance<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="shaft-support-and-adjustment--a-spring-maintains-force-over-travel-a-shim-sets-distance" data-card="shaft-support-and-adjustment--a-spring-maintains-force-over-travel-a-shim-sets-distance" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>A spring maintains force over travel; a shim sets distance<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A spring maintains force over travel; a shim sets distance</h2>
 <p>A shim sets distance and a spring maintains force.</p>
@@ -3226,7 +3249,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="linear-bearing-guides--opposed-v-wheels-guide-a-carriage-one-wheel-does-not" data-card="linear-bearing-guides--opposed-v-wheels-guide-a-carriage-one-wheel-does-not">
-    <summary>Opposed V-wheels guide a carriage; one wheel does not<span class="chev"></span></summary>
+    <summary>Opposed V-wheels guide a carriage; one wheel does not<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Opposed V-wheels guide a carriage; one wheel does not</h2>
 <p>A V-groove wheel runs on a matching edge or rail. A stable carriage commonly uses three or more wheels with contacts opposed across the rail and spaced along it. A triangular three-wheel arrangement can use an adjustable wheel to take up clearance.</p>

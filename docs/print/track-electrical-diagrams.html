@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3032,8 +3055,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Choose the drawing for the job</h2><p class="lede">One electrical system can need several drawings. Start with the question: What does the part look like? Where does this wire go? How does the circuit work? Where does the equipment fit?</p><div class="unit-table-wrap"><table class="unit-table"><caption>Choose the drawing for the question you need to answer.</caption><thead><tr><th scope="col">Type</th><th scope="col">Shows</th><th scope="col">Usually leaves out</th><th scope="col">Who uses it, and when</th></tr></thead><tbody><tr><th scope="row">Pictorial</th><td>Recognizable appearances of parts.</td><td>Exact electrical behavior and hidden connections may be omitted.</td><td>A beginner or assembler identifying parts before tracing connections.</td></tr><tr><th scope="row">Block</th><td>Functions and the direction of signal or power flow.</td><td>Individual terminals, component values, and return wires.</td><td>A designer explaining a system before working out its circuits.</td></tr><tr><th scope="row">Wiring</th><td>Connections between terminals; wire identifiers and routing where specified.</td><td>The reason the circuit behaves as it does; scale may be omitted.</td><td>An assembler or service technician connecting or tracing wires.</td></tr><tr><th scope="row">Schematic</th><td>Electrical function and connections using component symbols.</td><td>Actual component positions, wire lengths, and enclosure geometry.</td><td>A circuit designer or technician analyzing how a circuit works.</td></tr><tr><th scope="row">IC / PCB layout</th><td>Physical geometry: a PCB has footprints, pads and copper traces; an IC layout describes structures and interconnect on a chip.</td><td>A convenient explanation of circuit operation.</td><td>A board or chip designer checking placement and routing before manufacture.</td></tr><tr><th scope="row">Ladder</th><td>Relay or PLC control logic arranged in rungs between rails.</td><td>Exact equipment placement and wire routing.</td><td>A controls technician tracing the conditions for an output.</td></tr><tr><th scope="row">Logic</th><td>Gates and the relationships between logical inputs and outputs.</td><td>Power wiring, package pin locations, and physical placement unless added.</td><td>A digital designer following Boolean decisions through a circuit.</td></tr><tr><th scope="row">Electrical floor plan</th><td>Locations of outlets, switches and fixtures on a building plan, interpreted with its legend.</td><td>Internal circuit operation; complete routing may be on other drawings.</td><td>An installer or building designer locating devices within rooms.</td></tr><tr><th scope="row">Riser</th><td>Distribution between building levels and the equipment serving them.</td><td>Detailed room layouts and exact conduit paths unless specified.</td><td>A building electrical designer or installer coordinating distribution across floors.</td></tr></tbody></table></div><p>Read the drawing title, legend, revision, and notes before treating a line or mark as an instruction. The same habit applies to mechanical drawings; see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/choosing-drawing-views.html" target="_blank" rel="noopener">Choosing Drawing Views</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/alphabet-of-lines.html" target="_blank" rel="noopener">The Alphabet of Lines</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views" data-card="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views">
-    <summary>Compare one circuit in pictorial, wiring, and schematic views<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views" data-card="electrical-diagram-types--compare-one-circuit-in-pictorial-wiring-and-schematic-views" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Compare one circuit in pictorial, wiring, and schematic views<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Compare one circuit in pictorial, wiring, and schematic views</h2><p>This teaching example connects a battery, switch, resistor, and LED in one loop. The resistor is in series with the LED. The drawings explain identity and connections; they do not specify a buildable parts list, resistor value, battery rating, or package pinout.</p><div data-interactive="diagram-views">
 <div class="dv-controls" hidden><p>Choose a view. Choose a component to keep it marked when you change views.</p><div class="dv-views" aria-label="Drawing view"></div><div class="dv-parts" aria-label="Component selection"></div><p class="dv-status" aria-live="polite"></p></div>
@@ -3056,7 +3079,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="electrical-diagram-types--practice-selecting-a-useful-drawing" data-card="electrical-diagram-types--practice-selecting-a-useful-drawing">
-    <summary>Practice selecting a useful drawing<span class="chev"></span></summary>
+    <summary>Practice selecting a useful drawing<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Practice selecting a useful drawing</h2><p><a class="button" data-practice-add="diagram-job-terminals" href="../practice.html#diagram-job-terminals">Practice diagram selection</a></p><p>Continue with <a class="xref-page" href="#p-reading-electrical-connections">Reading Electrical Connections</a> to recognize common component symbols, distinguish a joined wire from a crossing, and count electrical nodes.</p>
     </div>
@@ -3091,14 +3114,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Read component identity separately from its value</h2><p>A reference such as R1 identifies a particular part; a value such as 1 kΩ describes its resistance. D1 can identify a diode or LED, so its symbol and parts information still matter. A ground label identifies a reference or connection according to the drawing; it does not by itself establish a connection to protective earth.</p><p>US practice (IEEE 315 / ANSI Y32.2) and international practice (IEC 60617) draw some symbols differently. Use the drawing legend; the forms below are teaching examples, not a claim of compliance with a standard.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="reading-electrical-connections--trace-a-connection-one-terminal-at-a-time" data-card="reading-electrical-connections--trace-a-connection-one-terminal-at-a-time">
-    <summary>Trace a connection one terminal at a time<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="reading-electrical-connections--trace-a-connection-one-terminal-at-a-time" data-card="reading-electrical-connections--trace-a-connection-one-terminal-at-a-time" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Trace a connection one terminal at a time<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Trace a connection one terminal at a time</h2><ul class="boxes"><li>Read the legend, notes, revision, and stated switch positions.</li><li>Find the source and the named return or reference node.</li><li>Follow each conductor to a component terminal, junction, or net label.</li><li>Mark each uninterrupted group of conductors as one node.</li><li>Check crossings and similarly named labels before assuming they join.</li><li>Use the wiring drawing and parts documentation when physical terminal locations matter.</li></ul><p><a class="button" data-practice-add="diagram-crossing" href="../practice.html#diagram-crossing">Practice crossing wires</a></p><p>See <a class="xref-page" href="#p-electrical-diagram-types">Electrical Diagram Types</a> for choosing a drawing and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/current-voltage-and-resistance.html" target="_blank" rel="noopener">Current, Voltage, and Resistance</a> for the quantities measured between and through components.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="reading-electrical-connections--recognize-common-symbols-before-tracing-their-connections" data-card="reading-electrical-connections--recognize-common-symbols-before-tracing-their-connections">
-    <summary>Recognize common symbols before tracing their connections<span class="chev"></span></summary>
+    <summary>Recognize common symbols before tracing their connections<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Recognize common symbols before tracing their connections</h2>
 <p>Use the symbol to identify the kind of component, then read its reference and value. The sheet includes both resistor forms and an unpolarized capacitor. A battery is one kind of DC source; other DC supplies may use a circle marked with polarity.</p>
@@ -3108,7 +3131,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="reading-electrical-connections--count-four-nodes-with-the-switch-open-three-with-it-closed" data-card="reading-electrical-connections--count-four-nodes-with-the-switch-open-three-with-it-closed">
-    <summary>Count four nodes with the switch open, three with it closed<span class="chev"></span></summary>
+    <summary>Count four nodes with the switch open, three with it closed<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Count four nodes with the switch open, three with it closed</h2>
 <p>Trace this small component schematic with S1 open. Stop at each component terminal; do not count through the battery, resistor, or LED.</p>

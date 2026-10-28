@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3055,7 +3078,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="wood-structure-and-species--hardwood-and-softwood-describe-the-tree-not-its-hardness" data-card="wood-structure-and-species--hardwood-and-softwood-describe-the-tree-not-its-hardness">
-    <summary>Hardwood and softwood describe the tree, not its hardness<span class="chev"></span></summary>
+    <summary>Hardwood and softwood describe the tree, not its hardness<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Hardwood and softwood describe the tree, not its hardness</h2>
 <p><strong>Hardwoods come from angiosperm trees; softwoods come from gymnosperm trees, commonly conifers.</strong> Leaf shedding is not the defining test: some hardwood trees are evergreen, and some conifers shed their needles.</p>
@@ -3130,8 +3153,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p>Choose and acclimate material for its intended service environment. Use measurements to judge readiness; a fixed number of days cannot guarantee equilibrium for every thickness and starting condition.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="grain-and-moisture-movement--most-movement-is-across-the-grain" data-card="grain-and-moisture-movement--most-movement-is-across-the-grain">
-    <summary>Most movement is across the grain<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="grain-and-moisture-movement--most-movement-is-across-the-grain" data-card="grain-and-moisture-movement--most-movement-is-across-the-grain" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Most movement is across the grain<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Most movement is across the grain</h2>
 <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPlRhbmdlbnRpYWwsIHJhZGlhbCBhbmQgbG9uZ2l0dWRpbmFsIGRpcmVjdGlvbnMgaW4gd29vZDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZmRmNyIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHRleHQgeD0iMzAiIHk9IjM1IiBmb250LXNpemU9IjIzIj5Nb3ZlbWVudCBkaXJlY3Rpb25zIGluIG5vcm1hbCBzdHJhaWdodC1ncmFpbmVkIHdvb2Q8L3RleHQ+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxNTUiIGZpbGw9IiNmNWRlYjAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSI4NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIyNDUiIHI9IjUwIiBmaWxsPSJub25lIiBzdHJva2U9IiM4MDU5MjkiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjIzMCIgY3k9IjI0NSIgcj0iNSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNIDIzMCAyNDUgTCAzNDUgMjQ1IE0gMzM0IDIzNyBMIDM0NSAyNDUgTCAzMzQgMjUzIiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjI0NyIgeT0iMjMyIiBmb250LXNpemU9IjIwIj5SYWRpYWw8L3RleHQ+PHBhdGggZD0iTSAxMDYgMjA4IEEgMTMwIDEzMCAwIDAgMSAyMzAgMTE1IE0gMjE3IDEwOCBMIDIzMCAxMTUgTCAyMTkgMTI0IiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI3MCIgZm9udC1zaXplPSIxOSI+VGFuZ2VudGlhbDogYXJvdW5kIGEgcmluZzwvdGV4dD48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTgyZDQwIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjQiIGZpbGw9IiMxODJkNDAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDUwIiB5PSIxNDAiIGZvbnQtc2l6ZT0iMjIiPlRhbmdlbnRpYWw6IGdyZWF0ZXN0IG1vdmVtZW50PC90ZXh0Pjx0ZXh0IHg9IjQ1MCIgeT0iMTg1IiBmb250LXNpemU9IjIyIj5SYWRpYWw6IHNtYWxsZXIgbW92ZW1lbnQ8L3RleHQ+PHRleHQgeD0iNDUwIiB5PSIyMzAiIGZvbnQtc2l6ZT0iMjEiPkxvbmdpdHVkaW5hbDogdXN1YWxseSBtdWNoIHNtYWxsZXI8L3RleHQ+PHBhdGggZD0iTSAyNDYgMzE1IEggNDI1IiBzdHJva2U9IiMxODJkNDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQ1MCIgeT0iMzIwIiBmb250LXNpemU9IjIxIj5Mb25naXR1ZGluYWw6IG91dCBvZiB0aGlzIHZpZXc8L3RleHQ+PHRleHQgeD0iNDAiIHk9IjQ0NSIgZm9udC1zaXplPSIxOCI+Q29tcGFyZSBkaXJlY3Rpb25zLCBub3QgYXJyb3cgbGVuZ3RoczogdGhpcyBkaWFncmFtIGlzIG5vdCBhIHNocmlua2FnZSBzY2FsZS48L3RleHQ+PC9nPjwvc3ZnPg==" alt="End-grain view labels tangential direction around a growth ring and radial direction toward the center; longitudinal direction is along the trunk, out of the view. Typical movement is greatest tangentially, then radially, and much smaller longitudinally." data-natural-width="900" data-natural-height="480"></p></figure>
@@ -3148,7 +3171,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="grain-and-moisture-movement--name-the-distortion-before-deciding-what-to-do" data-card="grain-and-moisture-movement--name-the-distortion-before-deciding-what-to-do">
-    <summary>Name the distortion before deciding what to do<span class="chev"></span></summary>
+    <summary>Name the distortion before deciding what to do<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Name the distortion before deciding what to do</h2>
 <table><caption>Defects described by shape</caption><thead><tr><th scope="col">Defect</th><th scope="col">What you see</th></tr></thead><tbody>
@@ -3162,8 +3185,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p><a class="button" data-practice-add="wood-identify-cup" href="../practice.html#wood-identify-cup">Practice: cup</a> <a class="button" data-practice-add="wood-identify-bow" href="../practice.html#wood-identify-bow">Practice: bow</a> <a class="button" data-practice-add="wood-identify-crook" href="../practice.html#wood-identify-crook">Practice: crook</a> <a class="button" data-practice-add="wood-identify-twist" href="../practice.html#wood-identify-twist">Practice: twist</a> <a class="button" data-practice-add="wood-identify-check" href="../practice.html#wood-identify-check">Practice: check</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card="grain-and-moisture-movement--allow-solid-wood-to-change-width">
-    <summary>Allow solid wood to change width<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Allow solid wood to change width<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Allow solid wood to change width</h2>
 <p>A solid-wood tabletop needs room to expand and contract across its grain. Suitable slotted attachments let it move relative to a supporting frame. A panel held in grooves needs clearance rather than rigid restraint across its full width. Details depend on the joint and expected movement.</p>
@@ -3192,7 +3215,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="buying-lumber-and-board-feet--nominal-size-is-a-name-actual-size-is-what-fits" data-card="buying-lumber-and-board-feet--nominal-size-is-a-name-actual-size-is-what-fits">
-    <summary>Nominal size is a name; actual size is what fits<span class="chev"></span></summary>
+    <summary>Nominal size is a name; actual size is what fits<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Nominal size is a name; actual size is what fits</h2>
 <p>A nominal lumber size identifies a product category. Dry, surfaced construction lumber sold as a <strong>2 × 4</strong> commonly measures <strong>1-1/2 × 3-1/2 in</strong> in cross-section. Rough, green, specialty, and reclaimed stock can differ. Measure the piece when fit matters.</p>
@@ -3221,8 +3244,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p><strong>State the measuring convention.</strong> A physical-volume calculation uses actual dimensions. A sales tally may use nominal thickness or other trade rules and may round individual board measurements. Ask the seller; do not replace a quoted tally basis with finished dimensions without saying so. The examples here explicitly specify their basis and use unrounded arithmetic until the final answer.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="buying-lumber-and-board-feet--keep-purchase-tally-and-finished-volume-separate" data-card="buying-lumber-and-board-feet--keep-purchase-tally-and-finished-volume-separate">
-    <summary>Keep purchase tally and finished volume separate<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="buying-lumber-and-board-feet--keep-purchase-tally-and-finished-volume-separate" data-card="buying-lumber-and-board-feet--keep-purchase-tally-and-finished-volume-separate" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Keep purchase tally and finished volume separate<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Keep purchase tally and finished volume separate</h2>
 <p>Suppose a seller specifies a tally using nominal 1 in thickness, measured 7 in width, and 9 ft length. The tally is <code>1 × 7 × 9 / 12 = <strong>5.25 BF</strong></code>.</p>
@@ -3272,7 +3295,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="engineered-wood-products--choose-the-sheet-by-its-structure-and-service-conditions" data-card="engineered-wood-products--choose-the-sheet-by-its-structure-and-service-conditions">
-    <summary>Choose the sheet by its structure and service conditions<span class="chev"></span></summary>
+    <summary>Choose the sheet by its structure and service conditions<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose the sheet by its structure and service conditions</h2>
 <table><caption>Sheet goods: useful differences</caption><thead><tr><th scope="col">Product</th><th scope="col">Structure and strengths</th><th scope="col">Limits and typical uses</th></tr></thead><tbody>

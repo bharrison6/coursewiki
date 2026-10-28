@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -6385,8 +6408,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="equipment-categories--category-3" data-card="equipment-categories--category-3">
-    <summary><span class="cat cat-3">Category 3</span><span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="equipment-categories--category-3" data-card="equipment-categories--category-3" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary><span class="cat cat-3">Category 3</span><span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="cat cat-3">Category 3</span></h2>
   <div class="stop">
@@ -6602,8 +6625,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="equipment-operating-procedure--before-operating-any-equipment" data-card="equipment-operating-procedure--before-operating-any-equipment">
-    <summary><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="equipment-operating-procedure--before-operating-any-equipment" data-card="equipment-operating-procedure--before-operating-any-equipment" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment</h2>
   <ul class="boxes">
@@ -6629,8 +6652,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   are covered in <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="equipment-operating-procedure--after-operating-any-equipment" data-card="equipment-operating-procedure--after-operating-any-equipment">
-    <summary><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="equipment-operating-procedure--after-operating-any-equipment" data-card="equipment-operating-procedure--after-operating-any-equipment" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment</h2>
   <ul class="boxes">
@@ -6671,8 +6694,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="ppe--eye-protection" data-card="ppe--eye-protection">
-    <summary>Eye protection<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="ppe--eye-protection" data-card="ppe--eye-protection" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Eye protection<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Eye protection</h2>
   <div class="gate">
@@ -6692,8 +6715,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="ppe--hearing-protection" data-card="ppe--hearing-protection">
-    <summary>Hearing protection<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="ppe--hearing-protection" data-card="ppe--hearing-protection" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Hearing protection<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Hearing protection</h2>
   <p><strong>Industry standard:</strong> shop tools nearly always require hearing protection in
@@ -6760,8 +6783,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   supportive and comfortable.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection" data-card="ppe--respiratory-protection">
-    <summary>Respiratory protection<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection" data-card="ppe--respiratory-protection" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Respiratory protection<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection</h2>
   <div class="stop">
@@ -6779,8 +6802,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   same protection. The next section is the one that decides which you need.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection-what-to-wear" data-card="ppe--respiratory-protection-what-to-wear">
-    <summary>Respiratory protection &mdash; what to wear<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection-what-to-wear" data-card="ppe--respiratory-protection-what-to-wear" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Respiratory protection &mdash; what to wear<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection &mdash; what to wear</h2>
   <div class="stop">
@@ -6810,8 +6833,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   see <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="ppe--clothing-and-jewelry" data-card="ppe--clothing-and-jewelry">
-    <summary>Clothing and jewelry<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="ppe--clothing-and-jewelry" data-card="ppe--clothing-and-jewelry" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Clothing and jewelry<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Clothing and jewelry</h2>
   <div class="stop">
@@ -6856,8 +6879,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-gate" id="lifting-and-carrying--lifting-rules" data-card="lifting-and-carrying--lifting-rules">
-    <summary>Lifting Rules<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="lifting-and-carrying--lifting-rules" data-card="lifting-and-carrying--lifting-rules" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Lifting Rules<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Lifting Rules</h2>
   <div class="gate">
@@ -6891,8 +6914,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   that point just sits somewhere different for every person and every shape.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="lifting-and-carrying--proper-lifting-technique" data-card="lifting-and-carrying--proper-lifting-technique">
-    <summary>Proper lifting technique<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="lifting-and-carrying--proper-lifting-technique" data-card="lifting-and-carrying--proper-lifting-technique" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Proper lifting technique<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Proper lifting technique</h2>
   <ul class="boxes">
@@ -6945,8 +6968,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-shock-hazard" data-card="electrical-safety--electrical-shock-hazard">
-    <summary>Electrical &mdash; Shock Hazard<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-shock-hazard" data-card="electrical-safety--electrical-shock-hazard" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Electrical &mdash; Shock Hazard<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical &mdash; Shock Hazard</h2>
   <p class="lede">There is no magic voltage at which shock suddenly becomes possible. A shock can be
@@ -6983,8 +7006,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-burn-hazard" data-card="electrical-safety--electrical-burn-hazard">
-    <summary>Electrical &mdash; Burn Hazard<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-burn-hazard" data-card="electrical-safety--electrical-burn-hazard" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Electrical &mdash; Burn Hazard<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical &mdash; Burn Hazard</h2>
   <p class="lede">Below 50&nbsp;V, the primary concern often shifts from shock to
@@ -7056,8 +7079,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   not by the number printed on the front of the supply.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-conductors" data-card="electrical-safety--electrical-conductors">
-    <summary>Electrical Conductors<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-conductors" data-card="electrical-safety--electrical-conductors" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Electrical Conductors<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical Conductors</h2>
   <p class="lede">Inspect every cord, every time, <strong>before it goes into the receptacle</strong>.
@@ -7177,8 +7200,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you">
-    <summary>Cords on the floor &mdash; the one most likely to get you<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Cords on the floor &mdash; the one most likely to get you<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cords on the floor &mdash; the one most likely to get you</h2>
   <p class="lede">Nothing else on this page is as likely to actually injure someone as a cord
@@ -7268,8 +7291,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-5s-workplace-organization">5S</a>. The safety case and the lean case are the same case.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--if-someone-is-shocked" data-card="electrical-safety--if-someone-is-shocked">
-    <summary>If someone is shocked<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--if-someone-is-shocked" data-card="electrical-safety--if-someone-is-shocked" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>If someone is shocked<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>If someone is shocked</h2>
   <div class="stop">
@@ -7401,8 +7424,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="machine-hazards--rotating-machinery" data-card="machine-hazards--rotating-machinery">
-    <summary>Rotating machinery<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="machine-hazards--rotating-machinery" data-card="machine-hazards--rotating-machinery" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Rotating machinery<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rotating machinery</h2>
   <p class="lede">Rotating machinery injures you by <strong>catching hold of something and pulling
@@ -7522,8 +7545,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; What the investigations actually describe.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="machine-hazards--moving-machinery-and-pinch-points" data-card="machine-hazards--moving-machinery-and-pinch-points">
-    <summary>Moving machinery and pinch points<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="machine-hazards--moving-machinery-and-pinch-points" data-card="machine-hazards--moving-machinery-and-pinch-points" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Moving machinery and pinch points<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Moving machinery and pinch points</h2>
   <p class="lede">Moving machinery injures you <strong>without ever catching hold of you</strong>.
@@ -7618,8 +7641,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Why belts and chains count as rotating, not pinching.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call">
-    <summary>Guards stay on, and taking one off is not your call<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Guards stay on, and taking one off is not your call<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Guards stay on, and taking one off is not your call</h2>
   <p class="lede">A guard is the thing standing between you and everything the two sections above
@@ -7643,8 +7666,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Why the rule has no exceptions in it.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine">
-    <summary>Lockout/Tagout &mdash; before anyone works on a machine<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Lockout/Tagout &mdash; before anyone works on a machine<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Lockout/Tagout &mdash; before anyone works on a machine</h2>
   <p class="lede">Everything on a machine that turns or travels does so because something is
@@ -7719,8 +7742,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="fire-safety--decide-before-you-reach-for-anything" data-card="fire-safety--decide-before-you-reach-for-anything">
-    <summary>Decide before you reach for anything<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="fire-safety--decide-before-you-reach-for-anything" data-card="fire-safety--decide-before-you-reach-for-anything" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Decide before you reach for anything<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Decide before you reach for anything</h2>
   <p class="lede">An extinguisher is for a <strong>small fire you caught early</strong>.</p>
@@ -7804,8 +7827,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   on it.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card="fire-safety--metal-fires-and-what-it-takes-to-start-one">
-    <summary>Metal fires, and what it takes to start one<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Metal fires, and what it takes to start one<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Metal fires, and what it takes to start one</h2>
   <p class="lede">Metal burns only when it is divided finely enough, and then only when several
@@ -7921,8 +7944,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-wiki-only" id="fire-safety--know-these-before-you-need-them" data-card="fire-safety--know-these-before-you-need-them">
-    <summary>Know these before you need them<span class="chev"></span></summary>
+  <details class="xcard deck-wiki-only is-checklist" id="fire-safety--know-these-before-you-need-them" data-card="fire-safety--know-these-before-you-need-them" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Know these before you need them<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Know these before you need them</h2>
   <p>None of the above helps if you are looking for equipment while a fire grows. On your first
@@ -7968,8 +7991,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="metal-chips--never-clear-chips-with-your-hands" data-card="metal-chips--never-clear-chips-with-your-hands">
-    <summary>Never clear chips with your hands<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="metal-chips--never-clear-chips-with-your-hands" data-card="metal-chips--never-clear-chips-with-your-hands" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Never clear chips with your hands<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Never clear chips with your hands</h2>
   <div class="stop">
@@ -7992,8 +8015,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="metal-chips--compressed-air-there-are-limits-on-this" data-card="metal-chips--compressed-air-there-are-limits-on-this">
-    <summary>Compressed air &mdash; there are limits on this<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="metal-chips--compressed-air-there-are-limits-on-this" data-card="metal-chips--compressed-air-there-are-limits-on-this" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Compressed air &mdash; there are limits on this<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Compressed air &mdash; there are limits on this</h2>
   <div class="gate">
@@ -8025,8 +8048,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="metal-chips--cleaning-up" data-card="metal-chips--cleaning-up">
-    <summary>Cleaning up<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="metal-chips--cleaning-up" data-card="metal-chips--cleaning-up" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Cleaning up<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cleaning up</h2>
   <ul class="boxes">
@@ -8092,8 +8115,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="conduct-and-emergency--prohibited-behavior" data-card="conduct-and-emergency--prohibited-behavior">
-    <summary>Prohibited behavior<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="conduct-and-emergency--prohibited-behavior" data-card="conduct-and-emergency--prohibited-behavior" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Prohibited behavior<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Prohibited behavior</h2>
   <div class="stop">
@@ -8118,8 +8141,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="conduct-and-emergency--emergency-procedures" data-card="conduct-and-emergency--emergency-procedures">
-    <summary>Emergency procedures<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="conduct-and-emergency--emergency-procedures" data-card="conduct-and-emergency--emergency-procedures" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Emergency procedures<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Emergency procedures</h2>
   <ul class="boxes">
@@ -8254,8 +8277,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Complete <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a> and <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a> before this machine-specific check. The general entanglement and stopping rules are in <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>. In our labs, nothing that can get caught by the lathe comes near it: <strong>no long, untied hair, long sleeves, gloves or rings</strong> (see <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>).</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="manual-lathe--check-the-setup-and-the-material-extending-through-the-spindle" data-card="manual-lathe--check-the-setup-and-the-material-extending-through-the-spindle">
-    <summary>Check the setup and the material extending through the spindle<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="manual-lathe--check-the-setup-and-the-material-extending-through-the-spindle" data-card="manual-lathe--check-the-setup-and-the-material-extending-through-the-spindle" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check the setup and the material extending through the spindle<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check the setup and the material extending through the spindle</h2>
   <p>In our labs, check the setup before starting the lathe.</p>
@@ -8306,8 +8329,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Start with <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a>, <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>, <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a> and <a class="xref-page" href="#p-metal-chips">Metal Chips and Swarf</a>. For the Tormach workflow, use <a class="xref-page" href="#p-mill-setup-checklist">Vertical Mill Startup, Setup and Shutdown</a>; its controller sequence is not a startup sequence for a manual mill.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="vertical-mill--check-clamping-cutter-travel-and-cutting-settings-before-the-cut" data-card="vertical-mill--check-clamping-cutter-travel-and-cutting-settings-before-the-cut">
-    <summary>Check clamping, cutter travel and cutting settings before the cut<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="vertical-mill--check-clamping-cutter-travel-and-cutting-settings-before-the-cut" data-card="vertical-mill--check-clamping-cutter-travel-and-cutting-settings-before-the-cut" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check clamping, cutter travel and cutting settings before the cut<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check clamping, cutter travel and cutting settings before the cut</h2>
   <p>In our labs, check and recheck the workpiece clamping before beginning an operation.</p>
@@ -8357,8 +8380,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Complete <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a> and <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>. The exposed chuck and bit are an entanglement hazard (see <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>). Before you start, check the <a class="xref-page" href="#p-ppe">clothing and hair rules</a>: long hair secured back, no long sleeves, hoodies or jackets near the spindle, no jewelry except a silicone wedding ring, and nothing dangling.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="drill-press--before-starting-secure-the-bit-work-and-vise" data-card="drill-press--before-starting-secure-the-bit-work-and-vise">
-    <summary>Before starting: secure the bit, work and vise<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="drill-press--before-starting-secure-the-bit-work-and-vise" data-card="drill-press--before-starting-secure-the-bit-work-and-vise" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Before starting: secure the bit, work and vise<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Before starting: secure the bit, work and vise</h2>
   <ul class="boxes">
@@ -8599,7 +8622,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="measurement-tools--gauge-blocks-supply-a-reference-transfer-gauges-carry-a-size" data-card="measurement-tools--gauge-blocks-supply-a-reference-transfer-gauges-carry-a-size">
-    <summary>Gauge blocks supply a reference; transfer gauges carry a size<span class="chev"></span></summary>
+    <summary>Gauge blocks supply a reference; transfer gauges carry a size<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Gauge blocks supply a reference; transfer gauges carry a size</h2>
   <p><strong>Gauge blocks</strong> have accurately finished opposing faces and a known length. Use suitable blocks to set a height, compare a measurement, or check an instrument. Clean and inspect the faces before wringing blocks together; follow their care instructions. A zero check alone is not a full calibration.</p>
@@ -8686,8 +8709,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Some dial calipers use a different travel per revolution. Check the dial markings rather than assuming this example applies. Clean the jaws, close gently, check zero, and confirm the reading again after measuring.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="reading-measuring-scales--practice-reading-a-new-micrometer-or-vernier-scale" data-card="reading-measuring-scales--practice-reading-a-new-micrometer-or-vernier-scale">
-    <summary>Practice reading a new micrometer or vernier scale<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="reading-measuring-scales--practice-reading-a-new-micrometer-or-vernier-scale" data-card="reading-measuring-scales--practice-reading-a-new-micrometer-or-vernier-scale" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Practice reading a new micrometer or vernier scale<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Practice reading a new micrometer or vernier scale</h2>
   <p>The trainer draws ideal scales with zero error. It teaches reading, not instrument accuracy. Micrometer examples stay within 0&ndash;1 in; caliper examples stay below 2 in. Enter the exact indicated reading in inches.</p>
@@ -8715,8 +8738,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="reliable-shop-measurement--clean-check-measure-and-check-again" data-card="reliable-shop-measurement--clean-check-measure-and-check-again">
-    <summary>Clean, check, measure, and check again<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="reliable-shop-measurement--clean-check-measure-and-check-again" data-card="reliable-shop-measurement--clean-check-measure-and-check-again" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Clean, check, measure, and check again<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Clean, check, measure, and check again</h2>
   <p class="lede">A good reading starts before the scale is read. Use this sequence with the instrument's own instructions.</p>
@@ -8835,7 +8858,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="layout-and-angle-measurement--a-universal-bevel-transfers-an-angle-a-vernier-protractor-reads-it" data-card="layout-and-angle-measurement--a-universal-bevel-transfers-an-angle-a-vernier-protractor-reads-it">
-    <summary>A universal bevel transfers an angle; a vernier protractor reads it<span class="chev"></span></summary>
+    <summary>A universal bevel transfers an angle; a vernier protractor reads it<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A universal bevel transfers an angle; a vernier protractor reads it</h2>
   <p>A <strong>universal bevel</strong> has an adjustable blade and stock that can fit against two surfaces. Lock it to transfer or compare an angle. A plain bevel has no numerical scale; obtain the angle from a separate reference.</p>
@@ -8847,8 +8870,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-22">Supporting detail: <a href="#deeper-addendum-22"><strong>Addendum 22</strong></a> &mdash; Why the 5-minute vernier works.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="layout-and-angle-measurement--check-the-layout-before-making-a-permanent-cut" data-card="layout-and-angle-measurement--check-the-layout-before-making-a-permanent-cut">
-    <summary>Check the layout before making a permanent cut<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="layout-and-angle-measurement--check-the-layout-before-making-a-permanent-cut" data-card="layout-and-angle-measurement--check-the-layout-before-making-a-permanent-cut" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check the layout before making a permanent cut<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check the layout before making a permanent cut</h2>
   <ul class="boxes"><li>Confirm the reference surfaces and dimension directions.</li><li>Check each line or center from the intended reference, including radius versus diameter.</li><li>Verify the height or angle after locking the tool.</li><li>Check the mark before punching more deeply or beginning the cut.</li><li>Plan how to measure the finished feature; use <a class="xref-page" href="#p-measurement-tools">Choosing Shop Measuring Tools</a> and <a class="xref-page" href="#p-tolerances-and-fits">Tolerances and Fits</a>.</li></ul>
@@ -8959,8 +8982,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Top up fluid that is still serviceable. Persistent odor, separation, sludge or contamination calls for the evaluation and cleaning decisions in <a class="xref-page" href="#p-coolant-maintenance">Coolant Condition and Tank Maintenance</a>. New premix does not make spoiled fluid sound.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="coolant-concentration--calculate-the-premix-needed-to-reach-both-target-level-and-concentration" data-card="coolant-concentration--calculate-the-premix-needed-to-reach-both-target-level-and-concentration">
-    <summary>Calculate the premix needed to reach both target level and concentration<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="coolant-concentration--calculate-the-premix-needed-to-reach-both-target-level-and-concentration" data-card="coolant-concentration--calculate-the-premix-needed-to-reach-both-target-level-and-concentration" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Calculate the premix needed to reach both target level and concentration<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Calculate the premix needed to reach both target level and concentration</h2>
   <p>Use the same volume unit throughout. Let <strong>V</strong> be the current tank volume, <strong>C</strong> its measured concentration, <strong>F</strong> the intended final volume, and <strong>T</strong> the target concentration. Concentrations below are entered as percent numbers, such as 6 for 6%.</p>
@@ -8986,7 +9009,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="coolant-concentration--practice-the-reading-the-ratio-and-the-top-up-balance" data-card="coolant-concentration--practice-the-reading-the-ratio-and-the-top-up-balance">
-    <summary>Practice the reading, the ratio and the top-up balance<span class="chev"></span></summary>
+    <summary>Practice the reading, the ratio and the top-up balance<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Practice the reading, the ratio and the top-up balance</h2>
   <p>Use fresh hypothetical values to check the method. Every question states its rounding and assumptions; none supplies a shop concentration recommendation.</p>
@@ -9032,8 +9055,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Use the machine and fluid suppliers' maintenance intervals and condition checks. There is no universal calendar changeout interval or guaranteed sump life.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="coolant-maintenance--clean-the-tank-and-its-return-path-before-refilling" data-card="coolant-maintenance--clean-the-tank-and-its-return-path-before-refilling">
-    <summary>Clean the tank and its return path before refilling<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="coolant-maintenance--clean-the-tank-and-its-return-path-before-refilling" data-card="coolant-maintenance--clean-the-tank-and-its-return-path-before-refilling" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Clean the tank and its return path before refilling<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Clean the tank and its return path before refilling</h2>
   <p><strong>Use this as a general sequence with the machine's approved maintenance procedure.</strong> Stop the machine and follow its isolation requirements before accessing the tank, pumps or chip-handling equipment. Only run pumps for a cleaning or circulation step when that procedure calls for it and the system is safely reassembled.</p>
@@ -9101,8 +9124,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>“Cold” distinguishes chip cutting from abrasive or friction cutting; it does not mean zero heat. Use <a class="xref-page" href="#p-saw-blade-selection">Saw Blade Selection</a> for toothed blades. An abrasive wheel has its own selection rules.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cutoff-sawing--hold-every-piece-including-pieces-in-a-bundle" data-card="cutoff-sawing--hold-every-piece-including-pieces-in-a-bundle">
-    <summary>Hold every piece, including pieces in a bundle<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="cutoff-sawing--hold-every-piece-including-pieces-in-a-bundle" data-card="cutoff-sawing--hold-every-piece-including-pieces-in-a-bundle" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Hold every piece, including pieces in a bundle<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Hold every piece, including pieces in a bundle</h2>
   <p><strong>NEVER hand-hold material for a horizontal saw cut.</strong> Use the machine's vise or a suitable fixture. Support long material at the saw's working height so it does not tilt the clamped piece. Arrange support for the cutoff without trapping the blade as the cut closes.</p>
@@ -9147,8 +9170,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgogIDx0aXRsZSBpZD0idGl0bGUiPlNhdyB0b290aCBwaXRjaCwgZ3VsbGV0LCBhbmQgc2V0PC90aXRsZT4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjY1MCIgZmlsbD0iI2ZmZiIvPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MjYzZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDQiIGZvbnQtd2VpZ2h0PSJib2xkIj5TSURFIFZJRVc6IHBpdGNoIGFuZCBndWxsZXQ8L3RleHQ+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MCA2MCkiPgo8cGF0aCBkPSJNNDAgMTgwVjEwMCBMOTAgMTQwIEwxMTAgMTQwIEwxNDAgMTAwIEwxOTAgMTQwIEwyMTAgMTQwIEwyNDAgMTAwIEwyOTAgMTQwIEwzMTAgMTQwIEwzNDAgMTAwIEwzOTAgMTQwIEw0MTAgMTQwIEw0NDAgMTAwIEw0OTAgMTQwIEw1MTAgMTQwIEw1NDAgMTAwIEw1OTAgMTQwIEw2MTAgMTQwIEw2NDAgMTAwIFYxODBaIiBmaWxsPSIjZGJlNWVmIiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iMyIgLz4KPHBhdGggZD0iTTE0MCA5M1Y1NSBNMjQwIDkzVjU1IE0xNDAgNjJIMjQwIE0xNDggNTdMMTQwIDYyTDE0OCA2NyBNMjMyIDU3TDI0MCA2MkwyMzIgNjciIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPgo8cGF0aCBkPSJNNDAwIDEzOEw0NjAgNjJINTQ1IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iMiIgLz4KICAgIDwvZz4KICAgIDx0ZXh0IHg9IjIzMCIgeT0iMTA4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIgcGFpbnQtb3JkZXI9InN0cm9rZSBmaWxsIj5QaXRjaDwvdGV4dD4KICAgIDx0ZXh0IHg9IjU5MiIgeT0iMTI4IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIgcGFpbnQtb3JkZXI9InN0cm9rZSBmaWxsIj5HdWxsZXQ8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iMjk0IiBmb250LXdlaWdodD0iYm9sZCI+RURHRSBWSUVXOiBzaWRld2F5cyBzZXQ8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iMzM2Ij4oZXhhZ2dlcmF0ZWQpPC90ZXh0PgogICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDAgMTAwKSI+CjxyZWN0IHg9IjYwIiB5PSIyODMiIHdpZHRoPSI0NDAiIGhlaWdodD0iMTYiIGZpbGw9IiNkYmU1ZWYiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPgo8cGF0aCBkPSJNOTUgMjkxTDExNSAyNTUgTTE1NSAyOTFMMTc1IDMyNyBNMjE1IDI5MUgyMzUgTTI3NSAyOTFMMjk1IDI1NSBNMzM1IDI5MUwzNTUgMzI3IE0zOTUgMjkxSDQxNSBNNDU1IDI5MUw0NzUgMjU1IiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iNyIgLz4KPHBhdGggZD0iTTU1IDI1MUg1MjAgTTU1IDMzMUg1MjAiIHN0cm9rZT0iIzU4Njc3NSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA1IiAvPgogICAgPC9nPgogICAgPHBhdGggZD0iTTU2MCAzNTFINjI1IE01NDAgMzkxSDYyNSBNNTYwIDQzMUg2MjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjM2MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiPjE8L3RleHQ+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjQwMiIgZm9udC13ZWlnaHQ9ImJvbGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiPjI8L3RleHQ+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjQ0MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiPjM8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDkyIj4xLiBTZXQgdG8gb25lIHNpZGU8L3RleHQ+CiAgICA8dGV4dCB4PSI0MzAiIHk9IjQ5MiI+Mi4gQmxhZGUgYm9keTwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSI1MzYiPjMuIFNldCB0byBvdGhlciBzaWRlPC90ZXh0PgogICAgPHRleHQgeD0iMzIiIHk9IjU5NCI+U2V0IHByb3ZpZGVzIGEga2VyZjwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSI2MzYiPndpZGVyIHRoYW4gdGhlIGJvZHkuPC90ZXh0PgogIDwvZz4KPC9zdmc+Cg==" alt="Side view shows pitch between adjacent tooth tips and the gullet between teeth; an edge view shows teeth set to either side of the blade body." data-natural-width="800" data-natural-height="650"><figcaption>Pitch is measured along the blade. Set is seen from a different direction. Shapes are schematic.</figcaption></figure>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="saw-blade-selection--estimate-teeth-in-the-cut-before-choosing-tpi" data-card="saw-blade-selection--estimate-teeth-in-the-cut-before-choosing-tpi">
-    <summary>Estimate teeth in the cut before choosing TPI<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="saw-blade-selection--estimate-teeth-in-the-cut-before-choosing-tpi" data-card="saw-blade-selection--estimate-teeth-in-the-cut-before-choosing-tpi" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Estimate teeth in the cut before choosing TPI<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Estimate teeth in the cut before choosing TPI</h2>
   <p>As a <strong>rule of thumb</strong>, aim to keep at least about three teeth engaged. For a uniform pitch crossing one continuous thickness of material:</p>
@@ -9173,7 +9196,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="saw-blade-selection--a-tube-s-outside-diameter-is-not-its-solid-thickness" data-card="saw-blade-selection--a-tube-s-outside-diameter-is-not-its-solid-thickness">
-    <summary>A tube's outside diameter is not its solid thickness<span class="chev"></span></summary>
+    <summary>A tube's outside diameter is not its solid thickness<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A tube's outside diameter is not its solid thickness</h2>
   <p>A solid bar offers continuous material across the blade's path. A tube, angle, or channel presents walls and gaps, and the contact changes as the cut progresses. Select from a chart for <strong>tubes or structural sections</strong>, using wall thickness, overall dimensions, and orientation as that chart requires.</p>
@@ -9280,7 +9303,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="bench-work--a-conventional-hand-hacksaw-cuts-on-the-push-stroke" data-card="bench-work--a-conventional-hand-hacksaw-cuts-on-the-push-stroke">
-    <summary>A conventional hand hacksaw cuts on the push stroke<span class="chev"></span></summary>
+    <summary>A conventional hand hacksaw cuts on the push stroke<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A conventional hand hacksaw cuts on the push stroke</h2>
   <p>Install the blade with its teeth pointing <strong>away from the handle</strong> for the conventional push-cut setup, and tension it according to the frame's instructions. Choose pitch for the material actually crossed by the teeth: thin sections need finer teeth. Apply the three-teeth rule of thumb from <a class="xref-page" href="#p-saw-blade-selection">Saw Blade Selection</a>.</p>
@@ -9289,7 +9312,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="bench-work--file-cut-and-coarseness-are-separate-choices" data-card="bench-work--file-cut-and-coarseness-are-separate-choices">
-    <summary>File cut and coarseness are separate choices<span class="chev"></span></summary>
+    <summary>File cut and coarseness are separate choices<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>File cut and coarseness are separate choices</h2>
   <p>A file removes small chips with many teeth. Choose its shape to reach the surface: flat for a flat face, round for a round opening, or half-round for both flat and curved areas. A <strong>safe edge</strong> has no cutting teeth, allowing work close to an adjoining surface that should remain uncut.</p>
@@ -9394,7 +9417,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="milling-workholding--sweep-the-fixed-jaw-adjust-tighten-then-sweep-again" data-card="milling-workholding--sweep-the-fixed-jaw-adjust-tighten-then-sweep-again">
-    <summary>Sweep the fixed jaw, adjust, tighten, then sweep again<span class="chev"></span></summary>
+    <summary>Sweep the fixed jaw, adjust, tighten, then sweep again<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Sweep the fixed jaw, adjust, tighten, then sweep again</h2>
   <ol>
@@ -9423,7 +9446,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="milling-workholding--put-the-clamp-stud-nearer-the-part-than-the-heel-support" data-card="milling-workholding--put-the-clamp-stud-nearer-the-part-than-the-heel-support">
-    <summary>Put the clamp stud nearer the part than the heel support<span class="chev"></span></summary>
+    <summary>Put the clamp stud nearer the part than the heel support<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Put the clamp stud nearer the part than the heel support</h2>
   <p>A strap clamp bridges the part and a heel support. A step clamp has a toothed heel that mates with a step block. Set the heel to the clamp maker's specified height, normally level with or slightly above the part contact. Locate the part against suitable stops and support it beneath the clamping points; a strap pressing on an unsupported span can bend the work.</p>
@@ -9604,7 +9627,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="milling-cutter-selection--match-hss-carbide-and-coating-to-the-job-and-machine" data-card="milling-cutter-selection--match-hss-carbide-and-coating-to-the-job-and-machine">
-    <summary>Match HSS, carbide and coating to the job and machine<span class="chev"></span></summary>
+    <summary>Match HSS, carbide and coating to the job and machine<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Match HSS, carbide and coating to the job and machine</h2>
   <p><strong>High-speed steel (HSS)</strong> is relatively tough and often economical. It can be a useful choice at lower cutting speeds, especially where the setup cannot take full advantage of carbide. Cobalt HSS is an HSS family with improved hot hardness.</p>
@@ -9661,7 +9684,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="milling-chatter--use-the-location-of-the-symptom-to-choose-the-next-check" data-card="milling-chatter--use-the-location-of-the-symptom-to-choose-the-next-check">
-    <summary>Use the location of the symptom to choose the next check<span class="chev"></span></summary>
+    <summary>Use the location of the symptom to choose the next check<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use the location of the symptom to choose the next check</h2>
   <table>
@@ -9697,8 +9720,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>The operating and hazard requirements live in <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a>, <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>, <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a> and <a class="xref-page" href="#p-metal-chips">Metal Chips and Swarf</a>. Complete those requirements before using this sequence.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="mill-setup-checklist--startup-inspect-power-up-enable-and-reference-the-axes" data-card="mill-setup-checklist--startup-inspect-power-up-enable-and-reference-the-axes">
-    <summary>Startup: inspect, power up, enable and reference the axes<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="mill-setup-checklist--startup-inspect-power-up-enable-and-reference-the-axes" data-card="mill-setup-checklist--startup-inspect-power-up-enable-and-reference-the-axes" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Startup: inspect, power up, enable and reference the axes<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Startup: inspect, power up, enable and reference the axes</h2>
   <ul class="boxes">
@@ -9711,8 +9734,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="mill-setup-checklist--part-and-tool-setup-seat-grip-locate-and-record" data-card="mill-setup-checklist--part-and-tool-setup-seat-grip-locate-and-record">
-    <summary>Part and tool setup: seat, grip, locate and record<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="mill-setup-checklist--part-and-tool-setup-seat-grip-locate-and-record" data-card="mill-setup-checklist--part-and-tool-setup-seat-grip-locate-and-record" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Part and tool setup: seat, grip, locate and record<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Part and tool setup: seat, grip, locate and record</h2>
   <ul class="boxes">
@@ -9726,8 +9749,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="mill-setup-checklist--before-cutting-verify-the-program-or-manual-movement-plan" data-card="mill-setup-checklist--before-cutting-verify-the-program-or-manual-movement-plan">
-    <summary>Before cutting: verify the program or manual movement plan<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="mill-setup-checklist--before-cutting-verify-the-program-or-manual-movement-plan" data-card="mill-setup-checklist--before-cutting-verify-the-program-or-manual-movement-plan" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Before cutting: verify the program or manual movement plan<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Before cutting: verify the program or manual movement plan</h2>
   <ul class="boxes">
@@ -9739,8 +9762,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="mill-setup-checklist--shutdown-end-operation-shut-down-the-controller-and-restore-the-work-area" data-card="mill-setup-checklist--shutdown-end-operation-shut-down-the-controller-and-restore-the-work-area">
-    <summary>Shutdown: end operation, shut down the controller and restore the work area<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="mill-setup-checklist--shutdown-end-operation-shut-down-the-controller-and-restore-the-work-area" data-card="mill-setup-checklist--shutdown-end-operation-shut-down-the-controller-and-restore-the-work-area" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Shutdown: end operation, shut down the controller and restore the work area<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Shutdown: end operation, shut down the controller and restore the work area</h2>
   <ul class="boxes">
@@ -9889,8 +9912,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   big enough for its bar, which makes it the tool for a hole of an exact, larger size.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="milling-operations--simulator-make-the-part-on-the-drawing-then-inspect-it" data-card="milling-operations--simulator-make-the-part-on-the-drawing-then-inspect-it">
-    <summary>Simulator: make the part on the drawing, then inspect it<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="milling-operations--simulator-make-the-part-on-the-drawing-then-inspect-it" data-card="milling-operations--simulator-make-the-part-on-the-drawing-then-inspect-it" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Simulator: make the part on the drawing, then inspect it<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Simulator: make the part on the drawing, then inspect it</h2>
   <div data-interactive="milling-simulator">
@@ -9926,8 +9949,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="milling-operations--things-to-try-in-the-simulator" data-card="milling-operations--things-to-try-in-the-simulator">
-    <summary>Things to try in the simulator<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="milling-operations--things-to-try-in-the-simulator" data-card="milling-operations--things-to-try-in-the-simulator" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Things to try in the simulator<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Things to try in the simulator</h2>
   <ul class="boxes">
@@ -10081,7 +10104,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="gcode-and-toolpaths--g2-turns-clockwise-and-g3-counterclockwise-seen-from-above" data-card="gcode-and-toolpaths--g2-turns-clockwise-and-g3-counterclockwise-seen-from-above">
-    <summary>G2 turns clockwise and G3 counterclockwise, seen from above<span class="chev"></span></summary>
+    <summary>G2 turns clockwise and G3 counterclockwise, seen from above<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>G2 turns clockwise and G3 counterclockwise, seen from above</h2>
   <p>An arc move cuts along part of a circle in the XY plane (<code>G17</code>) at the feed rate. Its
@@ -10150,8 +10173,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-cnc-axes-and-offsets">CNC Axes and Offsets</a> explains left/right compensation and tool-length offsets.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="gcode-and-toolpaths--simulator-build-a-program-from-blocks-and-watch-it-run" data-card="gcode-and-toolpaths--simulator-build-a-program-from-blocks-and-watch-it-run">
-    <summary>Simulator: build a program from blocks and watch it run<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="gcode-and-toolpaths--simulator-build-a-program-from-blocks-and-watch-it-run" data-card="gcode-and-toolpaths--simulator-build-a-program-from-blocks-and-watch-it-run" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Simulator: build a program from blocks and watch it run<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Simulator: build a program from blocks and watch it run</h2>
   <p class="lede">Pick a program, change it, and run it on a simulated block of metal in a vise. Every
@@ -10180,8 +10203,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="gcode-and-toolpaths--things-to-try-in-the-g-code-simulator" data-card="gcode-and-toolpaths--things-to-try-in-the-g-code-simulator">
-    <summary>Things to try in the G-code simulator<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="gcode-and-toolpaths--things-to-try-in-the-g-code-simulator" data-card="gcode-and-toolpaths--things-to-try-in-the-g-code-simulator" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Things to try in the G-code simulator<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Things to try in the G-code simulator</h2>
   <ul class="boxes">
@@ -10304,8 +10327,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="climb-and-conventional-milling--watch-one-tooth-take-its-chip" data-card="climb-and-conventional-milling--watch-one-tooth-take-its-chip">
-    <summary>Watch one tooth take its chip<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="climb-and-conventional-milling--watch-one-tooth-take-its-chip" data-card="climb-and-conventional-milling--watch-one-tooth-take-its-chip" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Watch one tooth take its chip<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Watch one tooth take its chip</h2>
   <p class="lede">The dashed gold outline is the slice of metal the cutting tooth has taken so far,
@@ -10373,8 +10396,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a href="https://www.harveyperformance.com/in-the-loupe/end-mill-anatomy/">Harvey Performance&rsquo;s end mill anatomy</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="climb-and-conventional-milling--six-things-to-try-in-the-demo" data-card="climb-and-conventional-milling--six-things-to-try-in-the-demo">
-    <summary>Six things to try in the demo<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="climb-and-conventional-milling--six-things-to-try-in-the-demo" data-card="climb-and-conventional-milling--six-things-to-try-in-the-demo" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Six things to try in the demo<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Six things to try in the demo</h2>
   <ul class="boxes">
@@ -10423,8 +10446,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="climb-and-conventional-milling--backlash-why-climb-milling-depends-on-the-machine" data-card="climb-and-conventional-milling--backlash-why-climb-milling-depends-on-the-machine">
-    <summary>Backlash: why climb milling depends on the machine<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="climb-and-conventional-milling--backlash-why-climb-milling-depends-on-the-machine" data-card="climb-and-conventional-milling--backlash-why-climb-milling-depends-on-the-machine" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Backlash: why climb milling depends on the machine<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Backlash: why climb milling depends on the machine</h2>
   <p class="lede">A feed screw moves the table by turning inside a nut. Unless the drive is built to
@@ -10620,8 +10643,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   is heavy, not to approve one.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="feeds-and-speeds--calculator-from-material-guidance-to-removal-and-power" data-card="feeds-and-speeds--calculator-from-material-guidance-to-removal-and-power">
-    <summary>Calculator: from material guidance to removal and power<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="feeds-and-speeds--calculator-from-material-guidance-to-removal-and-power" data-card="feeds-and-speeds--calculator-from-material-guidance-to-removal-and-power" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Calculator: from material guidance to removal and power<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Calculator: from material guidance to removal and power</h2>
   <span id="calculator-work-out-a-setup-then-change-only-the-spindle-speed"></span>
@@ -10657,8 +10680,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="feeds-and-speeds--things-to-try-in-the-calculator" data-card="feeds-and-speeds--things-to-try-in-the-calculator">
-    <summary>Things to try in the calculator<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="feeds-and-speeds--things-to-try-in-the-calculator" data-card="feeds-and-speeds--things-to-try-in-the-calculator" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Things to try in the calculator<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Things to try in the calculator</h2>
   <ul class="boxes">
@@ -10709,8 +10732,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   speed</em> box does this for a top speed.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="feeds-and-speeds--generic-ranges-are-a-starting-point-not-your-tool-s-data" data-card="feeds-and-speeds--generic-ranges-are-a-starting-point-not-your-tool-s-data">
-    <summary>Generic ranges are a starting point, not your tool&rsquo;s data<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="feeds-and-speeds--generic-ranges-are-a-starting-point-not-your-tool-s-data" data-card="feeds-and-speeds--generic-ranges-are-a-starting-point-not-your-tool-s-data" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Generic ranges are a starting point, not your tool&rsquo;s data<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Generic ranges are a starting point, not your tool&rsquo;s data</h2>
   <h3>What determines the surface speed?</h3>
@@ -10753,8 +10776,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-interactive" id="tool-deflection--experiment-how-much-does-a-shorter-tool-help" data-card="tool-deflection--experiment-how-much-does-a-shorter-tool-help">
-    <summary>Experiment: how much does a shorter tool help?<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="tool-deflection--experiment-how-much-does-a-shorter-tool-help" data-card="tool-deflection--experiment-how-much-does-a-shorter-tool-help" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Experiment: how much does a shorter tool help?<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Experiment: how much does a shorter tool help?</h2>
   <div data-interactive="tool-deflection">
@@ -10899,8 +10922,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   hand until it is out of the chuck.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="lathe-operations--lathe-simulator-make-the-part-on-the-drawing" data-card="lathe-operations--lathe-simulator-make-the-part-on-the-drawing">
-    <summary>Lathe simulator: make the part on the drawing<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="lathe-operations--lathe-simulator-make-the-part-on-the-drawing" data-card="lathe-operations--lathe-simulator-make-the-part-on-the-drawing" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Lathe simulator: make the part on the drawing<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Lathe simulator: make the part on the drawing</h2>
   <div data-interactive="turning-simulator">
@@ -10960,8 +10983,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="lathe-operations--each-simulator-tool-has-a-defined-job-its-form-knurl-displaces-metal" data-card="lathe-operations--each-simulator-tool-has-a-defined-job-its-form-knurl-displaces-metal">
-    <summary>Each simulator tool has a defined job; its form knurl displaces metal<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="lathe-operations--each-simulator-tool-has-a-defined-job-its-form-knurl-displaces-metal" data-card="lathe-operations--each-simulator-tool-has-a-defined-job-its-form-knurl-displaces-metal" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Each simulator tool has a defined job; its form knurl displaces metal<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Each simulator tool has a defined job; its form knurl displaces metal</h2>
   <p class="lede">Facing, turning, drilling, threading and knurling are not the same action with a
@@ -11105,8 +11128,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   head, not a dimensioned catalog tool or a setup instruction for a particular machine.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="lathe-operations--things-to-try-in-the-simulator" data-card="lathe-operations--things-to-try-in-the-simulator">
-    <summary>Things to try in the simulator<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="lathe-operations--things-to-try-in-the-simulator" data-card="lathe-operations--things-to-try-in-the-simulator" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Things to try in the simulator<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Things to try in the simulator</h2>
   <ul class="boxes">
@@ -11172,8 +11195,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-interactive" id="gear-ratios--experiment-trade-speed-for-turning-effort" data-card="gear-ratios--experiment-trade-speed-for-turning-effort">
-    <summary>Experiment: trade speed for turning effort<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="gear-ratios--experiment-trade-speed-for-turning-effort" data-card="gear-ratios--experiment-trade-speed-for-turning-effort" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Experiment: trade speed for turning effort<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Experiment: trade speed for turning effort</h2>
   <div data-interactive="gear-ratios">
@@ -11276,8 +11299,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><strong>Follow the loss assumption in the problem.</strong> Real meshes lose some power, but a problem may explicitly ignore it. If every actual mesh is 96% efficient, A → I → B has <code>η<sub>total</sub> = 0.96²</code>. If a whole stage including its idler is assigned 96%, use that stage value once. If η = 1.00 is stated, ignore losses. Do not infer the loss count from the reduction-stage count when an idler is present.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="gear-ratios--choose-teeth-then-check-both-output-limits" data-card="gear-ratios--choose-teeth-then-check-both-output-limits">
-    <summary>Choose teeth, then check both output limits<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="gear-ratios--choose-teeth-then-check-both-output-limits" data-card="gear-ratios--choose-teeth-then-check-both-output-limits" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Choose teeth, then check both output limits<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose teeth, then check both output limits</h2>
   <ul class="boxes">
@@ -11464,8 +11487,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </figure>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="tolerances-and-fits--fit-lab-make-two-parts-then-try-them-together" data-card="tolerances-and-fits--fit-lab-make-two-parts-then-try-them-together">
-    <summary>Fit lab: make two parts, then try them together<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="tolerances-and-fits--fit-lab-make-two-parts-then-try-them-together" data-card="tolerances-and-fits--fit-lab-make-two-parts-then-try-them-together" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Fit lab: make two parts, then try them together<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Fit lab: make two parts, then try them together</h2>
   <p class="lede">Pick a drawing, then set the size each part actually came out at. Watch whether
@@ -11496,8 +11519,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="tolerances-and-fits--two-good-parts-can-still-make-a-bad-pair" data-card="tolerances-and-fits--two-good-parts-can-still-make-a-bad-pair">
-    <summary>Two good parts can still make a bad pair<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="tolerances-and-fits--two-good-parts-can-still-make-a-bad-pair" data-card="tolerances-and-fits--two-good-parts-can-still-make-a-bad-pair" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Two good parts can still make a bad pair<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Two good parts can still make a bad pair</h2>
   <p class="lede">Checking each diameter against its own limits does not by itself check the
@@ -11519,8 +11542,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="tolerances-and-fits--call-the-fit-from-the-drawing-alone" data-card="tolerances-and-fits--call-the-fit-from-the-drawing-alone">
-    <summary>Call the fit from the drawing alone<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="tolerances-and-fits--call-the-fit-from-the-drawing-alone" data-card="tolerances-and-fits--call-the-fit-from-the-drawing-alone" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Call the fit from the drawing alone<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Call the fit from the drawing alone</h2>
   <p class="lede">Read the two callouts, work out the tightest and loosest pairs, and call it before
@@ -11601,8 +11624,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </figure>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="surface-texture--a-stylus-traces-one-line-and-a-filter-splits-it" data-card="surface-texture--a-stylus-traces-one-line-and-a-filter-splits-it">
-    <summary>A stylus traces one line, and a filter splits it<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="surface-texture--a-stylus-traces-one-line-and-a-filter-splits-it" data-card="surface-texture--a-stylus-traces-one-line-and-a-filter-splits-it" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>A stylus traces one line, and a filter splits it<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A stylus traces one line, and a filter splits it</h2>
   <p class="lede">A contact instrument drags a fine stylus along a straight line and records its height.
@@ -11665,8 +11688,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="surface-texture--surface-texture-lab-trace-a-surface-and-hold-it-to-a-drawing" data-card="surface-texture--surface-texture-lab-trace-a-surface-and-hold-it-to-a-drawing">
-    <summary>Surface texture lab: trace a surface and hold it to a drawing<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="surface-texture--surface-texture-lab-trace-a-surface-and-hold-it-to-a-drawing" data-card="surface-texture--surface-texture-lab-trace-a-surface-and-hold-it-to-a-drawing" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Surface texture lab: trace a surface and hold it to a drawing<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Surface texture lab: trace a surface and hold it to a drawing</h2>
   <p class="lede">Change the surface, the trace and the drawing, and watch the numbers. Start with
@@ -11793,8 +11816,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="aside">The lay symbols and meanings here are those of ISO&nbsp;1302:2002.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="surface-texture--older-notation-n-grades-and-triangle-marks" data-card="surface-texture--older-notation-n-grades-and-triangle-marks">
-    <summary>Older notation: N grades and triangle marks<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="surface-texture--older-notation-n-grades-and-triangle-marks" data-card="surface-texture--older-notation-n-grades-and-triangle-marks" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Older notation: N grades and triangle marks<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Older notation: N grades and triangle marks</h2>
   <p class="lede">Older drawings may give a roughness grade number or a row of triangles instead of a
@@ -11850,8 +11873,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="surface-texture--read-the-callout" data-card="surface-texture--read-the-callout">
-    <summary>Read the callout<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="surface-texture--read-the-callout" data-card="surface-texture--read-the-callout" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Read the callout<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Read the callout</h2>
   <p class="lede">Ten short questions on the symbols, the lay, the older notations and what the numbers
@@ -11934,7 +11957,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="keys-and-keyseats--identify-the-key-by-its-cross-section-and-seating-shape" data-card="keys-and-keyseats--identify-the-key-by-its-cross-section-and-seating-shape">
-    <summary>Identify the key by its cross-section and seating shape<span class="chev"></span></summary>
+    <summary>Identify the key by its cross-section and seating shape<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Identify the key by its cross-section and seating shape</h2>
   <table><thead><tr><th>Key</th><th>Recognizing feature</th></tr></thead><tbody>
@@ -11966,7 +11989,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="keys-and-keyseats--broach-a-through-hub-keyway-consider-slotting-when-the-geometry-needs-it" data-card="keys-and-keyseats--broach-a-through-hub-keyway-consider-slotting-when-the-geometry-needs-it">
-    <summary>Broach a through hub keyway; consider slotting when the geometry needs it<span class="chev"></span></summary>
+    <summary>Broach a through hub keyway; consider slotting when the geometry needs it<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Broach a through hub keyway; consider slotting when the geometry needs it</h2>
   <p>A conventional keyway broach and guide bushing are useful for a straight keyway through a hub bore. See <a class="xref-page" href="#p-broaching">Broaching</a> for the pass sequence. The same arrangement does not make a closed-end keyseat on the outside of a shaft.</p>
@@ -11974,8 +11997,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><a class="button" data-practice-add="broach-hub-method" href="../practice.html#broach-hub-method">Practice choosing a method</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="keys-and-keyseats--check-width-depth-and-location-before-using-assembly-as-a-fit-check" data-card="keys-and-keyseats--check-width-depth-and-location-before-using-assembly-as-a-fit-check">
-    <summary>Check width, depth and location before using assembly as a fit check<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="keys-and-keyseats--check-width-depth-and-location-before-using-assembly-as-a-fit-check" data-card="keys-and-keyseats--check-width-depth-and-location-before-using-assembly-as-a-fit-check" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check width, depth and location before using assembly as a fit check<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check width, depth and location before using assembly as a fit check</h2>
   <ul class="boxes">
@@ -12041,7 +12064,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="broaching--count-the-first-pass-separately-from-the-added-shim-passes" data-card="broaching--count-the-first-pass-separately-from-the-added-shim-passes">
-    <summary>Count the first pass separately from the added shim passes<span class="chev"></span></summary>
+    <summary>Count the first pass separately from the added shim passes<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Count the first pass separately from the added shim passes</h2>
   <p>Rise per tooth and depth per pass are different quantities. For a simple planning exercise, let <var>d</var><sub>1</sub> be the depth reached by the unshimmed pass and <var>s</var> the extra depth from each added shim increment. After <var>N</var> passes, depth is <var>d</var><sub>1</sub> + (<var>N</var> − 1)<var>s</var>.</p>
@@ -12141,7 +12164,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="drilling-operations--choose-speed-and-feed-for-this-drill-and-material" data-card="drilling-operations--choose-speed-and-feed-for-this-drill-and-material">
-    <summary>Choose speed and feed for this drill and material<span class="chev"></span></summary>
+    <summary>Choose speed and feed for this drill and material<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose speed and feed for this drill and material</h2>
   <p>Use <a class="xref-page" href="#p-feeds-and-speeds">Feeds, Speeds and Removal Rate</a> for the surface-speed-to-RPM calculation. For drilling, its diameter input is the <strong>drill's cutting diameter</strong>. Surface speed is a cutting condition; RPM is the spindle setting. They are not the same quantity.</p>
@@ -12159,8 +12182,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-70">Supporting detail: <a href="#deeper-addendum-70"><strong>Addendum 70</strong></a> &mdash; Why changes in the cut matter.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="drilling-operations--check-the-hole-before-calling-it-finished" data-card="drilling-operations--check-the-hole-before-calling-it-finished">
-    <summary>Check the hole before calling it finished<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="drilling-operations--check-the-hole-before-calling-it-finished" data-card="drilling-operations--check-the-hole-before-calling-it-finished" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check the hole before calling it finished<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check the hole before calling it finished</h2>
   <ul class="boxes">
@@ -12219,7 +12242,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="hole-finishing--test-the-choice-before-choosing-the-cutter" data-card="hole-finishing--test-the-choice-before-choosing-the-cutter">
-    <summary>Test the choice before choosing the cutter<span class="chev"></span></summary>
+    <summary>Test the choice before choosing the cutter<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Test the choice before choosing the cutter</h2>
   <p>A smooth pin hole already on location suggests reaming. A hole whose axis must be corrected suggests boring, if there is enough material. A socket-head screw recessed into a cylindrical pocket suggests counterboring. A conical flat-head seat suggests countersinking.</p>
@@ -12239,7 +12262,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="threaded-fasteners--read-diameter-spacing-series-and-class-separately" data-card="threaded-fasteners--read-diameter-spacing-series-and-class-separately">
-    <summary>Read diameter, spacing, series and class separately<span class="chev"></span></summary>
+    <summary>Read diameter, spacing, series and class separately<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Read diameter, spacing, series and class separately</h2>
   <p>In <strong>1/4-20 UNC-2B</strong>, 1/4 is the nominal major diameter in inches, 20 is the number of threads per inch, UNC is the Unified coarse series, and 2B identifies the internal thread's fit class. The major diameter is the largest thread diameter; it is not the diameter of the hole drilled before tapping.</p>
@@ -12304,7 +12327,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="tapping--subtract-the-pitch-to-estimate-a-cutting-tap-drill" data-card="tapping--subtract-the-pitch-to-estimate-a-cutting-tap-drill">
-    <summary>Subtract the pitch to estimate a cutting-tap drill<span class="chev"></span></summary>
+    <summary>Subtract the pitch to estimate a cutting-tap drill<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Subtract the pitch to estimate a cutting-tap drill</h2>
   <p>A tap makes an internal thread in a prepared hole. Start by reading the full <a class="xref-page" href="#p-threaded-fasteners">thread callout</a>. For common straight Unified and metric cutting taps, a useful <strong>roughly 75% thread</strong> estimate is:</p>
@@ -12323,7 +12346,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="tapping--thread-percentage-is-not-percent-of-bolt-strength" data-card="tapping--thread-percentage-is-not-percent-of-bolt-strength">
-    <summary>Thread percentage is not percent of bolt strength<span class="chev"></span></summary>
+    <summary>Thread percentage is not percent of bolt strength<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Thread percentage is not percent of bolt strength</h2>
   <p><strong>Percent thread</strong> describes how much thread height the hole permits relative to a reference profile. With the same cutting tap, a larger prepared hole leaves less thread height; a smaller hole leaves more material for the tap to remove and generally increases tapping torque.</p>
@@ -12341,8 +12364,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Chamfer style is separate from chip direction. A spiral-point cutting tap generally pushes chips ahead and needs exit space; a spiral-flute cutting tap can draw chips back toward the entrance. Select a tap intended for the material and through or blind hole.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="tapping--use-a-guide-to-start-a-hand-tap-square" data-card="tapping--use-a-guide-to-start-a-hand-tap-square">
-    <summary>Use a guide to start a hand tap square<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="tapping--use-a-guide-to-start-a-hand-tap-square" data-card="tapping--use-a-guide-to-start-a-hand-tap-square" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Use a guide to start a hand tap square<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use a guide to start a hand tap square</h2>
   <ul class="boxes">
@@ -12424,7 +12447,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="lathe-tapers--a-matching-taper-needs-both-the-right-slope-and-the-right-size" data-card="lathe-tapers--a-matching-taper-needs-both-the-right-slope-and-the-right-size">
-    <summary>A matching taper needs both the right slope and the right size<span class="chev"></span></summary>
+    <summary>A matching taper needs both the right slope and the right size<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A matching taper needs both the right slope and the right size</h2>
   <p>Measure diameters at two known axial positions to check the rate. A correct rate can still leave the entire taper too large or too small. A suitable taper plug or ring gauge checks the mating geometry; contact pattern and seating position answer different questions.</p>
@@ -12478,8 +12501,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-79">Supporting detail: <a href="#deeper-addendum-79"><strong>Addendum 79</strong></a> &mdash; Radial depth and compound travel are different quantities.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="single-point-threading--keep-every-pass-synchronized-with-the-same-helix" data-card="single-point-threading--keep-every-pass-synchronized-with-the-same-helix">
-    <summary>Keep every pass synchronized with the same helix<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="single-point-threading--keep-every-pass-synchronized-with-the-same-helix" data-card="single-point-threading--keep-every-pass-synchronized-with-the-same-helix" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Keep every pass synchronized with the same helix<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Keep every pass synchronized with the same helix</h2>
   <p>The gearbox establishes the relationship between spindle rotation and leadscrew rotation. Closing the <strong>half-nuts</strong> connects the carriage to the leadscrew so that each spindle revolution advances the tool by the selected lead. An ordinary power-feed setting is not a substitute for a threading setting.</p>
@@ -12497,7 +12520,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="single-point-threading--calculate-a-profile-depth-only-after-naming-the-profile" data-card="single-point-threading--calculate-a-profile-depth-only-after-naming-the-profile">
-    <summary>Calculate a profile depth only after naming the profile<span class="chev"></span></summary>
+    <summary>Calculate a profile depth only after naming the profile<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Calculate a profile depth only after naming the profile</h2>
   <p>A 60&deg; angle and a pitch do not, by themselves, specify a finished thread depth. Crest flats, root shape, tip geometry and dimensional limits all matter. Use the actual thread specification and tooling data for a production cut, then measure the result. Total depth is not a per-pass infeed instruction.</p>
@@ -12564,7 +12587,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="grinding-wheels--read-the-conventional-marking-from-abrasive-to-bond" data-card="grinding-wheels--read-the-conventional-marking-from-abrasive-to-bond">
-    <summary>Read the conventional marking from abrasive to bond<span class="chev"></span></summary>
+    <summary>Read the conventional marking from abrasive to bond<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Read the conventional marking from abrasive to bond</h2>
   <p>The usual core sequence is <strong>abrasive → grit → grade → structure → bond</strong>. Prefixes and suffixes may identify a manufacturer's particular abrasive or bond. Some markings omit a structure field. Superabrasive specifications may include concentration and use a different format.</p>
@@ -12627,7 +12650,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="offhand-grinding--compare-rpm-ratings-directly-calculate-rim-speed-separately" data-card="offhand-grinding--compare-rpm-ratings-directly-calculate-rim-speed-separately">
-    <summary>Compare RPM ratings directly; calculate rim speed separately<span class="chev"></span></summary>
+    <summary>Compare RPM ratings directly; calculate rim speed separately<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Compare RPM ratings directly; calculate rim speed separately</h2>
   <p>The machine's spindle speed must not exceed the wheel's printed <strong>maximum operating RPM</strong>. A wheel's grade or grit marking is not that rating. Passing the RPM comparison is only one compatibility check; it does not approve the wheel's mounting, dimensions or application.</p>
@@ -12678,7 +12701,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="precision-grinding--count-downfeed-increments-separately-from-table-strokes" data-card="precision-grinding--count-downfeed-increments-separately-from-table-strokes">
-    <summary>Count downfeed increments separately from table strokes<span class="chev"></span></summary>
+    <summary>Count downfeed increments separately from table strokes<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Count downfeed increments separately from table strokes</h2>
   <p>For an ideal plan with constant downfeed, <strong>number of increments = total thickness to remove / downfeed per increment</strong>. One increment may require many table strokes and crossfeed steps to cover the entire face. State what a “pass” means before using the equation.</p>
@@ -12780,7 +12803,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="cnc-axes-and-offsets--a-lathe-x-value-may-describe-diameter-or-radius" data-card="cnc-axes-and-offsets--a-lathe-x-value-may-describe-diameter-or-radius">
-    <summary>A lathe X value may describe diameter or radius<span class="chev"></span></summary>
+    <summary>A lathe X value may describe diameter or radius<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A lathe X value may describe diameter or radius</h2>
   <p>In <strong>diameter programming</strong>, X24 describes a surface 24 mm in diameter, 12 mm from the spindle centreline. In <strong>radius programming</strong>, the same surface is X12. Z distances are not halved.</p>
@@ -12834,7 +12857,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="absolute-and-incremental-positioning--one-path-can-be-written-as-points-or-as-moves" data-card="absolute-and-incremental-positioning--one-path-can-be-written-as-points-or-as-moves">
-    <summary>One path can be written as points or as moves<span class="chev"></span></summary>
+    <summary>One path can be written as points or as moves<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>One path can be written as points or as moves</h2>
   <p>Start at A = (6,4) mm. Visit B = (26,4), C = (26,19), then D = (11,19). Z is unchanged; these are coordinate exercises with no cutting setup implied.</p>
@@ -12849,7 +12872,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="absolute-and-incremental-positioning--trace-the-active-mode-before-evaluating-each-block" data-card="absolute-and-incremental-positioning--trace-the-active-mode-before-evaluating-each-block">
-    <summary>Trace the active mode before evaluating each block<span class="chev"></span></summary>
+    <summary>Trace the active mode before evaluating each block<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Trace the active mode before evaluating each block</h2>
   <p>Assume millimetres, one unchanged work coordinate system, no compensation and an initial position (6,4,12). This is a paper trace, not a machine-ready program. F120 is an arithmetic example.</p>
@@ -12905,7 +12928,7 @@ M30</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="cnc-program-structure--separate-spindle-tool-and-coolant-commands-from-motion" data-card="cnc-program-structure--separate-spindle-tool-and-coolant-commands-from-motion">
-    <summary>Separate spindle, tool and coolant commands from motion<span class="chev"></span></summary>
+    <summary>Separate spindle, tool and coolant commands from motion<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Separate spindle, tool and coolant commands from motion</h2>
   <p>These are common Fanuc-style meanings, not a promise for every machine.</p>
@@ -12978,8 +13001,8 @@ M30</code></pre>
   </tbody></table>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cnc-program-proving--review-the-program-against-the-setup-before-a-supervised-trial" data-card="cnc-program-proving--review-the-program-against-the-setup-before-a-supervised-trial">
-    <summary>Review the program against the setup before a supervised trial<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="cnc-program-proving--review-the-program-against-the-setup-before-a-supervised-trial" data-card="cnc-program-proving--review-the-program-against-the-setup-before-a-supervised-trial" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Review the program against the setup before a supervised trial<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Review the program against the setup before a supervised trial</h2>
   <ul class="boxes">
@@ -13007,7 +13030,7 @@ M30</code></pre>
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="cnc-turning-setup--read-x-as-a-size-and-z-as-a-position-along-the-spindle" data-card="cnc-turning-setup--read-x-as-a-size-and-z-as-a-position-along-the-spindle">
-    <summary>Read X as a size and Z as a position along the spindle<span class="chev"></span></summary>
+    <summary>Read X as a size and Z as a position along the spindle<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Read X as a size and Z as a position along the spindle</h2>
   <p>Start with <a class="xref-page" href="#p-cnc-control-fundamentals">CNC Control Fundamentals</a> for how CNC works and <a class="xref-page" href="#p-lathe-operations">Lathe Operations</a> for the cuts a lathe makes. Here the work rotates and the ordinary turning tool moves in the XZ plane. Z runs along the spindle; positive Z is away from the headstock in the basic arrangement shown. X moves radially, even when its displayed value is a diameter. A slant bed or rear turret changes the view, so check the machine's axis diagram.</p>
@@ -13068,7 +13091,7 @@ M30</code></pre>
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="cnc-turning-speeds-and-feeds--g96-changes-rpm-with-diameter-g97-holds-a-requested-rpm" data-card="cnc-turning-speeds-and-feeds--g96-changes-rpm-with-diameter-g97-holds-a-requested-rpm">
-    <summary>G96 changes RPM with diameter; G97 holds a requested RPM<span class="chev"></span></summary>
+    <summary>G96 changes RPM with diameter; G97 holds a requested RPM<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>G96 changes RPM with diameter; G97 holds a requested RPM</h2>
   <p>In the Fanuc-style lathe convention used here, <strong>G96</strong> selects constant surface speed (CSS). S gives cutting speed: surface feet per minute with inch units, or metres per minute with metric units. <strong>G97</strong> cancels CSS and makes S an RPM value. Confirm the actual control's units and code meanings.</p>
@@ -13081,8 +13104,8 @@ M30</code></pre>
   <p><a class="button" data-practice-add="turning-css-inch-a" href="../practice.html#turning-css-inch-a">Practice CSS calculations</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="cnc-turning-speeds-and-feeds--set-the-maximum-rpm-before-enabling-constant-surface-speed" data-card="cnc-turning-speeds-and-feeds--set-the-maximum-rpm-before-enabling-constant-surface-speed">
-    <summary>Set the maximum RPM before enabling constant surface speed<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="cnc-turning-speeds-and-feeds--set-the-maximum-rpm-before-enabling-constant-surface-speed" data-card="cnc-turning-speeds-and-feeds--set-the-maximum-rpm-before-enabling-constant-surface-speed" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Set the maximum RPM before enabling constant surface speed<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Set the maximum RPM before enabling constant surface speed</h2>
   <p>Establish an appropriate spindle-speed ceiling for the actual setup <strong>before G96</strong>. On the Fanuc-style lathe convention here, <code>G50 S1800</code> limits requested speed to 1800 RPM. The number is only an illustration; determine the permissible limit from the machine, workholding, tooling and setup documentation. Other controls use different commands or parameters.</p>
@@ -13104,7 +13127,7 @@ G97 S600  (LEAVE CSS: REQUEST 600 RPM)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="cnc-turning-speeds-and-feeds--read-the-feed-mode-before-interpreting-f" data-card="cnc-turning-speeds-and-feeds--read-the-feed-mode-before-interpreting-f">
-    <summary>Read the feed mode before interpreting F<span class="chev"></span></summary>
+    <summary>Read the feed mode before interpreting F<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Read the feed mode before interpreting F</h2>
   <p>In this common Fanuc-style lathe convention, <strong>G99 means feed per spindle revolution</strong> and <strong>G98 means feed per minute</strong>. With inch units, G99 F0.006 means 0.006 in/rev; G98 F0.006 means 0.006 in/min. With metric units, the corresponding lengths are millimetres. Codes vary: the milling return-level meanings of G98/G99 do not apply here.</p>
@@ -13245,8 +13268,8 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
   <p>File-start/end percent delimiters, tool-call behavior and supported startup codes must be supplied or adapted as required by the target control. No bar-feeder or parts-catcher sequence is implied.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cnc-turning-program--trace-the-modal-state-and-finished-dimensions-on-paper" data-card="cnc-turning-program--trace-the-modal-state-and-finished-dimensions-on-paper">
-    <summary>Trace the modal state and finished dimensions on paper<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="cnc-turning-program--trace-the-modal-state-and-finished-dimensions-on-paper" data-card="cnc-turning-program--trace-the-modal-state-and-finished-dimensions-on-paper" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Trace the modal state and finished dimensions on paper<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Trace the modal state and finished dimensions on paper</h2>
   <ul class="boxes">
@@ -13297,8 +13320,8 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
   <p class="deeper-ref" id="deeper-ref-101">Supporting detail: <a href="#deeper-addendum-101"><strong>Addendum 101</strong></a> &mdash; Why the gauge itself needs limits and wear checks.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="shop-inspection--build-a-clean-repeatable-surface-plate-setup" data-card="shop-inspection--build-a-clean-repeatable-surface-plate-setup">
-    <summary>Build a clean, repeatable surface-plate setup<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="shop-inspection--build-a-clean-repeatable-surface-plate-setup" data-card="shop-inspection--build-a-clean-repeatable-surface-plate-setup" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Build a clean, repeatable surface-plate setup<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Build a clean, repeatable surface-plate setup</h2>
   <p>A surface plate provides a reference plane. A height gauge measures from that plane; an indicator can compare the part with a reference or show variation as a surface is swept. Neither tool corrects a rocking part or dirt under a support.</p>
@@ -13330,7 +13353,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="shop-inspection--trust-a-result-only-as-far-as-the-measurement-supports-it" data-card="shop-inspection--trust-a-result-only-as-far-as-the-measurement-supports-it">
-    <summary>Trust a result only as far as the measurement supports it<span class="chev"></span></summary>
+    <summary>Trust a result only as far as the measurement supports it<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Trust a result only as far as the measurement supports it</h2>
   <p><strong>Accuracy</strong> concerns agreement with a reference or true value; <strong>precision</strong> concerns agreement among repeated measurements under stated conditions. Readings can cluster tightly and still be consistently wrong.</p>
@@ -13375,8 +13398,8 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
   <p class="deeper-ref" id="deeper-ref-102">Supporting detail: <a href="#deeper-addendum-102"><strong>Addendum 102</strong></a> &mdash; Why a small sample range is not the full process spread.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="process-capability--passing-parts-are-evidence-not-proof-of-a-capable-process" data-card="process-capability--passing-parts-are-evidence-not-proof-of-a-capable-process">
-    <summary>Passing parts are evidence, not proof of a capable process<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="process-capability--passing-parts-are-evidence-not-proof-of-a-capable-process" data-card="process-capability--passing-parts-are-evidence-not-proof-of-a-capable-process" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Passing parts are evidence, not proof of a capable process<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Passing parts are evidence, not proof of a capable process</h2>
   <p>Capability concerns a process over time, not a single successful part. First establish that the measurement method is suitable and the process is stable enough to describe meaningfully. Collect representative readings across the conditions the conclusion is meant to cover.</p>
@@ -13432,8 +13455,8 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
   <p>These contacts locate only while the work stays seated. Clamps maintain contact and resist forces that would lift or separate the part. Do not count positive and negative directions as twelve independent degrees of freedom.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="jigs-and-fixtures--direct-clamp-force-into-supports-and-leave-room-for-chips" data-card="jigs-and-fixtures--direct-clamp-force-into-supports-and-leave-room-for-chips">
-    <summary>Direct clamp force into supports and leave room for chips<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="jigs-and-fixtures--direct-clamp-force-into-supports-and-leave-room-for-chips" data-card="jigs-and-fixtures--direct-clamp-force-into-supports-and-leave-room-for-chips" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Direct clamp force into supports and leave room for chips<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Direct clamp force into supports and leave room for chips</h2>
   <p>Place clamp forces toward locators and supported regions, not toward open space where the part can bend. Use enough restraint for the operation without distorting the part. Plan the load path from the cutting force through the work and supports into the machine.</p>
@@ -13443,7 +13466,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="jigs-and-fixtures--modular-fixtures-trade-dedicated-tooling-for-reusable-components" data-card="jigs-and-fixtures--modular-fixtures-trade-dedicated-tooling-for-reusable-components">
-    <summary>Modular fixtures trade dedicated tooling for reusable components<span class="chev"></span></summary>
+    <summary>Modular fixtures trade dedicated tooling for reusable components<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Modular fixtures trade dedicated tooling for reusable components</h2>
   <p>A modular fixture combines a reusable base with locating pins, supports and clamps. It suits changing work when the arrangement can be documented and rebuilt repeatably. A dedicated fixture may reduce loading time for repeated production, but takes its own design and manufacturing effort.</p>
@@ -13556,7 +13579,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="metals-and-their-properties--ferrous-means-iron-based-a-magnet-does-not-identify-the-grade" data-card="metals-and-their-properties--ferrous-means-iron-based-a-magnet-does-not-identify-the-grade">
-    <summary>Ferrous means iron-based; a magnet does not identify the grade<span class="chev"></span></summary>
+    <summary>Ferrous means iron-based; a magnet does not identify the grade<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Ferrous means iron-based; a magnet does not identify the grade</h2>
   <p><strong>Ferrous metals</strong> have iron as their base: steels and cast irons belong here. <strong>Nonferrous metals</strong> have another base, such as aluminum, copper or titanium. Nonferrous does not mean that no trace of iron can be present.</p>
@@ -13654,7 +13677,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="types-of-steel--watch-the-steel-family-series-at-its-original-publisher" data-card="types-of-steel--watch-the-steel-family-series-at-its-original-publisher">
-    <summary>Watch the steel-family series at its original publisher<span class="chev"></span></summary>
+    <summary>Watch the steel-family series at its original publisher<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Watch the steel-family series at its original publisher</h2>
   <p>Metal Supermarkets hosts the five-part series: <a href="https://www.metalsupermarkets.com/video-blog-four-types-steel-part-1/">overview</a>, <a href="https://www.metalsupermarkets.com/video-blog-four-types-steel-part-2-carbon-steel/">carbon steel</a>, <a href="https://www.metalsupermarkets.com/video-four-types-steel-part-3-alloy-steel/">alloy steel</a>, <a href="https://www.metalsupermarkets.com/video-four-types-of-steel-part-4-stainless-steel/">stainless steel</a> and <a href="https://www.metalsupermarkets.com/video-blog-four-types-steel-part-5-tool-steel/">tool steel</a>. These are external learning resources, not specifications for purchasing or heat treatment.</p>
@@ -13744,7 +13767,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="nonferrous-metals--brass-and-bronze-trade-some-of-copper-s-conductivity-for-other-properties" data-card="nonferrous-metals--brass-and-bronze-trade-some-of-copper-s-conductivity-for-other-properties">
-    <summary>Brass and bronze trade some of copper's conductivity for other properties<span class="chev"></span></summary>
+    <summary>Brass and bronze trade some of copper's conductivity for other properties<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Brass and bronze trade some of copper's conductivity for other properties</h2>
   <p><strong>Brass</strong> is principally a copper-zinc alloy. Depending on grade, it can offer useful forming or machining behavior for fittings, hardware and decorative parts. Do not assume every brass has the same machinability or suitability for contact with drinking water.</p>
@@ -13784,7 +13807,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="heat-treating-metals--quench-hardening-usually-needs-tempering-afterward" data-card="heat-treating-metals--quench-hardening-usually-needs-tempering-afterward">
-    <summary>Quench hardening usually needs tempering afterward<span class="chev"></span></summary>
+    <summary>Quench hardening usually needs tempering afterward<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Quench hardening usually needs tempering afterward</h2>
   <p><strong>Quench hardening</strong> heats suitable steel to form austenite, holds as required, then cools fast enough to obtain the intended hardened structure. It commonly raises hardness and strength but can reduce ductility and toughness. Cracking and distortion are possible.</p>
@@ -13803,7 +13826,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="heat-treating-metals--cold-work-strengthens-stress-relief-addresses-locked-in-stresses" data-card="heat-treating-metals--cold-work-strengthens-stress-relief-addresses-locked-in-stresses">
-    <summary>Cold work strengthens; stress relief addresses locked-in stresses<span class="chev"></span></summary>
+    <summary>Cold work strengthens; stress relief addresses locked-in stresses<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cold work strengthens; stress relief addresses locked-in stresses</h2>
   <p><strong>Work hardening</strong>, also called strain hardening, occurs as metal is permanently deformed during cold working. It commonly raises strength and hardness while reducing remaining ductility. “Cold” here means below the relevant recrystallization range, not necessarily cold to the touch.</p>
@@ -13870,7 +13893,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="cutting-and-machining-plastics--trim-the-molding-excess-without-cutting-into-the-part" data-card="cutting-and-machining-plastics--trim-the-molding-excess-without-cutting-into-the-part">
-    <summary>Trim the molding excess without cutting into the part<span class="chev"></span></summary>
+    <summary>Trim the molding excess without cutting into the part<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Trim the molding excess without cutting into the part</h2>
   <p>A <strong>gate</strong> is the entry from a molding flow channel into the part cavity. Degating separates the part from that feed connection. <strong>Flash</strong> is a thin unwanted fin, often at a mold joint; trimming removes it. A <strong>burr</strong> is a raised edge left by cutting. These are different defects, even when the same trimming tool can remove them.</p>
@@ -13909,7 +13932,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="electrical-discharge-machining--offset-the-wire-center-by-its-radius-plus-the-spark-gap" data-card="electrical-discharge-machining--offset-the-wire-center-by-its-radius-plus-the-spark-gap">
-    <summary>Offset the wire center by its radius plus the spark gap<span class="chev"></span></summary>
+    <summary>Offset the wire center by its radius plus the spark gap<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Offset the wire center by its radius plus the spark gap</h2>
   <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5XaXJlIEVETSBjZW50ZXItcGF0aCBvZmZzZXQgZXF1YWxzIHdpcmUgcmFkaXVzIHBsdXMgc3BhcmsgZ2FwPC90aXRsZT4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI4MzAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMDAyMTQ0Ij4KPHRleHQgeD0iMzAiIHk9IjUwIiBmb250LXdlaWdodD0iYm9sZCI+V2lyZSBFRE06IHRvcCB2aWV3PC90ZXh0Pgo8cmVjdCB4PSIzMCIgeT0iOTAiIHdpZHRoPSI3NDAiIGhlaWdodD0iNDcwIiBmaWxsPSIjZTZmM2ZhIi8+CjxyZWN0IHg9IjQ3MCIgeT0iOTAiIHdpZHRoPSIzMDAiIGhlaWdodD0iNDcwIiBmaWxsPSIjZGRkIi8+CjxwYXRoIGQ9Ik00NzAgOTBWNTYwIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iNiIvPgo8dGV4dCB4PSI0OTAiIHk9IjE1NSI+UmV0YWluZWQ8L3RleHQ+PHRleHQgeD0iNDkwIiB5PSIyMDAiPndvcmtwaWVjZTwvdGV4dD4KPHRleHQgeD0iNTAiIHk9IjE0NSI+RGllbGVjdHJpYyBmbHVpZDwvdGV4dD4KPHBhdGggZD0iTTMzMCAxNjVWNTUwIiBzdHJva2U9IiMwMDVkODciIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOSIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMjAiIHI9IjkwIiBmaWxsPSIjZWNhYzAwIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iNCIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMjAiIHI9IjYiIGZpbGw9IiMwMDIxNDQiLz4KPHRleHQgeD0iMjgwIiB5PSIzMDAiPldpcmU8L3RleHQ+CjxwYXRoIGQ9Ik0zMzAgMzIwSDQyME0zMzAgMzEwVjMzME00MjAgMzEwVjMzMCIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHRleHQgeD0iNjUiIHk9IjM4NSI+UmFkaXVzPC90ZXh0PjxwYXRoIGQ9Ik0xOTAgMzc1TDM3MCAzMjciIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik00MjAgMzIwSDQ3ME00NzAgMzEwVjMzMCIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHRleHQgeD0iNDg1IiB5PSIzMTAiPlNwYXJrIGdhcDwvdGV4dD48cGF0aCBkPSJNNDg1IDMyMEw0NDYgMzI0IiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMzMwIDQ2NUg0NzBNMzMwIDQ1MFY0ODBNNDcwIDQ1MFY0ODAiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSI0Ii8+Cjx0ZXh0IHg9IjUwIiB5PSI1MTAiPk9mZnNldDwvdGV4dD48cGF0aCBkPSJNMTYwIDUwMEwzOTUgNDY4IiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIzMCIgeT0iNjEwIj5EYXNoZWQgbGluZTogd2lyZSBjZW50ZXIgcGF0aDwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjY2NSI+U29saWQgbGluZTogZmluaXNoZWQgd2FsbDwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjcyMCI+T2Zmc2V0ID0gcmFkaXVzICsgb25lLXNpZGVkIGdhcDwvdGV4dD4KPHRleHQgeD0iMzAiIHk9Ijc4MCI+V2lyZSBhbmQgZ2FwIGVubGFyZ2VkOyBub3QgdG8gc2NhbGUuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Top view of a wire beside a retained workpiece wall. The wire center path lies in the removed region, one wire radius plus one spark gap from the wall, in dielectric fluid." data-natural-width="800" data-natural-height="830"></p><figcaption>The wire runs perpendicular to this top view. Gap and wire are enlarged. The dashed line is the wire center path; the solid boundary is the finished wall.</figcaption></figure>
@@ -14083,8 +14106,8 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="selecting-a-removal-process--screen-the-material-and-feature-before-choosing-a-machine" data-card="selecting-a-removal-process--screen-the-material-and-feature-before-choosing-a-machine">
-    <summary>Screen the material and feature before choosing a machine<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="selecting-a-removal-process--screen-the-material-and-feature-before-choosing-a-machine" data-card="selecting-a-removal-process--screen-the-material-and-feature-before-choosing-a-machine" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Screen the material and feature before choosing a machine<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Screen the material and feature before choosing a machine</h2>
   <ul class="boxes">
@@ -14115,7 +14138,7 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
     </div>
   </details>
   <details class="xcard deck-slide" id="selecting-a-removal-process--keep-conventional-machining-on-the-candidate-list" data-card="selecting-a-removal-process--keep-conventional-machining-on-the-candidate-list">
-    <summary>Keep conventional machining on the candidate list<span class="chev"></span></summary>
+    <summary>Keep conventional machining on the candidate list<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Keep conventional machining on the candidate list</h2>
   <p>For an accessible flat face, hole or round shaft in a machinable material, conventional cutting may be the simplest route. Use the <a class="xref-page" href="#p-material-removal-processes">family map</a> to reach those methods. A part may combine sawing, milling and grinding, or use waterjet for a blank followed by machining of critical faces.</p>

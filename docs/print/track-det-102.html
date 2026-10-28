@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3124,8 +3147,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="equipment-categories--category-3" data-card="equipment-categories--category-3">
-    <summary><span class="cat cat-3">Category 3</span><span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="equipment-categories--category-3" data-card="equipment-categories--category-3" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary><span class="cat cat-3">Category 3</span><span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="cat cat-3">Category 3</span></h2>
   <div class="stop">
@@ -3341,8 +3364,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="equipment-operating-procedure--before-operating-any-equipment" data-card="equipment-operating-procedure--before-operating-any-equipment">
-    <summary><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="equipment-operating-procedure--before-operating-any-equipment" data-card="equipment-operating-procedure--before-operating-any-equipment" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="phase" data-phase="Before" aria-hidden="true"></span>Before operating any equipment</h2>
   <ul class="boxes">
@@ -3368,8 +3391,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   are covered in <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="equipment-operating-procedure--after-operating-any-equipment" data-card="equipment-operating-procedure--after-operating-any-equipment">
-    <summary><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="equipment-operating-procedure--after-operating-any-equipment" data-card="equipment-operating-procedure--after-operating-any-equipment" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2><span class="phase" data-phase="After" aria-hidden="true"></span>After operating any equipment</h2>
   <ul class="boxes">
@@ -3410,8 +3433,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="ppe--eye-protection" data-card="ppe--eye-protection">
-    <summary>Eye protection<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="ppe--eye-protection" data-card="ppe--eye-protection" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Eye protection<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Eye protection</h2>
   <div class="gate">
@@ -3431,8 +3454,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="ppe--hearing-protection" data-card="ppe--hearing-protection">
-    <summary>Hearing protection<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="ppe--hearing-protection" data-card="ppe--hearing-protection" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Hearing protection<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Hearing protection</h2>
   <p><strong>Industry standard:</strong> shop tools nearly always require hearing protection in
@@ -3499,8 +3522,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   supportive and comfortable.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection" data-card="ppe--respiratory-protection">
-    <summary>Respiratory protection<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection" data-card="ppe--respiratory-protection" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Respiratory protection<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection</h2>
   <div class="stop">
@@ -3518,8 +3541,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   same protection. The next section is the one that decides which you need.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection-what-to-wear" data-card="ppe--respiratory-protection-what-to-wear">
-    <summary>Respiratory protection &mdash; what to wear<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="ppe--respiratory-protection-what-to-wear" data-card="ppe--respiratory-protection-what-to-wear" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Respiratory protection &mdash; what to wear<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Respiratory protection &mdash; what to wear</h2>
   <div class="stop">
@@ -3549,8 +3572,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   see <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="ppe--clothing-and-jewelry" data-card="ppe--clothing-and-jewelry">
-    <summary>Clothing and jewelry<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="ppe--clothing-and-jewelry" data-card="ppe--clothing-and-jewelry" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Clothing and jewelry<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Clothing and jewelry</h2>
   <div class="stop">
@@ -3595,8 +3618,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-gate" id="lifting-and-carrying--lifting-rules" data-card="lifting-and-carrying--lifting-rules">
-    <summary>Lifting Rules<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="lifting-and-carrying--lifting-rules" data-card="lifting-and-carrying--lifting-rules" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Lifting Rules<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Lifting Rules</h2>
   <div class="gate">
@@ -3630,8 +3653,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   that point just sits somewhere different for every person and every shape.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="lifting-and-carrying--proper-lifting-technique" data-card="lifting-and-carrying--proper-lifting-technique">
-    <summary>Proper lifting technique<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="lifting-and-carrying--proper-lifting-technique" data-card="lifting-and-carrying--proper-lifting-technique" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Proper lifting technique<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Proper lifting technique</h2>
   <ul class="boxes">
@@ -3684,8 +3707,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-shock-hazard" data-card="electrical-safety--electrical-shock-hazard">
-    <summary>Electrical &mdash; Shock Hazard<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-shock-hazard" data-card="electrical-safety--electrical-shock-hazard" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Electrical &mdash; Shock Hazard<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical &mdash; Shock Hazard</h2>
   <p class="lede">There is no magic voltage at which shock suddenly becomes possible. A shock can be
@@ -3722,8 +3745,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-burn-hazard" data-card="electrical-safety--electrical-burn-hazard">
-    <summary>Electrical &mdash; Burn Hazard<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-burn-hazard" data-card="electrical-safety--electrical-burn-hazard" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Electrical &mdash; Burn Hazard<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical &mdash; Burn Hazard</h2>
   <p class="lede">Below 50&nbsp;V, the primary concern often shifts from shock to
@@ -3795,8 +3818,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   not by the number printed on the front of the supply.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-conductors" data-card="electrical-safety--electrical-conductors">
-    <summary>Electrical Conductors<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--electrical-conductors" data-card="electrical-safety--electrical-conductors" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Electrical Conductors<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Electrical Conductors</h2>
   <p class="lede">Inspect every cord, every time, <strong>before it goes into the receptacle</strong>.
@@ -3916,8 +3939,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you">
-    <summary>Cords on the floor &mdash; the one most likely to get you<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card="electrical-safety--cords-on-the-floor-the-one-most-likely-to-get-you" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Cords on the floor &mdash; the one most likely to get you<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cords on the floor &mdash; the one most likely to get you</h2>
   <p class="lede">Nothing else on this page is as likely to actually injure someone as a cord
@@ -4007,8 +4030,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <a class="xref-page" href="#p-5s-workplace-organization">5S</a>. The safety case and the lean case are the same case.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="electrical-safety--if-someone-is-shocked" data-card="electrical-safety--if-someone-is-shocked">
-    <summary>If someone is shocked<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="electrical-safety--if-someone-is-shocked" data-card="electrical-safety--if-someone-is-shocked" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>If someone is shocked<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>If someone is shocked</h2>
   <div class="stop">
@@ -4140,8 +4163,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="machine-hazards--rotating-machinery" data-card="machine-hazards--rotating-machinery">
-    <summary>Rotating machinery<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="machine-hazards--rotating-machinery" data-card="machine-hazards--rotating-machinery" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Rotating machinery<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rotating machinery</h2>
   <p class="lede">Rotating machinery injures you by <strong>catching hold of something and pulling
@@ -4261,8 +4284,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; What the investigations actually describe.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="machine-hazards--moving-machinery-and-pinch-points" data-card="machine-hazards--moving-machinery-and-pinch-points">
-    <summary>Moving machinery and pinch points<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="machine-hazards--moving-machinery-and-pinch-points" data-card="machine-hazards--moving-machinery-and-pinch-points" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Moving machinery and pinch points<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Moving machinery and pinch points</h2>
   <p class="lede">Moving machinery injures you <strong>without ever catching hold of you</strong>.
@@ -4357,8 +4380,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Why belts and chains count as rotating, not pinching.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call">
-    <summary>Guards stay on, and taking one off is not your call<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card="machine-hazards--guards-stay-on-and-taking-one-off-is-not-your-call" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Guards stay on, and taking one off is not your call<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Guards stay on, and taking one off is not your call</h2>
   <p class="lede">A guard is the thing standing between you and everything the two sections above
@@ -4382,8 +4405,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Why the rule has no exceptions in it.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine">
-    <summary>Lockout/Tagout &mdash; before anyone works on a machine<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card="machine-hazards--lockout-tagout-before-anyone-works-on-a-machine" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Lockout/Tagout &mdash; before anyone works on a machine<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Lockout/Tagout &mdash; before anyone works on a machine</h2>
   <p class="lede">Everything on a machine that turns or travels does so because something is
@@ -4458,8 +4481,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="fire-safety--decide-before-you-reach-for-anything" data-card="fire-safety--decide-before-you-reach-for-anything">
-    <summary>Decide before you reach for anything<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="fire-safety--decide-before-you-reach-for-anything" data-card="fire-safety--decide-before-you-reach-for-anything" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Decide before you reach for anything<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Decide before you reach for anything</h2>
   <p class="lede">An extinguisher is for a <strong>small fire you caught early</strong>.</p>
@@ -4543,8 +4566,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   on it.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card="fire-safety--metal-fires-and-what-it-takes-to-start-one">
-    <summary>Metal fires, and what it takes to start one<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card="fire-safety--metal-fires-and-what-it-takes-to-start-one" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Metal fires, and what it takes to start one<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Metal fires, and what it takes to start one</h2>
   <p class="lede">Metal burns only when it is divided finely enough, and then only when several
@@ -4660,8 +4683,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-wiki-only" id="fire-safety--know-these-before-you-need-them" data-card="fire-safety--know-these-before-you-need-them">
-    <summary>Know these before you need them<span class="chev"></span></summary>
+  <details class="xcard deck-wiki-only is-checklist" id="fire-safety--know-these-before-you-need-them" data-card="fire-safety--know-these-before-you-need-them" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Know these before you need them<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Know these before you need them</h2>
   <p>None of the above helps if you are looking for equipment while a fire grows. On your first
@@ -4707,8 +4730,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="metal-chips--never-clear-chips-with-your-hands" data-card="metal-chips--never-clear-chips-with-your-hands">
-    <summary>Never clear chips with your hands<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="metal-chips--never-clear-chips-with-your-hands" data-card="metal-chips--never-clear-chips-with-your-hands" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Never clear chips with your hands<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Never clear chips with your hands</h2>
   <div class="stop">
@@ -4731,8 +4754,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-gate" id="metal-chips--compressed-air-there-are-limits-on-this" data-card="metal-chips--compressed-air-there-are-limits-on-this">
-    <summary>Compressed air &mdash; there are limits on this<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="metal-chips--compressed-air-there-are-limits-on-this" data-card="metal-chips--compressed-air-there-are-limits-on-this" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Compressed air &mdash; there are limits on this<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Compressed air &mdash; there are limits on this</h2>
   <div class="gate">
@@ -4764,8 +4787,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide is-stop" id="metal-chips--cleaning-up" data-card="metal-chips--cleaning-up">
-    <summary>Cleaning up<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="metal-chips--cleaning-up" data-card="metal-chips--cleaning-up" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Cleaning up<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cleaning up</h2>
   <ul class="boxes">
@@ -4831,8 +4854,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide is-stop" id="conduct-and-emergency--prohibited-behavior" data-card="conduct-and-emergency--prohibited-behavior">
-    <summary>Prohibited behavior<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-stop" id="conduct-and-emergency--prohibited-behavior" data-card="conduct-and-emergency--prohibited-behavior" data-card-edge="stop" style="--card-marker:var(--mark-stop)">
+    <summary>Prohibited behavior<span class="card-tags"><span class="card-tag" data-marker="stop" style="--card-marker:var(--mark-stop)"><span class="marker-separator">; </span>Stop</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Prohibited behavior</h2>
   <div class="stop">
@@ -4857,8 +4880,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="conduct-and-emergency--emergency-procedures" data-card="conduct-and-emergency--emergency-procedures">
-    <summary>Emergency procedures<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="conduct-and-emergency--emergency-procedures" data-card="conduct-and-emergency--emergency-procedures" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Emergency procedures<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Emergency procedures</h2>
   <ul class="boxes">
@@ -5005,8 +5028,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="prusa-3d-printers--slice-for-the-selected-printer-then-check-it-in-person" data-card="prusa-3d-printers--slice-for-the-selected-printer-then-check-it-in-person">
-    <summary>Slice for the selected printer, then check it in person<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="prusa-3d-printers--slice-for-the-selected-printer-then-check-it-in-person" data-card="prusa-3d-printers--slice-for-the-selected-printer-then-check-it-in-person" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Slice for the selected printer, then check it in person<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Slice for the selected printer, then check it in person</h2>
   <ol>
@@ -5114,7 +5137,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="alphabet-of-lines--when-lines-coincide-do-not-invent-a-second-feature" data-card="alphabet-of-lines--when-lines-coincide-do-not-invent-a-second-feature">
-    <summary>When lines coincide, do not invent a second feature<span class="chev"></span></summary>
+    <summary>When lines coincide, do not invent a second feature<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>When lines coincide, do not invent a second feature</h2>
   <p>Where a visible edge and a hidden edge project to exactly the same place, read the visible
@@ -5171,8 +5194,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   the sheet. Compare <a class="xref-page" href="#p-first-and-third-angle-projection">First-Angle and Third-Angle Projection</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="orthographic-projection--predict-a-view-then-compare-it-with-the-same-block-part" data-card="orthographic-projection--predict-a-view-then-compare-it-with-the-same-block-part">
-    <summary>Predict a view, then compare it with the same block part<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="orthographic-projection--predict-a-view-then-compare-it-with-the-same-block-part" data-card="orthographic-projection--predict-a-view-then-compare-it-with-the-same-block-part" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Predict a view, then compare it with the same block part<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Predict a view, then compare it with the same block part</h2>
   <p>Choose a part and a viewing direction in the explorer. Before revealing the view, predict
@@ -5192,8 +5215,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="orthographic-projection--use-alignment-to-follow-one-feature-through-the-drawing" data-card="orthographic-projection--use-alignment-to-follow-one-feature-through-the-drawing">
-    <summary>Use alignment to follow one feature through the drawing<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="orthographic-projection--use-alignment-to-follow-one-feature-through-the-drawing" data-card="orthographic-projection--use-alignment-to-follow-one-feature-through-the-drawing" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Use alignment to follow one feature through the drawing<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use alignment to follow one feature through the drawing</h2>
   <ul class="boxes">
@@ -5211,7 +5234,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="orthographic-projection--match-the-pictorial-to-its-front-top-and-right-views" data-card="orthographic-projection--match-the-pictorial-to-its-front-top-and-right-views">
-    <summary>Match the pictorial to its front, top, and right views<span class="chev"></span></summary>
+    <summary>Match the pictorial to its front, top, and right views<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Match the pictorial to its front, top, and right views</h2>
   <p>Identify each numbered candidate using the viewing directions on the pictorial. These
@@ -5283,8 +5306,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-16">Supporting detail: <a href="#deeper-addendum-16"><strong>Addendum 16</strong></a> &mdash; Why more pictures do not automatically mean more information.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="choosing-drawing-views--check-the-view-set-before-moving-on-to-dimensions" data-card="choosing-drawing-views--check-the-view-set-before-moving-on-to-dimensions">
-    <summary>Check the view set before moving on to dimensions<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="choosing-drawing-views--check-the-view-set-before-moving-on-to-dimensions" data-card="choosing-drawing-views--check-the-view-set-before-moving-on-to-dimensions" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check the view set before moving on to dimensions<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check the view set before moving on to dimensions</h2>
   <ul class="boxes">
@@ -5348,7 +5371,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="first-and-third-angle-projection--expect-third-angle-on-u-s-mechanical-drawings-then-verify-it" data-card="first-and-third-angle-projection--expect-third-angle-on-u-s-mechanical-drawings-then-verify-it">
-    <summary>Expect third-angle on U.S. mechanical drawings, then verify it<span class="chev"></span></summary>
+    <summary>Expect third-angle on U.S. mechanical drawings, then verify it<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Expect third-angle on U.S. mechanical drawings, then verify it</h2>
   <p>Third-angle is the usual U.S. mechanical drawing convention. A shared convention lets the
@@ -5383,8 +5406,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p>Start with <a class="xref-page" href="#p-alphabet-of-lines">The Alphabet of Lines</a> and <a class="xref-page" href="#p-orthographic-projection">Orthographic Projection and the Glass Box</a> if the line types or viewing directions are unfamiliar. For a sloping face or a small feature, see <a class="xref-page" href="#p-auxiliary-and-detail-views">Auxiliary and Detail Views</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="section-views--follow-the-cutting-plane-arrows-and-match-the-letters" data-card="section-views--follow-the-cutting-plane-arrows-and-match-the-letters">
-    <summary>Follow the cutting-plane arrows and match the letters<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="section-views--follow-the-cutting-plane-arrows-and-match-the-letters" data-card="section-views--follow-the-cutting-plane-arrows-and-match-the-letters" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Follow the cutting-plane arrows and match the letters<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Follow the cutting-plane arrows and match the letters</h2>
 <p>The cutting-plane line locates the imaginary cut in a parent view. Its arrows point in the direction you look into the remaining part. Matching letters connect that line to a label such as <strong>SECTION A–A</strong>; the letters do not specify a dimension.</p>
@@ -5451,8 +5474,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p class="deeper-ref" id="deeper-ref-19">Supporting detail: <a href="#deeper-addendum-19"><strong>Addendum 19</strong></a> &mdash; Drawing standards and scope.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="section-views--create-the-section-from-a-cad-drawing-view-then-inspect-it" data-card="section-views--create-the-section-from-a-cad-drawing-view-then-inspect-it">
-    <summary>Create the section from a CAD drawing view, then inspect it<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="section-views--create-the-section-from-a-cad-drawing-view-then-inspect-it" data-card="section-views--create-the-section-from-a-cad-drawing-view-then-inspect-it" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Create the section from a CAD drawing view, then inspect it<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Create the section from a CAD drawing view, then inspect it</h2>
 <p>Start with a model-based parent drawing view. Choose a section command, define the cut, set its viewing direction, and place the result. These drawing operations do not remove material from the design model.</p>
@@ -5507,7 +5530,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="auxiliary-and-detail-views--create-auxiliary-detail-and-break-views-from-the-parent-in-cad" data-card="auxiliary-and-detail-views--create-auxiliary-detail-and-break-views-from-the-parent-in-cad">
-    <summary>Create auxiliary, detail, and break views from the parent in CAD<span class="chev"></span></summary>
+    <summary>Create auxiliary, detail, and break views from the parent in CAD<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Create auxiliary, detail, and break views from the parent in CAD</h2>
 <dl class="dims"><div><dt>Auxiliary view</dt><dd>Select the parent and a reference edge representing the inclined face edge-on. Use <strong>Auxiliary View</strong> in SOLIDWORKS or <strong>Auxiliary view</strong> in Onshape, check the direction, and place the view. For a partial view, limit the displayed region with the application’s crop or partial-view controls while retaining identifying references.</dd></div>
@@ -5575,7 +5598,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="dimension-anatomy-and-placement--rearrange-crossing-lines-before-accepting-clutter" data-card="dimension-anatomy-and-placement--rearrange-crossing-lines-before-accepting-clutter">
-    <summary>Rearrange crossing lines before accepting clutter<span class="chev"></span></summary>
+    <summary>Rearrange crossing lines before accepting clutter<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rearrange crossing lines before accepting clutter</h2>
   <p>Move dimensions or notes to avoid crossing dimension lines, extension lines and leaders wherever practical. Keep a leader short, with a clear arrow target and a short horizontal landing next to the note.</p>
@@ -5618,8 +5641,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>For the beginner drawings here, do not dimension to hidden lines: choose a view that exposes the feature. Keep the dimensions of one feature together when practical. See the <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/index.html" target="_blank" rel="noopener">Reading Drawings group in Engineering Graphics</a> for projection, section views and view selection.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="choosing-dimensions--build-the-dimension-scheme-in-a-deliberate-order" data-card="choosing-dimensions--build-the-dimension-scheme-in-a-deliberate-order">
-    <summary>Build the dimension scheme in a deliberate order<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="choosing-dimensions--build-the-dimension-scheme-in-a-deliberate-order" data-card="choosing-dimensions--build-the-dimension-scheme-in-a-deliberate-order" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Build the dimension scheme in a deliberate order<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Build the dimension scheme in a deliberate order</h2>
   <ul class="boxes">
@@ -5645,7 +5668,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="choosing-dimensions--parentheses-mark-information-not-an-extra-acceptance-requirement" data-card="choosing-dimensions--parentheses-mark-information-not-an-extra-acceptance-requirement">
-    <summary>Parentheses mark information, not an extra acceptance requirement<span class="chev"></span></summary>
+    <summary>Parentheses mark information, not an extra acceptance requirement<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Parentheses mark information, not an extra acceptance requirement</h2>
   <p>A <strong>reference dimension</strong> is shown in parentheses, such as <code>(1.50)</code>. It helps the reader without imposing another manufacturing or inspection requirement. Use one when the derived value is useful; leave it out when it only adds clutter.</p>
@@ -5721,8 +5744,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-26">Supporting detail: <a href="#deeper-addendum-26"><strong>Addendum 26</strong></a> &mdash; Reading old and new symbol styles.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="hole-and-feature-callouts--change-a-hole-and-watch-its-callout-change" data-card="hole-and-feature-callouts--change-a-hole-and-watch-its-callout-change">
-    <summary>Change a hole and watch its callout change<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="hole-and-feature-callouts--change-a-hole-and-watch-its-callout-change" data-card="hole-and-feature-callouts--change-a-hole-and-watch-its-callout-change" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Change a hole and watch its callout change<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Change a hole and watch its callout change</h2>
   <p>Predict which line will change before changing a control. Compare counterbore depth with countersink angle, then change the main diameter while keeping the recess diameter fixed.</p>
@@ -5772,8 +5795,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-27">Supporting detail: <a href="#deeper-addendum-27"><strong>Addendum 27</strong></a> &mdash; Vendor help for the document model.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cad-files-and-documents--check-the-template-and-units-before-entering-dimensions" data-card="cad-files-and-documents--check-the-template-and-units-before-entering-dimensions">
-    <summary>Check the template and units before entering dimensions<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="cad-files-and-documents--check-the-template-and-units-before-entering-dimensions" data-card="cad-files-and-documents--check-the-template-and-units-before-entering-dimensions" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check the template and units before entering dimensions<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check the template and units before entering dimensions</h2>
   <p>A template supplies starting settings. In SOLIDWORKS, part, assembly, and drawing templates use .prtdot, .asmdot, and .drwdot. Choose the appropriate template, then verify the new document's units. A familiar template name is not proof that its settings are right.</p>
@@ -5789,7 +5812,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="cad-files-and-documents--keep-referenced-files-together-when-you-transfer-a-design" data-card="cad-files-and-documents--keep-referenced-files-together-when-you-transfer-a-design">
-    <summary>Keep referenced files together when you transfer a design<span class="chev"></span></summary>
+    <summary>Keep referenced files together when you transfer a design<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Keep referenced files together when you transfer a design</h2>
   <p>For a typical file-based SOLIDWORKS design, the assembly points to component files, and a drawing points to its model. Sending only the assembly file may leave the recipient without the parts. Renaming or moving files outside a reference-aware workflow can break those connections.</p>
@@ -5854,8 +5877,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>A viewing section does not create an extruded cut feature. It also does not automatically create a documented section view on a drawing sheet. See <a href="https://cad.onshape.com/help/Content/View/section_view.htm">Onshape Section View help</a> for the available section controls.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cad-model-views-and-checks--check-the-selection-before-trusting-a-measurement" data-card="cad-model-views-and-checks--check-the-selection-before-trusting-a-measurement">
-    <summary>Check the selection before trusting a measurement<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="cad-model-views-and-checks--check-the-selection-before-trusting-a-measurement" data-card="cad-model-views-and-checks--check-the-selection-before-trusting-a-measurement" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check the selection before trusting a measurement<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check the selection before trusting a measurement</h2>
   <p>Select the actual entities you need, then use Measure. An edge can provide length; a circular edge can provide radius or diameter; two suitable entities can provide distance or angle. Read the result label: minimum distance, center distance, and distance along an axis answer different questions.</p>
@@ -5870,7 +5893,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="cad-model-views-and-checks--mass-needs-material-density-as-well-as-geometry" data-card="cad-model-views-and-checks--mass-needs-material-density-as-well-as-geometry">
-    <summary>Mass needs material density as well as geometry<span class="chev"></span></summary>
+    <summary>Mass needs material density as well as geometry<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Mass needs material density as well as geometry</h2>
   <p>Assign a material to the intended part or body before relying on mass properties. A color or metallic appearance alone is not proof that the material density is correct. Check which bodies or components are included, the units, and any overrides before accepting mass or center of mass.</p>
@@ -5920,8 +5943,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>SOLIDWORKS installations may use PDM or connected data management for version and revision control. Follow that system's workflow when present; local Save and Save As are not a universal replacement for it.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cad-history-and-sharing--share-the-intended-state-and-check-the-recipient-s-access" data-card="cad-history-and-sharing--share-the-intended-state-and-check-the-recipient-s-access">
-    <summary>Share the intended state and check the recipient's access<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="cad-history-and-sharing--share-the-intended-state-and-check-the-recipient-s-access" data-card="cad-history-and-sharing--share-the-intended-state-and-check-the-recipient-s-access" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Share the intended state and check the recipient's access<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Share the intended state and check the recipient's access</h2>
   <p>In Onshape, decide whether the recipient needs to inspect a fixed version or collaborate in an editable workspace. A link to a changing workspace can show later edits; a version identifies a fixed design state. Grant access using the document's sharing controls.</p>
@@ -6001,7 +6024,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="sketch-entities-and-planes--check-connections-before-moving-on-to-a-feature" data-card="sketch-entities-and-planes--check-connections-before-moving-on-to-a-feature">
-    <summary>Check connections before moving on to a feature<span class="chev"></span></summary>
+    <summary>Check connections before moving on to a feature<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check connections before moving on to a feature</h2>
   <p>Two endpoints that look joined may still be separate. A tiny gap can prevent a profile from closing. Use a coincident relation to make the connection intentional, then inspect the sketch.</p>
@@ -6128,7 +6151,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="sketch-geometric-relations--watch-automatic-relations-then-check-what-was-stored" data-card="sketch-geometric-relations--watch-automatic-relations-then-check-what-was-stored">
-    <summary>Watch automatic relations, then check what was stored<span class="chev"></span></summary>
+    <summary>Watch automatic relations, then check what was stored<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Watch automatic relations, then check what was stored</h2>
   <p>Sketching tools can add relations while you draw. A visual alignment is useful feedback; inspect the resulting relation icons before assuming the intended rule is present.</p>
@@ -6206,8 +6229,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-46">Supporting detail: <a href="#deeper-addendum-46"><strong>Addendum 46</strong></a> &mdash; Current vendor references for status colors.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="fully-defined-sketches--fully-define-a-sketch-in-a-repeatable-order" data-card="fully-defined-sketches--fully-define-a-sketch-in-a-repeatable-order">
-    <summary>Fully define a sketch in a repeatable order<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="fully-defined-sketches--fully-define-a-sketch-in-a-repeatable-order" data-card="fully-defined-sketches--fully-define-a-sketch-in-a-repeatable-order" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Fully define a sketch in a repeatable order<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Fully define a sketch in a repeatable order</h2>
   <ul class="boxes">
@@ -6225,7 +6248,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="fully-defined-sketches--test-design-intent-with-a-change-not-just-the-starting-shape" data-card="fully-defined-sketches--test-design-intent-with-a-change-not-just-the-starting-shape">
-    <summary>Test design intent with a change, not just the starting shape<span class="chev"></span></summary>
+    <summary>Test design intent with a change, not just the starting shape<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Test design intent with a change, not just the starting shape</h2>
   <p><strong>Fresh practice part: a circular inspection plate.</strong> Sketch two circular boundaries for an annular plate. Put their common center at the origin; use concentric and separate diameter dimensions of 46 mm and 18 mm. Increasing the outer diameter to 58 mm should leave the inner opening centered and unchanged in size.</p>
@@ -6277,8 +6300,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-48">Supporting detail: <a href="#deeper-addendum-48"><strong>Addendum 48</strong></a> &mdash; Why a small edit can break a later feature.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="feature-based-modeling--rollback-lets-you-inspect-an-earlier-stage-without-deleting-later-work" data-card="feature-based-modeling--rollback-lets-you-inspect-an-earlier-stage-without-deleting-later-work">
-    <summary>Rollback lets you inspect an earlier stage without deleting later work<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="feature-based-modeling--rollback-lets-you-inspect-an-earlier-stage-without-deleting-later-work" data-card="feature-based-modeling--rollback-lets-you-inspect-an-earlier-stage-without-deleting-later-work" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Rollback lets you inspect an earlier stage without deleting later work<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rollback lets you inspect an earlier stage without deleting later work</h2>
   <p>Move the rollback bar above later features to inspect or edit an earlier stage. Return it to the end when checking the completed part. <strong>Rollback is a temporary stopping point in regeneration.</strong> Suppression instead leaves a selected feature in the tree but excludes it from the active model; dependent features may also be affected. Hiding changes visibility, not the solid's definition.</p>
@@ -6301,8 +6324,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-50">Supporting detail: <a href="#deeper-addendum-50"><strong>Addendum 50</strong></a> &mdash; Fewest features is not always the best model.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="feature-based-modeling--check-units-bodies-material-and-mass-after-a-change" data-card="feature-based-modeling--check-units-bodies-material-and-mass-after-a-change">
-    <summary>Check units, bodies, material, and mass after a change<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="feature-based-modeling--check-units-bodies-material-and-mass-after-a-change" data-card="feature-based-modeling--check-units-bodies-material-and-mass-after-a-change" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check units, bodies, material, and mass after a change<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check units, bodies, material, and mass after a change</h2>
   <p>Assign the intended material or density before relying on mass. A surface color is not evidence that density is correct. For a uniform solid, <strong>mass = density × volume</strong>. Compare volume with a simple estimate, and inspect unexpected mass or center-of-mass changes.</p>
@@ -6342,7 +6365,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="extrude-and-revolve--choose-the-end-condition-for-what-should-happen-after-an-edit" data-card="extrude-and-revolve--choose-the-end-condition-for-what-should-happen-after-an-edit">
-    <summary>Choose the end condition for what should happen after an edit<span class="chev"></span></summary>
+    <summary>Choose the end condition for what should happen after an edit<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Choose the end condition for what should happen after an edit</h2>
   <table>
@@ -6373,7 +6396,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="extrude-and-revolve--pick-the-base-feature-from-the-shape-s-main-organizing-rule" data-card="extrude-and-revolve--pick-the-base-feature-from-the-shape-s-main-organizing-rule">
-    <summary>Pick the base feature from the shape's main organizing rule<span class="chev"></span></summary>
+    <summary>Pick the base feature from the shape's main organizing rule<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Pick the base feature from the shape's main organizing rule</h2>
   <p>Use extrusion when a useful section stays the same along a straight direction. Use revolution when a useful section repeats around an axis. A cylinder can be made either way. A rotationally stepped part often makes the reason for choosing revolve clearer than a plain cylinder does.</p>
@@ -6415,7 +6438,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="sweeps-and-lofts--use-the-controlling-geometry-to-choose-sweep-or-loft" data-card="sweeps-and-lofts--use-the-controlling-geometry-to-choose-sweep-or-loft">
-    <summary>Use the controlling geometry to choose sweep or loft<span class="chev"></span></summary>
+    <summary>Use the controlling geometry to choose sweep or loft<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use the controlling geometry to choose sweep or loft</h2>
   <table><thead><tr><th>What you know</th><th>First feature to consider</th><th>What to inspect</th></tr></thead><tbody>
@@ -6428,8 +6451,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><a class="button" data-practice-add="part-features-sweep" href="../practice.html#part-features-sweep">Practice profile and path</a> <a class="button" data-practice-add="part-features-loft" href="../practice.html#part-features-loft">Practice changing sections</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="sweeps-and-lofts--troubleshoot-the-inputs-before-changing-every-option" data-card="sweeps-and-lofts--troubleshoot-the-inputs-before-changing-every-option">
-    <summary>Troubleshoot the inputs before changing every option<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="sweeps-and-lofts--troubleshoot-the-inputs-before-changing-every-option" data-card="sweeps-and-lofts--troubleshoot-the-inputs-before-changing-every-option" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Troubleshoot the inputs before changing every option<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Troubleshoot the inputs before changing every option</h2>
   <ul class="boxes">
@@ -6455,7 +6478,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="patterns-mirror-and-applied-features--pattern-a-seed-when-the-copies-should-change-together" data-card="patterns-mirror-and-applied-features--pattern-a-seed-when-the-copies-should-change-together">
-    <summary>Pattern a seed when the copies should change together<span class="chev"></span></summary>
+    <summary>Pattern a seed when the copies should change together<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Pattern a seed when the copies should change together</h2>
   <p class="lede">A <strong>seed</strong> is the original feature being repeated. A feature pattern makes the repetition explicit: edit the seed's size once and rebuild the copies. Model independent features when their sizes or locations must change independently.</p>
@@ -6469,7 +6492,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="patterns-mirror-and-applied-features--mirror-across-a-plane-when-symmetry-is-the-rule" data-card="patterns-mirror-and-applied-features--mirror-across-a-plane-when-symmetry-is-the-rule">
-    <summary>Mirror across a plane when symmetry is the rule<span class="chev"></span></summary>
+    <summary>Mirror across a plane when symmetry is the rule<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Mirror across a plane when symmetry is the rule</h2>
   <p>A mirror reflects selected features or bodies across a plane. Corresponding points lie at equal distances on opposite sides. It is not a rotation: an asymmetric shape changes handedness.</p>
@@ -6502,7 +6525,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="patterns-mirror-and-applied-features--shell-hollows-a-solid-and-leaves-a-controlled-wall" data-card="patterns-mirror-and-applied-features--shell-hollows-a-solid-and-leaves-a-controlled-wall">
-    <summary>Shell hollows a solid and leaves a controlled wall<span class="chev"></span></summary>
+    <summary>Shell hollows a solid and leaves a controlled wall<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Shell hollows a solid and leaves a controlled wall</h2>
   <p>Select faces to remove and specify the remaining wall thickness. Removing the top face of a block makes an open container; keeping all faces can make an enclosed cavity. Check whether the thickness is offset inward or outward.</p>
@@ -6512,7 +6535,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="patterns-mirror-and-applied-features--draft-tapers-faces-a-rib-adds-a-thin-support" data-card="patterns-mirror-and-applied-features--draft-tapers-faces-a-rib-adds-a-thin-support">
-    <summary>Draft tapers faces; a rib adds a thin support<span class="chev"></span></summary>
+    <summary>Draft tapers faces; a rib adds a thin support<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Draft tapers faces; a rib adds a thin support</h2>
   <p><strong>Draft</strong> inclines faces relative to a pull direction, often to help a molded part release. In a neutral-plane construction, that reference keeps its size while selected side faces tilt. Check the direction and which end grows or shrinks. There is no universal draft angle for every material and process.</p>
@@ -6545,8 +6568,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-58">Supporting detail: <a href="#deeper-addendum-58"><strong>Addendum 58</strong></a> &mdash; Definitions, instances, and design changes.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="assembly-files-and-mates--rename-and-package-files-with-their-references" data-card="assembly-files-and-mates--rename-and-package-files-with-their-references">
-    <summary>Rename and package files with their references<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="assembly-files-and-mates--rename-and-package-files-with-their-references" data-card="assembly-files-and-mates--rename-and-package-files-with-their-references" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Rename and package files with their references<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rename and package files with their references</h2>
   <p>Renaming or moving a component in ordinary File Explorer can leave an assembly looking for its old name or location. Use the CAD system's reference-aware rename or move workflow. Changing a display name in the tree is not necessarily changing the file name.</p>
@@ -6616,7 +6639,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="assembly-files-and-mates--build-reusable-parts-and-subassemblies-with-deliberate-dependencies" data-card="assembly-files-and-mates--build-reusable-parts-and-subassemblies-with-deliberate-dependencies">
-    <summary>Build reusable parts and subassemblies with deliberate dependencies<span class="chev"></span></summary>
+    <summary>Build reusable parts and subassemblies with deliberate dependencies<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Build reusable parts and subassemblies with deliberate dependencies</h2>
   <p><strong>Bottom-up</strong> design starts with existing parts and brings them into an assembly. <strong>Top-down</strong> design starts with an overall layout or shared design references and develops parts around them. A mixed approach is common: use a shared layout for custom plates and insert purchased hardware.</p>
@@ -6650,8 +6673,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>For a shaft with concentric axes and seated shoulder faces, one rotation remains. Adding another mate that merely keeps those axes parallel is redundant. Adding an angle mate to lock that remaining rotation may be correct for a stationary shaft and wrong for a rotating lever. Review <a class="xref-page" href="#p-assembly-files-and-mates">Assembly Files and Mates</a> for the geometry.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="checking-cad-assemblies--repair-the-cause-of-a-mate-error-before-adding-more-mates" data-card="checking-cad-assemblies--repair-the-cause-of-a-mate-error-before-adding-more-mates">
-    <summary>Repair the cause of a mate error before adding more mates<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="checking-cad-assemblies--repair-the-cause-of-a-mate-error-before-adding-more-mates" data-card="checking-cad-assemblies--repair-the-cause-of-a-mate-error-before-adding-more-mates" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Repair the cause of a mate error before adding more mates<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Repair the cause of a mate error before adding more mates</h2>
   <ul class="boxes">
@@ -6675,8 +6698,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-65">Supporting detail: <a href="#deeper-addendum-65"><strong>Addendum 65</strong></a> &mdash; Selection scope can hide an interference.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="checking-cad-assemblies--move-the-mechanism-through-its-intended-range" data-card="checking-cad-assemblies--move-the-mechanism-through-its-intended-range">
-    <summary>Move the mechanism through its intended range<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="checking-cad-assemblies--move-the-mechanism-through-its-intended-range" data-card="checking-cad-assemblies--move-the-mechanism-through-its-intended-range" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Move the mechanism through its intended range<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Move the mechanism through its intended range</h2>
   <p>Move the input joint slowly and watch the connected parts. Test intermediate positions as well as endpoints: a lever can clear a housing at both ends and strike it halfway through. Check which mate limits apply and whether the model passes through solid geometry because collision checking is not active.</p>
@@ -6739,8 +6762,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-69">Supporting detail: <a href="#deeper-addendum-69"><strong>Addendum 69</strong></a> &mdash; Subassembly display changes what the table means.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="exploded-views-and-bills-of-materials--review-the-assembly-drawing-as-an-identification-tool" data-card="exploded-views-and-bills-of-materials--review-the-assembly-drawing-as-an-identification-tool">
-    <summary>Review the assembly drawing as an identification tool<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="exploded-views-and-bills-of-materials--review-the-assembly-drawing-as-an-identification-tool" data-card="exploded-views-and-bills-of-materials--review-the-assembly-drawing-as-an-identification-tool" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Review the assembly drawing as an identification tool<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Review the assembly drawing as an identification tool</h2>
   <ul class="boxes">
@@ -6774,8 +6797,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>The Certified SOLIDWORKS Associate (CSWA) is the worked case here, offered through Dassault Systèmes' SOLIDWORKS certification program. CourseWiki is an independent learning resource and is not affiliated with or endorsed by Dassault Systèmes.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cad-certification-preparation--find-the-current-exam-rules-before-you-register" data-card="cad-certification-preparation--find-the-current-exam-rules-before-you-register">
-    <summary>Find the current exam rules before you register<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="cad-certification-preparation--find-the-current-exam-rules-before-you-register" data-card="cad-certification-preparation--find-the-current-exam-rules-before-you-register" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Find the current exam rules before you register<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Find the current exam rules before you register</h2>
   <p>Start at the <a href="https://www.solidworks.com/solidworks-certification-program">official SOLIDWORKS certification program</a>, then select the <a href="https://www.solidworks.com/certifications/cswa-design-associate">CSWA Design Associate page</a>. Check the exact credential name: similarly named certifications can assess different tools.</p>
@@ -6802,8 +6825,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cad-certification-preparation--check-geometry-units-and-material-before-trusting-mass" data-card="cad-certification-preparation--check-geometry-units-and-material-before-trusting-mass">
-    <summary>Check geometry, units, and material before trusting mass<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="cad-certification-preparation--check-geometry-units-and-material-before-trusting-mass" data-card="cad-certification-preparation--check-geometry-units-and-material-before-trusting-mass" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Check geometry, units, and material before trusting mass<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Check geometry, units, and material before trusting mass</h2>
   <p>For a uniform solid, <code>mass = density × volume</code>. Use compatible units: density in g/cm³ multiplied by volume in cm³ gives mass in g. To convert mm³ to cm³, divide by 1,000 because <code>1 cm³ = 10 × 10 × 10 mm³</code>.</p>
@@ -6853,7 +6876,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="drawing-terminology-review--read-dimensions-and-callouts-as-instructions-about-features" data-card="drawing-terminology-review--read-dimensions-and-callouts-as-instructions-about-features">
-    <summary>Read dimensions and callouts as instructions about features<span class="chev"></span></summary>
+    <summary>Read dimensions and callouts as instructions about features<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Read dimensions and callouts as instructions about features</h2>
   <dl class="dims">
@@ -6866,7 +6889,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="drawing-terminology-review--distinguish-a-section-a-detail-and-an-auxiliary-view" data-card="drawing-terminology-review--distinguish-a-section-a-detail-and-an-auxiliary-view">
-    <summary>Distinguish a section, a detail, and an auxiliary view<span class="chev"></span></summary>
+    <summary>Distinguish a section, a detail, and an auxiliary view<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Distinguish a section, a detail, and an auxiliary view</h2>
   <ul>
@@ -6899,8 +6922,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>This page focuses on filament printing. Resin printing uses a different process and requires its own preparation, handling, and finishing procedures.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="3d-printing-from-cad--export-the-model-then-check-its-size-in-the-slicer" data-card="3d-printing-from-cad--export-the-model-then-check-its-size-in-the-slicer">
-    <summary>Export the model, then check its size in the slicer<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="3d-printing-from-cad--export-the-model-then-check-its-size-in-the-slicer" data-card="3d-printing-from-cad--export-the-model-then-check-its-size-in-the-slicer" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Export the model, then check its size in the slicer<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Export the model, then check its size in the slicer</h2>
   <ul class="boxes">
@@ -6926,7 +6949,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="3d-printing-from-cad--orient-for-load-direction-surface-quality-and-support-removal" data-card="3d-printing-from-cad--orient-for-load-direction-surface-quality-and-support-removal">
-    <summary>Orient for load direction, surface quality, and support removal<span class="chev"></span></summary>
+    <summary>Orient for load direction, surface quality, and support removal<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Orient for load direction, surface quality, and support removal</h2>
   <p>Ask which way the part will be pulled or bent. Filament prints are often weaker when a load pulls adjacent layers apart. For a straight bar pulled along its length, laying its length in the build plane is usually a better starting point than printing it upright. Test a representative part before relying on it under load.</p>
@@ -6961,7 +6984,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 <div class="cards">
   <details class="xcard deck-slide" id="laser-cutting-and-engraving-from-cad--use-vector-paths-for-outlines-and-raster-scans-for-filled-marks" data-card="laser-cutting-and-engraving-from-cad--use-vector-paths-for-outlines-and-raster-scans-for-filled-marks">
-    <summary>Use vector paths for outlines and raster scans for filled marks<span class="chev"></span></summary>
+    <summary>Use vector paths for outlines and raster scans for filled marks<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Use vector paths for outlines and raster scans for filled marks</h2>
   <p class="lede">A vector operation follows lines and curves. A raster operation scans across an area to make a surface image or filled mark.</p>
@@ -6970,8 +6993,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><a class="button" data-practice-add="fabrication-cut-or-engrave" href="../practice.html#fabrication-cut-or-engrave">Practice choosing cut or engrave</a></p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="laser-cutting-and-engraving-from-cad--prepare-a-full-size-profile-and-assign-each-operation-deliberately" data-card="laser-cutting-and-engraving-from-cad--prepare-a-full-size-profile-and-assign-each-operation-deliberately">
-    <summary>Prepare a full-size profile and assign each operation deliberately<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="laser-cutting-and-engraving-from-cad--prepare-a-full-size-profile-and-assign-each-operation-deliberately" data-card="laser-cutting-and-engraving-from-cad--prepare-a-full-size-profile-and-assign-each-operation-deliberately" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Prepare a full-size profile and assign each operation deliberately<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Prepare a full-size profile and assign each operation deliberately</h2>
   <ul class="boxes">
@@ -6986,7 +7009,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="laser-cutting-and-engraving-from-cad--offset-the-path-toward-the-waste-by-half-the-kerf" data-card="laser-cutting-and-engraving-from-cad--offset-the-path-toward-the-waste-by-half-the-kerf">
-    <summary>Offset the path toward the waste by half the kerf<span class="chev"></span></summary>
+    <summary>Offset the path toward the waste by half the kerf<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Offset the path toward the waste by half the kerf</h2>
   <p><strong>Kerf</strong> is the width of material removed by a cut. In the simple model below, the laser follows the center of a constant-width kerf. Half the removed width lies on each side of the path.</p>
@@ -7055,8 +7078,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-76">Supporting detail: <a href="#deeper-addendum-76"><strong>Addendum 76</strong></a> &mdash; Why there is no universal minimum wall or perfect press-fit allowance.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="choosing-a-fabrication-process--test-the-critical-feature-before-making-the-full-part" data-card="choosing-a-fabrication-process--test-the-critical-feature-before-making-the-full-part">
-    <summary>Test the critical feature before making the full part<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="choosing-a-fabrication-process--test-the-critical-feature-before-making-the-full-part" data-card="choosing-a-fabrication-process--test-the-critical-feature-before-making-the-full-part" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Test the critical feature before making the full part<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Test the critical feature before making the full part</h2>
   <ul class="boxes">

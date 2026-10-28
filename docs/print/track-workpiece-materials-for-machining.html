@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3045,7 +3068,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="metals-and-their-properties--ferrous-means-iron-based-a-magnet-does-not-identify-the-grade" data-card="metals-and-their-properties--ferrous-means-iron-based-a-magnet-does-not-identify-the-grade">
-    <summary>Ferrous means iron-based; a magnet does not identify the grade<span class="chev"></span></summary>
+    <summary>Ferrous means iron-based; a magnet does not identify the grade<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Ferrous means iron-based; a magnet does not identify the grade</h2>
   <p><strong>Ferrous metals</strong> have iron as their base: steels and cast irons belong here. <strong>Nonferrous metals</strong> have another base, such as aluminum, copper or titanium. Nonferrous does not mean that no trace of iron can be present.</p>
@@ -3143,7 +3166,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="types-of-steel--watch-the-steel-family-series-at-its-original-publisher" data-card="types-of-steel--watch-the-steel-family-series-at-its-original-publisher">
-    <summary>Watch the steel-family series at its original publisher<span class="chev"></span></summary>
+    <summary>Watch the steel-family series at its original publisher<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Watch the steel-family series at its original publisher</h2>
   <p>Metal Supermarkets hosts the five-part series: <a href="https://www.metalsupermarkets.com/video-blog-four-types-steel-part-1/">overview</a>, <a href="https://www.metalsupermarkets.com/video-blog-four-types-steel-part-2-carbon-steel/">carbon steel</a>, <a href="https://www.metalsupermarkets.com/video-four-types-steel-part-3-alloy-steel/">alloy steel</a>, <a href="https://www.metalsupermarkets.com/video-four-types-of-steel-part-4-stainless-steel/">stainless steel</a> and <a href="https://www.metalsupermarkets.com/video-blog-four-types-steel-part-5-tool-steel/">tool steel</a>. These are external learning resources, not specifications for purchasing or heat treatment.</p>
@@ -3233,7 +3256,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="nonferrous-metals--brass-and-bronze-trade-some-of-copper-s-conductivity-for-other-properties" data-card="nonferrous-metals--brass-and-bronze-trade-some-of-copper-s-conductivity-for-other-properties">
-    <summary>Brass and bronze trade some of copper's conductivity for other properties<span class="chev"></span></summary>
+    <summary>Brass and bronze trade some of copper's conductivity for other properties<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Brass and bronze trade some of copper's conductivity for other properties</h2>
   <p><strong>Brass</strong> is principally a copper-zinc alloy. Depending on grade, it can offer useful forming or machining behavior for fittings, hardware and decorative parts. Do not assume every brass has the same machinability or suitability for contact with drinking water.</p>
@@ -3273,7 +3296,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="heat-treating-metals--quench-hardening-usually-needs-tempering-afterward" data-card="heat-treating-metals--quench-hardening-usually-needs-tempering-afterward">
-    <summary>Quench hardening usually needs tempering afterward<span class="chev"></span></summary>
+    <summary>Quench hardening usually needs tempering afterward<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Quench hardening usually needs tempering afterward</h2>
   <p><strong>Quench hardening</strong> heats suitable steel to form austenite, holds as required, then cools fast enough to obtain the intended hardened structure. It commonly raises hardness and strength but can reduce ductility and toughness. Cracking and distortion are possible.</p>
@@ -3292,7 +3315,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="heat-treating-metals--cold-work-strengthens-stress-relief-addresses-locked-in-stresses" data-card="heat-treating-metals--cold-work-strengthens-stress-relief-addresses-locked-in-stresses">
-    <summary>Cold work strengthens; stress relief addresses locked-in stresses<span class="chev"></span></summary>
+    <summary>Cold work strengthens; stress relief addresses locked-in stresses<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Cold work strengthens; stress relief addresses locked-in stresses</h2>
   <p><strong>Work hardening</strong>, also called strain hardening, occurs as metal is permanently deformed during cold working. It commonly raises strength and hardness while reducing remaining ductility. “Cold” here means below the relevant recrystallization range, not necessarily cold to the touch.</p>
@@ -3359,7 +3382,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="cutting-and-machining-plastics--trim-the-molding-excess-without-cutting-into-the-part" data-card="cutting-and-machining-plastics--trim-the-molding-excess-without-cutting-into-the-part">
-    <summary>Trim the molding excess without cutting into the part<span class="chev"></span></summary>
+    <summary>Trim the molding excess without cutting into the part<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Trim the molding excess without cutting into the part</h2>
   <p>A <strong>gate</strong> is the entry from a molding flow channel into the part cavity. Degating separates the part from that feed connection. <strong>Flash</strong> is a thin unwanted fin, often at a mold joint; trimming removes it. A <strong>burr</strong> is a raised edge left by cutting. These are different defects, even when the same trimming tool can remove them.</p>

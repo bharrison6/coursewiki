@@ -1154,16 +1154,39 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    own, deliberately NOT tied to the MSU palette in msu-theme.css (operator,
    2026-10-28): change the brand and the markers stay put, and the reverse.
    The build sets the flag from the card's content (build-site.ps1, $flag),
-   precedence stop > gate > interactive. Interactive green passes 3:1 on both
+   precedence stop > watch > interactive > checklist. Interactive green passes 3:1 on both
    surfaces (4.0:1 light, 3.9:1 dark).                                      */
 :root {
   --mark-stop:        #FF4500;   /* a hard stop: do not proceed           */
-  --mark-gate:        #ECAC00;   /* a key rule or trap to check            */
+  --mark-watch:       #B8860B;   /* a key rule or trap to check            */
+  --mark-checklist:   #9466D1;
   --mark-interactive: #3A8C3F;   /* something to work with: a live module  */
 }
-.xcard.is-stop        { border-left: 3px solid var(--mark-stop); }
-.xcard.is-gate        { border-left: 3px solid var(--mark-gate); }
-.xcard.is-interactive { border-left: 3px solid var(--mark-interactive); }
+.xcard[data-card-edge] { border-left: 3px solid var(--card-marker); }
+.xcard > summary {
+  position: relative; flex-wrap: wrap; padding-right: 2.7rem;
+  overflow-wrap: anywhere;
+}
+.xcard > summary .chev { position: absolute; right: 1.05rem; top: 1.2rem; }
+.card-tags { display: inline-flex; flex-wrap: wrap; gap: .3rem .65rem; max-width: 100%; }
+.card-tag { display: inline-flex; align-items: center; gap: .3rem; color: var(--ink); font: 600 .75rem/1.5 var(--f-body); }
+.card-tag[style]::before, .marker-sample {
+  content: ''; display: inline-block; width: 3px; height: 1em;
+  flex: none; background: var(--card-marker);
+}
+.marker-separator { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.card-legend { margin: 1.5rem 0; padding-block: .75rem; border-block: 1px solid var(--rule); color: var(--ink); }
+.card-legend h2 { margin: 0 0 .5rem; font-size: 1rem; border: 0; padding: 0; }
+.card-legend ul { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.card-legend li::before { content: none; }
+.marker-sample { margin-right: .5rem; vertical-align: middle; }
+/* a label-only category keeps the sample's width so its row lines up, but shows no colour */
+.marker-sample.is-label-only { background: none; }
+.presenting .card-tags { display: none; }
+@media print {
+  main figure, [data-interactive] { break-inside: avoid; }
+  .card-tag { font-size: 8pt; }
+}
 
 /* ---- phase spine -------------------------------------------------------
    BEFORE / DURING / AFTER, set sideways down the left edge of the three
@@ -1245,7 +1268,7 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    top of it. :not() keeps the danger edge - a card that is both a phase and
    a hard stop shows 3px of red beside the rail rather than losing it, which
    is two facts instead of one overwriting the other. */
-.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) {
+.xcard:not([data-card-edge]):has(> summary > .phase) {
   border-left: 3px solid var(--accent);
 }
 
@@ -1255,14 +1278,14 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
    projector edge reads as a rendering artefact. Both overrides outrank the
    base on specificity rather than on source order. */
 .presenting .xcard > summary:has(> .phase) { padding: 0 0 1rem; }
-.presenting .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+.presenting .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
 .presenting .phase { --phase-w: 2.6rem; --phase-fs: 1.05rem; --phase-min: 0; margin-right: .8rem; }
 
 @media print {
   .xcard > summary:has(> .phase) { padding: 0; }
   /* On paper the heading underline does the separating - the print sheet
      drops every card border, and the rail goes with them. */
-  .xcard.xcard:not(.is-stop):not(.is-gate):has(> summary > .phase) { border-left: 0; }
+  .xcard.xcard:not([data-card-edge]):has(> summary > .phase) { border-left: 0; }
   /* NO FILL ON PAPER, and the doubled class rather than source order,
      because this is a legibility invariant and not a preference: a printer
      or a user setting that drops backgrounds would leave reversed type on a
@@ -3065,7 +3088,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="dimension-anatomy-and-placement--rearrange-crossing-lines-before-accepting-clutter" data-card="dimension-anatomy-and-placement--rearrange-crossing-lines-before-accepting-clutter">
-    <summary>Rearrange crossing lines before accepting clutter<span class="chev"></span></summary>
+    <summary>Rearrange crossing lines before accepting clutter<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Rearrange crossing lines before accepting clutter</h2>
   <p>Move dimensions or notes to avoid crossing dimension lines, extension lines and leaders wherever practical. Keep a leader short, with a clear arrow target and a short horizontal landing next to the note.</p>
@@ -3108,8 +3131,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>For the beginner drawings here, do not dimension to hidden lines: choose a view that exposes the feature. Keep the dimensions of one feature together when practical. See the <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/index.html" target="_blank" rel="noopener">Reading Drawings group in Engineering Graphics</a> for projection, section views and view selection.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="choosing-dimensions--build-the-dimension-scheme-in-a-deliberate-order" data-card="choosing-dimensions--build-the-dimension-scheme-in-a-deliberate-order">
-    <summary>Build the dimension scheme in a deliberate order<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-checklist" id="choosing-dimensions--build-the-dimension-scheme-in-a-deliberate-order" data-card="choosing-dimensions--build-the-dimension-scheme-in-a-deliberate-order" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Build the dimension scheme in a deliberate order<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Build the dimension scheme in a deliberate order</h2>
   <ul class="boxes">
@@ -3135,7 +3158,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="choosing-dimensions--parentheses-mark-information-not-an-extra-acceptance-requirement" data-card="choosing-dimensions--parentheses-mark-information-not-an-extra-acceptance-requirement">
-    <summary>Parentheses mark information, not an extra acceptance requirement<span class="chev"></span></summary>
+    <summary>Parentheses mark information, not an extra acceptance requirement<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Parentheses mark information, not an extra acceptance requirement</h2>
   <p>A <strong>reference dimension</strong> is shown in parentheses, such as <code>(1.50)</code>. It helps the reader without imposing another manufacturing or inspection requirement. Use one when the derived value is useful; leave it out when it only adds clutter.</p>
@@ -3211,8 +3234,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Reading old and new symbol styles.</p>
     </div>
   </details>
-  <details class="xcard deck-slide is-interactive" id="hole-and-feature-callouts--change-a-hole-and-watch-its-callout-change" data-card="hole-and-feature-callouts--change-a-hole-and-watch-its-callout-change">
-    <summary>Change a hole and watch its callout change<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="hole-and-feature-callouts--change-a-hole-and-watch-its-callout-change" data-card="hole-and-feature-callouts--change-a-hole-and-watch-its-callout-change" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Change a hole and watch its callout change<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Change a hole and watch its callout change</h2>
   <p>Predict which line will change before changing a control. Compare counterbore depth with countersink angle, then change the main diameter while keeping the recess diameter fixed.</p>
