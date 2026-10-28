@@ -1,0 +1,39 @@
+@@ID: cnc-control-fundamentals
+@@TITLE: CNC Control Fundamentals
+@@SECTION: CNC
+@@SUMMARY: How a control turns a program into motion, how feedback works, and what changes between milling and turning.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>CNC repeats programmed motion; the operator still defines the process</h2>
+  <p><strong>Computer numerical control (CNC)</strong> uses a program to command machine motion and functions. On a manual machine, the operator directs each move with handwheels or power-feed controls. On a CNC machine, the operator prepares the tools, workholding and coordinate references, then checks the programmed sequence.</p>
+  <p>CNC can repeat a complex path consistently. It does not remove variation from tool wear, deflection, temperature or setup errors. Programming and setup take time, so CNC is not automatically faster for every one-off job.</p>
+  <p>The <strong>machine control unit (MCU)</strong> reads program blocks, keeps track of active settings, calculates intermediate positions along a path, and sends commands to the axis drives and machine functions. The drives supply power to the motors. The control also presents positions, settings and alarms to the operator.</p>
+</section>
+
+<section>
+  <h2>Feedback distinguishes open-loop and closed-loop motion</h2>
+  <table><thead><tr><th>System</th><th>How position is controlled</th><th>What that means</th></tr></thead><tbody>
+    <tr><td>Open loop</td><td>The drive sends motion commands without measuring actual position back into that positioning loop.</td><td>The control may not detect a missed step. A displayed commanded position is not proof of actual position.</td></tr>
+    <tr><td>Closed loop</td><td>A sensor reports position or motion; the drive/control compares feedback with the command and corrects error.</td><td>Excessive following error can produce an alarm. Feedback does not make the mechanics error-free.</td></tr>
+  </tbody></table>
+  <p>A <strong>stepper motor</strong> advances through commanded angular steps and is often used in open-loop systems. A <strong>servo system</strong> uses feedback to regulate motion. Closed-loop stepper systems also exist: motor type alone does not tell you whether feedback is present.</p>
+  <details class="deeper"><summary>Where the sensor sits matters</summary><p>A motor encoder measures the motor, while a linear scale can measure the slide directly. Screw error, backlash and elastic deflection between the sensor and the cutting point may remain. Homing establishes a reference; repeating homing is not a general cure for lost motion. See <a href="https://www.orientalmotor.com/stepper-motors/alphastep-closed-loop-stepper-motors.html">Oriental Motor's closed-loop stepper overview</a> for an example of feedback used with steppers.</p></details>
+</section>
+
+<section>
+  <h2>Milling rotates the cutter; turning rotates the work</h2>
+  <table><thead><tr><th>Basic machine</th><th>Cutting motion</th><th>Common programming concerns</th></tr></thead><tbody>
+    <tr><td>Three-axis vertical mill</td><td>A rotating cutter moves relative to the work along X, Y and Z.</td><td>Tool lengths, cutter radius, XY contours and hole locations.</td></tr>
+    <tr><td>Two-axis lathe</td><td>The work rotates while a cutting tool moves along X and Z.</td><td>Diameter/radius convention, tool geometry and wear offsets, tool nose radius and changing work diameter.</td></tr>
+  </tbody></table>
+  <p>Machines with live tooling, extra linear axes or rotary axes extend these basic cases. A mill's tool changer and a lathe's turret do not necessarily use the same tool-selection commands. Learn the geometry in [[cnc-axes-and-offsets]], then compare [[milling-operations]] and [[lathe-operations]]. For cutting data use [[feeds-and-speeds]]; for milling direction use [[climb-and-conventional-milling]].</p>
+</section>
+
+<section>
+  <h2>G-code is a family of control dialects</h2>
+  <p>These pages describe <strong>common Fanuc-style milling usage</strong>, with turning differences called out. G- and M-code meanings vary by control, machine type, options and configuration. Check the machine's own manual before applying a code or example. These examples teach interpretation; they are not production programs.</p>
+  <p>PathPilot is Tormach's machine control. Tormach publishes <a href="https://knowledgebase.tormach.com/pcnc-440/pathpilot-programming">PathPilot programming documentation</a> and <a href="https://knowledgebase.tormach.com/1500mx/pathpilot-post-processor-guidelines">post-processor guidelines</a>. Select documentation for the actual machine and software version. A general description does not establish its installed tools, options or setup.</p>
+  <p>Continue with [[cnc-program-structure]] and [[cnc-program-proving]]. Use [[gcode-and-toolpaths]] to explore a deliberately limited teaching interpreter.</p>
+</section>

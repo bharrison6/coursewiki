@@ -1,0 +1,39 @@
+@@ID: cnc-program-proving
+@@TITLE: CNC Programming and Prove-Out
+@@SECTION: CNC
+@@SUMMARY: Follow the CAD-to-CAM-to-post chain and use graphics, dry run, single block and overrides to check a program against its setup.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>CAD describes the shape; CAM plans how to cut it</h2>
+  <p><strong>CAD</strong> supplies design geometry and drawings. <strong>CAM</strong> uses geometry plus the programmer's stock, tool, workholding, operation and cutting-data choices to calculate toolpaths. Depending on the operation, CAM may work from 2D profiles or a 3D model; a solid model is not always required.</p>
+  <p>[[img:cnc/cam-chain.svg|CAD geometry and dimensions flow to CAM operations and tools, then to a machine-specific post-processor, then to G-code reviewed against the actual setup.]]</p>
+  <p>A <strong>post-processor</strong> translates CAM output into the syntax and conventions for a particular machine/control combination. Selecting the wrong post can change tool calls, arc format, offsets or startup behavior. Review the posted code as well as the CAM preview.</p>
+  <details class="deeper"><summary>Other ways to create a program</summary><p>A short program can be written directly in a text editor. Conversational programming asks for feature dimensions at the control. Manual data input (MDI) lets the operator enter commands at the control, often for immediate execution. These routes still require correct modes, geometry and setup data; they do not bypass prove-out. Tormach's <a href="https://knowledgebase.tormach.com/1500mx/pathpilot-post-processor-guidelines">post-processor guidelines</a> identify control-specific requirements.</p></details>
+</section>
+
+<section>
+  <h2>Each prove-out aid answers a different question</h2>
+  <p>Prove-out compares the intended operation, posted code and actual setup. Follow [[equipment-operating-procedure]] and [[machine-hazards]] for safety requirements; this page explains program-checking concepts, not a machine operating procedure.</p>
+  <table><thead><tr><th>Aid</th><th>Useful for</th><th>Limit</th></tr></thead><tbody>
+    <tr><td>Graphics or simulation</td><td>Inspecting path shape, endpoints, sequence and modeled interference.</td><td>A missing clamp, wrong tool model or incorrect offset can make the preview disagree with the machine.</td></tr>
+    <tr><td>Dry run</td><td>Observing a trial cycle under the control's defined test conditions.</td><td>It may substitute feed rates; the name does not guarantee no motion or no contact. Use the manual's procedure.</td></tr>
+    <tr><td>Single block</td><td>Advancing through blocks while comparing position and active modes with expectations.</td><td>One canned-cycle block may contain several motions. Not every internal action stops separately.</td></tr>
+    <tr><td>Feed override</td><td>Adjusting eligible feed motions during observation.</td><td>It need not affect rapids, tool changes or synchronized operations. Rapid override may be a separate control.</td></tr>
+  </tbody></table>
+</section>
+
+<section>
+  <h2>Review the program against the setup before a supervised trial</h2>
+  <ul class="boxes">
+    <li>Match the posted file and revision to the intended part, machine and post-processor.</li>
+    <li>Identify the active units, plane, distance mode and feed mode at each operation.</li>
+    <li>Compare work offsets, tool numbers and offset registers with the documented setup.</li>
+    <li>Trace the first approach, tool changes, cycle returns and final retract against the modeled stock and fixtures.</li>
+    <li>Check that the actual setup matches what the preview includes; resolve any discrepancy with the instructor before proceeding.</li>
+    <li>Identify the manual's dry-run, single-block and override behavior before using those functions in a supervised trial.</li>
+    <li>After an edit, repeat the affected checks; compare the first part's measured features with the drawing.</li>
+  </ul>
+  <p>Practise interpretation with [[gcode-and-toolpaths]] and explore the existing 3D/WebGL milling lab in [[milling-operations]]. A successful simulation only establishes behavior within that model. It does not approve a program for a real machine.</p>
+</section>

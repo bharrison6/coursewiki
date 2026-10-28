@@ -1,0 +1,58 @@
+@@ID: cnc-program-structure
+@@TITLE: CNC Program Structure
+@@SECTION: CNC
+@@SUMMARY: Read program identifiers, startup modes, machine functions, feed modes and drilling cycles in common milling G-code.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>A block can combine motion, settings and machine functions</h2>
+  <p>A <strong>word</strong> is a letter and value, such as X12 or F100. A <strong>block</strong> is a line of words. The control applies its execution rules; words are not necessarily executed in left-to-right typing order. N numbers label blocks and are often optional. Many Fanuc-style programs use an O number such as <code>O2468</code> as the program identifier. File naming, percent delimiters and identifiers vary by control.</p>
+  <p>A <strong>modal</strong> command stays active until replaced or cancelled within its group. G01 can remain active while G90 changes to G91, because motion and distance mode are different groups. A startup line sets specific modes; it does not clear every stored setting or offset.</p>
+</section>
+
+<section>
+  <h2>A safe-start line declares assumptions; it does not prove the setup</h2>
+  <p>A common milling startup example is <code>G17 G21 G90 G94 G40 G49 G80</code>: XY plane, millimetres, absolute endpoints, feed per minute, cutter compensation cancelled, tool-length compensation cancelled and canned cycles cancelled. This is a reading example, <strong>not a universal restart line</strong>. Cancelling an offset changes the coordinate relationship; startup and restart sequences must match the actual control and tool position.</p>
+  <ol>
+    <li>Identify the program and establish required units, plane and modes.</li>
+    <li>Select the intended work coordinate system and tool; apply the correct offset data.</li>
+    <li>Establish spindle, feed and coolant settings for the operation.</li>
+    <li>Perform positioning and machining blocks, including any cycle cancellation.</li>
+    <li>Use the machine-approved retract and shutdown sequence, then end the program.</li>
+  </ol>
+  <p>The order and motion details around tool changes and offset activation require the machine manual. See [[cnc-axes-and-offsets]] and [[cnc-program-proving]].</p>
+</section>
+
+<section>
+  <h2>Separate spindle, tool and coolant commands from motion</h2>
+  <p>These are common Fanuc-style meanings, not a promise for every machine.</p>
+  <table><thead><tr><th>Code</th><th>Common meaning</th><th>Read with it</th></tr></thead><tbody>
+    <tr><td>M03 / M04 / M05</td><td>Spindle clockwise / counterclockwise / stop</td><td>S sets the speed value. Direction is conventionally viewed from the spindle toward the work; confirm machine orientation.</td></tr>
+    <tr><td>M06</td><td>Tool change on many mills</td><td>T selects a tool. The changer may be manual or automatic; offset activation is a separate issue.</td></tr>
+    <tr><td>M08 / M09</td><td>Flood coolant on / coolant off</td><td>Available coolant systems and auxiliary M codes depend on the machine.</td></tr>
+    <tr><td>M30</td><td>End program and commonly reset/rewind</td><td>It does not command a return to machine or work zero, and does not mean automatically run another part.</td></tr>
+  </tbody></table>
+  <p>For example, <code>S1800 M03</code> requests 1800 rpm in a fixed-rpm mode; it is not a cutting recommendation. A lathe using constant surface speed interprets S differently. See [[feeds-and-speeds]].</p>
+  <p><a class="button" data-practice-add="cnc-code-m05" href="../practice.html#cnc-code-m05">Practice code meanings</a></p>
+</section>
+
+<section>
+  <h2>Units, feed mode and plane answer different questions</h2>
+  <table><thead><tr><th>Setting</th><th>Common milling interpretation</th></tr></thead><tbody>
+    <tr><td>G20 / G21</td><td>Inch / millimetre length units.</td></tr>
+    <tr><td>G94 / G95</td><td>Feed in units per minute / units per spindle revolution, where supported.</td></tr>
+    <tr><td>G17 / G18 / G19</td><td>XY / XZ / YZ plane for plane-dependent operations such as arcs.</td></tr>
+    <tr><td>G00 / G01</td><td>Rapid positioning / straight-line motion at programmed feed.</td></tr>
+    <tr><td>G02 / G03</td><td>Clockwise / counterclockwise arc in the selected plane.</td></tr>
+  </tbody></table>
+  <p>In G21 G94, F90 means 90 mm/min. In G21 G95, F0.15 means 0.15 mm/rev; at 600 rpm that corresponds to 90 mm/min. G20/G21 alone does not choose the time basis. Some lathes use G98/G99 for feed mode, while mills commonly use those codes for drilling return levels.</p>
+  <p>Rapid path shape depends on the control and can differ from G01. G01 may feed through air as well as cut. Learn the motion and arc geometry in [[gcode-and-toolpaths]], including the existing simulator; learn distance modes in [[absolute-and-incremental-positioning]].</p>
+</section>
+
+<section>
+  <h2>G81 and G83 repeat a drilling sequence at hole locations</h2>
+  <p>A <strong>canned cycle</strong> packages repeated motions. In common milling use, G81 feeds a drill to depth then retracts; G83 divides the depth into pecks with retracts for chip clearance. X/Y locate the hole, Z specifies the drill-tip depth, R specifies a return/approach plane, F sets feed, and Q commonly specifies peck depth for G83. Q is not the final hole depth.</p>
+  <p>With G90 on a conventional mill, Z and R are coordinates in the active work system. Incremental canned-cycle rules need separate study in the manual. G98 commonly returns to the initial level and G99 to R; choose a return level for the actual setup. G80 cancels the cycle. Modal hole cycles can drill again at subsequent position blocks.</p>
+  <p>The simulator in [[gcode-and-toolpaths]] demonstrates G81, not G83. See <a href="https://knowledgebase.tormach.com/1500mx/programming-1500mx">Tormach's programming reference</a> for control-specific modes and cycles, and the <a href="https://www.haascnc.com/content/dam/haascnc/en/service/manual/operator/english---lathe-ngc---operator%27s-manual---2025.pdf">Haas lathe manual</a> for examples of meanings that differ from milling.</p>
+</section>

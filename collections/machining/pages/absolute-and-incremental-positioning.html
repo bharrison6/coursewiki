@@ -1,0 +1,46 @@
+@@ID: absolute-and-incremental-positioning
+@@TITLE: Absolute and Incremental Positioning
+@@SECTION: CNC
+@@SUMMARY: Convert between positions and signed moves, and trace the endpoint of a program as its distance mode changes.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>G90 gives a destination; G91 gives a signed change</h2>
+  <p>In common milling usage, <code>G90</code> makes axis values absolute coordinates in the active coordinate system. <code>G91</code> makes them signed changes from the current position. Neither command moves an axis by itself. Units and work offsets still matter.</p>
+  <p><strong>Increment = next position − current position.</strong> Reverse the calculation with <strong>next position = current position + increment</strong>. Keep a separate running total for every axis.</p>
+  <p>For an ordinary G00/G01 move, an omitted axis stays in place. In G90, <code>X0</code> requests X zero; in G91, <code>X0</code> requests zero X movement. Do not reuse an omitted incremental value from the preceding block.</p>
+  <p>These G90/G91 meanings must not be assumed on every lathe. Some turning controls use X/Z for absolute and U/W for incremental coordinates, and use G90 for a turning cycle. Check the control before translating a mill program to a lathe.</p>
+</section>
+
+<section>
+  <h2>One path can be written as points or as moves</h2>
+  <p>Start at A = (6,4) mm. Visit B = (26,4), C = (26,19), then D = (11,19). Z is unchanged; these are coordinate exercises with no cutting setup implied.</p>
+  <table><thead><tr><th>Move</th><th>Absolute destination, G90</th><th>Increment, G91</th></tr></thead><tbody>
+    <tr><td>A → B</td><td>X26 Y4</td><td>X20 Y0</td></tr>
+    <tr><td>B → C</td><td>X26 Y19</td><td>X0 Y15</td></tr>
+    <tr><td>C → D</td><td>X11 Y19</td><td>X−15 Y0</td></tr>
+  </tbody></table>
+  <p>[[img:cnc/positioning.svg|Path from A 6,4 to B 26,4 to C 26,19 to D 11,19. Signed moves are plus 20 in X, plus 15 in Y, then minus 15 in X.]]</p>
+  <details class="deeper"><summary>Check the conversion in both directions</summary><p>Subtract endpoints: (26−6,4−4) = (20,0); (26−26,19−4) = (0,15); (11−26,19−19) = (−15,0). Add those changes to A: (6+20+0−15,4+0+15+0) = (11,19). The net move is (5,15), not the final absolute position.</p></details>
+  <p><a class="button" data-practice-add="cnc-point-list-dx" href="../practice.html#cnc-point-list-dx">Practice point-list conversion</a></p>
+</section>
+
+<section>
+  <h2>Trace the active mode before evaluating each block</h2>
+  <p>Assume millimetres, one unchanged work coordinate system, no compensation and an initial position (6,4,12). This is a paper trace, not a machine-ready program. F120 is an arithmetic example.</p>
+  <pre><code>G21 G90 G94
+G01 X26 Y4 F120
+G91 Y15
+X-15
+G90 X8
+M30</code></pre>
+  <table><thead><tr><th>Motion block</th><th>Mode</th><th>Position afterward (mm)</th></tr></thead><tbody>
+    <tr><td>G01 X26 Y4 F120</td><td>Absolute</td><td>(26,4,12)</td></tr>
+    <tr><td>G91 Y15</td><td>Incremental</td><td>(26,19,12)</td></tr>
+    <tr><td>X−15</td><td>Incremental; G01 remains active</td><td>(11,19,12)</td></tr>
+    <tr><td>G90 X8</td><td>Absolute; G01 remains active</td><td>(8,19,12)</td></tr>
+  </tbody></table>
+  <p>M30 ends this trace; it is not a command to move to zero. For arcs, the endpoint mode and centre mode are separate questions: see [[gcode-and-toolpaths]]. For a broader view of modes use [[cnc-program-structure]].</p>
+  <p><a class="button" data-practice-add="cnc-trace-x" href="../practice.html#cnc-trace-x">Practice a program endpoint</a></p>
+</section>

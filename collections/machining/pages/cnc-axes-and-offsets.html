@@ -1,0 +1,40 @@
+@@ID: cnc-axes-and-offsets
+@@TITLE: CNC Axes and Offsets
+@@SECTION: CNC
+@@SUMMARY: Identify mill and lathe axes, distinguish machine and work zero, and separate work offsets from tool compensation.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Describe tool motion relative to the work with a right-handed frame</h2>
+  <p>Use your right hand: thumb along +X, index finger along +Y and middle finger along +Z, with all three perpendicular. Equivalently, curling from +X toward +Y makes the thumb point along +Z. Z runs parallel to the principal spindle axis.</p>
+  <p>On a conventional vertical mill viewed from the front, +X is to the right, +Y is toward the back and +Z raises the tool away from the work. These are <strong>tool-relative-to-work</strong> directions. If the table moves instead of the tool, its physical motion is opposite the tool-relative motion.</p>
+  <p>[[img:cnc/axes.svg|Vertical mill: tool-relative X right, Y back, Z up. Basic lathe: Z along the spindle away from the headstock, X radially outward on the illustrated tool side.]]</p>
+  <p>For a basic lathe, Z is along the spindle and +Z is away from the headstock. X is radial; positive X values commonly describe the tool side of the centreline. A slant bed or rear turret changes what this looks like from the operator's position. Do not infer axis signs from screen orientation. Two-axis turning normally uses the XZ plane.</p>
+</section>
+
+<section>
+  <h2>A lathe X value may describe diameter or radius</h2>
+  <p>In <strong>diameter programming</strong>, X24 describes a surface 24 mm in diameter, 12 mm from the spindle centreline. In <strong>radius programming</strong>, the same surface is X12. Z distances are not halved.</p>
+  <p>For a change from diameter 30 mm to diameter 26 mm, the X coordinate changes by −4 mm in diameter mode, but the tool moves only 2 mm radially inward. Confirm the control's convention for absolute X, incremental X and arc-centre words separately; do not halve every number in a turning block.</p>
+  <p><a class="button" data-practice-add="cnc-diameter-radius" href="../practice.html#cnc-diameter-radius">Practice diameter and radius</a></p>
+</section>
+
+<section>
+  <h2>Machine zero belongs to the machine; work zero belongs to the setup</h2>
+  <p><strong>Machine zero</strong> is the machine coordinate origin. A reference-return or homing procedure establishes the machine's position reference; the home position need not be the coordinate origin. <strong>Work zero</strong> is a chosen datum on the part or fixture, such as a corner, hole centre or faced end.</p>
+  <p>Common milling codes <code>G54</code> through <code>G59</code> select stored work coordinate systems. Selecting G54 does not measure the part, write the offset table or redefine machine zero. The setup procedure establishes the stored values.</p>
+  <p>[[img:cnc/work-zero.svg|Simplified XY translation: work zero is at machine coordinates 100,60. A work point 20,15 is at machine coordinates 120,75.]]</p>
+  <p>With only a translation, <strong>machine position = work-zero location in machine coordinates + work position</strong>. If the work origin is (100,60) and the program point is (20,15), the machine point is (120,75). This example omits rotation, local shifts and tool offsets.</p>
+  <p>In common Fanuc-style milling, <code>G53</code> selects machine coordinates for the block containing it. It does not erase G54 or force G54 to become the next active work system. The previously selected work system remains selected afterward. Tool-offset interaction and permitted motion modes are control-specific; check your control's manual. <strong>Machine-coordinate zero is not necessarily a clearance position.</strong></p>
+</section>
+
+<section>
+  <h2>Tool length and cutter radius compensate for different dimensions</h2>
+  <p>In common Fanuc-style milling, <code>G43 H...</code> applies <strong>positive tool-length compensation</strong>: it adds the signed value stored in the selected H register to commanded Z positions so Z can refer to the intended tool-tip position. The offset's sign, established by the touch-off convention, determines the direction of that shift. G43 does not mean an unconditional upward move. Check your control's manual for its offset and touch-off conventions.</p>
+  <p>For example, H03 selects register 3; it does not mean a length of 3 mm. T selects a tool; H selects offset data. Their numbers may match by shop convention, but the programmer must verify that relationship. <code>G49</code> commonly cancels length compensation.</p>
+  <details class="deeper"><summary>Why positive compensation can use a negative offset</summary><p>Positive compensation describes addition, not the sign of the stored number: adding a negative value shifts the compensated Z position in the negative direction. The <a href="https://www.haascnc.com/content/dam/haascnc/videos/bonus-content/ep81-essential-9-lines/programming-workbooks/mill---programming-workbook.pdf#page=53">Haas mill programming workbook's tool-length compensation section</a> explains G43's addition of the selected offset to commanded positions.</p></details>
+  <p><code>G41</code> offsets a cutter to the <strong>left of the programmed path looking in the direction of travel</strong>; <code>G42</code> offsets it to the right. <code>G40</code> cancels it. These are not clockwise/counterclockwise commands. Moving along +X in XY, left is +Y. On many mills a D word selects cutter compensation data; check whether that register stores radius, diameter or a wear adjustment.</p>
+  <p>Compensation needs suitable entry and exit moves. Do not add a full radius correction to a CAM path that already includes that correction. Turning tool nose compensation also depends on nose radius and tool orientation; it is not simply a milling H offset.</p>
+  <p>See [[gcode-and-toolpaths]] for tool-centre paths without compensation. Tormach's <a href="https://knowledgebase.tormach.com/1500mx/pathpilot-post-processor-guidelines">PathPilot guidelines</a> describe H-based tool offset selection; <a href="https://www.cimco.com/documentation/online/cimco_edit_courses/cimco_edit/courses/cnc%20milling%20fanuc/exercisesmillingfanucradiuscompensation.html">CIMCO's Fanuc milling lesson</a> illustrates left/right compensation.</p>
+</section>
