@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2948,7 +2975,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Start with what removes the material</h2>
   <p>A machine tool controls motion between a tool and the workpiece, the part being made. In material removal, the final shape is what remains after unwanted material is taken away.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5NYXRlcmlhbC1yZW1vdmFsIHByb2Nlc3MgZmFtaWx5IHRyZWU8L3RpdGxlPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9Ijk0MCIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzYiIGZpbGw9IiMwMDIxNDQiPgo8cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSI3NjAiIGhlaWdodD0iNzAiIHJ4PSIxMiIgZmlsbD0iIzAwMjE0NCIvPgo8dGV4dCB4PSI0MDAiIHk9IjY3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+TWF0ZXJpYWwgcmVtb3ZhbDwvdGV4dD4KPHBhdGggZD0iTTYwIDkwVjgwNU02MCAxNTVIMTEwTTYwIDM2NUgxMTBNNjAgNTU1SDExMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjUiLz4KPHJlY3QgeD0iMTEwIiB5PSIxMTUiIHdpZHRoPSI2NzAiIGhlaWdodD0iMTk1IiByeD0iMTIiIGZpbGw9IiNlNmYzZmEiLz4KPHRleHQgeD0iMTMwIiB5PSIxNjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5EZWZpbmVkIGN1dHRpbmcgZWRnZXM8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iMjA3Ij5UdXJuaW5nIMK3IG1pbGxpbmcgwrcgZHJpbGxpbmc8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iMjUxIj5TYXdpbmcgwrcgYnJvYWNoaW5nPC90ZXh0Pgo8dGV4dCB4PSIxMzAiIHk9IjI5NSI+U2hhcGluZyDCtyBwbGFuaW5nPC90ZXh0Pgo8cmVjdCB4PSIxMTAiIHk9IjMzMCIgd2lkdGg9IjY3MCIgaGVpZ2h0PSIxNDAiIHJ4PSIxMiIgZmlsbD0iI2ZmZjFjYyIvPgo8dGV4dCB4PSIxMzAiIHk9IjM3NSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFicmFzaXZlIGdyYWluczwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI0MjUiPkdyaW5kaW5nIMK3IGhvbmluZyDCtyBsYXBwaW5nPC90ZXh0Pgo8cmVjdCB4PSIxMTAiIHk9IjUwNSIgd2lkdGg9IjY3MCIgaGVpZ2h0PSIzNTUiIHJ4PSIxMiIgZmlsbD0iI2U2ZjNmYSIvPgo8dGV4dCB4PSIxMzAiIHk9IjU1MCIgZm9udC13ZWlnaHQ9ImJvbGQiPk5vbnRyYWRpdGlvbmFsIGVuZXJneTwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI2MDAiPlRoZXJtYWw6IEVETSDCtyBsYXNlciDCtyBwbGFzbWE8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iNjUwIj5FbGVjdHJvY2hlbWljYWw6IEVDTTwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI3MDAiPkNoZW1pY2FsOiBtaWxsaW5nIC8gZXRjaGluZzwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI3NTAiPk1lY2hhbmljYWw6IHdhdGVyamV0PC90ZXh0Pgo8dGV4dCB4PSIxMzAiIHk9IjgwMCI+YW5kIHVsdHJhc29uaWMgaW1wYWN0PC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iOTEwIj5DTkMgY29udHJvbHMgbW90aW9uIGFjcm9zcyB0aGVzZSBmYW1pbGllcy48L3RleHQ+PC9nPjwvc3ZnPg==" alt="Material removal branches into chip-forming tools, abrasive grains, and nontraditional energy sources."></p><figcaption>This is a teaching map of removal mechanisms. Abrasives also make small chips; the branches distinguish the kind of tool or energy doing the work.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5NYXRlcmlhbC1yZW1vdmFsIHByb2Nlc3MgZmFtaWx5IHRyZWU8L3RpdGxlPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9Ijk0MCIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzYiIGZpbGw9IiMwMDIxNDQiPgo8cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSI3NjAiIGhlaWdodD0iNzAiIHJ4PSIxMiIgZmlsbD0iIzAwMjE0NCIvPgo8dGV4dCB4PSI0MDAiIHk9IjY3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+TWF0ZXJpYWwgcmVtb3ZhbDwvdGV4dD4KPHBhdGggZD0iTTYwIDkwVjgwNU02MCAxNTVIMTEwTTYwIDM2NUgxMTBNNjAgNTU1SDExMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjUiLz4KPHJlY3QgeD0iMTEwIiB5PSIxMTUiIHdpZHRoPSI2NzAiIGhlaWdodD0iMTk1IiByeD0iMTIiIGZpbGw9IiNlNmYzZmEiLz4KPHRleHQgeD0iMTMwIiB5PSIxNjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5EZWZpbmVkIGN1dHRpbmcgZWRnZXM8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iMjA3Ij5UdXJuaW5nIMK3IG1pbGxpbmcgwrcgZHJpbGxpbmc8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iMjUxIj5TYXdpbmcgwrcgYnJvYWNoaW5nPC90ZXh0Pgo8dGV4dCB4PSIxMzAiIHk9IjI5NSI+U2hhcGluZyDCtyBwbGFuaW5nPC90ZXh0Pgo8cmVjdCB4PSIxMTAiIHk9IjMzMCIgd2lkdGg9IjY3MCIgaGVpZ2h0PSIxNDAiIHJ4PSIxMiIgZmlsbD0iI2ZmZjFjYyIvPgo8dGV4dCB4PSIxMzAiIHk9IjM3NSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFicmFzaXZlIGdyYWluczwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI0MjUiPkdyaW5kaW5nIMK3IGhvbmluZyDCtyBsYXBwaW5nPC90ZXh0Pgo8cmVjdCB4PSIxMTAiIHk9IjUwNSIgd2lkdGg9IjY3MCIgaGVpZ2h0PSIzNTUiIHJ4PSIxMiIgZmlsbD0iI2U2ZjNmYSIvPgo8dGV4dCB4PSIxMzAiIHk9IjU1MCIgZm9udC13ZWlnaHQ9ImJvbGQiPk5vbnRyYWRpdGlvbmFsIGVuZXJneTwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI2MDAiPlRoZXJtYWw6IEVETSDCtyBsYXNlciDCtyBwbGFzbWE8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iNjUwIj5FbGVjdHJvY2hlbWljYWw6IEVDTTwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI3MDAiPkNoZW1pY2FsOiBtaWxsaW5nIC8gZXRjaGluZzwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI3NTAiPk1lY2hhbmljYWw6IHdhdGVyamV0PC90ZXh0Pgo8dGV4dCB4PSIxMzAiIHk9IjgwMCI+YW5kIHVsdHJhc29uaWMgaW1wYWN0PC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iOTEwIj5DTkMgY29udHJvbHMgbW90aW9uIGFjcm9zcyB0aGVzZSBmYW1pbGllcy48L3RleHQ+PC9nPjwvc3ZnPg==" alt="Material removal branches into chip-forming tools, abrasive grains, and nontraditional energy sources." data-natural-width="800" data-natural-height="940"></p><figcaption>This is a teaching map of removal mechanisms. Abrasives also make small chips; the branches distinguish the kind of tool or energy doing the work.</figcaption></figure>
   <p><strong>CNC is a control method, not a removal family.</strong> Computer numerical control can guide a mill, lathe, grinder, EDM machine or cutting jet. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/gcode-and-toolpaths.html" target="_blank" rel="noopener">G-code and Toolpaths</a>. Forming moves material without removing it; see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/materials-and-processes/manufacturing-process-categories.html" target="_blank" rel="noopener">Manufacturing Process Categories</a> for the wider manufacturing map.</p>
     </div>
   </details>
@@ -3020,7 +3047,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Offset the wire center by its radius plus the spark gap<span class="chev"></span></summary>
     <div class="body">
       <h2>Offset the wire center by its radius plus the spark gap</h2>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5XaXJlIEVETSBjZW50ZXItcGF0aCBvZmZzZXQgZXF1YWxzIHdpcmUgcmFkaXVzIHBsdXMgc3BhcmsgZ2FwPC90aXRsZT4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI4MzAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMDAyMTQ0Ij4KPHRleHQgeD0iMzAiIHk9IjUwIiBmb250LXdlaWdodD0iYm9sZCI+V2lyZSBFRE06IHRvcCB2aWV3PC90ZXh0Pgo8cmVjdCB4PSIzMCIgeT0iOTAiIHdpZHRoPSI3NDAiIGhlaWdodD0iNDcwIiBmaWxsPSIjZTZmM2ZhIi8+CjxyZWN0IHg9IjQ3MCIgeT0iOTAiIHdpZHRoPSIzMDAiIGhlaWdodD0iNDcwIiBmaWxsPSIjZGRkIi8+CjxwYXRoIGQ9Ik00NzAgOTBWNTYwIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iNiIvPgo8dGV4dCB4PSI0OTAiIHk9IjE1NSI+UmV0YWluZWQ8L3RleHQ+PHRleHQgeD0iNDkwIiB5PSIyMDAiPndvcmtwaWVjZTwvdGV4dD4KPHRleHQgeD0iNTAiIHk9IjE0NSI+RGllbGVjdHJpYyBmbHVpZDwvdGV4dD4KPHBhdGggZD0iTTMzMCAxNjVWNTUwIiBzdHJva2U9IiMwMDVkODciIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOSIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMjAiIHI9IjkwIiBmaWxsPSIjZWNhYzAwIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iNCIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMjAiIHI9IjYiIGZpbGw9IiMwMDIxNDQiLz4KPHRleHQgeD0iMjgwIiB5PSIzMDAiPldpcmU8L3RleHQ+CjxwYXRoIGQ9Ik0zMzAgMzIwSDQyME0zMzAgMzEwVjMzME00MjAgMzEwVjMzMCIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHRleHQgeD0iNjUiIHk9IjM4NSI+UmFkaXVzPC90ZXh0PjxwYXRoIGQ9Ik0xOTAgMzc1TDM3MCAzMjciIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik00MjAgMzIwSDQ3ME00NzAgMzEwVjMzMCIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHRleHQgeD0iNDg1IiB5PSIzMTAiPlNwYXJrIGdhcDwvdGV4dD48cGF0aCBkPSJNNDg1IDMyMEw0NDYgMzI0IiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMzMwIDQ2NUg0NzBNMzMwIDQ1MFY0ODBNNDcwIDQ1MFY0ODAiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSI0Ii8+Cjx0ZXh0IHg9IjUwIiB5PSI1MTAiPk9mZnNldDwvdGV4dD48cGF0aCBkPSJNMTYwIDUwMEwzOTUgNDY4IiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIzMCIgeT0iNjEwIj5EYXNoZWQgbGluZTogd2lyZSBjZW50ZXIgcGF0aDwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjY2NSI+U29saWQgbGluZTogZmluaXNoZWQgd2FsbDwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjcyMCI+T2Zmc2V0ID0gcmFkaXVzICsgb25lLXNpZGVkIGdhcDwvdGV4dD4KPHRleHQgeD0iMzAiIHk9Ijc4MCI+V2lyZSBhbmQgZ2FwIGVubGFyZ2VkOyBub3QgdG8gc2NhbGUuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Top view of a wire beside a retained workpiece wall. The wire center path lies in the removed region, one wire radius plus one spark gap from the wall, in dielectric fluid."></p><figcaption>The wire runs perpendicular to this top view. Gap and wire are enlarged. The dashed line is the wire center path; the solid boundary is the finished wall.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5XaXJlIEVETSBjZW50ZXItcGF0aCBvZmZzZXQgZXF1YWxzIHdpcmUgcmFkaXVzIHBsdXMgc3BhcmsgZ2FwPC90aXRsZT4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI4MzAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMDAyMTQ0Ij4KPHRleHQgeD0iMzAiIHk9IjUwIiBmb250LXdlaWdodD0iYm9sZCI+V2lyZSBFRE06IHRvcCB2aWV3PC90ZXh0Pgo8cmVjdCB4PSIzMCIgeT0iOTAiIHdpZHRoPSI3NDAiIGhlaWdodD0iNDcwIiBmaWxsPSIjZTZmM2ZhIi8+CjxyZWN0IHg9IjQ3MCIgeT0iOTAiIHdpZHRoPSIzMDAiIGhlaWdodD0iNDcwIiBmaWxsPSIjZGRkIi8+CjxwYXRoIGQ9Ik00NzAgOTBWNTYwIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iNiIvPgo8dGV4dCB4PSI0OTAiIHk9IjE1NSI+UmV0YWluZWQ8L3RleHQ+PHRleHQgeD0iNDkwIiB5PSIyMDAiPndvcmtwaWVjZTwvdGV4dD4KPHRleHQgeD0iNTAiIHk9IjE0NSI+RGllbGVjdHJpYyBmbHVpZDwvdGV4dD4KPHBhdGggZD0iTTMzMCAxNjVWNTUwIiBzdHJva2U9IiMwMDVkODciIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOSIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMjAiIHI9IjkwIiBmaWxsPSIjZWNhYzAwIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iNCIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMjAiIHI9IjYiIGZpbGw9IiMwMDIxNDQiLz4KPHRleHQgeD0iMjgwIiB5PSIzMDAiPldpcmU8L3RleHQ+CjxwYXRoIGQ9Ik0zMzAgMzIwSDQyME0zMzAgMzEwVjMzME00MjAgMzEwVjMzMCIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHRleHQgeD0iNjUiIHk9IjM4NSI+UmFkaXVzPC90ZXh0PjxwYXRoIGQ9Ik0xOTAgMzc1TDM3MCAzMjciIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik00MjAgMzIwSDQ3ME00NzAgMzEwVjMzMCIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHRleHQgeD0iNDg1IiB5PSIzMTAiPlNwYXJrIGdhcDwvdGV4dD48cGF0aCBkPSJNNDg1IDMyMEw0NDYgMzI0IiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMzMwIDQ2NUg0NzBNMzMwIDQ1MFY0ODBNNDcwIDQ1MFY0ODAiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSI0Ii8+Cjx0ZXh0IHg9IjUwIiB5PSI1MTAiPk9mZnNldDwvdGV4dD48cGF0aCBkPSJNMTYwIDUwMEwzOTUgNDY4IiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIzMCIgeT0iNjEwIj5EYXNoZWQgbGluZTogd2lyZSBjZW50ZXIgcGF0aDwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjY2NSI+U29saWQgbGluZTogZmluaXNoZWQgd2FsbDwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjcyMCI+T2Zmc2V0ID0gcmFkaXVzICsgb25lLXNpZGVkIGdhcDwvdGV4dD4KPHRleHQgeD0iMzAiIHk9Ijc4MCI+V2lyZSBhbmQgZ2FwIGVubGFyZ2VkOyBub3QgdG8gc2NhbGUuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Top view of a wire beside a retained workpiece wall. The wire center path lies in the removed region, one wire radius plus one spark gap from the wall, in dielectric fluid." data-natural-width="800" data-natural-height="830"></p><figcaption>The wire runs perpendicular to this top view. Gap and wire are enlarged. The dashed line is the wire center path; the solid boundary is the finished wall.</figcaption></figure>
   <p><code>Center-path offset = wire radius + spark gap</code>. Measure this distance from the finished contour toward the material being removed. In a simple straight cut, the full cut width (kerf) is wire diameter plus twice the gap.</p>
   <p>For an illustrative radius of 0.120 mm and a one-sided gap of 0.018 mm, the offset is <strong>0.138 mm</strong>. These are teaching inputs, not machine settings. A control may apply compensation to a programmed part contour; do not also offset the geometry a second time.</p>
   <p><a class="button" data-practice-add="nt-wire-offset" href="../practice.html#nt-wire-offset">Practice a wire offset</a></p>
@@ -3088,7 +3115,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Distinguish a thermal cut from an erosive cut</h2>
   <p>Laser and plasma use concentrated heat. Waterjet uses mechanical energy. A <strong>heat-affected zone (HAZ)</strong> is material beside a cut whose properties or structure have changed from heating without being melted away.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5MYXNlciwgYWJyYXNpdmUgd2F0ZXJqZXQgYW5kIHBsYXNtYSBjdXR0aW5nIGNvbXBhcmVkPC90aXRsZT4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI5NjAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMDAyMTQ0Ij4KPHRleHQgeD0iMzAiIHk9IjUwIiBmb250LXdlaWdodD0iYm9sZCI+VGhyZWUgd2F5cyB0byBjdXQgYSBwcm9maWxlPC90ZXh0Pgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDkwKSI+CjxyZWN0IHg9IjIwIiB3aWR0aD0iNzYwIiBoZWlnaHQ9IjI0NSIgcng9IjEwIiBmaWxsPSIjZjJmNWY3Ii8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgZm9udC13ZWlnaHQ9ImJvbGQiPkxhc2VyPC90ZXh0Pgo8cGF0aCBkPSJNMTIwIDYwVjE3MCIgc3Ryb2tlPSIjYjEzZDE2IiBzdHJva2Utd2lkdGg9IjgiLz4KPHBhdGggZD0iTTM1IDE3MEgxMDBWMjIwSDM1Wk0xNDAgMTcwSDIxNVYyMjBIMTQwWiIgZmlsbD0iI2JiYiIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTkwIDE3MEgxMDBWMjIwSDkwWk0xNDAgMTcwSDE1MFYyMjBIMTQwWiIgZmlsbD0iI2ZmYjY5NSIvPgo8dGV4dCB4PSIyNTAiIHk9IjEwMCI+Rm9jdXNlZCBsaWdodCDihpIgaGVhdDwvdGV4dD4KPHRleHQgeD0iMjUwIiB5PSIxNTUiPkZpbmUgcHJvZmlsZXM7IG1hdGNoZWQ8L3RleHQ+Cjx0ZXh0IHg9IjI1MCIgeT0iMjAwIj5sYXNlciBhbmQgbWF0ZXJpYWw8L3RleHQ+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDM2MCkiPgo8cmVjdCB4PSIyMCIgd2lkdGg9Ijc2MCIgaGVpZ2h0PSIyNDUiIHJ4PSIxMCIgZmlsbD0iI2U2ZjNmYSIvPgo8dGV4dCB4PSI0MCIgeT0iNDUiIGZvbnQtd2VpZ2h0PSJib2xkIj5BYnJhc2l2ZSB3YXRlcmpldDwvdGV4dD4KPHBhdGggZD0iTTEyMCA2NVYxNjUiIHN0cm9rZT0iIzAwNWQ4NyIgc3Ryb2tlLXdpZHRoPSIxMiIvPgo8cGF0aCBkPSJNMzUgMTcwSDEwMEwxMTAgMjIwSDM1Wk0xNDAgMTcwSDIxNVYyMjBIMTMwWiIgZmlsbD0iI2JiYiIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjIiLz4KPGcgZmlsbD0iIzAwMjE0NCI+PGNpcmNsZSBjeD0iMTE4IiBjeT0iOTAiIHI9IjQiLz48Y2lyY2xlIGN4PSIxMjIiIGN5PSIxMTgiIHI9IjQiLz48Y2lyY2xlIGN4PSIxMTgiIGN5PSIxNTAiIHI9IjQiLz48L2c+Cjx0ZXh0IHg9IjI1MCIgeT0iMTAwIj5Nb3ZpbmcgZ3JpdCDihpIgZXJvc2lvbjwvdGV4dD4KPHRleHQgeD0iMjUwIiB5PSIxNTUiPk1hbnkgbWF0ZXJpYWxzOzwvdGV4dD4KPHRleHQgeD0iMjUwIiB5PSIyMDAiPm5vIHRoZXJtYWwgSEFaPC90ZXh0PjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCA2MzApIj4KPHJlY3QgeD0iMjAiIHdpZHRoPSI3NjAiIGhlaWdodD0iMjQ1IiByeD0iMTAiIGZpbGw9IiNmMmY1ZjciLz4KPHRleHQgeD0iNDAiIHk9IjQ1IiBmb250LXdlaWdodD0iYm9sZCI+UGxhc21hPC90ZXh0Pgo8cGF0aCBkPSJNMTAwIDY1SDE0MEwxMzAgOTBIMTEwWiIgZmlsbD0iIzAwMjE0NCIvPgo8cGF0aCBkPSJNMTIwIDkwTDEwNSAxNzVIMTM1WiIgZmlsbD0iI2IxM2QxNiIvPgo8cGF0aCBkPSJNMzUgMTcwSDEwMFYyMjBIMzVaTTE0MCAxNzBIMjE1VjIyMEgxNDBaIiBmaWxsPSIjYmJiIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNOTAgMTcwSDEwMFYyMjBIOTBaTTE0MCAxNzBIMTUwVjIyMEgxNDBaIiBmaWxsPSIjZmZiNjk1Ii8+Cjx0ZXh0IHg9IjI1MCIgeT0iMTAwIj5Jb25pemVkIGdhcyBhcmMg4oaSIGhlYXQ8L3RleHQ+Cjx0ZXh0IHg9IjI1MCIgeT0iMTU1Ij5Db25kdWN0aXZlIG1ldGFsczs8L3RleHQ+Cjx0ZXh0IHg9IjI1MCIgeT0iMjAwIj50aGVybWFsIEhBWjwvdGV4dD48L2c+Cjx0ZXh0IHg9IjMwIiB5PSI5MzAiPk9yYW5nZSBlZGdlIGJhbmRzOiB0aGVybWFsIGVmZmVjdHMuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Three cut sections: laser light and a plasma arc make thermal cuts; an abrasive waterjet erodes a cut without a thermal heat-affected zone."></p><figcaption>Conceptual cross-sections, not a scale comparison of kerf or HAZ widths. Kerf means the width removed by a cut.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5MYXNlciwgYWJyYXNpdmUgd2F0ZXJqZXQgYW5kIHBsYXNtYSBjdXR0aW5nIGNvbXBhcmVkPC90aXRsZT4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI5NjAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMDAyMTQ0Ij4KPHRleHQgeD0iMzAiIHk9IjUwIiBmb250LXdlaWdodD0iYm9sZCI+VGhyZWUgd2F5cyB0byBjdXQgYSBwcm9maWxlPC90ZXh0Pgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDkwKSI+CjxyZWN0IHg9IjIwIiB3aWR0aD0iNzYwIiBoZWlnaHQ9IjI0NSIgcng9IjEwIiBmaWxsPSIjZjJmNWY3Ii8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgZm9udC13ZWlnaHQ9ImJvbGQiPkxhc2VyPC90ZXh0Pgo8cGF0aCBkPSJNMTIwIDYwVjE3MCIgc3Ryb2tlPSIjYjEzZDE2IiBzdHJva2Utd2lkdGg9IjgiLz4KPHBhdGggZD0iTTM1IDE3MEgxMDBWMjIwSDM1Wk0xNDAgMTcwSDIxNVYyMjBIMTQwWiIgZmlsbD0iI2JiYiIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTkwIDE3MEgxMDBWMjIwSDkwWk0xNDAgMTcwSDE1MFYyMjBIMTQwWiIgZmlsbD0iI2ZmYjY5NSIvPgo8dGV4dCB4PSIyNTAiIHk9IjEwMCI+Rm9jdXNlZCBsaWdodCDihpIgaGVhdDwvdGV4dD4KPHRleHQgeD0iMjUwIiB5PSIxNTUiPkZpbmUgcHJvZmlsZXM7IG1hdGNoZWQ8L3RleHQ+Cjx0ZXh0IHg9IjI1MCIgeT0iMjAwIj5sYXNlciBhbmQgbWF0ZXJpYWw8L3RleHQ+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDM2MCkiPgo8cmVjdCB4PSIyMCIgd2lkdGg9Ijc2MCIgaGVpZ2h0PSIyNDUiIHJ4PSIxMCIgZmlsbD0iI2U2ZjNmYSIvPgo8dGV4dCB4PSI0MCIgeT0iNDUiIGZvbnQtd2VpZ2h0PSJib2xkIj5BYnJhc2l2ZSB3YXRlcmpldDwvdGV4dD4KPHBhdGggZD0iTTEyMCA2NVYxNjUiIHN0cm9rZT0iIzAwNWQ4NyIgc3Ryb2tlLXdpZHRoPSIxMiIvPgo8cGF0aCBkPSJNMzUgMTcwSDEwMEwxMTAgMjIwSDM1Wk0xNDAgMTcwSDIxNVYyMjBIMTMwWiIgZmlsbD0iI2JiYiIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjIiLz4KPGcgZmlsbD0iIzAwMjE0NCI+PGNpcmNsZSBjeD0iMTE4IiBjeT0iOTAiIHI9IjQiLz48Y2lyY2xlIGN4PSIxMjIiIGN5PSIxMTgiIHI9IjQiLz48Y2lyY2xlIGN4PSIxMTgiIGN5PSIxNTAiIHI9IjQiLz48L2c+Cjx0ZXh0IHg9IjI1MCIgeT0iMTAwIj5Nb3ZpbmcgZ3JpdCDihpIgZXJvc2lvbjwvdGV4dD4KPHRleHQgeD0iMjUwIiB5PSIxNTUiPk1hbnkgbWF0ZXJpYWxzOzwvdGV4dD4KPHRleHQgeD0iMjUwIiB5PSIyMDAiPm5vIHRoZXJtYWwgSEFaPC90ZXh0PjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCA2MzApIj4KPHJlY3QgeD0iMjAiIHdpZHRoPSI3NjAiIGhlaWdodD0iMjQ1IiByeD0iMTAiIGZpbGw9IiNmMmY1ZjciLz4KPHRleHQgeD0iNDAiIHk9IjQ1IiBmb250LXdlaWdodD0iYm9sZCI+UGxhc21hPC90ZXh0Pgo8cGF0aCBkPSJNMTAwIDY1SDE0MEwxMzAgOTBIMTEwWiIgZmlsbD0iIzAwMjE0NCIvPgo8cGF0aCBkPSJNMTIwIDkwTDEwNSAxNzVIMTM1WiIgZmlsbD0iI2IxM2QxNiIvPgo8cGF0aCBkPSJNMzUgMTcwSDEwMFYyMjBIMzVaTTE0MCAxNzBIMjE1VjIyMEgxNDBaIiBmaWxsPSIjYmJiIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNOTAgMTcwSDEwMFYyMjBIOTBaTTE0MCAxNzBIMTUwVjIyMEgxNDBaIiBmaWxsPSIjZmZiNjk1Ii8+Cjx0ZXh0IHg9IjI1MCIgeT0iMTAwIj5Jb25pemVkIGdhcyBhcmMg4oaSIGhlYXQ8L3RleHQ+Cjx0ZXh0IHg9IjI1MCIgeT0iMTU1Ij5Db25kdWN0aXZlIG1ldGFsczs8L3RleHQ+Cjx0ZXh0IHg9IjI1MCIgeT0iMjAwIj50aGVybWFsIEhBWjwvdGV4dD48L2c+Cjx0ZXh0IHg9IjMwIiB5PSI5MzAiPk9yYW5nZSBlZGdlIGJhbmRzOiB0aGVybWFsIGVmZmVjdHMuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Three cut sections: laser light and a plasma arc make thermal cuts; an abrasive waterjet erodes a cut without a thermal heat-affected zone." data-natural-width="800" data-natural-height="960"></p><figcaption>Conceptual cross-sections, not a scale comparison of kerf or HAZ widths. Kerf means the width removed by a cut.</figcaption></figure>
     </div>
   </details>
   <details class="xcard deck-slide" id="beam-and-jet-cutting--laser-cutting-concentrates-light-into-a-small-region" data-card="beam-and-jet-cutting--laser-cutting-concentrates-light-into-a-small-region">
@@ -4979,6 +5006,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

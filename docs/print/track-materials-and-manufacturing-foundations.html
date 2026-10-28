@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3014,7 +3041,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Five categories describe the change an operation makes</h2>
   <p class="lede">Name the operation's intended result. Are we removing material, creating shape, joining parts, changing internal properties or treating a surface?</p>
   <figure class="fig-narrow">
-    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgODUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkZpdmUgbWFudWZhY3R1cmluZyBwcm9jZXNzIGNhdGVnb3JpZXM8L3RpdGxlPgo8ZGVzYyBpZD0iZGVzYyI+Q2hvb3NlIHRoZSBjYXRlZ29yeSBieSB0aGUgaW50ZW5kZWQgY2hhbmdlLiBUaGUgY2F0ZWdvcmllcyBhcmUgbm90IGEgZml4ZWQgcHJvZHVjdGlvbiBzZXF1ZW5jZS48L2Rlc2M+CjxyZWN0IHdpZHRoPSI2NDAiIGhlaWdodD0iODUwIiByeD0iMTIiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTAyNjNiIj4KPHRleHQgeD0iMjYiIHk9IjQzIiBmb250LXNpemU9IjI5IiBmb250LXdlaWdodD0iYm9sZCI+V2hhdCBjaGFuZ2UgYXJlIHlvdSBtYWtpbmc/PC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iNzAiIHdpZHRoPSI2MDAiIGhlaWdodD0iMTMwIiByeD0iMTAiIGZpbGw9IiNmMGY1ZjgiIHN0cm9rZT0iIzQ2NjI3NiIvPgo8Y2lyY2xlIGN4PSI1MSIgY3k9IjEwNCIgcj0iMTgiIGZpbGw9IiMxNzNiNTkiLz4KPHRleHQgeD0iNTEiIHk9IjExMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMyIgZmlsbD0iI2ZmZiI+MTwvdGV4dD4KPHRleHQgeD0iODIiIHk9IjExMiIgZm9udC1zaXplPSIyOCIgZm9udC13ZWlnaHQ9ImJvbGQiPlNFUEFSQVRJTkc8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSIxNTAiIGZvbnQtc2l6ZT0iMjYiPlJlbW92ZSBtYXRlcmlhbDwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjE4MiIgZm9udC1zaXplPSIyNSI+U2F3IHdvb2Q7IGRyaWxsIG1ldGFsOyBsYXNlci1jdXQgYWNyeWxpYzwvdGV4dD4KPHJlY3QgeD0iMjAiIHk9IjIxNSIgd2lkdGg9IjYwMCIgaGVpZ2h0PSIxMzAiIHJ4PSIxMCIgZmlsbD0iI2YwZjVmOCIgc3Ryb2tlPSIjNDY2Mjc2Ii8+CjxjaXJjbGUgY3g9IjUxIiBjeT0iMjQ5IiByPSIxOCIgZmlsbD0iIzE3M2I1OSIvPgo8dGV4dCB4PSI1MSIgeT0iMjU3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjIzIiBmaWxsPSIjZmZmIj4yPC90ZXh0Pgo8dGV4dCB4PSI4MiIgeT0iMjU3IiBmb250LXNpemU9IjI4IiBmb250LXdlaWdodD0iYm9sZCI+Rk9STUlORzwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjI5NSIgZm9udC1zaXplPSIyNiI+Q3JlYXRlIHNoYXBlPC90ZXh0Pgo8dGV4dCB4PSIzOCIgeT0iMzI3IiBmb250LXNpemU9IjI1Ij5DYXN0IG1ldGFsOyBtb2xkIHBsYXN0aWM7IDNEIHByaW50PC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iMzYwIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjEzMCIgcng9IjEwIiBmaWxsPSIjZjBmNWY4IiBzdHJva2U9IiM0NjYyNzYiLz4KPGNpcmNsZSBjeD0iNTEiIGN5PSIzOTQiIHI9IjE4IiBmaWxsPSIjMTczYjU5Ii8+Cjx0ZXh0IHg9IjUxIiB5PSI0MDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjMiIGZpbGw9IiNmZmYiPjM8L3RleHQ+Cjx0ZXh0IHg9IjgyIiB5PSI0MDIiIGZvbnQtc2l6ZT0iMjgiIGZvbnQtd2VpZ2h0PSJib2xkIj5GQUJSSUNBVElORzwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjQ0MCIgZm9udC1zaXplPSIyNiI+Sm9pbiBwYXJ0czwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjQ3MiIgZm9udC1zaXplPSIyNSI+V2VsZCBhIGZyYW1lOyBnbHVlIHdvb2Q7IGFkZCBzY3Jld3M8L3RleHQ+CjxyZWN0IHg9IjIwIiB5PSI1MDUiIHdpZHRoPSI2MDAiIGhlaWdodD0iMTMwIiByeD0iMTAiIGZpbGw9IiNmMGY1ZjgiIHN0cm9rZT0iIzQ2NjI3NiIvPgo8Y2lyY2xlIGN4PSI1MSIgY3k9IjUzOSIgcj0iMTgiIGZpbGw9IiMxNzNiNTkiLz4KPHRleHQgeD0iNTEiIHk9IjU0NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMyIgZmlsbD0iI2ZmZiI+NDwvdGV4dD4KPHRleHQgeD0iODIiIHk9IjU0NyIgZm9udC1zaXplPSIyOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkNPTkRJVElPTklORzwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjU4NSIgZm9udC1zaXplPSIyNiI+Q2hhbmdlIGludGVybmFsIHByb3BlcnRpZXM8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI2MTciIGZvbnQtc2l6ZT0iMjUiPkRyeSB3b29kOyBjdXJlIHJlc2luOyBhbm5lYWwgbWV0YWw8L3RleHQ+CjxyZWN0IHg9IjIwIiB5PSI2NTAiIHdpZHRoPSI2MDAiIGhlaWdodD0iMTMwIiByeD0iMTAiIGZpbGw9IiNmMGY1ZjgiIHN0cm9rZT0iIzQ2NjI3NiIvPgo8Y2lyY2xlIGN4PSI1MSIgY3k9IjY4NCIgcj0iMTgiIGZpbGw9IiMxNzNiNTkiLz4KPHRleHQgeD0iNTEiIHk9IjY5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMyIgZmlsbD0iI2ZmZiI+NTwvdGV4dD4KPHRleHQgeD0iODIiIHk9IjY5MiIgZm9udC1zaXplPSIyOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkZJTklTSElORzwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjczMCIgZm9udC1zaXplPSIyNiI+VHJlYXQgdGhlIHN1cmZhY2U8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI3NjIiIGZvbnQtc2l6ZT0iMjUiPlBhaW50OyBwbGF0ZTsgc3RhaW47IHBvbGlzaDwvdGV4dD4KPHRleHQgeD0iMjYiIHk9IjgyNCIgZm9udC1zaXplPSIyNCI+Q2xhc3NpZnkgdGhlIHB1cnBvc2UsIHRoZW4gZXhwbGFpbiB0aGUgb3ZlcmxhcC48L3RleHQ+CjwvZz48L3N2Zz4=" alt="Five process categories: separating removes material; forming creates shape; fabricating joins parts; conditioning changes internal properties; finishing treats a surface."></p>
+    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgODUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkZpdmUgbWFudWZhY3R1cmluZyBwcm9jZXNzIGNhdGVnb3JpZXM8L3RpdGxlPgo8ZGVzYyBpZD0iZGVzYyI+Q2hvb3NlIHRoZSBjYXRlZ29yeSBieSB0aGUgaW50ZW5kZWQgY2hhbmdlLiBUaGUgY2F0ZWdvcmllcyBhcmUgbm90IGEgZml4ZWQgcHJvZHVjdGlvbiBzZXF1ZW5jZS48L2Rlc2M+CjxyZWN0IHdpZHRoPSI2NDAiIGhlaWdodD0iODUwIiByeD0iMTIiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTAyNjNiIj4KPHRleHQgeD0iMjYiIHk9IjQzIiBmb250LXNpemU9IjI5IiBmb250LXdlaWdodD0iYm9sZCI+V2hhdCBjaGFuZ2UgYXJlIHlvdSBtYWtpbmc/PC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iNzAiIHdpZHRoPSI2MDAiIGhlaWdodD0iMTMwIiByeD0iMTAiIGZpbGw9IiNmMGY1ZjgiIHN0cm9rZT0iIzQ2NjI3NiIvPgo8Y2lyY2xlIGN4PSI1MSIgY3k9IjEwNCIgcj0iMTgiIGZpbGw9IiMxNzNiNTkiLz4KPHRleHQgeD0iNTEiIHk9IjExMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMyIgZmlsbD0iI2ZmZiI+MTwvdGV4dD4KPHRleHQgeD0iODIiIHk9IjExMiIgZm9udC1zaXplPSIyOCIgZm9udC13ZWlnaHQ9ImJvbGQiPlNFUEFSQVRJTkc8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSIxNTAiIGZvbnQtc2l6ZT0iMjYiPlJlbW92ZSBtYXRlcmlhbDwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjE4MiIgZm9udC1zaXplPSIyNSI+U2F3IHdvb2Q7IGRyaWxsIG1ldGFsOyBsYXNlci1jdXQgYWNyeWxpYzwvdGV4dD4KPHJlY3QgeD0iMjAiIHk9IjIxNSIgd2lkdGg9IjYwMCIgaGVpZ2h0PSIxMzAiIHJ4PSIxMCIgZmlsbD0iI2YwZjVmOCIgc3Ryb2tlPSIjNDY2Mjc2Ii8+CjxjaXJjbGUgY3g9IjUxIiBjeT0iMjQ5IiByPSIxOCIgZmlsbD0iIzE3M2I1OSIvPgo8dGV4dCB4PSI1MSIgeT0iMjU3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjIzIiBmaWxsPSIjZmZmIj4yPC90ZXh0Pgo8dGV4dCB4PSI4MiIgeT0iMjU3IiBmb250LXNpemU9IjI4IiBmb250LXdlaWdodD0iYm9sZCI+Rk9STUlORzwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjI5NSIgZm9udC1zaXplPSIyNiI+Q3JlYXRlIHNoYXBlPC90ZXh0Pgo8dGV4dCB4PSIzOCIgeT0iMzI3IiBmb250LXNpemU9IjI1Ij5DYXN0IG1ldGFsOyBtb2xkIHBsYXN0aWM7IDNEIHByaW50PC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iMzYwIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjEzMCIgcng9IjEwIiBmaWxsPSIjZjBmNWY4IiBzdHJva2U9IiM0NjYyNzYiLz4KPGNpcmNsZSBjeD0iNTEiIGN5PSIzOTQiIHI9IjE4IiBmaWxsPSIjMTczYjU5Ii8+Cjx0ZXh0IHg9IjUxIiB5PSI0MDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjMiIGZpbGw9IiNmZmYiPjM8L3RleHQ+Cjx0ZXh0IHg9IjgyIiB5PSI0MDIiIGZvbnQtc2l6ZT0iMjgiIGZvbnQtd2VpZ2h0PSJib2xkIj5GQUJSSUNBVElORzwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjQ0MCIgZm9udC1zaXplPSIyNiI+Sm9pbiBwYXJ0czwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjQ3MiIgZm9udC1zaXplPSIyNSI+V2VsZCBhIGZyYW1lOyBnbHVlIHdvb2Q7IGFkZCBzY3Jld3M8L3RleHQ+CjxyZWN0IHg9IjIwIiB5PSI1MDUiIHdpZHRoPSI2MDAiIGhlaWdodD0iMTMwIiByeD0iMTAiIGZpbGw9IiNmMGY1ZjgiIHN0cm9rZT0iIzQ2NjI3NiIvPgo8Y2lyY2xlIGN4PSI1MSIgY3k9IjUzOSIgcj0iMTgiIGZpbGw9IiMxNzNiNTkiLz4KPHRleHQgeD0iNTEiIHk9IjU0NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMyIgZmlsbD0iI2ZmZiI+NDwvdGV4dD4KPHRleHQgeD0iODIiIHk9IjU0NyIgZm9udC1zaXplPSIyOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkNPTkRJVElPTklORzwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjU4NSIgZm9udC1zaXplPSIyNiI+Q2hhbmdlIGludGVybmFsIHByb3BlcnRpZXM8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI2MTciIGZvbnQtc2l6ZT0iMjUiPkRyeSB3b29kOyBjdXJlIHJlc2luOyBhbm5lYWwgbWV0YWw8L3RleHQ+CjxyZWN0IHg9IjIwIiB5PSI2NTAiIHdpZHRoPSI2MDAiIGhlaWdodD0iMTMwIiByeD0iMTAiIGZpbGw9IiNmMGY1ZjgiIHN0cm9rZT0iIzQ2NjI3NiIvPgo8Y2lyY2xlIGN4PSI1MSIgY3k9IjY4NCIgcj0iMTgiIGZpbGw9IiMxNzNiNTkiLz4KPHRleHQgeD0iNTEiIHk9IjY5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMyIgZmlsbD0iI2ZmZiI+NTwvdGV4dD4KPHRleHQgeD0iODIiIHk9IjY5MiIgZm9udC1zaXplPSIyOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkZJTklTSElORzwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjczMCIgZm9udC1zaXplPSIyNiI+VHJlYXQgdGhlIHN1cmZhY2U8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI3NjIiIGZvbnQtc2l6ZT0iMjUiPlBhaW50OyBwbGF0ZTsgc3RhaW47IHBvbGlzaDwvdGV4dD4KPHRleHQgeD0iMjYiIHk9IjgyNCIgZm9udC1zaXplPSIyNCI+Q2xhc3NpZnkgdGhlIHB1cnBvc2UsIHRoZW4gZXhwbGFpbiB0aGUgb3ZlcmxhcC48L3RleHQ+CjwvZz48L3N2Zz4=" alt="Five process categories: separating removes material; forming creates shape; fabricating joins parts; conditioning changes internal properties; finishing treats a surface." data-natural-width="640" data-natural-height="850"></p>
     <figcaption>These are five kinds of change, not five steps that every product must follow in order.</figcaption>
   </figure>
   <p>This collection uses the course's five-category model. In this model, <strong>forming includes casting, molding and additive manufacturing such as 3D printing</strong>. Other technical references may separate those into their own process groups.</p>
@@ -3178,7 +3205,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Compare typical behavior, then check the specific material</h2>
   <figure class="fig-narrow">
-    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2ODAgMTA1MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5Gb3VyIG1hdGVyaWFsIGZhbWlsaWVzOiBxdWFsaXRhdGl2ZSBjb21wYXJpc29uPC90aXRsZT4KPGRlc2MgaWQ9ImRlc2MiPkEgY29tcGFyaXNvbiBncmlkIG9mIG1hc3MgYW5kIHN0aWZmbmVzcywgY29uZHVjdGlvbiwgYW5kIHdvcmtpbmcgYmVoYXZpb3IuIENvbW1vbiB0ZW5kZW5jaWVzIG9ubHk7IGluZGl2aWR1YWwgZ3JhZGVzIGFuZCBjb25kaXRpb25zIHZhcnkuPC9kZXNjPgo8cmVjdCB3aWR0aD0iNjgwIiBoZWlnaHQ9IjEwNTAiIHJ4PSIxMiIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZpbGw9IiMxMDI2M2IiPgo8dGV4dCB4PSIyNCIgeT0iNDIiIGZvbnQtc2l6ZT0iMjkiIGZvbnQtd2VpZ2h0PSJib2xkIj5Gb3VyIGZhbWlsaWVzLCBkaWZmZXJlbnQgc3RhcnRpbmcgcG9pbnRzPC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iNjUiIHdpZHRoPSI2NDAiIGhlaWdodD0iMjE4IiByeD0iOSIgZmlsbD0iI2YwZjVmOCIgc3Ryb2tlPSIjNDY2Mjc2Ii8+Cjx0ZXh0IHg9IjM4IiB5PSIxMDMiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NZXRhbHM8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSIxMzciIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5NYXNzIC8gc3RpZmZuZXNzPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjEzNyIgZm9udC1zaXplPSIyMiI+T2Z0ZW4gZGVuc2UgYW5kIHN0aWZmPC90ZXh0Pgo8dGV4dCB4PSIzOCIgeT0iMTg0IiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+SGVhdCAvIGVsZWN0cmljaXR5PC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjE4NCIgZm9udC1zaXplPSIyMiI+VXN1YWxseSBnb29kIGNvbmR1Y3RvcnM8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSIyMzEiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5Xb3JraW5nIGJlaGF2aW9yPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjIzMSIgZm9udC1zaXplPSIyMiI+TWFueSBiZW5kOyBhbGxveSBtYXR0ZXJzPC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iMjk3IiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjIxOCIgcng9IjkiIGZpbGw9IiNmMGY1ZjgiIHN0cm9rZT0iIzQ2NjI3NiIvPgo8dGV4dCB4PSIzOCIgeT0iMzM1IiBmb250LXNpemU9IjMwIiBmb250LXdlaWdodD0iYm9sZCI+UGxhc3RpY3MgKHBvbHltZXJzKTwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjM2OSIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPk1hc3MgLyBzdGlmZm5lc3M8L3RleHQ+Cjx0ZXh0IHg9IjI4MCIgeT0iMzY5IiBmb250LXNpemU9IjIyIj5Vc3VhbGx5IGxpZ2h0OyBsb3dlciBzdGlmZm5lc3M8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI0MTYiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5IZWF0IC8gZWxlY3RyaWNpdHk8L3RleHQ+Cjx0ZXh0IHg9IjI4MCIgeT0iNDE2IiBmb250LXNpemU9IjIyIj5Vc3VhbGx5IHBvb3IgY29uZHVjdG9yczwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjQ2MyIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPldvcmtpbmcgYmVoYXZpb3I8L3RleHQ+Cjx0ZXh0IHg9IjI4MCIgeT0iNDYzIiBmb250LXNpemU9IjIyIj5PZnRlbiBtb2xkYWJsZTsgaGVhdCBsaW1pdHM8L3RleHQ+CjxyZWN0IHg9IjIwIiB5PSI1MjkiIHdpZHRoPSI2NDAiIGhlaWdodD0iMjE4IiByeD0iOSIgZmlsbD0iI2YwZjVmOCIgc3Ryb2tlPSIjNDY2Mjc2Ii8+Cjx0ZXh0IHg9IjM4IiB5PSI1NjciIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Xb29kICZhbXA7IENvbXBvc2l0ZXM8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI2MDEiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5NYXNzIC8gc3RpZmZuZXNzPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjYwMSIgZm9udC1zaXplPSIyMiI+T2Z0ZW4gbGlnaHQ7IGRpcmVjdGlvbiBtYXR0ZXJzPC90ZXh0Pgo8dGV4dCB4PSIzOCIgeT0iNjQ4IiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+SGVhdCAvIGVsZWN0cmljaXR5PC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjY0OCIgZm9udC1zaXplPSIyMiI+V29vZDogbG93OyBjb21wb3NpdGVzIHZhcnk8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI2OTUiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5Xb3JraW5nIGJlaGF2aW9yPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjY5NSIgZm9udC1zaXplPSIyMiI+R3JhaW4sIGxheWVycyBhbmQgYmluZGVyIG1hdHRlcjwvdGV4dD4KPHJlY3QgeD0iMjAiIHk9Ijc2MSIgd2lkdGg9IjY0MCIgaGVpZ2h0PSIyMTgiIHJ4PSI5IiBmaWxsPSIjZjBmNWY4IiBzdHJva2U9IiM0NjYyNzYiLz4KPHRleHQgeD0iMzgiIHk9Ijc5OSIgZm9udC1zaXplPSIzMCIgZm9udC13ZWlnaHQ9ImJvbGQiPkNlcmFtaWNzICZhbXA7IEdsYXNzPC90ZXh0Pgo8dGV4dCB4PSIzOCIgeT0iODMzIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+TWFzcyAvIHN0aWZmbmVzczwvdGV4dD4KPHRleHQgeD0iMjgwIiB5PSI4MzMiIGZvbnQtc2l6ZT0iMjIiPk9mdGVuIHN0aWZmOyBkZW5zaXR5IHZhcmllczwvdGV4dD4KPHRleHQgeD0iMzgiIHk9Ijg4MCIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkhlYXQgLyBlbGVjdHJpY2l0eTwvdGV4dD4KPHRleHQgeD0iMjgwIiB5PSI4ODAiIGZvbnQtc2l6ZT0iMjIiPkhlYXQgdmFyaWVzOyBtYW55IGluc3VsYXRlIGN1cnJlbnQ8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI5MjciIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5Xb3JraW5nIGJlaGF2aW9yPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjkyNyIgZm9udC1zaXplPSIyMiI+T2Z0ZW4gaGFyZCBhbmQgYnJpdHRsZTwvdGV4dD4KPHRleHQgeD0iMjQiIHk9IjEwMjQiIGZvbnQtc2l6ZT0iMjQiPlR5cGljYWwgYmVoYXZpb3Igb25seS4gQ2hlY2sgdGhlIHNwZWNpZmljIG1hdGVyaWFsLjwvdGV4dD4KPC9nPjwvc3ZnPg==" alt="Qualitative comparison of four families: metals tend to be stiff conductors; plastics light insulators; wood and composites depend on grain and reinforcement; ceramics and glass often hard and brittle. Each family has important exceptions."></p>
+    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2ODAgMTA1MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5Gb3VyIG1hdGVyaWFsIGZhbWlsaWVzOiBxdWFsaXRhdGl2ZSBjb21wYXJpc29uPC90aXRsZT4KPGRlc2MgaWQ9ImRlc2MiPkEgY29tcGFyaXNvbiBncmlkIG9mIG1hc3MgYW5kIHN0aWZmbmVzcywgY29uZHVjdGlvbiwgYW5kIHdvcmtpbmcgYmVoYXZpb3IuIENvbW1vbiB0ZW5kZW5jaWVzIG9ubHk7IGluZGl2aWR1YWwgZ3JhZGVzIGFuZCBjb25kaXRpb25zIHZhcnkuPC9kZXNjPgo8cmVjdCB3aWR0aD0iNjgwIiBoZWlnaHQ9IjEwNTAiIHJ4PSIxMiIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZpbGw9IiMxMDI2M2IiPgo8dGV4dCB4PSIyNCIgeT0iNDIiIGZvbnQtc2l6ZT0iMjkiIGZvbnQtd2VpZ2h0PSJib2xkIj5Gb3VyIGZhbWlsaWVzLCBkaWZmZXJlbnQgc3RhcnRpbmcgcG9pbnRzPC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iNjUiIHdpZHRoPSI2NDAiIGhlaWdodD0iMjE4IiByeD0iOSIgZmlsbD0iI2YwZjVmOCIgc3Ryb2tlPSIjNDY2Mjc2Ii8+Cjx0ZXh0IHg9IjM4IiB5PSIxMDMiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NZXRhbHM8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSIxMzciIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5NYXNzIC8gc3RpZmZuZXNzPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjEzNyIgZm9udC1zaXplPSIyMiI+T2Z0ZW4gZGVuc2UgYW5kIHN0aWZmPC90ZXh0Pgo8dGV4dCB4PSIzOCIgeT0iMTg0IiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+SGVhdCAvIGVsZWN0cmljaXR5PC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjE4NCIgZm9udC1zaXplPSIyMiI+VXN1YWxseSBnb29kIGNvbmR1Y3RvcnM8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSIyMzEiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5Xb3JraW5nIGJlaGF2aW9yPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjIzMSIgZm9udC1zaXplPSIyMiI+TWFueSBiZW5kOyBhbGxveSBtYXR0ZXJzPC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iMjk3IiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjIxOCIgcng9IjkiIGZpbGw9IiNmMGY1ZjgiIHN0cm9rZT0iIzQ2NjI3NiIvPgo8dGV4dCB4PSIzOCIgeT0iMzM1IiBmb250LXNpemU9IjMwIiBmb250LXdlaWdodD0iYm9sZCI+UGxhc3RpY3MgKHBvbHltZXJzKTwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjM2OSIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPk1hc3MgLyBzdGlmZm5lc3M8L3RleHQ+Cjx0ZXh0IHg9IjI4MCIgeT0iMzY5IiBmb250LXNpemU9IjIyIj5Vc3VhbGx5IGxpZ2h0OyBsb3dlciBzdGlmZm5lc3M8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI0MTYiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5IZWF0IC8gZWxlY3RyaWNpdHk8L3RleHQ+Cjx0ZXh0IHg9IjI4MCIgeT0iNDE2IiBmb250LXNpemU9IjIyIj5Vc3VhbGx5IHBvb3IgY29uZHVjdG9yczwvdGV4dD4KPHRleHQgeD0iMzgiIHk9IjQ2MyIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPldvcmtpbmcgYmVoYXZpb3I8L3RleHQ+Cjx0ZXh0IHg9IjI4MCIgeT0iNDYzIiBmb250LXNpemU9IjIyIj5PZnRlbiBtb2xkYWJsZTsgaGVhdCBsaW1pdHM8L3RleHQ+CjxyZWN0IHg9IjIwIiB5PSI1MjkiIHdpZHRoPSI2NDAiIGhlaWdodD0iMjE4IiByeD0iOSIgZmlsbD0iI2YwZjVmOCIgc3Ryb2tlPSIjNDY2Mjc2Ii8+Cjx0ZXh0IHg9IjM4IiB5PSI1NjciIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Xb29kICZhbXA7IENvbXBvc2l0ZXM8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI2MDEiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5NYXNzIC8gc3RpZmZuZXNzPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjYwMSIgZm9udC1zaXplPSIyMiI+T2Z0ZW4gbGlnaHQ7IGRpcmVjdGlvbiBtYXR0ZXJzPC90ZXh0Pgo8dGV4dCB4PSIzOCIgeT0iNjQ4IiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+SGVhdCAvIGVsZWN0cmljaXR5PC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjY0OCIgZm9udC1zaXplPSIyMiI+V29vZDogbG93OyBjb21wb3NpdGVzIHZhcnk8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI2OTUiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5Xb3JraW5nIGJlaGF2aW9yPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjY5NSIgZm9udC1zaXplPSIyMiI+R3JhaW4sIGxheWVycyBhbmQgYmluZGVyIG1hdHRlcjwvdGV4dD4KPHJlY3QgeD0iMjAiIHk9Ijc2MSIgd2lkdGg9IjY0MCIgaGVpZ2h0PSIyMTgiIHJ4PSI5IiBmaWxsPSIjZjBmNWY4IiBzdHJva2U9IiM0NjYyNzYiLz4KPHRleHQgeD0iMzgiIHk9Ijc5OSIgZm9udC1zaXplPSIzMCIgZm9udC13ZWlnaHQ9ImJvbGQiPkNlcmFtaWNzICZhbXA7IEdsYXNzPC90ZXh0Pgo8dGV4dCB4PSIzOCIgeT0iODMzIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+TWFzcyAvIHN0aWZmbmVzczwvdGV4dD4KPHRleHQgeD0iMjgwIiB5PSI4MzMiIGZvbnQtc2l6ZT0iMjIiPk9mdGVuIHN0aWZmOyBkZW5zaXR5IHZhcmllczwvdGV4dD4KPHRleHQgeD0iMzgiIHk9Ijg4MCIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkhlYXQgLyBlbGVjdHJpY2l0eTwvdGV4dD4KPHRleHQgeD0iMjgwIiB5PSI4ODAiIGZvbnQtc2l6ZT0iMjIiPkhlYXQgdmFyaWVzOyBtYW55IGluc3VsYXRlIGN1cnJlbnQ8L3RleHQ+Cjx0ZXh0IHg9IjM4IiB5PSI5MjciIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj5Xb3JraW5nIGJlaGF2aW9yPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjkyNyIgZm9udC1zaXplPSIyMiI+T2Z0ZW4gaGFyZCBhbmQgYnJpdHRsZTwvdGV4dD4KPHRleHQgeD0iMjQiIHk9IjEwMjQiIGZvbnQtc2l6ZT0iMjQiPlR5cGljYWwgYmVoYXZpb3Igb25seS4gQ2hlY2sgdGhlIHNwZWNpZmljIG1hdGVyaWFsLjwvdGV4dD4KPC9nPjwvc3ZnPg==" alt="Qualitative comparison of four families: metals tend to be stiff conductors; plastics light insulators; wood and composites depend on grain and reinforcement; ceramics and glass often hard and brittle. Each family has important exceptions." data-natural-width="680" data-natural-height="1050"></p>
     <figcaption>Common tendencies, not design values or a ranking from best to worst. Compare materials at the same temperature, condition and loading direction.</figcaption>
   </figure>
   <p>Use <a class="xref-page" href="#p-material-properties">Material Properties</a> to put a precise name to the requirement. Then select a grade, species or composite construction and check its data. No family wins on every property.</p>
@@ -5024,6 +5051,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

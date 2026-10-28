@@ -1660,4 +1660,105 @@
     wirePracticeChecks(document);
     refresh();
   })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
+  })();
 })();

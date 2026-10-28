@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2972,7 +2999,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Set total costs equal to find process break-even</h2>
 <p>Compare routes that meet the same requirements at the same quantity. From <code>F_A + v_A Q = F_B + v_B Q</code>, obtain <code>Q* = (F_B − F_A)/(v_A − v_B)</code>.</p>
 <p>Let A cost $120 + $8Q and B cost $720 + $3Q. Then Q* = ($720 − $120)/($8 − $3) = <strong>120 parts</strong>. Both cost $1,080 total or $9/part. A costs less below 120; B costs less above 120.</p>
-<p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgMzYwIiByb2xlPSJpbWciPjx0aXRsZT5Ud28gcHJvY2VzcyB1bml0LWNvc3QgY3VydmVzPC90aXRsZT48cmVjdCB3aWR0aD0iNzIwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE0MmI0OSI+PHRleHQgeD0iMjAiIHk9IjI2Ij5BdmVyYWdlIHVuaXQgY29zdCAoJC9wYXJ0KTwvdGV4dD48cGF0aCBkPSJNNzAgNDUgVjI4NSBINjcwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNDJiNDkiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjMwIiB5PSIyOTEuMCI+MDwvdGV4dD48dGV4dCB4PSIzMCIgeT0iMjM2LjAiPjEwPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIxODEuMCI+MjA8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjEyNi4wIj4zMDwvdGV4dD48dGV4dCB4PSIzMCIgeT0iNzEuMCI+NDA8L3RleHQ+PHRleHQgeD0iNTgiIHk9IjMxMCI+MjA8L3RleHQ+PHRleHQgeD0iMjU4IiB5PSIzMTAiPjEyMDwvdGV4dD48dGV4dCB4PSI0NTgiIHk9IjMxMCI+MjIwPC90ZXh0Pjx0ZXh0IHg9IjYxOCIgeT0iMzEwIj4zMDA8L3RleHQ+PHBvbHlsaW5lIHBvaW50cz0iNzAsMjA4LjAwIDc0LDIxMS4wMCA3OCwyMTMuNTAgODIsMjE1LjYyIDg2LDIxNy40MyA5MCwyMTkuMDAgOTQsMjIwLjM4IDk4LDIyMS41OSAxMDIsMjIyLjY3IDEwNiwyMjMuNjMgMTEwLDIyNC41MCAxMTQsMjI1LjI5IDExOCwyMjYuMDAgMTIyLDIyNi42NSAxMjYsMjI3LjI1IDEzMCwyMjcuODAgMTM0LDIyOC4zMSAxMzgsMjI4Ljc4IDE0MiwyMjkuMjEgMTQ2LDIyOS42MiAxNTAsMjMwLjAwIDE1NCwyMzAuMzUgMTU4LDIzMC42OSAxNjIsMjMxLjAwIDE2NiwyMzEuMjkgMTcwLDIzMS41NyAxNzQsMjMxLjgzIDE3OCwyMzIuMDggMTgyLDIzMi4zMiAxODYsMjMyLjU0IDE5MCwyMzIuNzUgMTk0LDIzMi45NSAxOTgsMjMzLjE0IDIwMiwyMzMuMzMgMjA2LDIzMy41MCAyMTAsMjMzLjY3IDIxNCwyMzMuODMgMjE4LDIzMy45OCAyMjIsMjM0LjEyIDIyNiwyMzQuMjcgMjMwLDIzNC40MCAyMzQsMjM0LjUzIDIzOCwyMzQuNjUgMjQyLDIzNC43NyAyNDYsMjM0Ljg5IDI1MCwyMzUuMDAgMjU0LDIzNS4xMSAyNTgsMjM1LjIxIDI2MiwyMzUuMzEgMjY2LDIzNS40MSAyNzAsMjM1LjUwIDI3NCwyMzUuNTkgMjc4LDIzNS42OCAyODIsMjM1Ljc2IDI4NiwyMzUuODQgMjkwLDIzNS45MiAyOTQsMjM2LjAwIDI5OCwyMzYuMDcgMzAyLDIzNi4xNSAzMDYsMjM2LjIyIDMxMCwyMzYuMjkgMzE0LDIzNi4zNSAzMTgsMjM2LjQyIDMyMiwyMzYuNDggMzI2LDIzNi41NCAzMzAsMjM2LjYwIDMzNCwyMzYuNjYgMzM4LDIzNi43MSAzNDIsMjM2Ljc3IDM0NiwyMzYuODIgMzUwLDIzNi44OCAzNTQsMjM2LjkzIDM1OCwyMzYuOTggMzYyLDIzNy4wMiAzNjYsMjM3LjA3IDM3MCwyMzcuMTIgMzc0LDIzNy4xNiAzNzgsMjM3LjIxIDM4MiwyMzcuMjUgMzg2LDIzNy4yOSAzOTAsMjM3LjMzIDM5NCwyMzcuMzcgMzk4LDIzNy40MSA0MDIsMjM3LjQ1IDQwNiwyMzcuNDkgNDEwLDIzNy41MyA0MTQsMjM3LjU2IDQxOCwyMzcuNjAgNDIyLDIzNy42MyA0MjYsMjM3LjY3IDQzMCwyMzcuNzAgNDM0LDIzNy43MyA0MzgsMjM3Ljc2IDQ0MiwyMzcuODAgNDQ2LDIzNy44MyA0NTAsMjM3Ljg2IDQ1NCwyMzcuODkgNDU4LDIzNy45MiA0NjIsMjM3Ljk0IDQ2NiwyMzcuOTcgNDcwLDIzOC4wMCA0NzQsMjM4LjAzIDQ3OCwyMzguMDUgNDgyLDIzOC4wOCA0ODYsMjM4LjExIDQ5MCwyMzguMTMgNDk0LDIzOC4xNiA0OTgsMjM4LjE4IDUwMiwyMzguMjAgNTA2LDIzOC4yMyA1MTAsMjM4LjI1IDUxNCwyMzguMjcgNTE4LDIzOC4zMCA1MjIsMjM4LjMyIDUyNiwyMzguMzQgNTMwLDIzOC4zNiA1MzQsMjM4LjM4IDUzOCwyMzguNDAgNTQyLDIzOC40MiA1NDYsMjM4LjQ0IDU1MCwyMzguNDYgNTU0LDIzOC40OCA1NTgsMjM4LjUwIDU2MiwyMzguNTIgNTY2LDIzOC41NCA1NzAsMjM4LjU2IDU3NCwyMzguNTcgNTc4LDIzOC41OSA1ODIsMjM4LjYxIDU4NiwyMzguNjMgNTkwLDIzOC42NCA1OTQsMjM4LjY2IDU5OCwyMzguNjggNjAyLDIzOC42OSA2MDYsMjM4LjcxIDYxMCwyMzguNzIgNjE0LDIzOC43NCA2MTgsMjM4Ljc2IDYyMiwyMzguNzcgNjI2LDIzOC43OSA2MzAsMjM4LjgwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDNiNzEiIHN0cm9rZS13aWR0aD0iMyIvPjxwb2x5bGluZSBwb2ludHM9IjcwLDcwLjUwIDc0LDg4LjUwIDc4LDEwMy41MCA4MiwxMTYuMTkgODYsMTI3LjA3IDkwLDEzNi41MCA5NCwxNDQuNzUgOTgsMTUyLjAzIDEwMiwxNTguNTAgMTA2LDE2NC4yOSAxMTAsMTY5LjUwIDExNCwxNzQuMjEgMTE4LDE3OC41MCAxMjIsMTgyLjQxIDEyNiwxODYuMDAgMTMwLDE4OS4zMCAxMzQsMTkyLjM1IDEzOCwxOTUuMTcgMTQyLDE5Ny43OSAxNDYsMjAwLjIyIDE1MCwyMDIuNTAgMTU0LDIwNC42MyAxNTgsMjA2LjYyIDE2MiwyMDguNTAgMTY2LDIxMC4yNiAxNzAsMjExLjkzIDE3NCwyMTMuNTAgMTc4LDIxNC45OSAxODIsMjE2LjM5IDE4NiwyMTcuNzMgMTkwLDIxOS4wMCAxOTQsMjIwLjIxIDE5OCwyMjEuMzYgMjAyLDIyMi40NSAyMDYsMjIzLjUwIDIxMCwyMjQuNTAgMjE0LDIyNS40NiAyMTgsMjI2LjM3IDIyMiwyMjcuMjUgMjI2LDIyOC4wOSAyMzAsMjI4LjkwIDIzNCwyMjkuNjggMjM4LDIzMC40MiAyNDIsMjMxLjE0IDI0NiwyMzEuODMgMjUwLDIzMi41MCAyNTQsMjMzLjE0IDI1OCwyMzMuNzYgMjYyLDIzNC4zNiAyNjYsMjM0Ljk0IDI3MCwyMzUuNTAgMjc0LDIzNi4wNCAyNzgsMjM2LjU2IDI4MiwyMzcuMDcgMjg2LDIzNy41NiAyOTAsMjM4LjA0IDI5NCwyMzguNTAgMjk4LDIzOC45NSAzMDIsMjM5LjM4IDMwNiwyMzkuODAgMzEwLDI0MC4yMSAzMTQsMjQwLjYxIDMxOCwyNDEuMDAgMzIyLDI0MS4zOCAzMjYsMjQxLjc0IDMzMCwyNDIuMTAgMzM0LDI0Mi40NSAzMzgsMjQyLjc5IDM0MiwyNDMuMTIgMzQ2LDI0My40NCAzNTAsMjQzLjc1IDM1NCwyNDQuMDYgMzU4LDI0NC4zNSAzNjIsMjQ0LjY0IDM2NiwyNDQuOTMgMzcwLDI0NS4yMSAzNzQsMjQ1LjQ4IDM3OCwyNDUuNzQgMzgyLDI0Ni4wMCAzODYsMjQ2LjI1IDM5MCwyNDYuNTAgMzk0LDI0Ni43NCAzOTgsMjQ2Ljk4IDQwMiwyNDcuMjEgNDA2LDI0Ny40NCA0MTAsMjQ3LjY2IDQxNCwyNDcuODggNDE4LDI0OC4wOSA0MjIsMjQ4LjMwIDQyNiwyNDguNTAgNDMwLDI0OC43MCA0MzQsMjQ4LjkwIDQzOCwyNDkuMDkgNDQyLDI0OS4yOCA0NDYsMjQ5LjQ2IDQ1MCwyNDkuNjQgNDU0LDI0OS44MiA0NTgsMjUwLjAwIDQ2MiwyNTAuMTcgNDY2LDI1MC4zMyA0NzAsMjUwLjUwIDQ3NCwyNTAuNjYgNDc4LDI1MC44MiA0ODIsMjUwLjk4IDQ4NiwyNTEuMTMgNDkwLDI1MS4yOCA0OTQsMjUxLjQzIDQ5OCwyNTEuNTggNTAyLDI1MS43MiA1MDYsMjUxLjg2IDUxMCwyNTIuMDAgNTE0LDI1Mi4xNCA1MTgsMjUyLjI3IDUyMiwyNTIuNDAgNTI2LDI1Mi41MyA1MzAsMjUyLjY2IDUzNCwyNTIuNzkgNTM4LDI1Mi45MSA1NDIsMjUzLjAzIDU0NiwyNTMuMTUgNTUwLDI1My4yNyA1NTQsMjUzLjM5IDU1OCwyNTMuNTAgNTYyLDI1My42MSA1NjYsMjUzLjcyIDU3MCwyNTMuODMgNTc0LDI1My45NCA1NzgsMjU0LjA1IDU4MiwyNTQuMTUgNTg2LDI1NC4yNiA1OTAsMjU0LjM2IDU5NCwyNTQuNDYgNTk4LDI1NC41NiA2MDIsMjU0LjY1IDYwNiwyNTQuNzUgNjEwLDI1NC44NCA2MTQsMjU0Ljk0IDYxOCwyNTUuMDMgNjIyLDI1NS4xMiA2MjYsMjU1LjIxIDYzMCwyNTUuMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzljMzgwMCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI4IDUiLz48Y2lyY2xlIGN4PSIyNzAiIGN5PSIyMzUuNSIgcj0iNSIvPjxwYXRoIGQ9Ik0yNzAgMjM1IEwzNDUgMTc1IiBzdHJva2U9IiMxNDJiNDkiLz48dGV4dCB4PSIzNTAiIHk9IjE3MCI+MTIwIHBhcnRzOyAkOS9wYXJ0PC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iNjUiPkE6ICQxMjAgKyAkOC9wYXJ0IChzb2xpZCk8L3RleHQ+PHRleHQgeD0iMzgwIiB5PSI5MiI+QjogJDcyMCArICQzL3BhcnQgKGRhc2hlZCk8L3RleHQ+PHRleHQgeD0iMjkwIiB5PSIzNDUiPlF1YW50aXR5IChwYXJ0cyk8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="Unit cost curves cross at 120 parts and 9 dollars per part. A costs less below the crossing and B above it."></p>
+<p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgMzYwIiByb2xlPSJpbWciPjx0aXRsZT5Ud28gcHJvY2VzcyB1bml0LWNvc3QgY3VydmVzPC90aXRsZT48cmVjdCB3aWR0aD0iNzIwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE0MmI0OSI+PHRleHQgeD0iMjAiIHk9IjI2Ij5BdmVyYWdlIHVuaXQgY29zdCAoJC9wYXJ0KTwvdGV4dD48cGF0aCBkPSJNNzAgNDUgVjI4NSBINjcwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNDJiNDkiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjMwIiB5PSIyOTEuMCI+MDwvdGV4dD48dGV4dCB4PSIzMCIgeT0iMjM2LjAiPjEwPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIxODEuMCI+MjA8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjEyNi4wIj4zMDwvdGV4dD48dGV4dCB4PSIzMCIgeT0iNzEuMCI+NDA8L3RleHQ+PHRleHQgeD0iNTgiIHk9IjMxMCI+MjA8L3RleHQ+PHRleHQgeD0iMjU4IiB5PSIzMTAiPjEyMDwvdGV4dD48dGV4dCB4PSI0NTgiIHk9IjMxMCI+MjIwPC90ZXh0Pjx0ZXh0IHg9IjYxOCIgeT0iMzEwIj4zMDA8L3RleHQ+PHBvbHlsaW5lIHBvaW50cz0iNzAsMjA4LjAwIDc0LDIxMS4wMCA3OCwyMTMuNTAgODIsMjE1LjYyIDg2LDIxNy40MyA5MCwyMTkuMDAgOTQsMjIwLjM4IDk4LDIyMS41OSAxMDIsMjIyLjY3IDEwNiwyMjMuNjMgMTEwLDIyNC41MCAxMTQsMjI1LjI5IDExOCwyMjYuMDAgMTIyLDIyNi42NSAxMjYsMjI3LjI1IDEzMCwyMjcuODAgMTM0LDIyOC4zMSAxMzgsMjI4Ljc4IDE0MiwyMjkuMjEgMTQ2LDIyOS42MiAxNTAsMjMwLjAwIDE1NCwyMzAuMzUgMTU4LDIzMC42OSAxNjIsMjMxLjAwIDE2NiwyMzEuMjkgMTcwLDIzMS41NyAxNzQsMjMxLjgzIDE3OCwyMzIuMDggMTgyLDIzMi4zMiAxODYsMjMyLjU0IDE5MCwyMzIuNzUgMTk0LDIzMi45NSAxOTgsMjMzLjE0IDIwMiwyMzMuMzMgMjA2LDIzMy41MCAyMTAsMjMzLjY3IDIxNCwyMzMuODMgMjE4LDIzMy45OCAyMjIsMjM0LjEyIDIyNiwyMzQuMjcgMjMwLDIzNC40MCAyMzQsMjM0LjUzIDIzOCwyMzQuNjUgMjQyLDIzNC43NyAyNDYsMjM0Ljg5IDI1MCwyMzUuMDAgMjU0LDIzNS4xMSAyNTgsMjM1LjIxIDI2MiwyMzUuMzEgMjY2LDIzNS40MSAyNzAsMjM1LjUwIDI3NCwyMzUuNTkgMjc4LDIzNS42OCAyODIsMjM1Ljc2IDI4NiwyMzUuODQgMjkwLDIzNS45MiAyOTQsMjM2LjAwIDI5OCwyMzYuMDcgMzAyLDIzNi4xNSAzMDYsMjM2LjIyIDMxMCwyMzYuMjkgMzE0LDIzNi4zNSAzMTgsMjM2LjQyIDMyMiwyMzYuNDggMzI2LDIzNi41NCAzMzAsMjM2LjYwIDMzNCwyMzYuNjYgMzM4LDIzNi43MSAzNDIsMjM2Ljc3IDM0NiwyMzYuODIgMzUwLDIzNi44OCAzNTQsMjM2LjkzIDM1OCwyMzYuOTggMzYyLDIzNy4wMiAzNjYsMjM3LjA3IDM3MCwyMzcuMTIgMzc0LDIzNy4xNiAzNzgsMjM3LjIxIDM4MiwyMzcuMjUgMzg2LDIzNy4yOSAzOTAsMjM3LjMzIDM5NCwyMzcuMzcgMzk4LDIzNy40MSA0MDIsMjM3LjQ1IDQwNiwyMzcuNDkgNDEwLDIzNy41MyA0MTQsMjM3LjU2IDQxOCwyMzcuNjAgNDIyLDIzNy42MyA0MjYsMjM3LjY3IDQzMCwyMzcuNzAgNDM0LDIzNy43MyA0MzgsMjM3Ljc2IDQ0MiwyMzcuODAgNDQ2LDIzNy44MyA0NTAsMjM3Ljg2IDQ1NCwyMzcuODkgNDU4LDIzNy45MiA0NjIsMjM3Ljk0IDQ2NiwyMzcuOTcgNDcwLDIzOC4wMCA0NzQsMjM4LjAzIDQ3OCwyMzguMDUgNDgyLDIzOC4wOCA0ODYsMjM4LjExIDQ5MCwyMzguMTMgNDk0LDIzOC4xNiA0OTgsMjM4LjE4IDUwMiwyMzguMjAgNTA2LDIzOC4yMyA1MTAsMjM4LjI1IDUxNCwyMzguMjcgNTE4LDIzOC4zMCA1MjIsMjM4LjMyIDUyNiwyMzguMzQgNTMwLDIzOC4zNiA1MzQsMjM4LjM4IDUzOCwyMzguNDAgNTQyLDIzOC40MiA1NDYsMjM4LjQ0IDU1MCwyMzguNDYgNTU0LDIzOC40OCA1NTgsMjM4LjUwIDU2MiwyMzguNTIgNTY2LDIzOC41NCA1NzAsMjM4LjU2IDU3NCwyMzguNTcgNTc4LDIzOC41OSA1ODIsMjM4LjYxIDU4NiwyMzguNjMgNTkwLDIzOC42NCA1OTQsMjM4LjY2IDU5OCwyMzguNjggNjAyLDIzOC42OSA2MDYsMjM4LjcxIDYxMCwyMzguNzIgNjE0LDIzOC43NCA2MTgsMjM4Ljc2IDYyMiwyMzguNzcgNjI2LDIzOC43OSA2MzAsMjM4LjgwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDNiNzEiIHN0cm9rZS13aWR0aD0iMyIvPjxwb2x5bGluZSBwb2ludHM9IjcwLDcwLjUwIDc0LDg4LjUwIDc4LDEwMy41MCA4MiwxMTYuMTkgODYsMTI3LjA3IDkwLDEzNi41MCA5NCwxNDQuNzUgOTgsMTUyLjAzIDEwMiwxNTguNTAgMTA2LDE2NC4yOSAxMTAsMTY5LjUwIDExNCwxNzQuMjEgMTE4LDE3OC41MCAxMjIsMTgyLjQxIDEyNiwxODYuMDAgMTMwLDE4OS4zMCAxMzQsMTkyLjM1IDEzOCwxOTUuMTcgMTQyLDE5Ny43OSAxNDYsMjAwLjIyIDE1MCwyMDIuNTAgMTU0LDIwNC42MyAxNTgsMjA2LjYyIDE2MiwyMDguNTAgMTY2LDIxMC4yNiAxNzAsMjExLjkzIDE3NCwyMTMuNTAgMTc4LDIxNC45OSAxODIsMjE2LjM5IDE4NiwyMTcuNzMgMTkwLDIxOS4wMCAxOTQsMjIwLjIxIDE5OCwyMjEuMzYgMjAyLDIyMi40NSAyMDYsMjIzLjUwIDIxMCwyMjQuNTAgMjE0LDIyNS40NiAyMTgsMjI2LjM3IDIyMiwyMjcuMjUgMjI2LDIyOC4wOSAyMzAsMjI4LjkwIDIzNCwyMjkuNjggMjM4LDIzMC40MiAyNDIsMjMxLjE0IDI0NiwyMzEuODMgMjUwLDIzMi41MCAyNTQsMjMzLjE0IDI1OCwyMzMuNzYgMjYyLDIzNC4zNiAyNjYsMjM0Ljk0IDI3MCwyMzUuNTAgMjc0LDIzNi4wNCAyNzgsMjM2LjU2IDI4MiwyMzcuMDcgMjg2LDIzNy41NiAyOTAsMjM4LjA0IDI5NCwyMzguNTAgMjk4LDIzOC45NSAzMDIsMjM5LjM4IDMwNiwyMzkuODAgMzEwLDI0MC4yMSAzMTQsMjQwLjYxIDMxOCwyNDEuMDAgMzIyLDI0MS4zOCAzMjYsMjQxLjc0IDMzMCwyNDIuMTAgMzM0LDI0Mi40NSAzMzgsMjQyLjc5IDM0MiwyNDMuMTIgMzQ2LDI0My40NCAzNTAsMjQzLjc1IDM1NCwyNDQuMDYgMzU4LDI0NC4zNSAzNjIsMjQ0LjY0IDM2NiwyNDQuOTMgMzcwLDI0NS4yMSAzNzQsMjQ1LjQ4IDM3OCwyNDUuNzQgMzgyLDI0Ni4wMCAzODYsMjQ2LjI1IDM5MCwyNDYuNTAgMzk0LDI0Ni43NCAzOTgsMjQ2Ljk4IDQwMiwyNDcuMjEgNDA2LDI0Ny40NCA0MTAsMjQ3LjY2IDQxNCwyNDcuODggNDE4LDI0OC4wOSA0MjIsMjQ4LjMwIDQyNiwyNDguNTAgNDMwLDI0OC43MCA0MzQsMjQ4LjkwIDQzOCwyNDkuMDkgNDQyLDI0OS4yOCA0NDYsMjQ5LjQ2IDQ1MCwyNDkuNjQgNDU0LDI0OS44MiA0NTgsMjUwLjAwIDQ2MiwyNTAuMTcgNDY2LDI1MC4zMyA0NzAsMjUwLjUwIDQ3NCwyNTAuNjYgNDc4LDI1MC44MiA0ODIsMjUwLjk4IDQ4NiwyNTEuMTMgNDkwLDI1MS4yOCA0OTQsMjUxLjQzIDQ5OCwyNTEuNTggNTAyLDI1MS43MiA1MDYsMjUxLjg2IDUxMCwyNTIuMDAgNTE0LDI1Mi4xNCA1MTgsMjUyLjI3IDUyMiwyNTIuNDAgNTI2LDI1Mi41MyA1MzAsMjUyLjY2IDUzNCwyNTIuNzkgNTM4LDI1Mi45MSA1NDIsMjUzLjAzIDU0NiwyNTMuMTUgNTUwLDI1My4yNyA1NTQsMjUzLjM5IDU1OCwyNTMuNTAgNTYyLDI1My42MSA1NjYsMjUzLjcyIDU3MCwyNTMuODMgNTc0LDI1My45NCA1NzgsMjU0LjA1IDU4MiwyNTQuMTUgNTg2LDI1NC4yNiA1OTAsMjU0LjM2IDU5NCwyNTQuNDYgNTk4LDI1NC41NiA2MDIsMjU0LjY1IDYwNiwyNTQuNzUgNjEwLDI1NC44NCA2MTQsMjU0Ljk0IDYxOCwyNTUuMDMgNjIyLDI1NS4xMiA2MjYsMjU1LjIxIDYzMCwyNTUuMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzljMzgwMCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI4IDUiLz48Y2lyY2xlIGN4PSIyNzAiIGN5PSIyMzUuNSIgcj0iNSIvPjxwYXRoIGQ9Ik0yNzAgMjM1IEwzNDUgMTc1IiBzdHJva2U9IiMxNDJiNDkiLz48dGV4dCB4PSIzNTAiIHk9IjE3MCI+MTIwIHBhcnRzOyAkOS9wYXJ0PC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iNjUiPkE6ICQxMjAgKyAkOC9wYXJ0IChzb2xpZCk8L3RleHQ+PHRleHQgeD0iMzgwIiB5PSI5MiI+QjogJDcyMCArICQzL3BhcnQgKGRhc2hlZCk8L3RleHQ+PHRleHQgeD0iMjkwIiB5PSIzNDUiPlF1YW50aXR5IChwYXJ0cyk8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="Unit cost curves cross at 120 parts and 9 dollars per part. A costs less below the crossing and B above it." data-natural-width="720" data-natural-height="360"></p>
 <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; When there is no positive crossing.</p>
 <p><a class="button" data-practice-add="economics-break-even" href="../practice.html#economics-break-even">Practice break-even</a></p>
     </div>
@@ -4817,6 +4844,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 (function (root) {

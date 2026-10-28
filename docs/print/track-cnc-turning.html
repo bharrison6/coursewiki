@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2995,7 +3022,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Read X as a size and Z as a position along the spindle</h2>
   <p>Start with <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/cnc-control-fundamentals.html" target="_blank" rel="noopener">CNC Control Fundamentals</a> for how CNC works and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/lathe-operations.html" target="_blank" rel="noopener">Lathe Operations</a> for the cuts a lathe makes. Here the work rotates and the ordinary turning tool moves in the XZ plane. Z runs along the spindle; positive Z is away from the headstock in the basic arrangement shown. X moves radially, even when its displayed value is a diameter. A slant bed or rear turret changes the view, so check the machine's axis diagram.</p>
   <p>Confirm <strong>diameter or radius programming</strong> before reading an X value. For a 28 mm diameter, diameter mode uses X28 and radius mode uses X14. Moving from X28 to X24 in diameter mode removes 2 mm radially. Z is not halved. Confirm incremental and arc-centre conventions separately.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkxhdGhlIGNvb3JkaW5hdGVzIGluIGRpYW1ldGVyIG1vZGU8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5BIDI4IG1tIGRpYW1ldGVyIGJhciBleHRlbmRzIGxlZnQgZnJvbSB0aGUgZmFjZS4gV29yayB6ZXJvIGxpZXMgYXQgdGhlIGZhY2Ugb24gdGhlIHNwaW5kbGUgY2VudHJlbGluZS4gWDI4IGlzIDE0IG1tIHJhZGlhbGx5IGZyb20gdGhhdCBsaW5lOyBwb3NpdGl2ZSBaIGlzIHJpZ2h0LjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MjAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjMwIiB5PSI0NSI+RGlhbWV0ZXIgbW9kZSDCtyBzaWRlIHZpZXc8L3RleHQ+CjxyZWN0IHg9IjU1IiB5PSIxMzUiIHdpZHRoPSIxMTUiIGhlaWdodD0iMjYwIiBmaWxsPSIjYzhkMGRhIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIvPgo8cmVjdCB4PSIxNzAiIHk9IjE4NSIgd2lkdGg9IjMzMCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiNlNWVkZjMiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxwYXRoIGQ9Ik0yNSAyNjVINzQwIE01MDAgMjY1VjgwIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNNzI1IDI1NUw3NDUgMjY1TDcyNSAyNzUgTTQ5MCAxMDBMNTAwIDgwTDUxMCAxMDAiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjY2NSIgeT0iMjQ1Ij4rWjwvdGV4dD48dGV4dCB4PSI1MjAiIHk9IjEwNSI+K1ggb3V0d2FyZDwvdGV4dD4KPGNpcmNsZSBjeD0iNTAwIiBjeT0iMjY1IiByPSI3IiBmaWxsPSIjYTYzODAwIi8+CjxwYXRoIGQ9Ik01MDAgMTg1SDYzMCBNNTAwIDI2NUg2MzAgTTYxNSAxODVWMjY1IE02MDYgMTk1TDYxNSAxODVMNjI0IDE5NSBNNjA2IDI1NUw2MTUgMjY1TDYyNCAyNTUiIHN0cm9rZT0iIzAwNjQ5MyIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjY0MCIgeT0iMTk1Ij4xNCBtbTwvdGV4dD48dGV4dCB4PSIxOTAiIHk9IjE2NSI+w5gyOCDihpIgWDI4PC90ZXh0Pgo8cGF0aCBkPSJNNTA1IDI3NUw1NjAgMzcwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjM5MCIgeT0iNDEwIj5GYWNlOiBaMDwvdGV4dD48dGV4dCB4PSIzOTAiIHk9IjQ1MyI+V29yayB6ZXJvOiBYMCBaMDwvdGV4dD4KPHRleHQgeD0iMzUiIHk9IjQ0NSI+SGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI0ODUiPkNlbnRyZWxpbmUg4oaSPC90ZXh0Pgo8L2c+PC9zdmc+Cg==" alt="Lathe side view: work zero is at the face on the spindle centreline. Positive Z points away from the headstock; X28 in diameter mode represents a surface 14 mm from the centreline."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkxhdGhlIGNvb3JkaW5hdGVzIGluIGRpYW1ldGVyIG1vZGU8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5BIDI4IG1tIGRpYW1ldGVyIGJhciBleHRlbmRzIGxlZnQgZnJvbSB0aGUgZmFjZS4gV29yayB6ZXJvIGxpZXMgYXQgdGhlIGZhY2Ugb24gdGhlIHNwaW5kbGUgY2VudHJlbGluZS4gWDI4IGlzIDE0IG1tIHJhZGlhbGx5IGZyb20gdGhhdCBsaW5lOyBwb3NpdGl2ZSBaIGlzIHJpZ2h0LjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MjAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjMwIiB5PSI0NSI+RGlhbWV0ZXIgbW9kZSDCtyBzaWRlIHZpZXc8L3RleHQ+CjxyZWN0IHg9IjU1IiB5PSIxMzUiIHdpZHRoPSIxMTUiIGhlaWdodD0iMjYwIiBmaWxsPSIjYzhkMGRhIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIvPgo8cmVjdCB4PSIxNzAiIHk9IjE4NSIgd2lkdGg9IjMzMCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiNlNWVkZjMiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxwYXRoIGQ9Ik0yNSAyNjVINzQwIE01MDAgMjY1VjgwIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNNzI1IDI1NUw3NDUgMjY1TDcyNSAyNzUgTTQ5MCAxMDBMNTAwIDgwTDUxMCAxMDAiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjY2NSIgeT0iMjQ1Ij4rWjwvdGV4dD48dGV4dCB4PSI1MjAiIHk9IjEwNSI+K1ggb3V0d2FyZDwvdGV4dD4KPGNpcmNsZSBjeD0iNTAwIiBjeT0iMjY1IiByPSI3IiBmaWxsPSIjYTYzODAwIi8+CjxwYXRoIGQ9Ik01MDAgMTg1SDYzMCBNNTAwIDI2NUg2MzAgTTYxNSAxODVWMjY1IE02MDYgMTk1TDYxNSAxODVMNjI0IDE5NSBNNjA2IDI1NUw2MTUgMjY1TDYyNCAyNTUiIHN0cm9rZT0iIzAwNjQ5MyIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjY0MCIgeT0iMTk1Ij4xNCBtbTwvdGV4dD48dGV4dCB4PSIxOTAiIHk9IjE2NSI+w5gyOCDihpIgWDI4PC90ZXh0Pgo8cGF0aCBkPSJNNTA1IDI3NUw1NjAgMzcwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjM5MCIgeT0iNDEwIj5GYWNlOiBaMDwvdGV4dD48dGV4dCB4PSIzOTAiIHk9IjQ1MyI+V29yayB6ZXJvOiBYMCBaMDwvdGV4dD4KPHRleHQgeD0iMzUiIHk9IjQ0NSI+SGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI0ODUiPkNlbnRyZWxpbmUg4oaSPC90ZXh0Pgo8L2c+PC9zdmc+Cg==" alt="Lathe side view: work zero is at the face on the spindle centreline. Positive Z points away from the headstock; X28 in diameter mode represents a surface 14 mm from the centreline." data-natural-width="800" data-natural-height="520"></p>
   <p>Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/absolute-and-incremental-positioning.html" target="_blank" rel="noopener">Absolute and Incremental Positioning</a> for coordinate arithmetic. On many Fanuc-style lathes X/Z are absolute endpoints and U/W are increments; G90 can be a turning cycle. Do not paste a mill's G90/G91 startup into a lathe program.</p>
   <p><a class="button" data-practice-add="turning-x-diameter" href="../practice.html#turning-x-diameter">Practice lathe X commands</a></p>
     </div>
@@ -3115,7 +3142,7 @@ G97 S600  (LEAVE CSS: REQUEST 600 RPM)</code></pre>
       <h2>A rounded tool nose does not cut at the imaginary sharp tip</h2>
   <p>A turning insert has a rounded corner, called its <strong>nose radius</strong>. Touching off along X and Z establishes an <strong>imaginary tip</strong>: the intersection of the two tangent reference lines. There is no cutting material at that intersection. The actual contact point moves around the nose as the direction of the surface changes.</p>
   <p>Axis-parallel cuts can reach the measured diameter or face with the corresponding touch-offs. On a taper, chamfer or arc, simply driving the imaginary tip along the desired surface leaves a profile error. Account for the nose radius with a calculated toolpath or the control's tool nose compensation. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/lathe-tapers.html" target="_blank" rel="noopener">Turning Tapers</a> for taper geometry.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkltYWdpbmFyeSB0aXAgdmVyc3VzIHJvdW5kZWQgbm9zZSBvbiBhIHRhcGVyPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+VGhlIGxlZnQgYW5kIGJvdHRvbSB0YW5nZW50cyB0byBhIGNpcmN1bGFyIHRvb2wgbm9zZSBtZWV0IGF0IGFuIGltYWdpbmFyeSB0aXAuIEEgZGVzaXJlZCB0YXBlciB0aHJvdWdoIHRoYXQgdGlwIGlzIHBhcmFsbGVsIHRvLCBidXQgc2VwYXJhdGVkIGZyb20sIHRoZSBhY3R1YWwgdGFuZ2VudCBjdXQgYnkgdGhlIG5vc2UuIFRoZSBnYXAgaWxsdXN0cmF0ZXMgdW5jb21wZW5zYXRlZCBwcm9maWxlIGVycm9yLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2NTAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjI1IiB5PSI0MiI+VW5jb21wZW5zYXRlZCBub3NlIMK3IGVubGFyZ2VkPC90ZXh0Pgo8Y2lyY2xlIGN4PSI0MTAiIGN5PSIyMjAiIHI9IjgwIiBmaWxsPSIjZTVlZGYzIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNMzMwIDExNVYzNDAgTTI5MCAzMDBINTMwIiBzdHJva2U9IiM2YjcyODAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTAgOCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMTkwIDE2MEw1MzAgNTAwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMTkwIDExMy4xNEw1MzAgNDUzLjE0IiBzdHJva2U9IiMwMDY0OTMiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMDAiIHI9IjciIGZpbGw9IiNhNjM4MDAiLz4KPHBhdGggZD0iTTQxMCAyMjBMMzUzLjQzIDI3Ni41NyIgc3Ryb2tlPSIjMTQyZDRlIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSI0MzAiIHk9IjIxOCI+cjwvdGV4dD4KPHBhdGggZD0iTTMzNSAzMTBMMTQ1IDM1NSIgc3Ryb2tlPSIjYTYzODAwIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSIyNSIgeT0iMzk1Ij5JbWFnaW5hcnkgdGlwPC90ZXh0Pgo8cGF0aCBkPSJNNDcwIDQ0MEw0OTMuNDMgNDE2LjU3IiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjUzNSIgeT0iMzkwIj5Qcm9maWxlPC90ZXh0Pjx0ZXh0IHg9IjUzNSIgeT0iNDMwIj5lcnJvcjwvdGV4dD4KPHRleHQgeD0iNTI1IiB5PSIxNjAiPlJvdW5kZWQ8L3RleHQ+PHRleHQgeD0iNTI1IiB5PSIyMDAiPm5vc2U8L3RleHQ+CjxwYXRoIGQ9Ik0zMCA1NDVIOTUiIHN0cm9rZT0iI2E2MzgwMCIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iMTE1IiB5PSI1NTUiPkRlc2lyZWQgdGFwZXIgdGhyb3VnaCB0aXA8L3RleHQ+CjxwYXRoIGQ9Ik0zMCA1OTVIOTUiIHN0cm9rZT0iIzAwNjQ5MyIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iMTE1IiB5PSI2MDUiPkFjdHVhbCB0YW5nZW50IGN1dDwvdGV4dD4KPC9nPjwvc3ZnPgo=" alt="A rounded nose touches the X and Z reference lines, whose intersection is the imaginary tip. A taper through that tip misses the rounded edge; a parallel tangent line shows the resulting surface without compensation."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkltYWdpbmFyeSB0aXAgdmVyc3VzIHJvdW5kZWQgbm9zZSBvbiBhIHRhcGVyPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+VGhlIGxlZnQgYW5kIGJvdHRvbSB0YW5nZW50cyB0byBhIGNpcmN1bGFyIHRvb2wgbm9zZSBtZWV0IGF0IGFuIGltYWdpbmFyeSB0aXAuIEEgZGVzaXJlZCB0YXBlciB0aHJvdWdoIHRoYXQgdGlwIGlzIHBhcmFsbGVsIHRvLCBidXQgc2VwYXJhdGVkIGZyb20sIHRoZSBhY3R1YWwgdGFuZ2VudCBjdXQgYnkgdGhlIG5vc2UuIFRoZSBnYXAgaWxsdXN0cmF0ZXMgdW5jb21wZW5zYXRlZCBwcm9maWxlIGVycm9yLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2NTAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjI1IiB5PSI0MiI+VW5jb21wZW5zYXRlZCBub3NlIMK3IGVubGFyZ2VkPC90ZXh0Pgo8Y2lyY2xlIGN4PSI0MTAiIGN5PSIyMjAiIHI9IjgwIiBmaWxsPSIjZTVlZGYzIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNMzMwIDExNVYzNDAgTTI5MCAzMDBINTMwIiBzdHJva2U9IiM2YjcyODAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTAgOCIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMTkwIDE2MEw1MzAgNTAwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMTkwIDExMy4xNEw1MzAgNDUzLjE0IiBzdHJva2U9IiMwMDY0OTMiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8Y2lyY2xlIGN4PSIzMzAiIGN5PSIzMDAiIHI9IjciIGZpbGw9IiNhNjM4MDAiLz4KPHBhdGggZD0iTTQxMCAyMjBMMzUzLjQzIDI3Ni41NyIgc3Ryb2tlPSIjMTQyZDRlIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSI0MzAiIHk9IjIxOCI+cjwvdGV4dD4KPHBhdGggZD0iTTMzNSAzMTBMMTQ1IDM1NSIgc3Ryb2tlPSIjYTYzODAwIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSIyNSIgeT0iMzk1Ij5JbWFnaW5hcnkgdGlwPC90ZXh0Pgo8cGF0aCBkPSJNNDcwIDQ0MEw0OTMuNDMgNDE2LjU3IiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjUzNSIgeT0iMzkwIj5Qcm9maWxlPC90ZXh0Pjx0ZXh0IHg9IjUzNSIgeT0iNDMwIj5lcnJvcjwvdGV4dD4KPHRleHQgeD0iNTI1IiB5PSIxNjAiPlJvdW5kZWQ8L3RleHQ+PHRleHQgeD0iNTI1IiB5PSIyMDAiPm5vc2U8L3RleHQ+CjxwYXRoIGQ9Ik0zMCA1NDVIOTUiIHN0cm9rZT0iI2E2MzgwMCIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iMTE1IiB5PSI1NTUiPkRlc2lyZWQgdGFwZXIgdGhyb3VnaCB0aXA8L3RleHQ+CjxwYXRoIGQ9Ik0zMCA1OTVIOTUiIHN0cm9rZT0iIzAwNjQ5MyIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iMTE1IiB5PSI2MDUiPkFjdHVhbCB0YW5nZW50IGN1dDwvdGV4dD4KPC9nPjwvc3ZnPgo=" alt="A rounded nose touches the X and Z reference lines, whose intersection is the imaginary tip. A taper through that tip misses the rounded edge; a parallel tangent line shows the resulting surface without compensation." data-natural-width="800" data-natural-height="650"></p>
   <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Why a good diameter measurement does not prove a taper is correct.</p>
     </div>
   </details>
@@ -3134,7 +3161,7 @@ G97 S600  (LEAVE CSS: REQUEST 600 RPM)</code></pre>
     <div class="body">
       <h2>A roughing cycle removes layers while leaving stock for finishing</h2>
   <p>A <strong>G71-type roughing cycle</strong> uses a defined final profile to generate repeated stock-removal passes, commonly along Z for outside or inside turning. The programmer supplies the applicable cut depth, retract and finish allowance. A <strong>G70-type finishing cycle</strong> follows the defined profile to remove the remaining allowance.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlJvdWdoaW5nIGxheWVycyBhbmQgZmluaXNoIGFsbG93YW5jZTwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlVwcGVyIGhhbGYgb2Ygc3RvY2sgc2hvd24gc2NoZW1hdGljYWxseS4gVGhyZWUgcm91Z2hpbmcgcGFzc2VzIHRyYXZlbCBsZWZ0IGFsb25nIFouIEEgcmVtYWluaW5nIGJhbmQgYWJvdmUgYSBzdGVwcGVkIGZpbmFsIG91dGxpbmUgaXMgcmVtb3ZlZCBieSBmaW5pc2hpbmcuIE5vdCBhIGN5Y2xlIHBhcmFtZXRlciBkaWFncmFtLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1ODAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjI1IiB5PSI0NSI+Um91Z2ggZmlyc3Qg4oaSIGZpbmlzaCB0aGUgcHJvZmlsZTwvdGV4dD4KPHBhdGggZD0iTTkwIDEyNUg2NzBWNDIwSDkwWiIgZmlsbD0iI2YwZjNmNiIgc3Ryb2tlPSIjMTQyZDRlIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTkwIDI1NUgzNDBWMzI1SDY3MFY0MjBIOTBaIiBmaWxsPSIjZjlkOTc0Ii8+CjxwYXRoIGQ9Ik05MCAyODBIMzY1VjM1MEg2NzBWNDIwSDkwWiIgZmlsbD0iI2M5ZGNlOCIvPgo8cGF0aCBkPSJNOTAgMjgwSDM2NVYzNTBINjcwIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNOTAgMjU1SDM0MFYzMjVINjcwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTAgNiIgZmlsbD0ibm9uZSIvPgo8ZyBzdHJva2U9IiMwMDY0OTMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTY1MCAxNjVIMTIwTDEzNyAxNTUgTTEyMCAxNjVMMTM3IDE3NSBNNjUwIDIwNUgxMjBMMTM3IDE5NSBNMTIwIDIwNUwxMzcgMjE1IE02NTAgMjQ1SDM4MEwzOTcgMjM1IE0zODAgMjQ1TDM5NyAyNTUiLz48L2c+Cjx0ZXh0IHg9IjE3MCIgeT0iMTA1Ij5PcmlnaW5hbCBzdG9jayBzdXJmYWNlPC90ZXh0Pgo8dGV4dCB4PSI0MDAiIHk9IjMwNyI+QWxsb3dhbmNlPC90ZXh0Pjx0ZXh0IHg9IjEwNSIgeT0iMzkwIj5GaW5pc2hlZCBtYXRlcmlhbDwvdGV4dD4KPHBhdGggZD0iTTU1IDQyMEg3MjAiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDQwIiB5PSI0NjIiPkNlbnRyZWxpbmU8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1MTAiPuKGkCBUb3dhcmQgaGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjU4MCIgeT0iNTEwIj4rWiDihpI8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1NTUiPlVwcGVyIGhhbGYgb25seSDCtyBub3QgdG8gc2NhbGU8L3RleHQ+CjwvZz48L3N2Zz4K" alt="Upper half of turning stock: successive roughing passes run along Z toward the headstock and leave an allowance above a stepped finished profile. Finishing follows the final outline."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlJvdWdoaW5nIGxheWVycyBhbmQgZmluaXNoIGFsbG93YW5jZTwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlVwcGVyIGhhbGYgb2Ygc3RvY2sgc2hvd24gc2NoZW1hdGljYWxseS4gVGhyZWUgcm91Z2hpbmcgcGFzc2VzIHRyYXZlbCBsZWZ0IGFsb25nIFouIEEgcmVtYWluaW5nIGJhbmQgYWJvdmUgYSBzdGVwcGVkIGZpbmFsIG91dGxpbmUgaXMgcmVtb3ZlZCBieSBmaW5pc2hpbmcuIE5vdCBhIGN5Y2xlIHBhcmFtZXRlciBkaWFncmFtLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1ODAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MmQ0ZSI+Cjx0ZXh0IHg9IjI1IiB5PSI0NSI+Um91Z2ggZmlyc3Qg4oaSIGZpbmlzaCB0aGUgcHJvZmlsZTwvdGV4dD4KPHBhdGggZD0iTTkwIDEyNUg2NzBWNDIwSDkwWiIgZmlsbD0iI2YwZjNmNiIgc3Ryb2tlPSIjMTQyZDRlIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTkwIDI1NUgzNDBWMzI1SDY3MFY0MjBIOTBaIiBmaWxsPSIjZjlkOTc0Ii8+CjxwYXRoIGQ9Ik05MCAyODBIMzY1VjM1MEg2NzBWNDIwSDkwWiIgZmlsbD0iI2M5ZGNlOCIvPgo8cGF0aCBkPSJNOTAgMjgwSDM2NVYzNTBINjcwIiBzdHJva2U9IiMxNDJkNGUiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNOTAgMjU1SDM0MFYzMjVINjcwIiBzdHJva2U9IiNhNjM4MDAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iMTAgNiIgZmlsbD0ibm9uZSIvPgo8ZyBzdHJva2U9IiMwMDY0OTMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTY1MCAxNjVIMTIwTDEzNyAxNTUgTTEyMCAxNjVMMTM3IDE3NSBNNjUwIDIwNUgxMjBMMTM3IDE5NSBNMTIwIDIwNUwxMzcgMjE1IE02NTAgMjQ1SDM4MEwzOTcgMjM1IE0zODAgMjQ1TDM5NyAyNTUiLz48L2c+Cjx0ZXh0IHg9IjE3MCIgeT0iMTA1Ij5PcmlnaW5hbCBzdG9jayBzdXJmYWNlPC90ZXh0Pgo8dGV4dCB4PSI0MDAiIHk9IjMwNyI+QWxsb3dhbmNlPC90ZXh0Pjx0ZXh0IHg9IjEwNSIgeT0iMzkwIj5GaW5pc2hlZCBtYXRlcmlhbDwvdGV4dD4KPHBhdGggZD0iTTU1IDQyMEg3MjAiIHN0cm9rZT0iIzE0MmQ0ZSIgc3Ryb2tlLWRhc2hhcnJheT0iMTIgOCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDQwIiB5PSI0NjIiPkNlbnRyZWxpbmU8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1MTAiPuKGkCBUb3dhcmQgaGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjU4MCIgeT0iNTEwIj4rWiDihpI8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1NTUiPlVwcGVyIGhhbGYgb25seSDCtyBub3QgdG8gc2NhbGU8L3RleHQ+CjwvZz48L3N2Zz4K" alt="Upper half of turning stock: successive roughing passes run along Z toward the headstock and leave an allowance above a stepped finished profile. Finishing follows the final outline." data-natural-width="800" data-natural-height="580"></p>
   <p>Read the control's cycle definition before entering parameters. One-block and two-block formats differ. A depth word may be radial while an X allowance is diametral; the same letter can mean different things in different blocks. P and Q commonly identify the first and last numbered profile blocks. Check the referenced blocks, permitted profile direction changes, return path and compensation rules.</p>
   <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; Why no universal cycle template is shown.</p>
     </div>
@@ -4982,6 +5009,107 @@ M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 (function (root, factory) {

@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2959,7 +2986,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>A generator converts motion into electrical energy</h2>
   <p class="lede">A generator does not create energy. It takes mechanical work at a shaft and delivers electrical energy to a circuit, with some energy becoming heat along the way.</p>
   <p>A turbine is a rotating machine driven by a moving fluid. Steam, flowing water, wind, or hot combustion gases can turn its blades. The turbine turns the generator; the generator supplies electricity. An engine can also drive a generator without a turbine.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjU1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5Ij4KPHRpdGxlPlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5PC90aXRsZT48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjI1NSIgZmlsbD0iI2ZmZmZmZiIvPgo8ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgcmVmWD0iNyIgcmVmWT0iMyIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwwLDYgTDcsMyBaIiBmaWxsPSIjMTgzMjRiIi8+PC9tYXJrZXI+PC9kZWZzPgo8c3R5bGU+dGV4dHtmb250OjIwcHggc2Fucy1zZXJpZjtmaWxsOiMxODMyNGJ9IC5ib3h7ZmlsbDojZWRmNGY4O3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDoyfSAuZmxvd3tmaWxsOm5vbmU7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjM7bWFya2VyLWVuZDp1cmwoI2Fycm93KX0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDozfTwvc3R5bGU+Cgo8dGV4dCB4PSIzMCIgeT0iMzUiPlN0ZWFtIHJvdXRlOiBoZWF0IOKGkiBmbHVpZCBtb3Rpb24g4oaSIHNoYWZ0IHdvcmsg4oaSIGVsZWN0cmljaXR5PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSIyNSIgeT0iNzAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNzAiLz48dGV4dCB4PSI0NSIgeT0iMTAwIj5IZWF0IHNvdXJjZTwvdGV4dD48dGV4dCB4PSI0NSIgeT0iMTI2Ij4rIGJvaWxlcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik0xNjUgMTA1IEgyMjAiLz48dGV4dCB4PSIxNzAiIHk9IjY1Ij5TdGVhbTwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMjMwIiB5PSI3MCIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjI1NSIgeT0iMTEyIj5UdXJiaW5lPC90ZXh0Pgo8cGF0aCBjbGFzcz0iZmxvdyIgZD0iTTM2MCAxMDUgSDQyNSIvPjx0ZXh0IHg9IjM2NiIgeT0iNjUiPlNoYWZ0PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSI0MzUiIHk9IjcwIiB3aWR0aD0iMTQ1IiBoZWlnaHQ9IjcwIi8+PHRleHQgeD0iNDUwIiB5PSIxMTIiPkdlbmVyYXRvcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik01ODAgMTA1IEg2NDAiLz4KPHJlY3QgY2xhc3M9ImJveCIgeD0iNjUwIiB5PSI3MCIgd2lkdGg9IjEyNSIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjY2MyIgeT0iMTEyIj5FbGVjdHJpY2l0eTwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjE5MCI+V2F0ZXIsIHdpbmQgb3IgY29tYnVzdGlvbiBnYXNlcyBjYW4gZHJpdmUgYSB0dXJiaW5lIGRpcmVjdGx5LjwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjIyNSI+UFYgdGFrZXMgYSBkaWZmZXJlbnQgcm91dGU6IGxpZ2h0IOKGkiBwaG90b3ZvbHRhaWMgY2VsbCDihpIgREMgZWxlY3RyaWNpdHkuPC90ZXh0Pgo8L3N2Zz4=" alt="Heat makes steam; steam turns a turbine; the turbine turns a generator; the generator supplies electricity. Water, wind and combustion gases can drive turbines too."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjU1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5Ij4KPHRpdGxlPlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5PC90aXRsZT48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjI1NSIgZmlsbD0iI2ZmZmZmZiIvPgo8ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgcmVmWD0iNyIgcmVmWT0iMyIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwwLDYgTDcsMyBaIiBmaWxsPSIjMTgzMjRiIi8+PC9tYXJrZXI+PC9kZWZzPgo8c3R5bGU+dGV4dHtmb250OjIwcHggc2Fucy1zZXJpZjtmaWxsOiMxODMyNGJ9IC5ib3h7ZmlsbDojZWRmNGY4O3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDoyfSAuZmxvd3tmaWxsOm5vbmU7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjM7bWFya2VyLWVuZDp1cmwoI2Fycm93KX0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDozfTwvc3R5bGU+Cgo8dGV4dCB4PSIzMCIgeT0iMzUiPlN0ZWFtIHJvdXRlOiBoZWF0IOKGkiBmbHVpZCBtb3Rpb24g4oaSIHNoYWZ0IHdvcmsg4oaSIGVsZWN0cmljaXR5PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSIyNSIgeT0iNzAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNzAiLz48dGV4dCB4PSI0NSIgeT0iMTAwIj5IZWF0IHNvdXJjZTwvdGV4dD48dGV4dCB4PSI0NSIgeT0iMTI2Ij4rIGJvaWxlcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik0xNjUgMTA1IEgyMjAiLz48dGV4dCB4PSIxNzAiIHk9IjY1Ij5TdGVhbTwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMjMwIiB5PSI3MCIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjI1NSIgeT0iMTEyIj5UdXJiaW5lPC90ZXh0Pgo8cGF0aCBjbGFzcz0iZmxvdyIgZD0iTTM2MCAxMDUgSDQyNSIvPjx0ZXh0IHg9IjM2NiIgeT0iNjUiPlNoYWZ0PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSI0MzUiIHk9IjcwIiB3aWR0aD0iMTQ1IiBoZWlnaHQ9IjcwIi8+PHRleHQgeD0iNDUwIiB5PSIxMTIiPkdlbmVyYXRvcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik01ODAgMTA1IEg2NDAiLz4KPHJlY3QgY2xhc3M9ImJveCIgeD0iNjUwIiB5PSI3MCIgd2lkdGg9IjEyNSIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjY2MyIgeT0iMTEyIj5FbGVjdHJpY2l0eTwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjE5MCI+V2F0ZXIsIHdpbmQgb3IgY29tYnVzdGlvbiBnYXNlcyBjYW4gZHJpdmUgYSB0dXJiaW5lIGRpcmVjdGx5LjwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjIyNSI+UFYgdGFrZXMgYSBkaWZmZXJlbnQgcm91dGU6IGxpZ2h0IOKGkiBwaG90b3ZvbHRhaWMgY2VsbCDihpIgREMgZWxlY3RyaWNpdHkuPC90ZXh0Pgo8L3N2Zz4=" alt="Heat makes steam; steam turns a turbine; the turbine turns a generator; the generator supplies electricity. Water, wind and combustion gases can drive turbines too." data-natural-width="800" data-natural-height="255"></p>
   <p class="deeper-ref" id="deeper-ref-1">Supporting detail: <a href="#deeper-addendum-1"><strong>Addendum 1</strong></a> &mdash; How rotation produces electricity.</p>
   <p>See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/power-and-efficiency.html" target="_blank" rel="noopener">Power and Efficiency</a> for losses and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/ac-and-dc.html" target="_blank" rel="noopener">AC and DC</a> for the electrical output forms.</p>
     </div>
@@ -3006,7 +3033,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Pumped hydro stores energy by lifting water</h2>
   <p class="lede">Use electricity to pump water uphill, then let it flow downhill through a turbine and generator when electricity is needed. The stored energy is gravitational potential energy.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDU1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlB1bXBlZCBoeWRybzogZWxlY3RyaWNpdHkgbGlmdHMgd2F0ZXI7IGZhbGxpbmcgd2F0ZXIgcmV0dXJucyBlbGVjdHJpY2l0eSI+Cjx0aXRsZT5QdW1wZWQgaHlkcm86IGVsZWN0cmljaXR5IGxpZnRzIHdhdGVyOyBmYWxsaW5nIHdhdGVyIHJldHVybnMgZWxlY3RyaWNpdHk8L3RpdGxlPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDU1IiBmaWxsPSIjZmZmZmZmIi8+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iOCIgbWFya2VySGVpZ2h0PSI4IiByZWZYPSI3IiByZWZZPSIzIiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wLDAgTDAsNiBMNywzIFoiIGZpbGw9IiMxODMyNGIiLz48L21hcmtlcj48L2RlZnM+CjxzdHlsZT50ZXh0e2ZvbnQ6MjBweCBzYW5zLXNlcmlmO2ZpbGw6IzE4MzI0Yn0gLmJveHtmaWxsOiNlZGY0Zjg7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjJ9IC5mbG93e2ZpbGw6bm9uZTtzdHJva2U6IzE4MzI0YjtzdHJva2Utd2lkdGg6MzttYXJrZXItZW5kOnVybCgjYXJyb3cpfSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjN9PC9zdHlsZT4KCjxyZWN0IGNsYXNzPSJib3giIHg9IjI2MCIgeT0iMzUiIHdpZHRoPSIyODAiIGhlaWdodD0iNzAiLz48dGV4dCB4PSIzMTAiIHk9Ijc3Ij5VcHBlciByZXNlcnZvaXI8L3RleHQ+CjxyZWN0IGNsYXNzPSJib3giIHg9IjI2MCIgeT0iMzEwIiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjcwIi8+PHRleHQgeD0iMzEwIiB5PSIzNTIiPkxvd2VyIHJlc2Vydm9pcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik0yNjAgMzQ1IEgxNjAgVjcwIEgyNTAiLz4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik01NDAgNzAgSDY0MCBWMzQ1IEg1NTAiLz4KPHJlY3QgY2xhc3M9ImJveCIgeD0iNzAiIHk9IjE3MCIgd2lkdGg9IjE4NSIgaGVpZ2h0PSI4NSIvPjx0ZXh0IHg9IjkwIiB5PSIyMDIiPlB1bXAgKyBtb3RvcjwvdGV4dD48dGV4dCB4PSI5MCIgeT0iMjMyIj5FbGVjdHJpY2l0eSBJTjwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iNTQwIiB5PSIxNzAiIHdpZHRoPSIyNDUiIGhlaWdodD0iODUiLz48dGV4dCB4PSI1NTgiIHk9IjIwMiI+VHVyYmluZSArIGdlbmVyYXRvcjwvdGV4dD48dGV4dCB4PSI1NTgiIHk9IjIzMiI+RWxlY3RyaWNpdHkgT1VUPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjE3OCI+Q2hhcmdlOiBsaWZ0IHdhdGVyPC90ZXh0Pjx0ZXh0IHg9IjI4MCIgeT0iMjEzIj5EaXNjaGFyZ2U6IGxvd2VyIHdhdGVyPC90ZXh0Pgo8dGV4dCB4PSIxNTUiIHk9IjQyNSI+TG9zc2VzIG1lYW4gZWxlY3RyaWNhbCBlbmVyZ3kgb3V0IGlzIGxlc3MgdGhhbiBlbmVyZ3kgaW4uPC90ZXh0Pgo8L3N2Zz4=" alt="Charging pumps water from a lower reservoir to an upper reservoir using electricity. Discharging sends it downhill through a turbine and generator to return electricity."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDU1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlB1bXBlZCBoeWRybzogZWxlY3RyaWNpdHkgbGlmdHMgd2F0ZXI7IGZhbGxpbmcgd2F0ZXIgcmV0dXJucyBlbGVjdHJpY2l0eSI+Cjx0aXRsZT5QdW1wZWQgaHlkcm86IGVsZWN0cmljaXR5IGxpZnRzIHdhdGVyOyBmYWxsaW5nIHdhdGVyIHJldHVybnMgZWxlY3RyaWNpdHk8L3RpdGxlPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDU1IiBmaWxsPSIjZmZmZmZmIi8+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iOCIgbWFya2VySGVpZ2h0PSI4IiByZWZYPSI3IiByZWZZPSIzIiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wLDAgTDAsNiBMNywzIFoiIGZpbGw9IiMxODMyNGIiLz48L21hcmtlcj48L2RlZnM+CjxzdHlsZT50ZXh0e2ZvbnQ6MjBweCBzYW5zLXNlcmlmO2ZpbGw6IzE4MzI0Yn0gLmJveHtmaWxsOiNlZGY0Zjg7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjJ9IC5mbG93e2ZpbGw6bm9uZTtzdHJva2U6IzE4MzI0YjtzdHJva2Utd2lkdGg6MzttYXJrZXItZW5kOnVybCgjYXJyb3cpfSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjN9PC9zdHlsZT4KCjxyZWN0IGNsYXNzPSJib3giIHg9IjI2MCIgeT0iMzUiIHdpZHRoPSIyODAiIGhlaWdodD0iNzAiLz48dGV4dCB4PSIzMTAiIHk9Ijc3Ij5VcHBlciByZXNlcnZvaXI8L3RleHQ+CjxyZWN0IGNsYXNzPSJib3giIHg9IjI2MCIgeT0iMzEwIiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjcwIi8+PHRleHQgeD0iMzEwIiB5PSIzNTIiPkxvd2VyIHJlc2Vydm9pcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik0yNjAgMzQ1IEgxNjAgVjcwIEgyNTAiLz4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik01NDAgNzAgSDY0MCBWMzQ1IEg1NTAiLz4KPHJlY3QgY2xhc3M9ImJveCIgeD0iNzAiIHk9IjE3MCIgd2lkdGg9IjE4NSIgaGVpZ2h0PSI4NSIvPjx0ZXh0IHg9IjkwIiB5PSIyMDIiPlB1bXAgKyBtb3RvcjwvdGV4dD48dGV4dCB4PSI5MCIgeT0iMjMyIj5FbGVjdHJpY2l0eSBJTjwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iNTQwIiB5PSIxNzAiIHdpZHRoPSIyNDUiIGhlaWdodD0iODUiLz48dGV4dCB4PSI1NTgiIHk9IjIwMiI+VHVyYmluZSArIGdlbmVyYXRvcjwvdGV4dD48dGV4dCB4PSI1NTgiIHk9IjIzMiI+RWxlY3RyaWNpdHkgT1VUPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjE3OCI+Q2hhcmdlOiBsaWZ0IHdhdGVyPC90ZXh0Pjx0ZXh0IHg9IjI4MCIgeT0iMjEzIj5EaXNjaGFyZ2U6IGxvd2VyIHdhdGVyPC90ZXh0Pgo8dGV4dCB4PSIxNTUiIHk9IjQyNSI+TG9zc2VzIG1lYW4gZWxlY3RyaWNhbCBlbmVyZ3kgb3V0IGlzIGxlc3MgdGhhbiBlbmVyZ3kgaW4uPC90ZXh0Pgo8L3N2Zz4=" alt="Charging pumps water from a lower reservoir to an upper reservoir using electricity. Discharging sends it downhill through a turbine and generator to return electricity." data-natural-width="800" data-natural-height="455"></p>
   <p>The cycle returns less electrical energy than it consumed because pumping, flow and generation all have losses. It needs suitable elevations, reservoirs and water management; it cannot be placed wherever a battery can.</p>
   <p>For the energy and efficiency relationships, see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/work-and-energy.html" target="_blank" rel="noopener">Work and Energy</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/power-and-efficiency.html" target="_blank" rel="noopener">Power and Efficiency</a>.</p>
     </div>
@@ -3153,7 +3180,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Series adds voltage; parallel adds charge capacity</h2>
   <p>For matched cells, connect cells in series to increase voltage. Put identical series strings in parallel to increase Ah at the same voltage. <strong>3s2p</strong> means three cells per series string and two strings in parallel: six cells altogether.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlR3byBtYXRjaGVkIGNlbGxzOiBzZXJpZXMgYWRkcyB2b2x0YWdlOyBwYXJhbGxlbCBhZGRzIGFtcGVyZS1ob3VycyI+Cjx0aXRsZT5Ud28gbWF0Y2hlZCBjZWxsczogc2VyaWVzIGFkZHMgdm9sdGFnZTsgcGFyYWxsZWwgYWRkcyBhbXBlcmUtaG91cnM8L3RpdGxlPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDkwIiBmaWxsPSIjZmZmZmZmIi8+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iOCIgbWFya2VySGVpZ2h0PSI4IiByZWZYPSI3IiByZWZZPSIzIiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wLDAgTDAsNiBMNywzIFoiIGZpbGw9IiMxODMyNGIiLz48L21hcmtlcj48L2RlZnM+CjxzdHlsZT50ZXh0e2ZvbnQ6MjBweCBzYW5zLXNlcmlmO2ZpbGw6IzE4MzI0Yn0gLmJveHtmaWxsOiNlZGY0Zjg7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjJ9IC5mbG93e2ZpbGw6bm9uZTtzdHJva2U6IzE4MzI0YjtzdHJva2Utd2lkdGg6MzttYXJrZXItZW5kOnVybCgjYXJyb3cpfSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjN9PC9zdHlsZT4KCjx0ZXh0IHg9IjI1IiB5PSIzNSI+RWFjaCBjZWxsOiAzLjYgViwgMi40IEFoIChpZGVhbCk8L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSI4MCI+MnMxcDogc2VyaWVzPC90ZXh0Pgo8cGF0aCBjbGFzcz0id2lyZSIgZD0iTTM1IDEzNSBIOTAgTTIzMCAxMzUgSDI5NSBNNDM1IDEzNSBINDkwIi8+CjxyZWN0IGNsYXNzPSJib3giIHg9IjkwIiB5PSIxMDUiIHdpZHRoPSIxNDAiIGhlaWdodD0iNjAiLz48dGV4dCB4PSIxMDAiIHk9IjE0MyI+4oiSICAgY2VsbCAxICAgKzwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMjk1IiB5PSIxMDUiIHdpZHRoPSIxNDAiIGhlaWdodD0iNjAiLz48dGV4dCB4PSIzMDUiIHk9IjE0MyI+4oiSICAgY2VsbCAyICAgKzwvdGV4dD4KPHRleHQgeD0iNTIwIiB5PSIxNDAiPjcuMiBWLCAyLjQgQWg8L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSIyMTUiPjFzMnA6IHBhcmFsbGVsPC90ZXh0Pgo8cGF0aCBjbGFzcz0id2lyZSIgZD0iTTM1IDMwNSBIOTAgVjI2MCBIMTgwIE05MCAzMDUgVjM1MCBIMTgwIE0zMjAgMjYwIEg0MTAgVjM1MCBIMzIwIE00MTAgMzA1IEg0OTAiLz4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMTgwIiB5PSIyMzAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNjAiLz48dGV4dCB4PSIxOTAiIHk9IjI2OCI+4oiSICAgY2VsbCAxICAgKzwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMTgwIiB5PSIzMjAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNjAiLz48dGV4dCB4PSIxOTAiIHk9IjM1OCI+4oiSICAgY2VsbCAyICAgKzwvdGV4dD4KPHRleHQgeD0iNTIwIiB5PSIzMTAiPjMuNiBWLCA0LjggQWg8L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSI0MjUiPkJvdGggdXNlIHR3byBjZWxscy4gQm90aCBzdG9yZSBhbiBpZGVhbCAxNy4yOCBXaC48L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSI0NjAiPkNvbmNlcHQgZGlhZ3JhbSBvbmx5OiBwYWNrIHByb3RlY3Rpb24gYW5kIGludGVyY29ubmVjdGlvbnMgb21pdHRlZC48L3RleHQ+Cjwvc3ZnPg==" alt="Two identical 3.6 V 2.4 Ah cells in series give 7.2 V and 2.4 Ah; the same two in parallel give 3.6 V and 4.8 Ah. Each arrangement stores an ideal 17.28 Wh."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlR3byBtYXRjaGVkIGNlbGxzOiBzZXJpZXMgYWRkcyB2b2x0YWdlOyBwYXJhbGxlbCBhZGRzIGFtcGVyZS1ob3VycyI+Cjx0aXRsZT5Ud28gbWF0Y2hlZCBjZWxsczogc2VyaWVzIGFkZHMgdm9sdGFnZTsgcGFyYWxsZWwgYWRkcyBhbXBlcmUtaG91cnM8L3RpdGxlPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDkwIiBmaWxsPSIjZmZmZmZmIi8+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iOCIgbWFya2VySGVpZ2h0PSI4IiByZWZYPSI3IiByZWZZPSIzIiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wLDAgTDAsNiBMNywzIFoiIGZpbGw9IiMxODMyNGIiLz48L21hcmtlcj48L2RlZnM+CjxzdHlsZT50ZXh0e2ZvbnQ6MjBweCBzYW5zLXNlcmlmO2ZpbGw6IzE4MzI0Yn0gLmJveHtmaWxsOiNlZGY0Zjg7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjJ9IC5mbG93e2ZpbGw6bm9uZTtzdHJva2U6IzE4MzI0YjtzdHJva2Utd2lkdGg6MzttYXJrZXItZW5kOnVybCgjYXJyb3cpfSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjN9PC9zdHlsZT4KCjx0ZXh0IHg9IjI1IiB5PSIzNSI+RWFjaCBjZWxsOiAzLjYgViwgMi40IEFoIChpZGVhbCk8L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSI4MCI+MnMxcDogc2VyaWVzPC90ZXh0Pgo8cGF0aCBjbGFzcz0id2lyZSIgZD0iTTM1IDEzNSBIOTAgTTIzMCAxMzUgSDI5NSBNNDM1IDEzNSBINDkwIi8+CjxyZWN0IGNsYXNzPSJib3giIHg9IjkwIiB5PSIxMDUiIHdpZHRoPSIxNDAiIGhlaWdodD0iNjAiLz48dGV4dCB4PSIxMDAiIHk9IjE0MyI+4oiSICAgY2VsbCAxICAgKzwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMjk1IiB5PSIxMDUiIHdpZHRoPSIxNDAiIGhlaWdodD0iNjAiLz48dGV4dCB4PSIzMDUiIHk9IjE0MyI+4oiSICAgY2VsbCAyICAgKzwvdGV4dD4KPHRleHQgeD0iNTIwIiB5PSIxNDAiPjcuMiBWLCAyLjQgQWg8L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSIyMTUiPjFzMnA6IHBhcmFsbGVsPC90ZXh0Pgo8cGF0aCBjbGFzcz0id2lyZSIgZD0iTTM1IDMwNSBIOTAgVjI2MCBIMTgwIE05MCAzMDUgVjM1MCBIMTgwIE0zMjAgMjYwIEg0MTAgVjM1MCBIMzIwIE00MTAgMzA1IEg0OTAiLz4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMTgwIiB5PSIyMzAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNjAiLz48dGV4dCB4PSIxOTAiIHk9IjI2OCI+4oiSICAgY2VsbCAxICAgKzwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMTgwIiB5PSIzMjAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNjAiLz48dGV4dCB4PSIxOTAiIHk9IjM1OCI+4oiSICAgY2VsbCAyICAgKzwvdGV4dD4KPHRleHQgeD0iNTIwIiB5PSIzMTAiPjMuNiBWLCA0LjggQWg8L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSI0MjUiPkJvdGggdXNlIHR3byBjZWxscy4gQm90aCBzdG9yZSBhbiBpZGVhbCAxNy4yOCBXaC48L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSI0NjAiPkNvbmNlcHQgZGlhZ3JhbSBvbmx5OiBwYWNrIHByb3RlY3Rpb24gYW5kIGludGVyY29ubmVjdGlvbnMgb21pdHRlZC48L3RleHQ+Cjwvc3ZnPg==" alt="Two identical 3.6 V 2.4 Ah cells in series give 7.2 V and 2.4 Ah; the same two in parallel give 3.6 V and 4.8 Ah. Each arrangement stores an ideal 17.28 Wh." data-natural-width="800" data-natural-height="490"></p>
   <p><code>Pack V = series count × cell V</code><br><code>Pack Ah = parallel count × cell Ah</code><br><code>Pack Wh ≈ pack V × pack Ah</code></p>
   <p>With 3.6 V, 2.4 Ah cells, a 3s2p pack is <strong>10.8 V, 4.8 Ah and 51.84 Wh</strong>. At 3C it has an ideal rated-current estimate of 14.4 A. A 1.2 A pack load gives 4 h ideal runtime.</p>
   <p>This is an electrical model, not a pack assembly procedure. It assumes matched cells, balanced series operation and equal current sharing between parallel strings. Real packs need appropriate cell matching, interconnections and protection. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/series-and-parallel-circuits.html" target="_blank" rel="noopener">Series and Parallel Circuits</a>.</p>
@@ -4879,6 +4906,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 (function (root) {

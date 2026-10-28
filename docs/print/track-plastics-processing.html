@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3002,7 +3029,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Start with both plastics and what the joint must do</h2>
   <p>Fabricating joins pieces into a useful assembly. Name <strong>both</strong> materials, then state the load, service temperature, appearance and whether the assembly must come apart. A leak-tight seam, a removable cover and a clear display corner need different joints.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MDAgNjQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+Q2hvb3NlIGEgcGxhc3RpYyBqb2luaW5nIGNhbmRpZGF0ZTwvdGl0bGU+CiAgPGRlc2MgaWQ9ImRlc2MiPklkZW50aWZ5IGJvdGggbWF0ZXJpYWxzIGFuZCB0aGUgcmVxdWlyZW1lbnRzLiBJZiBkaXNhc3NlbWJseSBpcyByZXF1aXJlZCwgY29uc2lkZXIgbWVjaGFuaWNhbCBqb2luaW5nLiBPdGhlcndpc2UsIGlmIHRoZXJtb3BsYXN0aWNzIGFyZSB3ZWxkLWNvbXBhdGlibGUsIGV2YWx1YXRlIGEgd2VsZC4gSWYgdGhleSBhcmUgbm90LCBldmFsdWF0ZSBhIHZhbGlkYXRlZCBzb2x2ZW50IGNlbWVudCBvciBhZGhlc2l2ZSwgb3IgcmVkZXNpZ24uIFRlc3QgZXZlcnkgY2FuZGlkYXRlIGZvciB0aGUgaW50ZW5kZWQgc2VydmljZS48L2Rlc2M+CiAgPHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI2NDAiIHJ4PSIxMiIgZmlsbD0iI2ZmZiIvPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzAwMjE0NCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICA8dGV4dCB4PSIzMDAiIHk9IjMyIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+Q2hvb3NlIGEgam9pbnQsIHRoZW4gdGVzdCBpdDwvdGV4dD4KICAgIDxnIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSIjZWVmNWY4Ij4KICAgICAgPHJlY3QgeD0iNzAiIHk9IjUzIiB3aWR0aD0iNDYwIiBoZWlnaHQ9IjYwIiByeD0iOCIvPgogICAgICA8cmVjdCB4PSIyOCIgeT0iMTU1IiB3aWR0aD0iMjc1IiBoZWlnaHQ9IjY3IiByeD0iOCIvPgogICAgICA8cmVjdCB4PSIzNzMiIHk9IjE1NSIgd2lkdGg9IjIwMiIgaGVpZ2h0PSI2NyIgcng9IjgiIGZpbGw9IiNmZmYxYzkiLz4KICAgICAgPHJlY3QgeD0iMjgiIHk9IjI3OCIgd2lkdGg9IjI3NSIgaGVpZ2h0PSI4MiIgcng9IjgiLz4KICAgICAgPHJlY3QgeD0iMzczIiB5PSIyNzgiIHdpZHRoPSIyMDIiIGhlaWdodD0iODIiIHJ4PSI4IiBmaWxsPSIjZmZmMWM5Ii8+CiAgICAgIDxyZWN0IHg9IjI4IiB5PSI0MTciIHdpZHRoPSIyNzUiIGhlaWdodD0iODYiIHJ4PSI4IiBmaWxsPSIjZmZmMWM5Ii8+CiAgICAgIDxyZWN0IHg9IjcwIiB5PSI1NjAiIHdpZHRoPSI0NjAiIGhlaWdodD0iNTgiIHJ4PSI4Ii8+CiAgICA8L2c+CiAgICA8dGV4dCB4PSIzMDAiIHk9Ijc5Ij5JZGVudGlmeSBib3RoIHJlc2lucyBhbmQgZ3JhZGVzLjwvdGV4dD48dGV4dCB4PSIzMDAiIHk9IjEwMiI+RGVmaW5lIGxvYWQsIGVudmlyb25tZW50IGFuZCBhcHBlYXJhbmNlLjwvdGV4dD4KICAgIDx0ZXh0IHg9IjE2NSIgeT0iMTg0Ij5NdXN0IHRoZSBhc3NlbWJseTwvdGV4dD48dGV4dCB4PSIxNjUiIHk9IjIwOCI+Y29tZSBhcGFydD88L3RleHQ+CiAgICA8dGV4dCB4PSI0NzQiIHk9IjE4NCI+TWVjaGFuaWNhbCBqb2ludDwvdGV4dD48dGV4dCB4PSI0NzQiIHk9IjIwOCI+U2NyZXdzIC8gcmVsZWFzZSBzbmFwczwvdGV4dD4KICAgIDx0ZXh0IHg9IjE2NSIgeT0iMzA2Ij5Db21wYXRpYmxlIHRoZXJtb3BsYXN0aWNzPC90ZXh0Pjx0ZXh0IHg9IjE2NSIgeT0iMzMwIj53aXRoIGFuIGFjY2Vzc2libGUsPC90ZXh0Pjx0ZXh0IHg9IjE2NSIgeT0iMzUzIj53ZWxkYWJsZSBqb2ludD88L3RleHQ+CiAgICA8dGV4dCB4PSI0NzQiIHk9IjMxMCI+RXZhbHVhdGUgd2VsZGluZzwvdGV4dD48dGV4dCB4PSI0NzQiIHk9IjMzNyI+UHJvY2VzcyArIGpvaW50IGRlc2lnbjwvdGV4dD4KICAgIDx0ZXh0IHg9IjE2NSIgeT0iNDQ0Ij5WYWxpZGF0ZWQgY2VtZW50IC8gYWRoZXNpdmU/PC90ZXh0Pjx0ZXh0IHg9IjE2NSIgeT0iNDY4Ij5DaGVjayBib3RoIHN1cmZhY2VzLjwvdGV4dD48dGV4dCB4PSIxNjUiIHk9IjQ5MiI+SWYgbm9uZTogcmVkZXNpZ24gdGhlIGpvaW50LjwvdGV4dD4KICAgIDxnIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgICAgPHBhdGggZD0iTTE2NSAxMTNWMTU1bS01LTggNSA4IDUtOE0zMDMgMTg5SDM3M20tOC01IDggNS04IDVNMTY1IDIyMlYyNzhtLTUtOCA1IDggNS04TTMwMyAzMTlIMzczbS04LTUgOCA1LTggNU0xNjUgMzYwVjQxN20tNS04IDUgOCA1LThNMTY1IDUwM1Y1NjBtLTUtOCA1IDggNS04TTQ3NCAyMjJWMjYwSDU4OFY1MzBINDc0VjU2MG0tNS04IDUgOCA1LThNNDc0IDM2MFY1MzBIMTY1Ii8+CiAgICA8L2c+CiAgICA8dGV4dCB4PSIzMzgiIHk9IjE3OCI+WWVzPC90ZXh0Pjx0ZXh0IHg9IjE4NyIgeT0iMjU0Ij5ObzwvdGV4dD48dGV4dCB4PSIzMzgiIHk9IjMwNyI+WWVzPC90ZXh0Pjx0ZXh0IHg9IjE4NyIgeT0iMzkzIj5ObzwvdGV4dD4KICAgIDx0ZXh0IHg9IjMwMCIgeT0iNTg1Ij5UZXN0IGEgcmVwcmVzZW50YXRpdmUgam9pbnQgYWZ0ZXIgY3VyZSAvIGNvb2xpbmcuPC90ZXh0Pjx0ZXh0IHg9IjMwMCIgeT0iNjA4Ij5DaGVjayBsb2FkLCBmaXQgYW5kIHNlYWxpbmcgd2hlcmUgcmVxdWlyZWQuPC90ZXh0PgogIDwvZz4KPC9zdmc+Cg==" alt="Joining decision: identify both materials and requirements; choose mechanical joining for disassembly, evaluate welding for compatible thermoplastics, otherwise evaluate a validated cement or adhesive; test the selected joint."></p><figcaption>These routes identify candidates. The actual grade, joint shape and service conditions decide whether a candidate works.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MDAgNjQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+Q2hvb3NlIGEgcGxhc3RpYyBqb2luaW5nIGNhbmRpZGF0ZTwvdGl0bGU+CiAgPGRlc2MgaWQ9ImRlc2MiPklkZW50aWZ5IGJvdGggbWF0ZXJpYWxzIGFuZCB0aGUgcmVxdWlyZW1lbnRzLiBJZiBkaXNhc3NlbWJseSBpcyByZXF1aXJlZCwgY29uc2lkZXIgbWVjaGFuaWNhbCBqb2luaW5nLiBPdGhlcndpc2UsIGlmIHRoZXJtb3BsYXN0aWNzIGFyZSB3ZWxkLWNvbXBhdGlibGUsIGV2YWx1YXRlIGEgd2VsZC4gSWYgdGhleSBhcmUgbm90LCBldmFsdWF0ZSBhIHZhbGlkYXRlZCBzb2x2ZW50IGNlbWVudCBvciBhZGhlc2l2ZSwgb3IgcmVkZXNpZ24uIFRlc3QgZXZlcnkgY2FuZGlkYXRlIGZvciB0aGUgaW50ZW5kZWQgc2VydmljZS48L2Rlc2M+CiAgPHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI2NDAiIHJ4PSIxMiIgZmlsbD0iI2ZmZiIvPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzAwMjE0NCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICA8dGV4dCB4PSIzMDAiIHk9IjMyIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+Q2hvb3NlIGEgam9pbnQsIHRoZW4gdGVzdCBpdDwvdGV4dD4KICAgIDxnIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSIjZWVmNWY4Ij4KICAgICAgPHJlY3QgeD0iNzAiIHk9IjUzIiB3aWR0aD0iNDYwIiBoZWlnaHQ9IjYwIiByeD0iOCIvPgogICAgICA8cmVjdCB4PSIyOCIgeT0iMTU1IiB3aWR0aD0iMjc1IiBoZWlnaHQ9IjY3IiByeD0iOCIvPgogICAgICA8cmVjdCB4PSIzNzMiIHk9IjE1NSIgd2lkdGg9IjIwMiIgaGVpZ2h0PSI2NyIgcng9IjgiIGZpbGw9IiNmZmYxYzkiLz4KICAgICAgPHJlY3QgeD0iMjgiIHk9IjI3OCIgd2lkdGg9IjI3NSIgaGVpZ2h0PSI4MiIgcng9IjgiLz4KICAgICAgPHJlY3QgeD0iMzczIiB5PSIyNzgiIHdpZHRoPSIyMDIiIGhlaWdodD0iODIiIHJ4PSI4IiBmaWxsPSIjZmZmMWM5Ii8+CiAgICAgIDxyZWN0IHg9IjI4IiB5PSI0MTciIHdpZHRoPSIyNzUiIGhlaWdodD0iODYiIHJ4PSI4IiBmaWxsPSIjZmZmMWM5Ii8+CiAgICAgIDxyZWN0IHg9IjcwIiB5PSI1NjAiIHdpZHRoPSI0NjAiIGhlaWdodD0iNTgiIHJ4PSI4Ii8+CiAgICA8L2c+CiAgICA8dGV4dCB4PSIzMDAiIHk9Ijc5Ij5JZGVudGlmeSBib3RoIHJlc2lucyBhbmQgZ3JhZGVzLjwvdGV4dD48dGV4dCB4PSIzMDAiIHk9IjEwMiI+RGVmaW5lIGxvYWQsIGVudmlyb25tZW50IGFuZCBhcHBlYXJhbmNlLjwvdGV4dD4KICAgIDx0ZXh0IHg9IjE2NSIgeT0iMTg0Ij5NdXN0IHRoZSBhc3NlbWJseTwvdGV4dD48dGV4dCB4PSIxNjUiIHk9IjIwOCI+Y29tZSBhcGFydD88L3RleHQ+CiAgICA8dGV4dCB4PSI0NzQiIHk9IjE4NCI+TWVjaGFuaWNhbCBqb2ludDwvdGV4dD48dGV4dCB4PSI0NzQiIHk9IjIwOCI+U2NyZXdzIC8gcmVsZWFzZSBzbmFwczwvdGV4dD4KICAgIDx0ZXh0IHg9IjE2NSIgeT0iMzA2Ij5Db21wYXRpYmxlIHRoZXJtb3BsYXN0aWNzPC90ZXh0Pjx0ZXh0IHg9IjE2NSIgeT0iMzMwIj53aXRoIGFuIGFjY2Vzc2libGUsPC90ZXh0Pjx0ZXh0IHg9IjE2NSIgeT0iMzUzIj53ZWxkYWJsZSBqb2ludD88L3RleHQ+CiAgICA8dGV4dCB4PSI0NzQiIHk9IjMxMCI+RXZhbHVhdGUgd2VsZGluZzwvdGV4dD48dGV4dCB4PSI0NzQiIHk9IjMzNyI+UHJvY2VzcyArIGpvaW50IGRlc2lnbjwvdGV4dD4KICAgIDx0ZXh0IHg9IjE2NSIgeT0iNDQ0Ij5WYWxpZGF0ZWQgY2VtZW50IC8gYWRoZXNpdmU/PC90ZXh0Pjx0ZXh0IHg9IjE2NSIgeT0iNDY4Ij5DaGVjayBib3RoIHN1cmZhY2VzLjwvdGV4dD48dGV4dCB4PSIxNjUiIHk9IjQ5MiI+SWYgbm9uZTogcmVkZXNpZ24gdGhlIGpvaW50LjwvdGV4dD4KICAgIDxnIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgICAgPHBhdGggZD0iTTE2NSAxMTNWMTU1bS01LTggNSA4IDUtOE0zMDMgMTg5SDM3M20tOC01IDggNS04IDVNMTY1IDIyMlYyNzhtLTUtOCA1IDggNS04TTMwMyAzMTlIMzczbS04LTUgOCA1LTggNU0xNjUgMzYwVjQxN20tNS04IDUgOCA1LThNMTY1IDUwM1Y1NjBtLTUtOCA1IDggNS04TTQ3NCAyMjJWMjYwSDU4OFY1MzBINDc0VjU2MG0tNS04IDUgOCA1LThNNDc0IDM2MFY1MzBIMTY1Ii8+CiAgICA8L2c+CiAgICA8dGV4dCB4PSIzMzgiIHk9IjE3OCI+WWVzPC90ZXh0Pjx0ZXh0IHg9IjE4NyIgeT0iMjU0Ij5ObzwvdGV4dD48dGV4dCB4PSIzMzgiIHk9IjMwNyI+WWVzPC90ZXh0Pjx0ZXh0IHg9IjE4NyIgeT0iMzkzIj5ObzwvdGV4dD4KICAgIDx0ZXh0IHg9IjMwMCIgeT0iNTg1Ij5UZXN0IGEgcmVwcmVzZW50YXRpdmUgam9pbnQgYWZ0ZXIgY3VyZSAvIGNvb2xpbmcuPC90ZXh0Pjx0ZXh0IHg9IjMwMCIgeT0iNjA4Ij5DaGVjayBsb2FkLCBmaXQgYW5kIHNlYWxpbmcgd2hlcmUgcmVxdWlyZWQuPC90ZXh0PgogIDwvZz4KPC9zdmc+Cg==" alt="Joining decision: identify both materials and requirements; choose mechanical joining for disassembly, evaluate welding for compatible thermoplastics, otherwise evaluate a validated cement or adhesive; test the selected joint." data-natural-width="600" data-natural-height="640"></p><figcaption>These routes identify candidates. The actual grade, joint shape and service conditions decide whether a candidate works.</figcaption></figure>
   <ul class="boxes"><li>Identify the two resins and any coating or surface contamination.</li><li>State the load direction, environment and need for disassembly or sealing.</li><li>Check the joining product or process guidance for that material pair.</li><li>Make a representative trial joint and inspect it after full cure or cooling.</li></ul>
     </div>
   </details>
@@ -3069,7 +3096,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>A slicer turns a solid model into deposited layers</h2>
   <p><strong>Fused deposition modeling (FDM)</strong>, also called fused filament fabrication (FFF), feeds thermoplastic filament into a heated nozzle. The machine lays down narrow roads of softened material that bond as the part builds. Relative motion between the nozzle and build plate advances the layers; the nozzle itself does not have to move upward on every printer.</p>
   <p>A <strong>slicer</strong> converts the model into tool paths, including walls, internal fill and any temporary supports. Preview those paths before printing. An enclosed shape on a CAD screen does not tell you how its underside will be supported.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNDYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+RkRNIGNyb3NzLXNlY3Rpb24gZHVyaW5nIHByaW50aW5nPC90aXRsZT4KICA8ZGVzYyBpZD0iZGVzYyI+RmlsYW1lbnQgZW50ZXJzIGEgaGVhdGVkIG5venpsZS4gVGhlIG5venpsZSBkZXBvc2l0cyBsYXllcnMgb24gYSBwYXJ0IHdpdGggc29saWQgd2FsbHMgYW5kIHNwYXJzZSBpbmZpbGwuIFRlbXBvcmFyeSBzdXBwb3J0cyBob2xkIHVwIGFuIG92ZXJoYW5nLiBBbGwgcmVzdCBvbiBhIGJ1aWxkIHBsYXRlLjwvZGVzYz4KICA8cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ2MCIgcng9IjEyIiBmaWxsPSIjZmZmIi8+CiAgPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjMDAyMTQ0Ij4KICAgIDx0ZXh0IHg9IjI0IiB5PSIzMiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9ImJvbGQiPkZETTogYnVpbGQgdGhlIHBhcnQgb25lIGxheWVyIGF0IGEgdGltZTwvdGV4dD4KICAgIDxwYXRoIGQ9Ik0zMTAgNTBWOTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSI5Ii8+CiAgICA8cGF0aCBkPSJNMjgxIDk4SDMzOVYxMzdMMzE0IDE2NEgzMDZMMjgxIDEzN1oiIGZpbGw9IiNlY2FjMDAiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cGF0aCBkPSJNMzEwIDE2NFYxODBIMzU2IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iNiIvPgogICAgPHBhdGggZD0iTTI5MCA3MkgyMTRNMzM5IDExNUgzODgiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSI4NyIgeT0iNzgiPkZpbGFtZW50PC90ZXh0Pjx0ZXh0IHg9IjM5OSIgeT0iMTIxIj5IZWF0ZWQgbm96emxlPC90ZXh0PgogICAgPHJlY3QgeD0iMTEyIiB5PSIxODQiIHdpZHRoPSIzMjIiIGhlaWdodD0iMzIiIGZpbGw9IiNkOGViZjMiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cmVjdCB4PSIxMTIiIHk9IjIxNiIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxNjIiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cGF0aCBkPSJNMTEyIDIxNkgzMTJNMTEyIDIzNEgzMTJNMTEyIDI1MkgzMTJNMTEyIDI3MEgzMTJNMTEyIDI4OEgzMTJNMTEyIDMwNkgzMTJNMTEyIDMyNEgzMTJNMTEyIDM0MkgzMTJNMTEyIDM2MEgzMTIiIHN0cm9rZT0iI2FmYzZkNSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cGF0aCBkPSJNMTM1IDIxNlYzNzhNMjg5IDIxNlYzNzgiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSI4Ii8+CiAgICA8cGF0aCBkPSJNMTQzIDIxNkwyODEgMjcwTDE0MyAzMjRMMjgxIDM3OE0yODEgMjE2TDE0MyAyNzBMMjgxIDMyNEwxNDMgMzc4IiBzdHJva2U9IiMwMDcxOWMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPgogICAgPHBhdGggZD0iTTMzOSAyMjVWMzc4TTM2NyAyMjVWMzc4TTM5NSAyMjVWMzc4TTQyMyAyMjVWMzc4TTMzMiAyNDNINDMwTTMzMiAyNzBINDMwTTMzMiAyOTdINDMwTTMzMiAzMjRINDMwTTMzMiAzNTFINDMwIiBmaWxsPSJub25lIiBzdHJva2U9IiM4YTU3MDAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CiAgICA8cmVjdCB4PSI3NiIgeT0iMzgwIiB3aWR0aD0iNDE0IiBoZWlnaHQ9IjIwIiByeD0iMyIgZmlsbD0iIzAwMjE0NCIvPgogICAgPHBhdGggZD0iTTQzNCAxOTlINDU4TTM5NSAyOTdINDUzTTIxMSAyNzBMMjExIDQyNkgzMTlNMTEyIDI4NkgzN1YyMzgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSI0NjYiIHk9IjIwNCI+T3Zlcmhhbmc8L3RleHQ+CiAgICA8dGV4dCB4PSI0NjMiIHk9IjI4NiI+VGVtcG9yYXJ5PC90ZXh0Pjx0ZXh0IHg9IjQ2MyIgeT0iMzEwIj5zdXBwb3J0czwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyNiIgeT0iNDMyIj5TcGFyc2UgaW5maWxsPC90ZXh0PgogICAgPHRleHQgeD0iMjAiIHk9IjIxMCI+TGF5ZXJzPC90ZXh0Pjx0ZXh0IHg9IjIwIiB5PSIyMzMiPmFuZCB3YWxsczwvdGV4dD4KICAgIDx0ZXh0IHg9Ijc3IiB5PSI0MzIiPkJ1aWxkIHBsYXRlPC90ZXh0PgogIDwvZz4KPC9zdmc+Cg==" alt="Schematic FDM cross-section: filament enters the heated nozzle above deposited layers; outer walls enclose sparse infill; removable supports stand beneath an overhang on the build plate."></p><figcaption>A section through a partly printed part. Walls, infill and supports are different tool paths. The large lines are illustrative, not a scale drawing.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNDYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+RkRNIGNyb3NzLXNlY3Rpb24gZHVyaW5nIHByaW50aW5nPC90aXRsZT4KICA8ZGVzYyBpZD0iZGVzYyI+RmlsYW1lbnQgZW50ZXJzIGEgaGVhdGVkIG5venpsZS4gVGhlIG5venpsZSBkZXBvc2l0cyBsYXllcnMgb24gYSBwYXJ0IHdpdGggc29saWQgd2FsbHMgYW5kIHNwYXJzZSBpbmZpbGwuIFRlbXBvcmFyeSBzdXBwb3J0cyBob2xkIHVwIGFuIG92ZXJoYW5nLiBBbGwgcmVzdCBvbiBhIGJ1aWxkIHBsYXRlLjwvZGVzYz4KICA8cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ2MCIgcng9IjEyIiBmaWxsPSIjZmZmIi8+CiAgPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjMDAyMTQ0Ij4KICAgIDx0ZXh0IHg9IjI0IiB5PSIzMiIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9ImJvbGQiPkZETTogYnVpbGQgdGhlIHBhcnQgb25lIGxheWVyIGF0IGEgdGltZTwvdGV4dD4KICAgIDxwYXRoIGQ9Ik0zMTAgNTBWOTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSI5Ii8+CiAgICA8cGF0aCBkPSJNMjgxIDk4SDMzOVYxMzdMMzE0IDE2NEgzMDZMMjgxIDEzN1oiIGZpbGw9IiNlY2FjMDAiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cGF0aCBkPSJNMzEwIDE2NFYxODBIMzU2IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iNiIvPgogICAgPHBhdGggZD0iTTI5MCA3MkgyMTRNMzM5IDExNUgzODgiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSI4NyIgeT0iNzgiPkZpbGFtZW50PC90ZXh0Pjx0ZXh0IHg9IjM5OSIgeT0iMTIxIj5IZWF0ZWQgbm96emxlPC90ZXh0PgogICAgPHJlY3QgeD0iMTEyIiB5PSIxODQiIHdpZHRoPSIzMjIiIGhlaWdodD0iMzIiIGZpbGw9IiNkOGViZjMiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cmVjdCB4PSIxMTIiIHk9IjIxNiIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxNjIiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cGF0aCBkPSJNMTEyIDIxNkgzMTJNMTEyIDIzNEgzMTJNMTEyIDI1MkgzMTJNMTEyIDI3MEgzMTJNMTEyIDI4OEgzMTJNMTEyIDMwNkgzMTJNMTEyIDMyNEgzMTJNMTEyIDM0MkgzMTJNMTEyIDM2MEgzMTIiIHN0cm9rZT0iI2FmYzZkNSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cGF0aCBkPSJNMTM1IDIxNlYzNzhNMjg5IDIxNlYzNzgiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSI4Ii8+CiAgICA8cGF0aCBkPSJNMTQzIDIxNkwyODEgMjcwTDE0MyAzMjRMMjgxIDM3OE0yODEgMjE2TDE0MyAyNzBMMjgxIDMyNEwxNDMgMzc4IiBzdHJva2U9IiMwMDcxOWMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPgogICAgPHBhdGggZD0iTTMzOSAyMjVWMzc4TTM2NyAyMjVWMzc4TTM5NSAyMjVWMzc4TTQyMyAyMjVWMzc4TTMzMiAyNDNINDMwTTMzMiAyNzBINDMwTTMzMiAyOTdINDMwTTMzMiAzMjRINDMwTTMzMiAzNTFINDMwIiBmaWxsPSJub25lIiBzdHJva2U9IiM4YTU3MDAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CiAgICA8cmVjdCB4PSI3NiIgeT0iMzgwIiB3aWR0aD0iNDE0IiBoZWlnaHQ9IjIwIiByeD0iMyIgZmlsbD0iIzAwMjE0NCIvPgogICAgPHBhdGggZD0iTTQzNCAxOTlINDU4TTM5NSAyOTdINDUzTTIxMSAyNzBMMjExIDQyNkgzMTlNMTEyIDI4NkgzN1YyMzgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSI0NjYiIHk9IjIwNCI+T3Zlcmhhbmc8L3RleHQ+CiAgICA8dGV4dCB4PSI0NjMiIHk9IjI4NiI+VGVtcG9yYXJ5PC90ZXh0Pjx0ZXh0IHg9IjQ2MyIgeT0iMzEwIj5zdXBwb3J0czwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyNiIgeT0iNDMyIj5TcGFyc2UgaW5maWxsPC90ZXh0PgogICAgPHRleHQgeD0iMjAiIHk9IjIxMCI+TGF5ZXJzPC90ZXh0Pjx0ZXh0IHg9IjIwIiB5PSIyMzMiPmFuZCB3YWxsczwvdGV4dD4KICAgIDx0ZXh0IHg9Ijc3IiB5PSI0MzIiPkJ1aWxkIHBsYXRlPC90ZXh0PgogIDwvZz4KPC9zdmc+Cg==" alt="Schematic FDM cross-section: filament enters the heated nozzle above deposited layers; outer walls enclose sparse infill; removable supports stand beneath an overhang on the build plate." data-natural-width="640" data-natural-height="460"></p><figcaption>A section through a partly printed part. Walls, infill and supports are different tool paths. The large lines are illustrative, not a scale drawing.</figcaption></figure>
   <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Where additive manufacturing fits the five process categories.</p>
     </div>
   </details>
@@ -4947,6 +4974,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

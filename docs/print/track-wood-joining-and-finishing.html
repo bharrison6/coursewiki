@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3027,7 +3054,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Recognize the shoulders, sockets and mating surfaces</h2>
   <figure>
-    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5NjAgMTAwMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5TaXggd29vZCBqb2ludHMgc2hvd24gYmVmb3JlIGFzc2VtYmx5PC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+T3JpZ2luYWwgQ291cnNlV2lraSBzY2hlbWF0aWMuIFJlYWQgbGFiZWxzIGFuZCB0aGUgYWNjb21wYW55aW5nIHBhZ2UgZm9yIGxpbWl0YXRpb25zLjwvZGVzYz4KPGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDAgTDEwIDUgTDAgMTBaIiBmaWxsPSIjMjQzYjUzIi8+PC9tYXJrZXI+PC9kZWZzPgo8c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0MDtmb250LXNpemU6MTlweH0gLmhlYWRpbmd7Zm9udC1zaXplOjIzcHg7Zm9udC13ZWlnaHQ6NzAwfSAuYXtmaWxsOiNlZmQ0OWM7c3Ryb2tlOiMyNDNiNTM7c3Ryb2tlLXdpZHRoOjJ9IC5ie2ZpbGw6I2FjZDVlNTtzdHJva2U6IzI0M2I1MztzdHJva2Utd2lkdGg6Mn0gLm1vdGlvbntzdHJva2U6IzI0M2I1MztzdHJva2Utd2lkdGg6MjtzdHJva2UtZGFzaGFycmF5OjUgNDtmaWxsOm5vbmU7bWFya2VyLWVuZDp1cmwoI2Fycm93KX0gLmdyYWlue3N0cm9rZTojODk2YjNiO3N0cm9rZS13aWR0aDoyO2ZpbGw6bm9uZX08L3N0eWxlPgo8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjEwMDAiIHJ4PSIxMiIgZmlsbD0iI2ZmZmRmNyIvPjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIyOCIgeT0iMzgiPkpvaW50IGdhbGxlcnkgwrcgZXhwbG9kZWQgcHJvZmlsZXM8L3RleHQ+PHRleHQgeD0iMjgiIHk9IjY4Ij5EYXNoZWQgYXJyb3dzIHNob3cgYXNzZW1ibHkgZGlyZWN0aW9uLiBOb3QgdG8gc2NhbGUuPC90ZXh0PjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIwIDk1KSI+PHJlY3Qgd2lkdGg9IjQ1NSIgaGVpZ2h0PSIyODAiIHJ4PSIxMCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjYjRjMWM5Ii8+PHRleHQgY2xhc3M9ImhlYWRpbmciIHg9IjE4IiB5PSIzMCI+QnV0dDwvdGV4dD48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDgpIj48cGF0aCBjbGFzcz0iYSIgZD0iTTcwIDE1NUgzOTBWMTkwSDcwWiIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMTAwIDUwSDEzNVYxMTVIMTAwWiIvPjxwYXRoIGNsYXNzPSJtb3Rpb24iIGQ9Ik0xMTggMTIyVjE1MCIvPjwvZz48dGV4dCB4PSIxNiIgeT0iMjY1IiBmb250LXNpemU9IjE3Ij5FbmQgbWVldHMgYW4gdW5jdXQgZmFjZS48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ5MCA5NSkiPjxyZWN0IHdpZHRoPSI0NTUiIGhlaWdodD0iMjgwIiByeD0iMTAiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI2I0YzFjOSIvPjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIxOCIgeT0iMzAiPlJhYmJldDwvdGV4dD48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDgpIj48cGF0aCBjbGFzcz0iYSIgZD0iTTcwIDE1MEgxMzVWMTc1SDM5MFYyMTBINzBaIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0xMzUgNDVIMTcwVjEzMEgxMzVaIi8+PHBhdGggY2xhc3M9Im1vdGlvbiIgZD0iTTE1MyAxMzdWMTcwIi8+PC9nPjx0ZXh0IHg9IjE2IiB5PSIyNjUiIGZvbnQtc2l6ZT0iMTciPkEgc3RlcCBhdCBhbiBlZGdlIHJlY2VpdmVzIHRoZSBlbmQuPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMCAzOTApIj48cmVjdCB3aWR0aD0iNDU1IiBoZWlnaHQ9IjI4MCIgcng9IjEwIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNiNGMxYzkiLz48dGV4dCBjbGFzcz0iaGVhZGluZyIgeD0iMTgiIHk9IjMwIj5EYWRvPC90ZXh0PjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgOCkiPjxwYXRoIGNsYXNzPSJhIiBkPSJNNzAgMTUwSDIxMFYxODBIMjQ1VjE1MEgzOTBWMjE1SDcwWiIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMjEwIDQ1SDI0NVYxMTBIMjEwWiIvPjxwYXRoIGNsYXNzPSJtb3Rpb24iIGQ9Ik0yMjcgMTE4VjE3MyIvPjwvZz48dGV4dCB4PSIxNiIgeT0iMjY1IiBmb250LXNpemU9IjE3Ij5BIGNoYW5uZWwgYWNyb3NzIGdyYWluIHJlY2VpdmVzIGEgcGFydC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ5MCAzOTApIj48cmVjdCB3aWR0aD0iNDU1IiBoZWlnaHQ9IjI4MCIgcng9IjEwIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNiNGMxYzkiLz48dGV4dCBjbGFzcz0iaGVhZGluZyIgeD0iMTgiIHk9IjMwIj5IYWxmLWxhcDwvdGV4dD48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDgpIj48cGF0aCBjbGFzcz0iYSIgZD0iTTQwIDExMEgxNzBWMTM1SDIyMFYxNjBINDBaIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0yNzAgMTEwSDQzMFYxNjBIMzIwVjEzNUgyNzBaIi8+PHBhdGggY2xhc3M9Im1vdGlvbiIgZD0iTTI5MCAxOTBIMTkwIi8+PHRleHQgeD0iNjUiIHk9Ijc1Ij5Mb3dlciBoYWxmPC90ZXh0Pjx0ZXh0IHg9IjI3MCIgeT0iNzUiPlVwcGVyIGhhbGY8L3RleHQ+PC9nPjx0ZXh0IHg9IjE2IiB5PSIyNjUiIGZvbnQtc2l6ZT0iMTciPlJlZHVjZWQgZW5kcyBvdmVybGFwIHRvIGZ1bGwgdGhpY2tuZXNzLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjAgNjg1KSI+PHJlY3Qgd2lkdGg9IjQ1NSIgaGVpZ2h0PSIyODAiIHJ4PSIxMCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjYjRjMWM5Ii8+PHRleHQgY2xhc3M9ImhlYWRpbmciIHg9IjE4IiB5PSIzMCI+TWl0ZXI8L3RleHQ+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCA4KSI+PHBhdGggY2xhc3M9ImEiIGQ9Ik02MCAxNTBIMjEwTDI2MCAyMDBINjBaIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0yOTAgNDVIMzQwVjIwMEwyOTAgMTUwWiIvPjxwYXRoIGNsYXNzPSJtb3Rpb24iIGQ9Ik0yODIgMTIwSDIxNSIvPjwvZz48dGV4dCB4PSIxNiIgeT0iMjY1IiBmb250LXNpemU9IjE3Ij5BbmdsZWQgZmFjZXMgbWVldCBhdCB0aGUgY29ybmVyLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDkwIDY4NSkiPjxyZWN0IHdpZHRoPSI0NTUiIGhlaWdodD0iMjgwIiByeD0iMTAiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI2I0YzFjOSIvPjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIxOCIgeT0iMzAiPk1vcnRpc2UgYW5kIHRlbm9uPC90ZXh0PjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgOCkiPjxwYXRoIGNsYXNzPSJhIiBkPSJNNjAgODBIMTgwVjEyMEgxMzVWMTYwSDE4MFYyMDVINjBaIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0yODUgOTVINDMwVjE4NUgyODVWMTYwSDI0MFYxMjBIMjg1WiIvPjxwYXRoIGNsYXNzPSJtb3Rpb24iIGQ9Ik0yNjAgMjE1SDE2MCIvPjx0ZXh0IHg9IjY1IiB5PSI1NSI+U29ja2V0IChzZWN0aW9uKTwvdGV4dD48dGV4dCB4PSIyODAiIHk9IjY1Ij5UZW5vbjwvdGV4dD48L2c+PHRleHQgeD0iMTYiIHk9IjI2NSIgZm9udC1zaXplPSIxNyI+QSB0b25ndWUgZW50ZXJzIGEgbWF0Y2hpbmcgc29ja2V0LjwvdGV4dD48L2c+PC9zdmc+" alt="Six separated joint diagrams: butt, rabbet, dado, half-lap, miter, and mortise and tenon. Arrows show how the parts meet."></p>
+    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5NjAgMTAwMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5TaXggd29vZCBqb2ludHMgc2hvd24gYmVmb3JlIGFzc2VtYmx5PC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+T3JpZ2luYWwgQ291cnNlV2lraSBzY2hlbWF0aWMuIFJlYWQgbGFiZWxzIGFuZCB0aGUgYWNjb21wYW55aW5nIHBhZ2UgZm9yIGxpbWl0YXRpb25zLjwvZGVzYz4KPGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDAgTDEwIDUgTDAgMTBaIiBmaWxsPSIjMjQzYjUzIi8+PC9tYXJrZXI+PC9kZWZzPgo8c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0MDtmb250LXNpemU6MTlweH0gLmhlYWRpbmd7Zm9udC1zaXplOjIzcHg7Zm9udC13ZWlnaHQ6NzAwfSAuYXtmaWxsOiNlZmQ0OWM7c3Ryb2tlOiMyNDNiNTM7c3Ryb2tlLXdpZHRoOjJ9IC5ie2ZpbGw6I2FjZDVlNTtzdHJva2U6IzI0M2I1MztzdHJva2Utd2lkdGg6Mn0gLm1vdGlvbntzdHJva2U6IzI0M2I1MztzdHJva2Utd2lkdGg6MjtzdHJva2UtZGFzaGFycmF5OjUgNDtmaWxsOm5vbmU7bWFya2VyLWVuZDp1cmwoI2Fycm93KX0gLmdyYWlue3N0cm9rZTojODk2YjNiO3N0cm9rZS13aWR0aDoyO2ZpbGw6bm9uZX08L3N0eWxlPgo8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjEwMDAiIHJ4PSIxMiIgZmlsbD0iI2ZmZmRmNyIvPjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIyOCIgeT0iMzgiPkpvaW50IGdhbGxlcnkgwrcgZXhwbG9kZWQgcHJvZmlsZXM8L3RleHQ+PHRleHQgeD0iMjgiIHk9IjY4Ij5EYXNoZWQgYXJyb3dzIHNob3cgYXNzZW1ibHkgZGlyZWN0aW9uLiBOb3QgdG8gc2NhbGUuPC90ZXh0PjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIwIDk1KSI+PHJlY3Qgd2lkdGg9IjQ1NSIgaGVpZ2h0PSIyODAiIHJ4PSIxMCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjYjRjMWM5Ii8+PHRleHQgY2xhc3M9ImhlYWRpbmciIHg9IjE4IiB5PSIzMCI+QnV0dDwvdGV4dD48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDgpIj48cGF0aCBjbGFzcz0iYSIgZD0iTTcwIDE1NUgzOTBWMTkwSDcwWiIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMTAwIDUwSDEzNVYxMTVIMTAwWiIvPjxwYXRoIGNsYXNzPSJtb3Rpb24iIGQ9Ik0xMTggMTIyVjE1MCIvPjwvZz48dGV4dCB4PSIxNiIgeT0iMjY1IiBmb250LXNpemU9IjE3Ij5FbmQgbWVldHMgYW4gdW5jdXQgZmFjZS48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ5MCA5NSkiPjxyZWN0IHdpZHRoPSI0NTUiIGhlaWdodD0iMjgwIiByeD0iMTAiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI2I0YzFjOSIvPjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIxOCIgeT0iMzAiPlJhYmJldDwvdGV4dD48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDgpIj48cGF0aCBjbGFzcz0iYSIgZD0iTTcwIDE1MEgxMzVWMTc1SDM5MFYyMTBINzBaIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0xMzUgNDVIMTcwVjEzMEgxMzVaIi8+PHBhdGggY2xhc3M9Im1vdGlvbiIgZD0iTTE1MyAxMzdWMTcwIi8+PC9nPjx0ZXh0IHg9IjE2IiB5PSIyNjUiIGZvbnQtc2l6ZT0iMTciPkEgc3RlcCBhdCBhbiBlZGdlIHJlY2VpdmVzIHRoZSBlbmQuPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMCAzOTApIj48cmVjdCB3aWR0aD0iNDU1IiBoZWlnaHQ9IjI4MCIgcng9IjEwIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNiNGMxYzkiLz48dGV4dCBjbGFzcz0iaGVhZGluZyIgeD0iMTgiIHk9IjMwIj5EYWRvPC90ZXh0PjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgOCkiPjxwYXRoIGNsYXNzPSJhIiBkPSJNNzAgMTUwSDIxMFYxODBIMjQ1VjE1MEgzOTBWMjE1SDcwWiIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMjEwIDQ1SDI0NVYxMTBIMjEwWiIvPjxwYXRoIGNsYXNzPSJtb3Rpb24iIGQ9Ik0yMjcgMTE4VjE3MyIvPjwvZz48dGV4dCB4PSIxNiIgeT0iMjY1IiBmb250LXNpemU9IjE3Ij5BIGNoYW5uZWwgYWNyb3NzIGdyYWluIHJlY2VpdmVzIGEgcGFydC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ5MCAzOTApIj48cmVjdCB3aWR0aD0iNDU1IiBoZWlnaHQ9IjI4MCIgcng9IjEwIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNiNGMxYzkiLz48dGV4dCBjbGFzcz0iaGVhZGluZyIgeD0iMTgiIHk9IjMwIj5IYWxmLWxhcDwvdGV4dD48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDgpIj48cGF0aCBjbGFzcz0iYSIgZD0iTTQwIDExMEgxNzBWMTM1SDIyMFYxNjBINDBaIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0yNzAgMTEwSDQzMFYxNjBIMzIwVjEzNUgyNzBaIi8+PHBhdGggY2xhc3M9Im1vdGlvbiIgZD0iTTI5MCAxOTBIMTkwIi8+PHRleHQgeD0iNjUiIHk9Ijc1Ij5Mb3dlciBoYWxmPC90ZXh0Pjx0ZXh0IHg9IjI3MCIgeT0iNzUiPlVwcGVyIGhhbGY8L3RleHQ+PC9nPjx0ZXh0IHg9IjE2IiB5PSIyNjUiIGZvbnQtc2l6ZT0iMTciPlJlZHVjZWQgZW5kcyBvdmVybGFwIHRvIGZ1bGwgdGhpY2tuZXNzLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjAgNjg1KSI+PHJlY3Qgd2lkdGg9IjQ1NSIgaGVpZ2h0PSIyODAiIHJ4PSIxMCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjYjRjMWM5Ii8+PHRleHQgY2xhc3M9ImhlYWRpbmciIHg9IjE4IiB5PSIzMCI+TWl0ZXI8L3RleHQ+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCA4KSI+PHBhdGggY2xhc3M9ImEiIGQ9Ik02MCAxNTBIMjEwTDI2MCAyMDBINjBaIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0yOTAgNDVIMzQwVjIwMEwyOTAgMTUwWiIvPjxwYXRoIGNsYXNzPSJtb3Rpb24iIGQ9Ik0yODIgMTIwSDIxNSIvPjwvZz48dGV4dCB4PSIxNiIgeT0iMjY1IiBmb250LXNpemU9IjE3Ij5BbmdsZWQgZmFjZXMgbWVldCBhdCB0aGUgY29ybmVyLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDkwIDY4NSkiPjxyZWN0IHdpZHRoPSI0NTUiIGhlaWdodD0iMjgwIiByeD0iMTAiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI2I0YzFjOSIvPjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIxOCIgeT0iMzAiPk1vcnRpc2UgYW5kIHRlbm9uPC90ZXh0PjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgOCkiPjxwYXRoIGNsYXNzPSJhIiBkPSJNNjAgODBIMTgwVjEyMEgxMzVWMTYwSDE4MFYyMDVINjBaIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0yODUgOTVINDMwVjE4NUgyODVWMTYwSDI0MFYxMjBIMjg1WiIvPjxwYXRoIGNsYXNzPSJtb3Rpb24iIGQ9Ik0yNjAgMjE1SDE2MCIvPjx0ZXh0IHg9IjY1IiB5PSI1NSI+U29ja2V0IChzZWN0aW9uKTwvdGV4dD48dGV4dCB4PSIyODAiIHk9IjY1Ij5UZW5vbjwvdGV4dD48L2c+PHRleHQgeD0iMTYiIHk9IjI2NSIgZm9udC1zaXplPSIxNyI+QSB0b25ndWUgZW50ZXJzIGEgbWF0Y2hpbmcgc29ja2V0LjwvdGV4dD48L2c+PC9zdmc+" alt="Six separated joint diagrams: butt, rabbet, dado, half-lap, miter, and mortise and tenon. Arrows show how the parts meet." data-natural-width="960" data-natural-height="1000"></p>
     <figcaption>Schematic exploded profiles, not cutting dimensions. The colored parts remain separate so the contact surfaces are visible.</figcaption>
   </figure>
   <table>
@@ -3107,7 +3134,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Build the joint around sound, closely fitted glue surfaces</h2>
   <p>Glue needs clean, sound surfaces and a joint designed for the load. For ordinary PVA wood glue, prepare mating surfaces that contact closely without being forced into shape. Paint, finish, dust and old adhesive can prevent a reliable bond.</p>
   <p><strong>Long grain</strong> is a surface running along the wood fibers; <strong>end grain</strong> exposes their cut ends. A long-grain edge joint can provide broad, continuous contact. End grain can absorb liquid adhesive rapidly and leave too little at the interface; a plain end-grain butt joint also has limited bonded area and unfavorable loading. End grain can bond, but adding more glue does not automatically make that joint equivalent to a fitted tenon or lap.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDU1IiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkxvbmctZ3JhaW4gYW5kIGVuZC1ncmFpbiBnbHVlIHN1cmZhY2VzPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+T3JpZ2luYWwgQ291cnNlV2lraSBzY2hlbWF0aWMuIFJlYWQgbGFiZWxzIGFuZCB0aGUgYWNjb21wYW55aW5nIHBhZ2UgZm9yIGxpbWl0YXRpb25zLjwvZGVzYz4KPGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDAgTDEwIDUgTDAgMTBaIiBmaWxsPSIjMjQzYjUzIi8+PC9tYXJrZXI+PC9kZWZzPgo8c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0MDtmb250LXNpemU6MTlweH0gLmhlYWRpbmd7Zm9udC1zaXplOjIzcHg7Zm9udC13ZWlnaHQ6NzAwfSAuYXtmaWxsOiNlZmQ0OWM7c3Ryb2tlOiMyNDNiNTM7c3Ryb2tlLXdpZHRoOjJ9IC5ie2ZpbGw6I2FjZDVlNTtzdHJva2U6IzI0M2I1MztzdHJva2Utd2lkdGg6Mn0gLm1vdGlvbntzdHJva2U6IzI0M2I1MztzdHJva2Utd2lkdGg6MjtzdHJva2UtZGFzaGFycmF5OjUgNDtmaWxsOm5vbmU7bWFya2VyLWVuZDp1cmwoI2Fycm93KX0gLmdyYWlue3N0cm9rZTojODk2YjNiO3N0cm9rZS13aWR0aDoyO2ZpbGw6bm9uZX08L3N0eWxlPgo8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjQ1NSIgcng9IjEyIiBmaWxsPSIjZmZmZGY3Ii8+PHRleHQgY2xhc3M9ImhlYWRpbmciIHg9IjI1IiB5PSIzOCI+R2x1ZSBjb250YWN0IGFuZCBmaWJlciBkaXJlY3Rpb248L3RleHQ+Cjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIyNSIgeT0iODUiPkxvbmcgZ3JhaW4gdG8gbG9uZyBncmFpbjwvdGV4dD4KPHJlY3QgY2xhc3M9ImEiIHg9IjM1IiB5PSIxMTUiIHdpZHRoPSIzNzAiIGhlaWdodD0iODUiLz48cmVjdCBjbGFzcz0iYSIgeD0iMzUiIHk9IjIxMCIgd2lkdGg9IjM3MCIgaGVpZ2h0PSI4NSIvPgo8cGF0aCBjbGFzcz0iZ3JhaW4iIGQ9Ik00NSAxMzVIMzk1IE00NSAxNTVIMzk1IE00NSAxODBIMzk1IE00NSAyMzBIMzk1IE00NSAyNTVIMzk1IE00NSAyODBIMzk1Ii8+CjxyZWN0IHg9IjM1IiB5PSIyMDAiIHdpZHRoPSIzNzAiIGhlaWdodD0iMTAiIGZpbGw9IiMxNDdjYTMiLz4KPHRleHQgeD0iMzUiIHk9IjMzMCI+Q29udGludW91cyBjb250YWN0IGFsb25nIGZpYmVyczwvdGV4dD4KPHRleHQgY2xhc3M9ImhlYWRpbmciIHg9IjQ3MCIgeT0iODUiPkVuZCBncmFpbiB0byBmYWNlPC90ZXh0Pgo8cmVjdCBjbGFzcz0iYSIgeD0iNTMwIiB5PSIxMTUiIHdpZHRoPSIxMDAiIGhlaWdodD0iODUiLz48cmVjdCBjbGFzcz0iYSIgeD0iNDcwIiB5PSIyMTAiIHdpZHRoPSIzNzAiIGhlaWdodD0iODUiLz4KPHBhdGggY2xhc3M9ImdyYWluIiBkPSJNNTQ1IDEyMFYxOTMgTTU2NSAxMjBWMTkzIE01ODUgMTIwVjE5MyBNNjA1IDEyMFYxOTMgTTYyMCAxMjBWMTkzIE00ODAgMjMwSDgzMCBNNDgwIDI1NUg4MzAgTTQ4MCAyODBIODMwIi8+CjxyZWN0IHg9IjUzMCIgeT0iMjAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjMTQ3Y2EzIi8+CjxwYXRoIGQ9Ik01NDUgMjAwVjE3MCBNNTY1IDIwMFYxODAgTTU4NSAyMDBWMTY1IE02MDUgMjAwVjE3NSBNNjIwIDIwMFYxODAiIHN0cm9rZT0iIzE0N2NhMyIgc3Ryb2tlLXdpZHRoPSI2Ii8+Cjx0ZXh0IHg9IjQ3MCIgeT0iMzMwIj5BZGhlc2l2ZSBjYW4gd2ljayBpbnRvIGN1dCBlbmRzPC90ZXh0Pgo8cmVjdCB4PSIzMCIgeT0iMzcwIiB3aWR0aD0iMjIiIGhlaWdodD0iMTIiIGZpbGw9IiMxNDdjYTMiLz48dGV4dCB4PSI2NSIgeT0iMzg1Ij5CbHVlID0gYWRoZXNpdmU7IGJyb3duIGxpbmVzID0gZmliZXIgZGlyZWN0aW9uPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iNDI1Ij5FbmQtZ3JhaW4gYm9uZHMgYXJlIHBvc3NpYmxlOyBqb2ludCBkZXNpZ24gYW5kIGFwcGxpY2F0aW9uIHN0aWxsIGdvdmVybiBzdHJlbmd0aC48L3RleHQ+PC9zdmc+" alt="Long-grain surfaces meet along parallel fibers with a continuous glue line. An end-grain butt connection exposes cut fiber ends that can absorb adhesive away from the interface."></p><figcaption>Fiber direction and adhesive coverage both matter. The diagram is a simplified comparison, not a strength ranking of every possible joint.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDU1IiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkxvbmctZ3JhaW4gYW5kIGVuZC1ncmFpbiBnbHVlIHN1cmZhY2VzPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+T3JpZ2luYWwgQ291cnNlV2lraSBzY2hlbWF0aWMuIFJlYWQgbGFiZWxzIGFuZCB0aGUgYWNjb21wYW55aW5nIHBhZ2UgZm9yIGxpbWl0YXRpb25zLjwvZGVzYz4KPGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDAgTDEwIDUgTDAgMTBaIiBmaWxsPSIjMjQzYjUzIi8+PC9tYXJrZXI+PC9kZWZzPgo8c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0MDtmb250LXNpemU6MTlweH0gLmhlYWRpbmd7Zm9udC1zaXplOjIzcHg7Zm9udC13ZWlnaHQ6NzAwfSAuYXtmaWxsOiNlZmQ0OWM7c3Ryb2tlOiMyNDNiNTM7c3Ryb2tlLXdpZHRoOjJ9IC5ie2ZpbGw6I2FjZDVlNTtzdHJva2U6IzI0M2I1MztzdHJva2Utd2lkdGg6Mn0gLm1vdGlvbntzdHJva2U6IzI0M2I1MztzdHJva2Utd2lkdGg6MjtzdHJva2UtZGFzaGFycmF5OjUgNDtmaWxsOm5vbmU7bWFya2VyLWVuZDp1cmwoI2Fycm93KX0gLmdyYWlue3N0cm9rZTojODk2YjNiO3N0cm9rZS13aWR0aDoyO2ZpbGw6bm9uZX08L3N0eWxlPgo8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjQ1NSIgcng9IjEyIiBmaWxsPSIjZmZmZGY3Ii8+PHRleHQgY2xhc3M9ImhlYWRpbmciIHg9IjI1IiB5PSIzOCI+R2x1ZSBjb250YWN0IGFuZCBmaWJlciBkaXJlY3Rpb248L3RleHQ+Cjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIyNSIgeT0iODUiPkxvbmcgZ3JhaW4gdG8gbG9uZyBncmFpbjwvdGV4dD4KPHJlY3QgY2xhc3M9ImEiIHg9IjM1IiB5PSIxMTUiIHdpZHRoPSIzNzAiIGhlaWdodD0iODUiLz48cmVjdCBjbGFzcz0iYSIgeD0iMzUiIHk9IjIxMCIgd2lkdGg9IjM3MCIgaGVpZ2h0PSI4NSIvPgo8cGF0aCBjbGFzcz0iZ3JhaW4iIGQ9Ik00NSAxMzVIMzk1IE00NSAxNTVIMzk1IE00NSAxODBIMzk1IE00NSAyMzBIMzk1IE00NSAyNTVIMzk1IE00NSAyODBIMzk1Ii8+CjxyZWN0IHg9IjM1IiB5PSIyMDAiIHdpZHRoPSIzNzAiIGhlaWdodD0iMTAiIGZpbGw9IiMxNDdjYTMiLz4KPHRleHQgeD0iMzUiIHk9IjMzMCI+Q29udGludW91cyBjb250YWN0IGFsb25nIGZpYmVyczwvdGV4dD4KPHRleHQgY2xhc3M9ImhlYWRpbmciIHg9IjQ3MCIgeT0iODUiPkVuZCBncmFpbiB0byBmYWNlPC90ZXh0Pgo8cmVjdCBjbGFzcz0iYSIgeD0iNTMwIiB5PSIxMTUiIHdpZHRoPSIxMDAiIGhlaWdodD0iODUiLz48cmVjdCBjbGFzcz0iYSIgeD0iNDcwIiB5PSIyMTAiIHdpZHRoPSIzNzAiIGhlaWdodD0iODUiLz4KPHBhdGggY2xhc3M9ImdyYWluIiBkPSJNNTQ1IDEyMFYxOTMgTTU2NSAxMjBWMTkzIE01ODUgMTIwVjE5MyBNNjA1IDEyMFYxOTMgTTYyMCAxMjBWMTkzIE00ODAgMjMwSDgzMCBNNDgwIDI1NUg4MzAgTTQ4MCAyODBIODMwIi8+CjxyZWN0IHg9IjUzMCIgeT0iMjAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjMTQ3Y2EzIi8+CjxwYXRoIGQ9Ik01NDUgMjAwVjE3MCBNNTY1IDIwMFYxODAgTTU4NSAyMDBWMTY1IE02MDUgMjAwVjE3NSBNNjIwIDIwMFYxODAiIHN0cm9rZT0iIzE0N2NhMyIgc3Ryb2tlLXdpZHRoPSI2Ii8+Cjx0ZXh0IHg9IjQ3MCIgeT0iMzMwIj5BZGhlc2l2ZSBjYW4gd2ljayBpbnRvIGN1dCBlbmRzPC90ZXh0Pgo8cmVjdCB4PSIzMCIgeT0iMzcwIiB3aWR0aD0iMjIiIGhlaWdodD0iMTIiIGZpbGw9IiMxNDdjYTMiLz48dGV4dCB4PSI2NSIgeT0iMzg1Ij5CbHVlID0gYWRoZXNpdmU7IGJyb3duIGxpbmVzID0gZmliZXIgZGlyZWN0aW9uPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iNDI1Ij5FbmQtZ3JhaW4gYm9uZHMgYXJlIHBvc3NpYmxlOyBqb2ludCBkZXNpZ24gYW5kIGFwcGxpY2F0aW9uIHN0aWxsIGdvdmVybiBzdHJlbmd0aC48L3RleHQ+PC9zdmc+" alt="Long-grain surfaces meet along parallel fibers with a continuous glue line. An end-grain butt connection exposes cut fiber ends that can absorb adhesive away from the interface." data-natural-width="900" data-natural-height="455"></p><figcaption>Fiber direction and adhesive coverage both matter. The diagram is a simplified comparison, not a strength ranking of every possible joint.</figcaption></figure>
   <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; What “stronger than the wood” actually demonstrates.</p>
     </div>
   </details>
@@ -3211,7 +3238,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Compare a low-build oil finish with a protective surface film<span class="chev"></span></summary>
     <div class="body">
       <h2>Compare a low-build oil finish with a protective surface film</h2>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNTA1IiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlBlbmV0cmF0aW5nIG9pbCBhbmQgZmlsbSBmaW5pc2hlcyBjb21wYXJlZDwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPk9yaWdpbmFsIENvdXJzZVdpa2kgc2NoZW1hdGljLiBSZWFkIGxhYmVscyBhbmQgdGhlIGFjY29tcGFueWluZyBwYWdlIGZvciBsaW1pdGF0aW9ucy48L2Rlc2M+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwIEwxMCA1IEwwIDEwWiIgZmlsbD0iIzI0M2I1MyIvPjwvbWFya2VyPjwvZGVmcz4KPHN0eWxlPnRleHR7Zm9udC1mYW1pbHk6QXJpYWwsc2Fucy1zZXJpZjtmaWxsOiMxNzJiNDA7Zm9udC1zaXplOjE5cHh9IC5oZWFkaW5ne2ZvbnQtc2l6ZToyM3B4O2ZvbnQtd2VpZ2h0OjcwMH0gLmF7ZmlsbDojZWZkNDljO3N0cm9rZTojMjQzYjUzO3N0cm9rZS13aWR0aDoyfSAuYntmaWxsOiNhY2Q1ZTU7c3Ryb2tlOiMyNDNiNTM7c3Ryb2tlLXdpZHRoOjJ9IC5tb3Rpb257c3Ryb2tlOiMyNDNiNTM7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWRhc2hhcnJheTo1IDQ7ZmlsbDpub25lO21hcmtlci1lbmQ6dXJsKCNhcnJvdyl9IC5ncmFpbntzdHJva2U6Izg5NmIzYjtzdHJva2Utd2lkdGg6MjtmaWxsOm5vbmV9PC9zdHlsZT4KPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1MDUiIHJ4PSIxMiIgZmlsbD0iI2ZmZmRmNyIvPjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIyNSIgeT0iMzgiPldoZXJlIHRoZSBmaW5pc2ggc2l0cyDCtyBpZGVhbGl6ZWQgY3Jvc3Mtc2VjdGlvbnM8L3RleHQ+Cjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIzMCIgeT0iOTUiPkxvdy1idWlsZCBvaWwgdHJlYXRtZW50PC90ZXh0Pjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSI0OTAiIHk9Ijk1Ij5GaWxtIGZpbmlzaDwvdGV4dD4KPHJlY3QgY2xhc3M9ImEiIHg9IjM1IiB5PSIxNzAiIHdpZHRoPSIzNjAiIGhlaWdodD0iMTQwIi8+PHJlY3QgY2xhc3M9ImEiIHg9IjQ4NSIgeT0iMTcwIiB3aWR0aD0iMzYwIiBoZWlnaHQ9IjE0MCIvPgo8cGF0aCBjbGFzcz0iZ3JhaW4iIGQ9Ik00NSAyMzBRMjAwIDIxMCAzODUgMjMwIE00NSAyNzBRMjAwIDI1MCAzODUgMjcwIE00OTUgMjMwUTY1MCAyMTAgODM1IDIzMCBNNDk1IDI3MFE2NTAgMjUwIDgzNSAyNzAiLz4KPHBhdGggZD0iTTM2IDE3MUgzOTRWMTkzTDM3MCAxODUgMzQ1IDIwMiAzMTUgMTg3IDI4MCAyMDAgMjUwIDE4OCAyMjAgMTk2IDE5MCAxODcgMTYwIDIwMiAxMzAgMTg5IDEwMCAxOTkgNzAgMTg2IDM2IDE5M1oiIGZpbGw9IiNkMWEwNGQiLz4KPHJlY3QgeD0iNDg1IiB5PSIxNDUiIHdpZHRoPSIzNjAiIGhlaWdodD0iMjUiIGZpbGw9IiNhY2Q1ZTUiIHN0cm9rZT0iIzI0M2I1MyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjM1IiB5PSIzNDUiPkxpdHRsZSBjb2F0aW5nIGFib3ZlIHRoZSBzdXJmYWNlPC90ZXh0Pjx0ZXh0IHg9IjQ4NSIgeT0iMzQ1Ij5Db250aW51b3VzIGxheWVyIGFib3ZlIHRoZSB3b29kPC90ZXh0Pgo8dGV4dCB4PSIzNSIgeT0iMzg1Ij5PZnRlbiBlYXN5IHRvIHJlZnJlc2g8L3RleHQ+PHRleHQgeD0iNDg1IiB5PSIzODUiPkNhbiBwcm92aWRlIG1vcmUgd2VhciBwcm90ZWN0aW9uPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iNDM1Ij5Qcm9kdWN0LCBwcmVwYXJhdGlvbiwgdGhpY2tuZXNzIGFuZCBjdXJlIGRldGVybWluZSBwZXJmb3JtYW5jZS48L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI0NzAiPk5laXRoZXIgdHJlYXRtZW50IHN0b3BzIGFsbCBtb2lzdHVyZSBleGNoYW5nZS4gS2VlcCBtb3ZlbWVudCBhbGxvd2FuY2VzLjwvdGV4dD48L3N2Zz4=" alt="Wood cross-sections compare a low-build oil treatment near the surface with a continuous film coating above the surface. Neither stops all moisture movement."></p><figcaption>Idealized finish families. Real products overlap: an oil–varnish blend can build some film, and film finishes also penetrate surface pores.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNTA1IiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlBlbmV0cmF0aW5nIG9pbCBhbmQgZmlsbSBmaW5pc2hlcyBjb21wYXJlZDwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPk9yaWdpbmFsIENvdXJzZVdpa2kgc2NoZW1hdGljLiBSZWFkIGxhYmVscyBhbmQgdGhlIGFjY29tcGFueWluZyBwYWdlIGZvciBsaW1pdGF0aW9ucy48L2Rlc2M+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwIEwxMCA1IEwwIDEwWiIgZmlsbD0iIzI0M2I1MyIvPjwvbWFya2VyPjwvZGVmcz4KPHN0eWxlPnRleHR7Zm9udC1mYW1pbHk6QXJpYWwsc2Fucy1zZXJpZjtmaWxsOiMxNzJiNDA7Zm9udC1zaXplOjE5cHh9IC5oZWFkaW5ne2ZvbnQtc2l6ZToyM3B4O2ZvbnQtd2VpZ2h0OjcwMH0gLmF7ZmlsbDojZWZkNDljO3N0cm9rZTojMjQzYjUzO3N0cm9rZS13aWR0aDoyfSAuYntmaWxsOiNhY2Q1ZTU7c3Ryb2tlOiMyNDNiNTM7c3Ryb2tlLXdpZHRoOjJ9IC5tb3Rpb257c3Ryb2tlOiMyNDNiNTM7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWRhc2hhcnJheTo1IDQ7ZmlsbDpub25lO21hcmtlci1lbmQ6dXJsKCNhcnJvdyl9IC5ncmFpbntzdHJva2U6Izg5NmIzYjtzdHJva2Utd2lkdGg6MjtmaWxsOm5vbmV9PC9zdHlsZT4KPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1MDUiIHJ4PSIxMiIgZmlsbD0iI2ZmZmRmNyIvPjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIyNSIgeT0iMzgiPldoZXJlIHRoZSBmaW5pc2ggc2l0cyDCtyBpZGVhbGl6ZWQgY3Jvc3Mtc2VjdGlvbnM8L3RleHQ+Cjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSIzMCIgeT0iOTUiPkxvdy1idWlsZCBvaWwgdHJlYXRtZW50PC90ZXh0Pjx0ZXh0IGNsYXNzPSJoZWFkaW5nIiB4PSI0OTAiIHk9Ijk1Ij5GaWxtIGZpbmlzaDwvdGV4dD4KPHJlY3QgY2xhc3M9ImEiIHg9IjM1IiB5PSIxNzAiIHdpZHRoPSIzNjAiIGhlaWdodD0iMTQwIi8+PHJlY3QgY2xhc3M9ImEiIHg9IjQ4NSIgeT0iMTcwIiB3aWR0aD0iMzYwIiBoZWlnaHQ9IjE0MCIvPgo8cGF0aCBjbGFzcz0iZ3JhaW4iIGQ9Ik00NSAyMzBRMjAwIDIxMCAzODUgMjMwIE00NSAyNzBRMjAwIDI1MCAzODUgMjcwIE00OTUgMjMwUTY1MCAyMTAgODM1IDIzMCBNNDk1IDI3MFE2NTAgMjUwIDgzNSAyNzAiLz4KPHBhdGggZD0iTTM2IDE3MUgzOTRWMTkzTDM3MCAxODUgMzQ1IDIwMiAzMTUgMTg3IDI4MCAyMDAgMjUwIDE4OCAyMjAgMTk2IDE5MCAxODcgMTYwIDIwMiAxMzAgMTg5IDEwMCAxOTkgNzAgMTg2IDM2IDE5M1oiIGZpbGw9IiNkMWEwNGQiLz4KPHJlY3QgeD0iNDg1IiB5PSIxNDUiIHdpZHRoPSIzNjAiIGhlaWdodD0iMjUiIGZpbGw9IiNhY2Q1ZTUiIHN0cm9rZT0iIzI0M2I1MyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjM1IiB5PSIzNDUiPkxpdHRsZSBjb2F0aW5nIGFib3ZlIHRoZSBzdXJmYWNlPC90ZXh0Pjx0ZXh0IHg9IjQ4NSIgeT0iMzQ1Ij5Db250aW51b3VzIGxheWVyIGFib3ZlIHRoZSB3b29kPC90ZXh0Pgo8dGV4dCB4PSIzNSIgeT0iMzg1Ij5PZnRlbiBlYXN5IHRvIHJlZnJlc2g8L3RleHQ+PHRleHQgeD0iNDg1IiB5PSIzODUiPkNhbiBwcm92aWRlIG1vcmUgd2VhciBwcm90ZWN0aW9uPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iNDM1Ij5Qcm9kdWN0LCBwcmVwYXJhdGlvbiwgdGhpY2tuZXNzIGFuZCBjdXJlIGRldGVybWluZSBwZXJmb3JtYW5jZS48L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI0NzAiPk5laXRoZXIgdHJlYXRtZW50IHN0b3BzIGFsbCBtb2lzdHVyZSBleGNoYW5nZS4gS2VlcCBtb3ZlbWVudCBhbGxvd2FuY2VzLjwvdGV4dD48L3N2Zz4=" alt="Wood cross-sections compare a low-build oil treatment near the surface with a continuous film coating above the surface. Neither stops all moisture movement." data-natural-width="900" data-natural-height="505"></p><figcaption>Idealized finish families. Real products overlap: an oil–varnish blend can build some film, and film finishes also penetrate surface pores.</figcaption></figure>
   <table>
     <caption>Choose by the service conditions and exact formulation</caption>
     <thead><tr><th scope="col">Finish</th><th scope="col">Appearance and use</th><th scope="col">Tradeoff</th></tr></thead>
@@ -4967,6 +4994,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

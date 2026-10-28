@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -6363,7 +6390,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   change <code>J8</code> to <code>J6</code> and the start radius is 6&nbsp;mm while the end radius is
   &radic;(8&sup2; + 2&sup2;) = &radic;68, about 8.246&nbsp;mm, so
   the simulator stops at that line instead of guessing.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5RdWFydGVyIGFyYzogRzAzIGZyb20gQSB0byBCLCBHMDIgZnJvbSBCIHRvIEEsIHdpdGggY2VudHJlIG9mZnNldHM8L3RpdGxlPjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMFoiIGZpbGw9IiMxNzM5NTciLz48L21hcmtlcj48L2RlZnM+CjxyZWN0IHdpZHRoPSI3NjAiIGhlaWdodD0iMzQwIiBmaWxsPSIjZmZmIi8+PGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTcyYzQwIj4KPHRleHQgeD0iMzAiIHk9IjMwIiBmb250LXdlaWdodD0iYm9sZCI+RzE3OiBsb29raW5nIGZyb20gK1ogdG93YXJkIHRoZSBYWSBwbGFuZTwvdGV4dD4KPHBhdGggZD0iTTY1IDI3NUgzODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhOGE5NiIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik02NSAyNzVWNTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhOGE5NiIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8dGV4dCB4PSIzODUiIHk9IjI4MCI+K1g8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjU1Ij4rWTwvdGV4dD4KPHBhdGggZD0iTTE1MCAyMzVBMTQwIDE0MCAwIDAgMCAyOTAgOTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSI0IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8cGF0aCBkPSJNMTUwIDIzNVY5NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHBhdGggZD0iTTI5MCA5NUgxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyN2Q5MSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9Ijk1IiByPSI1Ii8+PHRleHQgeD0iODUiIHk9Ijc1Ij5DICgxMiwxOCk8L3RleHQ+PHRleHQgeD0iOTAiIHk9IjI2MCI+QSAoMTIsOCk8L3RleHQ+PHRleHQgeD0iMzAwIiB5PSIxMDAiPkIgKDIyLDE4KTwvdGV4dD4KPHRleHQgeD0iNzUiIHk9IjE3MCI+SiArMTA8L3RleHQ+PHRleHQgeD0iMTgwIiB5PSI4MyI+SSDiiJIxMDwvdGV4dD4KPHRleHQgeD0iNDI1IiB5PSIxNTAiPkEg4oaSIEI6IEcwMyAoQ0NXKTwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjE4MCI+SSA9IDAsIEogPSArMTA8L3RleHQ+Cjx0ZXh0IHg9IjQyNSIgeT0iMjI1Ij5CIOKGkiBBOiBHMDIgKENXKTwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjI1NSI+SSA9IOKIkjEwLCBKID0gMDwvdGV4dD4KPHRleHQgeD0iMTAwIiB5PSIzMTUiPlJhZGl1cyAxMCBtbS4gSS9KIG1lYXN1cmVkIGZyb20gZWFjaCBhcmMncyBzdGFydC48L3RleHQ+PC9nPjwvc3ZnPg==" alt="A radius-10 quarter arc from A 12,8 to B 22,18 around C 12,18 uses G03 I0 J10. Reversing from B to A uses G02 I-10 J0."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5RdWFydGVyIGFyYzogRzAzIGZyb20gQSB0byBCLCBHMDIgZnJvbSBCIHRvIEEsIHdpdGggY2VudHJlIG9mZnNldHM8L3RpdGxlPjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMFoiIGZpbGw9IiMxNzM5NTciLz48L21hcmtlcj48L2RlZnM+CjxyZWN0IHdpZHRoPSI3NjAiIGhlaWdodD0iMzQwIiBmaWxsPSIjZmZmIi8+PGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTcyYzQwIj4KPHRleHQgeD0iMzAiIHk9IjMwIiBmb250LXdlaWdodD0iYm9sZCI+RzE3OiBsb29raW5nIGZyb20gK1ogdG93YXJkIHRoZSBYWSBwbGFuZTwvdGV4dD4KPHBhdGggZD0iTTY1IDI3NUgzODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhOGE5NiIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik02NSAyNzVWNTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhOGE5NiIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8dGV4dCB4PSIzODUiIHk9IjI4MCI+K1g8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjU1Ij4rWTwvdGV4dD4KPHBhdGggZD0iTTE1MCAyMzVBMTQwIDE0MCAwIDAgMCAyOTAgOTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSI0IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8cGF0aCBkPSJNMTUwIDIzNVY5NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHBhdGggZD0iTTI5MCA5NUgxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyN2Q5MSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9Ijk1IiByPSI1Ii8+PHRleHQgeD0iODUiIHk9Ijc1Ij5DICgxMiwxOCk8L3RleHQ+PHRleHQgeD0iOTAiIHk9IjI2MCI+QSAoMTIsOCk8L3RleHQ+PHRleHQgeD0iMzAwIiB5PSIxMDAiPkIgKDIyLDE4KTwvdGV4dD4KPHRleHQgeD0iNzUiIHk9IjE3MCI+SiArMTA8L3RleHQ+PHRleHQgeD0iMTgwIiB5PSI4MyI+SSDiiJIxMDwvdGV4dD4KPHRleHQgeD0iNDI1IiB5PSIxNTAiPkEg4oaSIEI6IEcwMyAoQ0NXKTwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjE4MCI+SSA9IDAsIEogPSArMTA8L3RleHQ+Cjx0ZXh0IHg9IjQyNSIgeT0iMjI1Ij5CIOKGkiBBOiBHMDIgKENXKTwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjI1NSI+SSA9IOKIkjEwLCBKID0gMDwvdGV4dD4KPHRleHQgeD0iMTAwIiB5PSIzMTUiPlJhZGl1cyAxMCBtbS4gSS9KIG1lYXN1cmVkIGZyb20gZWFjaCBhcmMncyBzdGFydC48L3RleHQ+PC9nPjwvc3ZnPg==" alt="A radius-10 quarter arc from A 12,8 to B 22,18 around C 12,18 uses G03 I0 J10. Reversing from B to A uses G02 I-10 J0." data-natural-width="760" data-natural-height="340"></p>
   <p>In the diagram, absolute endpoints and start-relative centres give
   <code>G03 X22 Y18 I0 J10</code> from A to B, then <code>G02 X12 Y8 I-10 J0</code> back to A.
   Each start point needs its own centre offsets. Radius format can instead use
@@ -7077,7 +7104,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Identify the parts that rotate, guide and feed<span class="chev"></span></summary>
     <div class="body">
       <h2>Identify the parts that rotate, guide and feed</h2>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNzYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5FbmdpbmUgbGF0aGUgYW5hdG9teSwgc2NoZW1hdGljIGZyb250IHZpZXc8L3RpdGxlPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9Ijc2MCIgZmlsbD0iI2ZmZiIvPgo8c3R5bGU+dGV4dHtmb250OjMycHggc2Fucy1zZXJpZjtmaWxsOiMxNDJiNDZ9ICAubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxNDJiNDY7c3Ryb2tlLXdpZHRoOjJ9IC5heGlze3N0cm9rZTojNTI2OTdkO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1kYXNoYXJyYXk6OCA1fSAuc2hhcGV7ZmlsbDojZTlmMWY3O3N0cm9rZTojMTQyYjQ2O3N0cm9rZS13aWR0aDoyfSAuYWNjZW50e2ZpbGw6bm9uZTtzdHJva2U6I2FkNDMwMDtzdHJva2Utd2lkdGg6M308L3N0eWxlPgoKPHJlY3QgY2xhc3M9InNoYXBlIiB4PSI0NSIgeT0iODAiIHdpZHRoPSIxMzAiIGhlaWdodD0iMTM1Ii8+CjxyZWN0IGNsYXNzPSJzaGFwZSIgeD0iMTc1IiB5PSIxMDUiIHdpZHRoPSIzOCIgaGVpZ2h0PSI2OCIvPjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMTIwIDE0MEgyOTAiLz4KPHBhdGggY2xhc3M9ImF4aXMiIGQ9Ik0yMTUgMTQwSDcxMCIvPgo8cmVjdCBjbGFzcz0ic2hhcGUiIHg9IjYwNSIgeT0iMTA1IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEwMCIvPjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNNjA1IDE0MEg1NTMiLz4KPHJlY3QgY2xhc3M9InNoYXBlIiB4PSI0MCIgeT0iMjE1IiB3aWR0aD0iNzAwIiBoZWlnaHQ9IjMwIi8+CjxyZWN0IGNsYXNzPSJzaGFwZSIgeD0iMzMwIiB5PSIxOTMiIHdpZHRoPSIxNzAiIGhlaWdodD0iNjUiLz4KPHJlY3QgY2xhc3M9InNoYXBlIiB4PSIzNTAiIHk9IjE3NSIgd2lkdGg9IjEzMCIgaGVpZ2h0PSIxOCIvPgo8cmVjdCBjbGFzcz0ic2hhcGUiIHg9IjM4NSIgeT0iMTUyIiB3aWR0aD0iNjAiIGhlaWdodD0iMjMiLz4KPHBhdGggY2xhc3M9InNoYXBlIiBkPSJNMzcwIDE0Nkw0MTYgMTIwTDQzMCAxNDJMMzg0IDE2NloiLz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik04NSAzMjNINzI4TTg1IDM0OEg3MjgiLz4KPHJlY3QgY2xhc3M9InNoYXBlIiB4PSI1MCIgeT0iMjgwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIi8+Cgo8ZyBzdHlsZT0icGFpbnQtb3JkZXI6c3Ryb2tlO3N0cm9rZTojZmZmO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1saW5lam9pbjpyb3VuZCI+PHRleHQgeD0iOTIiIHk9IjY1Ij4xPC90ZXh0Pjx0ZXh0IHg9IjIyNCIgeT0iOTAiPjI8L3RleHQ+PHRleHQgeD0iNjUwIiB5PSI5MCI+MzwvdGV4dD48dGV4dCB4PSI2NjUiIHk9IjIzNiI+NDwvdGV4dD48dGV4dCB4PSI0MDAiIHk9IjIzNyI+NTwvdGV4dD48dGV4dCB4PSIyODgiIHk9IjI4OCI+NjwvdGV4dD48dGV4dCB4PSI0ODUiIHk9IjE1MCI+NzwvdGV4dD48dGV4dCB4PSIzOTUiIHk9IjcwIj44PC90ZXh0Pjx0ZXh0IHg9IjU3NSIgeT0iMzE1Ij45PC90ZXh0Pjx0ZXh0IHg9IjU3NSIgeT0iMzgyIj4xMDwvdGV4dD48dGV4dCB4PSIxMTAiIHk9IjMzMCI+MTE8L3RleHQ+PC9nPjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMjMwIDk4TDE5NSAxMjBNMzEyIDI3MEwzNjAgMTg1TTQ4MCAxNTVMNDQ1IDE2NE00MDUgODBWMTI1Ii8+PHRleHQgeD0iMzUiIHk9IjQ0MCI+MSAgSGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjQyNSIgeT0iNDQwIj43ICBDcm9zcyBzbGlkZTwvdGV4dD48dGV4dCB4PSIzNSIgeT0iNDg0Ij4yICBTcGluZGxlIC8gY2h1Y2s8L3RleHQ+PHRleHQgeD0iNDI1IiB5PSI0ODQiPjggIENvbXBvdW5kIGFuZDwvdGV4dD48dGV4dCB4PSI0NjUiIHk9IjUyMiI+dG9vbCBwb3N0PC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI1MjgiPjMgIFRhaWxzdG9jazwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjU3MiI+OSAgRmVlZCByb2Q8L3RleHQ+PHRleHQgeD0iMzUiIHk9IjU3MiI+NCAgQmVkIGFuZCB3YXlzPC90ZXh0Pjx0ZXh0IHg9IjQyNSIgeT0iNjE2Ij4xMCAgTGVhZHNjcmV3PC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI2MTYiPjUgIEFwcm9uPC90ZXh0Pjx0ZXh0IHg9IjQyNSIgeT0iNjYwIj4xMSAgUXVpY2stY2hhbmdlPC90ZXh0Pjx0ZXh0IHg9IjQ4MCIgeT0iNjk4Ij5nZWFyYm94PC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI2NjAiPjYgIENhcnJpYWdlPC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI3MTMiPkhhbGYtbnV0cyBpbiB0aGUgYXByb248L3RleHQ+PHRleHQgeD0iMzUiIHk9Ijc1MCI+ZW5nYWdlIHRoZSBsZWFkc2NyZXcuPC90ZXh0Pgo8L3N2Zz4=" alt="Schematic engine lathe with headstock and spindle at left, tailstock at right, and carriage, cross slide, compound, apron, feed rod and leadscrew along the bed."><figcaption>Typical engine-lathe arrangement. Controls and drive arrangements vary by machine.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNzYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5FbmdpbmUgbGF0aGUgYW5hdG9teSwgc2NoZW1hdGljIGZyb250IHZpZXc8L3RpdGxlPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9Ijc2MCIgZmlsbD0iI2ZmZiIvPgo8c3R5bGU+dGV4dHtmb250OjMycHggc2Fucy1zZXJpZjtmaWxsOiMxNDJiNDZ9ICAubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxNDJiNDY7c3Ryb2tlLXdpZHRoOjJ9IC5heGlze3N0cm9rZTojNTI2OTdkO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1kYXNoYXJyYXk6OCA1fSAuc2hhcGV7ZmlsbDojZTlmMWY3O3N0cm9rZTojMTQyYjQ2O3N0cm9rZS13aWR0aDoyfSAuYWNjZW50e2ZpbGw6bm9uZTtzdHJva2U6I2FkNDMwMDtzdHJva2Utd2lkdGg6M308L3N0eWxlPgoKPHJlY3QgY2xhc3M9InNoYXBlIiB4PSI0NSIgeT0iODAiIHdpZHRoPSIxMzAiIGhlaWdodD0iMTM1Ii8+CjxyZWN0IGNsYXNzPSJzaGFwZSIgeD0iMTc1IiB5PSIxMDUiIHdpZHRoPSIzOCIgaGVpZ2h0PSI2OCIvPjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMTIwIDE0MEgyOTAiLz4KPHBhdGggY2xhc3M9ImF4aXMiIGQ9Ik0yMTUgMTQwSDcxMCIvPgo8cmVjdCBjbGFzcz0ic2hhcGUiIHg9IjYwNSIgeT0iMTA1IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEwMCIvPjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNNjA1IDE0MEg1NTMiLz4KPHJlY3QgY2xhc3M9InNoYXBlIiB4PSI0MCIgeT0iMjE1IiB3aWR0aD0iNzAwIiBoZWlnaHQ9IjMwIi8+CjxyZWN0IGNsYXNzPSJzaGFwZSIgeD0iMzMwIiB5PSIxOTMiIHdpZHRoPSIxNzAiIGhlaWdodD0iNjUiLz4KPHJlY3QgY2xhc3M9InNoYXBlIiB4PSIzNTAiIHk9IjE3NSIgd2lkdGg9IjEzMCIgaGVpZ2h0PSIxOCIvPgo8cmVjdCBjbGFzcz0ic2hhcGUiIHg9IjM4NSIgeT0iMTUyIiB3aWR0aD0iNjAiIGhlaWdodD0iMjMiLz4KPHBhdGggY2xhc3M9InNoYXBlIiBkPSJNMzcwIDE0Nkw0MTYgMTIwTDQzMCAxNDJMMzg0IDE2NloiLz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik04NSAzMjNINzI4TTg1IDM0OEg3MjgiLz4KPHJlY3QgY2xhc3M9InNoYXBlIiB4PSI1MCIgeT0iMjgwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIi8+Cgo8ZyBzdHlsZT0icGFpbnQtb3JkZXI6c3Ryb2tlO3N0cm9rZTojZmZmO3N0cm9rZS13aWR0aDo3O3N0cm9rZS1saW5lam9pbjpyb3VuZCI+PHRleHQgeD0iOTIiIHk9IjY1Ij4xPC90ZXh0Pjx0ZXh0IHg9IjIyNCIgeT0iOTAiPjI8L3RleHQ+PHRleHQgeD0iNjUwIiB5PSI5MCI+MzwvdGV4dD48dGV4dCB4PSI2NjUiIHk9IjIzNiI+NDwvdGV4dD48dGV4dCB4PSI0MDAiIHk9IjIzNyI+NTwvdGV4dD48dGV4dCB4PSIyODgiIHk9IjI4OCI+NjwvdGV4dD48dGV4dCB4PSI0ODUiIHk9IjE1MCI+NzwvdGV4dD48dGV4dCB4PSIzOTUiIHk9IjcwIj44PC90ZXh0Pjx0ZXh0IHg9IjU3NSIgeT0iMzE1Ij45PC90ZXh0Pjx0ZXh0IHg9IjU3NSIgeT0iMzgyIj4xMDwvdGV4dD48dGV4dCB4PSIxMTAiIHk9IjMzMCI+MTE8L3RleHQ+PC9nPjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMjMwIDk4TDE5NSAxMjBNMzEyIDI3MEwzNjAgMTg1TTQ4MCAxNTVMNDQ1IDE2NE00MDUgODBWMTI1Ii8+PHRleHQgeD0iMzUiIHk9IjQ0MCI+MSAgSGVhZHN0b2NrPC90ZXh0Pjx0ZXh0IHg9IjQyNSIgeT0iNDQwIj43ICBDcm9zcyBzbGlkZTwvdGV4dD48dGV4dCB4PSIzNSIgeT0iNDg0Ij4yICBTcGluZGxlIC8gY2h1Y2s8L3RleHQ+PHRleHQgeD0iNDI1IiB5PSI0ODQiPjggIENvbXBvdW5kIGFuZDwvdGV4dD48dGV4dCB4PSI0NjUiIHk9IjUyMiI+dG9vbCBwb3N0PC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI1MjgiPjMgIFRhaWxzdG9jazwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjU3MiI+OSAgRmVlZCByb2Q8L3RleHQ+PHRleHQgeD0iMzUiIHk9IjU3MiI+NCAgQmVkIGFuZCB3YXlzPC90ZXh0Pjx0ZXh0IHg9IjQyNSIgeT0iNjE2Ij4xMCAgTGVhZHNjcmV3PC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI2MTYiPjUgIEFwcm9uPC90ZXh0Pjx0ZXh0IHg9IjQyNSIgeT0iNjYwIj4xMSAgUXVpY2stY2hhbmdlPC90ZXh0Pjx0ZXh0IHg9IjQ4MCIgeT0iNjk4Ij5nZWFyYm94PC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI2NjAiPjYgIENhcnJpYWdlPC90ZXh0Pjx0ZXh0IHg9IjM1IiB5PSI3MTMiPkhhbGYtbnV0cyBpbiB0aGUgYXByb248L3RleHQ+PHRleHQgeD0iMzUiIHk9Ijc1MCI+ZW5nYWdlIHRoZSBsZWFkc2NyZXcuPC90ZXh0Pgo8L3N2Zz4=" alt="Schematic engine lathe with headstock and spindle at left, tailstock at right, and carriage, cross slide, compound, apron, feed rod and leadscrew along the bed." data-natural-width="800" data-natural-height="760"><figcaption>Typical engine-lathe arrangement. Controls and drive arrangements vary by machine.</figcaption></figure>
   <dl class="dims">
     <div><dt>Headstock and spindle</dt><dd>The headstock supports the rotating spindle and its drive. The spindle carries the chuck, faceplate or other workholding. Its axis is the reference for turning.</dd></div>
     <div><dt>Bed and ways</dt><dd>The bed supports the assemblies. Its guide surfaces, called ways, guide carriage travel and locate the tailstock.</dd></div>
@@ -10023,6 +10050,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 /* ============================================================================

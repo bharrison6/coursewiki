@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3019,7 +3046,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Normal to looks straight at a selected plane</h2>
   <p>Front, rear, top, bottom, left, and right are standard model directions. <strong>Normal to</strong> a planar face or sketch plane means looking along a direction perpendicular to it. An inclined face can therefore have a normal view that is different from every standard view.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNTEwIiB2aWV3Qm94PSIwIDAgNDAwIDUxMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5TdGFuZGFyZCBkaXJlY3Rpb25zIGFuZCBub3JtYWwgdG8gYSBwbGFuZTwvdGl0bGU+CjxkZXNjIGlkPSJkZXNjIj5BbiBvYmxpcXVlIGN1YmUgd2l0aCBpdHMgZnJvbnQgbWFya2VkIEYsIGZyb250IGFuZCB0b3AgcHJvamVjdGlvbnMsIGFuZCBhIHBlcnBlbmRpY3VsYXIgdmlld2luZyBkaXJlY3Rpb24gdG93YXJkIGEgcGxhbmUgc2hvd24gZWRnZS1vbi48L2Rlc2M+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMFoiIGZpbGw9IiMxNTJjNDMiLz48L21hcmtlcj48L2RlZnM+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNTEwIiBmaWxsPSIjZmZmIi8+CjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzE1MmM0MyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+Cjx0ZXh0IHg9IjIwIiB5PSIyNSI+T2JsaXF1ZSB2aWV3OiBpZGVudGlmeSB0aGUgZnJvbnQ8L3RleHQ+CjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIj4KPHBhdGggZD0iTTEzNSA5MEwyMDAgNTJMMjY1IDkwTDIwMCAxMjhaIiBmaWxsPSIjZDdlN2YwIi8+CjxwYXRoIGQ9Ik0xMzUgOTBMMjAwIDEyOEwyMDAgMjAzTDEzNSAxNjVaIiBmaWxsPSIjYThjY2RmIi8+CjxwYXRoIGQ9Ik0yMDAgMTI4TDI2NSA5MEwyNjUgMTY1TDIwMCAyMDNaIiBmaWxsPSIjNjM5YmI4Ii8+CjxwYXRoIGQ9Ik04MCAxNzVMMTMyIDE0NSIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHBhdGggZD0iTTIwMCAzMEwyMDAgNzAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjwvZz4KPHRleHQgeD0iMTYwIiB5PSIxNTAiPkY8L3RleHQ+PHRleHQgeD0iMjAiIHk9IjE5MyI+RnJvbnQ8L3RleHQ+PHRleHQgeD0iMjIyIiB5PSI0NSI+VG9wPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iMjQ1Ij5Gcm9udCB2aWV3PC90ZXh0Pjx0ZXh0IHg9IjIzMCIgeT0iMjQ1Ij5Ub3AgdmlldzwvdGV4dD4KPHJlY3QgeD0iNDAiIHk9IjI2NSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNhOGNjZGYiIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjgzIiB5PSIzMjAiPkY8L3RleHQ+CjxyZWN0IHg9IjI0MCIgeT0iMjY1IiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Q3ZTdmMCIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiLz4KPHRleHQgeD0iMjAiIHk9IjQwMSI+Tm9ybWFsIHRvOiBsb29rIHBlcnBlbmRpY3VsYXIgdG8gYSBwbGFuZTwvdGV4dD4KPHBhdGggZD0iTTIwNSA0MjVMMjk1IDQ4NSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTIyMCA1MDBMMjUwIDQ1NSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjxwYXRoIGQ9Ik0yNDIgNDY3TDI1NCA0NzVMMjYyIDQ2MyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiLz4KPHRleHQgeD0iMjAiIHk9IjQzMCI+UGxhbmUgc2VlbiBlZGdlLW9uPC90ZXh0Pgo8dGV4dCB4PSIzMDAiIHk9IjQ4MCI+OTDCsDwvdGV4dD4KPC9nPgo8L3N2Zz4K" alt="A cube shown obliquely, then straight-on front and top views. A separate edge-on plane has a viewing arrow perpendicular to it and a right-angle marker."><figcaption>The face marked F establishes the front. Normal to depends on the selected plane, not on the name of a standard view.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNTEwIiB2aWV3Qm94PSIwIDAgNDAwIDUxMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5TdGFuZGFyZCBkaXJlY3Rpb25zIGFuZCBub3JtYWwgdG8gYSBwbGFuZTwvdGl0bGU+CjxkZXNjIGlkPSJkZXNjIj5BbiBvYmxpcXVlIGN1YmUgd2l0aCBpdHMgZnJvbnQgbWFya2VkIEYsIGZyb250IGFuZCB0b3AgcHJvamVjdGlvbnMsIGFuZCBhIHBlcnBlbmRpY3VsYXIgdmlld2luZyBkaXJlY3Rpb24gdG93YXJkIGEgcGxhbmUgc2hvd24gZWRnZS1vbi48L2Rlc2M+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMFoiIGZpbGw9IiMxNTJjNDMiLz48L21hcmtlcj48L2RlZnM+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNTEwIiBmaWxsPSIjZmZmIi8+CjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzE1MmM0MyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+Cjx0ZXh0IHg9IjIwIiB5PSIyNSI+T2JsaXF1ZSB2aWV3OiBpZGVudGlmeSB0aGUgZnJvbnQ8L3RleHQ+CjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIj4KPHBhdGggZD0iTTEzNSA5MEwyMDAgNTJMMjY1IDkwTDIwMCAxMjhaIiBmaWxsPSIjZDdlN2YwIi8+CjxwYXRoIGQ9Ik0xMzUgOTBMMjAwIDEyOEwyMDAgMjAzTDEzNSAxNjVaIiBmaWxsPSIjYThjY2RmIi8+CjxwYXRoIGQ9Ik0yMDAgMTI4TDI2NSA5MEwyNjUgMTY1TDIwMCAyMDNaIiBmaWxsPSIjNjM5YmI4Ii8+CjxwYXRoIGQ9Ik04MCAxNzVMMTMyIDE0NSIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHBhdGggZD0iTTIwMCAzMEwyMDAgNzAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjwvZz4KPHRleHQgeD0iMTYwIiB5PSIxNTAiPkY8L3RleHQ+PHRleHQgeD0iMjAiIHk9IjE5MyI+RnJvbnQ8L3RleHQ+PHRleHQgeD0iMjIyIiB5PSI0NSI+VG9wPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iMjQ1Ij5Gcm9udCB2aWV3PC90ZXh0Pjx0ZXh0IHg9IjIzMCIgeT0iMjQ1Ij5Ub3AgdmlldzwvdGV4dD4KPHJlY3QgeD0iNDAiIHk9IjI2NSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNhOGNjZGYiIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjgzIiB5PSIzMjAiPkY8L3RleHQ+CjxyZWN0IHg9IjI0MCIgeT0iMjY1IiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Q3ZTdmMCIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiLz4KPHRleHQgeD0iMjAiIHk9IjQwMSI+Tm9ybWFsIHRvOiBsb29rIHBlcnBlbmRpY3VsYXIgdG8gYSBwbGFuZTwvdGV4dD4KPHBhdGggZD0iTTIwNSA0MjVMMjk1IDQ4NSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTIyMCA1MDBMMjUwIDQ1NSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjxwYXRoIGQ9Ik0yNDIgNDY3TDI1NCA0NzVMMjYyIDQ2MyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiLz4KPHRleHQgeD0iMjAiIHk9IjQzMCI+UGxhbmUgc2VlbiBlZGdlLW9uPC90ZXh0Pgo8dGV4dCB4PSIzMDAiIHk9IjQ4MCI+OTDCsDwvdGV4dD4KPC9nPgo8L3N2Zz4K" alt="A cube shown obliquely, then straight-on front and top views. A separate edge-on plane has a viewing arrow perpendicular to it and a right-angle marker." data-natural-width="400" data-natural-height="510"><figcaption>The face marked F establishes the front. Normal to depends on the selected plane, not on the name of a standard view.</figcaption></figure>
   <p>Isometric, dimetric, and trimetric are angled parallel-projection views. The three principal axes have equal foreshortening in isometric, two equal in dimetric, and three different in trimetric. Perspective adds apparent size change with distance; turn it off when comparing parallel projected shapes.</p>
   <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Viewing direction is separate from drawing layout.</p>
     </div>
@@ -3036,7 +3063,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div><dt>Hidden lines/edges visible</dt><dd>Concealed edges are also shown, distinguished from visible edges. Useful for finding geometry behind the front surface.</dd></div>
     <div><dt>Wireframe</dt><dd>Shows the edge framework through the model without opaque shaded faces. Overlapping edges can make depth difficult to read.</dd></div>
   </dl>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNjcwIiB2aWV3Qm94PSIwIDAgNDAwIDY3MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5Db21wYXJlIGRpc3BsYXkgc3R5bGVzIG9uIHRoZSBzYW1lIGN1YmU8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5TaXggcGFuZWxzIHByZXNlcnZlIG9uZSB2aWV3aW5nIGRpcmVjdGlvbi4gSGlkZGVuIGVkZ2VzIGFyZSBkYXNoZWQgd2hlbiBkaXN0aW5ndWlzaGVkIGFuZCBzb2xpZCBpbiB3aXJlZnJhbWUuPC9kZXNjPgo8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjY3MCIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMxNTJjNDMiPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMCAxMCkiPjx0ZXh0IHg9IjAiIHk9IjIwIj5TaGFkZWQsIG5vIGVkZ2VzPC90ZXh0PjxnIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZDdlN2YwIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNhOGNjZGYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjNjM5YmI4Ii8+PC9nPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwIDEwKSI+PHRleHQgeD0iMCIgeT0iMjAiPlNoYWRlZCB3aXRoIGVkZ2VzPC90ZXh0PjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZDdlN2YwIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNhOGNjZGYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjNjM5YmI4Ii8+PC9nPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAgMjMwKSI+PHRleHQgeD0iMCIgeT0iMjAiPkhpZGRlbiByZW1vdmVkPC90ZXh0PjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjZmZmIi8+PC9nPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwIDIzMCkiPjx0ZXh0IHg9IjAiIHk9IjIwIj5IaWRkZW4gdmlzaWJsZTwvdGV4dD48ZyBzdHJva2U9IiMxNTJjNDMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTIwIDg1IEw2NSA1NSBMMTQwIDg1IEw5NSAxMTUgWiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMCA4NSBMOTUgMTE1IEw5NSAxODUgTDIwIDE1NSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTk1IDExNSBMMTQwIDg1IEwxNDAgMTU1IEw5NSAxODUgWiIgZmlsbD0iI2ZmZiIvPjwvZz48cGF0aCBkPSJNMjAgMTU1IEw2NSAxMjUgTDE0MCAxNTUgTTY1IDEyNSBMNjUgNTUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgLTApIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNTJjNDMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSA1Ii8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMCA0NTApIj48dGV4dCB4PSIwIiB5PSIyMCI+V2lyZWZyYW1lPC90ZXh0PjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjZmZmIi8+PC9nPjxwYXRoIGQ9Ik0yMCAxNTUgTDY1IDEyNSBMMTQwIDE1NSBNNjUgMTI1IEw2NSA1NSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAtMCkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiAvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwIDQ1MCkiPjx0ZXh0IHg9IjAiIHk9IjIwIj5TaGFkZWQgKyBoaWRkZW48L3RleHQ+PGcgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCA4NSBMNjUgNTUgTDE0MCA4NSBMOTUgMTE1IFoiIGZpbGw9IiNkN2U3ZjAiLz48cGF0aCBkPSJNMjAgODUgTDk1IDExNSBMOTUgMTg1IEwyMCAxNTUgWiIgZmlsbD0iI2E4Y2NkZiIvPjxwYXRoIGQ9Ik05NSAxMTUgTDE0MCA4NSBMMTQwIDE1NSBMOTUgMTg1IFoiIGZpbGw9IiM2MzliYjgiLz48L2c+PHBhdGggZD0iTTIwIDE1NSBMNjUgMTI1IEwxNDAgMTU1IE02NSAxMjUgTDY1IDU1IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIC0wKSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUgNSIvPjwvZz4KPC9nPjwvc3ZnPgo=" alt="Six views of the same cube: shaded without edges, shaded with edges, hidden edges removed, hidden edges visible with dashed concealed edges, wireframe with all edges solid, and shaded with dashed hidden edges."><figcaption>Original schematic: dashed lines mark concealed edges where they are distinguished. Colors and exact edge treatments vary with software settings.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNjcwIiB2aWV3Qm94PSIwIDAgNDAwIDY3MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5Db21wYXJlIGRpc3BsYXkgc3R5bGVzIG9uIHRoZSBzYW1lIGN1YmU8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5TaXggcGFuZWxzIHByZXNlcnZlIG9uZSB2aWV3aW5nIGRpcmVjdGlvbi4gSGlkZGVuIGVkZ2VzIGFyZSBkYXNoZWQgd2hlbiBkaXN0aW5ndWlzaGVkIGFuZCBzb2xpZCBpbiB3aXJlZnJhbWUuPC9kZXNjPgo8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjY3MCIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMxNTJjNDMiPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMCAxMCkiPjx0ZXh0IHg9IjAiIHk9IjIwIj5TaGFkZWQsIG5vIGVkZ2VzPC90ZXh0PjxnIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZDdlN2YwIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNhOGNjZGYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjNjM5YmI4Ii8+PC9nPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwIDEwKSI+PHRleHQgeD0iMCIgeT0iMjAiPlNoYWRlZCB3aXRoIGVkZ2VzPC90ZXh0PjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZDdlN2YwIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNhOGNjZGYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjNjM5YmI4Ii8+PC9nPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAgMjMwKSI+PHRleHQgeD0iMCIgeT0iMjAiPkhpZGRlbiByZW1vdmVkPC90ZXh0PjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjZmZmIi8+PC9nPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwIDIzMCkiPjx0ZXh0IHg9IjAiIHk9IjIwIj5IaWRkZW4gdmlzaWJsZTwvdGV4dD48ZyBzdHJva2U9IiMxNTJjNDMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTIwIDg1IEw2NSA1NSBMMTQwIDg1IEw5NSAxMTUgWiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMCA4NSBMOTUgMTE1IEw5NSAxODUgTDIwIDE1NSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTk1IDExNSBMMTQwIDg1IEwxNDAgMTU1IEw5NSAxODUgWiIgZmlsbD0iI2ZmZiIvPjwvZz48cGF0aCBkPSJNMjAgMTU1IEw2NSAxMjUgTDE0MCAxNTUgTTY1IDEyNSBMNjUgNTUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgLTApIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNTJjNDMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSA1Ii8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMCA0NTApIj48dGV4dCB4PSIwIiB5PSIyMCI+V2lyZWZyYW1lPC90ZXh0PjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjZmZmIi8+PC9nPjxwYXRoIGQ9Ik0yMCAxNTUgTDY1IDEyNSBMMTQwIDE1NSBNNjUgMTI1IEw2NSA1NSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAtMCkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiAvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwIDQ1MCkiPjx0ZXh0IHg9IjAiIHk9IjIwIj5TaGFkZWQgKyBoaWRkZW48L3RleHQ+PGcgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCA4NSBMNjUgNTUgTDE0MCA4NSBMOTUgMTE1IFoiIGZpbGw9IiNkN2U3ZjAiLz48cGF0aCBkPSJNMjAgODUgTDk1IDExNSBMOTUgMTg1IEwyMCAxNTUgWiIgZmlsbD0iI2E4Y2NkZiIvPjxwYXRoIGQ9Ik05NSAxMTUgTDE0MCA4NSBMMTQwIDE1NSBMOTUgMTg1IFoiIGZpbGw9IiM2MzliYjgiLz48L2c+PHBhdGggZD0iTTIwIDE1NSBMNjUgMTI1IEwxNDAgMTU1IE02NSAxMjUgTDY1IDU1IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIC0wKSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUgNSIvPjwvZz4KPC9nPjwvc3ZnPgo=" alt="Six views of the same cube: shaded without edges, shaded with edges, hidden edges removed, hidden edges visible with dashed concealed edges, wireframe with all edges solid, and shaded with dashed hidden edges." data-natural-width="400" data-natural-height="670"><figcaption>Original schematic: dashed lines mark concealed edges where they are distinguished. Colors and exact edge treatments vary with software settings.</figcaption></figure>
   <p>Onshape also provides translucent display and shaded display with hidden edges. Translucency lets you see through faces; hidden-edge display highlights concealed boundaries. Neither removes material.</p>
   <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Find the view options in vendor help.</p>
     </div>
@@ -4877,6 +4904,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

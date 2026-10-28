@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2947,7 +2974,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>The lips cut; the flutes give chips a way out</h2>
   <p>A twist drill makes a round hole with cutting edges at its point. The <strong>lips</strong> run from the center region toward the outside diameter. The helical grooves are <strong>flutes</strong>: they provide space for chips and a route for cutting fluid. The <strong>web</strong> is the central core between the flutes.</p>
   <p>The <strong>chisel edge</strong> crosses the center of a conventional point. It pushes material aside with substantial thrust. Narrow strips called <strong>margins</strong> run along the outside of the drill body and help guide it in the hole. The relieved body behind them reduces rubbing. The <strong>shank</strong> is the portion held by the machine.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMTA0MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIj4KPHRpdGxlIGlkPSJ0aXRsZSI+VHdpc3QgZHJpbGwgYW5hdG9teSBhbmQgaW5jbHVkZWQgcG9pbnQgYW5nbGVzPC90aXRsZT4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSIxMDQwIiBmaWxsPSIjZmZmIi8+CjxzdHlsZT50ZXh0e2ZvbnQtZmFtaWx5OkFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMTAyNTNmO2ZvbnQtc2l6ZTozMnB4O3BhaW50LW9yZGVyOnN0cm9rZTtzdHJva2U6I2ZmZjtzdHJva2Utd2lkdGg6NnB4O3N0cm9rZS1saW5lam9pbjpyb3VuZH0ubGFiZWx7Zm9udC13ZWlnaHQ6Ym9sZH0ubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxMDI1M2Y7c3Ryb2tlLXdpZHRoOjJ9LmF4aXN7c3Ryb2tlOiM2ODc3ODc7c3Ryb2tlLWRhc2hhcnJheTo3IDQ7ZmlsbDpub25lfS5tZXRhbHtmaWxsOiNkY2U0ZWE7c3Ryb2tlOiMxMDI1M2Y7c3Ryb2tlLXdpZHRoOjJ9LmN1dHtmaWxsOm5vbmU7c3Ryb2tlOiNiMDRkMDA7c3Ryb2tlLXdpZHRoOjR9PC9zdHlsZT4KPHRleHQgeD0iMjQiIHk9IjQ0IiBjbGFzcz0ibGFiZWwiPlR3aXN0IGRyaWxsOiBzY2hlbWF0aWMgc2lkZSB2aWV3PC90ZXh0Pgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjUsLTYwKSBzY2FsZSgxLjYpIj4KICA8cGF0aCBjbGFzcz0ibWV0YWwiIGQ9Ik04MCAxODBMMTMwIDE1MEg0NzVWMjEwSDEzMFoiLz4KICA8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTM2MCAxNTBWMjEwTTEzMiAxNTBDMTcwIDE2MCAxNjUgMjAwIDIxMCAyMTBNMjEwIDE1MEMyNTAgMTYwIDI0NSAyMDAgMjkwIDIxME0yOTAgMTUwQzMzMCAxNjAgMzI1IDIwMCAzNjAgMjEwIi8+CiAgPHBhdGggZD0iTTE0MCAxNTBIMTc0TTIxOCAxNTBIMjUyTTI5NyAxNTBIMzMwIiBzdHJva2U9IiNiMDRkMDAiIHN0cm9rZS13aWR0aD0iNCIvPgogIDxwYXRoIGNsYXNzPSJheGlzIiBkPSJNNTggMTgwSDQ5NSIvPgo8L2c+CjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMTIwIDEzNkwxNDMgMjA0TTM2MCAxMzZMMzU2IDIyM002NDAgMTM2VjE3N000NDAgMzA3TDQ3NCAxODQiLz4KPHRleHQgeD0iMjQiIHk9IjEyMCI+TGlwIGF0IHBvaW50PC90ZXh0Pjx0ZXh0IHg9IjMwMCIgeT0iMTIwIj5GbHV0ZTwvdGV4dD48dGV4dCB4PSI1ODgiIHk9IjEyMCI+U2hhbms8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMzM4Ij5NYXJnaW46IG5hcnJvdyBvdXRlciBzdHJpcDwvdGV4dD4KPHRleHQgeD0iMjQiIHk9IjM5MCI+Rmx1dGUgPSBjaGlwIHNwYWNlPC90ZXh0Pgo8cGF0aCBkPSJNMjQgNDE0SDc3NiIgc3Ryb2tlPSIjYzVjZWQ3Ii8+Cjx0ZXh0IHg9IjI0IiB5PSI0NjIiIGNsYXNzPSJsYWJlbCI+U2NoZW1hdGljIHBvaW50IHZpZXc8L3RleHQ+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC03MDAsMzQyKSBzY2FsZSgxLjQ1KSI+CiAgPGNpcmNsZSBjeD0iNjMxIiBjeT0iMTY3IiByPSI2MyIgY2xhc3M9Im1ldGFsIi8+CiAgPHBhdGggZD0iTTU4MCAxMzBRNjI3IDEzNiA2MjQgMTYxTDYzOCAxNzNRNjM1IDIwNyA2ODIgMjA0IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMjQiIGZpbGw9Im5vbmUiLz4KICA8cGF0aCBkPSJNNTc3IDEzNUw2MjQgMTYxTTYzOCAxNzNMNjg1IDE5OSIgY2xhc3M9ImN1dCIvPgogIDxwYXRoIGQ9Ik02MjQgMTYxTDYzOCAxNzMiIHN0cm9rZT0iIzEwMjUzZiIgc3Ryb2tlLXdpZHRoPSI3Ii8+CjwvZz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0yMjMgNTg1TDM1MCA1MzQiLz4KPHRleHQgeD0iMzY2IiB5PSI1NDAiPkNoaXNlbCBlZGdlPC90ZXh0Pgo8dGV4dCB4PSIzNjYiIHk9IjYwNCI+V2ViOiBjb3JlIGJlaGluZDwvdGV4dD48dGV4dCB4PSIzNjYiIHk9IjY0NiI+dGhlIGNoaXNlbCBlZGdlPC90ZXh0Pgo8cGF0aCBkPSJNMjQgNzAwSDc3NiIgc3Ryb2tlPSIjYzVjZWQ3Ii8+Cjx0ZXh0IHg9IjI0IiB5PSI3NDYiIGNsYXNzPSJsYWJlbCI+SW5jbHVkZWQgcG9pbnQgYW5nbGU6IGF4aWFsIHZpZXc8L3RleHQ+CjxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTgwIDc3OFY4MDhMMTM1IDg0MS4wNUwxOTAgODA4Vjc3OFoiLz48cGF0aCBjbGFzcz0iY3V0IiBkPSJNODAgODA4TDEzNSA4NDEuMDVMMTkwIDgwOCIvPgo8dGV4dCB4PSIyMjAiIHk9IjgyNiI+MTE4wrA8L3RleHQ+CjxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTQ1MCA3NzhWODA4TDUwNSA4MzAuNzhMNTYwIDgwOFY3NzhaIi8+PHBhdGggY2xhc3M9ImN1dCIgZD0iTTQ1MCA4MDhMNTA1IDgzMC43OEw1NjAgODA4Ii8+Cjx0ZXh0IHg9IjU5MCIgeT0iODI2Ij4xMzXCsDwvdGV4dD4KPHRleHQgeD0iMjQiIHk9IjkwMCI+TGFyZ2VyIGFuZ2xlIOKGkiBzaG9ydGVyLCBmbGF0dGVyIHBvaW50PC90ZXh0Pgo8dGV4dCB4PSIyNCIgeT0iOTU4Ij5TcGxpdC1wb2ludCBncmluZGluZyBjaGFuZ2VzIHRoZSBjZW50ZXIuPC90ZXh0Pgo8dGV4dCB4PSIyNCIgeT0iMTAwNCI+UG9pbnQgYW5nbGUgYWxvbmUgZG9lcyBub3QgaWRlbnRpZnkgaXQuPC90ZXh0Pgo8L3N2Zz4K" alt="Schematic side and end views identify the lips, chisel edge, web, flutes, margins and shank; a side-view comparison shows 118 and 135 degree included point angles."><figcaption>The point does the cutting. The body supports it and provides room for chips. Views are schematic, not sharpening templates.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMTA0MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIj4KPHRpdGxlIGlkPSJ0aXRsZSI+VHdpc3QgZHJpbGwgYW5hdG9teSBhbmQgaW5jbHVkZWQgcG9pbnQgYW5nbGVzPC90aXRsZT4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSIxMDQwIiBmaWxsPSIjZmZmIi8+CjxzdHlsZT50ZXh0e2ZvbnQtZmFtaWx5OkFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMTAyNTNmO2ZvbnQtc2l6ZTozMnB4O3BhaW50LW9yZGVyOnN0cm9rZTtzdHJva2U6I2ZmZjtzdHJva2Utd2lkdGg6NnB4O3N0cm9rZS1saW5lam9pbjpyb3VuZH0ubGFiZWx7Zm9udC13ZWlnaHQ6Ym9sZH0ubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxMDI1M2Y7c3Ryb2tlLXdpZHRoOjJ9LmF4aXN7c3Ryb2tlOiM2ODc3ODc7c3Ryb2tlLWRhc2hhcnJheTo3IDQ7ZmlsbDpub25lfS5tZXRhbHtmaWxsOiNkY2U0ZWE7c3Ryb2tlOiMxMDI1M2Y7c3Ryb2tlLXdpZHRoOjJ9LmN1dHtmaWxsOm5vbmU7c3Ryb2tlOiNiMDRkMDA7c3Ryb2tlLXdpZHRoOjR9PC9zdHlsZT4KPHRleHQgeD0iMjQiIHk9IjQ0IiBjbGFzcz0ibGFiZWwiPlR3aXN0IGRyaWxsOiBzY2hlbWF0aWMgc2lkZSB2aWV3PC90ZXh0Pgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjUsLTYwKSBzY2FsZSgxLjYpIj4KICA8cGF0aCBjbGFzcz0ibWV0YWwiIGQ9Ik04MCAxODBMMTMwIDE1MEg0NzVWMjEwSDEzMFoiLz4KICA8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTM2MCAxNTBWMjEwTTEzMiAxNTBDMTcwIDE2MCAxNjUgMjAwIDIxMCAyMTBNMjEwIDE1MEMyNTAgMTYwIDI0NSAyMDAgMjkwIDIxME0yOTAgMTUwQzMzMCAxNjAgMzI1IDIwMCAzNjAgMjEwIi8+CiAgPHBhdGggZD0iTTE0MCAxNTBIMTc0TTIxOCAxNTBIMjUyTTI5NyAxNTBIMzMwIiBzdHJva2U9IiNiMDRkMDAiIHN0cm9rZS13aWR0aD0iNCIvPgogIDxwYXRoIGNsYXNzPSJheGlzIiBkPSJNNTggMTgwSDQ5NSIvPgo8L2c+CjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMTIwIDEzNkwxNDMgMjA0TTM2MCAxMzZMMzU2IDIyM002NDAgMTM2VjE3N000NDAgMzA3TDQ3NCAxODQiLz4KPHRleHQgeD0iMjQiIHk9IjEyMCI+TGlwIGF0IHBvaW50PC90ZXh0Pjx0ZXh0IHg9IjMwMCIgeT0iMTIwIj5GbHV0ZTwvdGV4dD48dGV4dCB4PSI1ODgiIHk9IjEyMCI+U2hhbms8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMzM4Ij5NYXJnaW46IG5hcnJvdyBvdXRlciBzdHJpcDwvdGV4dD4KPHRleHQgeD0iMjQiIHk9IjM5MCI+Rmx1dGUgPSBjaGlwIHNwYWNlPC90ZXh0Pgo8cGF0aCBkPSJNMjQgNDE0SDc3NiIgc3Ryb2tlPSIjYzVjZWQ3Ii8+Cjx0ZXh0IHg9IjI0IiB5PSI0NjIiIGNsYXNzPSJsYWJlbCI+U2NoZW1hdGljIHBvaW50IHZpZXc8L3RleHQ+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC03MDAsMzQyKSBzY2FsZSgxLjQ1KSI+CiAgPGNpcmNsZSBjeD0iNjMxIiBjeT0iMTY3IiByPSI2MyIgY2xhc3M9Im1ldGFsIi8+CiAgPHBhdGggZD0iTTU4MCAxMzBRNjI3IDEzNiA2MjQgMTYxTDYzOCAxNzNRNjM1IDIwNyA2ODIgMjA0IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMjQiIGZpbGw9Im5vbmUiLz4KICA8cGF0aCBkPSJNNTc3IDEzNUw2MjQgMTYxTTYzOCAxNzNMNjg1IDE5OSIgY2xhc3M9ImN1dCIvPgogIDxwYXRoIGQ9Ik02MjQgMTYxTDYzOCAxNzMiIHN0cm9rZT0iIzEwMjUzZiIgc3Ryb2tlLXdpZHRoPSI3Ii8+CjwvZz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0yMjMgNTg1TDM1MCA1MzQiLz4KPHRleHQgeD0iMzY2IiB5PSI1NDAiPkNoaXNlbCBlZGdlPC90ZXh0Pgo8dGV4dCB4PSIzNjYiIHk9IjYwNCI+V2ViOiBjb3JlIGJlaGluZDwvdGV4dD48dGV4dCB4PSIzNjYiIHk9IjY0NiI+dGhlIGNoaXNlbCBlZGdlPC90ZXh0Pgo8cGF0aCBkPSJNMjQgNzAwSDc3NiIgc3Ryb2tlPSIjYzVjZWQ3Ii8+Cjx0ZXh0IHg9IjI0IiB5PSI3NDYiIGNsYXNzPSJsYWJlbCI+SW5jbHVkZWQgcG9pbnQgYW5nbGU6IGF4aWFsIHZpZXc8L3RleHQ+CjxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTgwIDc3OFY4MDhMMTM1IDg0MS4wNUwxOTAgODA4Vjc3OFoiLz48cGF0aCBjbGFzcz0iY3V0IiBkPSJNODAgODA4TDEzNSA4NDEuMDVMMTkwIDgwOCIvPgo8dGV4dCB4PSIyMjAiIHk9IjgyNiI+MTE4wrA8L3RleHQ+CjxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTQ1MCA3NzhWODA4TDUwNSA4MzAuNzhMNTYwIDgwOFY3NzhaIi8+PHBhdGggY2xhc3M9ImN1dCIgZD0iTTQ1MCA4MDhMNTA1IDgzMC43OEw1NjAgODA4Ii8+Cjx0ZXh0IHg9IjU5MCIgeT0iODI2Ij4xMzXCsDwvdGV4dD4KPHRleHQgeD0iMjQiIHk9IjkwMCI+TGFyZ2VyIGFuZ2xlIOKGkiBzaG9ydGVyLCBmbGF0dGVyIHBvaW50PC90ZXh0Pgo8dGV4dCB4PSIyNCIgeT0iOTU4Ij5TcGxpdC1wb2ludCBncmluZGluZyBjaGFuZ2VzIHRoZSBjZW50ZXIuPC90ZXh0Pgo8dGV4dCB4PSIyNCIgeT0iMTAwNCI+UG9pbnQgYW5nbGUgYWxvbmUgZG9lcyBub3QgaWRlbnRpZnkgaXQuPC90ZXh0Pgo8L3N2Zz4K" alt="Schematic side and end views identify the lips, chisel edge, web, flutes, margins and shank; a side-view comparison shows 118 and 135 degree included point angles." data-natural-width="800" data-natural-height="1040"><figcaption>The point does the cutting. The body supports it and provides room for chips. Views are schematic, not sharpening templates.</figcaption></figure>
     </div>
   </details>
   <details class="xcard deck-slide" id="twist-drills--point-angle-and-split-point-describe-different-features" data-card="twist-drills--point-angle-and-split-point-describe-different-features">
@@ -3059,7 +3086,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Choose the operation from the finished shape<span class="chev"></span></summary>
     <div class="body">
       <h2>Choose the operation from the finished shape</h2>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5Db3VudGVyYm9yZSwgY291bnRlcnNpbmssIHNwb3QgZmFjZSBhbmQgcmVhbWVkIGhvbGUgY29tcGFyZWQ8L3RpdGxlPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjkyMCIgZmlsbD0iI2ZmZiIvPgo8c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzEwMjUzZjtmb250LXNpemU6MzJweDtwYWludC1vcmRlcjpzdHJva2U7c3Ryb2tlOiNmZmY7c3Ryb2tlLXdpZHRoOjZweDtzdHJva2UtbGluZWpvaW46cm91bmR9LmxhYmVse2ZvbnQtd2VpZ2h0OmJvbGR9LmxpbmV7ZmlsbDpub25lO3N0cm9rZTojMTAyNTNmO3N0cm9rZS13aWR0aDoyfS5heGlze3N0cm9rZTojNjg3Nzg3O3N0cm9rZS1kYXNoYXJyYXk6NyA0O2ZpbGw6bm9uZX0ubWV0YWx7ZmlsbDojZGNlNGVhO3N0cm9rZTojMTAyNTNmO3N0cm9rZS13aWR0aDoyfS5jdXR7ZmlsbDpub25lO3N0cm9rZTojYjA0ZDAwO3N0cm9rZS13aWR0aDo0fTwvc3R5bGU+Cjx0ZXh0IHg9IjI0IiB5PSI0NCIgY2xhc3M9ImxhYmVsIj5Ib2xlIHNlY3Rpb25zOiBmaW5pc2hlZCBzaGFwZXM8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSI5MCI+R3JheSA9IG1hdGVyaWFsOyB3aGl0ZSA9IGhvbGU8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIxMzIiPkRhc2hlZCBsaW5lcyA9IGF4ZXM7IHNjaGVtYXRpYyBvbmx5PC90ZXh0Pgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNCwxODUpIj4KICA8dGV4dCB4PSIwIiB5PSIwIiBjbGFzcz0ibGFiZWwiPkNvdW50ZXJib3JlPC90ZXh0PgogIDxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTUwIDMwSDg1VjkwSDExNVYxODBINTBaTTIyNSAzMEgxOTBWOTBIMTYwVjE4MEgyMjVaIi8+CiAgPHBhdGggY2xhc3M9ImF4aXMiIGQ9Ik0xMzcuNSAxNVYxOTUiLz4KICA8dGV4dCB4PSIwIiB5PSIyMzQiPkN5bGluZHJpY2FsIHJlY2VzczwvdGV4dD48dGV4dCB4PSIwIiB5PSIyNzYiPkZsYXQgc2hvdWxkZXI8L3RleHQ+CjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDI0LDE4NSkiPgogIDx0ZXh0IHg9IjAiIHk9IjAiIGNsYXNzPSJsYWJlbCI+Q291bnRlcnNpbms8L3RleHQ+CiAgPHBhdGggY2xhc3M9Im1ldGFsIiBkPSJNNTAgMzBIODBMMTE1IDgwVjE4MEg1MFpNMjI1IDMwSDE5NUwxNjAgODBWMTgwSDIyNVoiLz4KICA8cGF0aCBjbGFzcz0iYXhpcyIgZD0iTTEzNy41IDE1VjE5NSIvPgogIDx0ZXh0IHg9IjAiIHk9IjIzNCI+Q29uaWNhbCBzZWF0PC90ZXh0Pjx0ZXh0IHg9IjAiIHk9IjI3NiI+TWF0Y2ggaGVhZCBhbmdsZTwvdGV4dD4KPC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNCw1MzApIj4KICA8dGV4dCB4PSIwIiB5PSIwIiBjbGFzcz0ibGFiZWwiPlNwb3QgZmFjZTwvdGV4dD4KICA8cGF0aCBjbGFzcz0ibWV0YWwiIGQ9Ik01MCAzMEw2NSAyNUw4MCAzMUg4NVY0N0gxMTVWMTgwSDUwWk0yMjUgMzBMMjEwIDI1TDE5NSAzMUgxOTBWNDdIMTYwVjE4MEgyMjVaIi8+CiAgPHBhdGggY2xhc3M9ImF4aXMiIGQ9Ik0xMzcuNSAxNVYxOTUiLz4KICA8dGV4dCB4PSIwIiB5PSIyMzQiPlNoYWxsb3cgZmxhdCBzZWF0PC90ZXh0Pjx0ZXh0IHg9IjAiIHk9IjI3NiI+QmVhcmluZyBzdXJmYWNlPC90ZXh0Pgo8L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQyNCw1MzApIj4KICA8dGV4dCB4PSIwIiB5PSIwIiBjbGFzcz0ibGFiZWwiPlJlYW1lZCBob2xlPC90ZXh0PgogIDxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTUwIDMwSDExMlYxODBINTBaTTIyNSAzMEgxNjNWMTgwSDIyNVoiLz4KICA8cGF0aCBjbGFzcz0iYXhpcyIgZD0iTTEzNy41IDE1VjE5NSIvPjxwYXRoIGNsYXNzPSJjdXQiIGQ9Ik0xMTIgMzFWMTc5TTE2MyAzMVYxNzkiLz4KICA8dGV4dCB4PSIwIiB5PSIyMzQiPkZpbmlzaGVkIGJvcmU8L3RleHQ+PHRleHQgeD0iMCIgeT0iMjc2Ij5TaXplIGFuZCBmaW5pc2g8L3RleHQ+CjwvZz4KPHRleHQgeD0iMjQiIHk9Ijg2NCI+Qm9yaW5nIGNhbiBhbHNvIGZpbmlzaCBhIHN0cmFpZ2h0IGJvcmUuPC90ZXh0Pgo8dGV4dCB4PSIyNCIgeT0iOTA2Ij5TaGFwZSBhbG9uZSBkb2VzIG5vdCBpZGVudGlmeSB0aGUgdG9vbC48L3RleHQ+Cjwvc3ZnPgo=" alt="Four schematic sections compare a deep flat-bottomed counterbore, a conical countersink, a shallow flat spot face and a straight reamed hole."><figcaption>Section views through the hole axis. Gray is material; white is open space. A spot face provides a bearing surface; a counterbore provides a recess.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5Db3VudGVyYm9yZSwgY291bnRlcnNpbmssIHNwb3QgZmFjZSBhbmQgcmVhbWVkIGhvbGUgY29tcGFyZWQ8L3RpdGxlPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjkyMCIgZmlsbD0iI2ZmZiIvPgo8c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzEwMjUzZjtmb250LXNpemU6MzJweDtwYWludC1vcmRlcjpzdHJva2U7c3Ryb2tlOiNmZmY7c3Ryb2tlLXdpZHRoOjZweDtzdHJva2UtbGluZWpvaW46cm91bmR9LmxhYmVse2ZvbnQtd2VpZ2h0OmJvbGR9LmxpbmV7ZmlsbDpub25lO3N0cm9rZTojMTAyNTNmO3N0cm9rZS13aWR0aDoyfS5heGlze3N0cm9rZTojNjg3Nzg3O3N0cm9rZS1kYXNoYXJyYXk6NyA0O2ZpbGw6bm9uZX0ubWV0YWx7ZmlsbDojZGNlNGVhO3N0cm9rZTojMTAyNTNmO3N0cm9rZS13aWR0aDoyfS5jdXR7ZmlsbDpub25lO3N0cm9rZTojYjA0ZDAwO3N0cm9rZS13aWR0aDo0fTwvc3R5bGU+Cjx0ZXh0IHg9IjI0IiB5PSI0NCIgY2xhc3M9ImxhYmVsIj5Ib2xlIHNlY3Rpb25zOiBmaW5pc2hlZCBzaGFwZXM8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSI5MCI+R3JheSA9IG1hdGVyaWFsOyB3aGl0ZSA9IGhvbGU8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIxMzIiPkRhc2hlZCBsaW5lcyA9IGF4ZXM7IHNjaGVtYXRpYyBvbmx5PC90ZXh0Pgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNCwxODUpIj4KICA8dGV4dCB4PSIwIiB5PSIwIiBjbGFzcz0ibGFiZWwiPkNvdW50ZXJib3JlPC90ZXh0PgogIDxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTUwIDMwSDg1VjkwSDExNVYxODBINTBaTTIyNSAzMEgxOTBWOTBIMTYwVjE4MEgyMjVaIi8+CiAgPHBhdGggY2xhc3M9ImF4aXMiIGQ9Ik0xMzcuNSAxNVYxOTUiLz4KICA8dGV4dCB4PSIwIiB5PSIyMzQiPkN5bGluZHJpY2FsIHJlY2VzczwvdGV4dD48dGV4dCB4PSIwIiB5PSIyNzYiPkZsYXQgc2hvdWxkZXI8L3RleHQ+CjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDI0LDE4NSkiPgogIDx0ZXh0IHg9IjAiIHk9IjAiIGNsYXNzPSJsYWJlbCI+Q291bnRlcnNpbms8L3RleHQ+CiAgPHBhdGggY2xhc3M9Im1ldGFsIiBkPSJNNTAgMzBIODBMMTE1IDgwVjE4MEg1MFpNMjI1IDMwSDE5NUwxNjAgODBWMTgwSDIyNVoiLz4KICA8cGF0aCBjbGFzcz0iYXhpcyIgZD0iTTEzNy41IDE1VjE5NSIvPgogIDx0ZXh0IHg9IjAiIHk9IjIzNCI+Q29uaWNhbCBzZWF0PC90ZXh0Pjx0ZXh0IHg9IjAiIHk9IjI3NiI+TWF0Y2ggaGVhZCBhbmdsZTwvdGV4dD4KPC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNCw1MzApIj4KICA8dGV4dCB4PSIwIiB5PSIwIiBjbGFzcz0ibGFiZWwiPlNwb3QgZmFjZTwvdGV4dD4KICA8cGF0aCBjbGFzcz0ibWV0YWwiIGQ9Ik01MCAzMEw2NSAyNUw4MCAzMUg4NVY0N0gxMTVWMTgwSDUwWk0yMjUgMzBMMjEwIDI1TDE5NSAzMUgxOTBWNDdIMTYwVjE4MEgyMjVaIi8+CiAgPHBhdGggY2xhc3M9ImF4aXMiIGQ9Ik0xMzcuNSAxNVYxOTUiLz4KICA8dGV4dCB4PSIwIiB5PSIyMzQiPlNoYWxsb3cgZmxhdCBzZWF0PC90ZXh0Pjx0ZXh0IHg9IjAiIHk9IjI3NiI+QmVhcmluZyBzdXJmYWNlPC90ZXh0Pgo8L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQyNCw1MzApIj4KICA8dGV4dCB4PSIwIiB5PSIwIiBjbGFzcz0ibGFiZWwiPlJlYW1lZCBob2xlPC90ZXh0PgogIDxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTUwIDMwSDExMlYxODBINTBaTTIyNSAzMEgxNjNWMTgwSDIyNVoiLz4KICA8cGF0aCBjbGFzcz0iYXhpcyIgZD0iTTEzNy41IDE1VjE5NSIvPjxwYXRoIGNsYXNzPSJjdXQiIGQ9Ik0xMTIgMzFWMTc5TTE2MyAzMVYxNzkiLz4KICA8dGV4dCB4PSIwIiB5PSIyMzQiPkZpbmlzaGVkIGJvcmU8L3RleHQ+PHRleHQgeD0iMCIgeT0iMjc2Ij5TaXplIGFuZCBmaW5pc2g8L3RleHQ+CjwvZz4KPHRleHQgeD0iMjQiIHk9Ijg2NCI+Qm9yaW5nIGNhbiBhbHNvIGZpbmlzaCBhIHN0cmFpZ2h0IGJvcmUuPC90ZXh0Pgo8dGV4dCB4PSIyNCIgeT0iOTA2Ij5TaGFwZSBhbG9uZSBkb2VzIG5vdCBpZGVudGlmeSB0aGUgdG9vbC48L3RleHQ+Cjwvc3ZnPgo=" alt="Four schematic sections compare a deep flat-bottomed counterbore, a conical countersink, a shallow flat spot face and a straight reamed hole." data-natural-width="800" data-natural-height="920"><figcaption>Section views through the hole axis. Gray is material; white is open space. A spot face provides a bearing surface; a counterbore provides a recess.</figcaption></figure>
   <table><thead><tr><th>Needed feature</th><th>Operation</th></tr></thead><tbody>
     <tr><td>Improve the diameter and finish of a nearly correct hole</td><td>Ream</td></tr>
     <tr><td>Enlarge an existing hole with control of its axis and diameter</td><td>Bore</td></tr>
@@ -3113,7 +3140,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Read diameter, spacing, series and class separately</h2>
   <p>In <strong>1/4-20 UNC-2B</strong>, 1/4 is the nominal major diameter in inches, 20 is the number of threads per inch, UNC is the Unified coarse series, and 2B identifies the internal thread's fit class. The major diameter is the largest thread diameter; it is not the diameter of the hole drilled before tapping.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5SZWFkaW5nIFVuaWZpZWQgaW5jaCBhbmQgbWV0cmljIHRocmVhZCBjYWxsb3V0czwvdGl0bGU+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iODUwIiBmaWxsPSIjZmZmIi8+CjxzdHlsZT50ZXh0e2ZvbnQtZmFtaWx5OkFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMTAyNTNmO2ZvbnQtc2l6ZTozMnB4O3BhaW50LW9yZGVyOnN0cm9rZTtzdHJva2U6I2ZmZjtzdHJva2Utd2lkdGg6NnB4O3N0cm9rZS1saW5lam9pbjpyb3VuZH0ubGFiZWx7Zm9udC13ZWlnaHQ6Ym9sZH0ubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxMDI1M2Y7c3Ryb2tlLXdpZHRoOjJ9LmF4aXN7c3Ryb2tlOiM2ODc3ODc7c3Ryb2tlLWRhc2hhcnJheTo3IDQ7ZmlsbDpub25lfS5tZXRhbHtmaWxsOiNkY2U0ZWE7c3Ryb2tlOiMxMDI1M2Y7c3Ryb2tlLXdpZHRoOjJ9LmN1dHtmaWxsOm5vbmU7c3Ryb2tlOiNiMDRkMDA7c3Ryb2tlLXdpZHRoOjR9PC9zdHlsZT4KPHRleHQgeD0iMjQiIHk9IjQ0IiBjbGFzcz0ibGFiZWwiPlVuaWZpZWQgaW5jaCB0aHJlYWQ8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIxMDYiIGNsYXNzPSJsYWJlbCI+MS80IOKAkyAyMCBVTkMg4oCTIDJCPC90ZXh0Pgo8cGF0aCBkPSJNMjQgMTI4SDc3NiIgc3Ryb2tlPSIjYzVjZWQ3Ii8+Cjx0ZXh0IHg9IjI0IiB5PSIxODIiIGNsYXNzPSJsYWJlbCI+MS80PC90ZXh0Pjx0ZXh0IHg9IjIxMCIgeT0iMTgyIj5Ob21pbmFsIG1ham9yIGRpYW1ldGVyIChpbik8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIyNDAiIGNsYXNzPSJsYWJlbCI+MjA8L3RleHQ+PHRleHQgeD0iMjEwIiB5PSIyNDAiPlRocmVhZHMgcGVyIGluY2ggKFRQSSk8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIyOTgiIGNsYXNzPSJsYWJlbCI+VU5DPC90ZXh0Pjx0ZXh0IHg9IjIxMCIgeT0iMjk4Ij5VbmlmaWVkIGNvYXJzZSBzZXJpZXM8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIzNTYiIGNsYXNzPSJsYWJlbCI+MkI8L3RleHQ+PHRleHQgeD0iMjEwIiB5PSIzNTYiPkNsYXNzIDI7IEIgPSBpbnRlcm5hbDwvdGV4dD4KPHBhdGggZD0iTTI0IDM5Nkg3NzYiIHN0cm9rZT0iI2M1Y2VkNyIvPgo8dGV4dCB4PSIyNCIgeT0iNDQ4IiBjbGFzcz0ibGFiZWwiPk1ldHJpYyB0aHJlYWQ8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSI1MTAiIGNsYXNzPSJsYWJlbCI+TTYgw5cgMTwvdGV4dD4KPHBhdGggZD0iTTI0IDUzMkg3NzYiIHN0cm9rZT0iI2M1Y2VkNyIvPgo8dGV4dCB4PSIyNCIgeT0iNTg0IiBjbGFzcz0ibGFiZWwiPk02PC90ZXh0Pjx0ZXh0IHg9IjIxMCIgeT0iNTg0Ij5NZXRyaWM7IG5vbWluYWwgbWFqb3I8L3RleHQ+PHRleHQgeD0iMjEwIiB5PSI2MjYiPmRpYW1ldGVyIDYgbW08L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSI2ODQiIGNsYXNzPSJsYWJlbCI+MTwvdGV4dD48dGV4dCB4PSIyMTAiIHk9IjY4NCI+UGl0Y2g6IDEgbW0gYmV0d2VlbiBjcmVzdHM8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSI3NTgiPlBpdGNoIGlzIGEgZGlzdGFuY2U7IFRQSSBpcyBhIGNvdW50IHBlciBpbmNoLjwvdGV4dD4KPHRleHQgeD0iMjQiIHk9IjgxNiI+TTYgw5cgMSBhbG9uZSBzdGF0ZXMgbm8gdG9sZXJhbmNlIGNsYXNzLjwvdGV4dD4KPC9zdmc+Cg==" alt="The callout 1/4-20 UNC-2B is separated into nominal major diameter, threads per inch, coarse series and class 2 internal thread. M6 x 1 is separated into metric thread, 6 mm nominal major diameter and 1 mm pitch."><figcaption>Read the whole callout. Matching only the nominal diameter is not enough.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5SZWFkaW5nIFVuaWZpZWQgaW5jaCBhbmQgbWV0cmljIHRocmVhZCBjYWxsb3V0czwvdGl0bGU+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iODUwIiBmaWxsPSIjZmZmIi8+CjxzdHlsZT50ZXh0e2ZvbnQtZmFtaWx5OkFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMTAyNTNmO2ZvbnQtc2l6ZTozMnB4O3BhaW50LW9yZGVyOnN0cm9rZTtzdHJva2U6I2ZmZjtzdHJva2Utd2lkdGg6NnB4O3N0cm9rZS1saW5lam9pbjpyb3VuZH0ubGFiZWx7Zm9udC13ZWlnaHQ6Ym9sZH0ubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxMDI1M2Y7c3Ryb2tlLXdpZHRoOjJ9LmF4aXN7c3Ryb2tlOiM2ODc3ODc7c3Ryb2tlLWRhc2hhcnJheTo3IDQ7ZmlsbDpub25lfS5tZXRhbHtmaWxsOiNkY2U0ZWE7c3Ryb2tlOiMxMDI1M2Y7c3Ryb2tlLXdpZHRoOjJ9LmN1dHtmaWxsOm5vbmU7c3Ryb2tlOiNiMDRkMDA7c3Ryb2tlLXdpZHRoOjR9PC9zdHlsZT4KPHRleHQgeD0iMjQiIHk9IjQ0IiBjbGFzcz0ibGFiZWwiPlVuaWZpZWQgaW5jaCB0aHJlYWQ8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIxMDYiIGNsYXNzPSJsYWJlbCI+MS80IOKAkyAyMCBVTkMg4oCTIDJCPC90ZXh0Pgo8cGF0aCBkPSJNMjQgMTI4SDc3NiIgc3Ryb2tlPSIjYzVjZWQ3Ii8+Cjx0ZXh0IHg9IjI0IiB5PSIxODIiIGNsYXNzPSJsYWJlbCI+MS80PC90ZXh0Pjx0ZXh0IHg9IjIxMCIgeT0iMTgyIj5Ob21pbmFsIG1ham9yIGRpYW1ldGVyIChpbik8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIyNDAiIGNsYXNzPSJsYWJlbCI+MjA8L3RleHQ+PHRleHQgeD0iMjEwIiB5PSIyNDAiPlRocmVhZHMgcGVyIGluY2ggKFRQSSk8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIyOTgiIGNsYXNzPSJsYWJlbCI+VU5DPC90ZXh0Pjx0ZXh0IHg9IjIxMCIgeT0iMjk4Ij5VbmlmaWVkIGNvYXJzZSBzZXJpZXM8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSIzNTYiIGNsYXNzPSJsYWJlbCI+MkI8L3RleHQ+PHRleHQgeD0iMjEwIiB5PSIzNTYiPkNsYXNzIDI7IEIgPSBpbnRlcm5hbDwvdGV4dD4KPHBhdGggZD0iTTI0IDM5Nkg3NzYiIHN0cm9rZT0iI2M1Y2VkNyIvPgo8dGV4dCB4PSIyNCIgeT0iNDQ4IiBjbGFzcz0ibGFiZWwiPk1ldHJpYyB0aHJlYWQ8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSI1MTAiIGNsYXNzPSJsYWJlbCI+TTYgw5cgMTwvdGV4dD4KPHBhdGggZD0iTTI0IDUzMkg3NzYiIHN0cm9rZT0iI2M1Y2VkNyIvPgo8dGV4dCB4PSIyNCIgeT0iNTg0IiBjbGFzcz0ibGFiZWwiPk02PC90ZXh0Pjx0ZXh0IHg9IjIxMCIgeT0iNTg0Ij5NZXRyaWM7IG5vbWluYWwgbWFqb3I8L3RleHQ+PHRleHQgeD0iMjEwIiB5PSI2MjYiPmRpYW1ldGVyIDYgbW08L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSI2ODQiIGNsYXNzPSJsYWJlbCI+MTwvdGV4dD48dGV4dCB4PSIyMTAiIHk9IjY4NCI+UGl0Y2g6IDEgbW0gYmV0d2VlbiBjcmVzdHM8L3RleHQ+Cjx0ZXh0IHg9IjI0IiB5PSI3NTgiPlBpdGNoIGlzIGEgZGlzdGFuY2U7IFRQSSBpcyBhIGNvdW50IHBlciBpbmNoLjwvdGV4dD4KPHRleHQgeD0iMjQiIHk9IjgxNiI+TTYgw5cgMSBhbG9uZSBzdGF0ZXMgbm8gdG9sZXJhbmNlIGNsYXNzLjwvdGV4dD4KPC9zdmc+Cg==" alt="The callout 1/4-20 UNC-2B is separated into nominal major diameter, threads per inch, coarse series and class 2 internal thread. M6 x 1 is separated into metric thread, 6 mm nominal major diameter and 1 mm pitch." data-natural-width="800" data-natural-height="850"><figcaption>Read the whole callout. Matching only the nominal diameter is not enough.</figcaption></figure>
   <p><strong>UNF</strong> identifies the Unified fine series. At a given nominal diameter, fine threads have more threads per inch and therefore a smaller pitch than coarse threads. In <strong>M6 × 1</strong>, M identifies a metric thread, 6 is the nominal major diameter in millimeters, and 1 is the pitch in millimeters. It does not mean one thread per inch.</p>
   <p><a class="button" data-practice-add="drilling-callout-inch" href="../practice.html#drilling-callout-inch">Practice reading a callout</a></p>
     </div>
@@ -4975,6 +5002,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

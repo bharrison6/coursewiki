@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3845,7 +3872,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Describe tool motion relative to the work with a right-handed frame</h2>
   <p>Use your right hand: thumb along +X, index finger along +Y and middle finger along +Z, with all three perpendicular. Equivalently, curling from +X toward +Y makes the thumb point along +Z. Z runs parallel to the principal spindle axis.</p>
   <p>On a conventional vertical mill viewed from the front, +X is to the right, +Y is toward the back and +Z raises the tool away from the work. These are <strong>tool-relative-to-work</strong> directions. If the table moves instead of the tool, its physical motion is opposite the tool-relative motion.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5Ub29sLXJlbGF0aXZlIGF4ZXMgb24gYSB2ZXJ0aWNhbCBtaWxsIGFuZCBhIGJhc2ljIGxhdGhlPC90aXRsZT48ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNyIgbWFya2VySGVpZ2h0PSI3IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+PHBhdGggZD0iTTAgMEwxMCA1TDAgMTBaIiBmaWxsPSIjMTczOTU3Ii8+PC9tYXJrZXI+PC9kZWZzPgo8cmVjdCB3aWR0aD0iNzYwIiBoZWlnaHQ9IjM0MCIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE3MmM0MCI+Cjx0ZXh0IHg9IjMwIiB5PSIzMCIgZm9udC13ZWlnaHQ9ImJvbGQiPlZlcnRpY2FsIG1pbGwg4oCUIGZyb250IHBlcnNwZWN0aXZlPC90ZXh0Pgo8cGF0aCBkPSJNNTUgMjM1TDIyNSAyMzVMMzA1IDE4MEwxMzUgMTgwWiIgZmlsbD0iI2UyZWRmNCIgc3Ryb2tlPSIjMTczOTU3Ii8+CjxwYXRoIGQ9Ik0xNzUgMjEwSDMyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTE3NSAyMTBMMjcwIDE0NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTE3NSAyMTBWNjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSIzIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8dGV4dCB4PSIzMjUiIHk9IjIxNSI+K1g8L3RleHQ+PHRleHQgeD0iMjc1IiB5PSIxNDAiPitZIChiYWNrKTwvdGV4dD48dGV4dCB4PSIxODUiIHk9Ijc1Ij4rWjwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjI4MCI+VG9vbCByZWxhdGl2ZSB0byB3b3JrOiByaWdodCwgYmFjaywgdXAuPC90ZXh0Pgo8dGV4dCB4PSI0MTAiIHk9IjMwIiBmb250LXdlaWdodD0iYm9sZCI+TGF0aGUg4oCUIHNjaGVtYXRpYyBzaWRlIHZpZXc8L3RleHQ+CjxyZWN0IHg9IjQyNSIgeT0iMTYwIiB3aWR0aD0iNjUiIGhlaWdodD0iOTUiIGZpbGw9IiNkNWRmZTUiIHN0cm9rZT0iIzE3Mzk1NyIvPgo8cmVjdCB4PSI0OTAiIHk9IjE4NSIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI0NSIgZmlsbD0iI2UyZWRmNCIgc3Ryb2tlPSIjMTczOTU3Ii8+CjxwYXRoIGQ9Ik00MTAgMjA4SDcwNSIgc3Ryb2tlPSIjNjY3IiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz4KPHBhdGggZD0iTTYyMCAyMDhINzE1IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNzM5NTciIHN0cm9rZS13aWR0aD0iMyIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz48cGF0aCBkPSJNNjIwIDIwOFY4NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+Cjx0ZXh0IHg9IjY5NSIgeT0iMjQwIj4rWjwvdGV4dD48dGV4dCB4PSI2MzIiIHk9IjkwIj4rWCByYWRpYWw8L3RleHQ+PHRleHQgeD0iNDEyIiB5PSIyODAiPkhlYWRzdG9jazwvdGV4dD4KPHRleHQgeD0iNDEwIiB5PSIzMTIiPlggc2hvd24gb24gdGhlIGlsbHVzdHJhdGVkIHRvb2wgc2lkZS48L3RleHQ+PC9nPjwvc3ZnPg==" alt="Vertical mill: tool-relative X right, Y back, Z up. Basic lathe: Z along the spindle away from the headstock, X radially outward on the illustrated tool side."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5Ub29sLXJlbGF0aXZlIGF4ZXMgb24gYSB2ZXJ0aWNhbCBtaWxsIGFuZCBhIGJhc2ljIGxhdGhlPC90aXRsZT48ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNyIgbWFya2VySGVpZ2h0PSI3IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+PHBhdGggZD0iTTAgMEwxMCA1TDAgMTBaIiBmaWxsPSIjMTczOTU3Ii8+PC9tYXJrZXI+PC9kZWZzPgo8cmVjdCB3aWR0aD0iNzYwIiBoZWlnaHQ9IjM0MCIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE3MmM0MCI+Cjx0ZXh0IHg9IjMwIiB5PSIzMCIgZm9udC13ZWlnaHQ9ImJvbGQiPlZlcnRpY2FsIG1pbGwg4oCUIGZyb250IHBlcnNwZWN0aXZlPC90ZXh0Pgo8cGF0aCBkPSJNNTUgMjM1TDIyNSAyMzVMMzA1IDE4MEwxMzUgMTgwWiIgZmlsbD0iI2UyZWRmNCIgc3Ryb2tlPSIjMTczOTU3Ii8+CjxwYXRoIGQ9Ik0xNzUgMjEwSDMyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTE3NSAyMTBMMjcwIDE0NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTE3NSAyMTBWNjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSIzIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8dGV4dCB4PSIzMjUiIHk9IjIxNSI+K1g8L3RleHQ+PHRleHQgeD0iMjc1IiB5PSIxNDAiPitZIChiYWNrKTwvdGV4dD48dGV4dCB4PSIxODUiIHk9Ijc1Ij4rWjwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjI4MCI+VG9vbCByZWxhdGl2ZSB0byB3b3JrOiByaWdodCwgYmFjaywgdXAuPC90ZXh0Pgo8dGV4dCB4PSI0MTAiIHk9IjMwIiBmb250LXdlaWdodD0iYm9sZCI+TGF0aGUg4oCUIHNjaGVtYXRpYyBzaWRlIHZpZXc8L3RleHQ+CjxyZWN0IHg9IjQyNSIgeT0iMTYwIiB3aWR0aD0iNjUiIGhlaWdodD0iOTUiIGZpbGw9IiNkNWRmZTUiIHN0cm9rZT0iIzE3Mzk1NyIvPgo8cmVjdCB4PSI0OTAiIHk9IjE4NSIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI0NSIgZmlsbD0iI2UyZWRmNCIgc3Ryb2tlPSIjMTczOTU3Ii8+CjxwYXRoIGQ9Ik00MTAgMjA4SDcwNSIgc3Ryb2tlPSIjNjY3IiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz4KPHBhdGggZD0iTTYyMCAyMDhINzE1IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNzM5NTciIHN0cm9rZS13aWR0aD0iMyIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz48cGF0aCBkPSJNNjIwIDIwOFY4NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+Cjx0ZXh0IHg9IjY5NSIgeT0iMjQwIj4rWjwvdGV4dD48dGV4dCB4PSI2MzIiIHk9IjkwIj4rWCByYWRpYWw8L3RleHQ+PHRleHQgeD0iNDEyIiB5PSIyODAiPkhlYWRzdG9jazwvdGV4dD4KPHRleHQgeD0iNDEwIiB5PSIzMTIiPlggc2hvd24gb24gdGhlIGlsbHVzdHJhdGVkIHRvb2wgc2lkZS48L3RleHQ+PC9nPjwvc3ZnPg==" alt="Vertical mill: tool-relative X right, Y back, Z up. Basic lathe: Z along the spindle away from the headstock, X radially outward on the illustrated tool side." data-natural-width="760" data-natural-height="340"></p>
   <p>For a basic lathe, Z is along the spindle and +Z is away from the headstock. X is radial; positive X values commonly describe the tool side of the centreline. A slant bed or rear turret changes what this looks like from the operator's position. Do not infer axis signs from screen orientation. Two-axis turning normally uses the XZ plane.</p>
     </div>
   </details>
@@ -3864,7 +3891,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Machine zero belongs to the machine; work zero belongs to the setup</h2>
   <p><strong>Machine zero</strong> is the machine coordinate origin. A reference-return or homing procedure establishes the machine's position reference; the home position need not be the coordinate origin. <strong>Work zero</strong> is a chosen datum on the part or fixture, such as a corner, hole centre or faced end.</p>
   <p>Common milling codes <code>G54</code> through <code>G59</code> select stored work coordinate systems. Selecting G54 does not measure the part, write the offset table or redefine machine zero. The setup procedure establishes the stored values.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5NYWNoaW5lIGFuZCB3b3JrIGNvb3JkaW5hdGVzIHJlbGF0ZWQgYnkgYSB0cmFuc2xhdGlvbjwvdGl0bGU+PGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEwWiIgZmlsbD0iIzE3Mzk1NyIvPjwvbWFya2VyPjwvZGVmcz4KPHJlY3Qgd2lkdGg9Ijc2MCIgaGVpZ2h0PSIzNDAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMxNzJjNDAiPgo8cGF0aCBkPSJNNjUgMjc1SDY5MCIgc3Ryb2tlPSIjMTczOTU3IiBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTY1IDI3NVY0NSIgc3Ryb2tlPSIjMTczOTU3IiBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+Cjx0ZXh0IHg9IjY5MCIgeT0iMzAwIj4rWDwvdGV4dD48dGV4dCB4PSIyNSIgeT0iNDUiPitZPC90ZXh0Pjx0ZXh0IHg9IjI1IiB5PSIzMDUiPk0gKDAsMCk8L3RleHQ+CjxwYXRoIGQ9Ik02NSAyNzVMMzkwIDEzMCIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTgwIj5PZmZzZXQgdmVjdG9yICgxMDAsNjApPC90ZXh0Pgo8cGF0aCBkPSJNMzkwIDEzMEg2NzAiIHN0cm9rZT0iIzUyN2Q5MSIgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik0zOTAgMTMwVjQ1IiBzdHJva2U9IiM1MjdkOTEiIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPGNpcmNsZSBjeD0iMzkwIiBjeT0iMTMwIiByPSI1Ii8+PHRleHQgeD0iMzg1IiB5PSIxNjAiPlcgKHdvcmsgemVybyk8L3RleHQ+CjxwYXRoIGQ9Ik0zOTAgMTMwTDUzNSA3NSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2UtZGFzaGFycmF5PSI2IDQiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPGNpcmNsZSBjeD0iNTM1IiBjeT0iNzUiIHI9IjUiLz48dGV4dCB4PSI1NDUiIHk9IjYwIj5QOiB3b3JrICgyMCwxNSk8L3RleHQ+PHRleHQgeD0iNTQ1IiB5PSI4NSI+bWFjaGluZSAoMTIwLDc1KTwvdGV4dD4KPHRleHQgeD0iMjI1IiB5PSIzMjAiPlhZIHRyYW5zbGF0aW9uIG9ubHk7IGRpYWdyYW0gbm90IHRvIHNjYWxlLjwvdGV4dD48L2c+PC9zdmc+" alt="Simplified XY translation: work zero is at machine coordinates 100,60. A work point 20,15 is at machine coordinates 120,75."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5NYWNoaW5lIGFuZCB3b3JrIGNvb3JkaW5hdGVzIHJlbGF0ZWQgYnkgYSB0cmFuc2xhdGlvbjwvdGl0bGU+PGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEwWiIgZmlsbD0iIzE3Mzk1NyIvPjwvbWFya2VyPjwvZGVmcz4KPHJlY3Qgd2lkdGg9Ijc2MCIgaGVpZ2h0PSIzNDAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMxNzJjNDAiPgo8cGF0aCBkPSJNNjUgMjc1SDY5MCIgc3Ryb2tlPSIjMTczOTU3IiBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTY1IDI3NVY0NSIgc3Ryb2tlPSIjMTczOTU3IiBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+Cjx0ZXh0IHg9IjY5MCIgeT0iMzAwIj4rWDwvdGV4dD48dGV4dCB4PSIyNSIgeT0iNDUiPitZPC90ZXh0Pjx0ZXh0IHg9IjI1IiB5PSIzMDUiPk0gKDAsMCk8L3RleHQ+CjxwYXRoIGQ9Ik02NSAyNzVMMzkwIDEzMCIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTgwIj5PZmZzZXQgdmVjdG9yICgxMDAsNjApPC90ZXh0Pgo8cGF0aCBkPSJNMzkwIDEzMEg2NzAiIHN0cm9rZT0iIzUyN2Q5MSIgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik0zOTAgMTMwVjQ1IiBzdHJva2U9IiM1MjdkOTEiIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPGNpcmNsZSBjeD0iMzkwIiBjeT0iMTMwIiByPSI1Ii8+PHRleHQgeD0iMzg1IiB5PSIxNjAiPlcgKHdvcmsgemVybyk8L3RleHQ+CjxwYXRoIGQ9Ik0zOTAgMTMwTDUzNSA3NSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2UtZGFzaGFycmF5PSI2IDQiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPGNpcmNsZSBjeD0iNTM1IiBjeT0iNzUiIHI9IjUiLz48dGV4dCB4PSI1NDUiIHk9IjYwIj5QOiB3b3JrICgyMCwxNSk8L3RleHQ+PHRleHQgeD0iNTQ1IiB5PSI4NSI+bWFjaGluZSAoMTIwLDc1KTwvdGV4dD4KPHRleHQgeD0iMjI1IiB5PSIzMjAiPlhZIHRyYW5zbGF0aW9uIG9ubHk7IGRpYWdyYW0gbm90IHRvIHNjYWxlLjwvdGV4dD48L2c+PC9zdmc+" alt="Simplified XY translation: work zero is at machine coordinates 100,60. A work point 20,15 is at machine coordinates 120,75." data-natural-width="760" data-natural-height="340"></p>
   <p>With only a translation, <strong>machine position = work-zero location in machine coordinates + work position</strong>. If the work origin is (100,60) and the program point is (20,15), the machine point is (120,75). This example omits rotation, local shifts and tool offsets.</p>
   <p>In common Fanuc-style milling, <code>G53</code> selects machine coordinates for the block containing it. It does not erase G54 or force G54 to become the next active work system. The previously selected work system remains selected afterward. Tool-offset interaction and permitted motion modes are control-specific; check your control's manual. <strong>Machine-coordinate zero is not necessarily a clearance position.</strong></p>
     </div>
@@ -3913,7 +3940,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <tr><td>B → C</td><td>X26 Y19</td><td>X0 Y15</td></tr>
     <tr><td>C → D</td><td>X11 Y19</td><td>X−15 Y0</td></tr>
   </tbody></table>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5PbmUgcGF0aCBpbiBhYnNvbHV0ZSBwb2ludHMgYW5kIGluY3JlbWVudGFsIG1vdmVzPC90aXRsZT48ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNyIgbWFya2VySGVpZ2h0PSI3IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+PHBhdGggZD0iTTAgMEwxMCA1TDAgMTBaIiBmaWxsPSIjMTczOTU3Ii8+PC9tYXJrZXI+PC9kZWZzPgo8cmVjdCB3aWR0aD0iNzYwIiBoZWlnaHQ9IjM0MCIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE3MmM0MCI+CjxwYXRoIGQ9Ik03MCAyNzVINjgwIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YThhOTYiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz48cGF0aCBkPSJNNzAgMjc1VjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YThhOTYiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHRleHQgeD0iNjg1IiB5PSIyODAiPitYPC90ZXh0Pjx0ZXh0IHg9IjQwIiB5PSI0NSI+K1k8L3RleHQ+CjxwYXRoIGQ9Ik0xNTAgMjMwSDU5MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjQiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTU5MCAyMzBWODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSI0IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik01OTAgODBIMjYwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNzM5NTciIHN0cm9rZS13aWR0aD0iNCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHRleHQgeD0iMTAwIiB5PSIyNTUiPkEgKDYsNCk8L3RleHQ+PHRleHQgeD0iNTkwIiB5PSIyNTUiPkIgKDI2LDQpPC90ZXh0Pjx0ZXh0IHg9IjU5MCIgeT0iNjAiPkMgKDI2LDE5KTwvdGV4dD48dGV4dCB4PSIyMDAiIHk9IjYwIj5EICgxMSwxOSk8L3RleHQ+Cjx0ZXh0IHg9IjMwMCIgeT0iMjE1Ij7OlFggPSArMjA8L3RleHQ+PHRleHQgeD0iNjAwIiB5PSIxNTUiPs6UWSA9ICsxNTwvdGV4dD48dGV4dCB4PSIzNDUiIHk9IjExNSI+zpRYID0g4oiSMTU8L3RleHQ+Cjx0ZXh0IHg9IjE1MCIgeT0iMzE1Ij5Db29yZGluYXRlcyBpbiBtbS4gVW5saXN0ZWQgYXhpcyBpbmNyZW1lbnRzIGFyZSB6ZXJvLjwvdGV4dD48L2c+PC9zdmc+" alt="Path from A 6,4 to B 26,4 to C 26,19 to D 11,19. Signed moves are plus 20 in X, plus 15 in Y, then minus 15 in X."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5PbmUgcGF0aCBpbiBhYnNvbHV0ZSBwb2ludHMgYW5kIGluY3JlbWVudGFsIG1vdmVzPC90aXRsZT48ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNyIgbWFya2VySGVpZ2h0PSI3IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+PHBhdGggZD0iTTAgMEwxMCA1TDAgMTBaIiBmaWxsPSIjMTczOTU3Ii8+PC9tYXJrZXI+PC9kZWZzPgo8cmVjdCB3aWR0aD0iNzYwIiBoZWlnaHQ9IjM0MCIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE3MmM0MCI+CjxwYXRoIGQ9Ik03MCAyNzVINjgwIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YThhOTYiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz48cGF0aCBkPSJNNzAgMjc1VjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiM3YThhOTYiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHRleHQgeD0iNjg1IiB5PSIyODAiPitYPC90ZXh0Pjx0ZXh0IHg9IjQwIiB5PSI0NSI+K1k8L3RleHQ+CjxwYXRoIGQ9Ik0xNTAgMjMwSDU5MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjQiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTU5MCAyMzBWODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSI0IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik01OTAgODBIMjYwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNzM5NTciIHN0cm9rZS13aWR0aD0iNCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHRleHQgeD0iMTAwIiB5PSIyNTUiPkEgKDYsNCk8L3RleHQ+PHRleHQgeD0iNTkwIiB5PSIyNTUiPkIgKDI2LDQpPC90ZXh0Pjx0ZXh0IHg9IjU5MCIgeT0iNjAiPkMgKDI2LDE5KTwvdGV4dD48dGV4dCB4PSIyMDAiIHk9IjYwIj5EICgxMSwxOSk8L3RleHQ+Cjx0ZXh0IHg9IjMwMCIgeT0iMjE1Ij7OlFggPSArMjA8L3RleHQ+PHRleHQgeD0iNjAwIiB5PSIxNTUiPs6UWSA9ICsxNTwvdGV4dD48dGV4dCB4PSIzNDUiIHk9IjExNSI+zpRYID0g4oiSMTU8L3RleHQ+Cjx0ZXh0IHg9IjE1MCIgeT0iMzE1Ij5Db29yZGluYXRlcyBpbiBtbS4gVW5saXN0ZWQgYXhpcyBpbmNyZW1lbnRzIGFyZSB6ZXJvLjwvdGV4dD48L2c+PC9zdmc+" alt="Path from A 6,4 to B 26,4 to C 26,19 to D 11,19. Signed moves are plus 20 in X, plus 15 in Y, then minus 15 in X." data-natural-width="760" data-natural-height="340"></p>
   <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Check the conversion in both directions.</p>
   <p><a class="button" data-practice-add="cnc-point-list-dx" href="../practice.html#cnc-point-list-dx">Practice point-list conversion</a></p>
     </div>
@@ -4140,7 +4167,7 @@ M30</code></pre>
   change <code>J8</code> to <code>J6</code> and the start radius is 6&nbsp;mm while the end radius is
   &radic;(8&sup2; + 2&sup2;) = &radic;68, about 8.246&nbsp;mm, so
   the simulator stops at that line instead of guessing.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5RdWFydGVyIGFyYzogRzAzIGZyb20gQSB0byBCLCBHMDIgZnJvbSBCIHRvIEEsIHdpdGggY2VudHJlIG9mZnNldHM8L3RpdGxlPjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMFoiIGZpbGw9IiMxNzM5NTciLz48L21hcmtlcj48L2RlZnM+CjxyZWN0IHdpZHRoPSI3NjAiIGhlaWdodD0iMzQwIiBmaWxsPSIjZmZmIi8+PGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTcyYzQwIj4KPHRleHQgeD0iMzAiIHk9IjMwIiBmb250LXdlaWdodD0iYm9sZCI+RzE3OiBsb29raW5nIGZyb20gK1ogdG93YXJkIHRoZSBYWSBwbGFuZTwvdGV4dD4KPHBhdGggZD0iTTY1IDI3NUgzODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhOGE5NiIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik02NSAyNzVWNTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhOGE5NiIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8dGV4dCB4PSIzODUiIHk9IjI4MCI+K1g8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjU1Ij4rWTwvdGV4dD4KPHBhdGggZD0iTTE1MCAyMzVBMTQwIDE0MCAwIDAgMCAyOTAgOTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSI0IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8cGF0aCBkPSJNMTUwIDIzNVY5NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHBhdGggZD0iTTI5MCA5NUgxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyN2Q5MSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9Ijk1IiByPSI1Ii8+PHRleHQgeD0iODUiIHk9Ijc1Ij5DICgxMiwxOCk8L3RleHQ+PHRleHQgeD0iOTAiIHk9IjI2MCI+QSAoMTIsOCk8L3RleHQ+PHRleHQgeD0iMzAwIiB5PSIxMDAiPkIgKDIyLDE4KTwvdGV4dD4KPHRleHQgeD0iNzUiIHk9IjE3MCI+SiArMTA8L3RleHQ+PHRleHQgeD0iMTgwIiB5PSI4MyI+SSDiiJIxMDwvdGV4dD4KPHRleHQgeD0iNDI1IiB5PSIxNTAiPkEg4oaSIEI6IEcwMyAoQ0NXKTwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjE4MCI+SSA9IDAsIEogPSArMTA8L3RleHQ+Cjx0ZXh0IHg9IjQyNSIgeT0iMjI1Ij5CIOKGkiBBOiBHMDIgKENXKTwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjI1NSI+SSA9IOKIkjEwLCBKID0gMDwvdGV4dD4KPHRleHQgeD0iMTAwIiB5PSIzMTUiPlJhZGl1cyAxMCBtbS4gSS9KIG1lYXN1cmVkIGZyb20gZWFjaCBhcmMncyBzdGFydC48L3RleHQ+PC9nPjwvc3ZnPg==" alt="A radius-10 quarter arc from A 12,8 to B 22,18 around C 12,18 uses G03 I0 J10. Reversing from B to A uses G02 I-10 J0."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5RdWFydGVyIGFyYzogRzAzIGZyb20gQSB0byBCLCBHMDIgZnJvbSBCIHRvIEEsIHdpdGggY2VudHJlIG9mZnNldHM8L3RpdGxlPjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMFoiIGZpbGw9IiMxNzM5NTciLz48L21hcmtlcj48L2RlZnM+CjxyZWN0IHdpZHRoPSI3NjAiIGhlaWdodD0iMzQwIiBmaWxsPSIjZmZmIi8+PGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTcyYzQwIj4KPHRleHQgeD0iMzAiIHk9IjMwIiBmb250LXdlaWdodD0iYm9sZCI+RzE3OiBsb29raW5nIGZyb20gK1ogdG93YXJkIHRoZSBYWSBwbGFuZTwvdGV4dD4KPHBhdGggZD0iTTY1IDI3NUgzODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhOGE5NiIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik02NSAyNzVWNTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhOGE5NiIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8dGV4dCB4PSIzODUiIHk9IjI4MCI+K1g8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjU1Ij4rWTwvdGV4dD4KPHBhdGggZD0iTTE1MCAyMzVBMTQwIDE0MCAwIDAgMCAyOTAgOTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSI0IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8cGF0aCBkPSJNMTUwIDIzNVY5NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHBhdGggZD0iTTI5MCA5NUgxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyN2Q5MSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9Ijk1IiByPSI1Ii8+PHRleHQgeD0iODUiIHk9Ijc1Ij5DICgxMiwxOCk8L3RleHQ+PHRleHQgeD0iOTAiIHk9IjI2MCI+QSAoMTIsOCk8L3RleHQ+PHRleHQgeD0iMzAwIiB5PSIxMDAiPkIgKDIyLDE4KTwvdGV4dD4KPHRleHQgeD0iNzUiIHk9IjE3MCI+SiArMTA8L3RleHQ+PHRleHQgeD0iMTgwIiB5PSI4MyI+SSDiiJIxMDwvdGV4dD4KPHRleHQgeD0iNDI1IiB5PSIxNTAiPkEg4oaSIEI6IEcwMyAoQ0NXKTwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjE4MCI+SSA9IDAsIEogPSArMTA8L3RleHQ+Cjx0ZXh0IHg9IjQyNSIgeT0iMjI1Ij5CIOKGkiBBOiBHMDIgKENXKTwvdGV4dD48dGV4dCB4PSI0MjUiIHk9IjI1NSI+SSA9IOKIkjEwLCBKID0gMDwvdGV4dD4KPHRleHQgeD0iMTAwIiB5PSIzMTUiPlJhZGl1cyAxMCBtbS4gSS9KIG1lYXN1cmVkIGZyb20gZWFjaCBhcmMncyBzdGFydC48L3RleHQ+PC9nPjwvc3ZnPg==" alt="A radius-10 quarter arc from A 12,8 to B 22,18 around C 12,18 uses G03 I0 J10. Reversing from B to A uses G02 I-10 J0." data-natural-width="760" data-natural-height="340"></p>
   <p>In the diagram, absolute endpoints and start-relative centres give
   <code>G03 X22 Y18 I0 J10</code> from A to B, then <code>G02 X12 Y8 I-10 J0</code> back to A.
   Each start point needs its own centre offsets. Radius format can instead use
@@ -4308,7 +4335,7 @@ M30</code></pre>
     <div class="body">
       <h2>CAD describes the shape; CAM plans how to cut it</h2>
   <p><strong>CAD</strong> supplies design geometry and drawings. <strong>CAM</strong> uses geometry plus the programmer's stock, tool, workholding, operation and cutting-data choices to calculate toolpaths. Depending on the operation, CAM may work from 2D profiles or a 3D model; a solid model is not always required.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMTg1IiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5DQUQgdG8gQ0FNIHRvIHBvc3QtcHJvY2Vzc29yIHRvIHJldmlld2VkIEctY29kZTwvdGl0bGU+PGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEwWiIgZmlsbD0iIzE3Mzk1NyIvPjwvbWFya2VyPjwvZGVmcz4KPHJlY3Qgd2lkdGg9Ijc2MCIgaGVpZ2h0PSIxODUiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMxNzJjNDAiPgo8ZyBmaWxsPSIjZTJlZGY0IiBzdHJva2U9IiMxNzM5NTciPjxyZWN0IHg9IjE1IiB5PSI0MCIgd2lkdGg9IjE1NSIgaGVpZ2h0PSIxMTAiIHJ4PSI4Ii8+PHJlY3QgeD0iMjA1IiB5PSI0MCIgd2lkdGg9IjE1NSIgaGVpZ2h0PSIxMTAiIHJ4PSI4Ii8+PHJlY3QgeD0iMzk1IiB5PSI0MCIgd2lkdGg9IjE1NSIgaGVpZ2h0PSIxMTAiIHJ4PSI4Ii8+PHJlY3QgeD0iNTg1IiB5PSI0MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxMTAiIHJ4PSI4Ii8+PC9nPgo8cGF0aCBkPSJNMTcwIDk1SDIwMCIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTM2MCA5NUgzOTAiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik01NTAgOTVINTgwIiBzdHJva2U9IiMxNzM5NTciIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHRleHQgeD0iMzIiIHk9IjcwIj5DQUQ8L3RleHQ+PHRleHQgeD0iMzIiIHk9IjEwMCI+R2VvbWV0cnkgYW5kPC90ZXh0Pjx0ZXh0IHg9IjMyIiB5PSIxMjUiPmRpbWVuc2lvbnM8L3RleHQ+Cjx0ZXh0IHg9IjIyMCIgeT0iNzAiPkNBTTwvdGV4dD48dGV4dCB4PSIyMjAiIHk9IjEwMCI+T3BlcmF0aW9ucyw8L3RleHQ+PHRleHQgeD0iMjIwIiB5PSIxMjUiPnRvb2xzLCBwYXRoczwvdGV4dD4KPHRleHQgeD0iNDEwIiB5PSI3MCI+UG9zdC1wcm9jZXNzb3I8L3RleHQ+PHRleHQgeD0iNDEwIiB5PSIxMDAiPk1hY2hpbmUvY29udHJvbDwvdGV4dD48dGV4dCB4PSI0MTAiIHk9IjEyNSI+Y29udmVudGlvbnM8L3RleHQ+Cjx0ZXh0IHg9IjYwMCIgeT0iNzAiPkctY29kZTwvdGV4dD48dGV4dCB4PSI2MDAiIHk9IjEwMCI+UmV2aWV3IGFnYWluc3Q8L3RleHQ+PHRleHQgeD0iNjAwIiB5PSIxMjUiPmFjdHVhbCBzZXR1cDwvdGV4dD48L2c+PC9zdmc+" alt="CAD geometry and dimensions flow to CAM operations and tools, then to a machine-specific post-processor, then to G-code reviewed against the actual setup."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMTg1IiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5DQUQgdG8gQ0FNIHRvIHBvc3QtcHJvY2Vzc29yIHRvIHJldmlld2VkIEctY29kZTwvdGl0bGU+PGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEwWiIgZmlsbD0iIzE3Mzk1NyIvPjwvbWFya2VyPjwvZGVmcz4KPHJlY3Qgd2lkdGg9Ijc2MCIgaGVpZ2h0PSIxODUiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMxNzJjNDAiPgo8ZyBmaWxsPSIjZTJlZGY0IiBzdHJva2U9IiMxNzM5NTciPjxyZWN0IHg9IjE1IiB5PSI0MCIgd2lkdGg9IjE1NSIgaGVpZ2h0PSIxMTAiIHJ4PSI4Ii8+PHJlY3QgeD0iMjA1IiB5PSI0MCIgd2lkdGg9IjE1NSIgaGVpZ2h0PSIxMTAiIHJ4PSI4Ii8+PHJlY3QgeD0iMzk1IiB5PSI0MCIgd2lkdGg9IjE1NSIgaGVpZ2h0PSIxMTAiIHJ4PSI4Ii8+PHJlY3QgeD0iNTg1IiB5PSI0MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxMTAiIHJ4PSI4Ii8+PC9nPgo8cGF0aCBkPSJNMTcwIDk1SDIwMCIgc3Ryb2tlPSIjMTczOTU3IiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTM2MCA5NUgzOTAiIHN0cm9rZT0iIzE3Mzk1NyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxwYXRoIGQ9Ik01NTAgOTVINTgwIiBzdHJva2U9IiMxNzM5NTciIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHRleHQgeD0iMzIiIHk9IjcwIj5DQUQ8L3RleHQ+PHRleHQgeD0iMzIiIHk9IjEwMCI+R2VvbWV0cnkgYW5kPC90ZXh0Pjx0ZXh0IHg9IjMyIiB5PSIxMjUiPmRpbWVuc2lvbnM8L3RleHQ+Cjx0ZXh0IHg9IjIyMCIgeT0iNzAiPkNBTTwvdGV4dD48dGV4dCB4PSIyMjAiIHk9IjEwMCI+T3BlcmF0aW9ucyw8L3RleHQ+PHRleHQgeD0iMjIwIiB5PSIxMjUiPnRvb2xzLCBwYXRoczwvdGV4dD4KPHRleHQgeD0iNDEwIiB5PSI3MCI+UG9zdC1wcm9jZXNzb3I8L3RleHQ+PHRleHQgeD0iNDEwIiB5PSIxMDAiPk1hY2hpbmUvY29udHJvbDwvdGV4dD48dGV4dCB4PSI0MTAiIHk9IjEyNSI+Y29udmVudGlvbnM8L3RleHQ+Cjx0ZXh0IHg9IjYwMCIgeT0iNzAiPkctY29kZTwvdGV4dD48dGV4dCB4PSI2MDAiIHk9IjEwMCI+UmV2aWV3IGFnYWluc3Q8L3RleHQ+PHRleHQgeD0iNjAwIiB5PSIxMjUiPmFjdHVhbCBzZXR1cDwvdGV4dD48L2c+PC9zdmc+" alt="CAD geometry and dimensions flow to CAM operations and tools, then to a machine-specific post-processor, then to G-code reviewed against the actual setup." data-natural-width="760" data-natural-height="185"></p>
   <p>A <strong>post-processor</strong> translates CAM output into the syntax and conventions for a particular machine/control combination. Selecting the wrong post can change tool calls, arc format, offsets or startup behavior. Review the posted code as well as the CAM preview.</p>
   <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Other ways to create a program.</p>
     </div>
@@ -6068,6 +6095,107 @@ M30</code></pre>
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 /* ============================================================================

@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2965,7 +2992,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>A microcontroller reads inputs and controls outputs</h2>
   <p>A <strong>microcontroller</strong> is a small computer on a chip, with a processor, memory and connections to the outside world. Its program can read a switch, decide what that input means, and turn an output on or off. The Arduino Uno is a board that supplies the chip with power connections, a USB interface and accessible pins.</p>
   <p>This topic uses the <strong>classic Uno R3 with an ATmega328P</strong>, operating with 5 V logic. Other Arduino boards, including newer Uno models, can have different converters and electrical limits.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik9yaWdpbmFsIGZ1bmN0aW9uYWwgZ3JvdXBpbmcgb2YgVW5vIFIzIHBpbnMiPjxyZWN0IHdpZHRoPSI3NjAiIGhlaWdodD0iMzUwIiBmaWxsPSIjZmZmIi8+PGcgZmlsbD0iIzEzMmI0OSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTkiPgo8cmVjdCB4PSI3MCIgeT0iNjUiIHdpZHRoPSI2MjAiIGhlaWdodD0iMjIwIiByeD0iMjQiIGZpbGw9IiNlZGY0ZjciIHN0cm9rZT0iIzEzMmI0OSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjMwIiB5PSIxNDAiIHdpZHRoPSI5MCIgaGVpZ2h0PSI2NSIgZmlsbD0iI2RkZCIgc3Ryb2tlPSIjMTMyYjQ5Ii8+PHRleHQgeD0iNDQiIHk9IjE3OCI+VVNCPC90ZXh0Pgo8dGV4dCB4PSIxNDUiIHk9Ijk4Ij5EaWdpdGFsIEkvTzogRDDigJNEMTM8L3RleHQ+CjxyZWN0IHg9IjE0NSIgeT0iMTEwIiB3aWR0aD0iNTA1IiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMTMyYjQ5Ii8+PHRleHQgeD0iMTYwIiB5PSIxMzkiIGZpbGw9IndoaXRlIj5QV00gc3Vic2V0OiAzLCA1LCA2LCA5LCAxMCwgMTE8L3RleHQ+CjxyZWN0IHg9IjI0MCIgeT0iMTc0IiB3aWR0aD0iMjUwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTMyYjQ5Ii8+PHRleHQgeD0iMjYwIiB5PSIyMDMiPkFUbWVnYTMyOFA8L3RleHQ+Cjx0ZXh0IHg9IjE0NSIgeT0iMjUyIj5Qb3dlciAvIEdORDwvdGV4dD48dGV4dCB4PSIzODAiIHk9IjI1MiI+QW5hbG9nIGlucHV0czogQTDigJNBNTwvdGV4dD4KPHRleHQgeD0iNDAiIHk9IjM1Ij5Vbm8gUjMgwrcgZnVuY3Rpb24gZ3JvdXBzLCBub3QgY29ubmVjdG9yIHBvc2l0aW9uczwvdGV4dD4KPHRleHQgeD0iNTUiIHk9IjMyNSI+UFdNIHVzZXMgZGlnaXRhbCBwaW5zOyBBMOKAk0E1IG1lYXN1cmUgYW5hbG9nIGlucHV0cy48L3RleHQ+PC9nPjwvc3ZnPgo=" alt="Simplified Uno R3 outline: digital pins D0 through D13, PWM on D3 D5 D6 D9 D10 D11, and analog inputs A0 through A5."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik9yaWdpbmFsIGZ1bmN0aW9uYWwgZ3JvdXBpbmcgb2YgVW5vIFIzIHBpbnMiPjxyZWN0IHdpZHRoPSI3NjAiIGhlaWdodD0iMzUwIiBmaWxsPSIjZmZmIi8+PGcgZmlsbD0iIzEzMmI0OSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTkiPgo8cmVjdCB4PSI3MCIgeT0iNjUiIHdpZHRoPSI2MjAiIGhlaWdodD0iMjIwIiByeD0iMjQiIGZpbGw9IiNlZGY0ZjciIHN0cm9rZT0iIzEzMmI0OSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjMwIiB5PSIxNDAiIHdpZHRoPSI5MCIgaGVpZ2h0PSI2NSIgZmlsbD0iI2RkZCIgc3Ryb2tlPSIjMTMyYjQ5Ii8+PHRleHQgeD0iNDQiIHk9IjE3OCI+VVNCPC90ZXh0Pgo8dGV4dCB4PSIxNDUiIHk9Ijk4Ij5EaWdpdGFsIEkvTzogRDDigJNEMTM8L3RleHQ+CjxyZWN0IHg9IjE0NSIgeT0iMTEwIiB3aWR0aD0iNTA1IiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMTMyYjQ5Ii8+PHRleHQgeD0iMTYwIiB5PSIxMzkiIGZpbGw9IndoaXRlIj5QV00gc3Vic2V0OiAzLCA1LCA2LCA5LCAxMCwgMTE8L3RleHQ+CjxyZWN0IHg9IjI0MCIgeT0iMTc0IiB3aWR0aD0iMjUwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTMyYjQ5Ii8+PHRleHQgeD0iMjYwIiB5PSIyMDMiPkFUbWVnYTMyOFA8L3RleHQ+Cjx0ZXh0IHg9IjE0NSIgeT0iMjUyIj5Qb3dlciAvIEdORDwvdGV4dD48dGV4dCB4PSIzODAiIHk9IjI1MiI+QW5hbG9nIGlucHV0czogQTDigJNBNTwvdGV4dD4KPHRleHQgeD0iNDAiIHk9IjM1Ij5Vbm8gUjMgwrcgZnVuY3Rpb24gZ3JvdXBzLCBub3QgY29ubmVjdG9yIHBvc2l0aW9uczwvdGV4dD4KPHRleHQgeD0iNTUiIHk9IjMyNSI+UFdNIHVzZXMgZGlnaXRhbCBwaW5zOyBBMOKAk0E1IG1lYXN1cmUgYW5hbG9nIGlucHV0cy48L3RleHQ+PC9nPjwvc3ZnPgo=" alt="Simplified Uno R3 outline: digital pins D0 through D13, PWM on D3 D5 D6 D9 D10 D11, and analog inputs A0 through A5." data-natural-width="760" data-natural-height="350"></p>
   <p>The drawing groups functions; it is not a wiring pinout. Check the labels on the actual board. Start with <a class="xref-page" href="#p-digital-and-analog-signals">Digital and Analog Signals</a>, then <a class="xref-page" href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a> and <a class="xref-page" href="#p-pulse-width-modulation">Pulse-Width Modulation</a>.</p>
     </div>
   </details>
@@ -3004,7 +3031,7 @@ void loop() {
     <div class="body">
       <h2>A button to ground reads LOW when pressed</h2>
   <p>With <code>INPUT_PULLUP</code>, an open switch reads <strong>HIGH</strong>. Closing the switch to ground reads <strong>LOW</strong>. This is called active-low: the action happens when the signal is low.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkJ1dHRvbiB0byBncm91bmQgd2l0aCBpbnRlcm5hbCBwdWxsLXVwIj48cmVjdCB3aWR0aD0iNzYwIiBoZWlnaHQ9IjMzMCIgZmlsbD0iI2ZmZiIvPjxnIGZpbGw9IiMxMzJiNDkiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE5Ij4KPHRleHQgeD0iODAiIHk9IjM1Ij5JbnNpZGUgdGhlIG1pY3JvY29udHJvbGxlcjwvdGV4dD48dGV4dCB4PSI0MDAiIHk9IjM1Ij5FeHRlcm5hbCBidXR0b248L3RleHQ+CjxyZWN0IHg9IjU1IiB5PSI1MCIgd2lkdGg9IjI5MCIgaGVpZ2h0PSIyMDUiIHJ4PSIxMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzg5IiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz4KPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTMyYjQ5IiBzdHJva2Utd2lkdGg9IjMiPjxwYXRoIGQ9Ik0xODAgNzBWOTVNMTgwIDE0NVYxODBINDcwVjE5OE00NzAgMjMzVjI2MCIvPgo8cmVjdCB4PSIxNjYiIHk9Ijk1IiB3aWR0aD0iMjgiIGhlaWdodD0iNTAiLz48cGF0aCBkPSJNNDcwIDE5OEw1MDAgMjI1TTQ1MCAyNjBINDkwTTQ1NiAyNjhINDg0TTQ2MyAyNzZINDc3TTE4MCAxODBWMjI1Ii8+PC9nPgo8Y2lyY2xlIGN4PSIxODAiIGN5PSIxODAiIHI9IjUiLz48Y2lyY2xlIGN4PSI0NzAiIGN5PSIxOTgiIHI9IjQiLz48Y2lyY2xlIGN4PSI0NzAiIGN5PSIyMzMiIHI9IjQiLz4KPHRleHQgeD0iMTk1IiB5PSI4MCI+NSBWPC90ZXh0Pjx0ZXh0IHg9IjIwNSIgeT0iMTI1Ij4yMOKAkzUwIGvOqTwvdGV4dD48dGV4dCB4PSI5MCIgeT0iMjQ1Ij5JbnB1dCBwaW48L3RleHQ+Cjx0ZXh0IHg9IjUyMCIgeT0iMTgwIj5PcGVuIOKGkiBISUdIPC90ZXh0Pjx0ZXh0IHg9IjUyMCIgeT0iMjE0Ij5DbG9zZWQg4oaSIExPVzwvdGV4dD4KPHRleHQgeD0iNDA1IiB5PSIzMDciPkdORDwvdGV4dD48L2c+PC9zdmc+Cg==" alt="Internal pull-up resistor from 5 V to the input node, with a normally open button from that node to ground. Open gives HIGH; closed gives LOW."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkJ1dHRvbiB0byBncm91bmQgd2l0aCBpbnRlcm5hbCBwdWxsLXVwIj48cmVjdCB3aWR0aD0iNzYwIiBoZWlnaHQ9IjMzMCIgZmlsbD0iI2ZmZiIvPjxnIGZpbGw9IiMxMzJiNDkiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE5Ij4KPHRleHQgeD0iODAiIHk9IjM1Ij5JbnNpZGUgdGhlIG1pY3JvY29udHJvbGxlcjwvdGV4dD48dGV4dCB4PSI0MDAiIHk9IjM1Ij5FeHRlcm5hbCBidXR0b248L3RleHQ+CjxyZWN0IHg9IjU1IiB5PSI1MCIgd2lkdGg9IjI5MCIgaGVpZ2h0PSIyMDUiIHJ4PSIxMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzg5IiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz4KPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTMyYjQ5IiBzdHJva2Utd2lkdGg9IjMiPjxwYXRoIGQ9Ik0xODAgNzBWOTVNMTgwIDE0NVYxODBINDcwVjE5OE00NzAgMjMzVjI2MCIvPgo8cmVjdCB4PSIxNjYiIHk9Ijk1IiB3aWR0aD0iMjgiIGhlaWdodD0iNTAiLz48cGF0aCBkPSJNNDcwIDE5OEw1MDAgMjI1TTQ1MCAyNjBINDkwTTQ1NiAyNjhINDg0TTQ2MyAyNzZINDc3TTE4MCAxODBWMjI1Ii8+PC9nPgo8Y2lyY2xlIGN4PSIxODAiIGN5PSIxODAiIHI9IjUiLz48Y2lyY2xlIGN4PSI0NzAiIGN5PSIxOTgiIHI9IjQiLz48Y2lyY2xlIGN4PSI0NzAiIGN5PSIyMzMiIHI9IjQiLz4KPHRleHQgeD0iMTk1IiB5PSI4MCI+NSBWPC90ZXh0Pjx0ZXh0IHg9IjIwNSIgeT0iMTI1Ij4yMOKAkzUwIGvOqTwvdGV4dD48dGV4dCB4PSI5MCIgeT0iMjQ1Ij5JbnB1dCBwaW48L3RleHQ+Cjx0ZXh0IHg9IjUyMCIgeT0iMTgwIj5PcGVuIOKGkiBISUdIPC90ZXh0Pjx0ZXh0IHg9IjUyMCIgeT0iMjE0Ij5DbG9zZWQg4oaSIExPVzwvdGV4dD4KPHRleHQgeD0iNDA1IiB5PSIzMDciPkdORDwvdGV4dD48L2c+PC9zdmc+Cg==" alt="Internal pull-up resistor from 5 V to the input node, with a normally open button from that node to ground. Open gives HIGH; closed gives LOW." data-natural-width="760" data-natural-height="330"></p>
   <pre><code>void setup() {
   pinMode(2, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -3045,7 +3072,7 @@ void loop() {
       <h2>Digital uses two states; analog uses a range</h2>
   <p>A <strong>digital</strong> input interprets two states: LOW/HIGH, or 0/1. The wire still carries a physical voltage; the receiving circuit decides which logic state it represents. A voltage in the undefined region between valid LOW and HIGH levels is not a useful third state.</p>
   <p>An <strong>analog</strong> signal represents a quantity by a continuous range of values. A potentiometer wired between ground and 5 V can provide a changing voltage at its middle terminal. On a classic Uno R3, the usual analog measurement range is nominally 0–5 V with the default reference. That is not a universal sensor range.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkRpZ2l0YWwgYW5kIGFuYWxvZyB2b2x0YWdlIHZlcnN1cyB0aW1lIj48cmVjdCB3aWR0aD0iNzYwIiBoZWlnaHQ9IjMzMCIgZmlsbD0iI2ZmZiIvPjxnIGZpbGw9IiMxMzJiNDkiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE5Ij4KPHRleHQgeD0iMzAiIHk9IjMwIj5EaWdpdGFsOiB0d28gaW50ZXJwcmV0ZWQgc3RhdGVzPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIxNzUiPkFuYWxvZzogYSBjb250aW51b3VzIHJhbmdlPC90ZXh0Pgo8ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxMzJiNDkiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTEwMCA0MFYxMzBINzAwTTEwMCAxOTBWMjgwSDcwMCIvPjwvZz4KPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTY1ZDhiIiBzdHJva2Utd2lkdGg9IjQiPjxwYXRoIGQ9Ik0xMDAgMTIwSDE3MFY1NUgyNjBWMTIwSDQwMFY1NUg1MTBWMTIwSDY5MCIvPgo8cGF0aCBkPSJNMTAwIDI2MEMxODAgMjYwIDE4MCAxOTUgMjYwIDIwNVMzNzAgMjc1IDQ1MCAyNDBTNTcwIDE5NSA2OTAgMjMwIi8+PC9nPgo8dGV4dCB4PSIyNSIgeT0iNjIiPkhJR0g8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjEyNCI+TE9XPC90ZXh0Pjx0ZXh0IHg9IjYyMCIgeT0iMTU1Ij5UaW1lIOKGkjwvdGV4dD4KPHRleHQgeD0iMTAiIHk9IjIxNSI+Vm9sdGFnZTwvdGV4dD48dGV4dCB4PSI2MjAiIHk9IjMxMCI+VGltZSDihpI8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="Digital waveform switches between LOW and HIGH; analog waveform changes smoothly through intermediate voltages. Both are plotted against time."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkRpZ2l0YWwgYW5kIGFuYWxvZyB2b2x0YWdlIHZlcnN1cyB0aW1lIj48cmVjdCB3aWR0aD0iNzYwIiBoZWlnaHQ9IjMzMCIgZmlsbD0iI2ZmZiIvPjxnIGZpbGw9IiMxMzJiNDkiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE5Ij4KPHRleHQgeD0iMzAiIHk9IjMwIj5EaWdpdGFsOiB0d28gaW50ZXJwcmV0ZWQgc3RhdGVzPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIxNzUiPkFuYWxvZzogYSBjb250aW51b3VzIHJhbmdlPC90ZXh0Pgo8ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxMzJiNDkiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTEwMCA0MFYxMzBINzAwTTEwMCAxOTBWMjgwSDcwMCIvPjwvZz4KPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTY1ZDhiIiBzdHJva2Utd2lkdGg9IjQiPjxwYXRoIGQ9Ik0xMDAgMTIwSDE3MFY1NUgyNjBWMTIwSDQwMFY1NUg1MTBWMTIwSDY5MCIvPgo8cGF0aCBkPSJNMTAwIDI2MEMxODAgMjYwIDE4MCAxOTUgMjYwIDIwNVMzNzAgMjc1IDQ1MCAyNDBTNTcwIDE5NSA2OTAgMjMwIi8+PC9nPgo8dGV4dCB4PSIyNSIgeT0iNjIiPkhJR0g8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjEyNCI+TE9XPC90ZXh0Pjx0ZXh0IHg9IjYyMCIgeT0iMTU1Ij5UaW1lIOKGkjwvdGV4dD4KPHRleHQgeD0iMTAiIHk9IjIxNSI+Vm9sdGFnZTwvdGV4dD48dGV4dCB4PSI2MjAiIHk9IjMxMCI+VGltZSDihpI8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="Digital waveform switches between LOW and HIGH; analog waveform changes smoothly through intermediate voltages. Both are plotted against time." data-natural-width="760" data-natural-height="330"></p>
     </div>
   </details>
   <details class="xcard deck-slide" id="digital-and-analog-signals--classify-the-sensor-s-output-circuit-not-just-its-name" data-card="digital-and-analog-signals--classify-the-sensor-s-output-circuit-not-just-its-name">
@@ -3131,7 +3158,7 @@ void loop() {
       <h2>Duty cycle is the fraction of each cycle spent HIGH</h2>
   <p><strong>Pulse-width modulation (PWM)</strong> repeats a rectangular waveform. The period T is the time for one cycle; frequency f is cycles per second. Duty cycle D is the fraction of the period spent HIGH.</p>
   <p><code>T = 1/f</code>, <code>t<sub>on</sub> = D × T</code>, and for ideal switching between 0 V and a supply V<sub>s</sub>, <code>V<sub>average</sub> = D × V<sub>s</sub></code>. Convert a percentage to a fraction: 25% means D = 0.25.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzg1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlBXTSBkdXR5IGN5Y2xlcyBvZiAyNSwgNTAgYW5kIDc1IHBlcmNlbnQiPjxyZWN0IHdpZHRoPSI3NjAiIGhlaWdodD0iMzg1IiBmaWxsPSIjZmZmIi8+PGcgZmlsbD0iIzEzMmI0OSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTkiPjx0ZXh0IHg9IjI1IiB5PSIzMCI+U2FtZSBwZXJpb2QsIGluY3JlYXNpbmcgSElHSCB0aW1lIMK3IGlkZWFsIDDigJM1IFY8L3RleHQ+PHRleHQgeD0iMTUiIHk9Ijg1Ij4yNSU8L3RleHQ+PHRleHQgeD0iODUiIHk9IjY1Ij41IFY8L3RleHQ+PHRleHQgeD0iODUiIHk9IjEyMCI+MCBWPC90ZXh0PjxwYXRoIGQ9Ik0xNDAgNjAgSDE4NS4wIFYxMTUgSDMyMCBWNjAgSDM2NS4wIFYxMTUgSDUwMCBWNjAgSDU0NS4wIFYxMTUgSDY4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTY1ZDhiIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSIxNSIgeT0iMTgwIj41MCU8L3RleHQ+PHRleHQgeD0iODUiIHk9IjE2MCI+NSBWPC90ZXh0Pjx0ZXh0IHg9Ijg1IiB5PSIyMTUiPjAgVjwvdGV4dD48cGF0aCBkPSJNMTQwIDE1NSBIMjMwLjAgVjIxMCBIMzIwIFYxNTUgSDQxMC4wIFYyMTAgSDUwMCBWMTU1IEg1OTAuMCBWMjEwIEg2ODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2NWQ4YiIgc3Ryb2tlLXdpZHRoPSIzIi8+PHRleHQgeD0iMTUiIHk9IjI3NSI+NzUlPC90ZXh0Pjx0ZXh0IHg9Ijg1IiB5PSIyNTUiPjUgVjwvdGV4dD48dGV4dCB4PSI4NSIgeT0iMzEwIj4wIFY8L3RleHQ+PHBhdGggZD0iTTE0MCAyNTAgSDI3NS4wIFYzMDUgSDMyMCBWMjUwIEg0NTUuMCBWMzA1IEg1MDAgVjI1MCBINjM1LjAgVjMwNSBINjgwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNjVkOGIiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjE0MCIgeT0iMzYwIj4wPC90ZXh0Pjx0ZXh0IHg9IjMxMCIgeT0iMzYwIj5UPC90ZXh0Pjx0ZXh0IHg9IjQ4NSIgeT0iMzYwIj4yVDwvdGV4dD48dGV4dCB4PSI2NjUiIHk9IjM2MCI+M1Q8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="Three PWM waveforms with equal periods and duty cycles of 25, 50 and 75 percent. The HIGH time increases while the period stays fixed."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzg1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlBXTSBkdXR5IGN5Y2xlcyBvZiAyNSwgNTAgYW5kIDc1IHBlcmNlbnQiPjxyZWN0IHdpZHRoPSI3NjAiIGhlaWdodD0iMzg1IiBmaWxsPSIjZmZmIi8+PGcgZmlsbD0iIzEzMmI0OSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTkiPjx0ZXh0IHg9IjI1IiB5PSIzMCI+U2FtZSBwZXJpb2QsIGluY3JlYXNpbmcgSElHSCB0aW1lIMK3IGlkZWFsIDDigJM1IFY8L3RleHQ+PHRleHQgeD0iMTUiIHk9Ijg1Ij4yNSU8L3RleHQ+PHRleHQgeD0iODUiIHk9IjY1Ij41IFY8L3RleHQ+PHRleHQgeD0iODUiIHk9IjEyMCI+MCBWPC90ZXh0PjxwYXRoIGQ9Ik0xNDAgNjAgSDE4NS4wIFYxMTUgSDMyMCBWNjAgSDM2NS4wIFYxMTUgSDUwMCBWNjAgSDU0NS4wIFYxMTUgSDY4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTY1ZDhiIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSIxNSIgeT0iMTgwIj41MCU8L3RleHQ+PHRleHQgeD0iODUiIHk9IjE2MCI+NSBWPC90ZXh0Pjx0ZXh0IHg9Ijg1IiB5PSIyMTUiPjAgVjwvdGV4dD48cGF0aCBkPSJNMTQwIDE1NSBIMjMwLjAgVjIxMCBIMzIwIFYxNTUgSDQxMC4wIFYyMTAgSDUwMCBWMTU1IEg1OTAuMCBWMjEwIEg2ODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2NWQ4YiIgc3Ryb2tlLXdpZHRoPSIzIi8+PHRleHQgeD0iMTUiIHk9IjI3NSI+NzUlPC90ZXh0Pjx0ZXh0IHg9Ijg1IiB5PSIyNTUiPjUgVjwvdGV4dD48dGV4dCB4PSI4NSIgeT0iMzEwIj4wIFY8L3RleHQ+PHBhdGggZD0iTTE0MCAyNTAgSDI3NS4wIFYzMDUgSDMyMCBWMjUwIEg0NTUuMCBWMzA1IEg1MDAgVjI1MCBINjM1LjAgVjMwNSBINjgwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNjVkOGIiIHN0cm9rZS13aWR0aD0iMyIvPjx0ZXh0IHg9IjE0MCIgeT0iMzYwIj4wPC90ZXh0Pjx0ZXh0IHg9IjMxMCIgeT0iMzYwIj5UPC90ZXh0Pjx0ZXh0IHg9IjQ4NSIgeT0iMzYwIj4yVDwvdGV4dD48dGV4dCB4PSI2NjUiIHk9IjM2MCI+M1Q8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="Three PWM waveforms with equal periods and duty cycles of 25, 50 and 75 percent. The HIGH time increases while the period stays fixed." data-natural-width="760" data-natural-height="385"></p>
   <p>At 500 Hz, T = 0.002 s = 2 ms = 2000 µs. At 25% duty, the on-time is 500 µs and the average of a 0–5 V output is 1.25 V. The pin itself still switches between 0 and 5 V.</p>
     </div>
   </details>
@@ -4905,6 +4932,107 @@ void loop() {
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 (function (root) {

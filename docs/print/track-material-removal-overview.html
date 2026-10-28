@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2942,7 +2969,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Start with what removes the material</h2>
   <p>A machine tool controls motion between a tool and the workpiece, the part being made. In material removal, the final shape is what remains after unwanted material is taken away.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5NYXRlcmlhbC1yZW1vdmFsIHByb2Nlc3MgZmFtaWx5IHRyZWU8L3RpdGxlPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9Ijk0MCIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzYiIGZpbGw9IiMwMDIxNDQiPgo8cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSI3NjAiIGhlaWdodD0iNzAiIHJ4PSIxMiIgZmlsbD0iIzAwMjE0NCIvPgo8dGV4dCB4PSI0MDAiIHk9IjY3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+TWF0ZXJpYWwgcmVtb3ZhbDwvdGV4dD4KPHBhdGggZD0iTTYwIDkwVjgwNU02MCAxNTVIMTEwTTYwIDM2NUgxMTBNNjAgNTU1SDExMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjUiLz4KPHJlY3QgeD0iMTEwIiB5PSIxMTUiIHdpZHRoPSI2NzAiIGhlaWdodD0iMTk1IiByeD0iMTIiIGZpbGw9IiNlNmYzZmEiLz4KPHRleHQgeD0iMTMwIiB5PSIxNjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5EZWZpbmVkIGN1dHRpbmcgZWRnZXM8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iMjA3Ij5UdXJuaW5nIMK3IG1pbGxpbmcgwrcgZHJpbGxpbmc8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iMjUxIj5TYXdpbmcgwrcgYnJvYWNoaW5nPC90ZXh0Pgo8dGV4dCB4PSIxMzAiIHk9IjI5NSI+U2hhcGluZyDCtyBwbGFuaW5nPC90ZXh0Pgo8cmVjdCB4PSIxMTAiIHk9IjMzMCIgd2lkdGg9IjY3MCIgaGVpZ2h0PSIxNDAiIHJ4PSIxMiIgZmlsbD0iI2ZmZjFjYyIvPgo8dGV4dCB4PSIxMzAiIHk9IjM3NSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFicmFzaXZlIGdyYWluczwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI0MjUiPkdyaW5kaW5nIMK3IGhvbmluZyDCtyBsYXBwaW5nPC90ZXh0Pgo8cmVjdCB4PSIxMTAiIHk9IjUwNSIgd2lkdGg9IjY3MCIgaGVpZ2h0PSIzNTUiIHJ4PSIxMiIgZmlsbD0iI2U2ZjNmYSIvPgo8dGV4dCB4PSIxMzAiIHk9IjU1MCIgZm9udC13ZWlnaHQ9ImJvbGQiPk5vbnRyYWRpdGlvbmFsIGVuZXJneTwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI2MDAiPlRoZXJtYWw6IEVETSDCtyBsYXNlciDCtyBwbGFzbWE8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iNjUwIj5FbGVjdHJvY2hlbWljYWw6IEVDTTwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI3MDAiPkNoZW1pY2FsOiBtaWxsaW5nIC8gZXRjaGluZzwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI3NTAiPk1lY2hhbmljYWw6IHdhdGVyamV0PC90ZXh0Pgo8dGV4dCB4PSIxMzAiIHk9IjgwMCI+YW5kIHVsdHJhc29uaWMgaW1wYWN0PC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iOTEwIj5DTkMgY29udHJvbHMgbW90aW9uIGFjcm9zcyB0aGVzZSBmYW1pbGllcy48L3RleHQ+PC9nPjwvc3ZnPg==" alt="Material removal branches into chip-forming tools, abrasive grains, and nontraditional energy sources."></p><figcaption>This is a teaching map of removal mechanisms. Abrasives also make small chips; the branches distinguish the kind of tool or energy doing the work.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5NYXRlcmlhbC1yZW1vdmFsIHByb2Nlc3MgZmFtaWx5IHRyZWU8L3RpdGxlPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9Ijk0MCIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzYiIGZpbGw9IiMwMDIxNDQiPgo8cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSI3NjAiIGhlaWdodD0iNzAiIHJ4PSIxMiIgZmlsbD0iIzAwMjE0NCIvPgo8dGV4dCB4PSI0MDAiIHk9IjY3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+TWF0ZXJpYWwgcmVtb3ZhbDwvdGV4dD4KPHBhdGggZD0iTTYwIDkwVjgwNU02MCAxNTVIMTEwTTYwIDM2NUgxMTBNNjAgNTU1SDExMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjUiLz4KPHJlY3QgeD0iMTEwIiB5PSIxMTUiIHdpZHRoPSI2NzAiIGhlaWdodD0iMTk1IiByeD0iMTIiIGZpbGw9IiNlNmYzZmEiLz4KPHRleHQgeD0iMTMwIiB5PSIxNjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5EZWZpbmVkIGN1dHRpbmcgZWRnZXM8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iMjA3Ij5UdXJuaW5nIMK3IG1pbGxpbmcgwrcgZHJpbGxpbmc8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iMjUxIj5TYXdpbmcgwrcgYnJvYWNoaW5nPC90ZXh0Pgo8dGV4dCB4PSIxMzAiIHk9IjI5NSI+U2hhcGluZyDCtyBwbGFuaW5nPC90ZXh0Pgo8cmVjdCB4PSIxMTAiIHk9IjMzMCIgd2lkdGg9IjY3MCIgaGVpZ2h0PSIxNDAiIHJ4PSIxMiIgZmlsbD0iI2ZmZjFjYyIvPgo8dGV4dCB4PSIxMzAiIHk9IjM3NSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFicmFzaXZlIGdyYWluczwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI0MjUiPkdyaW5kaW5nIMK3IGhvbmluZyDCtyBsYXBwaW5nPC90ZXh0Pgo8cmVjdCB4PSIxMTAiIHk9IjUwNSIgd2lkdGg9IjY3MCIgaGVpZ2h0PSIzNTUiIHJ4PSIxMiIgZmlsbD0iI2U2ZjNmYSIvPgo8dGV4dCB4PSIxMzAiIHk9IjU1MCIgZm9udC13ZWlnaHQ9ImJvbGQiPk5vbnRyYWRpdGlvbmFsIGVuZXJneTwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI2MDAiPlRoZXJtYWw6IEVETSDCtyBsYXNlciDCtyBwbGFzbWE8L3RleHQ+Cjx0ZXh0IHg9IjEzMCIgeT0iNjUwIj5FbGVjdHJvY2hlbWljYWw6IEVDTTwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI3MDAiPkNoZW1pY2FsOiBtaWxsaW5nIC8gZXRjaGluZzwvdGV4dD4KPHRleHQgeD0iMTMwIiB5PSI3NTAiPk1lY2hhbmljYWw6IHdhdGVyamV0PC90ZXh0Pgo8dGV4dCB4PSIxMzAiIHk9IjgwMCI+YW5kIHVsdHJhc29uaWMgaW1wYWN0PC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iOTEwIj5DTkMgY29udHJvbHMgbW90aW9uIGFjcm9zcyB0aGVzZSBmYW1pbGllcy48L3RleHQ+PC9nPjwvc3ZnPg==" alt="Material removal branches into chip-forming tools, abrasive grains, and nontraditional energy sources." data-natural-width="800" data-natural-height="940"></p><figcaption>This is a teaching map of removal mechanisms. Abrasives also make small chips; the branches distinguish the kind of tool or energy doing the work.</figcaption></figure>
   <p><strong>CNC is a control method, not a removal family.</strong> Computer numerical control can guide a mill, lathe, grinder, EDM machine or cutting jet. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/gcode-and-toolpaths.html" target="_blank" rel="noopener">G-code and Toolpaths</a>. Forming moves material without removing it; see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/materials-and-processes/manufacturing-process-categories.html" target="_blank" rel="noopener">Manufacturing Process Categories</a> for the wider manufacturing map.</p>
     </div>
   </details>
@@ -4646,6 +4673,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2954,7 +2981,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Give hole locations from named reference edges</h2>
   <p>The original DL-01 display plate below illustrates a shop drawing. Its two suspension holes must stay at the intended locations; length and width mainly establish the display area. These are invented teaching limits, not a general specification for plywood or hanging hardware.</p>
   <figure>
-    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNTIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkRpc3BsYXkgbGFiZWwgcGxhdGUgREwtMDEsIHJldmlzaW9uIEE8L3RpdGxlPgo8ZGVzYyBpZD0iZGVzYyI+RnJvbnQgdmlldzogbGVuZ3RoIDEwMCwgd2lkdGggNDAsIHR3byBkaWFtZXRlciA0LjUgdGhyb3VnaCBob2xlcyBhdCB4IDE1IGFuZCA4NSBmcm9tIGxlZnQgZWRnZSBMLCB5IDIwIGZyb20gYm90dG9tIGVkZ2UgQi4gU2lkZSB2aWV3OiB0aGlja25lc3MgNi4gQWxsIGRpbWVuc2lvbnMgaW4gbWlsbGltZXRlcnM7IGNyaXRpY2FsIGRpbWVuc2lvbnMgbWFya2VkIEMuIERyYXdpbmcgbGltaXRzIGFwcGVhciBpbiB0aGUgYWNjb21wYW55aW5nIHRhYmxlLjwvZGVzYz4KPGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYiIG1hcmtlckhlaWdodD0iNiIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEwWiIgZmlsbD0iIzI0Mzc0NiIvPjwvbWFya2VyPjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1MjAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTcyYjNhIiBmb250LXNpemU9IjE4Ij4KPHRleHQgeD0iMzAiIHk9IjM0IiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+REwtMDEg4oCUIGRpc3BsYXkgbGFiZWwgcGxhdGUg4oCUIHJldmlzaW9uIEE8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI2MiI+QWxsIGRpbWVuc2lvbnMgbW0g4oCiIGJpcmNoIHBseXdvb2Qg4oCiIG5vIGNvYXRpbmc8L3RleHQ+CjxwYXRoIGQ9Ik0xNTAgMTYwSDU1MFYzMjBIMTUwWiIgZmlsbD0iI2Y4ZWZkNiIgc3Ryb2tlPSIjMjQzNzQ2IiBzdHJva2Utd2lkdGg9IjMiLz4KPGcgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMjQzNzQ2IiBzdHJva2Utd2lkdGg9IjIiPjxjaXJjbGUgY3g9IjIxMCIgY3k9IjI0MCIgcj0iOSIvPjxjaXJjbGUgY3g9IjQ5MCIgY3k9IjI0MCIgcj0iOSIvPjxyZWN0IHg9Ijc5NSIgeT0iMTYwIiB3aWR0aD0iMjQiIGhlaWdodD0iMTYwIi8+PC9nPgo8ZyBzdHJva2U9IiM1MjZhN2EiIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtZGFzaGFycmF5PSI3IDQiPjxwYXRoIGQ9Ik0xODggMjQwSDIzMk0yMTAgMjE4VjI2Mk00NjggMjQwSDUxMk00OTAgMjE4VjI2MiIvPjwvZz4KPGcgc3Ryb2tlPSIjNTI2YTdhIiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTE1MCAxNTVWMTA1TTU1MCAxNTVWMTA1TTE0NSAxNjBINzBNMTQ1IDMyMEg3ME0xNTAgMzI1VjQyNU0yMTAgMjY1VjM2NU00OTAgMjY1VjQyNU01NTUgMjQwSDYxNU01NTUgMzIwSDYxNU03OTUgMzI1VjM3ME04MTkgMzI1VjM3MCIvPjwvZz4KPGcgc3Ryb2tlPSIjMjQzNzQ2IiBzdHJva2Utd2lkdGg9IjEuNCIgbWFya2VyLXN0YXJ0PSJ1cmwoI2Fycm93KSIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0xNTAgMTIwSDU1ME04NSAxNjBWMzIwTTE1MCAzNTBIMjEwTTE1MCA0MTBINDkwTTYwMCAyNDBWMzIwTTc5NSAzNTVIODE5Ii8+PC9nPgo8dGV4dCB4PSIzMTAiIHk9IjExMCI+MTAwIMKxMTwvdGV4dD48dGV4dCB4PSI1MCIgeT0iMjcwIiB0cmFuc2Zvcm09InJvdGF0ZSgtOTAgNTAgMjcwKSI+NDAgwrExPC90ZXh0Pgo8dGV4dCB4PSIxNjAiIHk9IjM4MCI+QzogMTUgwrEwLjU8L3RleHQ+PHRleHQgeD0iMjc1IiB5PSI0NDAiPkM6IDg1IMKxMC41PC90ZXh0Pgo8dGV4dCB4PSI2MjAiIHk9IjI3MCI+QzogMjAgwrEwLjU8L3RleHQ+PHRleHQgeD0iNjIwIiB5PSIyOTQiPmJvdGggaG9sZXM8L3RleHQ+Cjx0ZXh0IHg9Ijc2OCIgeT0iMzkwIj42IMKxMC41PC90ZXh0Pjx0ZXh0IHg9Ijc4OCIgeT0iMTQwIj5TaWRlPC90ZXh0Pgo8cGF0aCBkPSJNNDk2IDIzM0w1NzAgODhINjUwIiBzdHJva2U9IiMyNDM3NDYiIGZpbGw9Im5vbmUiLz4KPHRleHQgeD0iMzg1IiB5PSI4NSI+QzogMiDDlyDDmDQuNSDCsTAuMiBUSFJPVUdIPC90ZXh0Pgo8dGV4dCB4PSIxMTgiIHk9IjMwNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkw8L3RleHQ+PHRleHQgeD0iMzY1IiB5PSIzNDUiIGZvbnQtd2VpZ2h0PSJib2xkIj5CPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iNDgwIj5DID0gY3JpdGljYWwgZm9yIHRoaXMgZXhhbXBsZS4gTCA9IGxlZnQgcmVmZXJlbmNlOyBCID0gYm90dG9tIHJlZmVyZW5jZS48L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1MDYiPlJlYWQgdGhlIHJlcXVpcmVtZW50IHRhYmxlOyBkbyBub3QgbWVhc3VyZSB0aGlzIHBpY3R1cmUuPC90ZXh0Pgo8L2c+PC9zdmc+Cg==" alt="DL-01 revision A. Front view of a 100 by 40 mm plate with two through holes. From left edge L, centers are at 15 and 85 mm; both are 20 mm from bottom edge B. Hole diameter is 4.5 mm. Side view shows 6 mm thickness. Critical hole dimensions are marked C; all limits are in the table."></p>
+    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNTIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkRpc3BsYXkgbGFiZWwgcGxhdGUgREwtMDEsIHJldmlzaW9uIEE8L3RpdGxlPgo8ZGVzYyBpZD0iZGVzYyI+RnJvbnQgdmlldzogbGVuZ3RoIDEwMCwgd2lkdGggNDAsIHR3byBkaWFtZXRlciA0LjUgdGhyb3VnaCBob2xlcyBhdCB4IDE1IGFuZCA4NSBmcm9tIGxlZnQgZWRnZSBMLCB5IDIwIGZyb20gYm90dG9tIGVkZ2UgQi4gU2lkZSB2aWV3OiB0aGlja25lc3MgNi4gQWxsIGRpbWVuc2lvbnMgaW4gbWlsbGltZXRlcnM7IGNyaXRpY2FsIGRpbWVuc2lvbnMgbWFya2VkIEMuIERyYXdpbmcgbGltaXRzIGFwcGVhciBpbiB0aGUgYWNjb21wYW55aW5nIHRhYmxlLjwvZGVzYz4KPGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYiIG1hcmtlckhlaWdodD0iNiIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEwWiIgZmlsbD0iIzI0Mzc0NiIvPjwvbWFya2VyPjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1MjAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTcyYjNhIiBmb250LXNpemU9IjE4Ij4KPHRleHQgeD0iMzAiIHk9IjM0IiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCI+REwtMDEg4oCUIGRpc3BsYXkgbGFiZWwgcGxhdGUg4oCUIHJldmlzaW9uIEE8L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI2MiI+QWxsIGRpbWVuc2lvbnMgbW0g4oCiIGJpcmNoIHBseXdvb2Qg4oCiIG5vIGNvYXRpbmc8L3RleHQ+CjxwYXRoIGQ9Ik0xNTAgMTYwSDU1MFYzMjBIMTUwWiIgZmlsbD0iI2Y4ZWZkNiIgc3Ryb2tlPSIjMjQzNzQ2IiBzdHJva2Utd2lkdGg9IjMiLz4KPGcgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMjQzNzQ2IiBzdHJva2Utd2lkdGg9IjIiPjxjaXJjbGUgY3g9IjIxMCIgY3k9IjI0MCIgcj0iOSIvPjxjaXJjbGUgY3g9IjQ5MCIgY3k9IjI0MCIgcj0iOSIvPjxyZWN0IHg9Ijc5NSIgeT0iMTYwIiB3aWR0aD0iMjQiIGhlaWdodD0iMTYwIi8+PC9nPgo8ZyBzdHJva2U9IiM1MjZhN2EiIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtZGFzaGFycmF5PSI3IDQiPjxwYXRoIGQ9Ik0xODggMjQwSDIzMk0yMTAgMjE4VjI2Mk00NjggMjQwSDUxMk00OTAgMjE4VjI2MiIvPjwvZz4KPGcgc3Ryb2tlPSIjNTI2YTdhIiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTE1MCAxNTVWMTA1TTU1MCAxNTVWMTA1TTE0NSAxNjBINzBNMTQ1IDMyMEg3ME0xNTAgMzI1VjQyNU0yMTAgMjY1VjM2NU00OTAgMjY1VjQyNU01NTUgMjQwSDYxNU01NTUgMzIwSDYxNU03OTUgMzI1VjM3ME04MTkgMzI1VjM3MCIvPjwvZz4KPGcgc3Ryb2tlPSIjMjQzNzQ2IiBzdHJva2Utd2lkdGg9IjEuNCIgbWFya2VyLXN0YXJ0PSJ1cmwoI2Fycm93KSIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0xNTAgMTIwSDU1ME04NSAxNjBWMzIwTTE1MCAzNTBIMjEwTTE1MCA0MTBINDkwTTYwMCAyNDBWMzIwTTc5NSAzNTVIODE5Ii8+PC9nPgo8dGV4dCB4PSIzMTAiIHk9IjExMCI+MTAwIMKxMTwvdGV4dD48dGV4dCB4PSI1MCIgeT0iMjcwIiB0cmFuc2Zvcm09InJvdGF0ZSgtOTAgNTAgMjcwKSI+NDAgwrExPC90ZXh0Pgo8dGV4dCB4PSIxNjAiIHk9IjM4MCI+QzogMTUgwrEwLjU8L3RleHQ+PHRleHQgeD0iMjc1IiB5PSI0NDAiPkM6IDg1IMKxMC41PC90ZXh0Pgo8dGV4dCB4PSI2MjAiIHk9IjI3MCI+QzogMjAgwrEwLjU8L3RleHQ+PHRleHQgeD0iNjIwIiB5PSIyOTQiPmJvdGggaG9sZXM8L3RleHQ+Cjx0ZXh0IHg9Ijc2OCIgeT0iMzkwIj42IMKxMC41PC90ZXh0Pjx0ZXh0IHg9Ijc4OCIgeT0iMTQwIj5TaWRlPC90ZXh0Pgo8cGF0aCBkPSJNNDk2IDIzM0w1NzAgODhINjUwIiBzdHJva2U9IiMyNDM3NDYiIGZpbGw9Im5vbmUiLz4KPHRleHQgeD0iMzg1IiB5PSI4NSI+QzogMiDDlyDDmDQuNSDCsTAuMiBUSFJPVUdIPC90ZXh0Pgo8dGV4dCB4PSIxMTgiIHk9IjMwNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkw8L3RleHQ+PHRleHQgeD0iMzY1IiB5PSIzNDUiIGZvbnQtd2VpZ2h0PSJib2xkIj5CPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iNDgwIj5DID0gY3JpdGljYWwgZm9yIHRoaXMgZXhhbXBsZS4gTCA9IGxlZnQgcmVmZXJlbmNlOyBCID0gYm90dG9tIHJlZmVyZW5jZS48L3RleHQ+Cjx0ZXh0IHg9IjMwIiB5PSI1MDYiPlJlYWQgdGhlIHJlcXVpcmVtZW50IHRhYmxlOyBkbyBub3QgbWVhc3VyZSB0aGlzIHBpY3R1cmUuPC90ZXh0Pgo8L2c+PC9zdmc+Cg==" alt="DL-01 revision A. Front view of a 100 by 40 mm plate with two through holes. From left edge L, centers are at 15 and 85 mm; both are 20 mm from bottom edge B. Hole diameter is 4.5 mm. Side view shows 6 mm thickness. Critical hole dimensions are marked C; all limits are in the table." data-natural-width="900" data-natural-height="520"></p>
     <figcaption>All dimensions in mm. Not to scale for measurement. L and B are plain-language reference labels, not formal geometric-tolerancing datum symbols. C marks the dimensions selected as critical for this example.</figcaption>
   </figure>
   <div class="unit-table-wrap" role="region" aria-label="Documentation table; scroll horizontally if needed" tabindex="0"><table class="unit-table">
@@ -3089,7 +3116,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Establish reference surfaces before locating features</h2>
   <p>Choose the order around what each later step needs. Make a straight, square reference edge before measuring hole locations from it. Make features while there is enough material to support and hold the work. Inspect a feature before the next step hides it.</p>
   <figure>
-    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgNDYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPk9wZXJhdGlvbiBzZXF1ZW5jaW5nIGZvbGxvd3MgZGVwZW5kZW5jaWVzPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+RXN0YWJsaXNoIHJlZmVyZW5jZSBmYWNlcyBhbmQgZWRnZXMuIExvY2F0ZSBhbmQgbWFrZSBmZWF0dXJlcyB3aGlsZSBzdXBwb3J0ZWQuIFNlcGFyYXRlIHNtYWxsIHBhcnRzIGlmIG5lZWRlZC4gRmluaXNoIGFmdGVyIGN1dHRpbmcsIHRoZW4gaW5zcGVjdC4gUHJlc2VydmUgaG9sZGluZyBtYXRlcmlhbCB0aHJvdWdob3V0LjwvZGVzYz4KPHJlY3Qgd2lkdGg9Ijc2MCIgaGVpZ2h0PSI0NjAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTcyYjNhIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KPHRleHQgeD0iMzgwIiB5PSIzNCIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPktlZXAgdGhlIG5leHQgb3BlcmF0aW9uIHBvc3NpYmxlPC90ZXh0Pgo8ZyBmaWxsPSIjZjRmN2ZhIiBzdHJva2U9IiMyNDM3NDYiIHN0cm9rZS13aWR0aD0iMiI+PHJlY3QgeD0iMTAwIiB5PSI1NiIgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MiIgcng9IjgiLz48cmVjdCB4PSIxMDAiIHk9IjEzOCIgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MiIgcng9IjgiLz48cmVjdCB4PSIxMDAiIHk9IjIyMCIgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MiIgcng9IjgiLz48cmVjdCB4PSIxMDAiIHk9IjMwMiIgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MiIgcng9IjgiLz48L2c+CjxnIGZvbnQtc2l6ZT0iMjAiPjx0ZXh0IHg9IjM4MCIgeT0iODIiPjEuIEVzdGFibGlzaCByZWZlcmVuY2UgZmFjZXMgYW5kIGVkZ2VzPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMTA2IiBmb250LXNpemU9IjE2Ij5HaXZlIGxhdGVyIGRpbWVuc2lvbnMgYSByZWxpYWJsZSBzdGFydGluZyBwb2ludC48L3RleHQ+PHRleHQgeD0iMzgwIiB5PSIxNjQiPjIuIExvY2F0ZSBhbmQgbWFrZSBmZWF0dXJlczwvdGV4dD48dGV4dCB4PSIzODAiIHk9IjE4OCIgZm9udC1zaXplPSIxNiI+S2VlcCB0aGUgd29yayBzdXBwb3J0ZWQgYW5kIGFjY2Vzc2libGUuPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMjQ2Ij4zLiBTZXBhcmF0ZSBzbWFsbCBwYXJ0cywgaWYgdGhlIHJvdXRlIG5lZWRzIGl0PC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMjcwIiBmb250LXNpemU9IjE2Ij5SZXRhaW4gdGhlIHJlZmVyZW5jZXMgdXNlZCB0byBsb2NhdGUgZmVhdHVyZXMuPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMzI4Ij40LiBGaW5pc2gsIHRoZW4gaW5zcGVjdDwvdGV4dD48dGV4dCB4PSIzODAiIHk9IjM1MiIgZm9udC1zaXplPSIxNiI+Q2hlY2sgdGhhdCBmaW5pc2hpbmcga2VwdCB0aGUgcmVxdWlyZWQgZGltZW5zaW9ucy48L3RleHQ+PC9nPgo8ZyBmaWxsPSIjMjQzNzQ2Ij48cGF0aCBkPSJNMzcyIDEyMUgzODhWMTI5SDM5NkwzODAgMTM3TDM2NCAxMjlIMzcyWiIvPjxwYXRoIGQ9Ik0zNzIgMjAzSDM4OFYyMTFIMzk2TDM4MCAyMTlMMzY0IDIxMUgzNzJaIi8+PHBhdGggZD0iTTM3MiAyODVIMzg4VjI5M0gzOTZMMzgwIDMwMUwzNjQgMjkzSDM3MloiLz48L2c+Cjx0ZXh0IHg9IjM4MCIgeT0iNDA1IiBmb250LXNpemU9IjE4Ij5JbnNwZWN0IGF0IGNoZWNrcG9pbnRzIGJlZm9yZSBkZWZlY3RzIGFyZSBoaWRkZW4uPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iNDM1IiBmb250LXNpemU9IjE4Ij5BZGFwdCB0aGUgcm91dGUgdG8gYWNjZXNzLCBob2xkaW5nIGFuZCB0aGUgcmVxdWlyZWQgcmVzdWx0LjwvdGV4dD4KPC9nPjwvc3ZnPgo=" alt="Planning sequence: establish references, locate and make features, separate if needed, finish, then inspect. Preserve enough stock for holding throughout."></p>
+    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgNDYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPk9wZXJhdGlvbiBzZXF1ZW5jaW5nIGZvbGxvd3MgZGVwZW5kZW5jaWVzPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+RXN0YWJsaXNoIHJlZmVyZW5jZSBmYWNlcyBhbmQgZWRnZXMuIExvY2F0ZSBhbmQgbWFrZSBmZWF0dXJlcyB3aGlsZSBzdXBwb3J0ZWQuIFNlcGFyYXRlIHNtYWxsIHBhcnRzIGlmIG5lZWRlZC4gRmluaXNoIGFmdGVyIGN1dHRpbmcsIHRoZW4gaW5zcGVjdC4gUHJlc2VydmUgaG9sZGluZyBtYXRlcmlhbCB0aHJvdWdob3V0LjwvZGVzYz4KPHJlY3Qgd2lkdGg9Ijc2MCIgaGVpZ2h0PSI0NjAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTcyYjNhIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KPHRleHQgeD0iMzgwIiB5PSIzNCIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPktlZXAgdGhlIG5leHQgb3BlcmF0aW9uIHBvc3NpYmxlPC90ZXh0Pgo8ZyBmaWxsPSIjZjRmN2ZhIiBzdHJva2U9IiMyNDM3NDYiIHN0cm9rZS13aWR0aD0iMiI+PHJlY3QgeD0iMTAwIiB5PSI1NiIgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MiIgcng9IjgiLz48cmVjdCB4PSIxMDAiIHk9IjEzOCIgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MiIgcng9IjgiLz48cmVjdCB4PSIxMDAiIHk9IjIyMCIgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MiIgcng9IjgiLz48cmVjdCB4PSIxMDAiIHk9IjMwMiIgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MiIgcng9IjgiLz48L2c+CjxnIGZvbnQtc2l6ZT0iMjAiPjx0ZXh0IHg9IjM4MCIgeT0iODIiPjEuIEVzdGFibGlzaCByZWZlcmVuY2UgZmFjZXMgYW5kIGVkZ2VzPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMTA2IiBmb250LXNpemU9IjE2Ij5HaXZlIGxhdGVyIGRpbWVuc2lvbnMgYSByZWxpYWJsZSBzdGFydGluZyBwb2ludC48L3RleHQ+PHRleHQgeD0iMzgwIiB5PSIxNjQiPjIuIExvY2F0ZSBhbmQgbWFrZSBmZWF0dXJlczwvdGV4dD48dGV4dCB4PSIzODAiIHk9IjE4OCIgZm9udC1zaXplPSIxNiI+S2VlcCB0aGUgd29yayBzdXBwb3J0ZWQgYW5kIGFjY2Vzc2libGUuPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMjQ2Ij4zLiBTZXBhcmF0ZSBzbWFsbCBwYXJ0cywgaWYgdGhlIHJvdXRlIG5lZWRzIGl0PC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMjcwIiBmb250LXNpemU9IjE2Ij5SZXRhaW4gdGhlIHJlZmVyZW5jZXMgdXNlZCB0byBsb2NhdGUgZmVhdHVyZXMuPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMzI4Ij40LiBGaW5pc2gsIHRoZW4gaW5zcGVjdDwvdGV4dD48dGV4dCB4PSIzODAiIHk9IjM1MiIgZm9udC1zaXplPSIxNiI+Q2hlY2sgdGhhdCBmaW5pc2hpbmcga2VwdCB0aGUgcmVxdWlyZWQgZGltZW5zaW9ucy48L3RleHQ+PC9nPgo8ZyBmaWxsPSIjMjQzNzQ2Ij48cGF0aCBkPSJNMzcyIDEyMUgzODhWMTI5SDM5NkwzODAgMTM3TDM2NCAxMjlIMzcyWiIvPjxwYXRoIGQ9Ik0zNzIgMjAzSDM4OFYyMTFIMzk2TDM4MCAyMTlMMzY0IDIxMUgzNzJaIi8+PHBhdGggZD0iTTM3MiAyODVIMzg4VjI5M0gzOTZMMzgwIDMwMUwzNjQgMjkzSDM3MloiLz48L2c+Cjx0ZXh0IHg9IjM4MCIgeT0iNDA1IiBmb250LXNpemU9IjE4Ij5JbnNwZWN0IGF0IGNoZWNrcG9pbnRzIGJlZm9yZSBkZWZlY3RzIGFyZSBoaWRkZW4uPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iNDM1IiBmb250LXNpemU9IjE4Ij5BZGFwdCB0aGUgcm91dGUgdG8gYWNjZXNzLCBob2xkaW5nIGFuZCB0aGUgcmVxdWlyZWQgcmVzdWx0LjwvdGV4dD4KPC9nPjwvc3ZnPgo=" alt="Planning sequence: establish references, locate and make features, separate if needed, finish, then inspect. Preserve enough stock for holding throughout." data-natural-width="760" data-natural-height="460"></p>
     <figcaption>This is a planning pattern, not a mandatory route for every part.</figcaption>
   </figure>
   <p>Holes may be easier to make before small parts are cut free from a larger piece. Final finishing usually follows cutting and drilling, so those operations do not damage the finished surface. Inspect afterward too: finishing can change dimensions.</p>
@@ -3170,7 +3197,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>A <strong>pattern</strong> is the original shape copied by a mold. For a simple one-part, open-face mold, use a shape with a flat back and features that can be withdrawn through the opening. An original example is a small decorative relief tile with a flat back, gently sloping sides and no hooked details.</p>
   <p><strong>Draft</strong> is a slight taper that helps a part leave the mold. Let the shape widen toward the opening. A flat parting face, where the pattern meets the mold-box base, defines the open back of this mold. Avoid undercuts that hook behind the silicone; flexibility does not make every trapped shape removable.</p>
   <figure>
-    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPk9uZS1wYXJ0IG1vbGQgZnJvbSBhIHByaW50ZWQgcGF0dGVybjwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPkZvdXIgY3Jvc3Mtc2VjdGlvbnMgc2hvdyBhIHRhcGVyZWQgcHJpbnRlZCBwYXR0ZXJuIG9uIGEgZmxhdCBiYXNlLCBzaWxpY29uZSBhcm91bmQgdGhlIHBhdHRlcm4sIHRoZSBpbnZlcnRlZCBvcGVuIG1vbGQgYWZ0ZXIgcGF0dGVybiByZW1vdmFsLCBhbmQgYSBjYXN0aW5nIGZpbGxpbmcgdGhhdCBjYXZpdHkuIFRoZSBwYXR0ZXJuIGlzIHdpZGVyIGF0IGl0cyBmbGF0IGJhY2sgc28gdGhlIGZpbmFsIGNhdml0eSB3aWRlbnMgdG93YXJkIGl0cyBvcGVuaW5nLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjMTcyYjNhIj4KPHRleHQgeD0iMzAiIHk9IjM1IiBmb250LXNpemU9IjI1IiBmb250LXdlaWdodD0iYm9sZCI+UGF0dGVybiDihpIgc2lsaWNvbmUgY2F2aXR5IOKGkiBjYXN0aW5nPC90ZXh0Pgo8dGV4dCB4PSIzNSIgeT0iODAiPjEuIEZsYXQgYmFjayBvbiBib3ggYmFzZTwvdGV4dD48dGV4dCB4PSI0MzUiIHk9IjgwIj4yLiBTaWxpY29uZSBzdXJyb3VuZHMgcGF0dGVybjwvdGV4dD4KPGcgc3Ryb2tlPSIjMjQzNzQ2IiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik00NSAxMTBWMjMwSDM0NVYxMTAiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIwIDIzMEwxNDUgMTUwSDI0NUwyNzAgMjMwWiIgZmlsbD0iI2VkYzU2YyIvPgo8cGF0aCBkPSJNNDQ1IDExMFYyMzBINzQ1VjExMCIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik00NDUgMTMwSDc0NVYyMzBINjcwTDY0NSAxNTBINTQ1TDUyMCAyMzBINDQ1WiIgZmlsbD0iI2I0ZGNlYSIvPjxwYXRoIGQ9Ik01MjAgMjMwTDU0NSAxNTBINjQ1TDY3MCAyMzBaIiBmaWxsPSIjZWRjNTZjIi8+PC9nPgo8dGV4dCB4PSI1NSIgeT0iMjY0IiBmb250LXNpemU9IjE3Ij5TbG9wZWQgc2lkZXMgZ2l2ZSBkcmFmdC48L3RleHQ+PHRleHQgeD0iNDQ4IiB5PSIyNjQiIGZvbnQtc2l6ZT0iMTciPkN1cmUgYXMgdGhlIHByb2R1Y3Qgc3BlY2lmaWVzLjwvdGV4dD4KPHRleHQgeD0iMzUiIHk9IjMyMiI+My4gSW52ZXJ0OyByZW1vdmUgcGF0dGVybjwvdGV4dD48dGV4dCB4PSI0MzUiIHk9IjMyMiI+NC4gRmlsbCB0aGUgb3BlbiBjYXZpdHk8L3RleHQ+CjxnIHN0cm9rZT0iIzI0Mzc0NiIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNNDUgMzUwSDEyMEwxNDUgNDMwSDI0NUwyNzAgMzUwSDM0NVY0NjBINDVaIiBmaWxsPSIjYjRkY2VhIi8+PHBhdGggZD0iTTQ0NSAzNTBINTIwTDU0NSA0MzBINjQ1TDY3MCAzNTBINzQ1VjQ2MEg0NDVaIiBmaWxsPSIjYjRkY2VhIi8+PHBhdGggZD0iTTUyMCAzNTBINjcwTDY0NSA0MzBINTQ1WiIgZmlsbD0iI2QyZDhkZCIvPjwvZz4KPHBhdGggZD0iTTE5NSA0MDBWMzQ1TTE4NSAzNTVMMTk1IDM0NUwyMDUgMzU1IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNDM3NDYiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSI1NSIgeT0iNDkwIiBmb250LXNpemU9IjE3Ij5PcGVuaW5nIGlzIHRoZSB3aWRlc3Qgc2VjdGlvbi48L3RleHQ+PHRleHQgeD0iNDQ4IiB5PSI0OTAiIGZvbnQtc2l6ZT0iMTciPkN1cmUsIHJlbW92ZSBhbmQgaW5zcGVjdCBjYXN0aW5nLjwvdGV4dD4KPHJlY3QgeD0iMzUiIHk9IjUyMSIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiBmaWxsPSIjZWRjNTZjIiBzdHJva2U9IiMyNDM3NDYiLz48dGV4dCB4PSI2MyIgeT0iNTM3IiBmb250LXNpemU9IjE3Ij5QcmludGVkIHBhdHRlcm48L3RleHQ+PHJlY3QgeD0iMjc1IiB5PSI1MjEiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgZmlsbD0iI2I0ZGNlYSIgc3Ryb2tlPSIjMjQzNzQ2Ii8+PHRleHQgeD0iMzAzIiB5PSI1MzciIGZvbnQtc2l6ZT0iMTciPlNpbGljb25lIG1vbGQ8L3RleHQ+PHJlY3QgeD0iNTEwIiB5PSI1MjEiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgZmlsbD0iI2QyZDhkZCIgc3Ryb2tlPSIjMjQzNzQ2Ii8+PHRleHQgeD0iNTM4IiB5PSI1MzciIGZvbnQtc2l6ZT0iMTciPkNhc3RpbmcgbWF0ZXJpYWw8L3RleHQ+CjwvZz48L3N2Zz4K" alt="Cross-section sequence: printed pattern with flat back on the box base; silicone cured around it; mold inverted and pattern removed; casting material fills the open cavity. The cavity widens toward its opening."></p>
+    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPk9uZS1wYXJ0IG1vbGQgZnJvbSBhIHByaW50ZWQgcGF0dGVybjwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPkZvdXIgY3Jvc3Mtc2VjdGlvbnMgc2hvdyBhIHRhcGVyZWQgcHJpbnRlZCBwYXR0ZXJuIG9uIGEgZmxhdCBiYXNlLCBzaWxpY29uZSBhcm91bmQgdGhlIHBhdHRlcm4sIHRoZSBpbnZlcnRlZCBvcGVuIG1vbGQgYWZ0ZXIgcGF0dGVybiByZW1vdmFsLCBhbmQgYSBjYXN0aW5nIGZpbGxpbmcgdGhhdCBjYXZpdHkuIFRoZSBwYXR0ZXJuIGlzIHdpZGVyIGF0IGl0cyBmbGF0IGJhY2sgc28gdGhlIGZpbmFsIGNhdml0eSB3aWRlbnMgdG93YXJkIGl0cyBvcGVuaW5nLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjMTcyYjNhIj4KPHRleHQgeD0iMzAiIHk9IjM1IiBmb250LXNpemU9IjI1IiBmb250LXdlaWdodD0iYm9sZCI+UGF0dGVybiDihpIgc2lsaWNvbmUgY2F2aXR5IOKGkiBjYXN0aW5nPC90ZXh0Pgo8dGV4dCB4PSIzNSIgeT0iODAiPjEuIEZsYXQgYmFjayBvbiBib3ggYmFzZTwvdGV4dD48dGV4dCB4PSI0MzUiIHk9IjgwIj4yLiBTaWxpY29uZSBzdXJyb3VuZHMgcGF0dGVybjwvdGV4dD4KPGcgc3Ryb2tlPSIjMjQzNzQ2IiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik00NSAxMTBWMjMwSDM0NVYxMTAiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIwIDIzMEwxNDUgMTUwSDI0NUwyNzAgMjMwWiIgZmlsbD0iI2VkYzU2YyIvPgo8cGF0aCBkPSJNNDQ1IDExMFYyMzBINzQ1VjExMCIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik00NDUgMTMwSDc0NVYyMzBINjcwTDY0NSAxNTBINTQ1TDUyMCAyMzBINDQ1WiIgZmlsbD0iI2I0ZGNlYSIvPjxwYXRoIGQ9Ik01MjAgMjMwTDU0NSAxNTBINjQ1TDY3MCAyMzBaIiBmaWxsPSIjZWRjNTZjIi8+PC9nPgo8dGV4dCB4PSI1NSIgeT0iMjY0IiBmb250LXNpemU9IjE3Ij5TbG9wZWQgc2lkZXMgZ2l2ZSBkcmFmdC48L3RleHQ+PHRleHQgeD0iNDQ4IiB5PSIyNjQiIGZvbnQtc2l6ZT0iMTciPkN1cmUgYXMgdGhlIHByb2R1Y3Qgc3BlY2lmaWVzLjwvdGV4dD4KPHRleHQgeD0iMzUiIHk9IjMyMiI+My4gSW52ZXJ0OyByZW1vdmUgcGF0dGVybjwvdGV4dD48dGV4dCB4PSI0MzUiIHk9IjMyMiI+NC4gRmlsbCB0aGUgb3BlbiBjYXZpdHk8L3RleHQ+CjxnIHN0cm9rZT0iIzI0Mzc0NiIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNNDUgMzUwSDEyMEwxNDUgNDMwSDI0NUwyNzAgMzUwSDM0NVY0NjBINDVaIiBmaWxsPSIjYjRkY2VhIi8+PHBhdGggZD0iTTQ0NSAzNTBINTIwTDU0NSA0MzBINjQ1TDY3MCAzNTBINzQ1VjQ2MEg0NDVaIiBmaWxsPSIjYjRkY2VhIi8+PHBhdGggZD0iTTUyMCAzNTBINjcwTDY0NSA0MzBINTQ1WiIgZmlsbD0iI2QyZDhkZCIvPjwvZz4KPHBhdGggZD0iTTE5NSA0MDBWMzQ1TTE4NSAzNTVMMTk1IDM0NUwyMDUgMzU1IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNDM3NDYiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSI1NSIgeT0iNDkwIiBmb250LXNpemU9IjE3Ij5PcGVuaW5nIGlzIHRoZSB3aWRlc3Qgc2VjdGlvbi48L3RleHQ+PHRleHQgeD0iNDQ4IiB5PSI0OTAiIGZvbnQtc2l6ZT0iMTciPkN1cmUsIHJlbW92ZSBhbmQgaW5zcGVjdCBjYXN0aW5nLjwvdGV4dD4KPHJlY3QgeD0iMzUiIHk9IjUyMSIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiBmaWxsPSIjZWRjNTZjIiBzdHJva2U9IiMyNDM3NDYiLz48dGV4dCB4PSI2MyIgeT0iNTM3IiBmb250LXNpemU9IjE3Ij5QcmludGVkIHBhdHRlcm48L3RleHQ+PHJlY3QgeD0iMjc1IiB5PSI1MjEiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgZmlsbD0iI2I0ZGNlYSIgc3Ryb2tlPSIjMjQzNzQ2Ii8+PHRleHQgeD0iMzAzIiB5PSI1MzciIGZvbnQtc2l6ZT0iMTciPlNpbGljb25lIG1vbGQ8L3RleHQ+PHJlY3QgeD0iNTEwIiB5PSI1MjEiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgZmlsbD0iI2QyZDhkZCIgc3Ryb2tlPSIjMjQzNzQ2Ii8+PHRleHQgeD0iNTM4IiB5PSI1MzciIGZvbnQtc2l6ZT0iMTciPkNhc3RpbmcgbWF0ZXJpYWw8L3RleHQ+CjwvZz48L3N2Zz4K" alt="Cross-section sequence: printed pattern with flat back on the box base; silicone cured around it; mold inverted and pattern removed; casting material fills the open cavity. The cavity widens toward its opening." data-natural-width="800" data-natural-height="560"></p>
     <figcaption>The mold copies the pattern's surface. Smooth and inspect the print before making the mold.</figcaption>
   </figure>
   <p>Remove unwanted layer ridges and support marks without losing important dimensions. Choose pattern preparation, any sealer and any release agent for the specific print, silicone and casting material. Follow the manufacturers' compatibility instructions and test a small prepared sample before committing the full mold.</p>
@@ -4942,6 +4969,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

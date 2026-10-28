@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2988,7 +3015,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Clean, tin, and keep the working face coated</h2>
   <p>With the iron at working temperature, briefly clean the tip on brass wool or a damp soldering sponge. Apply fresh solder to coat its working face, then remove the excess on the cleaner. Leave a thin coating; do not wipe it bare and let it sit hot. Re-tin as needed and before storage as directed by the tool manufacturer.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkNsZWFuLCBjb2F0LCBhbmQgcmV0YWluIGEgdGhpbiBsYXllciBvZiBzb2xkZXI8L3RpdGxlPjxyZWN0IHdpZHRoPSIzNjAiIGhlaWdodD0iODQwIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MThweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0ZH0gLmhlYWR7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MjJweH0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojOWE1MTE5O3N0cm9rZS13aWR0aDo5O3N0cm9rZS1saW5lY2FwOnJvdW5kfSAubGVhZHtmaWxsOiNjY2M7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5zb2xkZXJ7ZmlsbDojYjhkOWVhO3N0cm9rZTojMTcyYjRkO3N0cm9rZS13aWR0aDoyfSAucGFke2ZpbGw6I2I4NzMzMztzdHJva2U6IzE3MmI0ZH0gLmJvYXJke2ZpbGw6I2UyZWRkZjtzdHJva2U6IzE3MmI0ZH08L3N0eWxlPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjEuIENsZWFuIGJyaWVmbHk8L3RleHQ+PHBhdGggZD0iTTgwIDE5NUgyODBWMjIwSDgwWiIgZmlsbD0iI2VjYWMwMCIgc3Ryb2tlPSIjMTcyYjRkIi8+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjUwIj5EYW1wIHNwb25nZSBvciBicmFzcyB3b29sLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj4yLiBBcHBseSBmcmVzaCBzb2xkZXI8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48cGF0aCBkPSJNMzAwIDkwTDIxMCAxODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyNmI4MyIgc3Ryb2tlLXdpZHRoPSI3Ii8+PHRleHQgeD0iMjAiIHk9IjI1MCI+Q29hdCB0aGUgaG90IHdvcmtpbmcgZmFjZS48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gTGVhdmUgYSB0aGluIGNvYXRpbmc8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5SZW1vdmUgZXhjZXNzIG9uIHRoZSBjbGVhbmVyLjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjcwIj5EbyBub3QgbGVhdmUgdGhlIGhvdCBmYWNlIGJhcmUuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Three stages: clean the working face, melt fresh solder onto it, and leave a thin solder coating after removing excess."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkNsZWFuLCBjb2F0LCBhbmQgcmV0YWluIGEgdGhpbiBsYXllciBvZiBzb2xkZXI8L3RpdGxlPjxyZWN0IHdpZHRoPSIzNjAiIGhlaWdodD0iODQwIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MThweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0ZH0gLmhlYWR7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MjJweH0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojOWE1MTE5O3N0cm9rZS13aWR0aDo5O3N0cm9rZS1saW5lY2FwOnJvdW5kfSAubGVhZHtmaWxsOiNjY2M7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5zb2xkZXJ7ZmlsbDojYjhkOWVhO3N0cm9rZTojMTcyYjRkO3N0cm9rZS13aWR0aDoyfSAucGFke2ZpbGw6I2I4NzMzMztzdHJva2U6IzE3MmI0ZH0gLmJvYXJke2ZpbGw6I2UyZWRkZjtzdHJva2U6IzE3MmI0ZH08L3N0eWxlPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjEuIENsZWFuIGJyaWVmbHk8L3RleHQ+PHBhdGggZD0iTTgwIDE5NUgyODBWMjIwSDgwWiIgZmlsbD0iI2VjYWMwMCIgc3Ryb2tlPSIjMTcyYjRkIi8+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjUwIj5EYW1wIHNwb25nZSBvciBicmFzcyB3b29sLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj4yLiBBcHBseSBmcmVzaCBzb2xkZXI8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48cGF0aCBkPSJNMzAwIDkwTDIxMCAxODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyNmI4MyIgc3Ryb2tlLXdpZHRoPSI3Ii8+PHRleHQgeD0iMjAiIHk9IjI1MCI+Q29hdCB0aGUgaG90IHdvcmtpbmcgZmFjZS48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gTGVhdmUgYSB0aGluIGNvYXRpbmc8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5SZW1vdmUgZXhjZXNzIG9uIHRoZSBjbGVhbmVyLjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjcwIj5EbyBub3QgbGVhdmUgdGhlIGhvdCBmYWNlIGJhcmUuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Three stages: clean the working face, melt fresh solder onto it, and leave a thin solder coating after removing excess." data-natural-width="360" data-natural-height="840"></p>
   <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Why tinning helps heat transfer.</p>
     </div>
   </details>
@@ -3009,7 +3036,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Heat both parts, then feed solder into the joint</h2>
   <p>Prepare the iron and bench using <a class="xref-page" href="#p-soldering-equipment">Soldering Equipment and Setup</a>. The iron heats the parts; the heated parts melt the solder. Touch the tinned working face to both wires, or to both the pad and the component lead. Feed solder into the joint, away from the iron's contact point when access allows.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkhlYXQgcGFkIGFuZCBsZWFkLCBmZWVkIHNvbGRlciwgdGhlbiB3aXRoZHJhdyBhbmQgY29vbDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+MS4gSGVhdCBib3RoIHBhcnRzPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNNTUgOTBMODAgNzBMMTc1IDE2NVYxODBIMTUzWiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Jcm9uIGZhY2UgdG91Y2hlcyBwYWQgYW5kIGxlYWQuPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDI4MCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjIuIEZlZWQgaW50byB0aGUgam9pbnQ8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik01NSA5MEw4MCA3MEwxNzUgMTY1VjE4MEgxNTNaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik0zMDAgODBMMjEwIDE2NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTI2YjgzIiBzdHJva2Utd2lkdGg9IjciLz48cGF0aCBkPSJNMTkwIDE0MFEyMDAgMTczIDI1MCAxODBIMTkwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjI0MCIgeT0iNjIiPlNvbGRlcjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5LZWVwIGhlYXRpbmcgYXMgc29sZGVyIHdldHMgYm90aC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gV2l0aGRyYXcgYW5kIGNvb2w8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik05NSAxODBRMTcwIDE3NCAxNzUgMTEwVjE4MFogTTE5MCAxMTBRMjAwIDE3NCAyNjUgMTgwSDE5MFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Tb2xkZXIgYXdheSwgdGhlbiBpcm9uLiBIb2xkIHN0aWxsLjwvdGV4dD48L2c+PC9zdmc+" alt="First the iron contacts both pad and lead. Then solder wire approaches the heated joint from the other side while the iron stays in contact. Finally remove solder, remove iron, and hold still."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkhlYXQgcGFkIGFuZCBsZWFkLCBmZWVkIHNvbGRlciwgdGhlbiB3aXRoZHJhdyBhbmQgY29vbDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+MS4gSGVhdCBib3RoIHBhcnRzPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNNTUgOTBMODAgNzBMMTc1IDE2NVYxODBIMTUzWiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Jcm9uIGZhY2UgdG91Y2hlcyBwYWQgYW5kIGxlYWQuPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDI4MCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjIuIEZlZWQgaW50byB0aGUgam9pbnQ8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik01NSA5MEw4MCA3MEwxNzUgMTY1VjE4MEgxNTNaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik0zMDAgODBMMjEwIDE2NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTI2YjgzIiBzdHJva2Utd2lkdGg9IjciLz48cGF0aCBkPSJNMTkwIDE0MFEyMDAgMTczIDI1MCAxODBIMTkwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjI0MCIgeT0iNjIiPlNvbGRlcjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5LZWVwIGhlYXRpbmcgYXMgc29sZGVyIHdldHMgYm90aC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gV2l0aGRyYXcgYW5kIGNvb2w8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik05NSAxODBRMTcwIDE3NCAxNzUgMTEwVjE4MFogTTE5MCAxMTBRMjAwIDE3NCAyNjUgMTgwSDE5MFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Tb2xkZXIgYXdheSwgdGhlbiBpcm9uLiBIb2xkIHN0aWxsLjwvdGV4dD48L2c+PC9zdmc+" alt="First the iron contacts both pad and lead. Then solder wire approaches the heated joint from the other side while the iron stays in contact. Finally remove solder, remove iron, and hold still." data-natural-width="360" data-natural-height="840"></p>
   <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; A one-second count is a rhythm, not a temperature test.</p>
     </div>
   </details>
@@ -3036,7 +3063,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Look for wetting and shape; shine alone is not a verdict</h2>
   <p>A good joint flows onto both surfaces. On a typical through-hole pad, look for a smooth transition from pad to lead, often a concave fillet (an inward-curving slope). Tin-lead joints are often shiny. A sound lead-free joint may be dull; dullness alone does not diagnose a cold joint.</p>
   <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Why lead-free solder may look different.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkpvaW50IGluc3BlY3Rpb246IHNjaGVtYXRpYyBjcm9zcy1zZWN0aW9uczwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+R29vZDogd2V0dGVkPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNOTUgMTgwUTE3MCAxNzQgMTc1IDExMFYxODBaIE0xOTAgMTEwUTIwMCAxNzQgMjY1IDE4MEgxOTBaIiBjbGFzcz0ic29sZGVyIi8+PHRleHQgeD0iMjAiIHk9IjI0NSI+U29sZGVyIHNsb3BlcyBmcm9tIHBhZCB0byBsZWFkLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj5Db2xkIC8gcG9vcmx5IHdldHRlZDwvdGV4dD48cGF0aCBkPSJNNDAgMTkwSDMyMFYyMTVINDBaIiBjbGFzcz0iYm9hcmQiLz48cGF0aCBkPSJNODUgMTgwSDI3NVYxOTBIODVaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTE3NSA2NUgxOTBWMjE1SDE3NVoiIGNsYXNzPSJsZWFkIi8+PGVsbGlwc2UgY3g9IjEzMCIgY3k9IjE1NSIgcng9IjM3IiByeT0iMjQiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5CZWFkIGZhaWxzIHRvIHdldCB0aGUgbGVhZC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+QnJpZGdlOiB1bndhbnRlZCBwYXRoPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik02NSAxODBIMTUwVjE5MEg2NVogTTIxMCAxODBIMjk1VjE5MEgyMTBaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTEwNSA2NUgxMjBWMjE1SDEwNVogTTI0MCA2NUgyNTVWMjE1SDI0MFoiIGNsYXNzPSJsZWFkIi8+PHBhdGggZD0iTTc1IDE4MFExMDAgMTY1IDEwNSAxMzBWMTYwUTE4MCAxNDAgMjQwIDE2MFYxMzBRMjcwIDE3MCAyODUgMTgwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjIwIiB5PSIyNDUiPlNvbGRlciBqb2lucyBzZXBhcmF0ZSBwYWRzLjwvdGV4dD48L2c+PC9zdmc+" alt="Conceptual cross-sections: wetted solder slopes from pad to lead; a cold poorly wetted bead sits on the pad; a solder bridge connects two pads that should be separate."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkpvaW50IGluc3BlY3Rpb246IHNjaGVtYXRpYyBjcm9zcy1zZWN0aW9uczwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+R29vZDogd2V0dGVkPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNOTUgMTgwUTE3MCAxNzQgMTc1IDExMFYxODBaIE0xOTAgMTEwUTIwMCAxNzQgMjY1IDE4MEgxOTBaIiBjbGFzcz0ic29sZGVyIi8+PHRleHQgeD0iMjAiIHk9IjI0NSI+U29sZGVyIHNsb3BlcyBmcm9tIHBhZCB0byBsZWFkLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj5Db2xkIC8gcG9vcmx5IHdldHRlZDwvdGV4dD48cGF0aCBkPSJNNDAgMTkwSDMyMFYyMTVINDBaIiBjbGFzcz0iYm9hcmQiLz48cGF0aCBkPSJNODUgMTgwSDI3NVYxOTBIODVaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTE3NSA2NUgxOTBWMjE1SDE3NVoiIGNsYXNzPSJsZWFkIi8+PGVsbGlwc2UgY3g9IjEzMCIgY3k9IjE1NSIgcng9IjM3IiByeT0iMjQiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5CZWFkIGZhaWxzIHRvIHdldCB0aGUgbGVhZC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+QnJpZGdlOiB1bndhbnRlZCBwYXRoPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik02NSAxODBIMTUwVjE5MEg2NVogTTIxMCAxODBIMjk1VjE5MEgyMTBaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTEwNSA2NUgxMjBWMjE1SDEwNVogTTI0MCA2NUgyNTVWMjE1SDI0MFoiIGNsYXNzPSJsZWFkIi8+PHBhdGggZD0iTTc1IDE4MFExMDAgMTY1IDEwNSAxMzBWMTYwUTE4MCAxNDAgMjQwIDE2MFYxMzBRMjcwIDE3MCAyODUgMTgwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjIwIiB5PSIyNDUiPlNvbGRlciBqb2lucyBzZXBhcmF0ZSBwYWRzLjwvdGV4dD48L2c+PC9zdmc+" alt="Conceptual cross-sections: wetted solder slopes from pad to lead; a cold poorly wetted bead sits on the pad; a solder bridge connects two pads that should be separate." data-natural-width="360" data-natural-height="840"></p>
   <dl class="dims">
     <div><dt>Cold or poorly wetted</dt><dd>Solder balls up or fails to bond to one surface, often because the parts were not heated adequately. A rough or dull appearance can be a clue, but inspect the contact and shape too.</dd></div>
     <div><dt>Disturbed</dt><dd>The connection moved while solidifying, leaving a cracked or disrupted joint. Secure it before reworking.</dd></div>
@@ -3073,7 +3100,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Make the splice mechanically sound before soldering</h2>
   <p>Solder should not be the only thing holding loose wires in position. Form a stable splice, support it during soldering, and provide strain relief so pulling or bending the cable does not load the soldered joint. Follow the wire and assembly requirements; these sketches show splice shapes, not a qualification standard.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MjAgNjEwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkxhcCwgdHdpc3QgcGlndGFpbCwgYW5kIFdlc3Rlcm4gVW5pb24gc3BsaWNlIHNoYXBlczwvdGl0bGU+PHJlY3Qgd2lkdGg9IjQyMCIgaGVpZ2h0PSI2MTAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+Cjx0ZXh0IHg9IjIwIiB5PSIzNSIgY2xhc3M9ImhlYWQiPkxhcCAvIGxheS1vdmVyPC90ZXh0PjxwYXRoIGQ9Ik0zMCA4NUgyNjUgTTE2MCAxMDBIMzkwIiBjbGFzcz0id2lyZSIvPjx0ZXh0IHg9IjIwIiB5PSIxNDUiPlN0cmFpZ2h0IGVuZHMgb3ZlcmxhcC48L3RleHQ+PHRleHQgeD0iMjAiIHk9IjE3MCI+U3VwcG9ydCB0aGVtIHdoaWxlIHNvbGRlcmluZy48L3RleHQ+Cjx0ZXh0IHg9IjIwIiB5PSIyMzAiIGNsYXNzPSJoZWFkIj5Ud2lzdCAvIHBpZ3RhaWw8L3RleHQ+PHBhdGggZD0iTTMwIDI2NUwxMzAgMjg1UTE1MCAyNjAgMTcwIDI4NVQyMTAgMjg1VDI1MCAyODVUMjkwIDI4NSBNMzAgMzEwTDEzMCAyOTBRMTUwIDMxNSAxNzAgMjkwVDIxMCAyOTBUMjUwIDI5MFQyOTAgMjkwIiBjbGFzcz0id2lyZSIvPjx0ZXh0IHg9IjIwIiB5PSIzNTAiPkVuZHMgdHdpc3QgaW50byBhIGpvaW5lZCB0YWlsLjwvdGV4dD4KPHRleHQgeD0iMjAiIHk9IjQxNSIgY2xhc3M9ImhlYWQiPldlc3Rlcm4gVW5pb24gLyBpbmxpbmU8L3RleHQ+PHBhdGggZD0iTTMwIDQ2NUgyMTBRMjIwIDQzNSAyMzAgNDY1VDI1MCA0NjVUMjcwIDQ2NUwyODAgNDQ1IE0zOTAgNDgwSDIyMFEyMTAgNTEwIDIwMCA0ODBUMTgwIDQ4MFQxNjAgNDgwTDE1MCA1MDAiIGNsYXNzPSJ3aXJlIi8+PHRleHQgeD0iMjAiIHk9IjU0MCI+RWFjaCBlbmQgd3JhcHMgdGhlIG9wcG9zaXRlIHdpcmUuPC90ZXh0Pjx0ZXh0IHg9IjIwIiB5PSI1ODUiPlNoYXBlcyBvbmx5OyBub3QgdG8gc2NhbGUgb3IgYSB3cmFwLWNvdW50IHJ1bGUuPC90ZXh0Pjwvc3ZnPg==" alt="Lap splice overlaps straight stripped ends; twist splice winds two ends together into a pigtail; Western Union splice wraps each free end around the opposite standing wire."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MjAgNjEwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkxhcCwgdHdpc3QgcGlndGFpbCwgYW5kIFdlc3Rlcm4gVW5pb24gc3BsaWNlIHNoYXBlczwvdGl0bGU+PHJlY3Qgd2lkdGg9IjQyMCIgaGVpZ2h0PSI2MTAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+Cjx0ZXh0IHg9IjIwIiB5PSIzNSIgY2xhc3M9ImhlYWQiPkxhcCAvIGxheS1vdmVyPC90ZXh0PjxwYXRoIGQ9Ik0zMCA4NUgyNjUgTTE2MCAxMDBIMzkwIiBjbGFzcz0id2lyZSIvPjx0ZXh0IHg9IjIwIiB5PSIxNDUiPlN0cmFpZ2h0IGVuZHMgb3ZlcmxhcC48L3RleHQ+PHRleHQgeD0iMjAiIHk9IjE3MCI+U3VwcG9ydCB0aGVtIHdoaWxlIHNvbGRlcmluZy48L3RleHQ+Cjx0ZXh0IHg9IjIwIiB5PSIyMzAiIGNsYXNzPSJoZWFkIj5Ud2lzdCAvIHBpZ3RhaWw8L3RleHQ+PHBhdGggZD0iTTMwIDI2NUwxMzAgMjg1UTE1MCAyNjAgMTcwIDI4NVQyMTAgMjg1VDI1MCAyODVUMjkwIDI4NSBNMzAgMzEwTDEzMCAyOTBRMTUwIDMxNSAxNzAgMjkwVDIxMCAyOTBUMjUwIDI5MFQyOTAgMjkwIiBjbGFzcz0id2lyZSIvPjx0ZXh0IHg9IjIwIiB5PSIzNTAiPkVuZHMgdHdpc3QgaW50byBhIGpvaW5lZCB0YWlsLjwvdGV4dD4KPHRleHQgeD0iMjAiIHk9IjQxNSIgY2xhc3M9ImhlYWQiPldlc3Rlcm4gVW5pb24gLyBpbmxpbmU8L3RleHQ+PHBhdGggZD0iTTMwIDQ2NUgyMTBRMjIwIDQzNSAyMzAgNDY1VDI1MCA0NjVUMjcwIDQ2NUwyODAgNDQ1IE0zOTAgNDgwSDIyMFEyMTAgNTEwIDIwMCA0ODBUMTgwIDQ4MFQxNjAgNDgwTDE1MCA1MDAiIGNsYXNzPSJ3aXJlIi8+PHRleHQgeD0iMjAiIHk9IjU0MCI+RWFjaCBlbmQgd3JhcHMgdGhlIG9wcG9zaXRlIHdpcmUuPC90ZXh0Pjx0ZXh0IHg9IjIwIiB5PSI1ODUiPlNoYXBlcyBvbmx5OyBub3QgdG8gc2NhbGUgb3IgYSB3cmFwLWNvdW50IHJ1bGUuPC90ZXh0Pjwvc3ZnPg==" alt="Lap splice overlaps straight stripped ends; twist splice winds two ends together into a pigtail; Western Union splice wraps each free end around the opposite standing wire." data-natural-width="420" data-natural-height="610"></p>
   <ul>
     <li><strong>Lay-over or lap:</strong> stripped ends overlap alongside one another. Support and strain relief are especially important because the overlap does not lock itself together.</li>
     <li><strong>Twist or pigtail:</strong> stripped ends twist together and leave the connection on the same side. Cover the joined end completely when insulating it.</li>
@@ -4835,6 +4862,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

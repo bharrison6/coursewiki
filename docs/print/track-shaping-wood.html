@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2946,7 +2973,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Teeth remove chips; the kerf is the wood they remove</h2>
   <p>Sawing is a <strong>Separating</strong> process: each tooth removes a small chip, and successive teeth make a slot. The slot's width is the <strong>kerf</strong>. The space ahead of a tooth, called the <strong>gullet</strong>, carries chips out of the cut.</p>
   <p>Many steel saw teeth have <strong>set</strong>: teeth bend slightly to alternating sides so the cut is wider than the blade body. Carbide-tipped circular blades commonly get that clearance from tips wider than the steel plate instead. Set and kerf are related, but they are not the same measurement.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+PHRpdGxlIGlkPSJ0aXRsZSI+VG9vdGggZ2VvbWV0cnkgYW5kIGtlcmY8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5Db25jZXB0dWFsIGRpYWdyYW0sIG5vdCBhIG1hY2hpbmUgc2V0dXAgZHJhd2luZy4gTm90IHRvIHNjYWxlLjwvZGVzYz48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQyMCIgZmlsbD0iI2ZmZiIvPjxzdHlsZT50ZXh0e2ZvbnQ6MThweCBzYW5zLXNlcmlmO2ZpbGw6IzEyMjg0Y30uaGVhZGluZ3tmb250LXNpemU6MjJweDtmb250LXdlaWdodDpib2xkfS53b29ke2ZpbGw6I2Y3ZTViNTtzdHJva2U6IzEyMjg0YztzdHJva2Utd2lkdGg6Mn0ubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxMjI4NGM7c3Ryb2tlLXdpZHRoOjN9LmN1dHtmaWxsOm5vbmU7c3Ryb2tlOiNiNDQwMTU7c3Ryb2tlLXdpZHRoOjR9Lm5vdGV7Zm9udC1zaXplOjE2cHh9PC9zdHlsZT4KPHRleHQgeD0iMjUiIHk9IjMyIiBjbGFzcz0iaGVhZGluZyI+UmVwcmVzZW50YXRpdmUgY2lyY3VsYXItYmxhZGUgdGVldGg6IGZyb250IHZpZXdzPC90ZXh0Pgo8dGV4dCB4PSIyNSIgeT0iNzIiPlJpcDogZmxhdCB0b3AsIGNoaXNlbC1saWtlIGVkZ2U8L3RleHQ+CjxwYXRoIGQ9Ik01NSAxNjBWMTA1SDEyNVYxNjAgTTE1NSAxNjBWMTA1SDIyNVYxNjAiIGNsYXNzPSJ3b29kIi8+CjxwYXRoIGQ9Ik01NSAxMDVIMTI1IE0xNTUgMTA1SDIyNSIgY2xhc3M9ImN1dCIvPgo8dGV4dCB4PSI0MjAiIHk9IjcyIj5Dcm9zc2N1dDogYWx0ZXJuYXRlIHRvcCBiZXZlbDwvdGV4dD4KPHBhdGggZD0iTTQ1MCAxNjBWOTVMNTIwIDEyNVYxNjAgTTU1MCAxNjBWMTI1TDYyMCA5NVYxNjAiIGNsYXNzPSJ3b29kIi8+CjxwYXRoIGQ9Ik00NTAgOTVMNTIwIDEyNSBNNTUwIDEyNUw2MjAgOTUiIGNsYXNzPSJjdXQiLz4KPHRleHQgeD0iMjUiIHk9IjIwMyIgY2xhc3M9Im5vdGUiPkVkZ2VzIGVtcGhhc2l6ZWQ7IGFjdHVhbCBibGFkZXMgY2FuIHVzZSBvdGhlciB0b290aCBhcnJhbmdlbWVudHMuPC90ZXh0Pgo8dGV4dCB4PSIyNSIgeT0iMjQ4IiBjbGFzcz0iaGVhZGluZyI+Q2xlYXJhbmNlOiBibGFkZSBib2R5IG5hcnJvd2VyIHRoYW4gY3V0PC90ZXh0Pgo8cmVjdCB4PSIzNSIgeT0iMjc1IiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjkwIiBjbGFzcz0id29vZCIvPjxyZWN0IHg9IjQwNSIgeT0iMjc1IiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjkwIiBjbGFzcz0id29vZCIvPgo8cmVjdCB4PSIzMzUiIHk9IjMwMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjZDJkN2RmIiBzdHJva2U9IiMxMjI4NGMiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMzA1IDI4M0g0MDUgTTMwNSAyNzVWMjkxIE00MDUgMjc1VjI5MSIgY2xhc3M9ImN1dCIvPgo8dGV4dCB4PSIzMTgiIHk9IjI2OCIgY2xhc3M9Im5vdGUiPktlcmY8L3RleHQ+PHRleHQgeD0iMjg1IiB5PSIzOTUiPkJsYWRlIGJvZHk8L3RleHQ+Cjx0ZXh0IHg9IjQ0MCIgeT0iMzk1IiBjbGFzcz0ibm90ZSI+U2V0IG9yIHdpZGVyIHRpcHMgcHJvdmlkZSBjbGVhcmFuY2UuPC90ZXh0Pgo8L3N2Zz4=" alt="Front views of flat-top ripping teeth and alternating beveled crosscut teeth, plus a blade body narrower than the kerf it cuts."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+PHRpdGxlIGlkPSJ0aXRsZSI+VG9vdGggZ2VvbWV0cnkgYW5kIGtlcmY8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5Db25jZXB0dWFsIGRpYWdyYW0sIG5vdCBhIG1hY2hpbmUgc2V0dXAgZHJhd2luZy4gTm90IHRvIHNjYWxlLjwvZGVzYz48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQyMCIgZmlsbD0iI2ZmZiIvPjxzdHlsZT50ZXh0e2ZvbnQ6MThweCBzYW5zLXNlcmlmO2ZpbGw6IzEyMjg0Y30uaGVhZGluZ3tmb250LXNpemU6MjJweDtmb250LXdlaWdodDpib2xkfS53b29ke2ZpbGw6I2Y3ZTViNTtzdHJva2U6IzEyMjg0YztzdHJva2Utd2lkdGg6Mn0ubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxMjI4NGM7c3Ryb2tlLXdpZHRoOjN9LmN1dHtmaWxsOm5vbmU7c3Ryb2tlOiNiNDQwMTU7c3Ryb2tlLXdpZHRoOjR9Lm5vdGV7Zm9udC1zaXplOjE2cHh9PC9zdHlsZT4KPHRleHQgeD0iMjUiIHk9IjMyIiBjbGFzcz0iaGVhZGluZyI+UmVwcmVzZW50YXRpdmUgY2lyY3VsYXItYmxhZGUgdGVldGg6IGZyb250IHZpZXdzPC90ZXh0Pgo8dGV4dCB4PSIyNSIgeT0iNzIiPlJpcDogZmxhdCB0b3AsIGNoaXNlbC1saWtlIGVkZ2U8L3RleHQ+CjxwYXRoIGQ9Ik01NSAxNjBWMTA1SDEyNVYxNjAgTTE1NSAxNjBWMTA1SDIyNVYxNjAiIGNsYXNzPSJ3b29kIi8+CjxwYXRoIGQ9Ik01NSAxMDVIMTI1IE0xNTUgMTA1SDIyNSIgY2xhc3M9ImN1dCIvPgo8dGV4dCB4PSI0MjAiIHk9IjcyIj5Dcm9zc2N1dDogYWx0ZXJuYXRlIHRvcCBiZXZlbDwvdGV4dD4KPHBhdGggZD0iTTQ1MCAxNjBWOTVMNTIwIDEyNVYxNjAgTTU1MCAxNjBWMTI1TDYyMCA5NVYxNjAiIGNsYXNzPSJ3b29kIi8+CjxwYXRoIGQ9Ik00NTAgOTVMNTIwIDEyNSBNNTUwIDEyNUw2MjAgOTUiIGNsYXNzPSJjdXQiLz4KPHRleHQgeD0iMjUiIHk9IjIwMyIgY2xhc3M9Im5vdGUiPkVkZ2VzIGVtcGhhc2l6ZWQ7IGFjdHVhbCBibGFkZXMgY2FuIHVzZSBvdGhlciB0b290aCBhcnJhbmdlbWVudHMuPC90ZXh0Pgo8dGV4dCB4PSIyNSIgeT0iMjQ4IiBjbGFzcz0iaGVhZGluZyI+Q2xlYXJhbmNlOiBibGFkZSBib2R5IG5hcnJvd2VyIHRoYW4gY3V0PC90ZXh0Pgo8cmVjdCB4PSIzNSIgeT0iMjc1IiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjkwIiBjbGFzcz0id29vZCIvPjxyZWN0IHg9IjQwNSIgeT0iMjc1IiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjkwIiBjbGFzcz0id29vZCIvPgo8cmVjdCB4PSIzMzUiIHk9IjMwMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjZDJkN2RmIiBzdHJva2U9IiMxMjI4NGMiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMzA1IDI4M0g0MDUgTTMwNSAyNzVWMjkxIE00MDUgMjc1VjI5MSIgY2xhc3M9ImN1dCIvPgo8dGV4dCB4PSIzMTgiIHk9IjI2OCIgY2xhc3M9Im5vdGUiPktlcmY8L3RleHQ+PHRleHQgeD0iMjg1IiB5PSIzOTUiPkJsYWRlIGJvZHk8L3RleHQ+Cjx0ZXh0IHg9IjQ0MCIgeT0iMzk1IiBjbGFzcz0ibm90ZSI+U2V0IG9yIHdpZGVyIHRpcHMgcHJvdmlkZSBjbGVhcmFuY2UuPC90ZXh0Pgo8L3N2Zz4=" alt="Front views of flat-top ripping teeth and alternating beveled crosscut teeth, plus a blade body narrower than the kerf it cuts." data-natural-width="800" data-natural-height="420"></p>
   <p>This page explains cutting concepts. For operation, use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a>.</p>
     </div>
   </details>
@@ -3082,7 +3109,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>A jointer establishes flatness; a planer establishes thickness</h2>
   <p><strong>Stock</strong> is the material a part starts from. Rough lumber may have uneven surfaces or warp. A jointer removes material to establish a flat face. With that face as a reference against a square fence, it can establish a straight edge at 90° to the face.</p>
   <p>A thickness planer cuts the upper face relative to the face supported by its bed. With a flat reference face down, it makes the opposite face parallel and brings the board to thickness. Jointing both faces separately does not ensure they are parallel.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+PHRpdGxlIGlkPSJ0aXRsZSI+RmxhdG5lc3MgYmVmb3JlIHBhcmFsbGVsIHRoaWNrbmVzczwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPkNvbmNlcHR1YWwgZGlhZ3JhbSwgbm90IGEgbWFjaGluZSBzZXR1cCBkcmF3aW5nLiBOb3QgdG8gc2NhbGUuPC9kZXNjPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDIwIiBmaWxsPSIjZmZmIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTIyODRjfS5oZWFkaW5ne2ZvbnQtc2l6ZToyMnB4O2ZvbnQtd2VpZ2h0OmJvbGR9Lndvb2R7ZmlsbDojZjdlNWI1O3N0cm9rZTojMTIyODRjO3N0cm9rZS13aWR0aDoyfS5saW5le2ZpbGw6bm9uZTtzdHJva2U6IzEyMjg0YztzdHJva2Utd2lkdGg6M30uY3V0e2ZpbGw6bm9uZTtzdHJva2U6I2I0NDAxNTtzdHJva2Utd2lkdGg6NH0ubm90ZXtmb250LXNpemU6MTZweH08L3N0eWxlPgo8dGV4dCB4PSIyNSIgeT0iMzUiIGNsYXNzPSJoZWFkaW5nIj5Kb2ludGVyOiBlc3RhYmxpc2ggb25lIGZsYXQgcmVmZXJlbmNlIGZhY2U8L3RleHQ+CjxwYXRoIGQ9Ik00NSA5NVExMjAgNjUgMTk1IDkwVDM0NSA4NUwzNDUgMTU1SDQ1WiIgY2xhc3M9Indvb2QiLz4KPHBhdGggZD0iTTQ1IDE1NUgzNDUiIGNsYXNzPSJjdXQiLz48dGV4dCB4PSIzODAiIHk9IjExMCI+T3Bwb3NpdGUgZmFjZSBzdGlsbCB1bmV2ZW48L3RleHQ+CjxwYXRoIGQ9Ik0zNTAgMTU1SDQyMCIgY2xhc3M9ImxpbmUiLz48dGV4dCB4PSI0MzAiIHk9IjE2MiI+RmxhdCByZWZlcmVuY2UgZmFjZTwvdGV4dD4KPHRleHQgeD0iMjUiIHk9IjIyNSIgY2xhc3M9ImhlYWRpbmciPlBsYW5lcjogbWFrZSB0aGUgb3RoZXIgZmFjZSBwYXJhbGxlbDwvdGV4dD4KPHJlY3QgeD0iNDUiIHk9IjI3MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI2NSIgY2xhc3M9Indvb2QiLz4KPHBhdGggZD0iTTQ1IDI3MEgzNDUgTTQ1IDMzNUgzNDUiIGNsYXNzPSJjdXQiLz4KPHBhdGggZD0iTTMwIDM0NUgzNjUiIGNsYXNzPSJsaW5lIi8+PHRleHQgeD0iMzgwIiB5PSIyOTUiPk9wcG9zaXRlIGZhY2UgY3V0IHBhcmFsbGVsPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMzM3Ij5SZWZlcmVuY2UgZmFjZSByZXN0cyBvbiBiZWQ8L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSIzOTAiIGNsYXNzPSJub3RlIj5SZXN1bHQgZ2VvbWV0cnkgb25seS4gSm9pbnRpbmcgYm90aCBmYWNlcyBkb2VzIG5vdCBlbnN1cmUgcGFyYWxsZWwgZmFjZXMuPC90ZXh0Pgo8L3N2Zz4=" alt="A jointer makes one face flat while the opposite face remains uneven; a planer references that flat face to make the opposite face parallel."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+PHRpdGxlIGlkPSJ0aXRsZSI+RmxhdG5lc3MgYmVmb3JlIHBhcmFsbGVsIHRoaWNrbmVzczwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPkNvbmNlcHR1YWwgZGlhZ3JhbSwgbm90IGEgbWFjaGluZSBzZXR1cCBkcmF3aW5nLiBOb3QgdG8gc2NhbGUuPC9kZXNjPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDIwIiBmaWxsPSIjZmZmIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTIyODRjfS5oZWFkaW5ne2ZvbnQtc2l6ZToyMnB4O2ZvbnQtd2VpZ2h0OmJvbGR9Lndvb2R7ZmlsbDojZjdlNWI1O3N0cm9rZTojMTIyODRjO3N0cm9rZS13aWR0aDoyfS5saW5le2ZpbGw6bm9uZTtzdHJva2U6IzEyMjg0YztzdHJva2Utd2lkdGg6M30uY3V0e2ZpbGw6bm9uZTtzdHJva2U6I2I0NDAxNTtzdHJva2Utd2lkdGg6NH0ubm90ZXtmb250LXNpemU6MTZweH08L3N0eWxlPgo8dGV4dCB4PSIyNSIgeT0iMzUiIGNsYXNzPSJoZWFkaW5nIj5Kb2ludGVyOiBlc3RhYmxpc2ggb25lIGZsYXQgcmVmZXJlbmNlIGZhY2U8L3RleHQ+CjxwYXRoIGQ9Ik00NSA5NVExMjAgNjUgMTk1IDkwVDM0NSA4NUwzNDUgMTU1SDQ1WiIgY2xhc3M9Indvb2QiLz4KPHBhdGggZD0iTTQ1IDE1NUgzNDUiIGNsYXNzPSJjdXQiLz48dGV4dCB4PSIzODAiIHk9IjExMCI+T3Bwb3NpdGUgZmFjZSBzdGlsbCB1bmV2ZW48L3RleHQ+CjxwYXRoIGQ9Ik0zNTAgMTU1SDQyMCIgY2xhc3M9ImxpbmUiLz48dGV4dCB4PSI0MzAiIHk9IjE2MiI+RmxhdCByZWZlcmVuY2UgZmFjZTwvdGV4dD4KPHRleHQgeD0iMjUiIHk9IjIyNSIgY2xhc3M9ImhlYWRpbmciPlBsYW5lcjogbWFrZSB0aGUgb3RoZXIgZmFjZSBwYXJhbGxlbDwvdGV4dD4KPHJlY3QgeD0iNDUiIHk9IjI3MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI2NSIgY2xhc3M9Indvb2QiLz4KPHBhdGggZD0iTTQ1IDI3MEgzNDUgTTQ1IDMzNUgzNDUiIGNsYXNzPSJjdXQiLz4KPHBhdGggZD0iTTMwIDM0NUgzNjUiIGNsYXNzPSJsaW5lIi8+PHRleHQgeD0iMzgwIiB5PSIyOTUiPk9wcG9zaXRlIGZhY2UgY3V0IHBhcmFsbGVsPC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iMzM3Ij5SZWZlcmVuY2UgZmFjZSByZXN0cyBvbiBiZWQ8L3RleHQ+Cjx0ZXh0IHg9IjI1IiB5PSIzOTAiIGNsYXNzPSJub3RlIj5SZXN1bHQgZ2VvbWV0cnkgb25seS4gSm9pbnRpbmcgYm90aCBmYWNlcyBkb2VzIG5vdCBlbnN1cmUgcGFyYWxsZWwgZmFjZXMuPC90ZXh0Pgo8L3N2Zz4=" alt="A jointer makes one face flat while the opposite face remains uneven; a planer references that flat face to make the opposite face parallel." data-natural-width="800" data-natural-height="420"></p>
   <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Why a planer alone can preserve a bow.</p>
     </div>
   </details>
@@ -3091,7 +3118,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Build reference surfaces in order: face, edge, thickness, width, length</h2>
   <p>This is the geometry sequence for preparing rough stock. It assumes enough material remains for the finished dimensions and that the stock fits the equipment. It is not a machine setup guide; use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a> for operation.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+PHRpdGxlIGlkPSJ0aXRsZSI+Rml2ZS1zdGFnZSByb3VnaC1sdW1iZXIgbWlsbGluZyBzZXF1ZW5jZTwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPkNvbmNlcHR1YWwgZGlhZ3JhbSwgbm90IGEgbWFjaGluZSBzZXR1cCBkcmF3aW5nLiBOb3QgdG8gc2NhbGUuPC9kZXNjPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjMwIiBmaWxsPSIjZmZmIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTIyODRjfS5oZWFkaW5ne2ZvbnQtc2l6ZToyMnB4O2ZvbnQtd2VpZ2h0OmJvbGR9Lndvb2R7ZmlsbDojZjdlNWI1O3N0cm9rZTojMTIyODRjO3N0cm9rZS13aWR0aDoyfS5saW5le2ZpbGw6bm9uZTtzdHJva2U6IzEyMjg0YztzdHJva2Utd2lkdGg6M30uY3V0e2ZpbGw6bm9uZTtzdHJva2U6I2I0NDAxNTtzdHJva2Utd2lkdGg6NH0ubm90ZXtmb250LXNpemU6MTZweH08L3N0eWxlPjx0ZXh0IHg9IjI1IiB5PSIzNSIgY2xhc3M9ImhlYWRpbmciPlJvdWdoIHN0b2NrIOKGkiByZWZlcmVuY2Ugc3VyZmFjZXMg4oaSIGZpbmFsIGRpbWVuc2lvbnM8L3RleHQ+PHJlY3QgeD0iMjUiIHk9IjY1IiB3aWR0aD0iNzUwIiBoZWlnaHQ9Ijc4IiByeD0iOCIgY2xhc3M9Indvb2QiLz48dGV4dCB4PSI0NSIgeT0iOTQiIGNsYXNzPSJoZWFkaW5nIj4xLiBGYWNlLWpvaW50PC90ZXh0Pjx0ZXh0IHg9IjQ1IiB5PSIxMjMiPk9uZSBmbGF0IGZhY2U8L3RleHQ+PHBhdGggZD0iTTQwMCAxNDV2MjBtLTYgLTYgNiA2IDYgLTYiIGNsYXNzPSJsaW5lIi8+PHJlY3QgeD0iMjUiIHk9IjE2OCIgd2lkdGg9Ijc1MCIgaGVpZ2h0PSI3OCIgcng9IjgiIGNsYXNzPSJ3b29kIi8+PHRleHQgeD0iNDUiIHk9IjE5NyIgY2xhc3M9ImhlYWRpbmciPjIuIEVkZ2Utam9pbnQ8L3RleHQ+PHRleHQgeD0iNDUiIHk9IjIyNiI+T25lIGVkZ2Ugc3F1YXJlIHRvIHRoYXQgZmFjZTwvdGV4dD48cGF0aCBkPSJNNDAwIDI0OHYyMG0tNiAtNiA2IDYgNiAtNiIgY2xhc3M9ImxpbmUiLz48cmVjdCB4PSIyNSIgeT0iMjcxIiB3aWR0aD0iNzUwIiBoZWlnaHQ9Ijc4IiByeD0iOCIgY2xhc3M9Indvb2QiLz48dGV4dCB4PSI0NSIgeT0iMzAwIiBjbGFzcz0iaGVhZGluZyI+My4gUGxhbmU8L3RleHQ+PHRleHQgeD0iNDUiIHk9IjMyOSI+T3Bwb3NpdGUgZmFjZSBwYXJhbGxlbDsgc2V0IHRoaWNrbmVzczwvdGV4dD48cGF0aCBkPSJNNDAwIDM1MXYyMG0tNiAtNiA2IDYgNiAtNiIgY2xhc3M9ImxpbmUiLz48cmVjdCB4PSIyNSIgeT0iMzc0IiB3aWR0aD0iNzUwIiBoZWlnaHQ9Ijc4IiByeD0iOCIgY2xhc3M9Indvb2QiLz48dGV4dCB4PSI0NSIgeT0iNDAzIiBjbGFzcz0iaGVhZGluZyI+NC4gUmlwPC90ZXh0Pjx0ZXh0IHg9IjQ1IiB5PSI0MzIiPk9wcG9zaXRlIGVkZ2UgcGFyYWxsZWw7IHNldCB3aWR0aDwvdGV4dD48cGF0aCBkPSJNNDAwIDQ1NHYyMG0tNiAtNiA2IDYgNiAtNiIgY2xhc3M9ImxpbmUiLz48cmVjdCB4PSIyNSIgeT0iNDc3IiB3aWR0aD0iNzUwIiBoZWlnaHQ9Ijc4IiByeD0iOCIgY2xhc3M9Indvb2QiLz48dGV4dCB4PSI0NSIgeT0iNTA2IiBjbGFzcz0iaGVhZGluZyI+NS4gQ3Jvc3NjdXQ8L3RleHQ+PHRleHQgeD0iNDUiIHk9IjUzNSI+U3F1YXJlIGVuZHM7IHNldCBsZW5ndGg8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjYwNiIgY2xhc3M9Im5vdGUiPkVhY2ggc3RhZ2UgdXNlcyBnZW9tZXRyeSBlc3RhYmxpc2hlZCBlYXJsaWVyLiBJbnNwZWN0IHRoZSByZXN1bHQgYXQgZWFjaCBzdGFnZS48L3RleHQ+PC9zdmc+" alt="Five stages: face-joint a flat face, edge-joint square to that face, plane the opposite face parallel, rip the opposite edge parallel, then crosscut ends to length."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+PHRpdGxlIGlkPSJ0aXRsZSI+Rml2ZS1zdGFnZSByb3VnaC1sdW1iZXIgbWlsbGluZyBzZXF1ZW5jZTwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPkNvbmNlcHR1YWwgZGlhZ3JhbSwgbm90IGEgbWFjaGluZSBzZXR1cCBkcmF3aW5nLiBOb3QgdG8gc2NhbGUuPC9kZXNjPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjMwIiBmaWxsPSIjZmZmIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTIyODRjfS5oZWFkaW5ne2ZvbnQtc2l6ZToyMnB4O2ZvbnQtd2VpZ2h0OmJvbGR9Lndvb2R7ZmlsbDojZjdlNWI1O3N0cm9rZTojMTIyODRjO3N0cm9rZS13aWR0aDoyfS5saW5le2ZpbGw6bm9uZTtzdHJva2U6IzEyMjg0YztzdHJva2Utd2lkdGg6M30uY3V0e2ZpbGw6bm9uZTtzdHJva2U6I2I0NDAxNTtzdHJva2Utd2lkdGg6NH0ubm90ZXtmb250LXNpemU6MTZweH08L3N0eWxlPjx0ZXh0IHg9IjI1IiB5PSIzNSIgY2xhc3M9ImhlYWRpbmciPlJvdWdoIHN0b2NrIOKGkiByZWZlcmVuY2Ugc3VyZmFjZXMg4oaSIGZpbmFsIGRpbWVuc2lvbnM8L3RleHQ+PHJlY3QgeD0iMjUiIHk9IjY1IiB3aWR0aD0iNzUwIiBoZWlnaHQ9Ijc4IiByeD0iOCIgY2xhc3M9Indvb2QiLz48dGV4dCB4PSI0NSIgeT0iOTQiIGNsYXNzPSJoZWFkaW5nIj4xLiBGYWNlLWpvaW50PC90ZXh0Pjx0ZXh0IHg9IjQ1IiB5PSIxMjMiPk9uZSBmbGF0IGZhY2U8L3RleHQ+PHBhdGggZD0iTTQwMCAxNDV2MjBtLTYgLTYgNiA2IDYgLTYiIGNsYXNzPSJsaW5lIi8+PHJlY3QgeD0iMjUiIHk9IjE2OCIgd2lkdGg9Ijc1MCIgaGVpZ2h0PSI3OCIgcng9IjgiIGNsYXNzPSJ3b29kIi8+PHRleHQgeD0iNDUiIHk9IjE5NyIgY2xhc3M9ImhlYWRpbmciPjIuIEVkZ2Utam9pbnQ8L3RleHQ+PHRleHQgeD0iNDUiIHk9IjIyNiI+T25lIGVkZ2Ugc3F1YXJlIHRvIHRoYXQgZmFjZTwvdGV4dD48cGF0aCBkPSJNNDAwIDI0OHYyMG0tNiAtNiA2IDYgNiAtNiIgY2xhc3M9ImxpbmUiLz48cmVjdCB4PSIyNSIgeT0iMjcxIiB3aWR0aD0iNzUwIiBoZWlnaHQ9Ijc4IiByeD0iOCIgY2xhc3M9Indvb2QiLz48dGV4dCB4PSI0NSIgeT0iMzAwIiBjbGFzcz0iaGVhZGluZyI+My4gUGxhbmU8L3RleHQ+PHRleHQgeD0iNDUiIHk9IjMyOSI+T3Bwb3NpdGUgZmFjZSBwYXJhbGxlbDsgc2V0IHRoaWNrbmVzczwvdGV4dD48cGF0aCBkPSJNNDAwIDM1MXYyMG0tNiAtNiA2IDYgNiAtNiIgY2xhc3M9ImxpbmUiLz48cmVjdCB4PSIyNSIgeT0iMzc0IiB3aWR0aD0iNzUwIiBoZWlnaHQ9Ijc4IiByeD0iOCIgY2xhc3M9Indvb2QiLz48dGV4dCB4PSI0NSIgeT0iNDAzIiBjbGFzcz0iaGVhZGluZyI+NC4gUmlwPC90ZXh0Pjx0ZXh0IHg9IjQ1IiB5PSI0MzIiPk9wcG9zaXRlIGVkZ2UgcGFyYWxsZWw7IHNldCB3aWR0aDwvdGV4dD48cGF0aCBkPSJNNDAwIDQ1NHYyMG0tNiAtNiA2IDYgNiAtNiIgY2xhc3M9ImxpbmUiLz48cmVjdCB4PSIyNSIgeT0iNDc3IiB3aWR0aD0iNzUwIiBoZWlnaHQ9Ijc4IiByeD0iOCIgY2xhc3M9Indvb2QiLz48dGV4dCB4PSI0NSIgeT0iNTA2IiBjbGFzcz0iaGVhZGluZyI+NS4gQ3Jvc3NjdXQ8L3RleHQ+PHRleHQgeD0iNDUiIHk9IjUzNSI+U3F1YXJlIGVuZHM7IHNldCBsZW5ndGg8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjYwNiIgY2xhc3M9Im5vdGUiPkVhY2ggc3RhZ2UgdXNlcyBnZW9tZXRyeSBlc3RhYmxpc2hlZCBlYXJsaWVyLiBJbnNwZWN0IHRoZSByZXN1bHQgYXQgZWFjaCBzdGFnZS48L3RleHQ+PC9zdmc+" alt="Five stages: face-joint a flat face, edge-joint square to that face, plane the opposite face parallel, rip the opposite edge parallel, then crosscut ends to length." data-natural-width="800" data-natural-height="630"></p>
   <ol>
     <li><strong>Face-joint:</strong> establish a flat face and mark it as the reference.</li>
     <li><strong>Edge-joint:</strong> use the reference face to establish one straight edge square to it.</li>
@@ -3158,7 +3185,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Bent lamination uses thin strips and adhesive to retain a curve</h2>
   <p>Thin strips bend more easily than one solid piece of the same total thickness. Bent lamination brings prepared strips together with adhesive over a form, then restrains them until the bond has developed as specified for that adhesive. The strips commonly run with their grain along the curve. Alternating grain direction is not a requirement of bent lamination.</p>
   <p><strong>Springback</strong> is the tendency for a bend to open when restraint is removed. It can occur in both steam-bent and laminated parts. Thinner laminations can reduce springback for a given total thickness and curve, but adhesive behavior, layer count and material also matter. A trial bend establishes any form compensation; there is no universal correction percentage.</p>
-  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+PHRpdGxlIGlkPSJ0aXRsZSI+U3RlYW0gYmVuZGluZyBjb21wYXJlZCB3aXRoIGJlbnQgbGFtaW5hdGlvbjwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPkNvbmNlcHR1YWwgZGlhZ3JhbSwgbm90IGEgbWFjaGluZSBzZXR1cCBkcmF3aW5nLiBOb3QgdG8gc2NhbGUuPC9kZXNjPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDgwIiBmaWxsPSIjZmZmIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTIyODRjfS5oZWFkaW5ne2ZvbnQtc2l6ZToyMnB4O2ZvbnQtd2VpZ2h0OmJvbGR9Lndvb2R7ZmlsbDojZjdlNWI1O3N0cm9rZTojMTIyODRjO3N0cm9rZS13aWR0aDoyfS5saW5le2ZpbGw6bm9uZTtzdHJva2U6IzEyMjg0YztzdHJva2Utd2lkdGg6M30uY3V0e2ZpbGw6bm9uZTtzdHJva2U6I2I0NDAxNTtzdHJva2Utd2lkdGg6NH0ubm90ZXtmb250LXNpemU6MTZweH08L3N0eWxlPgo8dGV4dCB4PSIyNSIgeT0iMzUiIGNsYXNzPSJoZWFkaW5nIj5TdGVhbSBiZW5kOiBvbmUgc29mdGVuZWQgcGllY2U8L3RleHQ+CjxyZWN0IHg9IjI1IiB5PSI2NSIgd2lkdGg9IjI0MCIgaGVpZ2h0PSIyNSIgY2xhc3M9Indvb2QiLz4KPHBhdGggZD0iTTI5NSA3OEgzNzBtLTEwIC04IDEwIDggLTEwIDgiIGNsYXNzPSJsaW5lIi8+CjxwYXRoIGQ9Ik00MzAgMTcwUTU2MCAtMTAgNjkwIDE3MEw2NzMgMTg4UTU2MCAyNSA0NDcgMTg4WiIgY2xhc3M9Indvb2QiLz4KPHBhdGggZD0iTTQ2MCAxOTVRNTYwIDU4IDY2MCAxOTVaIiBmaWxsPSIjZDJkN2RmIiBzdHJva2U9IiMxMjI4NGMiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSI1MzUiIHk9IjE3NyI+Rm9ybTwvdGV4dD48dGV4dCB4PSIyNSIgeT0iMTI3Ij5IZWF0ICsgbW9pc3R1cmU8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjE1NyI+QmVuZDsgcmVzdHJhaW4gd2hpbGUgc2V0dGluZzwvdGV4dD4KPHRleHQgeD0iMjUiIHk9IjI0NSIgY2xhc3M9ImhlYWRpbmciPkJlbnQgbGFtaW5hdGlvbjogdGhpbiBzdHJpcHMgKyBhZGhlc2l2ZTwvdGV4dD4KPHBhdGggZD0iTTI1IDI4MEgyNjUgTTI1IDI5MkgyNjUgTTI1IDMwNEgyNjUiIHN0cm9rZT0iI2FkNzgyOSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CjxwYXRoIGQ9Ik0yOTUgMjkySDM3MG0tMTAgLTggMTAgOCAtMTAgOCIgY2xhc3M9ImxpbmUiLz4KPHBhdGggZD0iTTQzMCAzNzVRNTYwIDE5NSA2OTAgMzc1IE00MzggMzgzUTU2MCAyMTcgNjgyIDM4MyBNNDQ2IDM5MVE1NjAgMjM5IDY3NCAzOTEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2FkNzgyOSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CjxwYXRoIGQ9Ik00NjAgNDA5UTU2MCAyNzIgNjYwIDQwOVoiIGZpbGw9IiNkMmQ3ZGYiIHN0cm9rZT0iIzEyMjg0YyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjUzNSIgeT0iMzkwIj5Gb3JtPC90ZXh0Pjx0ZXh0IHg9IjI1IiB5PSIzNDYiPkJlbmQgdG9nZXRoZXI7IHJlc3RyYWluPC90ZXh0Pjx0ZXh0IHg9IjI1IiB5PSIzNzYiPnVudGlsIHRoZSBib25kIGRldmVsb3BzPC90ZXh0Pgo8dGV4dCB4PSIyNSIgeT0iNDU1IiBjbGFzcz0ibm90ZSI+Qm90aCByb3V0ZXMgY2FuIHNwcmluZyBiYWNrIGFmdGVyIHJlbGVhc2UuIEZvcm0gY29tcGVuc2F0aW9uIG5lZWRzIGEgdHJpYWwuPC90ZXh0Pgo8L3N2Zz4=" alt="Steam bending curves one softened piece around a form; bent lamination curves several thin strips and bonds them together over a form. Both can spring back when released."></p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+PHRpdGxlIGlkPSJ0aXRsZSI+U3RlYW0gYmVuZGluZyBjb21wYXJlZCB3aXRoIGJlbnQgbGFtaW5hdGlvbjwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPkNvbmNlcHR1YWwgZGlhZ3JhbSwgbm90IGEgbWFjaGluZSBzZXR1cCBkcmF3aW5nLiBOb3QgdG8gc2NhbGUuPC9kZXNjPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDgwIiBmaWxsPSIjZmZmIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTIyODRjfS5oZWFkaW5ne2ZvbnQtc2l6ZToyMnB4O2ZvbnQtd2VpZ2h0OmJvbGR9Lndvb2R7ZmlsbDojZjdlNWI1O3N0cm9rZTojMTIyODRjO3N0cm9rZS13aWR0aDoyfS5saW5le2ZpbGw6bm9uZTtzdHJva2U6IzEyMjg0YztzdHJva2Utd2lkdGg6M30uY3V0e2ZpbGw6bm9uZTtzdHJva2U6I2I0NDAxNTtzdHJva2Utd2lkdGg6NH0ubm90ZXtmb250LXNpemU6MTZweH08L3N0eWxlPgo8dGV4dCB4PSIyNSIgeT0iMzUiIGNsYXNzPSJoZWFkaW5nIj5TdGVhbSBiZW5kOiBvbmUgc29mdGVuZWQgcGllY2U8L3RleHQ+CjxyZWN0IHg9IjI1IiB5PSI2NSIgd2lkdGg9IjI0MCIgaGVpZ2h0PSIyNSIgY2xhc3M9Indvb2QiLz4KPHBhdGggZD0iTTI5NSA3OEgzNzBtLTEwIC04IDEwIDggLTEwIDgiIGNsYXNzPSJsaW5lIi8+CjxwYXRoIGQ9Ik00MzAgMTcwUTU2MCAtMTAgNjkwIDE3MEw2NzMgMTg4UTU2MCAyNSA0NDcgMTg4WiIgY2xhc3M9Indvb2QiLz4KPHBhdGggZD0iTTQ2MCAxOTVRNTYwIDU4IDY2MCAxOTVaIiBmaWxsPSIjZDJkN2RmIiBzdHJva2U9IiMxMjI4NGMiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSI1MzUiIHk9IjE3NyI+Rm9ybTwvdGV4dD48dGV4dCB4PSIyNSIgeT0iMTI3Ij5IZWF0ICsgbW9pc3R1cmU8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjE1NyI+QmVuZDsgcmVzdHJhaW4gd2hpbGUgc2V0dGluZzwvdGV4dD4KPHRleHQgeD0iMjUiIHk9IjI0NSIgY2xhc3M9ImhlYWRpbmciPkJlbnQgbGFtaW5hdGlvbjogdGhpbiBzdHJpcHMgKyBhZGhlc2l2ZTwvdGV4dD4KPHBhdGggZD0iTTI1IDI4MEgyNjUgTTI1IDI5MkgyNjUgTTI1IDMwNEgyNjUiIHN0cm9rZT0iI2FkNzgyOSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CjxwYXRoIGQ9Ik0yOTUgMjkySDM3MG0tMTAgLTggMTAgOCAtMTAgOCIgY2xhc3M9ImxpbmUiLz4KPHBhdGggZD0iTTQzMCAzNzVRNTYwIDE5NSA2OTAgMzc1IE00MzggMzgzUTU2MCAyMTcgNjgyIDM4MyBNNDQ2IDM5MVE1NjAgMjM5IDY3NCAzOTEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2FkNzgyOSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CjxwYXRoIGQ9Ik00NjAgNDA5UTU2MCAyNzIgNjYwIDQwOVoiIGZpbGw9IiNkMmQ3ZGYiIHN0cm9rZT0iIzEyMjg0YyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjUzNSIgeT0iMzkwIj5Gb3JtPC90ZXh0Pjx0ZXh0IHg9IjI1IiB5PSIzNDYiPkJlbmQgdG9nZXRoZXI7IHJlc3RyYWluPC90ZXh0Pjx0ZXh0IHg9IjI1IiB5PSIzNzYiPnVudGlsIHRoZSBib25kIGRldmVsb3BzPC90ZXh0Pgo8dGV4dCB4PSIyNSIgeT0iNDU1IiBjbGFzcz0ibm90ZSI+Qm90aCByb3V0ZXMgY2FuIHNwcmluZyBiYWNrIGFmdGVyIHJlbGVhc2UuIEZvcm0gY29tcGVuc2F0aW9uIG5lZWRzIGEgdHJpYWwuPC90ZXh0Pgo8L3N2Zz4=" alt="Steam bending curves one softened piece around a form; bent lamination curves several thin strips and bonds them together over a form. Both can spring back when released." data-natural-width="800" data-natural-height="480"></p>
   <p>Do not rank every “hot/wet” part above every “cold/dry” part in strength. Compare the actual grain path, remaining section, bond quality, loading and service conditions.</p>
   <p><a class="button" data-practice-add="wood-bent-lamination" href="../practice.html#wood-bent-lamination">Practice bending-route selection</a></p>
     </div>
@@ -4895,6 +4922,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

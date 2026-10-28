@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2979,7 +3006,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Read the conventional marking from abrasive to bond</h2>
   <p>The usual core sequence is <strong>abrasive → grit → grade → structure → bond</strong>. Prefixes and suffixes may identify a manufacturer's particular abrasive or bond. Some markings omit a structure field. Superabrasive specifications may include concentration and use a different format.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkNvbnZlbnRpb25hbCB3aGVlbCBtYXJraW5nIHNlcXVlbmNlPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+UmVhZCBmaXZlIGZpZWxkcyBmcm9tIHRvcCB0byBib3R0b206IGFicmFzaXZlLCBncml0LCBncmFkZSwgc3RydWN0dXJlLCBib25kLiBBbiBpbGx1c3RyYXRpdmUgc3VwcGxpZXIga2V5IGlzIEEsIDYwLCBKLCA3LCBWLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1OTAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMTAyYjQ5Ij4KPHRleHQgeD0iMzAiIHk9IjQ4Ij5JbGx1c3RyYXRpdmUgbWFya2luZzogQSA2MCBKIDcgVjwvdGV4dD4KPGcgZmlsbD0iI2VlZjRmYSIgc3Ryb2tlPSIjMTAyYjQ5IiBzdHJva2Utd2lkdGg9IjIiPjxyZWN0IHg9IjMwIiB5PSI3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjE3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjI3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjM3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjQ3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PC9nPgo8dGV4dCB4PSI1MCIgeT0iMTI1Ij5BIMK3IEFicmFzaXZlOiBjdXR0aW5nIG1hdGVyaWFsPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSIyMjUiPjYwIMK3IEdyaXQ6IGdyYWluIHNpemU8L3RleHQ+PHRleHQgeD0iNTAiIHk9IjMyNSI+SiDCtyBHcmFkZTogZ3JhaW4gcmV0ZW50aW9uPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI0MjUiPjcgwrcgU3RydWN0dXJlOiBncmFpbiBzcGFjaW5nPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI1MjUiPlYgwrcgQm9uZDogYmluZGVyPC90ZXh0Pgo8L2c+PHBhdGggZD0iTTQwMCAxNTR2MjBtLTctOCA3IDggNy04TTQwMCAyNTR2MjBtLTctOCA3IDggNy04TTQwMCAzNTR2MjBtLTctOCA3IDggNy04TTQwMCA0NTR2MjBtLTctOCA3IDggNy04IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMDJiNDkiIHN0cm9rZS13aWR0aD0iMyIvPgo8L3N2Zz4K" alt="Five fields in order: abrasive identifies the cutting material, grit its size, grade grain retention, structure grain spacing, and bond the binder."></p><figcaption>Read the meaning of each field before interpreting a manufacturer's code.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkNvbnZlbnRpb25hbCB3aGVlbCBtYXJraW5nIHNlcXVlbmNlPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+UmVhZCBmaXZlIGZpZWxkcyBmcm9tIHRvcCB0byBib3R0b206IGFicmFzaXZlLCBncml0LCBncmFkZSwgc3RydWN0dXJlLCBib25kLiBBbiBpbGx1c3RyYXRpdmUgc3VwcGxpZXIga2V5IGlzIEEsIDYwLCBKLCA3LCBWLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1OTAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMTAyYjQ5Ij4KPHRleHQgeD0iMzAiIHk9IjQ4Ij5JbGx1c3RyYXRpdmUgbWFya2luZzogQSA2MCBKIDcgVjwvdGV4dD4KPGcgZmlsbD0iI2VlZjRmYSIgc3Ryb2tlPSIjMTAyYjQ5IiBzdHJva2Utd2lkdGg9IjIiPjxyZWN0IHg9IjMwIiB5PSI3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjE3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjI3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjM3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PHJlY3QgeD0iMzAiIHk9IjQ3NSIgd2lkdGg9Ijc0MCIgaGVpZ2h0PSI3OCIgcng9IjEwIi8+PC9nPgo8dGV4dCB4PSI1MCIgeT0iMTI1Ij5BIMK3IEFicmFzaXZlOiBjdXR0aW5nIG1hdGVyaWFsPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSIyMjUiPjYwIMK3IEdyaXQ6IGdyYWluIHNpemU8L3RleHQ+PHRleHQgeD0iNTAiIHk9IjMyNSI+SiDCtyBHcmFkZTogZ3JhaW4gcmV0ZW50aW9uPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI0MjUiPjcgwrcgU3RydWN0dXJlOiBncmFpbiBzcGFjaW5nPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI1MjUiPlYgwrcgQm9uZDogYmluZGVyPC90ZXh0Pgo8L2c+PHBhdGggZD0iTTQwMCAxNTR2MjBtLTctOCA3IDggNy04TTQwMCAyNTR2MjBtLTctOCA3IDggNy04TTQwMCAzNTR2MjBtLTctOCA3IDggNy04TTQwMCA0NTR2MjBtLTctOCA3IDggNy04IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMDJiNDkiIHN0cm9rZS13aWR0aD0iMyIvPgo8L3N2Zz4K" alt="Five fields in order: abrasive identifies the cutting material, grit its size, grade grain retention, structure grain spacing, and bond the binder." data-natural-width="800" data-natural-height="590"></p><figcaption>Read the meaning of each field before interpreting a manufacturer's code.</figcaption></figure>
   <p>For a teaching example, suppose a supplier defines <strong>A 60 J 7 V</strong> as aluminum oxide, grit 60, grade J, structure 7 and vitrified bond. The 60 is not an RPM limit; the J is not the hardness of aluminum oxide. Use that supplier's key to interpret J and 7 rather than assuming all manufacturers' grades behave alike.</p>
   <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; A manufacturer's explanation of the marking.</p>
   <p><a class="button" data-practice-add="grinding-marking-fields" href="../practice.html#grinding-marking-fields">Practice decoding a wheel</a> <a class="button" data-practice-add="grinding-grit-comparison" href="../practice.html#grinding-grit-comparison">Practice grit selection</a></p>
@@ -3011,7 +3038,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Wheel wear changes both rest and tongue-guard clearances</h2>
   <p>The <strong>tool rest</strong> supports the work near the wheel. The <strong>tongue guard</strong> is the adjustable part of the surrounding guard above the working opening; it is not the transparent eye shield. As the wheel becomes smaller, both clearances need checking and adjustment to the applicable machine instructions and requirements.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkJlbmNoIGdyaW5kZXIgcmVzdCBhbmQgdG9uZ3VlIGd1YXJkPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+U2lkZSB2aWV3OiB0aGUgZ3VhcmQgc3Vycm91bmRzIHRoZSBiYWNrIG9mIHRoZSB3aGVlbC4gVGhlIHRvbmd1ZSBndWFyZCBlbmRzIGFib3ZlIHRoZSBvcGVuaW5nIG9uIHRoZSByaWdodC4gVGhlIHRvb2wgcmVzdCBlbmRzIG5lYXIgdGhlIGxvd2VyIHBhcnQgb2YgdGhhdCBvcGVuaW5nLiBMZWFkZXJzIGlkZW50aWZ5IGVhY2ggZ2FwIHdpdGhvdXQgZGltZW5zaW9ucy48L2Rlc2M+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiBmaWxsPSIjZmZmIi8+CjxwYXRoIGQ9Ik0zNjUgMTIwQTIxMCAyMTAgMCAxIDAgMzY1IDQ4MEwzMzUgNDM1QTE1NSAxNTUgMCAxIDEgMzM1IDE2NVoiIGZpbGw9IiNjZWQ4ZTIiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxjaXJjbGUgY3g9IjI2MCIgY3k9IjMwMCIgcj0iMTU1IiBmaWxsPSIjZWVmNGZhIiBzdHJva2U9IiMxMDJiNDkiIHN0cm9rZS13aWR0aD0iNCIvPjxjaXJjbGUgY3g9IjI2MCIgY3k9IjMwMCIgcj0iMjIiIGZpbGw9IiMxMDJiNDkiLz4KPHBhdGggZD0iTTM0MCAxMzBoODh2NDJoLTY1IiBmaWxsPSIjZWNhYzAwIiBzdHJva2U9IiMxMDJiNDkiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNNDE0IDM3NWgxNTV2MzBINDQ0djY1aC0zMFoiIGZpbGw9IiNlY2FjMDAiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSIzIj48cGF0aCBkPSJNNDI1IDE0NSA0OTAgODBoMjYwTTQwMCAxOTMgNDkwIDI0NWgyNjBNNDA4IDM2MSA0OTAgMzIwaDI2ME01NDUgMzk4djkyaDIwNU0xNTAgMTQ1IDcwIDgwTTIwMCAzMzBsLTg1IDE5MCIvPjwvZz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMTAyYjQ5Ij48dGV4dCB4PSI0NzAiIHk9IjY1Ij5Ub25ndWUgZ3VhcmQ8L3RleHQ+PHRleHQgeD0iNDc1IiB5PSIyMzAiPlVwcGVyIGdhcDwvdGV4dD48dGV4dCB4PSI0NzUiIHk9IjMwNSI+UmVzdCBnYXA8L3RleHQ+PHRleHQgeD0iNTYwIiB5PSI0NzUiPlRvb2wgcmVzdDwvdGV4dD48dGV4dCB4PSIzMCIgeT0iNjUiPkd1YXJkPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI1NTUiPldoZWVsPC90ZXh0Pjx0ZXh0IHg9IjQwMCIgeT0iNTY1Ij5TaWRlIHZpZXcgwrcgbm90IHRvIHNjYWxlPC90ZXh0PjwvZz4KPC9zdmc+Cg==" alt="Side-view schematic with the wheel inside a surrounding guard, a tongue guard above the opening, and a tool rest below it; the two clearances are separately labeled."></p><figcaption>Positions only, not a scale drawing or a gap-setting gauge. The eye shield is omitted for clarity.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkJlbmNoIGdyaW5kZXIgcmVzdCBhbmQgdG9uZ3VlIGd1YXJkPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+U2lkZSB2aWV3OiB0aGUgZ3VhcmQgc3Vycm91bmRzIHRoZSBiYWNrIG9mIHRoZSB3aGVlbC4gVGhlIHRvbmd1ZSBndWFyZCBlbmRzIGFib3ZlIHRoZSBvcGVuaW5nIG9uIHRoZSByaWdodC4gVGhlIHRvb2wgcmVzdCBlbmRzIG5lYXIgdGhlIGxvd2VyIHBhcnQgb2YgdGhhdCBvcGVuaW5nLiBMZWFkZXJzIGlkZW50aWZ5IGVhY2ggZ2FwIHdpdGhvdXQgZGltZW5zaW9ucy48L2Rlc2M+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiBmaWxsPSIjZmZmIi8+CjxwYXRoIGQ9Ik0zNjUgMTIwQTIxMCAyMTAgMCAxIDAgMzY1IDQ4MEwzMzUgNDM1QTE1NSAxNTUgMCAxIDEgMzM1IDE2NVoiIGZpbGw9IiNjZWQ4ZTIiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxjaXJjbGUgY3g9IjI2MCIgY3k9IjMwMCIgcj0iMTU1IiBmaWxsPSIjZWVmNGZhIiBzdHJva2U9IiMxMDJiNDkiIHN0cm9rZS13aWR0aD0iNCIvPjxjaXJjbGUgY3g9IjI2MCIgY3k9IjMwMCIgcj0iMjIiIGZpbGw9IiMxMDJiNDkiLz4KPHBhdGggZD0iTTM0MCAxMzBoODh2NDJoLTY1IiBmaWxsPSIjZWNhYzAwIiBzdHJva2U9IiMxMDJiNDkiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNNDE0IDM3NWgxNTV2MzBINDQ0djY1aC0zMFoiIGZpbGw9IiNlY2FjMDAiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSIzIj48cGF0aCBkPSJNNDI1IDE0NSA0OTAgODBoMjYwTTQwMCAxOTMgNDkwIDI0NWgyNjBNNDA4IDM2MSA0OTAgMzIwaDI2ME01NDUgMzk4djkyaDIwNU0xNTAgMTQ1IDcwIDgwTTIwMCAzMzBsLTg1IDE5MCIvPjwvZz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMTAyYjQ5Ij48dGV4dCB4PSI0NzAiIHk9IjY1Ij5Ub25ndWUgZ3VhcmQ8L3RleHQ+PHRleHQgeD0iNDc1IiB5PSIyMzAiPlVwcGVyIGdhcDwvdGV4dD48dGV4dCB4PSI0NzUiIHk9IjMwNSI+UmVzdCBnYXA8L3RleHQ+PHRleHQgeD0iNTYwIiB5PSI0NzUiPlRvb2wgcmVzdDwvdGV4dD48dGV4dCB4PSIzMCIgeT0iNjUiPkd1YXJkPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI1NTUiPldoZWVsPC90ZXh0Pjx0ZXh0IHg9IjQwMCIgeT0iNTY1Ij5TaWRlIHZpZXcgwrcgbm90IHRvIHNjYWxlPC90ZXh0PjwvZz4KPC9zdmc+Cg==" alt="Side-view schematic with the wheel inside a surrounding guard, a tongue guard above the opening, and a tool rest below it; the two clearances are separately labeled." data-natural-width="800" data-natural-height="600"></p><figcaption>Positions only, not a scale drawing or a gap-setting gauge. The eye shield is omitted for clarity.</figcaption></figure>
   <p>Make these adjustments with the wheel stopped and the machine secured according to its operating procedure. Recheck after dressing or wheel replacement. Use the specified clearance limits, not the proportions in the drawing.</p>
   <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Where to check the clearance requirements.</p>
     </div>
@@ -3074,7 +3101,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>A surface grinder separates table travel, crossfeed and downfeed</h2>
   <p>On a horizontal-spindle reciprocating-table surface grinder, the table carries the work back and forth under the wheel. <strong>Crossfeed</strong> shifts the contact across the width of the work. <strong>Downfeed</strong> moves the wheel toward the work in small increments to remove thickness. Other surface grinders use different arrangements, including rotary tables.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlRocmVlIHN1cmZhY2UgZ3JpbmRlciBtb3Rpb25zPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+U2lkZSB2aWV3IHNob3dzIHRoZSB0YWJsZSByZWNpcHJvY2F0aW5nIGJlbmVhdGggdGhlIHdoZWVsLiBUb3AgdmlldyBzaG93cyBjcm9zc2ZlZWQgcGVycGVuZGljdWxhciB0byB0YWJsZSB0cmF2ZWwuIEEgc2Vjb25kIHNpZGUgdmlldyBzaG93cyBkb3duZmVlZCBtb3ZpbmcgdGhlIHdoZWVsIHRvd2FyZCB0aGUgd29yay48L2Rlc2M+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIHJlZlg9IjgiIHJlZlk9IjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwIDEwIDUgMCAxMFoiIGZpbGw9IiMxMDJiNDkiLz48L21hcmtlcj48L2RlZnM+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI5MDAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMTAyYjQ5Ij48dGV4dCB4PSIzMCIgeT0iNDgiPlRhYmxlIHRyYXZlbCDCtyBzaWRlIHZpZXc8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjMzOCI+Q3Jvc3NmZWVkIMK3IHRvcCB2aWV3PC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSI2MjgiPkRvd25mZWVkIMK3IHNpZGUgdmlldzwvdGV4dD48L2c+CjxnIGZpbGw9IiNlZWY0ZmEiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSIzIj48Y2lyY2xlIGN4PSIzODAiIGN5PSIxMjUiIHI9IjU1Ii8+PHJlY3QgeD0iMTgwIiB5PSIxODUiIHdpZHRoPSI0MDAiIGhlaWdodD0iMzIiLz48cmVjdCB4PSIxNDAiIHk9IjIxNyIgd2lkdGg9IjQ4MCIgaGVpZ2h0PSIyNSIvPjxyZWN0IHg9IjE4MCIgeT0iMzc1IiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjE1NSIvPjxyZWN0IHg9IjM1MCIgeT0iMzkwIiB3aWR0aD0iNjAiIGhlaWdodD0iMTI1Ii8+PGNpcmNsZSBjeD0iMzgwIiBjeT0iNzE1IiByPSI1NSIvPjxyZWN0IHg9IjE4MCIgeT0iODA1IiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMyIi8+PHJlY3QgeD0iMTQwIiB5PSI4MzciIHdpZHRoPSI0ODAiIGhlaWdodD0iMjUiLz48L2c+CjxnIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSI+PHBhdGggZD0iTTIxMCAyNzNINTUwIiBtYXJrZXItc3RhcnQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTY0MCAzOTV2MTI1IiBtYXJrZXItc3RhcnQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTQ3MCA2ODB2MTA1Ii8+PC9nPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzYiIGZpbGw9IiMxMDJiNDkiPjx0ZXh0IHg9IjQ3MCIgeT0iMTI1Ij5XaGVlbDwvdGV4dD48dGV4dCB4PSI2MCIgeT0iMTk4Ij5Xb3JrPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSI1NjgiPkFjcm9zcyB3aWR0aCwgcGVycGVuZGljdWxhciB0byB0YWJsZSB0cmF2ZWw8L3RleHQ+PHRleHQgeD0iNTEwIiB5PSI3MjUiPlRvd2FyZCB3b3JrPC90ZXh0PjwvZz4KPC9zdmc+Cg==" alt="Three separate views show table travel along the work, crossfeed across its width, and wheel downfeed toward the top face."></p><figcaption>Separate views keep the three directions distinct. Arrows show motion, not feed amounts.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlRocmVlIHN1cmZhY2UgZ3JpbmRlciBtb3Rpb25zPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+U2lkZSB2aWV3IHNob3dzIHRoZSB0YWJsZSByZWNpcHJvY2F0aW5nIGJlbmVhdGggdGhlIHdoZWVsLiBUb3AgdmlldyBzaG93cyBjcm9zc2ZlZWQgcGVycGVuZGljdWxhciB0byB0YWJsZSB0cmF2ZWwuIEEgc2Vjb25kIHNpZGUgdmlldyBzaG93cyBkb3duZmVlZCBtb3ZpbmcgdGhlIHdoZWVsIHRvd2FyZCB0aGUgd29yay48L2Rlc2M+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIHJlZlg9IjgiIHJlZlk9IjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwIDEwIDUgMCAxMFoiIGZpbGw9IiMxMDJiNDkiLz48L21hcmtlcj48L2RlZnM+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI5MDAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSIjMTAyYjQ5Ij48dGV4dCB4PSIzMCIgeT0iNDgiPlRhYmxlIHRyYXZlbCDCtyBzaWRlIHZpZXc8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjMzOCI+Q3Jvc3NmZWVkIMK3IHRvcCB2aWV3PC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSI2MjgiPkRvd25mZWVkIMK3IHNpZGUgdmlldzwvdGV4dD48L2c+CjxnIGZpbGw9IiNlZWY0ZmEiIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSIzIj48Y2lyY2xlIGN4PSIzODAiIGN5PSIxMjUiIHI9IjU1Ii8+PHJlY3QgeD0iMTgwIiB5PSIxODUiIHdpZHRoPSI0MDAiIGhlaWdodD0iMzIiLz48cmVjdCB4PSIxNDAiIHk9IjIxNyIgd2lkdGg9IjQ4MCIgaGVpZ2h0PSIyNSIvPjxyZWN0IHg9IjE4MCIgeT0iMzc1IiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjE1NSIvPjxyZWN0IHg9IjM1MCIgeT0iMzkwIiB3aWR0aD0iNjAiIGhlaWdodD0iMTI1Ii8+PGNpcmNsZSBjeD0iMzgwIiBjeT0iNzE1IiByPSI1NSIvPjxyZWN0IHg9IjE4MCIgeT0iODA1IiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMyIi8+PHJlY3QgeD0iMTQwIiB5PSI4MzciIHdpZHRoPSI0ODAiIGhlaWdodD0iMjUiLz48L2c+CjxnIHN0cm9rZT0iIzEwMmI0OSIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSI+PHBhdGggZD0iTTIxMCAyNzNINTUwIiBtYXJrZXItc3RhcnQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTY0MCAzOTV2MTI1IiBtYXJrZXItc3RhcnQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTQ3MCA2ODB2MTA1Ii8+PC9nPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzYiIGZpbGw9IiMxMDJiNDkiPjx0ZXh0IHg9IjQ3MCIgeT0iMTI1Ij5XaGVlbDwvdGV4dD48dGV4dCB4PSI2MCIgeT0iMTk4Ij5Xb3JrPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSI1NjgiPkFjcm9zcyB3aWR0aCwgcGVycGVuZGljdWxhciB0byB0YWJsZSB0cmF2ZWw8L3RleHQ+PHRleHQgeD0iNTEwIiB5PSI3MjUiPlRvd2FyZCB3b3JrPC90ZXh0PjwvZz4KPC9zdmc+Cg==" alt="Three separate views show table travel along the work, crossfeed across its width, and wheel downfeed toward the top face." data-natural-width="800" data-natural-height="900"></p><figcaption>Separate views keep the three directions distinct. Arrows show motion, not feed amounts.</figcaption></figure>
   <p>After the finishing downfeed, <strong>sparking out</strong> continues passes without adding downfeed. The wheel can still remove a small amount as elastic deflection relaxes. Spark-out is not a substitute for measuring the part, and the number of passes is process-dependent.</p>
     </div>
   </details>
@@ -4846,6 +4873,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

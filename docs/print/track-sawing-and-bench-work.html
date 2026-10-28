@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3008,7 +3035,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Pitch spaces the teeth; gullets carry the chips</h2>
   <p><strong>TPI</strong> means teeth per inch along the blade. A higher TPI is a finer pitch. For evenly spaced teeth, pitch in inches is <strong>1 ÷ TPI</strong>. The <strong>gullet</strong> is the hollow between teeth that provides chip space. <strong>Set</strong> is the sideways displacement of teeth, making clearance for the blade body in the kerf.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgogIDx0aXRsZSBpZD0idGl0bGUiPlNhdyB0b290aCBwaXRjaCwgZ3VsbGV0LCBhbmQgc2V0PC90aXRsZT4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjY1MCIgZmlsbD0iI2ZmZiIvPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MjYzZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDQiIGZvbnQtd2VpZ2h0PSJib2xkIj5TSURFIFZJRVc6IHBpdGNoIGFuZCBndWxsZXQ8L3RleHQ+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MCA2MCkiPgo8cGF0aCBkPSJNNDAgMTgwVjEwMCBMOTAgMTQwIEwxMTAgMTQwIEwxNDAgMTAwIEwxOTAgMTQwIEwyMTAgMTQwIEwyNDAgMTAwIEwyOTAgMTQwIEwzMTAgMTQwIEwzNDAgMTAwIEwzOTAgMTQwIEw0MTAgMTQwIEw0NDAgMTAwIEw0OTAgMTQwIEw1MTAgMTQwIEw1NDAgMTAwIEw1OTAgMTQwIEw2MTAgMTQwIEw2NDAgMTAwIFYxODBaIiBmaWxsPSIjZGJlNWVmIiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iMyIgLz4KPHBhdGggZD0iTTE0MCA5M1Y1NSBNMjQwIDkzVjU1IE0xNDAgNjJIMjQwIE0xNDggNTdMMTQwIDYyTDE0OCA2NyBNMjMyIDU3TDI0MCA2MkwyMzIgNjciIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPgo8cGF0aCBkPSJNNDAwIDEzOEw0NjAgNjJINTQ1IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iMiIgLz4KICAgIDwvZz4KICAgIDx0ZXh0IHg9IjIzMCIgeT0iMTA4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIgcGFpbnQtb3JkZXI9InN0cm9rZSBmaWxsIj5QaXRjaDwvdGV4dD4KICAgIDx0ZXh0IHg9IjU5MiIgeT0iMTI4IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIgcGFpbnQtb3JkZXI9InN0cm9rZSBmaWxsIj5HdWxsZXQ8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iMjk0IiBmb250LXdlaWdodD0iYm9sZCI+RURHRSBWSUVXOiBzaWRld2F5cyBzZXQ8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iMzM2Ij4oZXhhZ2dlcmF0ZWQpPC90ZXh0PgogICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDAgMTAwKSI+CjxyZWN0IHg9IjYwIiB5PSIyODMiIHdpZHRoPSI0NDAiIGhlaWdodD0iMTYiIGZpbGw9IiNkYmU1ZWYiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPgo8cGF0aCBkPSJNOTUgMjkxTDExNSAyNTUgTTE1NSAyOTFMMTc1IDMyNyBNMjE1IDI5MUgyMzUgTTI3NSAyOTFMMjk1IDI1NSBNMzM1IDI5MUwzNTUgMzI3IE0zOTUgMjkxSDQxNSBNNDU1IDI5MUw0NzUgMjU1IiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iNyIgLz4KPHBhdGggZD0iTTU1IDI1MUg1MjAgTTU1IDMzMUg1MjAiIHN0cm9rZT0iIzU4Njc3NSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA1IiAvPgogICAgPC9nPgogICAgPHBhdGggZD0iTTU2MCAzNTFINjI1IE01NDAgMzkxSDYyNSBNNTYwIDQzMUg2MjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjM2MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiPjE8L3RleHQ+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjQwMiIgZm9udC13ZWlnaHQ9ImJvbGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiPjI8L3RleHQ+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjQ0MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiPjM8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDkyIj4xLiBTZXQgdG8gb25lIHNpZGU8L3RleHQ+CiAgICA8dGV4dCB4PSI0MzAiIHk9IjQ5MiI+Mi4gQmxhZGUgYm9keTwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSI1MzYiPjMuIFNldCB0byBvdGhlciBzaWRlPC90ZXh0PgogICAgPHRleHQgeD0iMzIiIHk9IjU5NCI+U2V0IHByb3ZpZGVzIGEga2VyZjwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSI2MzYiPndpZGVyIHRoYW4gdGhlIGJvZHkuPC90ZXh0PgogIDwvZz4KPC9zdmc+Cg==" alt="Side view shows pitch between adjacent tooth tips and the gullet between teeth; an edge view shows teeth set to either side of the blade body."><figcaption>Pitch is measured along the blade. Set is seen from a different direction. Shapes are schematic.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgogIDx0aXRsZSBpZD0idGl0bGUiPlNhdyB0b290aCBwaXRjaCwgZ3VsbGV0LCBhbmQgc2V0PC90aXRsZT4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjY1MCIgZmlsbD0iI2ZmZiIvPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MjYzZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDQiIGZvbnQtd2VpZ2h0PSJib2xkIj5TSURFIFZJRVc6IHBpdGNoIGFuZCBndWxsZXQ8L3RleHQ+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MCA2MCkiPgo8cGF0aCBkPSJNNDAgMTgwVjEwMCBMOTAgMTQwIEwxMTAgMTQwIEwxNDAgMTAwIEwxOTAgMTQwIEwyMTAgMTQwIEwyNDAgMTAwIEwyOTAgMTQwIEwzMTAgMTQwIEwzNDAgMTAwIEwzOTAgMTQwIEw0MTAgMTQwIEw0NDAgMTAwIEw0OTAgMTQwIEw1MTAgMTQwIEw1NDAgMTAwIEw1OTAgMTQwIEw2MTAgMTQwIEw2NDAgMTAwIFYxODBaIiBmaWxsPSIjZGJlNWVmIiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iMyIgLz4KPHBhdGggZD0iTTE0MCA5M1Y1NSBNMjQwIDkzVjU1IE0xNDAgNjJIMjQwIE0xNDggNTdMMTQwIDYyTDE0OCA2NyBNMjMyIDU3TDI0MCA2MkwyMzIgNjciIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPgo8cGF0aCBkPSJNNDAwIDEzOEw0NjAgNjJINTQ1IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iMiIgLz4KICAgIDwvZz4KICAgIDx0ZXh0IHg9IjIzMCIgeT0iMTA4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIgcGFpbnQtb3JkZXI9InN0cm9rZSBmaWxsIj5QaXRjaDwvdGV4dD4KICAgIDx0ZXh0IHg9IjU5MiIgeT0iMTI4IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIgcGFpbnQtb3JkZXI9InN0cm9rZSBmaWxsIj5HdWxsZXQ8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iMjk0IiBmb250LXdlaWdodD0iYm9sZCI+RURHRSBWSUVXOiBzaWRld2F5cyBzZXQ8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iMzM2Ij4oZXhhZ2dlcmF0ZWQpPC90ZXh0PgogICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDAgMTAwKSI+CjxyZWN0IHg9IjYwIiB5PSIyODMiIHdpZHRoPSI0NDAiIGhlaWdodD0iMTYiIGZpbGw9IiNkYmU1ZWYiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPgo8cGF0aCBkPSJNOTUgMjkxTDExNSAyNTUgTTE1NSAyOTFMMTc1IDMyNyBNMjE1IDI5MUgyMzUgTTI3NSAyOTFMMjk1IDI1NSBNMzM1IDI5MUwzNTUgMzI3IE0zOTUgMjkxSDQxNSBNNDU1IDI5MUw0NzUgMjU1IiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iNyIgLz4KPHBhdGggZD0iTTU1IDI1MUg1MjAgTTU1IDMzMUg1MjAiIHN0cm9rZT0iIzU4Njc3NSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA1IiAvPgogICAgPC9nPgogICAgPHBhdGggZD0iTTU2MCAzNTFINjI1IE01NDAgMzkxSDYyNSBNNTYwIDQzMUg2MjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjM2MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiPjE8L3RleHQ+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjQwMiIgZm9udC13ZWlnaHQ9ImJvbGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiPjI8L3RleHQ+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjQ0MiIgZm9udC13ZWlnaHQ9ImJvbGQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiPjM8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDkyIj4xLiBTZXQgdG8gb25lIHNpZGU8L3RleHQ+CiAgICA8dGV4dCB4PSI0MzAiIHk9IjQ5MiI+Mi4gQmxhZGUgYm9keTwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSI1MzYiPjMuIFNldCB0byBvdGhlciBzaWRlPC90ZXh0PgogICAgPHRleHQgeD0iMzIiIHk9IjU5NCI+U2V0IHByb3ZpZGVzIGEga2VyZjwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSI2MzYiPndpZGVyIHRoYW4gdGhlIGJvZHkuPC90ZXh0PgogIDwvZz4KPC9zdmc+Cg==" alt="Side view shows pitch between adjacent tooth tips and the gullet between teeth; an edge view shows teeth set to either side of the blade body." data-natural-width="800" data-natural-height="650"><figcaption>Pitch is measured along the blade. Set is seen from a different direction. Shapes are schematic.</figcaption></figure>
     </div>
   </details>
   <details class="xcard deck-slide" id="saw-blade-selection--estimate-teeth-in-the-cut-before-choosing-tpi" data-card="saw-blade-selection--estimate-teeth-in-the-cut-before-choosing-tpi">
@@ -3018,7 +3045,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>As a <strong>rule of thumb</strong>, aim to keep at least about three teeth engaged. For a uniform pitch crossing one continuous thickness of material:</p>
   <p><strong>Estimated teeth engaged = contact length in inches × TPI</strong><br><strong>Minimum TPI for three teeth = 3 ÷ contact length in inches</strong></p>
   <p>Use thickness measured <em>along the tooth line through solid material</em>, not automatically the height of the part. For 0.25 in of continuous contact at 12 TPI, the estimate is 0.25 × 12 = <strong>3 teeth</strong>. At the same thickness, the three-tooth calculation gives 3 ÷ 0.25 = <strong>12 TPI</strong>.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgogIDx0aXRsZSBpZD0idGl0bGUiPlRoaW4gYW5kIHRoaWNrIHN0b2NrIGF0IHRoZSBzYW1lIHRvb3RoIHBpdGNoPC90aXRsZT4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgZmlsbD0iI2ZmZiIvPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MjYzZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDQiIGZvbnQtd2VpZ2h0PSJib2xkIj5TYW1lIGJsYWRlOiA4IHRlZXRoIHBlciBpbmNoPC90ZXh0PgogICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDAgMTApIj4KPHJlY3QgeD0iMTgwIiB5PSI3MCIgd2lkdGg9IjgwIiBoZWlnaHQ9Ijk2IiBmaWxsPSIjZjRkNzc4IiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iMiIgLz48cGF0aCBkPSJNNjAgMTQzVjg4TDgwIDExM0g5MEwxMDAgODhMMTIwIDExM0gxMzBMMTQwIDg4TDE2MCAxMTNIMTcwTDE4MCA4OEwyMDAgMTEzSDIxMEwyMjAgODhMMjQwIDExM0gyNTBMMjYwIDg4TDI4MCAxMTNIMjkwTDMwMCA4OEwzMjAgMTEzSDMzMEwzNDAgODhMMzYwIDExM0gzNzBMMzgwIDg4TDQwMCAxMTNINDEwTDQyMCA4OEw0NDAgMTEzSDQ1MEw0NjAgODhMNDgwIDExM0g0OTBMNTAwIDg4TDUyMCAxMTNINTMwTDU0MCA4OEw1NjAgMTEzSDU3MEw1ODAgODhMNjAwIDExM0g2MTBMNjIwIDg4VjE0M1oiIGZpbGw9IiNkYmU1ZWYiIGZpbGwtb3BhY2l0eT0iMC44NSIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjIiIC8+ICAgIDwvZz4KICAgIDx0ZXh0IHg9IjMyIiB5PSIyMjAiPjAuMjUgaW4gY29udGFjdDwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSIyNjIiPjAuMjUgw5cgOCA9IGFib3V0IDIgdGVldGg8L3RleHQ+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MCA3MCkiPgo8cmVjdCB4PSIxODAiIHk9IjIzMCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI5NiIgZmlsbD0iI2Y0ZDc3OCIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjIiIC8+PHBhdGggZD0iTTYwIDMwM1YyNDhMODAgMjczSDkwTDEwMCAyNDhMMTIwIDI3M0gxMzBMMTQwIDI0OEwxNjAgMjczSDE3MEwxODAgMjQ4TDIwMCAyNzNIMjEwTDIyMCAyNDhMMjQwIDI3M0gyNTBMMjYwIDI0OEwyODAgMjczSDI5MEwzMDAgMjQ4TDMyMCAyNzNIMzMwTDM0MCAyNDhMMzYwIDI3M0gzNzBMMzgwIDI0OEw0MDAgMjczSDQxMEw0MjAgMjQ4TDQ0MCAyNzNINDUwTDQ2MCAyNDhMNDgwIDI3M0g0OTBMNTAwIDI0OEw1MjAgMjczSDUzMEw1NDAgMjQ4TDU2MCAyNzNINTcwTDU4MCAyNDhMNjAwIDI3M0g2MTBMNjIwIDI0OFYzMDNaIiBmaWxsPSIjZGJlNWVmIiBmaWxsLW9wYWNpdHk9IjAuODUiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPiAgICA8L2c+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDQwIj4wLjc1IGluIGNvbnRhY3Q8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDgyIj4wLjc1IMOXIDggPSBhYm91dCA2IHRlZXRoPC90ZXh0PgogICAgPHRleHQgeD0iMzIiIHk9IjU0NCI+R29sZCA9IGNvbnRpbnVvdXMgbWF0ZXJpYWwgY3Jvc3NlZDwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSI1ODYiPmFsb25nIHRoZSB0b290aCBsaW5lLjwvdGV4dD4KICA8L2c+Cjwvc3ZnPgo=" alt="At the same 8 TPI, a 0.25 inch contact length spans about two teeth and a 0.75 inch contact length spans about six teeth."><figcaption>Same tooth spacing, different contact length. The thinner section needs a finer pitch to meet the three-tooth estimate.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgogIDx0aXRsZSBpZD0idGl0bGUiPlRoaW4gYW5kIHRoaWNrIHN0b2NrIGF0IHRoZSBzYW1lIHRvb3RoIHBpdGNoPC90aXRsZT4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgZmlsbD0iI2ZmZiIvPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMiIgZmlsbD0iIzE0MjYzZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDQiIGZvbnQtd2VpZ2h0PSJib2xkIj5TYW1lIGJsYWRlOiA4IHRlZXRoIHBlciBpbmNoPC90ZXh0PgogICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDAgMTApIj4KPHJlY3QgeD0iMTgwIiB5PSI3MCIgd2lkdGg9IjgwIiBoZWlnaHQ9Ijk2IiBmaWxsPSIjZjRkNzc4IiBzdHJva2U9IiMxNDI2M2QiIHN0cm9rZS13aWR0aD0iMiIgLz48cGF0aCBkPSJNNjAgMTQzVjg4TDgwIDExM0g5MEwxMDAgODhMMTIwIDExM0gxMzBMMTQwIDg4TDE2MCAxMTNIMTcwTDE4MCA4OEwyMDAgMTEzSDIxMEwyMjAgODhMMjQwIDExM0gyNTBMMjYwIDg4TDI4MCAxMTNIMjkwTDMwMCA4OEwzMjAgMTEzSDMzMEwzNDAgODhMMzYwIDExM0gzNzBMMzgwIDg4TDQwMCAxMTNINDEwTDQyMCA4OEw0NDAgMTEzSDQ1MEw0NjAgODhMNDgwIDExM0g0OTBMNTAwIDg4TDUyMCAxMTNINTMwTDU0MCA4OEw1NjAgMTEzSDU3MEw1ODAgODhMNjAwIDExM0g2MTBMNjIwIDg4VjE0M1oiIGZpbGw9IiNkYmU1ZWYiIGZpbGwtb3BhY2l0eT0iMC44NSIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjIiIC8+ICAgIDwvZz4KICAgIDx0ZXh0IHg9IjMyIiB5PSIyMjAiPjAuMjUgaW4gY29udGFjdDwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSIyNjIiPjAuMjUgw5cgOCA9IGFib3V0IDIgdGVldGg8L3RleHQ+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MCA3MCkiPgo8cmVjdCB4PSIxODAiIHk9IjIzMCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI5NiIgZmlsbD0iI2Y0ZDc3OCIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjIiIC8+PHBhdGggZD0iTTYwIDMwM1YyNDhMODAgMjczSDkwTDEwMCAyNDhMMTIwIDI3M0gxMzBMMTQwIDI0OEwxNjAgMjczSDE3MEwxODAgMjQ4TDIwMCAyNzNIMjEwTDIyMCAyNDhMMjQwIDI3M0gyNTBMMjYwIDI0OEwyODAgMjczSDI5MEwzMDAgMjQ4TDMyMCAyNzNIMzMwTDM0MCAyNDhMMzYwIDI3M0gzNzBMMzgwIDI0OEw0MDAgMjczSDQxMEw0MjAgMjQ4TDQ0MCAyNzNINDUwTDQ2MCAyNDhMNDgwIDI3M0g0OTBMNTAwIDI0OEw1MjAgMjczSDUzMEw1NDAgMjQ4TDU2MCAyNzNINTcwTDU4MCAyNDhMNjAwIDI3M0g2MTBMNjIwIDI0OFYzMDNaIiBmaWxsPSIjZGJlNWVmIiBmaWxsLW9wYWNpdHk9IjAuODUiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPiAgICA8L2c+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDQwIj4wLjc1IGluIGNvbnRhY3Q8L3RleHQ+CiAgICA8dGV4dCB4PSIzMiIgeT0iNDgyIj4wLjc1IMOXIDggPSBhYm91dCA2IHRlZXRoPC90ZXh0PgogICAgPHRleHQgeD0iMzIiIHk9IjU0NCI+R29sZCA9IGNvbnRpbnVvdXMgbWF0ZXJpYWwgY3Jvc3NlZDwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSI1ODYiPmFsb25nIHRoZSB0b290aCBsaW5lLjwvdGV4dD4KICA8L2c+Cjwvc3ZnPgo=" alt="At the same 8 TPI, a 0.25 inch contact length spans about two teeth and a 0.75 inch contact length spans about six teeth." data-natural-width="800" data-natural-height="600"><figcaption>Same tooth spacing, different contact length. The thinner section needs a finer pitch to meet the three-tooth estimate.</figcaption></figure>
   <p>A calculated minimum is a screening value, not a blade specification. If it falls between available pitches, select a suitable finer option from the maker's chart rather than rounding down. Excessively fine teeth can run out of chip space in thick stock.</p>
   <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Why the answer can be a fraction of a tooth.</p>
   <p><a class="button" data-practice-add="saw-teeth-quarter" href="../practice.html#saw-teeth-quarter">Practice teeth in the cut</a> <a class="button" data-practice-add="saw-minimum-pitch" href="../practice.html#saw-minimum-pitch">Practice minimum TPI</a></p>
@@ -3145,7 +3172,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>File cut and coarseness are separate choices</h2>
   <p>A file removes small chips with many teeth. Choose its shape to reach the surface: flat for a flat face, round for a round opening, or half-round for both flat and curved areas. A <strong>safe edge</strong> has no cutting teeth, allowing work close to an adjoining surface that should remain uncut.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgogIDx0aXRsZSBpZD0idGl0bGUiPlNpbmdsZS1jdXQgYW5kIGRvdWJsZS1jdXQgZmlsZXM8L3RpdGxlPgogIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDIwIiBmaWxsPSIjZmZmIi8+CiAgPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjMyIiBmaWxsPSIjMTQyNjNkIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDx0ZXh0IHg9IjMyIiB5PSI0NCIgZm9udC13ZWlnaHQ9ImJvbGQiPkZJTEUgRkFDRVM6IGVubGFyZ2VkIHRvb3RoIHBhdHRlcm5zPC90ZXh0PgogICAgPHRleHQgeD0iNzAiIHk9Ijk2Ij5TaW5nbGUtY3V0PC90ZXh0PgogICAgPHRleHQgeD0iNDIwIiB5PSI5NiI+RG91YmxlLWN1dDwvdGV4dD4KICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQwIDIwKSI+CjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDMwIj48cmVjdCB4PSIzMCIgeT0iOTUiIHdpZHRoPSIyOTAiIGhlaWdodD0iMTQwIiByeD0iOCIgLz48L2NsaXBQYXRoPjwvZGVmcz48cmVjdCB4PSIzMCIgeT0iOTUiIHdpZHRoPSIyOTAiIGhlaWdodD0iMTQwIiByeD0iOCIgZmlsbD0iI2RiZTVlZiIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjMiIC8+PGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAzMCkiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNLTExMCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNLTg4IDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0tNjYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTS00NCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNLTIyIDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0wIDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0yMiAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNNDQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTY2IDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik04OCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMTEwIDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0xMzIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTE1NCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMTc2IDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0xOTggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTIyMCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMjQyIDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0yNjQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTI4NiAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMzA4IDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0zMzAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTM1MiAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMzc0IDIzNWw5NSAtMTQwIiAvPjwvZz48ZGVmcz48Y2xpcFBhdGggaWQ9ImNsaXAzODAiPjxyZWN0IHg9IjM4MCIgeT0iOTUiIHdpZHRoPSIyOTAiIGhlaWdodD0iMTQwIiByeD0iOCIgLz48L2NsaXBQYXRoPjwvZGVmcz48cmVjdCB4PSIzODAiIHk9Ijk1IiB3aWR0aD0iMjkwIiBoZWlnaHQ9IjE0MCIgcng9IjgiIGZpbGw9IiNkYmU1ZWYiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIzIiAvPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMzgwKSIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yNDAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTI0MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0yNjIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTI2MiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0yODQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTI4NCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zMDYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTMwNiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zMjggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTMyOCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zNTAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTM1MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zNzIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTM3MiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zOTQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTM5NCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik00MTYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTQxNiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik00MzggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTQzOCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik00NjAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTQ2MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik00ODIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTQ4MiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01MDQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTUwNCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01MjYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTUyNiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01NDggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTU0OCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01NzAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTU3MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01OTIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTU5MiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik02MTQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTYxNCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik02MzYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTYzNiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik02NTggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTY1OCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik02ODAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTY4MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik03MDIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTcwMiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik03MjQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTcyNCA5NWwxMTAgMTQwIiAvPjwvZz4gICAgPC9nPgogICAgPHRleHQgeD0iNzAiIHk9IjI5NCI+T25lIGZhbWlseSBvZiBjdXRzPC90ZXh0PgogICAgPHRleHQgeD0iNDIwIiB5PSIyOTQiPlR3byBjcm9zc2luZyBmYW1pbGllczwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSIzNTQiPkVpdGhlciBwYXR0ZXJuIGNhbiBoYXZlPC90ZXh0PgogICAgPHRleHQgeD0iMzIiIHk9IjM5NiI+ZGlmZmVyZW50IGNvYXJzZW5lc3MgZ3JhZGVzLjwvdGV4dD4KICA8L2c+Cjwvc3ZnPgo=" alt="Single-cut file face has one family of diagonal teeth; double-cut face has two intersecting families."><figcaption>Cut pattern is not a coarseness grade. The drawing enlarges the tooth spacing for comparison.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgogIDx0aXRsZSBpZD0idGl0bGUiPlNpbmdsZS1jdXQgYW5kIGRvdWJsZS1jdXQgZmlsZXM8L3RpdGxlPgogIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDIwIiBmaWxsPSIjZmZmIi8+CiAgPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjMyIiBmaWxsPSIjMTQyNjNkIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDx0ZXh0IHg9IjMyIiB5PSI0NCIgZm9udC13ZWlnaHQ9ImJvbGQiPkZJTEUgRkFDRVM6IGVubGFyZ2VkIHRvb3RoIHBhdHRlcm5zPC90ZXh0PgogICAgPHRleHQgeD0iNzAiIHk9Ijk2Ij5TaW5nbGUtY3V0PC90ZXh0PgogICAgPHRleHQgeD0iNDIwIiB5PSI5NiI+RG91YmxlLWN1dDwvdGV4dD4KICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQwIDIwKSI+CjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDMwIj48cmVjdCB4PSIzMCIgeT0iOTUiIHdpZHRoPSIyOTAiIGhlaWdodD0iMTQwIiByeD0iOCIgLz48L2NsaXBQYXRoPjwvZGVmcz48cmVjdCB4PSIzMCIgeT0iOTUiIHdpZHRoPSIyOTAiIGhlaWdodD0iMTQwIiByeD0iOCIgZmlsbD0iI2RiZTVlZiIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjMiIC8+PGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAzMCkiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNLTExMCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNLTg4IDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0tNjYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTS00NCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNLTIyIDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0wIDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0yMiAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNNDQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTY2IDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik04OCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMTEwIDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0xMzIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTE1NCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMTc2IDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0xOTggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTIyMCAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMjQyIDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0yNjQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTI4NiAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMzA4IDIzNWw5NSAtMTQwIiAvPjxwYXRoIGQ9Ik0zMzAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTM1MiAyMzVsOTUgLTE0MCIgLz48cGF0aCBkPSJNMzc0IDIzNWw5NSAtMTQwIiAvPjwvZz48ZGVmcz48Y2xpcFBhdGggaWQ9ImNsaXAzODAiPjxyZWN0IHg9IjM4MCIgeT0iOTUiIHdpZHRoPSIyOTAiIGhlaWdodD0iMTQwIiByeD0iOCIgLz48L2NsaXBQYXRoPjwvZGVmcz48cmVjdCB4PSIzODAiIHk9Ijk1IiB3aWR0aD0iMjkwIiBoZWlnaHQ9IjE0MCIgcng9IjgiIGZpbGw9IiNkYmU1ZWYiIHN0cm9rZT0iIzE0MjYzZCIgc3Ryb2tlLXdpZHRoPSIzIiAvPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMzgwKSIgc3Ryb2tlPSIjMTQyNjNkIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yNDAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTI0MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0yNjIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTI2MiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0yODQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTI4NCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zMDYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTMwNiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zMjggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTMyOCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zNTAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTM1MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zNzIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTM3MiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik0zOTQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTM5NCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik00MTYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTQxNiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik00MzggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTQzOCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik00NjAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTQ2MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik00ODIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTQ4MiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01MDQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTUwNCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01MjYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTUyNiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01NDggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTU0OCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01NzAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTU3MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik01OTIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTU5MiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik02MTQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTYxNCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik02MzYgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTYzNiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik02NTggMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTY1OCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik02ODAgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTY4MCA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik03MDIgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTcwMiA5NWwxMTAgMTQwIiAvPjxwYXRoIGQ9Ik03MjQgMjM1bDk1IC0xNDAiIC8+PHBhdGggZD0iTTcyNCA5NWwxMTAgMTQwIiAvPjwvZz4gICAgPC9nPgogICAgPHRleHQgeD0iNzAiIHk9IjI5NCI+T25lIGZhbWlseSBvZiBjdXRzPC90ZXh0PgogICAgPHRleHQgeD0iNDIwIiB5PSIyOTQiPlR3byBjcm9zc2luZyBmYW1pbGllczwvdGV4dD4KICAgIDx0ZXh0IHg9IjMyIiB5PSIzNTQiPkVpdGhlciBwYXR0ZXJuIGNhbiBoYXZlPC90ZXh0PgogICAgPHRleHQgeD0iMzIiIHk9IjM5NiI+ZGlmZmVyZW50IGNvYXJzZW5lc3MgZ3JhZGVzLjwvdGV4dD4KICA8L2c+Cjwvc3ZnPgo=" alt="Single-cut file face has one family of diagonal teeth; double-cut face has two intersecting families." data-natural-width="800" data-natural-height="420"><figcaption>Cut pattern is not a coarseness grade. The drawing enlarges the tooth spacing for comparison.</figcaption></figure>
   <p><strong>Single-cut</strong> files have one family of parallel tooth cuts; they are useful for controlled finishing and draw filing. <strong>Double-cut</strong> files have crossing cuts that divide the teeth into smaller cutting points; they commonly suit faster stock removal.</p>
   <p>Coarseness describes tooth spacing. Common grades run from <strong>rough, coarse, bastard, second-cut, smooth, to dead smooth</strong>, from coarser to finer. Availability varies. Compare grades within the same file family and length; the name alone is not a universal tooth-spacing measurement. “Second-cut” is a coarseness grade, not another name for double-cut.</p>
   <p><a class="button" data-practice-add="bench-file-finish" href="../practice.html#bench-file-finish">Practice file choice</a></p>
@@ -4901,6 +4928,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

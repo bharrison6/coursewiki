@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2983,7 +3010,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Use TIMWOODS to name what you observe</h2>
 <p>Transportation, Inventory, Motion, Waiting, Overproduction, Over-processing, Defects and Skills form <strong>TIMWOODS</strong>. Describe the observed problem before choosing a remedy.</p>
-<p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgMzM1IiByb2xlPSJpbWciPjx0aXRsZT5USU1XT09EUzogZWlnaHQgd2FzdGVzPC90aXRsZT48cmVjdCB3aWR0aD0iNzIwIiBoZWlnaHQ9IjMzNSIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE0MmI0OSI+PHJlY3QgeD0iMTAiIHk9IjEwIiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjcwIiByeD0iNiIgZmlsbD0iI2VkZjNmOCIgc3Ryb2tlPSIjMDAzYjcxIi8+PHRleHQgeD0iMjIiIHk9IjM4Ij5UIOKAlCBUcmFuc3BvcnRhdGlvbjwvdGV4dD48dGV4dCB4PSIyMiIgeT0iNjMiIGZvbnQtc2l6ZT0iMTQiPk1hdGVyaWFscyBtb3ZlPC90ZXh0PjxyZWN0IHg9IjM2MCIgeT0iMTAiIHdpZHRoPSIzNDAiIGhlaWdodD0iNzAiIHJ4PSI2IiBmaWxsPSIjZWRmM2Y4IiBzdHJva2U9IiMwMDNiNzEiLz48dGV4dCB4PSIzNzIiIHk9IjM4Ij5JIOKAlCBJbnZlbnRvcnk8L3RleHQ+PHRleHQgeD0iMzcyIiB5PSI2MyIgZm9udC1zaXplPSIxNCI+RXhjZXNzIHN0b2NrPC90ZXh0PjxyZWN0IHg9IjEwIiB5PSI5MCIgd2lkdGg9IjM0MCIgaGVpZ2h0PSI3MCIgcng9IjYiIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzAwM2I3MSIvPjx0ZXh0IHg9IjIyIiB5PSIxMTgiPk0g4oCUIE1vdGlvbjwvdGV4dD48dGV4dCB4PSIyMiIgeT0iMTQzIiBmb250LXNpemU9IjE0Ij5QZW9wbGUgbW92ZTwvdGV4dD48cmVjdCB4PSIzNjAiIHk9IjkwIiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjcwIiByeD0iNiIgZmlsbD0iI2VkZjNmOCIgc3Ryb2tlPSIjMDAzYjcxIi8+PHRleHQgeD0iMzcyIiB5PSIxMTgiPlcg4oCUIFdhaXRpbmc8L3RleHQ+PHRleHQgeD0iMzcyIiB5PSIxNDMiIGZvbnQtc2l6ZT0iMTQiPldvcmsgY2Fubm90IHByb2NlZWQ8L3RleHQ+PHJlY3QgeD0iMTAiIHk9IjE3MCIgd2lkdGg9IjM0MCIgaGVpZ2h0PSI3MCIgcng9IjYiIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzAwM2I3MSIvPjx0ZXh0IHg9IjIyIiB5PSIxOTgiPk8g4oCUIE92ZXJwcm9kdWN0aW9uPC90ZXh0Pjx0ZXh0IHg9IjIyIiB5PSIyMjMiIGZvbnQtc2l6ZT0iMTQiPlRvbyBtdWNoIG9yIHRvbyBlYXJseTwvdGV4dD48cmVjdCB4PSIzNjAiIHk9IjE3MCIgd2lkdGg9IjM0MCIgaGVpZ2h0PSI3MCIgcng9IjYiIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzAwM2I3MSIvPjx0ZXh0IHg9IjM3MiIgeT0iMTk4Ij5PIOKAlCBPdmVyLXByb2Nlc3Npbmc8L3RleHQ+PHRleHQgeD0iMzcyIiB5PSIyMjMiIGZvbnQtc2l6ZT0iMTQiPk1vcmUgd29yayB0aGFuIG5lZWRlZDwvdGV4dD48cmVjdCB4PSIxMCIgeT0iMjUwIiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjcwIiByeD0iNiIgZmlsbD0iI2VkZjNmOCIgc3Ryb2tlPSIjMDAzYjcxIi8+PHRleHQgeD0iMjIiIHk9IjI3OCI+RCDigJQgRGVmZWN0czwvdGV4dD48dGV4dCB4PSIyMiIgeT0iMzAzIiBmb250LXNpemU9IjE0Ij5GYWlscyB0aGUgcmVxdWlyZW1lbnQ8L3RleHQ+PHJlY3QgeD0iMzYwIiB5PSIyNTAiIHdpZHRoPSIzNDAiIGhlaWdodD0iNzAiIHJ4PSI2IiBmaWxsPSIjZWRmM2Y4IiBzdHJva2U9IiMwMDNiNzEiLz48dGV4dCB4PSIzNzIiIHk9IjI3OCI+UyDigJQgU2tpbGxzIC8gdW51c2VkIHRhbGVudDwvdGV4dD48dGV4dCB4PSIzNzIiIHk9IjMwMyIgZm9udC1zaXplPSIxNCI+QWJpbGl0aWVzIGxlZnQgdW51c2VkPC90ZXh0PjwvZz48L3N2Zz4K" alt="Eight-cell TIMWOODS grid: Transportation, Inventory, Motion, Waiting, Overproduction, Over-processing, Defects and Skills."></p>
+<p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgMzM1IiByb2xlPSJpbWciPjx0aXRsZT5USU1XT09EUzogZWlnaHQgd2FzdGVzPC90aXRsZT48cmVjdCB3aWR0aD0iNzIwIiBoZWlnaHQ9IjMzNSIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE0MmI0OSI+PHJlY3QgeD0iMTAiIHk9IjEwIiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjcwIiByeD0iNiIgZmlsbD0iI2VkZjNmOCIgc3Ryb2tlPSIjMDAzYjcxIi8+PHRleHQgeD0iMjIiIHk9IjM4Ij5UIOKAlCBUcmFuc3BvcnRhdGlvbjwvdGV4dD48dGV4dCB4PSIyMiIgeT0iNjMiIGZvbnQtc2l6ZT0iMTQiPk1hdGVyaWFscyBtb3ZlPC90ZXh0PjxyZWN0IHg9IjM2MCIgeT0iMTAiIHdpZHRoPSIzNDAiIGhlaWdodD0iNzAiIHJ4PSI2IiBmaWxsPSIjZWRmM2Y4IiBzdHJva2U9IiMwMDNiNzEiLz48dGV4dCB4PSIzNzIiIHk9IjM4Ij5JIOKAlCBJbnZlbnRvcnk8L3RleHQ+PHRleHQgeD0iMzcyIiB5PSI2MyIgZm9udC1zaXplPSIxNCI+RXhjZXNzIHN0b2NrPC90ZXh0PjxyZWN0IHg9IjEwIiB5PSI5MCIgd2lkdGg9IjM0MCIgaGVpZ2h0PSI3MCIgcng9IjYiIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzAwM2I3MSIvPjx0ZXh0IHg9IjIyIiB5PSIxMTgiPk0g4oCUIE1vdGlvbjwvdGV4dD48dGV4dCB4PSIyMiIgeT0iMTQzIiBmb250LXNpemU9IjE0Ij5QZW9wbGUgbW92ZTwvdGV4dD48cmVjdCB4PSIzNjAiIHk9IjkwIiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjcwIiByeD0iNiIgZmlsbD0iI2VkZjNmOCIgc3Ryb2tlPSIjMDAzYjcxIi8+PHRleHQgeD0iMzcyIiB5PSIxMTgiPlcg4oCUIFdhaXRpbmc8L3RleHQ+PHRleHQgeD0iMzcyIiB5PSIxNDMiIGZvbnQtc2l6ZT0iMTQiPldvcmsgY2Fubm90IHByb2NlZWQ8L3RleHQ+PHJlY3QgeD0iMTAiIHk9IjE3MCIgd2lkdGg9IjM0MCIgaGVpZ2h0PSI3MCIgcng9IjYiIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzAwM2I3MSIvPjx0ZXh0IHg9IjIyIiB5PSIxOTgiPk8g4oCUIE92ZXJwcm9kdWN0aW9uPC90ZXh0Pjx0ZXh0IHg9IjIyIiB5PSIyMjMiIGZvbnQtc2l6ZT0iMTQiPlRvbyBtdWNoIG9yIHRvbyBlYXJseTwvdGV4dD48cmVjdCB4PSIzNjAiIHk9IjE3MCIgd2lkdGg9IjM0MCIgaGVpZ2h0PSI3MCIgcng9IjYiIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzAwM2I3MSIvPjx0ZXh0IHg9IjM3MiIgeT0iMTk4Ij5PIOKAlCBPdmVyLXByb2Nlc3Npbmc8L3RleHQ+PHRleHQgeD0iMzcyIiB5PSIyMjMiIGZvbnQtc2l6ZT0iMTQiPk1vcmUgd29yayB0aGFuIG5lZWRlZDwvdGV4dD48cmVjdCB4PSIxMCIgeT0iMjUwIiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjcwIiByeD0iNiIgZmlsbD0iI2VkZjNmOCIgc3Ryb2tlPSIjMDAzYjcxIi8+PHRleHQgeD0iMjIiIHk9IjI3OCI+RCDigJQgRGVmZWN0czwvdGV4dD48dGV4dCB4PSIyMiIgeT0iMzAzIiBmb250LXNpemU9IjE0Ij5GYWlscyB0aGUgcmVxdWlyZW1lbnQ8L3RleHQ+PHJlY3QgeD0iMzYwIiB5PSIyNTAiIHdpZHRoPSIzNDAiIGhlaWdodD0iNzAiIHJ4PSI2IiBmaWxsPSIjZWRmM2Y4IiBzdHJva2U9IiMwMDNiNzEiLz48dGV4dCB4PSIzNzIiIHk9IjI3OCI+UyDigJQgU2tpbGxzIC8gdW51c2VkIHRhbGVudDwvdGV4dD48dGV4dCB4PSIzNzIiIHk9IjMwMyIgZm9udC1zaXplPSIxNCI+QWJpbGl0aWVzIGxlZnQgdW51c2VkPC90ZXh0PjwvZz48L3N2Zz4K" alt="Eight-cell TIMWOODS grid: Transportation, Inventory, Motion, Waiting, Overproduction, Over-processing, Defects and Skills." data-natural-width="720" data-natural-height="335"></p>
     </div>
   </details>
   <details class="xcard deck-slide" id="eight-wastes-timwoods--compare-shop-examples-with-everyday-examples" data-card="eight-wastes-timwoods--compare-shop-examples-with-everyday-examples">
@@ -3119,7 +3146,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Read process boxes, inventory triangles and flow arrows<span class="chev"></span></summary>
     <div class="body">
       <h2>Read process boxes, inventory triangles and flow arrows</h2>
-<p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgMzYwIiByb2xlPSJpbWciPjx0aXRsZT5TaW1wbGlmaWVkIGN1cnJlbnQtc3RhdGUgdmFsdWUgc3RyZWFtPC90aXRsZT48cmVjdCB3aWR0aD0iNzIwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE0MmI0OSI+PGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIG1hcmtlcldpZHRoPSI4IiBtYXJrZXJIZWlnaHQ9IjgiIHJlZlg9IjciIHJlZlk9IjMiIG9yaWVudD0iYXV0byI+PHBhdGggZD0iTTAgMCBMNyAzIEwwIDYiIGZpbGw9IiMxNDJiNDkiLz48L21hcmtlcj48L2RlZnM+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQyYjQ5IiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIj48cGF0aCBkPSJNNjUwIDgwIFYzNSBINDMwIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz48cGF0aCBkPSJNMzAwIDM1IEgxMzAgVjEzMCIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+PHBhdGggZD0iTTIwNSAxNzAgSDI5MCIvPjxwYXRoIGQ9Ik0zNTAgMTcwIEg0MjUiLz48cGF0aCBkPSJNNTQ1IDE3MCBINTk1Ii8+PC9nPjxyZWN0IHg9IjMwMCIgeT0iMTUiIHdpZHRoPSIxMzAiIGhlaWdodD0iMzgiIGZpbGw9IndoaXRlIiBzdHJva2U9IiMxNDJiNDkiLz48dGV4dCB4PSIzMjAiIHk9IjQxIj5QbGFubmluZzwvdGV4dD48dGV4dCB4PSI0NTUiIHk9IjI5IiBmb250LXNpemU9IjE0Ij5DdXN0b21lciBvcmRlcjwvdGV4dD48dGV4dCB4PSIxMzUiIHk9Ijg1IiBmb250LXNpemU9IjE0Ij5Xb3JrIGluc3RydWN0aW9uPC90ZXh0PjxyZWN0IHg9IjY1IiB5PSIxMzAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNzAiIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzE0MmI0OSIvPjx0ZXh0IHg9IjEwNSIgeT0iMTcwIj5DdXR0aW5nPC90ZXh0PjxyZWN0IHg9IjY1IiB5PSIyMDAiIHdpZHRoPSIxNDAiIGhlaWdodD0iMzUiIGZpbGw9IndoaXRlIiBzdHJva2U9IiMxNDJiNDkiLz48dGV4dCB4PSIxMDAiIHk9IjIyNCI+NCBtaW48L3RleHQ+PHBhdGggZD0iTTMyMCAxMzAgTDM1MCAxOTUgSDI5MCBaIiBmaWxsPSIjZmZmNGQ0IiBzdHJva2U9IiMxNDJiNDkiLz48dGV4dCB4PSIzMTciIHk9IjE4MCI+STwvdGV4dD48dGV4dCB4PSIyNjUiIHk9IjIyNCI+V2FpdDogMTIwIG1pbjwvdGV4dD48cmVjdCB4PSI0MjUiIHk9IjEzMCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI3MCIgZmlsbD0iI2VkZjNmOCIgc3Ryb2tlPSIjMTQyYjQ5Ii8+PHRleHQgeD0iNDQwIiB5PSIxNzAiPkFzc2VtYmx5PC90ZXh0PjxyZWN0IHg9IjQyNSIgeT0iMjAwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjM1IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTQyYjQ5Ii8+PHRleHQgeD0iNDYwIiB5PSIyMjQiPjYgbWluPC90ZXh0PjxyZWN0IHg9IjU5NSIgeT0iODAiIHdpZHRoPSIxMTUiIGhlaWdodD0iMTIwIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTQyYjQ5Ii8+PHRleHQgeD0iNjA3IiB5PSIxNTAiPkN1c3RvbWVyPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIyODAiPlNvbGlkIGFycm93czogbWF0ZXJpYWwuIERhc2hlZCBhcnJvd3M6IGluZm9ybWF0aW9uLjwvdGV4dD48dGV4dCB4PSIzMCIgeT0iMzIwIj5Qcm9jZXNzIHRpbWU6IDEwIG1pbi4gRWxhcHNlZCBsZWFkIHRpbWU6IDEzMCBtaW4uPC90ZXh0PjwvZz48L3N2Zz4K" alt="Simplified map: customer order goes to planning, which instructs cutting. Material passes through cutting, inventory and assembly to the customer. Cutting takes 4 minutes, waiting 120 minutes and assembly 6 minutes."></p>
+<p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgMzYwIiByb2xlPSJpbWciPjx0aXRsZT5TaW1wbGlmaWVkIGN1cnJlbnQtc3RhdGUgdmFsdWUgc3RyZWFtPC90aXRsZT48cmVjdCB3aWR0aD0iNzIwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE0MmI0OSI+PGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIG1hcmtlcldpZHRoPSI4IiBtYXJrZXJIZWlnaHQ9IjgiIHJlZlg9IjciIHJlZlk9IjMiIG9yaWVudD0iYXV0byI+PHBhdGggZD0iTTAgMCBMNyAzIEwwIDYiIGZpbGw9IiMxNDJiNDkiLz48L21hcmtlcj48L2RlZnM+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQyYjQ5IiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIj48cGF0aCBkPSJNNjUwIDgwIFYzNSBINDMwIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz48cGF0aCBkPSJNMzAwIDM1IEgxMzAgVjEzMCIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+PHBhdGggZD0iTTIwNSAxNzAgSDI5MCIvPjxwYXRoIGQ9Ik0zNTAgMTcwIEg0MjUiLz48cGF0aCBkPSJNNTQ1IDE3MCBINTk1Ii8+PC9nPjxyZWN0IHg9IjMwMCIgeT0iMTUiIHdpZHRoPSIxMzAiIGhlaWdodD0iMzgiIGZpbGw9IndoaXRlIiBzdHJva2U9IiMxNDJiNDkiLz48dGV4dCB4PSIzMjAiIHk9IjQxIj5QbGFubmluZzwvdGV4dD48dGV4dCB4PSI0NTUiIHk9IjI5IiBmb250LXNpemU9IjE0Ij5DdXN0b21lciBvcmRlcjwvdGV4dD48dGV4dCB4PSIxMzUiIHk9Ijg1IiBmb250LXNpemU9IjE0Ij5Xb3JrIGluc3RydWN0aW9uPC90ZXh0PjxyZWN0IHg9IjY1IiB5PSIxMzAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNzAiIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzE0MmI0OSIvPjx0ZXh0IHg9IjEwNSIgeT0iMTcwIj5DdXR0aW5nPC90ZXh0PjxyZWN0IHg9IjY1IiB5PSIyMDAiIHdpZHRoPSIxNDAiIGhlaWdodD0iMzUiIGZpbGw9IndoaXRlIiBzdHJva2U9IiMxNDJiNDkiLz48dGV4dCB4PSIxMDAiIHk9IjIyNCI+NCBtaW48L3RleHQ+PHBhdGggZD0iTTMyMCAxMzAgTDM1MCAxOTUgSDI5MCBaIiBmaWxsPSIjZmZmNGQ0IiBzdHJva2U9IiMxNDJiNDkiLz48dGV4dCB4PSIzMTciIHk9IjE4MCI+STwvdGV4dD48dGV4dCB4PSIyNjUiIHk9IjIyNCI+V2FpdDogMTIwIG1pbjwvdGV4dD48cmVjdCB4PSI0MjUiIHk9IjEzMCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI3MCIgZmlsbD0iI2VkZjNmOCIgc3Ryb2tlPSIjMTQyYjQ5Ii8+PHRleHQgeD0iNDQwIiB5PSIxNzAiPkFzc2VtYmx5PC90ZXh0PjxyZWN0IHg9IjQyNSIgeT0iMjAwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjM1IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTQyYjQ5Ii8+PHRleHQgeD0iNDYwIiB5PSIyMjQiPjYgbWluPC90ZXh0PjxyZWN0IHg9IjU5NSIgeT0iODAiIHdpZHRoPSIxMTUiIGhlaWdodD0iMTIwIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTQyYjQ5Ii8+PHRleHQgeD0iNjA3IiB5PSIxNTAiPkN1c3RvbWVyPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIyODAiPlNvbGlkIGFycm93czogbWF0ZXJpYWwuIERhc2hlZCBhcnJvd3M6IGluZm9ybWF0aW9uLjwvdGV4dD48dGV4dCB4PSIzMCIgeT0iMzIwIj5Qcm9jZXNzIHRpbWU6IDEwIG1pbi4gRWxhcHNlZCBsZWFkIHRpbWU6IDEzMCBtaW4uPC90ZXh0PjwvZz48L3N2Zz4K" alt="Simplified map: customer order goes to planning, which instructs cutting. Material passes through cutting, inventory and assembly to the customer. Cutting takes 4 minutes, waiting 120 minutes and assembly 6 minutes." data-natural-width="720" data-natural-height="360"></p>
 <p>This original sketch uses common conventions: a rectangle for a process, a triangle marked I for inventory, attached data boxes for measurements and arrows for flow. The legend distinguishes material movement from information. This is a teaching sketch, not a complete symbol standard.</p>
     </div>
   </details>
@@ -3165,7 +3192,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Use Plan–Do–Check–Act to learn from a change</h2>
 <ol><li><strong>Plan:</strong> define the problem, measure the starting condition and predict the effect of a proposed change.</li><li><strong>Do:</strong> try an authorized change on a manageable scale and record what happens.</li><li><strong>Check:</strong> compare results with the prediction, including quality and unintended effects.</li><li><strong>Act:</strong> adopt and document an improvement, revise an uncertain idea or undo an unsuccessful change; begin the next cycle.</li></ol>
-<p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgMTgwIiByb2xlPSJpbWciPjx0aXRsZT5QbGFuIERvIENoZWNrIEFjdCBjeWNsZTwvdGl0bGU+PHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSIxODAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMxNDJiNDkiPjxnIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzE0MmI0OSI+PHJlY3QgeD0iMzAiIHk9IjMwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjY1Ii8+PHJlY3QgeD0iMjA1IiB5PSIzMCIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI2NSIvPjxyZWN0IHg9IjM4MCIgeT0iMzAiIHdpZHRoPSIxMzAiIGhlaWdodD0iNjUiLz48cmVjdCB4PSI1NTUiIHk9IjMwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjY1Ii8+PC9nPjx0ZXh0IHg9IjcwIiB5PSI3MCI+UGxhbjwvdGV4dD48dGV4dCB4PSIyNTUiIHk9IjcwIj5EbzwvdGV4dD48dGV4dCB4PSI0MjAiIHk9IjcwIj5DaGVjazwvdGV4dD48dGV4dCB4PSI2MDAiIHk9IjcwIj5BY3Q8L3RleHQ+PHRleHQgeD0iMTc1IiB5PSI3MCI+4oaSPC90ZXh0Pjx0ZXh0IHg9IjM1MCIgeT0iNzAiPuKGkjwvdGV4dD48dGV4dCB4PSI1MjUiIHk9IjcwIj7ihpI8L3RleHQ+PHBhdGggZD0iTTYyMCA5NSBWMTMwIEg5NSBWMTAwIE04OSAxMTAgTDk1IDEwMCBMMTAxIDExMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQyYjQ5IiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNDUiIHk9IjE2MCI+UmVwZWF0IHdpdGggd2hhdCB5b3UgbGVhcm5lZDwvdGV4dD48L2c+PC9zdmc+Cg==" alt="Plan leads to Do, then Check, then Act, with a return arrow to Plan for the next improvement cycle."></p>
+<p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgMTgwIiByb2xlPSJpbWciPjx0aXRsZT5QbGFuIERvIENoZWNrIEFjdCBjeWNsZTwvdGl0bGU+PHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSIxODAiIGZpbGw9IiNmZmYiLz48ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMxNDJiNDkiPjxnIGZpbGw9IiNlZGYzZjgiIHN0cm9rZT0iIzE0MmI0OSI+PHJlY3QgeD0iMzAiIHk9IjMwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjY1Ii8+PHJlY3QgeD0iMjA1IiB5PSIzMCIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI2NSIvPjxyZWN0IHg9IjM4MCIgeT0iMzAiIHdpZHRoPSIxMzAiIGhlaWdodD0iNjUiLz48cmVjdCB4PSI1NTUiIHk9IjMwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjY1Ii8+PC9nPjx0ZXh0IHg9IjcwIiB5PSI3MCI+UGxhbjwvdGV4dD48dGV4dCB4PSIyNTUiIHk9IjcwIj5EbzwvdGV4dD48dGV4dCB4PSI0MjAiIHk9IjcwIj5DaGVjazwvdGV4dD48dGV4dCB4PSI2MDAiIHk9IjcwIj5BY3Q8L3RleHQ+PHRleHQgeD0iMTc1IiB5PSI3MCI+4oaSPC90ZXh0Pjx0ZXh0IHg9IjM1MCIgeT0iNzAiPuKGkjwvdGV4dD48dGV4dCB4PSI1MjUiIHk9IjcwIj7ihpI8L3RleHQ+PHBhdGggZD0iTTYyMCA5NSBWMTMwIEg5NSBWMTAwIE04OSAxMTAgTDk1IDEwMCBMMTAxIDExMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQyYjQ5IiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNDUiIHk9IjE2MCI+UmVwZWF0IHdpdGggd2hhdCB5b3UgbGVhcm5lZDwvdGV4dD48L2c+PC9zdmc+Cg==" alt="Plan leads to Do, then Check, then Act, with a return arrow to Plan for the next improvement cycle." data-natural-width="720" data-natural-height="180"></p>
 <p>A useful result may be that the idea did not help. Keep that evidence rather than declaring success because something changed.</p>
     </div>
   </details>
@@ -4870,6 +4897,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2993,7 +3020,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <details class="xcard deck-slide" id="electrical-diagram-types--read-control-logic-without-assuming-physical-placement" data-card="electrical-diagram-types--read-control-logic-without-assuming-physical-placement">
     <summary>Read control logic without assuming physical placement<span class="chev"></span></summary>
     <div class="body">
-      <h2>Read control logic without assuming physical placement</h2><p>A ladder diagram arranges control conditions and outputs in horizontal rungs between two vertical rails. A relay drawing and a PLC program may use a similar ladder shape, but a PLC instruction tests a stored state; it is not a picture of a physical contact.</p><figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlR3byBydW5nIHJlbGF5IGxhZGRlciwgc3dpdGNoIHRvIGNvaWwgYW5kIHJlbGF5IGNvbnRhY3QgdG8gbGFtcCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxNzJiNGQiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTMwIDQwVjI2MCBNMjkwIDQwVjI2MCBNMzAgOTBIOTUgTTE0NSA5MEgyMjUgTTI2NSA5MEgyOTAgTTMwIDIxNUgxMDggTTEzMiAyMTVIMjI1IE0yNjUgMjE1SDI5MCBNMTA4IDE5OFYyMzIgTTEzMiAxOThWMjMyIi8+PGNpcmNsZSBjeD0iOTUiIGN5PSI5MCIgcj0iMyIvPjxjaXJjbGUgY3g9IjE0NSIgY3k9IjkwIiByPSIzIi8+PHBhdGggZD0iTTk4IDg4bDQwLTI0Ii8+PGNpcmNsZSBjeD0iMjQ1IiBjeT0iOTAiIHI9IjIwIi8+PGNpcmNsZSBjeD0iMjQ1IiBjeT0iMjE1IiByPSIyMCIvPjxwYXRoIGQ9Ik0yMzEgMjAxbDI4IDI4bTAtMjgtMjggMjgiLz48dGV4dCB4PSIzMCIgeT0iMjciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkwxPC90ZXh0Pjx0ZXh0IHg9IjI5MCIgeT0iMjciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkwyPC90ZXh0Pjx0ZXh0IHg9IjEyMCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlMxPC90ZXh0Pjx0ZXh0IHg9IjI0NSIgeT0iNTAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPksxIGNvaWw8L3RleHQ+PHRleHQgeD0iMTIwIiB5PSIxNzUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPksxIGNvbnRhY3Q8L3RleHQ+PHRleHQgeD0iMjQ1IiB5PSIxNzUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkgxIGxhbXA8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="L1 and L2 rails: S1 controls relay coil K1 on rung one; a normally open K1 contact controls lamp H1 on rung two."></p><figcaption>Common relay forms, shown with S1 open and K1 de-energized. Closing S1 energizes K1; its normally open contact closes and H1 lights. Opening S1 releases K1 and turns H1 off. The shared K1 label links the coil and its contact; it is not a wire between rungs. This is a functional example, not an installation drawing.</figcaption></figure><p>A logic diagram emphasizes operations such as AND, OR, and NOT. It helps answer which combinations of inputs produce an output. The diagram may omit supply connections and package pin numbers, so it does not replace a wiring drawing.</p>
+      <h2>Read control logic without assuming physical placement</h2><p>A ladder diagram arranges control conditions and outputs in horizontal rungs between two vertical rails. A relay drawing and a PLC program may use a similar ladder shape, but a PLC instruction tests a stored state; it is not a picture of a physical contact.</p><figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlR3byBydW5nIHJlbGF5IGxhZGRlciwgc3dpdGNoIHRvIGNvaWwgYW5kIHJlbGF5IGNvbnRhY3QgdG8gbGFtcCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxNzJiNGQiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTMwIDQwVjI2MCBNMjkwIDQwVjI2MCBNMzAgOTBIOTUgTTE0NSA5MEgyMjUgTTI2NSA5MEgyOTAgTTMwIDIxNUgxMDggTTEzMiAyMTVIMjI1IE0yNjUgMjE1SDI5MCBNMTA4IDE5OFYyMzIgTTEzMiAxOThWMjMyIi8+PGNpcmNsZSBjeD0iOTUiIGN5PSI5MCIgcj0iMyIvPjxjaXJjbGUgY3g9IjE0NSIgY3k9IjkwIiByPSIzIi8+PHBhdGggZD0iTTk4IDg4bDQwLTI0Ii8+PGNpcmNsZSBjeD0iMjQ1IiBjeT0iOTAiIHI9IjIwIi8+PGNpcmNsZSBjeD0iMjQ1IiBjeT0iMjE1IiByPSIyMCIvPjxwYXRoIGQ9Ik0yMzEgMjAxbDI4IDI4bTAtMjgtMjggMjgiLz48dGV4dCB4PSIzMCIgeT0iMjciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkwxPC90ZXh0Pjx0ZXh0IHg9IjI5MCIgeT0iMjciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkwyPC90ZXh0Pjx0ZXh0IHg9IjEyMCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlMxPC90ZXh0Pjx0ZXh0IHg9IjI0NSIgeT0iNTAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPksxIGNvaWw8L3RleHQ+PHRleHQgeD0iMTIwIiB5PSIxNzUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPksxIGNvbnRhY3Q8L3RleHQ+PHRleHQgeD0iMjQ1IiB5PSIxNzUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkgxIGxhbXA8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="L1 and L2 rails: S1 controls relay coil K1 on rung one; a normally open K1 contact controls lamp H1 on rung two." data-natural-width="320" data-natural-height="280"></p><figcaption>Common relay forms, shown with S1 open and K1 de-energized. Closing S1 energizes K1; its normally open contact closes and H1 lights. Opening S1 releases K1 and turns H1 off. The shared K1 label links the coil and its contact; it is not a wire between rungs. This is a functional example, not an installation drawing.</figcaption></figure><p>A logic diagram emphasizes operations such as AND, OR, and NOT. It helps answer which combinations of inputs produce an output. The diagram may omit supply connections and package pin numbers, so it does not replace a wiring drawing.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="electrical-diagram-types--practice-selecting-a-useful-drawing" data-card="electrical-diagram-types--practice-selecting-a-useful-drawing">
@@ -3017,7 +3044,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <details class="xcard deck-slide" id="reading-electrical-connections--read-the-connection-convention-before-tracing-a-wire" data-card="reading-electrical-connections--read-the-connection-convention-before-tracing-a-wire">
     <summary>Read the connection convention before tracing a wire<span class="chev"></span></summary>
     <div class="body">
-      <h2>Read the connection convention before tracing a wire</h2><p>A schematic organizes electrical relationships, not the positions of parts on a bench. Stretching or bending a drawn wire does not change its connections. Moving a line onto a different terminal does.</p><p>For the examples on this page, a filled dot at a crossing means the wires join. A crossing with no dot means they do not join. Other drawings may use a bridge or different conventions. Check the legend; an unclear or damaged junction mark is a reason to consult the drawing source.</p><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjA1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkxlZnQgZG90dGVkIGNyb3NzaW5nIGlzIGpvaW5lZDsgcmlnaHQgdW5kb3R0ZWQgY3Jvc3NpbmcgaXMgbm90IGpvaW5lZCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxNzJiNGQiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTEwIDgwSDE1MCBNODAgMjVWMTM1IE0xNzAgODBIMzEwIE0yNDAgMjVWMTM1Ii8+PGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iNSIgZmlsbD0iIzE3MmI0ZCIvPjx0ZXh0IHg9IjgwIiB5PSIxNjIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkRvdDogam9pbmVkPC90ZXh0Pjx0ZXh0IHg9IjgwIiB5PSIxODYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPjEgbm9kZTwvdGV4dD48dGV4dCB4PSIyNDAiIHk9IjE2MiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+Tm8gZG90OiBjcm9zc2luZzwvdGV4dD48dGV4dCB4PSIyNDAiIHk9IjE4NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+MiBub2RlczwvdGV4dD48L2c+PC9zdmc+Cg==" alt="Two crossing-wire examples: the dotted intersection is one node; the undotted intersection is two separate nodes under this drawing's convention."></p>
+      <h2>Read the connection convention before tracing a wire</h2><p>A schematic organizes electrical relationships, not the positions of parts on a bench. Stretching or bending a drawn wire does not change its connections. Moving a line onto a different terminal does.</p><p>For the examples on this page, a filled dot at a crossing means the wires join. A crossing with no dot means they do not join. Other drawings may use a bridge or different conventions. Check the legend; an unclear or damaged junction mark is a reason to consult the drawing source.</p><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjA1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkxlZnQgZG90dGVkIGNyb3NzaW5nIGlzIGpvaW5lZDsgcmlnaHQgdW5kb3R0ZWQgY3Jvc3NpbmcgaXMgbm90IGpvaW5lZCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxNzJiNGQiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTEwIDgwSDE1MCBNODAgMjVWMTM1IE0xNzAgODBIMzEwIE0yNDAgMjVWMTM1Ii8+PGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iNSIgZmlsbD0iIzE3MmI0ZCIvPjx0ZXh0IHg9IjgwIiB5PSIxNjIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkRvdDogam9pbmVkPC90ZXh0Pjx0ZXh0IHg9IjgwIiB5PSIxODYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPjEgbm9kZTwvdGV4dD48dGV4dCB4PSIyNDAiIHk9IjE2MiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+Tm8gZG90OiBjcm9zc2luZzwvdGV4dD48dGV4dCB4PSIyNDAiIHk9IjE4NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+MiBub2RlczwvdGV4dD48L2c+PC9zdmc+Cg==" alt="Two crossing-wire examples: the dotted intersection is one node; the undotted intersection is two separate nodes under this drawing's convention." data-natural-width="320" data-natural-height="205"></p>
     </div>
   </details>
   <details class="xcard deck-slide" id="reading-electrical-connections--count-connected-conductors-not-corners-or-dots" data-card="reading-electrical-connections--count-connected-conductors-not-corners-or-dots">
@@ -3043,8 +3070,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Recognize common symbols before tracing their connections</h2>
 <p>Use the symbol to identify the kind of component, then read its reference and value. The sheet includes both resistor forms and an unpolarized capacitor. A battery is one kind of DC source; other DC supplies may use a circle marked with polarity.</p>
-<figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNvbW1vbiBzeW1ib2xzLCBwYW5lbCAxOiBiYXR0ZXJ5LCBib3RoIHJlc2lzdG9yIGZvcm1zLCBzd2l0Y2gsIGxhbXAgYW5kIExFRCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxNzJiNGQiIHN0cm9rZS13aWR0aD0iMiI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHBhdGggZD0iTTMwIDQ1SDU4IE01OCAyOFY2MiBNNjggMThWNzIgTTc4IDI4VjYyIE04OCAxOFY3MiBNODggNDVIMTE1Ii8+PHRleHQgeD0iMTA1IiB5PSIyNSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+KzwvdGV4dD48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5CYXR0ZXJ5IC8gREMgc291cmNlPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEwNSkiPjxwYXRoIGQ9Ik0zMCA0NUg0OGw1LTEyIDEwIDI0IDEwLTI0IDEwIDI0IDEwLTI0IDEwIDI0IDUtMTJoMTIiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5SZXNpc3RvcjogVVMgemlnemFnPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDIxMCkiPjxwYXRoIGQ9Ik0zMCA0NUg1MiBNOTggNDVIMTIwIi8+PHJlY3QgeD0iNTIiIHk9IjMyIiB3aWR0aD0iNDYiIGhlaWdodD0iMjYiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5SZXNpc3RvcjogSUVDIHJlY3RhbmdsZTwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAzMTUpIj48cGF0aCBkPSJNMzAgNDVINTUgTTk1IDQ1SDEyMCBNNTUgNDVMOTAgMjAiLz48Y2lyY2xlIGN4PSI1NSIgY3k9IjQ1IiByPSIzIi8+PGNpcmNsZSBjeD0iOTUiIGN5PSI0NSIgcj0iMyIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlN3aXRjaCAob3Blbik8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNDIwKSI+PHBhdGggZD0iTTMwIDQ1SDU1IE05NSA0NUgxMjAgTTYxIDMxbDI4IDI4bTAtMjgtMjggMjgiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjQ1IiByPSIyMCIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkxhbXA8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTI1KSI+PHBhdGggZD0iTTMwIDQ1SDU1IE01NSAyNVY2NUw5MCA0NVogTTkwIDI1VjY1IE05MCA0NUgxMjAgTTY1IDIwbDE1LTE1bS04IDBoOHY4IE04NSAyMGwxNS0xNW0tOCAwaDh2OCIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkxFRDwvdGV4dD48L2c+PC9nPjwvc3ZnPgo=" alt="Common symbols panel 1: battery, US and IEC resistors, open switch, lamp and LED."></p><figcaption>Common teaching forms, panel 1 of 2.</figcaption></figure>
-<figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNvbW1vbiBzeW1ib2xzLCBwYW5lbCAyOiBidXp6ZXIsIGdyb3VuZCwgZnVzZSwgbW90b3IsIGNhcGFjaXRvciBhbmQgZGlvZGUiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IndoaXRlIi8+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTcyYjRkIiBzdHJva2Utd2lkdGg9IjIiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkiPjxwYXRoIGQ9Ik0zMCAzNUg1OCBNMzAgNTVINTggTTU4IDI1VjY1SDc0UTk4IDQ1IDc0IDI1WiBNMTAwIDI5UTExNCA0NSAxMDAgNjEgTTExMCAyMFExMzAgNDUgMTEwIDcwIi8+PHRleHQgeD0iMTYwIiB5PSI5NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+QnV6emVyIChjb21tb24gZm9ybSk8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMTA1KSI+PHBhdGggZD0iTTc1IDE1VjQ1IE00NSA0NUgxMDUgTTU1IDU3SDk1IE02NSA2OUg4NSIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkdyb3VuZCAvIHJlZmVyZW5jZTwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyMTApIj48cGF0aCBkPSJNMzAgNDVIMTIwIi8+PHJlY3QgeD0iNTIiIHk9IjMyIiB3aWR0aD0iNDYiIGhlaWdodD0iMjYiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5GdXNlIChjb21tb24gZm9ybSk8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMzE1KSI+PHBhdGggZD0iTTMwIDQ1SDU1IE05NSA0NUgxMjAiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjQ1IiByPSIyMCIvPjx0ZXh0IHg9Ijc1IiB5PSI1MiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+TTwvdGV4dD48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5Nb3RvcjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCA0MjApIj48cGF0aCBkPSJNMzAgNDVINjggTTY4IDIyVjY4IE04MiAyMlY2OCBNODIgNDVIMTIwIi8+PHRleHQgeD0iMTYwIiB5PSI5NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+Q2FwYWNpdG9yICh1bnBvbGFyaXplZCk8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTI1KSI+PHBhdGggZD0iTTMwIDQ1SDU1IE01NSAyNVY2NUw5MCA0NVogTTkwIDI1VjY1IE05MCA0NUgxMjAiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5EaW9kZTwvdGV4dD48L2c+PC9nPjwvc3ZnPgo=" alt="Common symbols panel 2: buzzer, ground, fuse, motor, unpolarized capacitor and diode."></p><figcaption>Common teaching forms, panel 2 of 2. Buzzer and fuse shapes vary, so check the legend. The ground mark's meaning depends on the drawing; it does not establish protective earth by itself. The diode bar marks its cathode; the LED adds outward arrows for light.</figcaption></figure>
+<figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNvbW1vbiBzeW1ib2xzLCBwYW5lbCAxOiBiYXR0ZXJ5LCBib3RoIHJlc2lzdG9yIGZvcm1zLCBzd2l0Y2gsIGxhbXAgYW5kIExFRCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxNzJiNGQiIHN0cm9rZS13aWR0aD0iMiI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHBhdGggZD0iTTMwIDQ1SDU4IE01OCAyOFY2MiBNNjggMThWNzIgTTc4IDI4VjYyIE04OCAxOFY3MiBNODggNDVIMTE1Ii8+PHRleHQgeD0iMTA1IiB5PSIyNSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+KzwvdGV4dD48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5CYXR0ZXJ5IC8gREMgc291cmNlPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEwNSkiPjxwYXRoIGQ9Ik0zMCA0NUg0OGw1LTEyIDEwIDI0IDEwLTI0IDEwIDI0IDEwLTI0IDEwIDI0IDUtMTJoMTIiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5SZXNpc3RvcjogVVMgemlnemFnPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDIxMCkiPjxwYXRoIGQ9Ik0zMCA0NUg1MiBNOTggNDVIMTIwIi8+PHJlY3QgeD0iNTIiIHk9IjMyIiB3aWR0aD0iNDYiIGhlaWdodD0iMjYiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5SZXNpc3RvcjogSUVDIHJlY3RhbmdsZTwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAzMTUpIj48cGF0aCBkPSJNMzAgNDVINTUgTTk1IDQ1SDEyMCBNNTUgNDVMOTAgMjAiLz48Y2lyY2xlIGN4PSI1NSIgY3k9IjQ1IiByPSIzIi8+PGNpcmNsZSBjeD0iOTUiIGN5PSI0NSIgcj0iMyIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlN3aXRjaCAob3Blbik8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNDIwKSI+PHBhdGggZD0iTTMwIDQ1SDU1IE05NSA0NUgxMjAgTTYxIDMxbDI4IDI4bTAtMjgtMjggMjgiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjQ1IiByPSIyMCIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkxhbXA8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTI1KSI+PHBhdGggZD0iTTMwIDQ1SDU1IE01NSAyNVY2NUw5MCA0NVogTTkwIDI1VjY1IE05MCA0NUgxMjAgTTY1IDIwbDE1LTE1bS04IDBoOHY4IE04NSAyMGwxNS0xNW0tOCAwaDh2OCIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkxFRDwvdGV4dD48L2c+PC9nPjwvc3ZnPgo=" alt="Common symbols panel 1: battery, US and IEC resistors, open switch, lamp and LED." data-natural-width="320" data-natural-height="630"></p><figcaption>Common teaching forms, panel 1 of 2.</figcaption></figure>
+<figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNvbW1vbiBzeW1ib2xzLCBwYW5lbCAyOiBidXp6ZXIsIGdyb3VuZCwgZnVzZSwgbW90b3IsIGNhcGFjaXRvciBhbmQgZGlvZGUiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IndoaXRlIi8+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTcyYjRkIiBzdHJva2Utd2lkdGg9IjIiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkiPjxwYXRoIGQ9Ik0zMCAzNUg1OCBNMzAgNTVINTggTTU4IDI1VjY1SDc0UTk4IDQ1IDc0IDI1WiBNMTAwIDI5UTExNCA0NSAxMDAgNjEgTTExMCAyMFExMzAgNDUgMTEwIDcwIi8+PHRleHQgeD0iMTYwIiB5PSI5NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+QnV6emVyIChjb21tb24gZm9ybSk8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMTA1KSI+PHBhdGggZD0iTTc1IDE1VjQ1IE00NSA0NUgxMDUgTTU1IDU3SDk1IE02NSA2OUg4NSIvPjx0ZXh0IHg9IjE2MCIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPkdyb3VuZCAvIHJlZmVyZW5jZTwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyMTApIj48cGF0aCBkPSJNMzAgNDVIMTIwIi8+PHJlY3QgeD0iNTIiIHk9IjMyIiB3aWR0aD0iNDYiIGhlaWdodD0iMjYiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5GdXNlIChjb21tb24gZm9ybSk8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMzE1KSI+PHBhdGggZD0iTTMwIDQ1SDU1IE05NSA0NUgxMjAiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjQ1IiByPSIyMCIvPjx0ZXh0IHg9Ijc1IiB5PSI1MiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+TTwvdGV4dD48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5Nb3RvcjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCA0MjApIj48cGF0aCBkPSJNMzAgNDVINjggTTY4IDIyVjY4IE04MiAyMlY2OCBNODIgNDVIMTIwIi8+PHRleHQgeD0iMTYwIiB5PSI5NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+Q2FwYWNpdG9yICh1bnBvbGFyaXplZCk8L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTI1KSI+PHBhdGggZD0iTTMwIDQ1SDU1IE01NSAyNVY2NUw5MCA0NVogTTkwIDI1VjY1IE05MCA0NUgxMjAiLz48dGV4dCB4PSIxNjAiIHk9Ijk2IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MmI0ZCIgc3Ryb2tlPSJub25lIj5EaW9kZTwvdGV4dD48L2c+PC9nPjwvc3ZnPgo=" alt="Common symbols panel 2: buzzer, ground, fuse, motor, unpolarized capacitor and diode." data-natural-width="320" data-natural-height="630"></p><figcaption>Common teaching forms, panel 2 of 2. Buzzer and fuse shapes vary, so check the legend. The ground mark's meaning depends on the drawing; it does not establish protective earth by itself. The diode bar marks its cathode; the LED adds outward arrows for light.</figcaption></figure>
 <p><a class="button" data-practice-add="diagram-symbol-led" href="../practice.html#diagram-symbol-led">Practice symbol identification</a></p>
     </div>
   </details>
@@ -3053,7 +3080,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Count four nodes with the switch open, three with it closed</h2>
 <p>Trace this small component schematic with S1 open. Stop at each component terminal; do not count through the battery, resistor, or LED.</p>
-<figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlNjaGVtYXRpYzogQjEgcG9zaXRpdmUgdG8gb3BlbiBTMSwgdGhlbiBSMSwgRDEgYW5vZGUsIEQxIGNhdGhvZGUgYW5kIEIxIG5lZ2F0aXZlIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3MmI0ZCIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNMjAgNjBINjggTTkyIDYwSDIxNSBNMjY1IDYwSDMwMFYyMDBIMjcwIE0yMTAgMjAwSDEwNSBNNTUgMjAwSDIwVjYwIi8+PGcgZGF0YS1jb21wb25lbnQ9ImJhdHRlcnkiPjxwYXRoIGQ9Ik02OCA0NVY3NSBNNzYgMzVWODUgTTg0IDQ1Vjc1IE05MiAzNVY4NSIvPjx0ZXh0IHg9IjEwNiIgeT0iNDIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPis8L3RleHQ+PHRleHQgeD0iODAiIHk9IjExNCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+QjEgYmF0dGVyeTwvdGV4dD48L2c+PGcgZGF0YS1jb21wb25lbnQ9InN3aXRjaCI+PGNpcmNsZSBjeD0iMjE1IiBjeT0iNjAiIHI9IjMiLz48Y2lyY2xlIGN4PSIyNjUiIGN5PSI2MCIgcj0iMyIvPjxwYXRoIGQ9Ik0yMTggNThMMjU5IDM1Ii8+PHRleHQgeD0iMjQwIiB5PSIxMTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlMxIG9wZW48L3RleHQ+PC9nPjxnIGRhdGEtY29tcG9uZW50PSJyZXNpc3RvciI+PHBhdGggZD0iTTIxMCAyMDBsNS0xMCAxMCAyMCAxMC0yMCAxMCAyMCAxMC0yMCAxMCAyMCA1LTEwIi8+PHRleHQgeD0iMjQwIiB5PSIyNTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlIxIHJlc2lzdG9yPC90ZXh0PjwvZz48ZyBkYXRhLWNvbXBvbmVudD0ibGVkIj48cGF0aCBkPSJNMTA1IDIwMEg5NSBNOTUgMTgzVjIxN0w2NSAyMDBaIE02NSAxODNWMjE3IE02NSAyMDBINTUgTTgzIDE3NmwtMTUtMThtMCA4di04aDggTTEwMCAxNzZsLTE1LTE4bTAgOHYtOGg4Ii8+PHRleHQgeD0iODAiIHk9IjI1NCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+RDEgTEVEPC90ZXh0PjwvZz48L2c+PC9zdmc+Cg==" alt="Battery B1, open switch S1, resistor R1 and LED D1 form a loop."></p><figcaption>The same generic circuit as the drawing comparison. No off-page connections are implied.</figcaption></figure>
+<figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlNjaGVtYXRpYzogQjEgcG9zaXRpdmUgdG8gb3BlbiBTMSwgdGhlbiBSMSwgRDEgYW5vZGUsIEQxIGNhdGhvZGUgYW5kIEIxIG5lZ2F0aXZlIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3MmI0ZCIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNMjAgNjBINjggTTkyIDYwSDIxNSBNMjY1IDYwSDMwMFYyMDBIMjcwIE0yMTAgMjAwSDEwNSBNNTUgMjAwSDIwVjYwIi8+PGcgZGF0YS1jb21wb25lbnQ9ImJhdHRlcnkiPjxwYXRoIGQ9Ik02OCA0NVY3NSBNNzYgMzVWODUgTTg0IDQ1Vjc1IE05MiAzNVY4NSIvPjx0ZXh0IHg9IjEwNiIgeT0iNDIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPis8L3RleHQ+PHRleHQgeD0iODAiIHk9IjExNCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+QjEgYmF0dGVyeTwvdGV4dD48L2c+PGcgZGF0YS1jb21wb25lbnQ9InN3aXRjaCI+PGNpcmNsZSBjeD0iMjE1IiBjeT0iNjAiIHI9IjMiLz48Y2lyY2xlIGN4PSIyNjUiIGN5PSI2MCIgcj0iMyIvPjxwYXRoIGQ9Ik0yMTggNThMMjU5IDM1Ii8+PHRleHQgeD0iMjQwIiB5PSIxMTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlMxIG9wZW48L3RleHQ+PC9nPjxnIGRhdGEtY29tcG9uZW50PSJyZXNpc3RvciI+PHBhdGggZD0iTTIxMCAyMDBsNS0xMCAxMCAyMCAxMC0yMCAxMCAyMCAxMC0yMCAxMCAyMCA1LTEwIi8+PHRleHQgeD0iMjQwIiB5PSIyNTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlIxIHJlc2lzdG9yPC90ZXh0PjwvZz48ZyBkYXRhLWNvbXBvbmVudD0ibGVkIj48cGF0aCBkPSJNMTA1IDIwMEg5NSBNOTUgMTgzVjIxN0w2NSAyMDBaIE02NSAxODNWMjE3IE02NSAyMDBINTUgTTgzIDE3NmwtMTUtMThtMCA4di04aDggTTEwMCAxNzZsLTE1LTE4bTAgOHYtOGg4Ii8+PHRleHQgeD0iODAiIHk9IjI1NCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+RDEgTEVEPC90ZXh0PjwvZz48L2c+PC9zdmc+Cg==" alt="Battery B1, open switch S1, resistor R1 and LED D1 form a loop." data-natural-width="320" data-natural-height="290"></p><figcaption>The same generic circuit as the drawing comparison. No off-page connections are implied.</figcaption></figure>
 <p class="deeper-ref" id="deeper-ref-1">Supporting detail: <a href="#deeper-addendum-1"><strong>Addendum 1</strong></a> &mdash; Check the node count terminal by terminal.</p>
 <p><a class="button" data-practice-add="diagram-component-nodes" href="../practice.html#diagram-component-nodes">Practice counting schematic nodes</a></p>
     </div>
@@ -4741,6 +4768,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 (function (root) {

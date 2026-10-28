@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3005,7 +3032,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li>Clean the prism after use. Recheck a doubtful reading; contamination can blur the boundary or bias the result. Use the supplier's alternative test if the sample cannot be read reliably.</li>
   </ol>
   <figure>
-    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDAgNTEwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlJlYWQgdGhlIEJyaXggYm91bmRhcnk8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5PcmlnaW5hbCB0ZWFjaGluZyBzY2FsZSwgemVybyB0byBzaXggQnJpeCBpbiAwLjIgZGl2aXNpb25zLiBEYXJrIGFib3ZlIGFuZCBsaWdodCBiZWxvdyBtZWV0IGF0IDMuMiBCcml4LiBNdWx0aXBseSB0aGF0IHJlYWRpbmcgYnkgdGhlIHByb2R1Y3QgZmFjdG9yLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjQ0MCIgaGVpZ2h0PSI1MTAiIHJ4PSIxNCIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZpbGw9IiMxMDJiNDYiPgo8dGV4dCB4PSIyMjAiIHk9IjM0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjIzIiBmb250LXdlaWdodD0iYm9sZCI+UmVhZCB0aGUgbGlnaHQvZGFyayBib3VuZGFyeTwvdGV4dD4KPHJlY3QgeD0iNjQiIHk9IjYyIiB3aWR0aD0iMzEyIiBoZWlnaHQ9IjMzMCIgZmlsbD0iI2Y0ZjdmYSIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHJlY3QgeD0iNjUiIHk9IjYzIiB3aWR0aD0iMzEwIiBoZWlnaHQ9IjE1OSIgZmlsbD0iIzE2M2U2NCIvPgo8dGV4dCB4PSI5NSIgeT0iOTUiIGZvbnQtc2l6ZT0iMjEiIGZpbGw9IndoaXRlIj5Ccml4PC90ZXh0PgoKPHBhdGggZD0iTTIwNSAzODJoMzYiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMzg5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjMTAyYjQ2Ij4wPC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDM3MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAzNjJoMjAiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMzUyaDIwIiBzdHJva2U9IiMxMDJiNDYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDM0MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAzMzJoMzYiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMzM5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjMTAyYjQ2Ij4xPC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDMyMmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAzMTJoMjAiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMzAyaDIwIiBzdHJva2U9IiMxMDJiNDYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDI5MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAyODJoMzYiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMjg5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjMTAyYjQ2Ij4yPC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDI3MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAyNjJoMjAiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMjUyaDIwIiBzdHJva2U9IiMxMDJiNDYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDI0MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAyMzJoMzYiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMjM5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjMTAyYjQ2Ij4zPC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDIyMmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAyMTJoMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMjAyaDIwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDE5MmgyMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAxODJoMzYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMTg5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjZmZmIj40PC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDE3MmgyMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAxNjJoMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMTUyaDIwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDE0MmgyMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAxMzJoMzYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMTM5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjZmZmIj41PC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDEyMmgyMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAxMTJoMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMTAyaDIwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDkyaDIwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDgyaDM2IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIyNTUiIHk9Ijg5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjZmZmIj42PC90ZXh0Pgo8cGF0aCBkPSJNNjUgMjIySDM3NSIgc3Ryb2tlPSIjZWNhYzAwIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTEwMCAyNDVWMjIyaDgzbS04LTYgOCA2LTggNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHRleHQgeD0iODYiIHk9IjI3MCIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9ImJvbGQiPjMuMjwvdGV4dD4KPHRleHQgeD0iMjIwIiB5PSI0MjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjIiPjMuMiBCcml4IMOXIHByb2R1Y3QgZmFjdG9yID0gJTwvdGV4dD4KPHRleHQgeD0iMjIwIiB5PSI0NjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTkiPkVhY2ggc21hbGwgZGl2aXNpb24gaXMgMC4yIEJyaXguPC90ZXh0Pgo8dGV4dCB4PSIyMjAiIHk9IjQ4OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNyI+SWxsdXN0cmF0aW9uIG9ubHk7IGluc3RydW1lbnQgc2NhbGVzIHZhcnkuPC90ZXh0Pgo8L2c+PC9zdmc+" alt="Illustrative Brix scale from 0 to 6 in 0.2 divisions. The dark upper field meets the light lower field at 3.2 Brix."></p>
+    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDAgNTEwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlJlYWQgdGhlIEJyaXggYm91bmRhcnk8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5PcmlnaW5hbCB0ZWFjaGluZyBzY2FsZSwgemVybyB0byBzaXggQnJpeCBpbiAwLjIgZGl2aXNpb25zLiBEYXJrIGFib3ZlIGFuZCBsaWdodCBiZWxvdyBtZWV0IGF0IDMuMiBCcml4LiBNdWx0aXBseSB0aGF0IHJlYWRpbmcgYnkgdGhlIHByb2R1Y3QgZmFjdG9yLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjQ0MCIgaGVpZ2h0PSI1MTAiIHJ4PSIxNCIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZpbGw9IiMxMDJiNDYiPgo8dGV4dCB4PSIyMjAiIHk9IjM0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjIzIiBmb250LXdlaWdodD0iYm9sZCI+UmVhZCB0aGUgbGlnaHQvZGFyayBib3VuZGFyeTwvdGV4dD4KPHJlY3QgeD0iNjQiIHk9IjYyIiB3aWR0aD0iMzEyIiBoZWlnaHQ9IjMzMCIgZmlsbD0iI2Y0ZjdmYSIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHJlY3QgeD0iNjUiIHk9IjYzIiB3aWR0aD0iMzEwIiBoZWlnaHQ9IjE1OSIgZmlsbD0iIzE2M2U2NCIvPgo8dGV4dCB4PSI5NSIgeT0iOTUiIGZvbnQtc2l6ZT0iMjEiIGZpbGw9IndoaXRlIj5Ccml4PC90ZXh0PgoKPHBhdGggZD0iTTIwNSAzODJoMzYiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMzg5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjMTAyYjQ2Ij4wPC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDM3MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAzNjJoMjAiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMzUyaDIwIiBzdHJva2U9IiMxMDJiNDYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDM0MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAzMzJoMzYiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMzM5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjMTAyYjQ2Ij4xPC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDMyMmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAzMTJoMjAiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMzAyaDIwIiBzdHJva2U9IiMxMDJiNDYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDI5MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAyODJoMzYiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMjg5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjMTAyYjQ2Ij4yPC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDI3MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAyNjJoMjAiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMjUyaDIwIiBzdHJva2U9IiMxMDJiNDYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDI0MmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAyMzJoMzYiIHN0cm9rZT0iIzEwMmI0NiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMjM5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjMTAyYjQ2Ij4zPC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDIyMmgyMCIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAyMTJoMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMjAyaDIwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDE5MmgyMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAxODJoMzYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMTg5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjZmZmIj40PC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDE3MmgyMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAxNjJoMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMTUyaDIwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDE0MmgyMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAxMzJoMzYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjI1NSIgeT0iMTM5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjZmZmIj41PC90ZXh0Pgo8cGF0aCBkPSJNMjA1IDEyMmgyMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwNSAxMTJoMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik0yMDUgMTAyaDIwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDkyaDIwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjA1IDgyaDM2IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIyNTUiIHk9Ijg5IiBmb250LXNpemU9IjIyIiBmaWxsPSIjZmZmIj42PC90ZXh0Pgo8cGF0aCBkPSJNNjUgMjIySDM3NSIgc3Ryb2tlPSIjZWNhYzAwIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTEwMCAyNDVWMjIyaDgzbS04LTYgOCA2LTggNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTAyYjQ2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHRleHQgeD0iODYiIHk9IjI3MCIgZm9udC1zaXplPSIyMyIgZm9udC13ZWlnaHQ9ImJvbGQiPjMuMjwvdGV4dD4KPHRleHQgeD0iMjIwIiB5PSI0MjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjIiPjMuMiBCcml4IMOXIHByb2R1Y3QgZmFjdG9yID0gJTwvdGV4dD4KPHRleHQgeD0iMjIwIiB5PSI0NjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTkiPkVhY2ggc21hbGwgZGl2aXNpb24gaXMgMC4yIEJyaXguPC90ZXh0Pgo8dGV4dCB4PSIyMjAiIHk9IjQ4OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNyI+SWxsdXN0cmF0aW9uIG9ubHk7IGluc3RydW1lbnQgc2NhbGVzIHZhcnkuPC90ZXh0Pgo8L2c+PC9zdmc+" alt="Illustrative Brix scale from 0 to 6 in 0.2 divisions. The dark upper field meets the light lower field at 3.2 Brix." data-natural-width="440" data-natural-height="510"></p>
     <figcaption>Read the boundary: <strong>3.2 Brix</strong>. With an invented teaching factor of 1.5, concentration is 3.2 × 1.5 = <strong>4.8%</strong>. That factor is not a shop recommendation.</figcaption>
   </figure>
   <p><strong>There is no universal factor or target range.</strong> The SDS explains hazards and handling; the product's technical data sheet supplies the mixing and measurement information. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a>.</p>
@@ -3101,7 +3128,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Clean the tank and its return path before refilling</h2>
   <p><strong>Use this as a general sequence with the machine's approved maintenance procedure.</strong> Stop the machine and follow its isolation requirements before accessing the tank, pumps or chip-handling equipment. Only run pumps for a cleaning or circulation step when that procedure calls for it and the system is safely reassembled.</p>
   <figure>
-    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NjAgNjIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkNvb2xhbnQgdGFuayBjbGVhbmluZyBzZXF1ZW5jZTwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlNpeCBzdGVwcyBmbG93IGRvd253YXJkOiBwcmVwYXJlIGFuZCBpc29sYXRlOyBza2ltIGFuZCBkcmFpbjsgcmVtb3ZlIHNvbGlkczsgY2xlYW4gcmVzaWR1ZSBhbmQgcGFzc2FnZXM7IHJlbW92ZSBjbGVhbmVyIGFuZCByaW5zZTsgcmVmaWxsLCBjaXJjdWxhdGUgYW5kIG1lYXN1cmUuIEZvbGxvdyB0aGUgbWFjaGluZSBhbmQgZmx1aWQgc3VwcGxpZXJzJyBwcm9jZWR1cmVzLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MjAiIGZpbGw9IndoaXRlIiByeD0iMTQiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTAyYjQ2Ij4KPHRleHQgeD0iMjgwIiB5PSIzMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkNsZWFuIGJlZm9yZSB0aGUgZnJlc2ggY2hhcmdlPC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iNTAiIHdpZHRoPSI1MjAiIGhlaWdodD0iNzUiIHJ4PSIxMCIgZmlsbD0iI2YwZjVmYSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBjeD0iNDkiIGN5PSI3NSIgcj0iMTciIGZpbGw9IiMxNjNlNjQiLz48dGV4dCB4PSI0OSIgeT0iODIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjIxIj4xPC90ZXh0Pgo8dGV4dCB4PSI3NyIgeT0iNzkiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSJib2xkIj5QcmVwYXJlIGFuZCBpc29sYXRlPC90ZXh0Pjx0ZXh0IHg9Ijc3IiB5PSIxMDciIGZvbnQtc2l6ZT0iMTkiPlByb2NlZHVyZSwgU0RTLCBjb250YWluZXJzLCBQUEU8L3RleHQ+CjxwYXRoIGQ9Ik0yODAgMTI2djEwbS02LTYgNiA2IDYtNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHJlY3QgeD0iMjAiIHk9IjE0MCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSI3NSIgcng9IjEwIiBmaWxsPSIjZjBmNWZhIiBzdHJva2U9IiMxNjNlNjQiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSI0OSIgY3k9IjE2NSIgcj0iMTciIGZpbGw9IiMxNjNlNjQiLz48dGV4dCB4PSI0OSIgeT0iMTcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMSI+MjwvdGV4dD4KPHRleHQgeD0iNzciIHk9IjE2OSIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlNraW0gYW5kIGRyYWluPC90ZXh0Pjx0ZXh0IHg9Ijc3IiB5PSIxOTciIGZvbnQtc2l6ZT0iMTkiPkNhdGNoIGxhcmdlciBjaGlwcyBpbiBhIHN0cmFpbmVyPC90ZXh0Pgo8cGF0aCBkPSJNMjgwIDIxNnYxMG0tNi02IDYgNiA2LTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2M2U2NCIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjIwIiB5PSIyMzAiIHdpZHRoPSI1MjAiIGhlaWdodD0iNzUiIHJ4PSIxMCIgZmlsbD0iI2YwZjVmYSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBjeD0iNDkiIGN5PSIyNTUiIHI9IjE3IiBmaWxsPSIjMTYzZTY0Ii8+PHRleHQgeD0iNDkiIHk9IjI2MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMjEiPjM8L3RleHQ+Cjx0ZXh0IHg9Ijc3IiB5PSIyNTkiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSJib2xkIj5SZW1vdmUgc29saWRzPC90ZXh0Pjx0ZXh0IHg9Ijc3IiB5PSIyODciIGZvbnQtc2l6ZT0iMTkiPkNsZWFyIGNoaXBzLCBzbHVkZ2UgYW5kIHNjcmVlbnM8L3RleHQ+CjxwYXRoIGQ9Ik0yODAgMzA2djEwbS02LTYgNiA2IDYtNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHJlY3QgeD0iMjAiIHk9IjMyMCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSI3NSIgcng9IjEwIiBmaWxsPSIjZjBmNWZhIiBzdHJva2U9IiMxNjNlNjQiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSI0OSIgY3k9IjM0NSIgcj0iMTciIGZpbGw9IiMxNjNlNjQiLz48dGV4dCB4PSI0OSIgeT0iMzUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMSI+NDwvdGV4dD4KPHRleHQgeD0iNzciIHk9IjM0OSIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9ImJvbGQiPkNsZWFuIHJlc2lkdWUgYW5kIHBhc3NhZ2VzPC90ZXh0Pjx0ZXh0IHg9Ijc3IiB5PSIzNzciIGZvbnQtc2l6ZT0iMTkiPlVzZSBjb21wYXRpYmxlLCBkaWx1dGVkIGNsZWFuZXI8L3RleHQ+CjxwYXRoIGQ9Ik0yODAgMzk2djEwbS02LTYgNiA2IDYtNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHJlY3QgeD0iMjAiIHk9IjQxMCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSI3NSIgcng9IjEwIiBmaWxsPSIjZjBmNWZhIiBzdHJva2U9IiMxNjNlNjQiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSI0OSIgY3k9IjQzNSIgcj0iMTciIGZpbGw9IiMxNjNlNjQiLz48dGV4dCB4PSI0OSIgeT0iNDQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMSI+NTwvdGV4dD4KPHRleHQgeD0iNzciIHk9IjQzOSIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlJlbW92ZSBjbGVhbmVyIGFuZCByaW5zZTwvdGV4dD48dGV4dCB4PSI3NyIgeT0iNDY3IiBmb250LXNpemU9IjE5Ij5Gb2xsb3cgaW5zdHJ1Y3Rpb25zOyBjYXB0dXJlIHdhc3RlPC90ZXh0Pgo8cGF0aCBkPSJNMjgwIDQ4NnYxMG0tNi02IDYgNiA2LTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2M2U2NCIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjIwIiB5PSI1MDAiIHdpZHRoPSI1MjAiIGhlaWdodD0iNzUiIHJ4PSIxMCIgZmlsbD0iI2YwZjVmYSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBjeD0iNDkiIGN5PSI1MjUiIHI9IjE3IiBmaWxsPSIjMTYzZTY0Ii8+PHRleHQgeD0iNDkiIHk9IjUzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMjEiPjY8L3RleHQ+Cjx0ZXh0IHg9Ijc3IiB5PSI1MjkiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSJib2xkIj5SZWZpbGwsIGNpcmN1bGF0ZSBhbmQgbWVhc3VyZTwvdGV4dD48dGV4dCB4PSI3NyIgeT0iNTU3IiBmb250LXNpemU9IjE5Ij5SZWNvcmQgY29uY2VudHJhdGlvbiBhbmQgY29uZGl0aW9uPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjYwMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxOCI+VXNlIHRoZSBtYWNoaW5lLXNwZWNpZmljIG1haW50ZW5hbmNlIHByb2NlZHVyZS48L3RleHQ+PC9nPjwvc3ZnPg==" alt="Tank-cleaning flow: prepare and isolate; skim and drain through a strainer; remove chips and sludge; clean residue and return paths; remove cleaner and rinse as specified; refill, circulate and measure."></p>
+    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NjAgNjIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkNvb2xhbnQgdGFuayBjbGVhbmluZyBzZXF1ZW5jZTwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlNpeCBzdGVwcyBmbG93IGRvd253YXJkOiBwcmVwYXJlIGFuZCBpc29sYXRlOyBza2ltIGFuZCBkcmFpbjsgcmVtb3ZlIHNvbGlkczsgY2xlYW4gcmVzaWR1ZSBhbmQgcGFzc2FnZXM7IHJlbW92ZSBjbGVhbmVyIGFuZCByaW5zZTsgcmVmaWxsLCBjaXJjdWxhdGUgYW5kIG1lYXN1cmUuIEZvbGxvdyB0aGUgbWFjaGluZSBhbmQgZmx1aWQgc3VwcGxpZXJzJyBwcm9jZWR1cmVzLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjU2MCIgaGVpZ2h0PSI2MjAiIGZpbGw9IndoaXRlIiByeD0iMTQiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjMTAyYjQ2Ij4KPHRleHQgeD0iMjgwIiB5PSIzMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkNsZWFuIGJlZm9yZSB0aGUgZnJlc2ggY2hhcmdlPC90ZXh0Pgo8cmVjdCB4PSIyMCIgeT0iNTAiIHdpZHRoPSI1MjAiIGhlaWdodD0iNzUiIHJ4PSIxMCIgZmlsbD0iI2YwZjVmYSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBjeD0iNDkiIGN5PSI3NSIgcj0iMTciIGZpbGw9IiMxNjNlNjQiLz48dGV4dCB4PSI0OSIgeT0iODIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjIxIj4xPC90ZXh0Pgo8dGV4dCB4PSI3NyIgeT0iNzkiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSJib2xkIj5QcmVwYXJlIGFuZCBpc29sYXRlPC90ZXh0Pjx0ZXh0IHg9Ijc3IiB5PSIxMDciIGZvbnQtc2l6ZT0iMTkiPlByb2NlZHVyZSwgU0RTLCBjb250YWluZXJzLCBQUEU8L3RleHQ+CjxwYXRoIGQ9Ik0yODAgMTI2djEwbS02LTYgNiA2IDYtNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHJlY3QgeD0iMjAiIHk9IjE0MCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSI3NSIgcng9IjEwIiBmaWxsPSIjZjBmNWZhIiBzdHJva2U9IiMxNjNlNjQiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSI0OSIgY3k9IjE2NSIgcj0iMTciIGZpbGw9IiMxNjNlNjQiLz48dGV4dCB4PSI0OSIgeT0iMTcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMSI+MjwvdGV4dD4KPHRleHQgeD0iNzciIHk9IjE2OSIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlNraW0gYW5kIGRyYWluPC90ZXh0Pjx0ZXh0IHg9Ijc3IiB5PSIxOTciIGZvbnQtc2l6ZT0iMTkiPkNhdGNoIGxhcmdlciBjaGlwcyBpbiBhIHN0cmFpbmVyPC90ZXh0Pgo8cGF0aCBkPSJNMjgwIDIxNnYxMG0tNi02IDYgNiA2LTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2M2U2NCIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjIwIiB5PSIyMzAiIHdpZHRoPSI1MjAiIGhlaWdodD0iNzUiIHJ4PSIxMCIgZmlsbD0iI2YwZjVmYSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBjeD0iNDkiIGN5PSIyNTUiIHI9IjE3IiBmaWxsPSIjMTYzZTY0Ii8+PHRleHQgeD0iNDkiIHk9IjI2MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMjEiPjM8L3RleHQ+Cjx0ZXh0IHg9Ijc3IiB5PSIyNTkiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSJib2xkIj5SZW1vdmUgc29saWRzPC90ZXh0Pjx0ZXh0IHg9Ijc3IiB5PSIyODciIGZvbnQtc2l6ZT0iMTkiPkNsZWFyIGNoaXBzLCBzbHVkZ2UgYW5kIHNjcmVlbnM8L3RleHQ+CjxwYXRoIGQ9Ik0yODAgMzA2djEwbS02LTYgNiA2IDYtNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHJlY3QgeD0iMjAiIHk9IjMyMCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSI3NSIgcng9IjEwIiBmaWxsPSIjZjBmNWZhIiBzdHJva2U9IiMxNjNlNjQiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSI0OSIgY3k9IjM0NSIgcj0iMTciIGZpbGw9IiMxNjNlNjQiLz48dGV4dCB4PSI0OSIgeT0iMzUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMSI+NDwvdGV4dD4KPHRleHQgeD0iNzciIHk9IjM0OSIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9ImJvbGQiPkNsZWFuIHJlc2lkdWUgYW5kIHBhc3NhZ2VzPC90ZXh0Pjx0ZXh0IHg9Ijc3IiB5PSIzNzciIGZvbnQtc2l6ZT0iMTkiPlVzZSBjb21wYXRpYmxlLCBkaWx1dGVkIGNsZWFuZXI8L3RleHQ+CjxwYXRoIGQ9Ik0yODAgMzk2djEwbS02LTYgNiA2IDYtNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHJlY3QgeD0iMjAiIHk9IjQxMCIgd2lkdGg9IjUyMCIgaGVpZ2h0PSI3NSIgcng9IjEwIiBmaWxsPSIjZjBmNWZhIiBzdHJva2U9IiMxNjNlNjQiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSI0OSIgY3k9IjQzNSIgcj0iMTciIGZpbGw9IiMxNjNlNjQiLz48dGV4dCB4PSI0OSIgeT0iNDQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMSI+NTwvdGV4dD4KPHRleHQgeD0iNzciIHk9IjQzOSIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlJlbW92ZSBjbGVhbmVyIGFuZCByaW5zZTwvdGV4dD48dGV4dCB4PSI3NyIgeT0iNDY3IiBmb250LXNpemU9IjE5Ij5Gb2xsb3cgaW5zdHJ1Y3Rpb25zOyBjYXB0dXJlIHdhc3RlPC90ZXh0Pgo8cGF0aCBkPSJNMjgwIDQ4NnYxMG0tNi02IDYgNiA2LTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2M2U2NCIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjIwIiB5PSI1MDAiIHdpZHRoPSI1MjAiIGhlaWdodD0iNzUiIHJ4PSIxMCIgZmlsbD0iI2YwZjVmYSIgc3Ryb2tlPSIjMTYzZTY0IiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBjeD0iNDkiIGN5PSI1MjUiIHI9IjE3IiBmaWxsPSIjMTYzZTY0Ii8+PHRleHQgeD0iNDkiIHk9IjUzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMjEiPjY8L3RleHQ+Cjx0ZXh0IHg9Ijc3IiB5PSI1MjkiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSJib2xkIj5SZWZpbGwsIGNpcmN1bGF0ZSBhbmQgbWVhc3VyZTwvdGV4dD48dGV4dCB4PSI3NyIgeT0iNTU3IiBmb250LXNpemU9IjE5Ij5SZWNvcmQgY29uY2VudHJhdGlvbiBhbmQgY29uZGl0aW9uPC90ZXh0Pgo8dGV4dCB4PSIyODAiIHk9IjYwMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxOCI+VXNlIHRoZSBtYWNoaW5lLXNwZWNpZmljIG1haW50ZW5hbmNlIHByb2NlZHVyZS48L3RleHQ+PC9nPjwvc3ZnPg==" alt="Tank-cleaning flow: prepare and isolate; skim and drain through a strainer; remove chips and sludge; clean residue and return paths; remove cleaner and rinse as specified; refill, circulate and measure." data-natural-width="560" data-natural-height="620"></p>
     <figcaption>Removing old fluid without removing deposits leaves contamination ready to enter the fresh charge.</figcaption>
   </figure>
   <ul class="boxes">
@@ -4867,6 +4894,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

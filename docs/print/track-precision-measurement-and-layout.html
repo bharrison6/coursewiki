@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3016,7 +3043,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Micrometers specialize in outside sizes, inside sizes, or depths</h2>
   <p>An <strong>outside micrometer</strong> measures between a fixed anvil and a moving spindle. Choose a range that contains the dimension: a 1&ndash;2 in instrument does not start from zero like a 0&ndash;1 in instrument. A conventional inch scale reads 0.001 in; a sleeve vernier can add 0.0001 in readings. A conventional metric scale reads 0.01 mm. Digital models differ.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MjAgNDMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+T3V0c2lkZSBtaWNyb21ldGVyIGFuYXRvbXk8L3RpdGxlPgogIDxkZXNjIGlkPSJkZXNjIj5BbiBvcmlnaW5hbCBzY2hlbWF0aWMuIEEgQy1zaGFwZWQgZnJhbWUgaG9sZHMgdGhlIGZpeGVkIGFudmlsIG9wcG9zaXRlIGEgbW92aW5nIHNwaW5kbGUuIFRoZSBzbGVldmUsIHJvdGF0aW5nIHRoaW1ibGUsIHNwaW5kbGUgbG9jaywgYW5kIHJhdGNoZXQgYXJlIGxhYmVsZWQuIFRoZSBnYXAgYmV0d2VlbiBtZWFzdXJpbmcgZmFjZXMgaXMgdGhlIHNpemUgYmVpbmcgbWVhc3VyZWQuPC9kZXNjPgogIDxyZWN0IHdpZHRoPSI5MjAiIGhlaWdodD0iNDMwIiBmaWxsPSIjZmZmIi8+CiAgPGcgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9IiNlNGU5ZWQiPgogICAgPHBhdGggZD0iTTEzMCAxNTAgTDEzMCAyNzUgUTEzMCAzNTUgMjQ1IDM1NSBRMzYwIDM1NSAzNjAgMjc1IEwzNjAgMTUwIEwzMjAgMTUwIEwzMjAgMjcwIFEzMjAgMzEwIDI0NSAzMTAgUTE3MCAzMTAgMTcwIDI3MCBMMTcwIDE1MCBaIi8+CiAgICA8cmVjdCB4PSIxMjUiIHk9IjE0MCIgd2lkdGg9IjY1IiBoZWlnaHQ9IjM1Ii8+CiAgICA8cmVjdCB4PSIyNzAiIHk9IjE0MyIgd2lkdGg9IjE0NSIgaGVpZ2h0PSIyOSIvPgogICAgPHJlY3QgeD0iMzcwIiB5PSIxMjUiIHdpZHRoPSIxODAiIGhlaWdodD0iNjUiLz4KICAgIDxyZWN0IHg9IjU1MCIgeT0iMTEzIiB3aWR0aD0iMTY1IiBoZWlnaHQ9Ijg5Ii8+CiAgICA8cmVjdCB4PSI3MTUiIHk9IjEzNSIgd2lkdGg9IjkwIiBoZWlnaHQ9IjQ1Ii8+CiAgICA8cmVjdCB4PSIzMzYiIHk9IjExMCIgd2lkdGg9IjI1IiBoZWlnaHQ9IjMyIiBmaWxsPSIjZWNhYzAwIi8+CiAgPC9nPgogIDxnIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0zOTAgMTU4IEg1NTAgTTQwNSAxNTggVjE3OCBNNDM1IDE1OCBWMTczIE00NjUgMTU4IFYxNzggTTQ5NSAxNTggVjE3MyBNNTI1IDE1OCBWMTc4Ii8+CiAgICA8cGF0aCBkPSJNNTU1IDEzNSBINTgwIE01NTUgMTU4IEg1OTAgTTU1NSAxODAgSDU4MCBNNzMwIDEzNyBWMTc3IE03NDUgMTM3IFYxNzcgTTc2MCAxMzcgVjE3NyBNNzc1IDEzNyBWMTc3Ii8+CiAgICA8cGF0aCBkPSJNMTU3IDE0MCBWODIgSDkwIE0yODUgMTQzIFY2NSBIMjUwIE00MzAgMTI1IFY2MiBINDQ1IE02MzAgMTEzIFY2NSBNNzcwIDEzNSBWODAgSDgzMCBNMzUwIDExMCBWMzIgSDM1MCBNMjIzIDM1NSBWMzkwIEgxMjAiLz4KICAgIDxwYXRoIGQ9Ik0xOTAgMTgzIFYyMjUgTTI3MCAxODMgVjIyNSBNMTkwIDIxMiBIMjcwIE0xOTAgMjEyIEwyMDAgMjA2IE0xOTAgMjEyIEwyMDAgMjE4IE0yNzAgMjEyIEwyNjAgMjA2IE0yNzAgMjEyIEwyNjAgMjE4Ii8+CiAgPC9nPgogIDxnIGZpbGw9IiMwMDIxNDQiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjIxIj4KICAgIDx0ZXh0IHg9IjM4IiB5PSI3NSI+Rml4ZWQgYW52aWw8L3RleHQ+PHRleHQgeD0iMTg1IiB5PSI1NSI+TW92aW5nIHNwaW5kbGU8L3RleHQ+CiAgICA8dGV4dCB4PSI0MTAiIHk9IjUzIj5TbGVldmU8L3RleHQ+PHRleHQgeD0iNTg1IiB5PSI1NSI+VGhpbWJsZTwvdGV4dD48dGV4dCB4PSI3OTAiIHk9IjcwIj5SYXRjaGV0PC90ZXh0PgogICAgPHRleHQgeD0iMzE1IiB5PSIyNSI+TG9jazwvdGV4dD48dGV4dCB4PSI0NSIgeT0iMzk3Ij5GcmFtZTwvdGV4dD4KICAgIDx0ZXh0IHg9IjIzMCIgeT0iMjUzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5NZWFzdXJlZCBnYXA8L3RleHQ+CiAgICA8dGV4dCB4PSI0NzUiIHk9IjI4NSI+U2xlZXZlOiBjb2Fyc2Ugc2NhbGU8L3RleHQ+PHRleHQgeD0iNDc1IiB5PSIzMTgiPlRoaW1ibGU6IGZyYWN0aW9uIG9mIGEgdHVybjwvdGV4dD4KICAgIDx0ZXh0IHg9IjQ3NSIgeT0iMzUxIj5SYXRjaGV0OiBjb250cm9scyBjb250YWN0IGZvcmNlPC90ZXh0PgogICAgPHRleHQgeD0iNDc1IiB5PSIzOTQiIGZvbnQtc2l6ZT0iMTciPlNjaGVtYXRpYzsgcHJvcG9ydGlvbnMgYXJlIGZvciBleHBsYW5hdGlvbi48L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt="Outside micrometer with the frame, fixed anvil, moving spindle, sleeve, thimble, lock, and force-limiting ratchet labeled. The gap between the faces is the measured size."><figcaption>The sleeve supplies the coarse reading; turning the thimble moves the spindle. The ratchet or friction device helps control contact force.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MjAgNDMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+T3V0c2lkZSBtaWNyb21ldGVyIGFuYXRvbXk8L3RpdGxlPgogIDxkZXNjIGlkPSJkZXNjIj5BbiBvcmlnaW5hbCBzY2hlbWF0aWMuIEEgQy1zaGFwZWQgZnJhbWUgaG9sZHMgdGhlIGZpeGVkIGFudmlsIG9wcG9zaXRlIGEgbW92aW5nIHNwaW5kbGUuIFRoZSBzbGVldmUsIHJvdGF0aW5nIHRoaW1ibGUsIHNwaW5kbGUgbG9jaywgYW5kIHJhdGNoZXQgYXJlIGxhYmVsZWQuIFRoZSBnYXAgYmV0d2VlbiBtZWFzdXJpbmcgZmFjZXMgaXMgdGhlIHNpemUgYmVpbmcgbWVhc3VyZWQuPC9kZXNjPgogIDxyZWN0IHdpZHRoPSI5MjAiIGhlaWdodD0iNDMwIiBmaWxsPSIjZmZmIi8+CiAgPGcgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9IiNlNGU5ZWQiPgogICAgPHBhdGggZD0iTTEzMCAxNTAgTDEzMCAyNzUgUTEzMCAzNTUgMjQ1IDM1NSBRMzYwIDM1NSAzNjAgMjc1IEwzNjAgMTUwIEwzMjAgMTUwIEwzMjAgMjcwIFEzMjAgMzEwIDI0NSAzMTAgUTE3MCAzMTAgMTcwIDI3MCBMMTcwIDE1MCBaIi8+CiAgICA8cmVjdCB4PSIxMjUiIHk9IjE0MCIgd2lkdGg9IjY1IiBoZWlnaHQ9IjM1Ii8+CiAgICA8cmVjdCB4PSIyNzAiIHk9IjE0MyIgd2lkdGg9IjE0NSIgaGVpZ2h0PSIyOSIvPgogICAgPHJlY3QgeD0iMzcwIiB5PSIxMjUiIHdpZHRoPSIxODAiIGhlaWdodD0iNjUiLz4KICAgIDxyZWN0IHg9IjU1MCIgeT0iMTEzIiB3aWR0aD0iMTY1IiBoZWlnaHQ9Ijg5Ii8+CiAgICA8cmVjdCB4PSI3MTUiIHk9IjEzNSIgd2lkdGg9IjkwIiBoZWlnaHQ9IjQ1Ii8+CiAgICA8cmVjdCB4PSIzMzYiIHk9IjExMCIgd2lkdGg9IjI1IiBoZWlnaHQ9IjMyIiBmaWxsPSIjZWNhYzAwIi8+CiAgPC9nPgogIDxnIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0zOTAgMTU4IEg1NTAgTTQwNSAxNTggVjE3OCBNNDM1IDE1OCBWMTczIE00NjUgMTU4IFYxNzggTTQ5NSAxNTggVjE3MyBNNTI1IDE1OCBWMTc4Ii8+CiAgICA8cGF0aCBkPSJNNTU1IDEzNSBINTgwIE01NTUgMTU4IEg1OTAgTTU1NSAxODAgSDU4MCBNNzMwIDEzNyBWMTc3IE03NDUgMTM3IFYxNzcgTTc2MCAxMzcgVjE3NyBNNzc1IDEzNyBWMTc3Ii8+CiAgICA8cGF0aCBkPSJNMTU3IDE0MCBWODIgSDkwIE0yODUgMTQzIFY2NSBIMjUwIE00MzAgMTI1IFY2MiBINDQ1IE02MzAgMTEzIFY2NSBNNzcwIDEzNSBWODAgSDgzMCBNMzUwIDExMCBWMzIgSDM1MCBNMjIzIDM1NSBWMzkwIEgxMjAiLz4KICAgIDxwYXRoIGQ9Ik0xOTAgMTgzIFYyMjUgTTI3MCAxODMgVjIyNSBNMTkwIDIxMiBIMjcwIE0xOTAgMjEyIEwyMDAgMjA2IE0xOTAgMjEyIEwyMDAgMjE4IE0yNzAgMjEyIEwyNjAgMjA2IE0yNzAgMjEyIEwyNjAgMjE4Ii8+CiAgPC9nPgogIDxnIGZpbGw9IiMwMDIxNDQiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjIxIj4KICAgIDx0ZXh0IHg9IjM4IiB5PSI3NSI+Rml4ZWQgYW52aWw8L3RleHQ+PHRleHQgeD0iMTg1IiB5PSI1NSI+TW92aW5nIHNwaW5kbGU8L3RleHQ+CiAgICA8dGV4dCB4PSI0MTAiIHk9IjUzIj5TbGVldmU8L3RleHQ+PHRleHQgeD0iNTg1IiB5PSI1NSI+VGhpbWJsZTwvdGV4dD48dGV4dCB4PSI3OTAiIHk9IjcwIj5SYXRjaGV0PC90ZXh0PgogICAgPHRleHQgeD0iMzE1IiB5PSIyNSI+TG9jazwvdGV4dD48dGV4dCB4PSI0NSIgeT0iMzk3Ij5GcmFtZTwvdGV4dD4KICAgIDx0ZXh0IHg9IjIzMCIgeT0iMjUzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5NZWFzdXJlZCBnYXA8L3RleHQ+CiAgICA8dGV4dCB4PSI0NzUiIHk9IjI4NSI+U2xlZXZlOiBjb2Fyc2Ugc2NhbGU8L3RleHQ+PHRleHQgeD0iNDc1IiB5PSIzMTgiPlRoaW1ibGU6IGZyYWN0aW9uIG9mIGEgdHVybjwvdGV4dD4KICAgIDx0ZXh0IHg9IjQ3NSIgeT0iMzUxIj5SYXRjaGV0OiBjb250cm9scyBjb250YWN0IGZvcmNlPC90ZXh0PgogICAgPHRleHQgeD0iNDc1IiB5PSIzOTQiIGZvbnQtc2l6ZT0iMTciPlNjaGVtYXRpYzsgcHJvcG9ydGlvbnMgYXJlIGZvciBleHBsYW5hdGlvbi48L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt="Outside micrometer with the frame, fixed anvil, moving spindle, sleeve, thimble, lock, and force-limiting ratchet labeled. The gap between the faces is the measured size." data-natural-width="920" data-natural-height="430"><figcaption>The sleeve supplies the coarse reading; turning the thimble moves the spindle. The ratchet or friction device helps control contact force.</figcaption></figure>
   <p>An <strong>inside micrometer</strong> spans an opening using internal contacts. Rod and two-point types require careful alignment; three-point types have a different contact arrangement. Check the reference and any extension length for the actual tool.</p>
   <p>A <strong>depth micrometer</strong> rests its flat base on the reference face and extends a rod to the lower surface. Keep the base seated. Check the installed rod's range and the scale direction: many depth scales run opposite to an outside micrometer. Do not add a rod length without checking how that instrument is marked.</p>
     </div>
@@ -3104,7 +3131,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>A 0.001 in vernier caliper adds the aligned division</h2>
   <p>For the <strong>25-division inch vernier used here</strong>, each main-scale space is 0.025 in. Twenty-five vernier spaces occupy the length of 24 main-scale spaces, so each vernier space is 0.024 in. Their 0.001 in difference makes the fine reading possible.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+QSB2ZXJuaWVyIHR1cm5zIGEgc21hbGwgc3BhY2luZyBkaWZmZXJlbmNlIGludG8gYSB2aXNpYmxlIGFsaWdubWVudDwvdGl0bGU+CiAgPGRlc2MgaWQ9ImRlc2MiPlR3byBzaG9ydGVuZWQgdmlld3Mgb2YgYSAyNS1kaXZpc2lvbiBpbmNoIHZlcm5pZXIuIFVwcGVyIG1haW4tc2NhbGUgbGluZXMgYXJlIDAuMDI1IGluY2ggYXBhcnQsIGxvd2VyIHZlcm5pZXIgbGluZXMgMC4wMjQgaW5jaCBhcGFydC4gSW4gdGhlIGZpcnN0IHZpZXcgYm90aCB6ZXJvcyBhbGlnbi4gSW4gdGhlIHNlY29uZCB0aGUgdmVybmllciBzaGlmdHMgMC4wMDMgaW5jaCwgc28gdGhlIHRoaXJkIHZlcm5pZXIgbGluZSBhbGlnbnMgd2l0aCBtYWluIGxpbmUgdGhyZWUuPC9kZXNjPgogIDxyZWN0IHdpZHRoPSI5MDAiIGhlaWdodD0iNDQwIiBmaWxsPSIjZmZmIi8+CiAgPGcgZmlsbD0iIzAwMjE0NCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiPgogICAgPHRleHQgeD0iMzAiIHk9IjMyIj4xLiBaZXJvcyBhbGlnbmVkOiByZWFkaW5nIDAuMDAwIGluPC90ZXh0PgogICAgPHRleHQgeD0iMzAiIHk9IjI0NSI+Mi4gVmVybmllciBzaGlmdGVkIDAuMDAzIGluOiBkaXZpc2lvbiAzIGFsaWduczwvdGV4dD4KICA8L2c+CiAgPGcgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjIiPgogICAgPHBhdGggZD0iTTcwIDExMCBIODIwIE03MCAxMDAgVjExMCBNMTcwIDc1IFYxMTAgTTI3MCA3NSBWMTEwIE0zNzAgNzUgVjExMCBNNDcwIDc1IFYxMTAgTTU3MCA3NSBWMTEwIE02NzAgNzUgVjExMCBNNzcwIDc1IFYxMTAgTTcwIDc1IFYxMTAiLz4KICAgIDxwYXRoIGQ9Ik03MCAxMTggSDc5MCBNNzAgMTE4IFYxNTMgTTE2NiAxMTggVjE1MyBNMjYyIDExOCBWMTUzIE0zNTggMTE4IFYxNTMgTTQ1NCAxMTggVjE1MyBNNTUwIDExOCBWMTUzIE02NDYgMTE4IFYxNTMgTTc0MiAxMTggVjE1MyIvPgogICAgPHBhdGggZD0iTTcwIDMyMCBIODIwIE03MCAyODUgVjMyMCBNMTcwIDI4NSBWMzIwIE0yNzAgMjg1IFYzMjAgTTM3MCAyODUgVjMyMCBNNDcwIDI4NSBWMzIwIE01NzAgMjg1IFYzMjAgTTY3MCAyODUgVjMyMCBNNzcwIDI4NSBWMzIwIi8+CiAgICA8cGF0aCBkPSJNODIgMzI4IEg4MDIgTTgyIDMyOCBWMzYzIE0xNzggMzI4IFYzNjMgTTI3NCAzMjggVjM2MyBNMzcwIDMyOCBWMzYzIE00NjYgMzI4IFYzNjMgTTU2MiAzMjggVjM2MyBNNjU4IDMyOCBWMzYzIE03NTQgMzI4IFYzNjMiLz4KICA8L2c+CiAgPGcgc3Ryb2tlPSIjYmI0YTAwIiBzdHJva2Utd2lkdGg9IjQiPjxwYXRoIGQ9Ik03MCA3NSBWMTUzIE0zNzAgMjg1IFYzNjMiLz48L2c+CiAgPGcgZmlsbD0iIzAwMjE0NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPgogICAgPHRleHQgeD0iNzAiIHk9IjY1Ij4wPC90ZXh0Pjx0ZXh0IHg9IjE3MCIgeT0iNjUiPi4wMjU8L3RleHQ+PHRleHQgeD0iMjcwIiB5PSI2NSI+LjA1MDwvdGV4dD48dGV4dCB4PSIzNzAiIHk9IjY1Ij4uMDc1PC90ZXh0Pjx0ZXh0IHg9IjQ3MCIgeT0iNjUiPi4xMDA8L3RleHQ+CiAgICA8dGV4dCB4PSI3MCIgeT0iMTc3Ij4wPC90ZXh0Pjx0ZXh0IHg9IjE2NiIgeT0iMTc3Ij4xPC90ZXh0Pjx0ZXh0IHg9IjI2MiIgeT0iMTc3Ij4yPC90ZXh0Pjx0ZXh0IHg9IjM1OCIgeT0iMTc3Ij4zPC90ZXh0Pjx0ZXh0IHg9IjQ1NCIgeT0iMTc3Ij40PC90ZXh0Pjx0ZXh0IHg9IjU1MCIgeT0iMTc3Ij41PC90ZXh0Pjx0ZXh0IHg9IjY0NiIgeT0iMTc3Ij42PC90ZXh0Pjx0ZXh0IHg9Ijc0MiIgeT0iMTc3Ij43PC90ZXh0PgogICAgPHRleHQgeD0iNzAiIHk9IjI3NSI+MDwvdGV4dD48dGV4dCB4PSIxNzAiIHk9IjI3NSI+LjAyNTwvdGV4dD48dGV4dCB4PSIyNzAiIHk9IjI3NSI+LjA1MDwvdGV4dD48dGV4dCB4PSIzNzAiIHk9IjI3NSI+LjA3NTwvdGV4dD48dGV4dCB4PSI0NzAiIHk9IjI3NSI+LjEwMDwvdGV4dD4KICAgIDx0ZXh0IHg9IjgyIiB5PSIzODciPjA8L3RleHQ+PHRleHQgeD0iMTc4IiB5PSIzODciPjE8L3RleHQ+PHRleHQgeD0iMjc0IiB5PSIzODciPjI8L3RleHQ+PHRleHQgeD0iMzcwIiB5PSIzODciPjM8L3RleHQ+PHRleHQgeD0iNDY2IiB5PSIzODciPjQ8L3RleHQ+PHRleHQgeD0iNTYyIiB5PSIzODciPjU8L3RleHQ+PHRleHQgeD0iNjU4IiB5PSIzODciPjY8L3RleHQ+PHRleHQgeD0iNzU0IiB5PSIzODciPjc8L3RleHQ+CiAgPC9nPgogIDxnIGZpbGw9IiMwMDIxNDQiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4Ij48dGV4dCB4PSI1NTAiIHk9IjY1Ij5NYWluOiAwLjAyNSBpbiBzcGFjZXM8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjIwNyI+VmVybmllcjogMC4wMjQgaW4gc3BhY2VzOyBvbmx5IHRoZSBmaXJzdCA3IG9mIDI1IHNwYWNlcyBzaG93bi48L3RleHQ+PHRleHQgeD0iNzAiIHk9IjQyNSI+QXQgZGl2aXNpb24gMzogMC4wMDMgKyAzIMOXIDAuMDI0ID0gMyDDlyAwLjAyNSA9IDAuMDc1IGluLjwvdGV4dD48L2c+Cjwvc3ZnPgo=" alt="Two original scale diagrams compare aligned zeros with a vernier shifted 0.003 inch. Main spaces are 0.025 inch and vernier spaces are 0.024 inch; after the shift the third vernier line aligns."><figcaption>The shortened diagram shows the first few lines of a 25-division scale. The mismatch accumulates by 0.001 in per division.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+QSB2ZXJuaWVyIHR1cm5zIGEgc21hbGwgc3BhY2luZyBkaWZmZXJlbmNlIGludG8gYSB2aXNpYmxlIGFsaWdubWVudDwvdGl0bGU+CiAgPGRlc2MgaWQ9ImRlc2MiPlR3byBzaG9ydGVuZWQgdmlld3Mgb2YgYSAyNS1kaXZpc2lvbiBpbmNoIHZlcm5pZXIuIFVwcGVyIG1haW4tc2NhbGUgbGluZXMgYXJlIDAuMDI1IGluY2ggYXBhcnQsIGxvd2VyIHZlcm5pZXIgbGluZXMgMC4wMjQgaW5jaCBhcGFydC4gSW4gdGhlIGZpcnN0IHZpZXcgYm90aCB6ZXJvcyBhbGlnbi4gSW4gdGhlIHNlY29uZCB0aGUgdmVybmllciBzaGlmdHMgMC4wMDMgaW5jaCwgc28gdGhlIHRoaXJkIHZlcm5pZXIgbGluZSBhbGlnbnMgd2l0aCBtYWluIGxpbmUgdGhyZWUuPC9kZXNjPgogIDxyZWN0IHdpZHRoPSI5MDAiIGhlaWdodD0iNDQwIiBmaWxsPSIjZmZmIi8+CiAgPGcgZmlsbD0iIzAwMjE0NCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiPgogICAgPHRleHQgeD0iMzAiIHk9IjMyIj4xLiBaZXJvcyBhbGlnbmVkOiByZWFkaW5nIDAuMDAwIGluPC90ZXh0PgogICAgPHRleHQgeD0iMzAiIHk9IjI0NSI+Mi4gVmVybmllciBzaGlmdGVkIDAuMDAzIGluOiBkaXZpc2lvbiAzIGFsaWduczwvdGV4dD4KICA8L2c+CiAgPGcgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjIiPgogICAgPHBhdGggZD0iTTcwIDExMCBIODIwIE03MCAxMDAgVjExMCBNMTcwIDc1IFYxMTAgTTI3MCA3NSBWMTEwIE0zNzAgNzUgVjExMCBNNDcwIDc1IFYxMTAgTTU3MCA3NSBWMTEwIE02NzAgNzUgVjExMCBNNzcwIDc1IFYxMTAgTTcwIDc1IFYxMTAiLz4KICAgIDxwYXRoIGQ9Ik03MCAxMTggSDc5MCBNNzAgMTE4IFYxNTMgTTE2NiAxMTggVjE1MyBNMjYyIDExOCBWMTUzIE0zNTggMTE4IFYxNTMgTTQ1NCAxMTggVjE1MyBNNTUwIDExOCBWMTUzIE02NDYgMTE4IFYxNTMgTTc0MiAxMTggVjE1MyIvPgogICAgPHBhdGggZD0iTTcwIDMyMCBIODIwIE03MCAyODUgVjMyMCBNMTcwIDI4NSBWMzIwIE0yNzAgMjg1IFYzMjAgTTM3MCAyODUgVjMyMCBNNDcwIDI4NSBWMzIwIE01NzAgMjg1IFYzMjAgTTY3MCAyODUgVjMyMCBNNzcwIDI4NSBWMzIwIi8+CiAgICA8cGF0aCBkPSJNODIgMzI4IEg4MDIgTTgyIDMyOCBWMzYzIE0xNzggMzI4IFYzNjMgTTI3NCAzMjggVjM2MyBNMzcwIDMyOCBWMzYzIE00NjYgMzI4IFYzNjMgTTU2MiAzMjggVjM2MyBNNjU4IDMyOCBWMzYzIE03NTQgMzI4IFYzNjMiLz4KICA8L2c+CiAgPGcgc3Ryb2tlPSIjYmI0YTAwIiBzdHJva2Utd2lkdGg9IjQiPjxwYXRoIGQ9Ik03MCA3NSBWMTUzIE0zNzAgMjg1IFYzNjMiLz48L2c+CiAgPGcgZmlsbD0iIzAwMjE0NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPgogICAgPHRleHQgeD0iNzAiIHk9IjY1Ij4wPC90ZXh0Pjx0ZXh0IHg9IjE3MCIgeT0iNjUiPi4wMjU8L3RleHQ+PHRleHQgeD0iMjcwIiB5PSI2NSI+LjA1MDwvdGV4dD48dGV4dCB4PSIzNzAiIHk9IjY1Ij4uMDc1PC90ZXh0Pjx0ZXh0IHg9IjQ3MCIgeT0iNjUiPi4xMDA8L3RleHQ+CiAgICA8dGV4dCB4PSI3MCIgeT0iMTc3Ij4wPC90ZXh0Pjx0ZXh0IHg9IjE2NiIgeT0iMTc3Ij4xPC90ZXh0Pjx0ZXh0IHg9IjI2MiIgeT0iMTc3Ij4yPC90ZXh0Pjx0ZXh0IHg9IjM1OCIgeT0iMTc3Ij4zPC90ZXh0Pjx0ZXh0IHg9IjQ1NCIgeT0iMTc3Ij40PC90ZXh0Pjx0ZXh0IHg9IjU1MCIgeT0iMTc3Ij41PC90ZXh0Pjx0ZXh0IHg9IjY0NiIgeT0iMTc3Ij42PC90ZXh0Pjx0ZXh0IHg9Ijc0MiIgeT0iMTc3Ij43PC90ZXh0PgogICAgPHRleHQgeD0iNzAiIHk9IjI3NSI+MDwvdGV4dD48dGV4dCB4PSIxNzAiIHk9IjI3NSI+LjAyNTwvdGV4dD48dGV4dCB4PSIyNzAiIHk9IjI3NSI+LjA1MDwvdGV4dD48dGV4dCB4PSIzNzAiIHk9IjI3NSI+LjA3NTwvdGV4dD48dGV4dCB4PSI0NzAiIHk9IjI3NSI+LjEwMDwvdGV4dD4KICAgIDx0ZXh0IHg9IjgyIiB5PSIzODciPjA8L3RleHQ+PHRleHQgeD0iMTc4IiB5PSIzODciPjE8L3RleHQ+PHRleHQgeD0iMjc0IiB5PSIzODciPjI8L3RleHQ+PHRleHQgeD0iMzcwIiB5PSIzODciPjM8L3RleHQ+PHRleHQgeD0iNDY2IiB5PSIzODciPjQ8L3RleHQ+PHRleHQgeD0iNTYyIiB5PSIzODciPjU8L3RleHQ+PHRleHQgeD0iNjU4IiB5PSIzODciPjY8L3RleHQ+PHRleHQgeD0iNzU0IiB5PSIzODciPjc8L3RleHQ+CiAgPC9nPgogIDxnIGZpbGw9IiMwMDIxNDQiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4Ij48dGV4dCB4PSI1NTAiIHk9IjY1Ij5NYWluOiAwLjAyNSBpbiBzcGFjZXM8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjIwNyI+VmVybmllcjogMC4wMjQgaW4gc3BhY2VzOyBvbmx5IHRoZSBmaXJzdCA3IG9mIDI1IHNwYWNlcyBzaG93bi48L3RleHQ+PHRleHQgeD0iNzAiIHk9IjQyNSI+QXQgZGl2aXNpb24gMzogMC4wMDMgKyAzIMOXIDAuMDI0ID0gMyDDlyAwLjAyNSA9IDAuMDc1IGluLjwvdGV4dD48L2c+Cjwvc3ZnPgo=" alt="Two original scale diagrams compare aligned zeros with a vernier shifted 0.003 inch. Main spaces are 0.025 inch and vernier spaces are 0.024 inch; after the shift the third vernier line aligns." data-natural-width="900" data-natural-height="440"><figcaption>The shortened diagram shows the first few lines of a 25-division scale. The mismatch accumulates by 0.001 in per division.</figcaption></figure>
   <ol><li>Read the last main-scale line at or before the vernier zero.</li><li>Find the vernier division that lines up with a main-scale line.</li><li>Add its division number &times; 0.001 in.</li></ol>
   <p>Vernier zero just beyond 1.325 in, with division 17 aligned, gives <code>1.325 + 0.017 = <strong>1.342 in</strong></code>. It is the <em>vernier zero</em>, not the right end of the slider, that locates the coarse reading.</p>
   <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Other 0.001 in verniers can have different spacing.</p>
@@ -5027,6 +5054,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 (function (root, factory) {

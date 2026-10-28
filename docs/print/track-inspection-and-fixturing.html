@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3003,7 +3030,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>A gauge gives a decision; a measurement gives a value</h2>
   <p><strong>Attribute gauging</strong> reports a category such as pass/fail. <strong>Variable measurement</strong> reports a number, such as 18.012 mm. A number can show how close the process is getting to a limit; a passing gauge alone cannot.</p>
   <p>For a plain hole, the <strong>GO plug</strong> checks the small-hole limit and should enter over the specified inspection length. The <strong>NO-GO plug</strong> checks the large-hole limit and should not enter as defined by the gauging procedure. Do not force either end. For a plain shaft, a <strong>GO ring</strong> should pass over the specified length and a <strong>NO-GO ring</strong> should not pass: the GO ring checks the large-shaft limit.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idCBkIj4KICA8dGl0bGUgaWQ9InQiPlBsYWluIEdPIGFuZCBOTy1HTyBwbHVnIGdhdWdlPC90aXRsZT4KICA8ZGVzYyBpZD0iZCI+VGhlIEdPIHBsdWcgaXMgc21hbGxlciBpbiBkaWFtZXRlciBhbmQgY2hlY2tzIHRoZSBsb3dlciBob2xlIGxpbWl0LiBUaGUgTk8tR08gcGx1ZyBpcyBsYXJnZXIgYW5kIGNoZWNrcyB0aGUgdXBwZXIgaG9sZSBsaW1pdC48L2Rlc2M+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0MzAiIGZpbGw9IiNmZmYiLz4KICA8ZyBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMyI+CiAgICA8cmVjdCB4PSIyODAiIHk9IjE2MCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjZThlZGYyIi8+CiAgICA8cmVjdCB4PSIxMTAiIHk9IjE0NSIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI5MCIgZmlsbD0iI2I5ZGVlZiIvPgogICAgPHJlY3QgeD0iNTIwIiB5PSIxMjUiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTMwIiBmaWxsPSIjZjVkYzlhIi8+CiAgPC9nPgogIDxnIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjMyIiBmaWxsPSIjMDAyMTQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgIDx0ZXh0IHg9IjE5NSIgeT0iNDUiPkdPPC90ZXh0PgogICAgPHRleHQgeD0iMTk1IiB5PSI4NSI+U21hbGxlciBkaWFtZXRlcjwvdGV4dD4KICAgIDx0ZXh0IHg9IjU4MCIgeT0iNDUiPk5PLUdPPC90ZXh0PgogICAgPHRleHQgeD0iNTgwIiB5PSI4NSI+TGFyZ2VyIGRpYW1ldGVyPC90ZXh0PgogICAgPHRleHQgeD0iNDAwIiB5PSIyMDEiPkhhbmRsZTwvdGV4dD4KICAgIDx0ZXh0IHg9IjE5NSIgeT0iMzA1Ij5TaG91bGQgZW50ZXI8L3RleHQ+CiAgICA8dGV4dCB4PSI1ODAiIHk9IjMwNSI+U2hvdWxkIG5vdCBlbnRlcio8L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjM2NSI+KlVzZSB0aGUgc3BlY2lmaWVkIGVuZ2FnZW1lbnQgcnVsZS48L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjQwNSI+TmV2ZXIgZm9yY2UgYSBnYXVnZS48L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt="Two ends of a plain plug gauge: the smaller GO end should enter the hole; the larger NO-GO end should not enter under the specified gauging procedure."></p><figcaption>Conceptual plain plug gauge. The diameter difference is exaggerated; these are not gauge manufacturing dimensions.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDMwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idCBkIj4KICA8dGl0bGUgaWQ9InQiPlBsYWluIEdPIGFuZCBOTy1HTyBwbHVnIGdhdWdlPC90aXRsZT4KICA8ZGVzYyBpZD0iZCI+VGhlIEdPIHBsdWcgaXMgc21hbGxlciBpbiBkaWFtZXRlciBhbmQgY2hlY2tzIHRoZSBsb3dlciBob2xlIGxpbWl0LiBUaGUgTk8tR08gcGx1ZyBpcyBsYXJnZXIgYW5kIGNoZWNrcyB0aGUgdXBwZXIgaG9sZSBsaW1pdC48L2Rlc2M+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0MzAiIGZpbGw9IiNmZmYiLz4KICA8ZyBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMyI+CiAgICA8cmVjdCB4PSIyODAiIHk9IjE2MCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjZThlZGYyIi8+CiAgICA8cmVjdCB4PSIxMTAiIHk9IjE0NSIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI5MCIgZmlsbD0iI2I5ZGVlZiIvPgogICAgPHJlY3QgeD0iNTIwIiB5PSIxMjUiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTMwIiBmaWxsPSIjZjVkYzlhIi8+CiAgPC9nPgogIDxnIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjMyIiBmaWxsPSIjMDAyMTQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgIDx0ZXh0IHg9IjE5NSIgeT0iNDUiPkdPPC90ZXh0PgogICAgPHRleHQgeD0iMTk1IiB5PSI4NSI+U21hbGxlciBkaWFtZXRlcjwvdGV4dD4KICAgIDx0ZXh0IHg9IjU4MCIgeT0iNDUiPk5PLUdPPC90ZXh0PgogICAgPHRleHQgeD0iNTgwIiB5PSI4NSI+TGFyZ2VyIGRpYW1ldGVyPC90ZXh0PgogICAgPHRleHQgeD0iNDAwIiB5PSIyMDEiPkhhbmRsZTwvdGV4dD4KICAgIDx0ZXh0IHg9IjE5NSIgeT0iMzA1Ij5TaG91bGQgZW50ZXI8L3RleHQ+CiAgICA8dGV4dCB4PSI1ODAiIHk9IjMwNSI+U2hvdWxkIG5vdCBlbnRlcio8L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjM2NSI+KlVzZSB0aGUgc3BlY2lmaWVkIGVuZ2FnZW1lbnQgcnVsZS48L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjQwNSI+TmV2ZXIgZm9yY2UgYSBnYXVnZS48L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt="Two ends of a plain plug gauge: the smaller GO end should enter the hole; the larger NO-GO end should not enter under the specified gauging procedure." data-natural-width="800" data-natural-height="430"></p><figcaption>Conceptual plain plug gauge. The diameter difference is exaggerated; these are not gauge manufacturing dimensions.</figcaption></figure>
   <p>A GO plug that will not enter is a failed check, not proof of one particular cause: an undersize hole, burr, dirt, poor alignment or form error can obstruct it. Clean and investigate using the approved method. A NO-GO plug that enters beyond the permitted engagement is also a failed check.</p>
   <p>Use the correctly identified gauge with current calibration status. Do not derive gauge sizes directly from workpiece limits. This plain-gauge explanation does not supply the engagement rules for threaded gauges.</p>
   <p class="deeper-ref" id="deeper-ref-1">Supporting detail: <a href="#deeper-addendum-1"><strong>Addendum 1</strong></a> &mdash; Why the gauge itself needs limits and wear checks.</p>
@@ -3069,7 +3096,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>The drawing sets the limits; the process produces the spread</h2>
   <p>A <strong>tolerance band</strong> is the permitted interval from the lower size limit to the upper size limit. <strong>Process spread</strong> describes how much the manufactured values vary. Changing a machine setting may shift the centre; it does not necessarily reduce the spread.</p>
   <p>A capable process consistently fits its variation within the required limits with useful margin. A narrow spread near a limit can still produce rejects if the process drifts. A wide spread cannot be fixed simply by moving its average to the middle.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idCBkIj4KICA8dGl0bGUgaWQ9InQiPlRvbGVyYW5jZSBhbmQgaWxsdXN0cmF0aXZlIHByb2Nlc3Mgc3ByZWFkczwvdGl0bGU+CiAgPGRlc2MgaWQ9ImQiPkJldHdlZW4gbGltaXRzIDI0Ljk1IGFuZCAyNS4wNSBtaWxsaW1ldHJlcywgYSBuYXJyb3cgc3ByZWFkIGZyb20gMjQuOTggdG8gMjUuMDIgaXMgY2VudHJlZC4gQSB3aWRlIHNoaWZ0ZWQgc3ByZWFkIGZyb20gMjQuOTcgdG8gMjUuMDggY3Jvc3NlcyB0aGUgdXBwZXIgbGltaXQuPC9kZXNjPgogIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwIiBmaWxsPSIjZmZmIi8+CiAgPHJlY3QgeD0iMjAwIiB5PSIxMDAiIHdpZHRoPSIzNTAiIGhlaWdodD0iMjQwIiBmaWxsPSIjZThlZGYyIi8+CiAgPGcgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjIiPgogICAgPHBhdGggZD0iTTIwMCAxMDBWMzUwIE01NTAgMTAwVjM1MCIvPgogICAgPHBhdGggZD0iTTM3NSAxMDBWMzUwIiBzdHJva2UtZGFzaGFycmF5PSI3IDUiLz4KICAgIDxwYXRoIGQ9Ik02MCAzNDBINzQwIi8+CiAgICA8cmVjdCB4PSIzMDUiIHk9IjE2MCIgd2lkdGg9IjE0MCIgaGVpZ2h0PSIzNSIgZmlsbD0iI2I5ZGVlZiIvPgogICAgPHJlY3QgeD0iMjcwIiB5PSIyNjUiIHdpZHRoPSIzODUiIGhlaWdodD0iMzUiIGZpbGw9IiNmNWRjOWEiLz4KICA8L2c+CiAgPGcgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzIiIGZpbGw9IiMwMDIxNDQiPgogICAgPGcgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICAgIDx0ZXh0IHg9IjQwMCIgeT0iNDAiPlRvbGVyYW5jZSBiYW5kPC90ZXh0PgogICAgICA8dGV4dCB4PSI0MDAiIHk9IjgwIj4yNC45NeKAkzI1LjA1IG1tPC90ZXh0PgogICAgICA8dGV4dCB4PSIyMDAiIHk9IjM4NSI+MjQuOTU8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjM3NSIgeT0iMzg1Ij4yNS4wMDwvdGV4dD4KICAgICAgPHRleHQgeD0iNTUwIiB5PSIzODUiPjI1LjA1PC90ZXh0PgogICAgPC9nPgogICAgPCEtLSBIYWxvcyBzZXBhcmF0ZSByb3cgbGFiZWxzIGZyb20gdGhlIGxpbWl0IGFuZCBjZW50cmUgbGluZXMuIC0tPgogICAgPGcgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjYiIHBhaW50LW9yZGVyPSJzdHJva2UgZmlsbCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICAgIDx0ZXh0IHg9IjY1IiB5PSIxNDAiPk5hcnJvdyBhbmQgY2VudHJlZDwvdGV4dD4KICAgICAgPHRleHQgeD0iNjUiIHk9IjI0NSI+V2lkZSBhbmQgb2ZmLWNlbnRyZTwvdGV4dD4KICAgIDwvZz4KICAgIDx0ZXh0IHg9Ijc0MCIgeT0iNDMwIiB0ZXh0LWFuY2hvcj0iZW5kIj5JbmNyZWFzaW5nIHNpemUgKG1tKTwvdGV4dD4KICA8L2c+Cjwvc3ZnPgo=" alt="The same tolerance band contains a narrow centred illustrative process spread, while a wider spread shifted to the right crosses the upper limit."></p><figcaption>Illustrative spreads, not probability curves or measured capability results. Both rows use the same size axis.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idCBkIj4KICA8dGl0bGUgaWQ9InQiPlRvbGVyYW5jZSBhbmQgaWxsdXN0cmF0aXZlIHByb2Nlc3Mgc3ByZWFkczwvdGl0bGU+CiAgPGRlc2MgaWQ9ImQiPkJldHdlZW4gbGltaXRzIDI0Ljk1IGFuZCAyNS4wNSBtaWxsaW1ldHJlcywgYSBuYXJyb3cgc3ByZWFkIGZyb20gMjQuOTggdG8gMjUuMDIgaXMgY2VudHJlZC4gQSB3aWRlIHNoaWZ0ZWQgc3ByZWFkIGZyb20gMjQuOTcgdG8gMjUuMDggY3Jvc3NlcyB0aGUgdXBwZXIgbGltaXQuPC9kZXNjPgogIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwIiBmaWxsPSIjZmZmIi8+CiAgPHJlY3QgeD0iMjAwIiB5PSIxMDAiIHdpZHRoPSIzNTAiIGhlaWdodD0iMjQwIiBmaWxsPSIjZThlZGYyIi8+CiAgPGcgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjIiPgogICAgPHBhdGggZD0iTTIwMCAxMDBWMzUwIE01NTAgMTAwVjM1MCIvPgogICAgPHBhdGggZD0iTTM3NSAxMDBWMzUwIiBzdHJva2UtZGFzaGFycmF5PSI3IDUiLz4KICAgIDxwYXRoIGQ9Ik02MCAzNDBINzQwIi8+CiAgICA8cmVjdCB4PSIzMDUiIHk9IjE2MCIgd2lkdGg9IjE0MCIgaGVpZ2h0PSIzNSIgZmlsbD0iI2I5ZGVlZiIvPgogICAgPHJlY3QgeD0iMjcwIiB5PSIyNjUiIHdpZHRoPSIzODUiIGhlaWdodD0iMzUiIGZpbGw9IiNmNWRjOWEiLz4KICA8L2c+CiAgPGcgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzIiIGZpbGw9IiMwMDIxNDQiPgogICAgPGcgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICAgIDx0ZXh0IHg9IjQwMCIgeT0iNDAiPlRvbGVyYW5jZSBiYW5kPC90ZXh0PgogICAgICA8dGV4dCB4PSI0MDAiIHk9IjgwIj4yNC45NeKAkzI1LjA1IG1tPC90ZXh0PgogICAgICA8dGV4dCB4PSIyMDAiIHk9IjM4NSI+MjQuOTU8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjM3NSIgeT0iMzg1Ij4yNS4wMDwvdGV4dD4KICAgICAgPHRleHQgeD0iNTUwIiB5PSIzODUiPjI1LjA1PC90ZXh0PgogICAgPC9nPgogICAgPCEtLSBIYWxvcyBzZXBhcmF0ZSByb3cgbGFiZWxzIGZyb20gdGhlIGxpbWl0IGFuZCBjZW50cmUgbGluZXMuIC0tPgogICAgPGcgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjYiIHBhaW50LW9yZGVyPSJzdHJva2UgZmlsbCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICAgIDx0ZXh0IHg9IjY1IiB5PSIxNDAiPk5hcnJvdyBhbmQgY2VudHJlZDwvdGV4dD4KICAgICAgPHRleHQgeD0iNjUiIHk9IjI0NSI+V2lkZSBhbmQgb2ZmLWNlbnRyZTwvdGV4dD4KICAgIDwvZz4KICAgIDx0ZXh0IHg9Ijc0MCIgeT0iNDMwIiB0ZXh0LWFuY2hvcj0iZW5kIj5JbmNyZWFzaW5nIHNpemUgKG1tKTwvdGV4dD4KICA8L2c+Cjwvc3ZnPgo=" alt="The same tolerance band contains a narrow centred illustrative process spread, while a wider spread shifted to the right crosses the upper limit." data-natural-width="800" data-natural-height="450"></p><figcaption>Illustrative spreads, not probability curves or measured capability results. Both rows use the same size axis.</figcaption></figure>
   <p>Read <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/tolerances-and-fits.html" target="_blank" rel="noopener">Tolerances and Fits</a> for the size-limit method and <a class="xref-page" href="#p-shop-inspection">Shop Inspection and Quality Control</a> for how these observations guide checks.</p>
     </div>
   </details>
@@ -3140,7 +3167,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <tr><td>Two separated side locators</td><td>Secondary, XZ side</td><td>Y translation and rotation about Z: two</td></tr>
     <tr><td>One end locator</td><td>Tertiary, YZ end</td><td>X translation: one</td></tr>
   </tbody></table>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNzIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idCBkIj4KICA8dGl0bGUgaWQ9InQiPjMtMi0xIGxvY2F0aW5nIGNvbnRhY3RzIGFuZCBjbGFtcCBkaXJlY3Rpb25zPC90aXRsZT4KICA8ZGVzYyBpZD0iZCI+QSB0cmFuc3BhcmVudCByZWN0YW5ndWxhciBibG9jayBoYXMgdGhyZWUgQSBzdXBwb3J0cyB1bmRlcm5lYXRoLCB0d28gQiBjb250YWN0cyBhdCB0aGUgcmVhciBzaWRlIGFuZCBvbmUgQyBjb250YWN0IGF0IGl0cyBsZWZ0IGVuZC4gQXJyb3dzIHB1c2ggZG93biwgYmFjayBhbmQgbGVmdCB0b3dhcmQgdGhlc2UgY29udGFjdHMuPC9kZXNjPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgb3JpZW50PSJhdXRvIj4KICAgICAgPHBhdGggZD0iTTAgMEwxMCA1TDAgMTBaIiBmaWxsPSIjOWM0MTAwIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI3MjAiIGZpbGw9IiNmZmYiLz4KICA8IS0tIFRoZSBjb250YWN0IGtleSBzaXRzIGJlbG93IHRoZSBkcmF3aW5nLiAtLT4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDQwKSI+CiAgICA8ZyBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0iI2U4ZWRmMiIgZmlsbC1vcGFjaXR5PSIwLjUiPgogICAgICA8cGF0aCBkPSJNMjAwIDIyMEw0NjAgMjIwTDU5MCAxNDBMMzMwIDE0MFoiLz4KICAgICAgPHBhdGggZD0iTTIwMCAyMjBMNDYwIDIyMEw0NjAgMzYwTDIwMCAzNjBaIi8+CiAgICAgIDxwYXRoIGQ9Ik00NjAgMjIwTDU5MCAxNDBMNTkwIDI4MEw0NjAgMzYwWiIvPgogICAgICA8cGF0aCBkPSJNMjAwIDM2MEwzMzAgMjgwTDU5MCAyODAgTTMzMCAyODBWMTQwIiBmaWxsPSJub25lIiBzdHJva2UtZGFzaGFycmF5PSI2IDUiLz4KICAgIDwvZz4KICAgIDxnIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIj4KICAgICAgPGcgZmlsbD0iI2I5ZGVlZiI+CiAgICAgICAgPGNpcmNsZSBjeD0iMjQ1IiBjeT0iMzQwIiByPSIyMyIvPgogICAgICAgIDxjaXJjbGUgY3g9IjQyMCIgY3k9IjM0MCIgcj0iMjMiLz4KICAgICAgICA8Y2lyY2xlIGN4PSIzOTUiIGN5PSIyOTAiIHI9IjIzIi8+CiAgICAgIDwvZz4KICAgICAgPGcgZmlsbD0iI2Y1ZGM5YSI+CiAgICAgICAgPGNpcmNsZSBjeD0iMzY1IiBjeT0iMjQwIiByPSIyMyIvPgogICAgICAgIDxjaXJjbGUgY3g9IjUzNSIgY3k9IjI0MCIgcj0iMjMiLz4KICAgICAgPC9nPgogICAgICA8Y2lyY2xlIGN4PSIyNjAiIGN5PSIyOTAiIHI9IjIzIiBmaWxsPSIjZGRkIi8+CiAgICA8L2c+CiAgICA8ZyBzdHJva2U9IiM5YzQxMDAiIHN0cm9rZS13aWR0aD0iNCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiPgogICAgICA8cGF0aCBkPSJNMzk1IDYwVjE3NSIvPgogICAgICA8cGF0aCBkPSJNMzYwIDQwNUw0MTAgMzczIi8+CiAgICAgIDxwYXRoIGQ9Ik02NjAgMjYwSDU3MCIvPgogICAgPC9nPgogICAgPGcgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzIiIGZpbGw9IiMwMDIxNDQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPgogICAgICA8ZyB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgICAgICA8dGV4dCB4PSIyNDUiIHk9IjM1MSI+QTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSI0MjAiIHk9IjM1MSI+QTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIzOTUiIHk9IjMwMSI+QTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIzNjUiIHk9IjI1MSI+QjwvdGV4dD4KICAgICAgICA8dGV4dCB4PSI1MzUiIHk9IjI1MSI+QjwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIyNjAiIHk9IjMwMSI+QzwvdGV4dD4KICAgICAgPC9nPgogICAgICA8dGV4dCB4PSI0MjAiIHk9IjgwIj5Eb3duIHRvIEE8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjQwNSIgeT0iNDMwIj5CYWNrIHRvIEI8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjYxMCIgeT0iMjMwIj5MZWZ0IHRvIEM8L3RleHQ+CiAgICA8L2c+CiAgPC9nPgogIDxnIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjMyIiBmaWxsPSIjMDAyMTQ0Ij4KICAgIDx0ZXh0IHg9IjMwIiB5PSI0NSI+SGlkZGVuIGNvbnRhY3RzIHNob3duIHRocm91Z2ggYmxvY2suPC90ZXh0PgogICAgPHRleHQgeD0iMzAiIHk9IjUzNSI+QTogcHJpbWFyeSBYWSDigJQgMyBzdXBwb3J0cyB1bmRlcm5lYXRoPC90ZXh0PgogICAgPHRleHQgeD0iMzAiIHk9IjU4MCI+Qjogc2Vjb25kYXJ5IFhaIOKAlCAyIHJlYXIgY29udGFjdHM8L3RleHQ+CiAgICA8dGV4dCB4PSIzMCIgeT0iNjI1Ij5DOiB0ZXJ0aWFyeSBZWiDigJQgMSBsZWZ0LWVuZCBjb250YWN0PC90ZXh0PgogICAgPHRleHQgeD0iMzAiIHk9IjY5MCI+U2NoZW1hdGljOyBub3QgYSBmaXh0dXJlIGRlc2lnbi48L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt="Transparent block with three underside primary supports, two secondary side contacts and one tertiary end contact. Clamp arrows press down, toward the side contacts and toward the end contact."></p><figcaption>Schematic contact locations, with the hidden contacts shown through the block. A, B and C name the locating planes in this example, not a replacement for the part drawing.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNzIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idCBkIj4KICA8dGl0bGUgaWQ9InQiPjMtMi0xIGxvY2F0aW5nIGNvbnRhY3RzIGFuZCBjbGFtcCBkaXJlY3Rpb25zPC90aXRsZT4KICA8ZGVzYyBpZD0iZCI+QSB0cmFuc3BhcmVudCByZWN0YW5ndWxhciBibG9jayBoYXMgdGhyZWUgQSBzdXBwb3J0cyB1bmRlcm5lYXRoLCB0d28gQiBjb250YWN0cyBhdCB0aGUgcmVhciBzaWRlIGFuZCBvbmUgQyBjb250YWN0IGF0IGl0cyBsZWZ0IGVuZC4gQXJyb3dzIHB1c2ggZG93biwgYmFjayBhbmQgbGVmdCB0b3dhcmQgdGhlc2UgY29udGFjdHMuPC9kZXNjPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgb3JpZW50PSJhdXRvIj4KICAgICAgPHBhdGggZD0iTTAgMEwxMCA1TDAgMTBaIiBmaWxsPSIjOWM0MTAwIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI3MjAiIGZpbGw9IiNmZmYiLz4KICA8IS0tIFRoZSBjb250YWN0IGtleSBzaXRzIGJlbG93IHRoZSBkcmF3aW5nLiAtLT4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDQwKSI+CiAgICA8ZyBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0iI2U4ZWRmMiIgZmlsbC1vcGFjaXR5PSIwLjUiPgogICAgICA8cGF0aCBkPSJNMjAwIDIyMEw0NjAgMjIwTDU5MCAxNDBMMzMwIDE0MFoiLz4KICAgICAgPHBhdGggZD0iTTIwMCAyMjBMNDYwIDIyMEw0NjAgMzYwTDIwMCAzNjBaIi8+CiAgICAgIDxwYXRoIGQ9Ik00NjAgMjIwTDU5MCAxNDBMNTkwIDI4MEw0NjAgMzYwWiIvPgogICAgICA8cGF0aCBkPSJNMjAwIDM2MEwzMzAgMjgwTDU5MCAyODAgTTMzMCAyODBWMTQwIiBmaWxsPSJub25lIiBzdHJva2UtZGFzaGFycmF5PSI2IDUiLz4KICAgIDwvZz4KICAgIDxnIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIj4KICAgICAgPGcgZmlsbD0iI2I5ZGVlZiI+CiAgICAgICAgPGNpcmNsZSBjeD0iMjQ1IiBjeT0iMzQwIiByPSIyMyIvPgogICAgICAgIDxjaXJjbGUgY3g9IjQyMCIgY3k9IjM0MCIgcj0iMjMiLz4KICAgICAgICA8Y2lyY2xlIGN4PSIzOTUiIGN5PSIyOTAiIHI9IjIzIi8+CiAgICAgIDwvZz4KICAgICAgPGcgZmlsbD0iI2Y1ZGM5YSI+CiAgICAgICAgPGNpcmNsZSBjeD0iMzY1IiBjeT0iMjQwIiByPSIyMyIvPgogICAgICAgIDxjaXJjbGUgY3g9IjUzNSIgY3k9IjI0MCIgcj0iMjMiLz4KICAgICAgPC9nPgogICAgICA8Y2lyY2xlIGN4PSIyNjAiIGN5PSIyOTAiIHI9IjIzIiBmaWxsPSIjZGRkIi8+CiAgICA8L2c+CiAgICA8ZyBzdHJva2U9IiM5YzQxMDAiIHN0cm9rZS13aWR0aD0iNCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiPgogICAgICA8cGF0aCBkPSJNMzk1IDYwVjE3NSIvPgogICAgICA8cGF0aCBkPSJNMzYwIDQwNUw0MTAgMzczIi8+CiAgICAgIDxwYXRoIGQ9Ik02NjAgMjYwSDU3MCIvPgogICAgPC9nPgogICAgPGcgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzIiIGZpbGw9IiMwMDIxNDQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0IiBwYWludC1vcmRlcj0ic3Ryb2tlIGZpbGwiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPgogICAgICA8ZyB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgICAgICA8dGV4dCB4PSIyNDUiIHk9IjM1MSI+QTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSI0MjAiIHk9IjM1MSI+QTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIzOTUiIHk9IjMwMSI+QTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIzNjUiIHk9IjI1MSI+QjwvdGV4dD4KICAgICAgICA8dGV4dCB4PSI1MzUiIHk9IjI1MSI+QjwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIyNjAiIHk9IjMwMSI+QzwvdGV4dD4KICAgICAgPC9nPgogICAgICA8dGV4dCB4PSI0MjAiIHk9IjgwIj5Eb3duIHRvIEE8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjQwNSIgeT0iNDMwIj5CYWNrIHRvIEI8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjYxMCIgeT0iMjMwIj5MZWZ0IHRvIEM8L3RleHQ+CiAgICA8L2c+CiAgPC9nPgogIDxnIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjMyIiBmaWxsPSIjMDAyMTQ0Ij4KICAgIDx0ZXh0IHg9IjMwIiB5PSI0NSI+SGlkZGVuIGNvbnRhY3RzIHNob3duIHRocm91Z2ggYmxvY2suPC90ZXh0PgogICAgPHRleHQgeD0iMzAiIHk9IjUzNSI+QTogcHJpbWFyeSBYWSDigJQgMyBzdXBwb3J0cyB1bmRlcm5lYXRoPC90ZXh0PgogICAgPHRleHQgeD0iMzAiIHk9IjU4MCI+Qjogc2Vjb25kYXJ5IFhaIOKAlCAyIHJlYXIgY29udGFjdHM8L3RleHQ+CiAgICA8dGV4dCB4PSIzMCIgeT0iNjI1Ij5DOiB0ZXJ0aWFyeSBZWiDigJQgMSBsZWZ0LWVuZCBjb250YWN0PC90ZXh0PgogICAgPHRleHQgeD0iMzAiIHk9IjY5MCI+U2NoZW1hdGljOyBub3QgYSBmaXh0dXJlIGRlc2lnbi48L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt="Transparent block with three underside primary supports, two secondary side contacts and one tertiary end contact. Clamp arrows press down, toward the side contacts and toward the end contact." data-natural-width="800" data-natural-height="720"></p><figcaption>Schematic contact locations, with the hidden contacts shown through the block. A, B and C name the locating planes in this example, not a replacement for the part drawing.</figcaption></figure>
   <p>These contacts locate only while the work stays seated. Clamps maintain contact and resist forces that would lift or separate the part. Do not count positive and negative directions as twelve independent degrees of freedom.</p>
     </div>
   </details>
@@ -4918,6 +4945,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 (function (root, factory) {

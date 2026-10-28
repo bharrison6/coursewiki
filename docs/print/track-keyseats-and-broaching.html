@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -2943,7 +2970,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>A key joins the shaft slot to the hub slot to transmit torque</h2>
   <p>A <strong>key</strong> is a separate piece fitted between a shaft and the bore of a hub, such as a pulley or gear. Contact between the key and slot faces transfers turning force. Here, <strong>keyseat</strong> means the recess in the shaft and <strong>keyway</strong> means the matching slot in the hub. Other references sometimes use keyway for both; always identify which part is being cut.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTcwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5LZXlzZWF0LCBrZXl3YXkgYW5kIGFzc2VtYmxlZCBwYXJhbGxlbCBrZXkgam9pbnQ8L3RpdGxlPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iOTcwIiBmaWxsPSIjZmZmIi8+CjxzdHlsZT50ZXh0e2ZvbnQ6MzRweCBBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzE0MmI0MX0gLmxpbmV7ZmlsbDpub25lO3N0cm9rZTojMTQyYjQxO3N0cm9rZS13aWR0aDozfSAubWV0YWx7ZmlsbDojZGJlNmVkO3N0cm9rZTojMTQyYjQxO3N0cm9rZS13aWR0aDozfTwvc3R5bGU+Cgo8dGV4dCB4PSIyOCIgeT0iNDUiPkVuZCB2aWV3cyDigJQgbm90IHRvIHNjYWxlPC90ZXh0Pgo8cGF0aCBjbGFzcz0ibWV0YWwiIGQ9Ik0xOTUgMTQ1IEExMDUgMTA1IDAgMSAwIDI2NSAxNDUgTDI2NSAyMDUgSDE5NSBaIi8+Cjx0ZXh0IHg9IjQxMCIgeT0iMTcwIj5TaGFmdCBrZXlzZWF0PC90ZXh0PjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMjY1IDE5MCBIMzkwIi8+Cjx0ZXh0IHg9IjQxMCIgeT0iMjI1Ij5SZWNlc3MgaW4gc2hhZnQ8L3RleHQ+CjxjaXJjbGUgY2xhc3M9Im1ldGFsIiBjeD0iMjMwIiBjeT0iNDkwIiByPSIxMzUiLz4KPHBhdGggZD0iTTE5NSAzOTAgVjM3NSBIMjY1IFYzOTAgQTEwNSAxMDUgMCAxIDEgMTk1IDM5MCBaIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTQyYjQxIiBzdHJva2Utd2lkdGg9IjMiLz4KPHRleHQgeD0iNDEwIiB5PSI0MDUiPkh1YiBrZXl3YXk8L3RleHQ+PHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0yNjUgMzgyIEgzOTAiLz4KPHRleHQgeD0iNDEwIiB5PSI0NjUiPlNsb3QgaW4gYm9yZTwvdGV4dD4KPGNpcmNsZSBjbGFzcz0ibWV0YWwiIGN4PSIyMzAiIGN5PSI3OTUiIHI9IjE0MCIvPgo8Y2lyY2xlIGN4PSIyMzAiIGN5PSI3OTUiIHI9IjEwOCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iIzE0MmI0MSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjE5NSIgeT0iNjcwIiB3aWR0aD0iNzAiIGhlaWdodD0iNTUiIGZpbGw9IndoaXRlIiBzdHJva2U9IiMxNDJiNDEiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNMTk1IDY5NiBBMTA1IDEwNSAwIDEgMCAyNjUgNjk2IEwyNjUgNzQ2IEgxOTUgWiIgZmlsbD0iI2EzY2NkOCIgc3Ryb2tlPSIjMTQyYjQxIiBzdHJva2Utd2lkdGg9IjMiLz4KPHJlY3QgeD0iMTk3IiB5PSI2ODAiIHdpZHRoPSI2NiIgaGVpZ2h0PSI2NSIgZmlsbD0iI2VjYWMwMCIgc3Ryb2tlPSIjMTQyYjQxIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0yNjUgNzEwIEgzOTAiLz48dGV4dCB4PSI0MTAiIHk9IjcyMCI+S2V5IGJyaWRnZXMgYm90aDwvdGV4dD4KPHRleHQgeD0iNDEwIiB5PSI3ODAiPkFzc2VtYmxlZCBzZWN0aW9uPC90ZXh0Pjx0ZXh0IHg9IjQxMCIgeT0iODM1Ij5TaWRlIGZhY2VzIGNhcnJ5PC90ZXh0Pjx0ZXh0IHg9IjQxMCIgeT0iODc1Ij50aGUgdHVybmluZyBsb2FkPC90ZXh0Pgo8L3N2Zz4=" alt="Separate end views of a shaft keyseat and hub keyway, followed by an assembled section with a key spanning both recesses."></p><figcaption>Schematic parallel-key joint. Clearances are exaggerated; obtain dimensions and fits from the drawing.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgOTcwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5LZXlzZWF0LCBrZXl3YXkgYW5kIGFzc2VtYmxlZCBwYXJhbGxlbCBrZXkgam9pbnQ8L3RpdGxlPjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iOTcwIiBmaWxsPSIjZmZmIi8+CjxzdHlsZT50ZXh0e2ZvbnQ6MzRweCBBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzE0MmI0MX0gLmxpbmV7ZmlsbDpub25lO3N0cm9rZTojMTQyYjQxO3N0cm9rZS13aWR0aDozfSAubWV0YWx7ZmlsbDojZGJlNmVkO3N0cm9rZTojMTQyYjQxO3N0cm9rZS13aWR0aDozfTwvc3R5bGU+Cgo8dGV4dCB4PSIyOCIgeT0iNDUiPkVuZCB2aWV3cyDigJQgbm90IHRvIHNjYWxlPC90ZXh0Pgo8cGF0aCBjbGFzcz0ibWV0YWwiIGQ9Ik0xOTUgMTQ1IEExMDUgMTA1IDAgMSAwIDI2NSAxNDUgTDI2NSAyMDUgSDE5NSBaIi8+Cjx0ZXh0IHg9IjQxMCIgeT0iMTcwIj5TaGFmdCBrZXlzZWF0PC90ZXh0PjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMjY1IDE5MCBIMzkwIi8+Cjx0ZXh0IHg9IjQxMCIgeT0iMjI1Ij5SZWNlc3MgaW4gc2hhZnQ8L3RleHQ+CjxjaXJjbGUgY2xhc3M9Im1ldGFsIiBjeD0iMjMwIiBjeT0iNDkwIiByPSIxMzUiLz4KPHBhdGggZD0iTTE5NSAzOTAgVjM3NSBIMjY1IFYzOTAgQTEwNSAxMDUgMCAxIDEgMTk1IDM5MCBaIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTQyYjQxIiBzdHJva2Utd2lkdGg9IjMiLz4KPHRleHQgeD0iNDEwIiB5PSI0MDUiPkh1YiBrZXl3YXk8L3RleHQ+PHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0yNjUgMzgyIEgzOTAiLz4KPHRleHQgeD0iNDEwIiB5PSI0NjUiPlNsb3QgaW4gYm9yZTwvdGV4dD4KPGNpcmNsZSBjbGFzcz0ibWV0YWwiIGN4PSIyMzAiIGN5PSI3OTUiIHI9IjE0MCIvPgo8Y2lyY2xlIGN4PSIyMzAiIGN5PSI3OTUiIHI9IjEwOCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iIzE0MmI0MSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjE5NSIgeT0iNjcwIiB3aWR0aD0iNzAiIGhlaWdodD0iNTUiIGZpbGw9IndoaXRlIiBzdHJva2U9IiMxNDJiNDEiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNMTk1IDY5NiBBMTA1IDEwNSAwIDEgMCAyNjUgNjk2IEwyNjUgNzQ2IEgxOTUgWiIgZmlsbD0iI2EzY2NkOCIgc3Ryb2tlPSIjMTQyYjQxIiBzdHJva2Utd2lkdGg9IjMiLz4KPHJlY3QgeD0iMTk3IiB5PSI2ODAiIHdpZHRoPSI2NiIgaGVpZ2h0PSI2NSIgZmlsbD0iI2VjYWMwMCIgc3Ryb2tlPSIjMTQyYjQxIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0yNjUgNzEwIEgzOTAiLz48dGV4dCB4PSI0MTAiIHk9IjcyMCI+S2V5IGJyaWRnZXMgYm90aDwvdGV4dD4KPHRleHQgeD0iNDEwIiB5PSI3ODAiPkFzc2VtYmxlZCBzZWN0aW9uPC90ZXh0Pjx0ZXh0IHg9IjQxMCIgeT0iODM1Ij5TaWRlIGZhY2VzIGNhcnJ5PC90ZXh0Pjx0ZXh0IHg9IjQxMCIgeT0iODc1Ij50aGUgdHVybmluZyBsb2FkPC90ZXh0Pgo8L3N2Zz4=" alt="Separate end views of a shaft keyseat and hub keyway, followed by an assembled section with a key spanning both recesses." data-natural-width="800" data-natural-height="970"></p><figcaption>Schematic parallel-key joint. Clearances are exaggerated; obtain dimensions and fits from the drawing.</figcaption></figure>
   <p>The key does not by itself define how the hub is held against movement along the shaft. Check the assembly drawing for axial retention as well as torque transmission.</p>
     </div>
   </details>
@@ -3021,7 +3048,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>A broach divides a shaped cut among a row of teeth</h2>
   <p>In conventional broaching, a tool moves in a straight line relative to the work. Successive cutting teeth reach farther into the material. <strong>Rise per tooth</strong> is that increase in cutting height between successive teeth; it is not the tooth spacing along the tool. The spaces between teeth hold chips.</p>
   <p>Roughing teeth remove most of the allowance. Semi-finishing teeth approach the final profile with smaller cuts. Finishing teeth establish size and finish; several may have the same height. The exact arrangement depends on the tool.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5Qcm9ncmVzc2l2ZSBicm9hY2ggdG9vdGggaGVpZ2h0czwvdGl0bGU+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2NDAiIGZpbGw9IiNmZmYiLz4KPHN0eWxlPnRleHR7Zm9udDozNHB4IEFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMTQyYjQxfSAubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9IC5tZXRhbHtmaWxsOiNkYmU2ZWQ7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9PC9zdHlsZT4KCjx0ZXh0IHg9IjMwIiB5PSI0OCI+U2lkZSBwcm9maWxlIOKAlCBoZWlnaHQgcmlzZSBleGFnZ2VyYXRlZDwvdGV4dD4KPHBhdGggY2xhc3M9Im1ldGFsIiBkPSJNNDAgMzEwIEw0MCAyNDAgTDY1IDI0MCBMOTAgMjkwIEwxMDUgMjkwIEwxMjUgMjE1IEwxNTAgMjE1IEwxNzUgMjkwIEwxOTAgMjkwIEwyMTAgMTkwIEwyMzUgMTkwIEwyNjAgMjkwIEwyNzUgMjkwIEwyOTUgMTY1IEwzMjAgMTY1IEwzNDUgMjkwIEwzNjAgMjkwIEwzODAgMTUwIEw0MDUgMTUwIEw0MzAgMjkwIEw0NDUgMjkwIEw0NjUgMTQwIEw0OTAgMTQwIEw1MTUgMjkwIEw1MzAgMjkwIEw1NTAgMTQwIEw1NzUgMTQwIEw2MDAgMjkwIEw2MTUgMjkwIEw2MzUgMTQwIEw2NjAgMTQwIEw2ODUgMjkwIEw3MTUgMjkwIEw3MTUgMzEwIFoiLz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik00MCAzNDAgSDMyNSBNNDAgMzMyIFYzNDggTTMyNSAzMzIgVjM0OCBNMzYwIDM0MCBINDkwIE0zNjAgMzMyIFYzNDggTTQ5MCAzMzIgVjM0OCBNNTMwIDM0MCBINzE1IE01MzAgMzMyIFYzNDggTTcxNSAzMzIgVjM0OCIvPgo8dGV4dCB4PSI0NSIgeT0iMzg3Ij5Sb3VnaGluZzwvdGV4dD48dGV4dCB4PSIzMzgiIHk9IjM4NyI+U2VtaS08L3RleHQ+PHRleHQgeD0iMzM4IiB5PSI0MjUiPmZpbmlzaGluZzwvdGV4dD48dGV4dCB4PSI1MzUiIHk9IjM4NyI+RmluaXNoaW5nPC90ZXh0Pgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTMwMCA5MCBINjAgTDgwIDc4IE02MCA5MCBMODAgMTAyIi8+PHRleHQgeD0iMzMwIiB5PSIxMDAiPlRvb2wgdHJhdmVsPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iNDc4Ij5Ud28gcm91Z2hpbmcgdGVldGggZW5sYXJnZWQ6PC90ZXh0Pgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTQwIDYwMCBMNzUgNTQ1IEgxMDUgTDE0NSA2MDAgTDE3NSA1MTAgSDIwNSBMMjQ1IDYwMCBNMTA1IDU0NSBIMjk1IE0yMDUgNTEwIEgyOTUgTTI4MCA1MTAgVjU0NSBNMjcwIDUxMCBIMjkwIE0yNzAgNTQ1IEgyOTAiLz4KPHRleHQgeD0iMzIwIiB5PSI1NDAiPlJpc2UgcGVyIHRvb3RoPC90ZXh0Pgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTc1IDYyMCBIMTc1IE03NSA2MTIgVjYyOCBNMTc1IDYxMiBWNjI4Ii8+PHRleHQgeD0iMzIwIiB5PSI2MjAiPlNwYWNpbmcgaXMgYWxvbmcgdGhlIHRvb2w8L3RleHQ+Cjwvc3ZnPg==" alt="Broach teeth increase in height through roughing and semi-finishing, then repeat the final height. An enlarged pair distinguishes rise per tooth from tooth spacing."></p><figcaption>Schematic side profile. Tooth heights are exaggerated; the small teeth enter first.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5Qcm9ncmVzc2l2ZSBicm9hY2ggdG9vdGggaGVpZ2h0czwvdGl0bGU+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2NDAiIGZpbGw9IiNmZmYiLz4KPHN0eWxlPnRleHR7Zm9udDozNHB4IEFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMTQyYjQxfSAubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9IC5tZXRhbHtmaWxsOiNkYmU2ZWQ7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9PC9zdHlsZT4KCjx0ZXh0IHg9IjMwIiB5PSI0OCI+U2lkZSBwcm9maWxlIOKAlCBoZWlnaHQgcmlzZSBleGFnZ2VyYXRlZDwvdGV4dD4KPHBhdGggY2xhc3M9Im1ldGFsIiBkPSJNNDAgMzEwIEw0MCAyNDAgTDY1IDI0MCBMOTAgMjkwIEwxMDUgMjkwIEwxMjUgMjE1IEwxNTAgMjE1IEwxNzUgMjkwIEwxOTAgMjkwIEwyMTAgMTkwIEwyMzUgMTkwIEwyNjAgMjkwIEwyNzUgMjkwIEwyOTUgMTY1IEwzMjAgMTY1IEwzNDUgMjkwIEwzNjAgMjkwIEwzODAgMTUwIEw0MDUgMTUwIEw0MzAgMjkwIEw0NDUgMjkwIEw0NjUgMTQwIEw0OTAgMTQwIEw1MTUgMjkwIEw1MzAgMjkwIEw1NTAgMTQwIEw1NzUgMTQwIEw2MDAgMjkwIEw2MTUgMjkwIEw2MzUgMTQwIEw2NjAgMTQwIEw2ODUgMjkwIEw3MTUgMjkwIEw3MTUgMzEwIFoiLz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik00MCAzNDAgSDMyNSBNNDAgMzMyIFYzNDggTTMyNSAzMzIgVjM0OCBNMzYwIDM0MCBINDkwIE0zNjAgMzMyIFYzNDggTTQ5MCAzMzIgVjM0OCBNNTMwIDM0MCBINzE1IE01MzAgMzMyIFYzNDggTTcxNSAzMzIgVjM0OCIvPgo8dGV4dCB4PSI0NSIgeT0iMzg3Ij5Sb3VnaGluZzwvdGV4dD48dGV4dCB4PSIzMzgiIHk9IjM4NyI+U2VtaS08L3RleHQ+PHRleHQgeD0iMzM4IiB5PSI0MjUiPmZpbmlzaGluZzwvdGV4dD48dGV4dCB4PSI1MzUiIHk9IjM4NyI+RmluaXNoaW5nPC90ZXh0Pgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTMwMCA5MCBINjAgTDgwIDc4IE02MCA5MCBMODAgMTAyIi8+PHRleHQgeD0iMzMwIiB5PSIxMDAiPlRvb2wgdHJhdmVsPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iNDc4Ij5Ud28gcm91Z2hpbmcgdGVldGggZW5sYXJnZWQ6PC90ZXh0Pgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTQwIDYwMCBMNzUgNTQ1IEgxMDUgTDE0NSA2MDAgTDE3NSA1MTAgSDIwNSBMMjQ1IDYwMCBNMTA1IDU0NSBIMjk1IE0yMDUgNTEwIEgyOTUgTTI4MCA1MTAgVjU0NSBNMjcwIDUxMCBIMjkwIE0yNzAgNTQ1IEgyOTAiLz4KPHRleHQgeD0iMzIwIiB5PSI1NDAiPlJpc2UgcGVyIHRvb3RoPC90ZXh0Pgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTc1IDYyMCBIMTc1IE03NSA2MTIgVjYyOCBNMTc1IDYxMiBWNjI4Ii8+PHRleHQgeD0iMzIwIiB5PSI2MjAiPlNwYWNpbmcgaXMgYWxvbmcgdGhlIHRvb2w8L3RleHQ+Cjwvc3ZnPg==" alt="Broach teeth increase in height through roughing and semi-finishing, then repeat the final height. An enlarged pair distinguishes rise per tooth from tooth spacing." data-natural-width="800" data-natural-height="640"></p><figcaption>Schematic side profile. Tooth heights are exaggerated; the small teeth enter first.</figcaption></figure>
   <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Why the finishing teeth need not keep getting taller.</p>
     </div>
   </details>
@@ -3040,7 +3067,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>A bushing guides the keyway broach; shims move its cutting edge outward</h2>
   <p>The <strong>hub</strong> is the part surrounding the shaft. A slotted <strong>bushing</strong> fits its bore and guides the broach. A <strong>shim</strong> is a thin spacer behind the broach that increases the depth reached on a later pass. Broach, bushing and shims must be a compatible set.</p>
-  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5TZWN0aW9uIHRocm91Z2ggYW4gYXJib3IgcHJlc3Mga2V5d2F5IGJyb2FjaGluZyBzZXR1cDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI4MjAiIGZpbGw9IiNmZmYiLz4KPHN0eWxlPnRleHR7Zm9udDozNHB4IEFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMTQyYjQxfSAubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9IC5tZXRhbHtmaWxsOiNkYmU2ZWQ7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9PC9zdHlsZT4KCjx0ZXh0IHg9IjI4IiB5PSI0NSI+U2VjdGlvbiB0aHJvdWdoIGJvcmUgYW5kIGtleXdheTwvdGV4dD4KPHJlY3QgY2xhc3M9Im1ldGFsIiB4PSIzMzUiIHk9Ijc1IiB3aWR0aD0iMTEwIiBoZWlnaHQ9IjkwIi8+Cjx0ZXh0IHg9IjUwMCIgeT0iMTE1Ij5QcmVzcyByYW08L3RleHQ+PHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik00OTAgMTEwIEg0NTAiLz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0zOTAgMTgwIFYyMjUgTDM4MCAyMDUgTTM5MCAyMjUgTDQwMCAyMDUiLz4KPHRleHQgeD0iMzAiIHk9IjIwNSI+UHVzaCBkb3duPC90ZXh0PjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMjMwIDE5NSBIMzYwIi8+CjxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTM3MCAyNDAgSDM5NSBMNDM4IDI3MCBMNDAwIDI4MCBMNDMwIDMxMCBMNDAwIDMyMCBMNDIyIDM1MCBMNDAwIDM2MCBMNDE0IDM5MCBMNDAwIDQwMCBMNDA2IDQzMCBMNDAwIDQ0MCBWNjUwIEgzNzAgWiIvPgo8cmVjdCBjbGFzcz0ibWV0YWwiIHg9IjE4MCIgeT0iMzUwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjIyMCIvPgo8cGF0aCBjbGFzcz0ibWV0YWwiIGQ9Ik00MjAgMzUwIEg1NDAgVjU3MCBINDIwIFY0MzAgSDQzNSBWMzUwIFoiLz4KPHJlY3QgeD0iMzAwIiB5PSIzNTAiIHdpZHRoPSI1NSIgaGVpZ2h0PSIyMjAiIGZpbGw9IiNhM2NjZDgiIHN0cm9rZT0iIzE0MmI0MSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjM1NSIgeT0iMzUwIiB3aWR0aD0iMTUiIGhlaWdodD0iMjIwIiBmaWxsPSIjZWNhYzAwIiBzdHJva2U9IiMxNDJiNDEiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTQ2NSAyNjUgSDU3MCIvPjx0ZXh0IHg9IjU4MCIgeT0iMjc2Ij5Ccm9hY2g8L3RleHQ+CjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNNTQwIDQ5MCBINTc1Ii8+PHRleHQgeD0iNTg1IiB5PSI1MDIiPkh1YjwvdGV4dD4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0zMjUgNDUwIEgxMDAgVjMyMCIvPjx0ZXh0IHg9IjI4IiB5PSIzMDIiPkJ1c2hpbmc8L3RleHQ+CjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMzYzIDUxNSBIMTAwIFY2NzUiLz48dGV4dCB4PSIyOCIgeT0iNzEyIj5TaGltIGJlaGluZDwvdGV4dD48dGV4dCB4PSIyOCIgeT0iNzU0Ij50aGUgYnJvYWNoPC90ZXh0Pgo8cmVjdCBjbGFzcz0ibWV0YWwiIHg9IjE1NSIgeT0iNTc1IiB3aWR0aD0iMTY1IiBoZWlnaHQ9IjQ1Ii8+PHJlY3QgY2xhc3M9Im1ldGFsIiB4PSI0NzAiIHk9IjU3NSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSI0NSIvPgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTU3MCA1OTUgSDYxMCBWNjYwIi8+PHRleHQgeD0iNDQ1IiB5PSI3MDUiPlByZXNzIGJlZCAvIHN1cHBvcnQ8L3RleHQ+CjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNNDA1IDYzNSBMNDMwIDc0NSIvPjx0ZXh0IHg9IjM4MCIgeT0iNzkwIj5PcGVuIGV4aXQgYmVsb3c8L3RleHQ+Cjwvc3ZnPg==" alt="Section through a hub supported on an arbor press, with the ram above the broach, a bushing in the bore, and a shim behind the broach. Open space below permits the broach to exit."></p><figcaption>Conceptual later-pass setup, not a construction drawing or a statement of shop inventory. The shim is behind the broach, opposite its teeth.</figcaption></figure>
+  <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPgo8dGl0bGUgaWQ9InRpdGxlIj5TZWN0aW9uIHRocm91Z2ggYW4gYXJib3IgcHJlc3Mga2V5d2F5IGJyb2FjaGluZyBzZXR1cDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI4MjAiIGZpbGw9IiNmZmYiLz4KPHN0eWxlPnRleHR7Zm9udDozNHB4IEFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMTQyYjQxfSAubGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9IC5tZXRhbHtmaWxsOiNkYmU2ZWQ7c3Ryb2tlOiMxNDJiNDE7c3Ryb2tlLXdpZHRoOjN9PC9zdHlsZT4KCjx0ZXh0IHg9IjI4IiB5PSI0NSI+U2VjdGlvbiB0aHJvdWdoIGJvcmUgYW5kIGtleXdheTwvdGV4dD4KPHJlY3QgY2xhc3M9Im1ldGFsIiB4PSIzMzUiIHk9Ijc1IiB3aWR0aD0iMTEwIiBoZWlnaHQ9IjkwIi8+Cjx0ZXh0IHg9IjUwMCIgeT0iMTE1Ij5QcmVzcyByYW08L3RleHQ+PHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik00OTAgMTEwIEg0NTAiLz4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0zOTAgMTgwIFYyMjUgTDM4MCAyMDUgTTM5MCAyMjUgTDQwMCAyMDUiLz4KPHRleHQgeD0iMzAiIHk9IjIwNSI+UHVzaCBkb3duPC90ZXh0PjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMjMwIDE5NSBIMzYwIi8+CjxwYXRoIGNsYXNzPSJtZXRhbCIgZD0iTTM3MCAyNDAgSDM5NSBMNDM4IDI3MCBMNDAwIDI4MCBMNDMwIDMxMCBMNDAwIDMyMCBMNDIyIDM1MCBMNDAwIDM2MCBMNDE0IDM5MCBMNDAwIDQwMCBMNDA2IDQzMCBMNDAwIDQ0MCBWNjUwIEgzNzAgWiIvPgo8cmVjdCBjbGFzcz0ibWV0YWwiIHg9IjE4MCIgeT0iMzUwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjIyMCIvPgo8cGF0aCBjbGFzcz0ibWV0YWwiIGQ9Ik00MjAgMzUwIEg1NDAgVjU3MCBINDIwIFY0MzAgSDQzNSBWMzUwIFoiLz4KPHJlY3QgeD0iMzAwIiB5PSIzNTAiIHdpZHRoPSI1NSIgaGVpZ2h0PSIyMjAiIGZpbGw9IiNhM2NjZDgiIHN0cm9rZT0iIzE0MmI0MSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxyZWN0IHg9IjM1NSIgeT0iMzUwIiB3aWR0aD0iMTUiIGhlaWdodD0iMjIwIiBmaWxsPSIjZWNhYzAwIiBzdHJva2U9IiMxNDJiNDEiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTQ2NSAyNjUgSDU3MCIvPjx0ZXh0IHg9IjU4MCIgeT0iMjc2Ij5Ccm9hY2g8L3RleHQ+CjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNNTQwIDQ5MCBINTc1Ii8+PHRleHQgeD0iNTg1IiB5PSI1MDIiPkh1YjwvdGV4dD4KPHBhdGggY2xhc3M9ImxpbmUiIGQ9Ik0zMjUgNDUwIEgxMDAgVjMyMCIvPjx0ZXh0IHg9IjI4IiB5PSIzMDIiPkJ1c2hpbmc8L3RleHQ+CjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNMzYzIDUxNSBIMTAwIFY2NzUiLz48dGV4dCB4PSIyOCIgeT0iNzEyIj5TaGltIGJlaGluZDwvdGV4dD48dGV4dCB4PSIyOCIgeT0iNzU0Ij50aGUgYnJvYWNoPC90ZXh0Pgo8cmVjdCBjbGFzcz0ibWV0YWwiIHg9IjE1NSIgeT0iNTc1IiB3aWR0aD0iMTY1IiBoZWlnaHQ9IjQ1Ii8+PHJlY3QgY2xhc3M9Im1ldGFsIiB4PSI0NzAiIHk9IjU3NSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSI0NSIvPgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTU3MCA1OTUgSDYxMCBWNjYwIi8+PHRleHQgeD0iNDQ1IiB5PSI3MDUiPlByZXNzIGJlZCAvIHN1cHBvcnQ8L3RleHQ+CjxwYXRoIGNsYXNzPSJsaW5lIiBkPSJNNDA1IDYzNSBMNDMwIDc0NSIvPjx0ZXh0IHg9IjM4MCIgeT0iNzkwIj5PcGVuIGV4aXQgYmVsb3c8L3RleHQ+Cjwvc3ZnPg==" alt="Section through a hub supported on an arbor press, with the ram above the broach, a bushing in the bore, and a shim behind the broach. Open space below permits the broach to exit." data-natural-width="800" data-natural-height="820"></p><figcaption>Conceptual later-pass setup, not a construction drawing or a statement of shop inventory. The shim is behind the broach, opposite its teeth.</figcaption></figure>
   <p>Before operation, use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">press and mill hazard guidance</a> in the safety collection. Follow the specific press and broach instructions for capacity, alignment, support, stroke, cut length and lubrication.</p>
   <ol>
     <li>Check the drawing, prepared bore and required keyway. Select the matching broach, bushing and specified shim schedule.</li>
@@ -4796,6 +4823,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>

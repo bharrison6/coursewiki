@@ -1273,6 +1273,33 @@ main { min-width: 0; padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.1rem, 4vw, 3rem
 }
 @media print { .content-img { break-inside: avoid; max-width: 100%; } }
 
+/* No wrappers or image sizing changes: print and the unenhanced page retain
+   their existing layout. The viewer alone owns oversized artwork. */
+.diagram-hint, .diagram-viewer { display: none; }
+@media screen {
+  .diagram-expandable { cursor: zoom-in; }
+  .diagram-hint:not([hidden]) { display: block; font-size: .8rem; color: var(--ink-soft); }
+  html.diagram-viewer-open, .diagram-viewer-open body { overflow: hidden; }
+  .diagram-viewer[open] {
+    display: flex; flex-direction: column; position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    box-sizing: border-box; margin: 0; padding: 0; border: 0;
+    background: var(--surface); color: var(--ink);
+  }
+  .diagram-toolbar {
+    display: flex; gap: .5rem; flex: none; padding: .75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .diagram-toolbar button {
+    min-height: 44px; padding: .5rem 1rem;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .diagram-toolbar button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .diagram-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .diagram-scroll img { display: block; max-width: none; height: auto; margin: auto; }
+}
+
 /* ---- figures and captions ----------------------------------------------
    The UA default for <figure> is `margin: 1em 40px`. Measured at a 375px
    viewport that insets the figure to 222px against 302px of prose -- a
@@ -3012,7 +3039,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Steel is iron-based, with carbon and other elements controlling behavior</h2>
   <p>Steel contains iron and carbon, often with additional alloying elements. Both composition and processing matter. The same grade can arrive softened for machining or hardened for service.</p>
   <p>Use four practical groups: <strong>carbon steel, alloy steel, stainless steel and tool steel</strong>. These are useful buying categories, not four mutually exclusive chemical definitions: stainless and tool steels also contain alloying elements.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMzcwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkZvdXIgcHJhY3RpY2FsIHN0ZWVsIGZhbWlsaWVzPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+U3RlZWwgYnJhbmNoZXMgaW50byBjYXJib24sIGFsbG95LCBzdGFpbmxlc3MgYW5kIHRvb2wgc3RlZWwuIENhcmJvbiBicmFuY2hlcyBpbnRvIGxvdywgbWVkaXVtIGFuZCBoaWdoIGNhcmJvbi4gVGhlc2UgY2F0ZWdvcmllcyBvdmVybGFwIGluIGNoZW1pc3RyeS48L2Rlc2M+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iMzcwIiBmaWxsPSIjZmZmIi8+CjxnIHN0cm9rZT0iIzE4MzI0YiIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIj48cGF0aCBkPSJNNDAwIDc1VjExMEgxMDVWMTQ1TTQwMCAxMTBINjk1VjE0NU0zMDAgMTEwVjE0NU01MDAgMTEwVjE0NU0xMDUgMjEwVjI1MEg1NVYyNzVNMTA1IDI1MEgyMjVWMjc1TTE0MCAyNTBWMjc1Ii8+PC9nPgo8ZyBmaWxsPSIjZWVmNWZhIiBzdHJva2U9IiMxODMyNGIiIHN0cm9rZS13aWR0aD0iMiI+PHJlY3QgeD0iMzAwIiB5PSIyMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI1NSIgcng9IjgiLz48cmVjdCB4PSIyMCIgeT0iMTQ1IiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjY1IiByeD0iOCIvPjxyZWN0IHg9IjIxNSIgeT0iMTQ1IiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjY1IiByeD0iOCIvPjxyZWN0IHg9IjQxNSIgeT0iMTQ1IiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjY1IiByeD0iOCIvPjxyZWN0IHg9IjYxMCIgeT0iMTQ1IiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjY1IiByeD0iOCIvPjwvZz4KPGcgZmlsbD0iIzE4MzI0YiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjx0ZXh0IHg9IjQwMCIgeT0iNTUiPlN0ZWVsPC90ZXh0Pjx0ZXh0IHg9IjEwNSIgeT0iMTg0Ij5DYXJib248L3RleHQ+PHRleHQgeD0iMzAwIiB5PSIxODQiPkFsbG95PC90ZXh0Pjx0ZXh0IHg9IjUwMCIgeT0iMTg0Ij5TdGFpbmxlc3M8L3RleHQ+PHRleHQgeD0iNjk1IiB5PSIxODQiPlRvb2w8L3RleHQ+PHRleHQgeD0iNTUiIHk9IjMwMCIgZm9udC1zaXplPSIxOCI+TG93PC90ZXh0Pjx0ZXh0IHg9IjE0MCIgeT0iMzAwIiBmb250LXNpemU9IjE4Ij5NZWRpdW08L3RleHQ+PHRleHQgeD0iMjI1IiB5PSIzMDAiIGZvbnQtc2l6ZT0iMTgiPkhpZ2g8L3RleHQ+PHRleHQgeD0iNDAwIiB5PSIzNDgiIGZvbnQtc2l6ZT0iMTgiPkJ1eWluZyBjYXRlZ29yaWVzIG92ZXJsYXAgaW4gY2hlbWlzdHJ5OyBzcGVjaWZ5IGdyYWRlIGFuZCBjb25kaXRpb24uPC90ZXh0PjwvZz4KPC9zdmc+Cg==" alt="Steel branches into carbon, alloy, stainless and tool groups; carbon steel divides into low, medium and high carbon."><figcaption>The four steel groups are a selection map. They do not replace grade and condition.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMzcwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkZvdXIgcHJhY3RpY2FsIHN0ZWVsIGZhbWlsaWVzPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+U3RlZWwgYnJhbmNoZXMgaW50byBjYXJib24sIGFsbG95LCBzdGFpbmxlc3MgYW5kIHRvb2wgc3RlZWwuIENhcmJvbiBicmFuY2hlcyBpbnRvIGxvdywgbWVkaXVtIGFuZCBoaWdoIGNhcmJvbi4gVGhlc2UgY2F0ZWdvcmllcyBvdmVybGFwIGluIGNoZW1pc3RyeS48L2Rlc2M+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iMzcwIiBmaWxsPSIjZmZmIi8+CjxnIHN0cm9rZT0iIzE4MzI0YiIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIj48cGF0aCBkPSJNNDAwIDc1VjExMEgxMDVWMTQ1TTQwMCAxMTBINjk1VjE0NU0zMDAgMTEwVjE0NU01MDAgMTEwVjE0NU0xMDUgMjEwVjI1MEg1NVYyNzVNMTA1IDI1MEgyMjVWMjc1TTE0MCAyNTBWMjc1Ii8+PC9nPgo8ZyBmaWxsPSIjZWVmNWZhIiBzdHJva2U9IiMxODMyNGIiIHN0cm9rZS13aWR0aD0iMiI+PHJlY3QgeD0iMzAwIiB5PSIyMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI1NSIgcng9IjgiLz48cmVjdCB4PSIyMCIgeT0iMTQ1IiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjY1IiByeD0iOCIvPjxyZWN0IHg9IjIxNSIgeT0iMTQ1IiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjY1IiByeD0iOCIvPjxyZWN0IHg9IjQxNSIgeT0iMTQ1IiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjY1IiByeD0iOCIvPjxyZWN0IHg9IjYxMCIgeT0iMTQ1IiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjY1IiByeD0iOCIvPjwvZz4KPGcgZmlsbD0iIzE4MzI0YiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjx0ZXh0IHg9IjQwMCIgeT0iNTUiPlN0ZWVsPC90ZXh0Pjx0ZXh0IHg9IjEwNSIgeT0iMTg0Ij5DYXJib248L3RleHQ+PHRleHQgeD0iMzAwIiB5PSIxODQiPkFsbG95PC90ZXh0Pjx0ZXh0IHg9IjUwMCIgeT0iMTg0Ij5TdGFpbmxlc3M8L3RleHQ+PHRleHQgeD0iNjk1IiB5PSIxODQiPlRvb2w8L3RleHQ+PHRleHQgeD0iNTUiIHk9IjMwMCIgZm9udC1zaXplPSIxOCI+TG93PC90ZXh0Pjx0ZXh0IHg9IjE0MCIgeT0iMzAwIiBmb250LXNpemU9IjE4Ij5NZWRpdW08L3RleHQ+PHRleHQgeD0iMjI1IiB5PSIzMDAiIGZvbnQtc2l6ZT0iMTgiPkhpZ2g8L3RleHQ+PHRleHQgeD0iNDAwIiB5PSIzNDgiIGZvbnQtc2l6ZT0iMTgiPkJ1eWluZyBjYXRlZ29yaWVzIG92ZXJsYXAgaW4gY2hlbWlzdHJ5OyBzcGVjaWZ5IGdyYWRlIGFuZCBjb25kaXRpb24uPC90ZXh0PjwvZz4KPC9zdmc+Cg==" alt="Steel branches into carbon, alloy, stainless and tool groups; carbon steel divides into low, medium and high carbon." data-natural-width="800" data-natural-height="370"><figcaption>The four steel groups are a selection map. They do not replace grade and condition.</figcaption></figure>
     </div>
   </details>
   <details class="xcard deck-slide" id="types-of-steel--carbon-steel-spans-easy-forming-through-hardenable-cutting-edges" data-card="types-of-steel--carbon-steel-spans-easy-forming-through-hardenable-cutting-edges">
@@ -3200,7 +3227,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Stock is the material shape you buy before making the part</h2>
   <p><strong>Stock</strong> is material supplied in a usable starting form. Choose a shape that leaves enough material for the finished part and any cutting or machining allowance. Buying the smallest possible shape can fail if saw cuts, surface cleanup or distortion consume the allowance.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3ODAgNTEwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkNvbW1vbiBtZXRhbCBzdG9jayBjcm9zcy1zZWN0aW9uczwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlNvbGlkIHJvdW5kLCBmbGF0LCBzcXVhcmUgYW5kIGhleCBiYXJzOyByb3VuZCBhbmQgc3F1YXJlIGhvbGxvdyB0dWJlczsgYW5nbGUsIGNoYW5uZWwgYW5kIEktYmVhbSBwcm9maWxlcy4gU2hhcGVzIGFyZSBub3QgdG8gc2NhbGUuPC9kZXNjPgo8cmVjdCB3aWR0aD0iNzgwIiBoZWlnaHQ9IjUxMCIgZmlsbD0iI2ZmZiIvPgo8ZyBmaWxsPSIjYjlkNWU1IiBzdHJva2U9IiMxODMyNGIiIHN0cm9rZS13aWR0aD0iMyI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iODUiIHI9IjM3Ii8+PHJlY3QgeD0iMjQwIiB5PSI2NSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIzNSIvPjxyZWN0IHg9IjQ1NSIgeT0iNDgiIHdpZHRoPSI3NCIgaGVpZ2h0PSI3NCIvPjxwYXRoIGQ9Ik02NzAgNDhINzEwTDczMCA4NSA3MTAgMTIySDY3MEw2NTAgODVaIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMjU1IiByPSI0NCIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjI1NSIgcj0iMzAiIGZpbGw9IiNmZmYiLz48cmVjdCB4PSIyNTAiIHk9IjIxMyIgd2lkdGg9Ijg0IiBoZWlnaHQ9Ijg0Ii8+PHJlY3QgeD0iMjYzIiB5PSIyMjYiIHdpZHRoPSI1OCIgaGVpZ2h0PSI1OCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik00NjAgMjEzSDQ3NVYyODJINTM1VjI5N0g0NjBaIi8+PHBhdGggZD0iTTY1NSAyMTNINzMwVjIyOEg2NzBWMjgySDczMFYyOTdINjU1WiIvPjxwYXRoIGQ9Ik0yNTAgMzgwSDMzNVYzOTRIMzAwVjQ1MEgzMzVWNDY0SDI1MFY0NTBIMjg1VjM5NEgyNTBaIi8+PC9nPgo8ZyBmaWxsPSIjMTgzMjRiIiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRleHQgeD0iMTAwIiB5PSIxNjAiPlJvdW5kIGJhcjwvdGV4dD48dGV4dCB4PSIyOTAiIHk9IjE2MCI+RmxhdCBiYXI8L3RleHQ+PHRleHQgeD0iNDkyIiB5PSIxNjAiPlNxdWFyZSBiYXI8L3RleHQ+PHRleHQgeD0iNjkwIiB5PSIxNjAiPkhleCBiYXI8L3RleHQ+PHRleHQgeD0iMTAwIiB5PSIzMzUiPlJvdW5kIHR1YmU8L3RleHQ+PHRleHQgeD0iMjkyIiB5PSIzMzUiPlNxdWFyZSB0dWJlPC90ZXh0Pjx0ZXh0IHg9IjQ5NSIgeT0iMzM1Ij5BbmdsZTwvdGV4dD48dGV4dCB4PSI2OTIiIHk9IjMzNSI+Q2hhbm5lbDwvdGV4dD48dGV4dCB4PSIyOTIiIHk9IjQ5NSI+SS1iZWFtPC90ZXh0Pjx0ZXh0IHg9IjU2NSIgeT0iNDIwIiBmb250LXNpemU9IjE4Ij5XaGl0ZSBjZW50ZXJzIGFyZSBvcGVuaW5ncy48L3RleHQ+PHRleHQgeD0iNTY1IiB5PSI0NDgiIGZvbnQtc2l6ZT0iMTgiPlNoYXBlcyBhcmUgbm90IHRvIHNjYWxlLjwvdGV4dD48L2c+Cjwvc3ZnPgo=" alt="Cross-sections of round, flat, square and hex bar, round and square tube, angle, channel and I-beam. Solid bar has no central opening; tube has a wall around an opening."><figcaption>Cross-sections show shape only. Dimensions and wall thickness still belong on the order.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3ODAgNTEwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkNvbW1vbiBtZXRhbCBzdG9jayBjcm9zcy1zZWN0aW9uczwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlNvbGlkIHJvdW5kLCBmbGF0LCBzcXVhcmUgYW5kIGhleCBiYXJzOyByb3VuZCBhbmQgc3F1YXJlIGhvbGxvdyB0dWJlczsgYW5nbGUsIGNoYW5uZWwgYW5kIEktYmVhbSBwcm9maWxlcy4gU2hhcGVzIGFyZSBub3QgdG8gc2NhbGUuPC9kZXNjPgo8cmVjdCB3aWR0aD0iNzgwIiBoZWlnaHQ9IjUxMCIgZmlsbD0iI2ZmZiIvPgo8ZyBmaWxsPSIjYjlkNWU1IiBzdHJva2U9IiMxODMyNGIiIHN0cm9rZS13aWR0aD0iMyI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iODUiIHI9IjM3Ii8+PHJlY3QgeD0iMjQwIiB5PSI2NSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIzNSIvPjxyZWN0IHg9IjQ1NSIgeT0iNDgiIHdpZHRoPSI3NCIgaGVpZ2h0PSI3NCIvPjxwYXRoIGQ9Ik02NzAgNDhINzEwTDczMCA4NSA3MTAgMTIySDY3MEw2NTAgODVaIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMjU1IiByPSI0NCIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjI1NSIgcj0iMzAiIGZpbGw9IiNmZmYiLz48cmVjdCB4PSIyNTAiIHk9IjIxMyIgd2lkdGg9Ijg0IiBoZWlnaHQ9Ijg0Ii8+PHJlY3QgeD0iMjYzIiB5PSIyMjYiIHdpZHRoPSI1OCIgaGVpZ2h0PSI1OCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik00NjAgMjEzSDQ3NVYyODJINTM1VjI5N0g0NjBaIi8+PHBhdGggZD0iTTY1NSAyMTNINzMwVjIyOEg2NzBWMjgySDczMFYyOTdINjU1WiIvPjxwYXRoIGQ9Ik0yNTAgMzgwSDMzNVYzOTRIMzAwVjQ1MEgzMzVWNDY0SDI1MFY0NTBIMjg1VjM5NEgyNTBaIi8+PC9nPgo8ZyBmaWxsPSIjMTgzMjRiIiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRleHQgeD0iMTAwIiB5PSIxNjAiPlJvdW5kIGJhcjwvdGV4dD48dGV4dCB4PSIyOTAiIHk9IjE2MCI+RmxhdCBiYXI8L3RleHQ+PHRleHQgeD0iNDkyIiB5PSIxNjAiPlNxdWFyZSBiYXI8L3RleHQ+PHRleHQgeD0iNjkwIiB5PSIxNjAiPkhleCBiYXI8L3RleHQ+PHRleHQgeD0iMTAwIiB5PSIzMzUiPlJvdW5kIHR1YmU8L3RleHQ+PHRleHQgeD0iMjkyIiB5PSIzMzUiPlNxdWFyZSB0dWJlPC90ZXh0Pjx0ZXh0IHg9IjQ5NSIgeT0iMzM1Ij5BbmdsZTwvdGV4dD48dGV4dCB4PSI2OTIiIHk9IjMzNSI+Q2hhbm5lbDwvdGV4dD48dGV4dCB4PSIyOTIiIHk9IjQ5NSI+SS1iZWFtPC90ZXh0Pjx0ZXh0IHg9IjU2NSIgeT0iNDIwIiBmb250LXNpemU9IjE4Ij5XaGl0ZSBjZW50ZXJzIGFyZSBvcGVuaW5ncy48L3RleHQ+PHRleHQgeD0iNTY1IiB5PSI0NDgiIGZvbnQtc2l6ZT0iMTgiPlNoYXBlcyBhcmUgbm90IHRvIHNjYWxlLjwvdGV4dD48L2c+Cjwvc3ZnPgo=" alt="Cross-sections of round, flat, square and hex bar, round and square tube, angle, channel and I-beam. Solid bar has no central opening; tube has a wall around an opening." data-natural-width="780" data-natural-height="510"><figcaption>Cross-sections show shape only. Dimensions and wall thickness still belong on the order.</figcaption></figure>
     </div>
   </details>
   <details class="xcard deck-slide" id="metal-stock-forms--sheet-plate-bar-and-structural-shapes-use-different-size-descriptions" data-card="metal-stock-forms--sheet-plate-bar-and-structural-shapes-use-different-size-descriptions">
@@ -3298,7 +3325,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Quench hardening usually needs tempering afterward</h2>
   <p><strong>Quench hardening</strong> heats suitable steel to form austenite, holds as required, then cools fast enough to obtain the intended hardened structure. It commonly raises hardness and strength but can reduce ductility and toughness. Cracking and distortion are possible.</p>
   <p><strong>Tempering</strong> reheats hardened steel below the temperature at which austenite begins to form. It adjusts the balance of hardness and toughness and reduces some quenching stresses. It is not simply heating “just below” one critical temperature; the required cycle depends on grade and target properties.</p>
-  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlF1YWxpdGF0aXZlIHN0ZWVsIGhlYXQtdHJlYXRtZW50IGN5Y2xlczwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlVwcGVyIHBsb3Qgc2hvd3MgaGVhdGluZywgaG9sZGluZyBhbmQgc2xvdyBjb29saW5nIGluIGEgZnVsbCBhbm5lYWwuIExvd2VyIHBsb3Qgc2hvd3MgaGVhdGluZywgaG9sZGluZywgcmFwaWQgcXVlbmNoaW5nLCB0aGVuIGEgc2VwYXJhdGUgbG93ZXItdGVtcGVyYXR1cmUgdGVtcGVyaW5nIGhvbGQgYW5kIGNvb2xpbmcuIEF4ZXMgaGF2ZSBubyBudW1lcmljYWwgc2NhbGUuPC9kZXNjPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ5MCIgZmlsbD0iI2ZmZiIvPgo8ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxODMyNGIiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTgwIDQ1VjIxMEg3NTBNODAgMjcwVjQzNUg3NTAiLz48L2c+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE4NWI4NiIgc3Ryb2tlLXdpZHRoPSI0Ij48cGF0aCBkPSJNOTAgMjAwTDE4MCA3NUgzMDBMNzAwIDIwMCIvPjxwYXRoIGQ9Ik05MCA0MjVMMTgwIDMwMEgzMDBMMzIwIDQyNUg0MTBMNDUwIDM2NUg1NzBMNjQwIDQyNUg3MjAiLz48L2c+CjxnIGZpbGw9IiMxODMyNGIiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4Ij48dGV4dCB4PSIxMTAiIHk9IjMwIj5GdWxsIGFubmVhbDogaGVhdCDihpIgaG9sZCDihpIgc2xvdyBjb29sPC90ZXh0Pjx0ZXh0IHg9IjExMCIgeT0iMjU1Ij5IYXJkZW4gYW5kIHRlbXBlcjogaGVhdCDihpIgaG9sZCDihpIgcXVlbmNoIOKGkiByZWhlYXQg4oaSIGhvbGQg4oaSIGNvb2w8L3RleHQ+PHRleHQgeD0iMzc1IiB5PSIxMDAiPlNsb3cgY29vbGluZzwvdGV4dD48dGV4dCB4PSIzMzAiIHk9IjMyMiI+UXVlbmNoPC90ZXh0Pjx0ZXh0IHg9IjQ4MCIgeT0iMzUwIj5UZW1wZXI8L3RleHQ+PHRleHQgeD0iNjg3IiB5PSIyMzUiPlRpbWUg4oaSPC90ZXh0Pjx0ZXh0IHg9IjY4NyIgeT0iNDYwIj5UaW1lIOKGkjwvdGV4dD48dGV4dCB4PSIyNyIgeT0iMTcwIiB0cmFuc2Zvcm09InJvdGF0ZSgtOTAgMjcgMTcwKSI+VGVtcGVyYXR1cmU8L3RleHQ+PHRleHQgeD0iMjciIHk9IjQwNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTkwIDI3IDQwNSkiPlRlbXBlcmF0dXJlPC90ZXh0Pjx0ZXh0IHg9IjkwIiB5PSI0ODMiPklsbHVzdHJhdGl2ZSBvbmx5OiBubyBudW1lcmljYWwgdGVtcGVyYXR1cmVzLCBkdXJhdGlvbnMgb3Igc2hhcmVkIHBlYWsgc2NhbGUuPC90ZXh0PjwvZz4KPC9zdmc+Cg==" alt="Qualitative temperature-time sketches: annealing has slow cooling; hardening has rapid quenching followed by a separate lower-temperature tempering cycle. No numerical times or temperatures are implied."><figcaption>Separate illustrative cycles, not a furnace program. Peak temperatures, holds and cooling rates are grade-specific.</figcaption></figure>
+  <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlF1YWxpdGF0aXZlIHN0ZWVsIGhlYXQtdHJlYXRtZW50IGN5Y2xlczwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlVwcGVyIHBsb3Qgc2hvd3MgaGVhdGluZywgaG9sZGluZyBhbmQgc2xvdyBjb29saW5nIGluIGEgZnVsbCBhbm5lYWwuIExvd2VyIHBsb3Qgc2hvd3MgaGVhdGluZywgaG9sZGluZywgcmFwaWQgcXVlbmNoaW5nLCB0aGVuIGEgc2VwYXJhdGUgbG93ZXItdGVtcGVyYXR1cmUgdGVtcGVyaW5nIGhvbGQgYW5kIGNvb2xpbmcuIEF4ZXMgaGF2ZSBubyBudW1lcmljYWwgc2NhbGUuPC9kZXNjPgo8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ5MCIgZmlsbD0iI2ZmZiIvPgo8ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxODMyNGIiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTgwIDQ1VjIxMEg3NTBNODAgMjcwVjQzNUg3NTAiLz48L2c+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE4NWI4NiIgc3Ryb2tlLXdpZHRoPSI0Ij48cGF0aCBkPSJNOTAgMjAwTDE4MCA3NUgzMDBMNzAwIDIwMCIvPjxwYXRoIGQ9Ik05MCA0MjVMMTgwIDMwMEgzMDBMMzIwIDQyNUg0MTBMNDUwIDM2NUg1NzBMNjQwIDQyNUg3MjAiLz48L2c+CjxnIGZpbGw9IiMxODMyNGIiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4Ij48dGV4dCB4PSIxMTAiIHk9IjMwIj5GdWxsIGFubmVhbDogaGVhdCDihpIgaG9sZCDihpIgc2xvdyBjb29sPC90ZXh0Pjx0ZXh0IHg9IjExMCIgeT0iMjU1Ij5IYXJkZW4gYW5kIHRlbXBlcjogaGVhdCDihpIgaG9sZCDihpIgcXVlbmNoIOKGkiByZWhlYXQg4oaSIGhvbGQg4oaSIGNvb2w8L3RleHQ+PHRleHQgeD0iMzc1IiB5PSIxMDAiPlNsb3cgY29vbGluZzwvdGV4dD48dGV4dCB4PSIzMzAiIHk9IjMyMiI+UXVlbmNoPC90ZXh0Pjx0ZXh0IHg9IjQ4MCIgeT0iMzUwIj5UZW1wZXI8L3RleHQ+PHRleHQgeD0iNjg3IiB5PSIyMzUiPlRpbWUg4oaSPC90ZXh0Pjx0ZXh0IHg9IjY4NyIgeT0iNDYwIj5UaW1lIOKGkjwvdGV4dD48dGV4dCB4PSIyNyIgeT0iMTcwIiB0cmFuc2Zvcm09InJvdGF0ZSgtOTAgMjcgMTcwKSI+VGVtcGVyYXR1cmU8L3RleHQ+PHRleHQgeD0iMjciIHk9IjQwNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTkwIDI3IDQwNSkiPlRlbXBlcmF0dXJlPC90ZXh0Pjx0ZXh0IHg9IjkwIiB5PSI0ODMiPklsbHVzdHJhdGl2ZSBvbmx5OiBubyBudW1lcmljYWwgdGVtcGVyYXR1cmVzLCBkdXJhdGlvbnMgb3Igc2hhcmVkIHBlYWsgc2NhbGUuPC90ZXh0PjwvZz4KPC9zdmc+Cg==" alt="Qualitative temperature-time sketches: annealing has slow cooling; hardening has rapid quenching followed by a separate lower-temperature tempering cycle. No numerical times or temperatures are implied." data-natural-width="800" data-natural-height="490"><figcaption>Separate illustrative cycles, not a furnace program. Peak temperatures, holds and cooling rates are grade-specific.</figcaption></figure>
   <p>These concepts explain specifications; they are not operating instructions. Use the approved process for the identified material, equipment and quench medium.</p>
   <p><a class="button" data-practice-add="metals-temper-goal" href="../practice.html#metals-temper-goal">Practice the purpose of tempering</a></p>
     </div>
@@ -5070,6 +5097,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 
     wirePracticeChecks(document);
     refresh();
+  })();
+  /* ---- content diagram viewer -------------------------------------------
+     Only the build's image tokens participate. Keep the original image in
+     place (including for print); the modal owns a separate, scrollable copy. */
+  (function () {
+    if (new URLSearchParams(location.search).get('present') === '1' ||
+        document.body.classList.contains('presenting')) return;
+    var images = $$('main img.content-img').filter(function (img) {
+      return !img.closest('a, [data-interactive], .ghs-pictogram') &&
+        !img.matches('.logo, .icon, [aria-hidden="true"]');
+    });
+    if (!images.length || !window.HTMLDialogElement) return;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'diagram-viewer';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.innerHTML = '<div class="diagram-toolbar"><button type="button" data-diagram-close>Close</button>' +
+      '<button type="button" data-diagram-zoom="1" aria-pressed="true">1x</button>' +
+      '<button type="button" data-diagram-zoom="2" aria-pressed="false">2x</button></div>' +
+      '<div class="diagram-scroll" tabindex="0" role="region" aria-label="Scrollable diagram"><img></div>';
+    document.body.appendChild(dialog);
+    var copy = $('img', dialog), scroller = $('.diagram-scroll', dialog);
+    var source = null, width = 0, height = 0, zoom = 1;
+    function size() {
+      copy.style.width = (width * zoom) + 'px';
+      copy.style.height = height > 0 ? (height * zoom) + 'px' : 'auto';
+    }
+    function close() { if (dialog.open) dialog.close(); }
+    $('[data-diagram-close]', dialog).addEventListener('click', close);
+    dialog.addEventListener('close', function () {
+      document.documentElement.classList.remove('diagram-viewer-open');
+      if (source) source.focus({ preventScroll: true });
+    });
+    $$('[data-diagram-zoom]', dialog).forEach(function (button) {
+      button.addEventListener('click', function () {
+        zoom = Number(button.getAttribute('data-diagram-zoom'));
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
+        });
+        size();
+      });
+    });
+    addEventListener('resize', function () { if (dialog.open) size(); });
+    addEventListener('beforeprint', close);
+    images.forEach(function (img) {
+      var natural = 0, naturalHeight = 0, hint = null, active = false;
+      function update() {
+        var displayed = img.getBoundingClientRect().width;
+        active = displayed > 0 && natural > displayed + 1;
+        img.classList.toggle('diagram-expandable', active);
+        if (active) {
+          img.setAttribute('tabindex', '0');
+          img.setAttribute('role', 'button');
+          img.setAttribute('aria-haspopup', 'dialog');
+          if (!hint) {
+            hint = document.createElement('span');
+            hint.className = 'diagram-hint';
+            hint.textContent = 'Tap or press Enter to enlarge';
+            hint.setAttribute('aria-hidden', 'true');
+            img.insertAdjacentElement('afterend', hint);
+          }
+        } else {
+          img.removeAttribute('tabindex');
+          img.removeAttribute('role');
+          img.removeAttribute('aria-haspopup');
+        }
+        if (hint) hint.hidden = !active;
+      }
+      function loaded() {
+        var stampedWidth = Number(img.getAttribute('data-natural-width'));
+        var stampedHeight = Number(img.getAttribute('data-natural-height'));
+        natural = isFinite(stampedWidth) && stampedWidth > 0 ? stampedWidth : img.naturalWidth;
+        naturalHeight = isFinite(stampedHeight) && stampedHeight > 0 ? stampedHeight : img.naturalHeight;
+        update();
+      }
+      img.addEventListener('load', loaded);
+      loaded();
+      if (window.ResizeObserver) new ResizeObserver(update).observe(img);
+      else addEventListener('resize', update);
+      function open() {
+        if (!active || matchMedia('print').matches) return;
+        source = img; width = natural; height = naturalHeight; zoom = 1;
+        copy.src = img.currentSrc || img.src;
+        copy.alt = img.alt;
+        dialog.setAttribute('aria-label', img.alt);
+        $$('[data-diagram-zoom]', dialog).forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-diagram-zoom') === '1' ? 'true' : 'false');
+        });
+        document.documentElement.classList.add('diagram-viewer-open');
+        dialog.showModal();
+        size();
+        scroller.scrollTo(0, 0);
+        $('[data-diagram-close]', dialog).focus();
+      }
+      img.addEventListener('click', open);
+      img.addEventListener('keydown', function (event) {
+        if (active && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault(); open();
+        }
+      });
+    });
   })();
 })();
 </script>
