@@ -62,6 +62,16 @@ $mediaDir = Join-Path $root 'media'
 $docsDir  = Join-Path $root 'docs'
 $enc      = New-Object System.Text.UTF8Encoding($false)
 
+# Ordered semantic categories: detection, edge precedence, labels and legend
+# share this table. Colour values remain independent of branding in app.css.
+$script:cardMarkers = @(
+  [pscustomobject]@{ Id='stop'; Label='Stop'; Pattern='<div\b[^>]*\bclass\s*=\s*["''][^"'']*\bstop\b'; Flag='is-stop'; Token='--mark-stop'; Meaning="Don't do this; danger." }
+  [pscustomobject]@{ Id='watch'; Label='Watch out'; Pattern='<div\b[^>]*\bclass\s*=\s*["''][^"'']*\bgate\b'; Flag='is-gate'; Token='--mark-watch'; Meaning='A key rule or a common trap.' }
+  [pscustomobject]@{ Id='interactive'; Label='Interactive'; Pattern='\bdata-interactive\s*='; Flag='is-interactive'; Token='--mark-interactive'; Meaning='Something to work with: a live model.' }
+  [pscustomobject]@{ Id='checklist'; Label='Checklist'; Pattern='<ul\b[^>]*\bclass\s*=\s*["''][^"'']*\bboxes\b'; Flag='is-checklist'; Token='--mark-checklist'; Meaning='Steps to work through and tick off.' }
+  [pscustomobject]@{ Id='practice'; Label='Practice'; Pattern='<a\b[^>]*\bhref\s*=\s*["''][^"'']*practice\.html#[^"'']+'; Flag=''; Token=''; Meaning='Check-yourself questions.' }
+)
+
 # ---------------------------------------------------------------- helpers ----
 . (Join-Path $root 'scripts/read-conf.ps1')
 . (Join-Path $root 'scripts/interactive-assets.ps1')
@@ -310,12 +320,13 @@ foreach ($cid in $collOrder) {
       if (-not $slug) { $slug = "section-$i" }
 
       $flag = ''
-      if ($inner -match '<div class="stop"') { $flag = 'is-stop' }
-      elseif ($inner -match '<div class="gate"') { $flag = 'is-gate' }
-      elseif ($inner -match '\bdata-interactive\s*=') { $flag = 'is-interactive' }
+      $markers = @($script:cardMarkers | Where-Object { $inner -match $_.Pattern })
+      $edge = $markers | Where-Object Token | Select-Object -First 1
+      if ($edge) { $flag = $edge.Flag }
 
       $secs += [pscustomobject]@{
         Mode = $mode; Html = $inner.Trim(); Head = $head; Slug = $slug; Flag = $flag
+        Markers = $markers; Edge = $edge
       }
     }
     if ($secs.Count -eq 0) { throw "$($f.Name): no <section> blocks found" }
@@ -1280,8 +1291,15 @@ function New-Cards($p, $ctx, [string]$mode) {
     if ($s.Flag) { $cls += ' ' + $s.Flag }
     $head = if ($s.Head) { $s.Head } else { ConvertTo-HtmlText $p.Title }
     $cardId = if ($mode -eq 'aggregate') { $p.Id + '--' + $s.Slug } else { $s.Slug }
-    [void]$sb.AppendLine('  <details class="' + $cls + '" id="' + $cardId + '" data-card="' + $cardId + '">')
-    [void]$sb.AppendLine('    <summary>' + $head + '<span class="chev"></span></summary>')
+    $edgeAttr = if ($s.Edge) { ' data-card-edge="' + $s.Edge.Id + '" style="--card-marker:var(' + $s.Edge.Token + ')"' } else { '' }
+    $tags = if ($s.Markers.Count) {
+      '<span class="card-tags">' + (($s.Markers | ForEach-Object {
+        $style = if ($_.Token) { ' style="--card-marker:var(' + $_.Token + ')"' } else { '' }
+        '<span class="card-tag" data-marker="' + $_.Id + '"' + $style + '><span class="marker-separator">; </span>' + $_.Label + '</span>'
+      }) -join '') + '</span>'
+    } else { '' }
+    [void]$sb.AppendLine('  <details class="' + $cls + '" id="' + $cardId + '" data-card="' + $cardId + '"' + $edgeAttr + '>')
+    [void]$sb.AppendLine('    <summary>' + $head + $tags + '<span class="chev"></span></summary>')
     [void]$sb.AppendLine('    <div class="body">')
     $sectionHtml = Resolve-Links $s.Html $ctx $mode
     [void]$sb.AppendLine('      ' + (Expand-ActivityDocuments $sectionHtml $ctx $mode))
@@ -1899,6 +1917,12 @@ foreach ($c in $collections.Values) {
                        '</a><span class="sep">/</span><span>' + (ConvertTo-HtmlText $c.Title) + '</span></div>')
   [void]$ci.AppendLine('  <h1>' + (ConvertTo-HtmlText $c.Title) + '</h1>')
   [void]$ci.AppendLine('  <p class="lede">' + (ConvertTo-HtmlText $c.Summary) + '</p>')
+  [void]$ci.AppendLine('<aside class="card-legend" aria-label="Card markers"><h2>Card markers</h2><ul>')
+  foreach ($marker in $script:cardMarkers) {
+    $sample = if ($marker.Token) { '<span class="marker-sample" aria-hidden="true" style="--card-marker:var(' + $marker.Token + ')"></span>' } else { '<small>label only</small> ' }
+    [void]$ci.AppendLine('<li>' + $sample + '<strong>' + $marker.Label + '</strong>: ' + (ConvertTo-HtmlText $marker.Meaning) + '</li>')
+  }
+  [void]$ci.AppendLine('</ul></aside>')
   if ($c.Intro) {
     # Up is this document's depth below docs\ - docs\<coll>\index.html - and is
     # what an image reference is resolved against. Threaded the same way $up is
