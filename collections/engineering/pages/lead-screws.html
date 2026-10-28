@@ -1,0 +1,74 @@
+@@ID: lead-screws
+@@TITLE: Lead Screws
+@@SECTION: Power Transmission
+@@SUMMARY: Pitch times starts gives lead. Use lead to convert rpm into travel speed and torque into force, with efficiency applied only to the force conversion.
+@@STATUS: ready
+@@TAGS: power screw, pitch, lead, starts, linear velocity, torque, force, efficiency
+@@END
+
+<section>
+  <h2>Pitch is thread spacing; lead is travel per revolution</h2>
+  <p class="lede"><strong>Lead = pitch × number of starts.</strong> This is the distinction to get right before calculating either speed or force.</p>
+  <p>A <strong>start</strong> is one continuous helical ridge. A single-start screw has one ridge, so its lead equals its pitch. A triple-start screw has three interleaved ridges: follow one ridge through a full turn and it advances three pitch distances.</p>
+  <figure>
+    [[img:power-transmission/pitch-and-lead.svg|Unwrapped screw surfaces compare a single-start screw with pitch 2 mm and lead 2 mm to a triple-start screw with the same pitch 2 mm and lead 6 mm. A, B and C label the separate ridges.]]
+    <figcaption>Imagine unwrapping the cylindrical surface. Top and bottom are the same angular position one full turn apart. Pitch is measured along the axis between adjacent ridges; lead follows the same ridge through a turn.</figcaption>
+  </figure>
+  <p>At the same pitch, adding starts increases travel per turn. At the same torque it reduces theoretical force. The thread's cross-sectional form and its number of starts are separate choices; see [[screw-threads]].</p>
+  <details class="deeper"><summary>Check the definition, not just the label on a catalog</summary><p><a href="https://www.thomsonlinear.com/en/support/tips/difference-between-screw-pitch-and-lead">Thomson: Screw Pitch and Lead</a> defines lead as nut travel per screw revolution and states the pitch-times-starts relationship. A supplier may list lead directly. Do not multiply a value already labelled lead by the number of starts a second time.</p></details>
+</section>
+
+<section>
+  <h2>Multiply rpm by lead to find linear speed</h2>
+  <p>For an engaged screw and nut, with the nut restrained from rotating, <code>v = nL</code>. Here <strong>n</strong> is screw speed in revolutions per minute and <strong>L</strong> is lead in distance per revolution. The result is distance per minute. Divide by 60 for distance per second.</p>
+  <div class="panel"><p>A triple-start screw with 1.5 mm pitch has <code>L = 1.5 × 3 = 4.5 mm/rev</code>. At 480 rpm, <code>v = 480 × 4.5 = 2,160 mm/min = <strong>36 mm/s</strong></code>.</p></div>
+  <p><strong>Do not multiply that speed by efficiency.</strong> The teaching rule is: “RPM → velocity is 100% efficient unless the screw is malfunctioning; all efficiency losses are found in the torque → force conversion.” This describes a positive-drive motion relationship, not 100% energy efficiency. It is the same tooth-count principle used in [[gear-ratios]].</p>
+  <p>Use the <em>actual screw rpm</em>. If the motor slows under load, the lower rpm gives a lower travel speed. Backlash at reversal and elastic deflection can affect positioning without being an efficiency factor on speed. These calculations describe steady engaged travel, after clearance is taken up. See [[rotation-and-linear-speed]] for the general rotation-to-travel connection.</p>
+</section>
+
+<section>
+  <h2>Divide torque times 2π by lead, then apply efficiency</h2>
+  <p>For steady motion driving a resisting axial load, <code>F<sub>theoretical</sub> = 2πT / L</code> and <code>F<sub>actual</sub> = η × F<sub>theoretical</sub></code>. Here <strong>T</strong> is input torque and <strong>η</strong> (eta) is efficiency written as a decimal: 40% is 0.40.</p>
+  <div class="unit-table-wrap"><table class="unit-table">
+    <caption>Make the length in torque match the length in lead.</caption>
+    <thead><tr><th scope="col">Torque</th><th scope="col">Lead for force calculation</th><th scope="col">Force</th></tr></thead>
+    <tbody><tr><td>N·m</td><td>metres per revolution (mm ÷ 1,000)</td><td>N</td></tr><tr><td>lbf·in (often written lb-in)</td><td>inches per revolution</td><td>lbf</td></tr></tbody>
+  </table></div>
+  <p>To find the torque required for a target actual force, rearrange: <code>T = FL / (2πη)</code>. For the same load and lead, lower efficiency requires more torque. Keep the efficiency boundary consistent: a whole screw assembly efficiency includes losses in the bearings or collar (a supporting thrust-contact surface) as well as the threads.</p>
+  <details class="deeper">
+    <summary>Derive the 2π from equal power, or one revolution of work</summary>
+    <p>Ideally, power in equals power out: <code>Tω = Fv</code>. With n in rpm, <code>ω = 2πn/60</code> rad/s and <code>v = nL/60</code>. Cancel n/60 at nonzero steady speed to get <code>F = 2πT/L</code>. Equivalently, one revolution puts in work <code>2πT</code> and moves the load through L, doing work <code>FL</code>.</p>
+    <p>With losses, <code>Fv = ηTω</code>. The motion ratio stays fixed, so the reduction appears in force. See [[power-and-efficiency]]. At zero speed both powers are zero; this derivation does not predict breakaway torque or static holding capacity. Lowering a load that drives the screw requires a different friction analysis.</p>
+    <p><a href="https://www.idc-online.com/technical_references/pdfs/mechanical_engineering/Power_Screw_drives.pdf">IIT Kharagpur: Power Screw Drives and Their Efficiency</a>, section 6.1.2, relates output work, input work and friction. The calculator uses a given efficiency, not a friction coefficient or a thread-strength model.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Experiment: more starts change speed and force in opposite ways</h2>
+  <div data-interactive="lead-screw">
+    <p>Predict first: keep pitch, rpm, torque and efficiency fixed, then change from one start to three. Lead and speed triple; theoretical force falls to one third. The same force ratio holds when efficiency is held fixed.</p>
+    <div class="ls-live" hidden></div>
+    <div class="ls-static">
+      <p><strong>Static comparison / print example:</strong> pitch 2 mm, 300 rpm, torque 1.2 N·m, given efficiency 40%.</p>
+      <div class="unit-table-wrap"><table class="unit-table"><caption>Same pitch and input, different starts.</caption><thead><tr><th scope="col">Starts</th><th scope="col">Lead</th><th scope="col">Speed</th><th scope="col">Ideal force</th><th scope="col">Actual force</th></tr></thead><tbody><tr><td>1</td><td>2 mm/rev</td><td>10 mm/s</td><td>3,770 N</td><td>1,508 N</td></tr><tr><td>3</td><td>6 mm/rev</td><td>30 mm/s</td><td>1,257 N</td><td>503 N</td></tr></tbody></table></div>
+      <p>Changing efficiency to 20% halves each actual force; both speeds stay the same. Real efficiency can change with lead, lubrication and load. Here it is an independent input so the two effects can be studied separately.</p>
+    </div>
+    <noscript><p>The controls require JavaScript. The comparison and formulas above provide the same calculation method without it.</p></noscript>
+  </div>
+</section>
+
+<section>
+  <h2>Worked actuator: keep inch torque and inch lead together</h2>
+  <p>A single-start ACME actuator has 0.20 in pitch, runs at 900 rpm and receives 12 lbf·in of torque. Its assembly efficiency is <strong>given as 60%</strong>. Find travel speed and useful axial force.</p>
+  <ol><li><code>L = 0.20 × 1 = 0.20 in/rev</code>.</li><li><code>v = 900 × 0.20 = <strong>180 in/min</strong> = 3 in/s</code>.</li><li><code>F<sub>theoretical</sub> = 2π × 12 / 0.20 = 376.99 lbf</code>.</li><li><code>F<sub>actual</sub> = 376.99 × 0.60 ≈ <strong>226 lbf</strong></code>.</li></ol>
+  <p>The 60% belongs in step 4, not step 2. It is an example input, not an efficiency assigned to every ACME screw.</p>
+  <p><a class="button" data-practice-add="screw-acme-force" href="../practice.html#screw-acme-force">Practice actuator force</a></p>
+</section>
+
+<section>
+  <h2>Worked vise: turn hand force into torque before finding clamp force</h2>
+  <p>For an illustrative square-thread vise, a 120 N hand force acts perpendicular to the handle at a radius of 0.18 m from the screw axis. Pitch is 4 mm with one start. <strong>Assume a given overall tightening efficiency of 30%</strong>; this is not a measured or universal vise efficiency.</p>
+  <ol><li>Use [[torque|torque = radius × perpendicular force]]: <code>T = 0.18 × 120 = <strong>21.6 N·m</strong></code>. Radius is the distance from the axis to the hand, not necessarily the full handle length.</li><li><code>L = 4 mm/rev = 0.004 m/rev</code>.</li><li><code>F<sub>actual</sub> = 0.30 × 2π × 21.6 / 0.004 ≈ <strong>10,179 N = 10.18 kN</strong></code>.</li></ol>
+  <p>This is a tightening estimate using the supplied efficiency. It is not a vise rating or a prediction of residual force after the hand stops turning. A separate free-travel calculation at 24 rpm gives <code>24 × 4 / 60 = 1.6 mm/s</code>; the jaws do not continue at that speed through a rigid clamped part.</p>
+  <p><a class="button" data-practice-add="screw-vise-force" href="../practice.html#screw-vise-force">Practice handle torque and clamp force</a> <a class="button" data-practice-add="screw-cnc-speed" href="../practice.html#screw-cnc-speed">Practice a triple-start CNC screw</a></p>
+</section>
