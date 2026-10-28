@@ -1,0 +1,47 @@
+@@ID: sweeps-and-lofts
+@@TITLE: Sweeps and Lofts
+@@SECTION: CAD Modeling
+@@SUMMARY: Use a sweep to carry a section along a path and a loft to transition through ordered sections, with references that control the result.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>A sweep needs a profile and a path</h2>
+  <p class="lede">A <strong>profile</strong> describes the cross-section; a <strong>path</strong> describes where it travels. A circular profile swept around a smooth bend makes a bent solid rod. An annular profile can make a tube. For a basic sweep, keep the section size constant and choose how it stays oriented along the path.</p>
+  <figure>[[img:engineering-graphics/part-features/sweep.svg|Three-step sequence: steps 1 and 2 across the top, then step 3 below. A circular profile at the start of a curved path sweeps into a bent rod with a circular cross-section.]]<figcaption>Profile + path → sweep → bent rod. The path is a reference curve, not another solid.</figcaption></figure>
+  <p>Place the profile on a plane normal (perpendicular) to the path at its start for an easy first construction. Constrain its position to the path. A shape that looks connected in one view can still be separated in three dimensions. Select the complete intended path, not a neighboring model edge.</p>
+  <p>A sweep can create material or remove it from an existing part. Advanced sweep options can control twist or scaling; a constant circular section is a simpler starting case. See <a href="https://cad.onshape.com/help/Content/PartStudio/sweep.htm">Onshape: Sweep</a>.</p>
+</section>
+
+<section>
+  <h2>A loft passes through profiles selected in order</h2>
+  <p>A <strong>loft</strong> transitions between two or more sections. Put sketches on suitable planes, then select the sections in the order the shape should pass through them. A broad oval transitioning to a smaller oval is a simple example; the section size changes along the length.</p>
+  <figure>[[img:engineering-graphics/part-features/loft.svg|Three-step sequence: steps 1 and 2 across the top, then step 3 below. Three oval profiles on separated planes are selected from bottom to top and joined into a tapered transition. A guide touches the outside of every profile.]]<figcaption>Ordered sections → transition → solid. A guide can control the side between the sections.</figcaption></figure>
+  <p>Use a <strong>guide curve</strong> when the profiles alone do not control the shape between them. For a straightforward boundary guide, constrain it to meet every profile at the intended boundary point. A Pierce relation can locate a sketch point where a curve crosses that sketch plane. Do not accept a connection solely because it looks right in an isometric view.</p>
+  <p>Match corresponding locations around successive profiles. If one section's corner connects to an unrelated corner on the next, the loft can twist. Inspect connection handles and a section view before adding more profiles.</p>
+  <details class="deeper"><summary>More profiles do not automatically make a better surface</summary><p>Extra sections and guides can introduce unwanted waves or conflicting conditions. Start with the fewest that describe the intended shape, then add a control for a specific problem. Profile and guide rules vary with solid, surface, and thin options. See <a href="https://cad.onshape.com/help/Content/PartStudio/loft.htm">Onshape: Loft</a> and <a href="https://help.solidworks.com/2026/english/solidworks/sldworks/c_Description_of_Sketch_Relations.htm">SOLIDWORKS: Description of Sketch Relations</a>.</p></details>
+</section>
+
+<section>
+  <h2>Use the controlling geometry to choose sweep or loft</h2>
+  <table><thead><tr><th>What you know</th><th>First feature to consider</th><th>What to inspect</th></tr></thead><tbody>
+    <tr><td>One section following a bent centerline</td><td>Sweep</td><td>Path continuity, section position, and orientation.</td></tr>
+    <tr><td>Different sections at several locations</td><td>Loft</td><td>Profile order, connections, and shape between sections.</td></tr>
+    <tr><td>One section along a straight direction</td><td>Extrude</td><td>Depth or end condition.</td></tr>
+    <tr><td>A section repeated around an axis</td><td>Revolve</td><td>Axis position and rotation angle.</td></tr>
+  </tbody></table>
+  <p>These are starting choices, not exclusive capabilities. For example, a loft can follow a centerline, and a sweep can vary with advanced controls. Prefer the feature that states the intended change clearly.</p>
+  <p><a class="button" data-practice-add="part-features-sweep" href="../practice.html#part-features-sweep">Practice profile and path</a> <a class="button" data-practice-add="part-features-loft" href="../practice.html#part-features-loft">Practice changing sections</a></p>
+</section>
+
+<section>
+  <h2>Troubleshoot the inputs before changing every option</h2>
+  <ul class="boxes">
+    <li>Check that the selected profile regions match the intended solid, surface, or thin result.</li>
+    <li>For a sweep, check path continuity and the profile's location and orientation.</li>
+    <li>For a loft, check profile order and each intended guide intersection.</li>
+    <li>Look for self-intersection: a thick swept section may overlap itself around a tight bend.</li>
+    <li>Inspect sections and confirm the expected part count; repair the first failed reference.</li>
+  </ul>
+  <p>Shelling a complicated loft is a separate geometry problem: offset walls can collide where the shape becomes tight. Build and inspect the outer shape first, then check the wall thickness. See [[patterns-mirror-and-applied-features|shell and other applied features]].</p>
+</section>

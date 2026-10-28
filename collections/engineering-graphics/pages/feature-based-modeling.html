@@ -1,0 +1,56 @@
+@@ID: feature-based-modeling
+@@TITLE: Feature-based Modeling
+@@SECTION: CAD Modeling
+@@SUMMARY: Plan a solid part as a sequence of features, choose stable references, and test whether the model survives a change.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Build the main shape, then add and remove material</h2>
+  <p class="lede">A parametric model stores instructions for building a shape. Dimensions and relationships are inputs; the solid is the result. Change an input and rebuild to see the result update.</p>
+  <p>The <strong>base feature</strong> creates the initial solid. Later features add material, remove material, or modify faces and edges. For a simple spacer, start with its main cross-section and extrude it. For a stepped round knob, a revolved section may describe the main shape more directly. There is often more than one valid feature sequence.</p>
+  <p>A <strong>body</strong> is a connected piece of solid geometry. A SOLIDWORKS part file can contain multiple bodies. An Onshape <strong>Part Studio</strong> can create multiple parts from a shared feature list. Neither arrangement, by itself, defines assembly motion or assembly relationships.</p>
+  <p>Start with sketch dimensions and relations in the <a href="../engineering-graphics/index.html">Engineering Graphics collection</a>. Then choose [[extrude-and-revolve|extrude or revolve]] for a straight or rotational shape, or [[sweeps-and-lofts|sweep or loft]] for a path or a changing cross-section.</p>
+</section>
+
+<section>
+  <h2>The feature tree records a build sequence and its dependencies</h2>
+  <p>Read the tree from the base feature toward the end. A feature that supplies a sketch, face, edge, or other reference is a <strong>parent</strong>; a feature that uses that reference is a <strong>child</strong>. A child can depend on more than one parent. Being later in the list does not, by itself, make a feature a direct child of every earlier feature.</p>
+  <p>For example: a plate extrusion supplies a top face for a hole-position sketch. A hole feature uses that sketch. A pattern uses that hole as its seed. Delete the hole and the pattern loses its seed; delete the plate and the sketch loses its support as well. Inspect the deletion dialog before accepting dependent deletions.</p>
+  <p>Rename features for their purpose, such as <em>Main plate</em>, <em>Locating hole</em>, and <em>Hole row</em>. Renaming a feature in the tree is different from renaming a referenced part file. File references need their own reference-aware workflow.</p>
+  <details class="deeper"><summary>Why a small edit can break a later feature</summary><p>A face or edge can disappear when the shape changes. A sketch attached to that face, or a fillet attached to that edge, then has a missing reference. Repair the first failed feature before chasing errors farther down the tree. Reordering is constrained by dependencies: a feature cannot use geometry that has not yet been created.</p></details>
+</section>
+
+<section>
+  <h2>Rollback lets you inspect an earlier stage without deleting later work</h2>
+  <p>Move the rollback bar above later features to inspect or edit an earlier stage. Return it to the end when checking the completed part. <strong>Rollback is a temporary stopping point in regeneration.</strong> Suppression instead leaves a selected feature in the tree but excludes it from the active model; dependent features may also be affected. Hiding changes visibility, not the solid's definition.</p>
+  <ul class="boxes">
+    <li>Find the earliest feature that fails or produces the wrong shape.</li>
+    <li>Roll back to inspect the geometry and references available at that point.</li>
+    <li>Edit the sketch for its dimensions or relations; edit the feature for its operation, depth, direction, or selected references.</li>
+    <li>Roll forward to the end, rebuild, and inspect the downstream results.</li>
+  </ul>
+  <details class="deeper"><summary>Vendor help for history and rollback</summary><p>See <a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_rollback_bar.htm">SOLIDWORKS: Rollback Bar</a>, <a href="https://help.solidworks.com/2026/English/SolidWorks/Sldworks/c_Suppress_and_Unsuppress_Features.htm">Suppress and Unsuppress Features</a>, and <a href="https://cad.onshape.com/help/Content/PartStudio/features_and_parts_lists.htm">Onshape: Feature and Part Lists</a>. Onshape document history records editing activity; moving a Part Studio rollback bar is not restoring an older document version.</p></details>
+</section>
+
+<section>
+  <h2>Choose references that express what must stay aligned</h2>
+  <p>A <strong>reference plane</strong> locates a sketch or defines symmetry. A <strong>reference axis</strong> supplies a direction or center of rotation. Neither adds material. Use the origin and default planes when they express the design; add offset, angled, or mid-planes when needed. Reference geometry can also have parents.</p>
+  <p><strong>Design intent</strong> is what should stay true when dimensions change. A centered plate should grow equally on both sides of its center plane. A hole required to pass through the plate should remain through when the plate gets thicker. A row of identical holes should share one seed definition and a spacing rule.</p>
+  <p>Put major shape and functional references early. Add small edge treatments later when they are finishing details. This is a useful starting order, not a rule that every fillet must be last: a large blend that defines the main shape may belong before shelling or other features.</p>
+  <details class="deeper"><summary>Fewest features is not always the best model</summary><p>A single complicated sketch can hide many unrelated decisions. Several named features may be easier to edit. Count features only after stating which operations are allowed and what the model must do when changed. A feature tree is also not a manufacturing operation sheet: a CAD cut does not specify tooling or setups.</p></details>
+</section>
+
+<section>
+  <h2>Check units, bodies, material, and mass after a change</h2>
+  <p>Assign the intended material or density before relying on mass. A surface color is not evidence that density is correct. For a uniform solid, <strong>mass = density × volume</strong>. Compare volume with a simple estimate, and inspect unexpected mass or center-of-mass changes.</p>
+  <p>A fresh example: a solid rectangular spacer measuring 30 × 20 × 8 mm has a volume of 4,800 mm³ = 4.8 cm³. With an assumed density of 2.50 g/cm³, its mass is 12.0 g. These are practice values, not a material specification. A hole should reduce that mass if the same body and density remain selected.</p>
+  <ul class="boxes">
+    <li>Confirm the document units and overall dimensions.</li>
+    <li>Confirm the expected body or part count and the scope of each add or cut.</li>
+    <li>Change one important dimension, rebuild, and check the intended relationships.</li>
+    <li>Check material assignment, selected bodies, and any mass overrides before trusting the result.</li>
+  </ul>
+  <p><a class="button" data-practice-add="part-features-mass" href="../practice.html#part-features-mass">Practice a mass check</a> <a class="button" data-practice-add="part-features-parent" href="../practice.html#part-features-parent">Practice dependencies</a></p>
+  <details class="deeper"><summary>Mass properties are a check, not proof of a correct part</summary><p>Different shapes can have the same volume and mass. Check the geometry as well. Onshape omits parts without assigned material from density-based calculations; inspect its notices and selection. See <a href="https://cad.onshape.com/help/Content/View/mass_properties_tool.htm">Onshape: Mass Properties Tool</a> and <a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_sel_bodies_feats_imp_multibodies.htm">SOLIDWORKS: Bodies and Features of Multibody Parts</a>.</p></details>
+</section>
