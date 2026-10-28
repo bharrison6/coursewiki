@@ -1,0 +1,47 @@
+@@ID: cnc-turning-setup
+@@TITLE: CNC Turning Setup and Offsets
+@@SECTION: CNC
+@@SUMMARY: Read lathe X and Z coordinates, identify tooling and workholding, and separate part location from tool geometry and wear.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Read X as a size and Z as a position along the spindle</h2>
+  <p>Start with [[cnc-control-fundamentals]] for how CNC works and [[lathe-operations]] for the cuts a lathe makes. Here the work rotates and the ordinary turning tool moves in the XZ plane. Z runs along the spindle; positive Z is away from the headstock in the basic arrangement shown. X moves radially, even when its displayed value is a diameter. A slant bed or rear turret changes the view, so check the machine's axis diagram.</p>
+  <p>Confirm <strong>diameter or radius programming</strong> before reading an X value. For a 28 mm diameter, diameter mode uses X28 and radius mode uses X14. Moving from X28 to X24 in diameter mode removes 2 mm radially. Z is not halved. Confirm incremental and arc-centre conventions separately.</p>
+  <p>[[img:cnc-turning/axes.svg|Lathe side view: work zero is at the face on the spindle centreline. Positive Z points away from the headstock; X28 in diameter mode represents a surface 14 mm from the centreline.]]</p>
+  <p>Use [[absolute-and-incremental-positioning]] for coordinate arithmetic. On many Fanuc-style lathes X/Z are absolute endpoints and U/W are increments; G90 can be a turning cycle. Do not paste a mill's G90/G91 startup into a lathe program.</p>
+  <p><a class="button" data-practice-add="turning-x-diameter" href="../practice.html#turning-x-diameter">Practice lathe X commands</a></p>
+</section>
+
+<section>
+  <h2>The tool arrangement determines how the next cutter reaches the work</h2>
+  <p>A <strong>turret</strong> indexes a selected tool station into working position. <strong>Gang tooling</strong> mounts several tools on a slide; moving the slide brings the selected tool into position without turret indexing. Each tool still needs the correct offsets and a checked approach path.</p>
+  <p><strong>Live tooling</strong> powers a rotating cutter on the lathe for operations such as drilling or milling. A <strong>C axis</strong> controls the spindle's angular position, allowing the work to be indexed or rotated under position control. These are options, not features of every CNC lathe. Some machines also add a Y axis. Live-tool and spindle-mode commands belong to the machine's manual.</p>
+  <details class="deeper"><summary>Why an extra axis changes the work a turning center can do</summary><p>Ordinary turning produces surfaces around the spindle axis. A powered tool plus controlled work angle can reach features at selected angular positions. See the <a href="https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---options-programming.html">Haas options programming reference</a> for one manufacturer's C-axis implementation.</p></details>
+</section>
+
+<section>
+  <h2>Match the workholding and automation to the part</h2>
+  <ul>
+    <li>A <strong>chuck</strong> grips with jaws. A self-centering chuck moves its jaws together; independent jaws permit individual adjustment. Jaw style and setup determine which shapes can be held.</li>
+    <li>A <strong>collet</strong> closes around a matching stock size and shape. Its useful size range depends on the collet design.</li>
+    <li>A <strong>tailstock center</strong> supports the free end of suitable work. It does not replace the chuck or collet that drives the work.</li>
+    <li>A <strong>bar feeder</strong> advances bar stock for successive parts. A <strong>parts catcher</strong> receives a separated part. Their timing and interlocks are machine-specific; neither is assumed in an ordinary two-axis program.</li>
+  </ul>
+  <p>For operating requirements use the <a href="../safety/index.html">Safety collection</a> and [[cnc-program-proving]]. No particular shop machine or installed option is assumed here.</p>
+</section>
+
+<section>
+  <h2>Locate the part face once, then locate each tool relative to it</h2>
+  <p>Use [[cnc-axes-and-offsets]] for machine zero, work zero and the general offset relationship. On a lathe, a common part datum is <strong>Z0 at the finished face and X0 on the spindle centreline</strong>. Establish the Z work shift using the control's documented reference-tool, probe or touch-off method. Allow for any material still to be faced away.</p>
+  <p>For X touch-off, the reference is a measured diameter. In a trial-cut method, a tool cuts a short cylindrical surface and that diameter is measured; the control's measurement function uses the known size to establish that tool's X geometry. Use the manual's procedure for the actual machine, including which table receives the value. Do not enter the measured diameter as though it were automatically the raw geometry-offset value.</p>
+  <table><thead><tr><th>Stored information</th><th>What it describes</th></tr></thead><tbody>
+    <tr><td>Work shift or work offset</td><td>The part datum, especially its Z location.</td></tr>
+    <tr><td>X and Z tool geometry</td><td>The position of each tool's reference tip relative to the established reference system.</td></tr>
+    <tr><td>X and Z wear</td><td>Small dimensional corrections after measurement, separate from the basic tool setup.</td></tr>
+    <tr><td>Nose radius and tip orientation</td><td>The rounded cutting corner and how its imaginary tip relates to it; see [[cnc-turning-profiles]].</td></tr>
+  </tbody></table>
+  <p>Check whether an X wear entry is interpreted radially or diametrally, its sign, and whether the control adds to or replaces the existing value. A work-offset change affects the shared datum; a tool correction addresses one tool. Selecting G54 does not measure or store a new zero. G53 does not erase the offset table.</p>
+  <details class="deeper"><summary>Control example: separate geometry and wear fields</summary><p>The <a href="https://www.haascnc.com/content/dam/haascnc/en/service/manual/operator/english---lathe-ngc---operator%27s-manual---2025.pdf">Haas lathe manual</a>, Operation, describes separate X/Z geometry wear, radius and tip-direction fields. Its button sequences and offset conventions must not be assumed on another control.</p></details>
+</section>

@@ -1,0 +1,81 @@
+@@ID: cnc-turning-program
+@@TITLE: CNC Turning Program Walkthrough
+@@SECTION: CNC
+@@SUMMARY: Trace an original facing, outside roughing, chamfering, finishing and cutoff sequence with every block explained.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Read the setup assumptions before the first block</h2>
+  <p><strong>Illustrative; check your control's manual.</strong> This is a reading example in a common Fanuc-style lathe dialect, not a machine-ready file. Read [[cnc-program-structure]] for blocks and modes, [[cnc-turning-setup]] for offsets, and [[cnc-turning-speeds-and-feeds]] for S and F. The mill simulator in [[gcode-and-toolpaths]] cannot validate this lathe program.</p>
+  <p>The invented part is 20 mm in diameter and 25 mm long, with a 1 mm × 45° front chamfer. The chamfer runs from X18 Z0 to X20 Z−1: the 2 mm diameter change is a 1 mm radial change. Stock is 24 mm diameter with its raw face at Z+0.5. G54 has Z0 at the finished face and X0 on the spindle centreline. Stock and clearance extend beyond Z−28; workholding is farther toward negative Z.</p>
+  <p>Assume diameter programming and absolute X/Z endpoints; this dialect does not need G90 for absolute moves. T0101 selects station 1 and offset 1: a right-hand OD/facing tool with a 0.4 mm nose radius, suitable for the illustrated cuts. Its imaginary tip and radius are set, and G42 is the correct side for this setup's finish contour. T0202 selects a 2 mm wide cutoff tool and offset 2. Its Z reference is the edge toward positive Z, so Z−25 puts the blade in the interval Z−27 to Z−25. The cutoff tool is capable of the illustrated small travel past centre.</p>
+  <p>The example assumes X60 Z10 is an already-verified tool-change clearance location for both tools and the turret sweep, and starts there with spindle and coolant off. These coordinates are not a general clearance rule. All speeds, feeds and the 1800 RPM ceiling are teaching values, not material recommendations. Verify the real setup, tool calls, compensation entry/exit, centre crossing and file delimiters using [[cnc-program-proving]] and the <a href="../safety/index.html">Safety collection</a>.</p>
+</section>
+
+<section>
+  <h2>Face the end, then leave a small allowance on the outside diameter</h2>
+  <p>Every parenthesized comment explains its block. G01 remains active until G00 replaces it; X/Z values here are destinations. Facing travels slightly past the centre to account for the rounded nose. Roughing uses two explicit lengthwise passes rather than a control-specific canned-cycle format.</p>
+  <pre><code>O2460 (IDENTIFY THIS EXAMPLE PROGRAM)
+G18 G21 G40 G80 G99 (XZ PLANE, MM, COMP OFF, CYCLES OFF, MM/REV)
+G54 (SELECT THE PRESET PART WORK OFFSET)
+T0101 (SELECT OD TOOL 1 WITH OFFSET 1 AT VERIFIED CLEARANCE)
+G50 S1800 (SET THE EXAMPLE MAXIMUM SPINDLE RPM)
+G97 S600 M03 (FIXED 600 RPM, START SPINDLE IN SETUP DIRECTION)
+G00 X26.0 (APPROACH OUTSIDE THE 24 MM STOCK AT Z10)
+G00 Z0.0 (MOVE TO FINISHED FACE PLANE WHILE OUTSIDE STOCK)
+M08 (TURN ON THE ASSUMED FLOOD COOLANT SYSTEM)
+G96 S90 (SELECT 90 M/MIN CSS WITH THE RPM CEILING ACTIVE)
+G01 X-0.8 F0.10 (FACE THROUGH CENTRE: 0.4 MM RADIAL OVERTRAVEL)
+G00 Z2.0 (RETRACT AXIALLY BEYOND THE FACED END)
+G00 X22.0 (POSITION FOR THE FIRST OD ROUGHING PASS IN AIR)
+G01 Z-28.0 F0.20 (ROUGH LENGTHWISE TO 22 MM DIAMETER)
+G00 X26.0 (RETRACT RADIALLY OUTSIDE THE ORIGINAL STOCK)
+G00 Z2.0 (RETURN TO THE FRONT AT CLEAR X)
+G00 X20.6 (POSITION FOR THE SECOND OD ROUGHING PASS)
+G01 Z-28.0 F0.20 (LEAVE 0.6 MM ON DIAMETER FOR FINISHING)
+G00 X26.0 (RETRACT OUTSIDE STOCK AGAIN)
+G00 Z2.0 (RETURN AHEAD OF THE FACE FOR FINISHING)</code></pre>
+  <details class="deeper"><summary>Check roughing depth and remaining material</summary><p>The first pass changes diameter from 24 to 22 mm, a 1 mm radial cut. The second changes 22 to 20.6 mm, a 0.7 mm radial cut. Finishing from 20.6 to 20 removes 0.3 mm radially. Extending the OD cuts beyond Z−25 leaves room for the cutoff blade and places the finishing departure on material that will not belong to the finished part.</p></details>
+</section>
+
+<section>
+  <h2>Compensate the chamfer and finish, then cut off at fixed RPM</h2>
+  <p>The finish contour uses the same tool at a smaller feed. Nose compensation is active for the chamfer and OD; it is entered ahead of the face and cancelled after departing the finished contour. See [[cnc-turning-profiles]] for why a sharp-point assumption would give the wrong chamfer.</p>
+  <pre><code>G00 X16.0 (POSITION AHEAD OF THE FACE FOR THE COMPENSATED ENTRY)
+G01 G42 X18.0 Z0.0 F0.10 (ENGAGE RIGHT COMP ON THE FACE APPROACH)
+G01 X20.0 Z-1.0 (CUT THE 1 MM RADIAL BY 1 MM AXIAL CHAMFER)
+G01 Z-26.0 (FINISH THE 20 MM OD PAST THE CUTOFF FACE)
+G01 X22.0 Z-27.0 (FEED OUT FROM THE OD BEHIND THE FINISHED PART)
+G01 G40 X26.0 (CANCEL COMPENSATION ON THE OUTWARD DEPARTURE)
+G97 S600 (CANCEL CSS AND REQUEST FIXED 600 RPM)
+G00 X60.0 (RETRACT RADIALLY TO THE ASSUMED CLEARANCE X)
+G00 Z10.0 (RETURN AXIALLY TO THE VERIFIED TOOL-CHANGE LOCATION)
+M09 (COOLANT OFF)
+M05 (STOP THE SPINDLE BEFORE THE TOOL CHANGE)
+T0202 (SELECT CUTOFF TOOL 2 AND ITS EDGE-REFERENCED OFFSET 2)
+G97 S500 M03 (START AT FIXED 500 RPM FOR THIS CUTOFF EXAMPLE)
+G00 X26.0 (POSITION OUTSIDE THE STOCK WITH THE NEW TOOL)
+G00 Z-25.0 (LOCATE THE POSITIVE-Z BLADE EDGE AT THE REAR FACE)
+M08 (COOLANT ON)
+G01 X-0.2 F0.05 (PART OFF WITH THE ASSUMED 0.1 MM RADIAL OVERTRAVEL)
+G00 X60.0 (WITHDRAW RADIALLY FROM THE CUTOFF SLOT)
+G00 Z10.0 (RETURN TO THE ASSUMED CLEARANCE Z)
+M09 (COOLANT OFF)
+M05 (SPINDLE STOP)
+M30 (END AND RESET THE PROGRAM; NO RETURN MOVE IS IMPLIED)</code></pre>
+  <p>File-start/end percent delimiters, tool-call behavior and supported startup codes must be supplied or adapted as required by the target control. No bar-feeder or parts-catcher sequence is implied.</p>
+</section>
+
+<section>
+  <h2>Trace the modal state and finished dimensions on paper</h2>
+  <ul class="boxes">
+    <li>Mark where S means RPM and where it means metres per minute; locate the preceding RPM clamp.</li>
+    <li>Confirm that every F value is interpreted in mm/rev under G99.</li>
+    <li>Calculate the radial depth of each OD pass and the two chamfer endpoints.</li>
+    <li>Locate the nose-compensation entry and departure, and identify the selected offset register.</li>
+    <li>Check that the cutoff blade's positive-Z edge leaves the intended 25 mm length.</li>
+  </ul>
+  <p>The syntax conventions can be compared with the <a href="https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---programming.html">Haas lathe programming reference</a>. This original example is not copied from a manufacturer program. A paper trace establishes intended geometry and modal state; actual prove-out still follows [[cnc-program-proving]].</p>
+  <p><a class="button" data-practice-add="turning-error-feed" href="../practice.html#turning-error-feed">Spot a feed-mode error</a></p>
+</section>

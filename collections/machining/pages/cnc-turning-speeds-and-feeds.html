@@ -1,0 +1,38 @@
+@@ID: cnc-turning-speeds-and-feeds
+@@TITLE: CNC Turning Spindle and Feed Modes
+@@SECTION: CNC
+@@SUMMARY: Calculate constant-surface-speed RPM, apply an RPM ceiling, and distinguish feed per revolution from feed per minute.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>G96 changes RPM with diameter; G97 holds a requested RPM</h2>
+  <p>In the Fanuc-style lathe convention used here, <strong>G96</strong> selects constant surface speed (CSS). S gives cutting speed: surface feet per minute with inch units, or metres per minute with metric units. <strong>G97</strong> cancels CSS and makes S an RPM value. Confirm the actual control's units and code meanings.</p>
+  <p>Use the <strong>work diameter at the cutting point</strong>, not the insert size. From [[feeds-and-speeds]]:</p>
+  <ul>
+    <li>Inch: RPM = SFM × 12 / (π × diameter in inches).</li>
+    <li>Metric: RPM = cutting speed in m/min × 1000 / (π × diameter in mm).</li>
+  </ul>
+  <p>At 180 SFM on a 1.5 in diameter, RPM = 180 × 12 / (π × 1.5) = <strong>458 RPM</strong>, rounded to a whole RPM. At 90 m/min on a 30 mm diameter, the result is <strong>955 RPM</strong>. These are arithmetic examples, not recommended cutting data.</p>
+  <p><a class="button" data-practice-add="turning-css-inch-a" href="../practice.html#turning-css-inch-a">Practice CSS calculations</a></p>
+</section>
+
+<section>
+  <h2>Set the maximum RPM before enabling constant surface speed</h2>
+  <p>Establish an appropriate spindle-speed ceiling for the actual setup <strong>before G96</strong>. On the Fanuc-style lathe convention here, <code>G50 S1800</code> limits requested speed to 1800 RPM. The number is only an illustration; determine the permissible limit from the machine, workholding, tooling and setup documentation. Other controls use different commands or parameters.</p>
+  <pre><code>G50 S1800 (ILLUSTRATIVE RPM CEILING)
+G96 S90   (METRIC CSS: 90 METRES PER MINUTE)
+G97 S600  (LEAVE CSS: REQUEST 600 RPM)</code></pre>
+  <p>As diameter approaches zero during facing, CSS requests increasing RPM. Once the clamp is reached, RPM stays limited and surface speed falls. At the centre, a nonzero surface speed cannot be maintained at any finite RPM. Use [[cnc-program-proving]] and the <a href="../safety/index.html">Safety collection</a> for the required operating checks.</p>
+  <details class="deeper"><summary>Calculate where a speed ceiling starts to matter</summary><p>With 90 m/min and a ceiling of 1800 RPM, the crossover diameter is 90 × 1000 / (π × 1800) = 15.92 mm. At 10 mm, unrestricted CSS would request 2865 RPM, so the simplified steady-state result is 1800 RPM. Acceleration and other machine limits can reduce actual speed further. See <a href="https://www.haascnc.com/content/dam/haascnc/en/service/reference/programming-workbooks/lathe---programming-workbook.pdf">Haas's spindle-speed commands workbook</a> for its G50/G96/G97 implementation.</p></details>
+  <p><a class="button" data-practice-add="turning-clamp-reason" href="../practice.html#turning-clamp-reason">Explain the RPM clamp</a></p>
+</section>
+
+<section>
+  <h2>Read the feed mode before interpreting F</h2>
+  <p>In this common Fanuc-style lathe convention, <strong>G99 means feed per spindle revolution</strong> and <strong>G98 means feed per minute</strong>. With inch units, G99 F0.006 means 0.006 in/rev; G98 F0.006 means 0.006 in/min. With metric units, the corresponding lengths are millimetres. Codes vary: the milling return-level meanings of G98/G99 do not apply here.</p>
+  <p><strong>Feed per minute = feed per revolution × RPM.</strong> At 800 RPM, 0.006 in/rev gives 4.8 in/min. If CSS increases RPM while G99 holds F constant, the feed per minute increases too. If G98 holds feed per minute constant, feed per revolution changes with RPM.</p>
+  <p>Set the intended feed mode explicitly. See [[cnc-program-structure]] for modal behavior and [[cnc-turning-program]] for a commented turning example.</p>
+  <details class="deeper"><summary>Reference for the code convention used here</summary><p>The G96–G99 entries in the <a href="https://www.haascnc.com/content/dam/haascnc/en/service/manual/operator/english---lathe-ngc---operator%27s-manual---2024.pdf">Haas lathe manual</a> describe S in CSS versus RPM and F per minute versus per revolution. Consult the manual for your own control before transferring these meanings.</p></details>
+  <p><a class="button" data-practice-add="turning-feed-inch" href="../practice.html#turning-feed-inch">Practice feed conversion</a></p>
+</section>
