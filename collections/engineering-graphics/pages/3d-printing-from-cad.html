@@ -1,0 +1,58 @@
+@@ID: 3d-printing-from-cad
+@@TITLE: 3D Printing from CAD
+@@SECTION: Digital Fabrication
+@@SUMMARY: Export a solid model, choose how its layers carry load, and inspect the sliced toolpaths before printing.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Build the part by adding layers</h2>
+  <p class="lede">Additive manufacturing makes a shape by adding material. In fused deposition modeling (FDM), a printer feeds thermoplastic through a heated nozzle and deposits it along paths, much like a controlled hot-glue gun.</p>
+  <p>A slicer divides the model into horizontal cross sections and plans the paths for each layer. The nozzle and build surface move relative to one another to build the next layer. A CAD model describes the desired shape; the sliced file describes how a particular printer will make it.</p>
+  <p>This page focuses on filament printing. Resin printing uses a different process and requires its own preparation, handling, and finishing procedures.</p>
+</section>
+
+<section>
+  <h2>Export the model, then check its size in the slicer</h2>
+  <ul class="boxes">
+    <li>Finish and save the editable CAD model. Check that the intended part is a closed solid; see [[feature-based-modeling]].</li>
+    <li>Export the intended body as STL or 3MF if supported by both programs. Inspect curved surfaces for coarse facets.</li>
+    <li>Import into the slicer and compare a known dimension with the CAD model. Check units, scale, and the number of bodies.</li>
+    <li>Select the actual printer, nozzle, and approved material profile. Do not assume settings imported with a file match the available machine.</li>
+    <li>Orient the part, set walls, infill, layer height, and supports, then slice and inspect the layer preview.</li>
+    <li>Export the printer's required job format using the posted procedure. Save the slicer project so you can revise the setup.</li>
+  </ul>
+  <details class="deeper"><summary>STL and 3MF carry different information</summary>
+    <p>STL represents the surface with triangles and does not record a unit of length. A 3MF file can carry units and multiple objects; a slicer's 3MF project can also carry settings. Support for those extra settings varies between applications. Neither filename alone proves a job is ready for your printer. Prusa documents <a href="https://help.prusa3d.com/article/saving-projects-as-3mf_1773">saving projects as 3MF</a> and its <a href="https://help.prusa3d.com/article/supported-file-formats_1772">supported file formats</a>.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Use walls for the shell, infill for the interior, and supports where needed</h2>
+  <p>Walls, also called perimeters, trace the outside and hole boundaries. Infill fills some of the interior. Solid top and bottom layers close the part. Increasing infill is not a substitute for choosing suitable walls and orientation.</p>
+  <p>Layer height sets the thickness of each deposited layer. Smaller layers can reduce the steps on sloped surfaces but usually add print time. They do not by themselves make a thin wall or tiny hole printable: nozzle size and extrusion width matter too.</p>
+  <p>Supports are temporary material beneath regions that cannot print reliably in the chosen orientation. They use material and time, may leave rough contact surfaces, and must be reachable for removal. A short bridge between two supported edges differs from an unsupported overhang; check the machine's demonstrated capability instead of assuming one universal angle limit.</p>
+  <p>[[img:engineering-graphics/fabrication/layers-and-supports.svg|A side view shows stacked layers and temporary supports under an overhang. A top slice shows perimeter walls surrounding sparse infill.]]</p>
+  <details class="deeper"><summary>Why more infill does not solve every strength problem</summary>
+    <p>Material near the outside can be especially useful when resisting bending. Infill also supports top surfaces and can help resist compression. The useful balance depends on the load and shape. Prusa's <a href="https://help.prusa3d.com/article/infill_42">infill guidance</a> discusses these different roles.</p>
+  </details>
+</section>
+
+<section>
+  <h2>Orient for load direction, surface quality, and support removal</h2>
+  <p>Ask which way the part will be pulled or bent. Filament prints are often weaker when a load pulls adjacent layers apart. For a straight bar pulled along its length, laying its length in the build plane is usually a better starting point than printing it upright. Test a representative part before relying on it under load.</p>
+  <p>Then consider the important faces. A face against the bed takes the bed's texture; a supported underside may need cleanup; a slope shows layer steps. Rotating the part can improve one surface while making another worse. A broad, stable bed contact usually makes the start easier than a narrow footprint.</p>
+  <p><a class="button" data-practice-add="fabrication-orientation" href="../practice.html#fabrication-orientation">Practice choosing an orientation</a></p>
+</section>
+
+<section>
+  <h2>Use the preview and the failed part to find the next check</h2>
+  <dl class="dims">
+    <div><dt>Missing thin feature</dt><dd>Inspect the sliced paths. A feature visible in CAD may be too thin for the selected extrusion width; revise the feature or an approved setup.</dd></div>
+    <div><dt>Loose first layer or lifted corners</dt><dd>Check bed preparation, first-layer setup, and the material profile against the machine procedure. Warping involves shrinkage as the part cools.</dd></div>
+    <div><dt>Sagging underside</dt><dd>Check the orientation, unsupported spans, and support placement before repeating the same job.</dd></div>
+    <div><dt>Gaps, strings, or shifted layers</dt><dd>Check material condition, extrusion, temperature/profile, and machine motion as appropriate. These symptoms have several possible causes; change one justified factor at a time and record the result.</dd></div>
+  </dl>
+  <p>In the preview, inspect the first layer, small holes, supports, and the final top layers. Estimate time and material before starting. Follow [[equipment-operating-procedure]] and [[machine-hazards]] for operation and handling; the nozzle and build surface may remain hot after motion stops.</p>
+  <p>For parts that must fit together, continue to [[choosing-a-fabrication-process]] and [[tolerances-and-fits]].</p>
+</section>
