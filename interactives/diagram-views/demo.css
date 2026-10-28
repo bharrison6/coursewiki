@@ -1,0 +1,28 @@
+[data-interactive="diagram-views"] svg { display: block; width: 100%; height: auto; max-width: 46rem; margin: auto; }
+[data-interactive="diagram-views"] figure { margin: 1rem 0; break-inside: avoid; }
+[data-interactive="diagram-views"] .dv-views,
+[data-interactive="diagram-views"] .dv-parts { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
+[data-interactive="diagram-views"] button { font: inherit; padding: .5rem .75rem; color: inherit; background: transparent; border: 1px solid currentColor; border-radius: .25rem; cursor: pointer; }
+[data-interactive="diagram-views"] button[aria-pressed="true"] { outline: 3px solid currentColor; outline-offset: 2px; font-weight: bold; }
+[data-interactive="diagram-views"] button:focus-visible { outline: 3px dashed currentColor; outline-offset: 3px; }
+[data-interactive="diagram-views"] [data-component] { cursor: pointer; }
+[data-interactive="diagram-views"] .dv-status { min-height: 3em; }
+@media print {
+  [data-interactive="diagram-views"] .dv-controls { display: none !important; }
+  [data-interactive="diagram-views"] figure[hidden] { display: block !important; }
+  [data-interactive="diagram-views"] .dv-highlight { visibility: hidden !important; }
+}
+
+[data-interactive="diagram-views"] .dv-drawings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; }
+[data-interactive="diagram-views"] .dv-drawings > figure[hidden] { display: none; }
+@media print {
+  [data-interactive="diagram-views"] .dv-drawings { display: block; }
+  [data-interactive="diagram-views"] .dv-drawings > figure[hidden] { display: block !important; }
+}
+
+@media print {
+  /* The block view is tall (320x490); at full width it outgrows a Letter page and splits. Cap every drawing's printed height so heading, drawing and caption fit on one page. */
+  [data-interactive="diagram-views"] svg { width: auto; max-width: 100%; max-height: 6in; }
+  [data-interactive="diagram-views"] figure { break-inside: avoid; page-break-inside: avoid; }
+  [data-interactive="diagram-views"] figure h3 { break-after: avoid; page-break-after: avoid; }
+}
