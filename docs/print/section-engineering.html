@@ -3230,6 +3230,31 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="series-parallel-circuits"] svg { max-height: 75mm; }
 }
 
+[data-interactive="wire-voltage-drop"] { min-width: 0; font-size: 16px; overflow-wrap: anywhere; }
+[data-interactive="wire-voltage-drop"] * { box-sizing: border-box; }
+[data-interactive="wire-voltage-drop"] .wvd-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; }
+[data-interactive="wire-voltage-drop"] label { display: grid; gap: .3rem; font-size: 16px; }
+[data-interactive="wire-voltage-drop"] :is(input, select, button) { min-width: 0; max-width: 100%; min-height: 44px; font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: .4rem; }
+[data-interactive="wire-voltage-drop"] :is(input, select, button):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+[data-interactive="wire-voltage-drop"] .wvd-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: .75rem; }
+[data-interactive="wire-voltage-drop"] .wvd-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+[data-interactive="wire-voltage-drop"] svg { display: block; width: 100%; max-width: 30rem; height: auto; margin: auto; color: var(--accent); }
+[data-interactive="wire-voltage-drop"] svg text { fill: var(--ink); font: 16px sans-serif; }
+[data-interactive="wire-voltage-drop"] :is(p, figcaption, caption, th, td) { font-size: 16px; }
+[data-interactive="wire-voltage-drop"] figure { margin: .75rem 0; }
+[data-interactive="wire-voltage-drop"] table { width: 100%; table-layout: fixed; }
+[data-interactive="wire-voltage-drop"] th { width: 70%; text-align: left; }
+[data-interactive="wire-voltage-drop"] :is(th, td) { padding: .35rem; white-space: normal; }
+[data-interactive="wire-voltage-drop"] .wvd-warning { border-left: 3px solid var(--accent); padding: .5rem; }
+@media (max-width: 48rem) { [data-interactive="wire-voltage-drop"] .wvd-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 28rem) { [data-interactive="wire-voltage-drop"] svg text { font-size: 18px; } }
+@media screen { [data-interactive="wire-voltage-drop"][data-wvd-ready] > .wvd-static { display: none; } }
+@media print {
+  [data-interactive="wire-voltage-drop"] .wvd-lab { display: none !important; }
+  [data-interactive="wire-voltage-drop"] > .wvd-static { display: block !important; }
+  [data-interactive="wire-voltage-drop"] :is(table, figure, svg) { break-inside: avoid; }
+}
+
 </style>
 </head>
 <body class="app skin-app aggregate" data-page="agg-section-engineering" data-base="">
@@ -6728,6 +6753,30 @@ void loop() {
   <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; Why a long wire can matter even below its current limit.</p>
     </div>
   </details>
+  <details class="xcard deck-slide" id="wire-and-wire-gauge--count-the-return-wire-explore-voltage-drop-and-heating" data-card="wire-and-wire-gauge--count-the-return-wire-explore-voltage-drop-and-heating">
+    <summary>Count the return wire: explore voltage drop and heating<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Count the return wire: explore voltage drop and heating</h2>
+  <p>A two-conductor circuit carries current out and back. Use <strong>twice the one-way run</strong> for its wire resistance. At the same current, longer or thinner wire drops more voltage and wastes more power as heat. Voltage drop is a separate check from ampacity: get the current rating from the applicable code table or manufacturer for the insulation and installation.</p>
+  <div data-interactive="wire-voltage-drop">
+    <div class="wvd-static">
+      <!-- WIRE-VOLTAGE-DROP-STATIC -->
+      <svg viewBox="0 0 300 160" role="img" aria-label="Current travels from source to load and returns on a second conductor. Both conductors contribute resistance."><path d="M45 90V35H255V90M255 110V135H45V110" fill="none" stroke="currentColor" stroke-width="3"/><path d="M140 30l10 5-10 5M160 130l-10 5 10 5" fill="none" stroke="currentColor" stroke-width="2"/><text x="150" y="23" text-anchor="middle">Out: 50 ft</text><text x="150" y="157" text-anchor="middle">Return: 50 ft</text><text x="8" y="106">Source</text><text x="228" y="106">Load</text><text x="150" y="75" text-anchor="middle">Loop = 30.48 m</text><text x="150" y="100" text-anchor="middle">AWG 18 · 5 A</text></svg><table><caption>AWG 18, 50 ft one way, 5 A, 24 V source</caption><tbody><tr><th scope="row">Single wire: Ω / 1000 ft</th><td>6.385</td></tr><tr><th scope="row">Single wire: Ω / km</th><td>20.95</td></tr><tr><th scope="row">Loop resistance (Ω)</th><td>0.6385</td></tr><tr><th scope="row">Voltage drop (V)</th><td>3.192</td></tr><tr><th scope="row">Source voltage lost (%)</th><td>13.3</td></tr><tr><th scope="row">Load voltage (V)</th><td>20.81</td></tr><tr><th scope="row">Wire heating loss (W)</th><td>15.96</td></tr></tbody></table><p>Worked example: 50 ft out + 50 ft back = 30.48 m of copper. R = ρL/A = 0.6385 Ω. At 5 A, IR = 3.192 V and I²R = 15.96 W.</p><figure><figcaption>Voltage drop: baseline 3.192 V; now 6.385 V</figcaption><svg viewBox="0 0 300 50" role="img" aria-label="Voltage drop, baseline 3.192, now 6.385 V"><rect x="0" y="3" width="145" height="16" fill="none" stroke="currentColor"/><rect x="0" y="28" width="290" height="16" fill="currentColor"/></svg></figure><figure><figcaption>Wire heating loss: baseline 15.96 W; now 63.85 W</figcaption><svg viewBox="0 0 300 50" role="img" aria-label="Wire heating loss, baseline 15.96, now 63.85 W"><rect x="0" y="3" width="72.5" height="16" fill="none" stroke="currentColor"/><rect x="0" y="28" width="290" height="16" fill="currentColor"/></svg></figure><p>Outline = baseline; filled = now. Each pair shares its own scale; compare within a pair. Loss is heating power, not wire temperature.</p><p>Doubling only current doubles the drop and quadruples heating loss. Doubling only length doubles both; a smaller AWG number lowers both at the same current.</p>
+      <!-- /WIRE-VOLTAGE-DROP-STATIC -->
+    </div>
+    <noscript><p>The worked table and comparison above work without JavaScript. Enable JavaScript to vary the inputs.</p></noscript>
+  </div>
+  <p>This model assumes solid copper at 20 °C, equal outgoing and return wires, and DC/resistive behavior. Current is an input, not a prediction of how a particular load responds. Heating loss is not a temperature prediction; copper resistance rises with temperature (approx. 0.393%/°C near 20 °C). Connections and AC reactance are omitted.</p>
+  <p class="deeper-ref" id="deeper-ref-78">Supporting detail: <a href="#deeper-addendum-78"><strong>Addendum 78</strong></a> &mdash; Definitions used to calculate every result.</p>
+  <p>Practice:
+    <a data-practice-add="wire-loop-resistance" href="../practice.html#wire-loop-resistance">Loop resistance</a> ·
+    <a data-practice-add="wire-run-drop" href="../practice.html#wire-run-drop">Voltage drop</a> ·
+    <a data-practice-add="wire-percent-drop" href="../practice.html#wire-percent-drop">Percent drop</a> ·
+    <a data-practice-add="wire-load-voltage" href="../practice.html#wire-load-voltage">Load voltage</a> ·
+    <a data-practice-add="wire-smallest-gauge" href="../practice.html#wire-smallest-gauge">Choose a gauge</a>.
+  </p>
+    </div>
+  </details>
 </div>
 
 </article>
@@ -7526,6 +7575,15 @@ void loop() {
         <h2><span class="deeper-addendum-number">Addendum 77.</span> Why a long wire can matter even below its current limit</h2>
         <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> shows the calculation.</p>
         <p class="deeper-back"><a href="#deeper-ref-77">Back to reference 77</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-78" value="78">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 78.</span> Definitions used to calculate every result</h2>
+        <p>For AWG number n, diameter d = 0.127 × 92<sup>(36 − n)/39</sup> mm. Convert d to meters, then A = πd²/4 in m². Using annealed-copper resistivity ρ = 1.724 × 10<sup>−8</sup> Ω·m at 20 °C, R = ρL/A. One foot is exactly 0.3048 m.</p>
+    <p>With one-way run ℓ, L = 2ℓ and R<sub>loop</sub> = ρ(2ℓ)/A. V<sub>drop</sub> = IR<sub>loop</sub>; percent drop = 100V<sub>drop</sub>/V<sub>source</sub>; V<sub>load</sub> = V<sub>source</sub> − V<sub>drop</sub>; wire loss P = I²R<sub>loop</sub>. A two-wire single-phase resistive approximation uses the same return path, but this model does not include AC effects.</p>
+        <p class="deeper-back"><a href="#deeper-ref-78">Back to reference 78</a></p>
       </article>
     </li>
   </ol>
@@ -10328,6 +10386,145 @@ void loop() {
     update();
   });
 })();
+
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiWireDrop = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  const RHO = 1.724e-8, FT = 0.3048;
+  const DEFAULT = Object.freeze({ voltage: 24, current: 5, length: 50, unit: 'ft', awg: 18 });
+  function diameter(awg) {
+    if (!Number.isInteger(awg) || awg < 4 || awg > 30) throw new RangeError('Use an integer AWG from 4 to 30.');
+    return 0.127 * Math.pow(92, (36 - awg) / 39); // mm
+  }
+  function solve(s) {
+    if (!s || !['voltage', 'current', 'length'].every(k => Number.isFinite(s[k]))) throw new RangeError('Enter finite numbers.');
+    if (s.voltage < 5 || s.voltage > 240 || s.current < 0.1 || s.current > 30 || s.length < 0 || s.length > 1000) throw new RangeError('Use 5–240 V, 0.1–30 A and a one-way length from 0 to 1000.');
+    if (s.unit !== 'ft' && s.unit !== 'm') throw new RangeError('Choose ft or m.');
+    const diameterMm = diameter(s.awg), areaM2 = Math.PI * (diameterMm / 1000) ** 2 / 4;
+    const oneWayM = s.length * (s.unit === 'ft' ? FT : 1), loopM = 2 * oneWayM;
+    const ohmsPerM = RHO / areaM2, loopResistance = ohmsPerM * loopM;
+    const drop = s.current * loopResistance, percent = drop / s.voltage * 100;
+    return { diameterMm, areaM2, oneWayM, loopM, ohmsPer1000Ft: ohmsPerM * 1000 * FT,
+      ohmsPerKm: ohmsPerM * 1000, loopResistance, drop, percent,
+      loadVoltage: s.voltage - drop, loss: s.current ** 2 * loopResistance,
+      feasible: drop < s.voltage };
+  }
+  function format(n) { return Number(n.toPrecision(4)).toString(); }
+  return { RHO, FT, DEFAULT, diameter, solve, format };
+});
+
+(function (root, factory) {
+  'use strict';
+  const node = typeof module === 'object' && module.exports;
+  const api = factory(node ? require('./model.js') : root.CourseWikiWireDrop);
+  if (node) module.exports = api; else root.CourseWikiWireDropDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  const f = M.format;
+  function diagram(s) {
+    const r = M.solve(s);
+    return '<svg viewBox="0 0 300 160" role="img" aria-label="Current travels from source to load and returns on a second conductor. Both conductors contribute resistance.">' +
+      '<path d="M45 90V35H255V90M255 110V135H45V110" fill="none" stroke="currentColor" stroke-width="3"/>' +
+      '<path d="M140 30l10 5-10 5M160 130l-10 5 10 5" fill="none" stroke="currentColor" stroke-width="2"/>' +
+      '<text x="150" y="23" text-anchor="middle">Out: ' + f(s.length) + ' ' + s.unit + '</text>' +
+      '<text x="150" y="157" text-anchor="middle">Return: ' + f(s.length) + ' ' + s.unit + '</text>' +
+      '<text x="8" y="106">Source</text><text x="228" y="106">Load</text>' +
+      '<text x="150" y="75" text-anchor="middle">Loop = ' + f(r.loopM) + ' m</text>' +
+      '<text x="150" y="100" text-anchor="middle">AWG ' + s.awg + ' · ' + f(s.current) + ' A</text></svg>';
+  }
+  function results(s) {
+    const r = M.solve(s);
+    const rows = [['Single wire: Ω / 1000 ft', r.ohmsPer1000Ft], ['Single wire: Ω / km', r.ohmsPerKm],
+      ['Loop resistance (Ω)', r.loopResistance], ['Voltage drop (V)', r.drop], ['Source voltage lost (%)', r.percent],
+      ['Load voltage (V)', r.loadVoltage], ['Wire heating loss (W)', r.loss]];
+    return '<table><caption>AWG ' + s.awg + ', ' + f(s.length) + ' ' + s.unit + ' one way, ' + f(s.current) + ' A, ' + f(s.voltage) + ' V source</caption><tbody>' +
+      rows.map(row => '<tr><th scope="row">' + row[0] + '</th><td>' + f(row[1]) + '</td></tr>').join('') + '</tbody></table>' +
+      (!r.feasible ? '<p class="wvd-warning">The requested current leaves no positive load voltage. This is not a possible operating point for a passive resistive load on this source; reduce current or wire resistance. Negative load voltage is an algebraic result, not a predicted passive-load voltage.</p>' : '');
+  }
+  function comparison(s, baseline) {
+    const a = M.solve(s), b = M.solve(baseline);
+    return [['Voltage drop', a.drop, b.drop, 'V'], ['Wire heating loss', a.loss, b.loss, 'W']].map(row => {
+      const max = Math.max(row[1], row[2], 1e-12);
+      return '<figure><figcaption>' + row[0] + ': baseline ' + f(row[2]) + ' ' + row[3] + '; now ' + f(row[1]) + ' ' + row[3] + '</figcaption>' +
+        '<svg viewBox="0 0 300 50" role="img" aria-label="' + row[0] + ', baseline ' + f(row[2]) + ', now ' + f(row[1]) + ' ' + row[3] + '">' +
+        '<rect x="0" y="3" width="' + (290 * row[2] / max) + '" height="16" fill="none" stroke="currentColor"/>' +
+        '<rect x="0" y="28" width="' + (290 * row[1] / max) + '" height="16" fill="currentColor"/></svg></figure>';
+    }).join('') + '<p>Outline = baseline; filled = now. Each pair shares its own scale; compare within a pair. Loss is heating power, not wire temperature.</p>';
+  }
+  function staticLesson() {
+    const s = M.DEFAULT, r = M.solve(s);
+    return diagram(s) + results(s) + '<p>Worked example: 50 ft out + 50 ft back = 30.48 m of copper. R = ρL/A = ' + f(r.loopResistance) + ' Ω. At 5 A, IR = ' + f(r.drop) + ' V and I²R = ' + f(r.loss) + ' W.</p>' +
+      comparison(Object.assign({}, s, { current: 10 }), s) + '<p>Doubling only current doubles the drop and quadruples heating loss. Doubling only length doubles both; a smaller AWG number lowers both at the same current.</p>';
+  }
+  return { diagram, results, comparison, staticLesson };
+});
+
+(function (root, factory) {
+  'use strict';
+  const node = typeof module === 'object' && module.exports;
+  const api = factory(node ? require('./model.js') : root.CourseWikiWireDrop, node ? require('./render.js') : root.CourseWikiWireDropDraw);
+  if (node) module.exports = api;
+  else document.querySelectorAll('[data-interactive="wire-voltage-drop"]').forEach(api.init);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M, D) {
+  'use strict';
+  let sequence = 0;
+  function init(root) {
+    if (root.dataset.wvdReady || !M || !D) return;
+    let id;
+    do { id = 'wvd-' + (++sequence); } while (document.getElementById(id + '-voltage'));
+    const lab = document.createElement('div');
+    lab.className = 'wvd-lab';
+    let state = Object.assign({}, M.DEFAULT), baseline = Object.assign({}, state);
+    lab.innerHTML = '<p>Predict first: what happens to heating when current doubles? Save a baseline, then change one input.</p><div class="wvd-controls">' +
+      [['voltage', 'Source voltage (V)', 5, 240], ['current', 'Load current (A)', 0.1, 30], ['length', 'One-way run length', 0, 1000], ['awg', 'Wire gauge (AWG)', 4, 30]].map(c =>
+        '<label for="' + id + '-' + c[0] + '">' + c[1] + '<input id="' + id + '-' + c[0] + '" data-key="' + c[0] + '" type="number" min="' + c[2] + '" max="' + c[3] + '" step="' + (c[0] === 'awg' ? '1' : 'any') + '" value="' + state[c[0]] + '"></label>').join('') +
+      '<label for="' + id + '-unit">Length unit<select id="' + id + '-unit"><option value="ft">Feet (ft)</option><option value="m">Meters (m)</option></select></label></div>' +
+      '<div class="wvd-actions"><button type="button" data-pin>Save baseline</button><button type="button" data-reset>Reset</button></div><p data-status role="status"></p><p data-baseline></p>' +
+      '<div class="wvd-grid"><div data-figure></div><div data-results></div></div><div data-comparison></div>';
+    root.prepend(lab);
+    const q = selector => lab.querySelector(selector), inputs = [...lab.querySelectorAll('input')];
+    function update() {
+      try {
+        if (inputs.some(e => e.value.trim() === '' || !e.checkValidity())) throw new RangeError('Enter values within the labeled ranges: 5–240 V, 0.1–30 A, length 0–1000, integer AWG 4–30.');
+        inputs.forEach(e => { state[e.dataset.key] = Number(e.value); });
+        M.solve(state);
+        q('[data-figure]').innerHTML = D.diagram(state);
+        q('[data-results]').innerHTML = D.results(state);
+        q('[data-comparison]').innerHTML = D.comparison(state, baseline);
+        q('[data-baseline]').textContent = 'Baseline: ' + baseline.voltage + ' V, ' + baseline.current + ' A, ' + M.format(baseline.length) + ' ' + baseline.unit + ' one way, AWG ' + baseline.awg + '.';
+        q('[data-status]').textContent = 'Results updated. Smaller AWG numbers mean thicker wire.';
+        q('[data-pin]').disabled = false;
+        return true;
+      } catch (error) {
+        q('[data-status]').textContent = error.message;
+        ['[data-figure]', '[data-results]', '[data-comparison]'].forEach(s => q(s).replaceChildren());
+        q('[data-pin]').disabled = true;
+        return false;
+      }
+    }
+    inputs.forEach(e => e.addEventListener('input', update));
+    lab.addEventListener('keydown', e => { if (e.target.matches('input, select, button')) e.stopPropagation(); });
+    q('select').addEventListener('change', e => {
+      const length = q('[data-key="length"]');
+      if (length.value.trim() && length.checkValidity()) {
+        const meters = Number(length.value) * (state.unit === 'ft' ? M.FT : 1);
+        length.value = meters / (e.target.value === 'ft' ? M.FT : 1);
+      }
+      state.unit = e.target.value; update();
+    });
+    q('[data-pin]').addEventListener('click', () => { if (update()) { baseline = Object.assign({}, state); update(); q('[data-status]').textContent = 'Baseline saved. Change one input to compare.'; } });
+    q('[data-reset]').addEventListener('click', () => {
+      state = Object.assign({}, M.DEFAULT); baseline = Object.assign({}, state);
+      inputs.forEach(e => { e.value = state[e.dataset.key]; }); q('select').value = state.unit; update();
+    });
+    update(); root.dataset.wvdReady = 'true';
+  }
+  return { init };
+});
 
 </script>
 </body>
