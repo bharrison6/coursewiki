@@ -1,0 +1,31 @@
+/* Topic-scoped controls and shared live/static figures; no motion. */
+[data-interactive="coolant-mix"] { min-width: 0; margin-block: 1rem; }
+.cm-lab { font: .94rem/1.45 var(--f-display); }
+.cm-live > .cm-static { display: none; }
+.cm-pair, .cm-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.cm-pair > *, .cm-fields > * { min-width: 0; margin: 0; }
+.cm-pair { margin-block: 1rem; }
+.cm-fields label { display: grid; gap: .3rem; align-content: start; }
+.cm-lab input[type="number"], .cm-lab select { width: 100%; box-sizing: border-box; min-width: 0; }
+.cm-lab :is(input, select, button) { font: inherit; accent-color: var(--accent); }
+.cm-lab :is(input[type="number"], select, button) { color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); min-height: 44px; padding: .4rem; }
+.cm-lab :is(input, select, button):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.cm-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.cm-actions [aria-pressed="true"] { border: 2px solid var(--accent); font-weight: bold; }
+.cm-lab button { cursor: pointer; }
+.cm-lab button:disabled { opacity: .55; cursor: default; }
+.cm-predict { min-width: 0; margin: 1rem 0; border: 1px solid var(--rule); padding: .6rem; }
+.cm-predict label { display: inline-flex; gap: .3rem; align-items: center; min-height: 44px; margin-right: .8rem; }
+.cm-sump { display: block; width: 100%; max-width: 360px; height: auto; background: var(--paper); }
+.cm-sump text { fill: var(--ink); font: 18px var(--f-display); }
+.cm-tank { fill: var(--surface); }
+.cm-liquid { fill: var(--accent); }
+.cm-outline { stroke: var(--ink); stroke-width: 2; fill: none; }
+@media (max-width: 55rem) { .cm-pair, .cm-fields { grid-template-columns: 1fr; } }
+@media (max-width: 28rem) { .xcard:has([data-interactive="coolant-mix"]) .body { padding-inline: .5rem; } }
+@media (prefers-reduced-motion: reduce) { [data-interactive="coolant-mix"] * { animation: none !important; transition: none !important; } }
+@media print {
+  .cm-lab { display: none !important; }
+  .cm-live > .cm-static { display: block !important; }
+  .cm-sump { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

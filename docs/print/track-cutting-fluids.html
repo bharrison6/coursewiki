@@ -2941,6 +2941,38 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
   .deeper-back { display: none; }
 }
+/* Topic-scoped controls and shared live/static figures; no motion. */
+[data-interactive="coolant-mix"] { min-width: 0; margin-block: 1rem; }
+.cm-lab { font: .94rem/1.45 var(--f-display); }
+.cm-live > .cm-static { display: none; }
+.cm-pair, .cm-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.cm-pair > *, .cm-fields > * { min-width: 0; margin: 0; }
+.cm-pair { margin-block: 1rem; }
+.cm-fields label { display: grid; gap: .3rem; align-content: start; }
+.cm-lab input[type="number"], .cm-lab select { width: 100%; box-sizing: border-box; min-width: 0; }
+.cm-lab :is(input, select, button) { font: inherit; accent-color: var(--accent); }
+.cm-lab :is(input[type="number"], select, button) { color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); min-height: 44px; padding: .4rem; }
+.cm-lab :is(input, select, button):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.cm-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.cm-actions [aria-pressed="true"] { border: 2px solid var(--accent); font-weight: bold; }
+.cm-lab button { cursor: pointer; }
+.cm-lab button:disabled { opacity: .55; cursor: default; }
+.cm-predict { min-width: 0; margin: 1rem 0; border: 1px solid var(--rule); padding: .6rem; }
+.cm-predict label { display: inline-flex; gap: .3rem; align-items: center; min-height: 44px; margin-right: .8rem; }
+.cm-sump { display: block; width: 100%; max-width: 360px; height: auto; background: var(--paper); }
+.cm-sump text { fill: var(--ink); font: 18px var(--f-display); }
+.cm-tank { fill: var(--surface); }
+.cm-liquid { fill: var(--accent); }
+.cm-outline { stroke: var(--ink); stroke-width: 2; fill: none; }
+@media (max-width: 55rem) { .cm-pair, .cm-fields { grid-template-columns: 1fr; } }
+@media (max-width: 28rem) { .xcard:has([data-interactive="coolant-mix"]) .body { padding-inline: .5rem; } }
+@media (prefers-reduced-motion: reduce) { [data-interactive="coolant-mix"] * { animation: none !important; transition: none !important; } }
+@media print {
+  .cm-lab { display: none !important; }
+  .cm-live > .cm-static { display: block !important; }
+  .cm-sump { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+
 </style>
 </head>
 <body class="app skin-app aggregate" data-page="agg-track-cutting-fluids" data-base="">
@@ -3072,6 +3104,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Check the balance: the tank contains 1.44 L concentrate, the addition supplies 1.20 L, and 2.64 ÷ 48 × 100 = <strong>5.5%</strong>. These assumed values teach the calculation; the product must permit the proposed makeup mix.</p>
   <p><strong>Stop when the result cannot be made.</strong> A must be positive. A negative P means even plain water cannot achieve the target at that final level; P above 100% asks for more concentrate than the addition can contain. A full tank has no top-up space. Seek an approved partial replacement or other correction instead of overfilling. Even a mathematical result between 0 and 100% may be outside the product's permitted mixing method.</p>
   <p>Mix the approved addition separately, add it, circulate as specified, then measure again. The calculation assumes accurate volumes, uniform mixing and no losses during the adjustment.</p>
+  <div data-interactive="coolant-mix">
+    <div class="cm-static">
+      <!-- COOLANT-MIX-STATIC -->
+      <h3>20:1 is not 5%</h3><div class="cm-pair"><p><strong>20:1 water : concentrate</strong><br>1 ÷ (20 + 1) × 100 = 4.76%</p><p><strong>5.00% concentrate</strong><br>5 parts concentrate in 100 total parts.<br>95:5 = 19:1 water : concentrate.</p></div><h3>Brix needs the product factor</h3><p>6 Brix × an invented teaching factor of 1.0 = 6.00%. Use the actual product data sheet factor.</p><h3>Correct a lean sump: account for the added volume</h3><p>Teaching example: 100 L at 3%, target 5%, capacity 120 L. With x litres of neat concentrate, the balance is 3 × 100 + 100x = 5(100 + x).</p><p>x = 100(5 − 3) ÷ (100 − 5) = <strong>2.1053 L</strong>. Final volume = 102.1053 L, within capacity. Check: (3 + 2.105263…) ÷ 102.105263… × 100 = 5.00%.</p><svg class="cm-sump" viewBox="0 0 280 210" role="img" aria-label="Sump: 102.11 L, 5.00%; capacity 120.00 L" focusable="false"><rect class="cm-tank" x="30" y="20" width="220" height="120"/><rect class="cm-liquid" x="30" y="37.89473684210526" width="220" height="102.10526315789474" fill-opacity="0.16"/><path class="cm-outline" d="M30 20V140H250V20"/><text x="140" y="165" text-anchor="middle">102.11 L · 5.00%</text><text x="140" y="193" text-anchor="middle">Capacity 120.00 L</text></svg><p>This is a concentrate balance, not an instruction to pour neat concentrate into a sump. Use the product-approved makeup method described on this page.</p><h3>Predict what water replaces</h3><p>Start with 100 L at 5%. Losing 20 L of well-mixed coolant leaves 80 L at 5%. Replace it with water: 4 L concentrate ÷ 100 L = 4%. Replace it with 5% premix: (4 + 1) ÷ 100 × 100 = 5%.</p><p>If instead only 20 L of water evaporates, all 5 L of concentrate remains: 5 ÷ 80 × 100 = 6.25%. Replacing that water restores 5%; adding 5% premix raises it to 6%. The loss mechanism matters.</p>
+      <!-- /COOLANT-MIX-STATIC -->
+      <noscript><p>The controls need JavaScript. These worked examples teach the same balances without it.</p></noscript>
+    </div>
+    <p>For coolant condition and contact guidance, see <a class="xref-page" href="#p-coolant-maintenance">Coolant Condition and Tank Maintenance</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/index.html" target="_blank" rel="noopener">Safety collection</a>.</p>
+  </div>
   <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Derive the balance, or solve for an unknown addition volume.</p>
     </div>
   </details>
@@ -4997,6 +5038,183 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
   })();
 })();
+(function (root, factory) {
+  'use strict';
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiCoolantMix = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  function positive(v, name) { if (!Number.isFinite(v) || v <= 0) throw new RangeError(name + ' must be finite and positive'); }
+  function nonnegative(v, name) { if (!Number.isFinite(v) || v < 0) throw new RangeError(name + ' must be finite and nonnegative'); }
+  function percent(v) { nonnegative(v, 'Percent'); if (v >= 100) throw new RangeError('Percent must be below 100'); }
+  function ratioToPercent(water, concentrate) {
+    positive(water, 'Water parts'); nonnegative(concentrate, 'Concentrate parts');
+    var p = 100 / (1 + water / concentrate); percent(p); return p;
+  }
+  function percentToRatio(p) { percent(p); return p === 0 ? { water: 1, concentrate: 0 } : { water: (100 - p) / p, concentrate: 1 }; }
+  function brixToPercent(brix, factor) { nonnegative(brix, 'Brix'); positive(factor, 'Factor'); var p = brix * factor; percent(p); return p; }
+  function result(volume, concentration, capacity) {
+    positive(volume, 'Final volume'); percent(concentration);
+    if (capacity !== undefined) positive(capacity, 'Capacity');
+    return { finalVolume: volume, finalPercent: concentration, exceedsCapacity: capacity !== undefined && volume > capacity };
+  }
+  function correctSump(s) {
+    if (!s) throw new RangeError('Sump inputs required');
+    positive(s.volume, 'Volume'); percent(s.currentPercent); percent(s.targetPercent);
+    var c = s.currentPercent, t = s.targetPercent, addition = 0, substance = 'none';
+    if (c > t && t === 0) throw new RangeError('No finite water addition reaches exactly 0% from a nonzero concentration');
+    if (c < t) { addition = s.volume * ((t - c) / (100 - t)); substance = 'neat concentrate'; }
+    if (c > t) { addition = s.volume * ((c - t) / t); substance = 'water'; }
+    return Object.assign(result(s.volume + addition, t, s.capacity), { addition: addition, substance: substance });
+  }
+  // Volume and concentration are BEFORE the loss. Default loss is well-mixed carry-out.
+  // Pure-water evaporation is an explicit idealisation, not the same loss mechanism.
+  function topUp(s) {
+    if (!s) throw new RangeError('Top-up inputs required');
+    positive(s.volume, 'Volume'); percent(s.currentPercent); percent(s.mixPercent); nonnegative(s.lossVolume, 'Loss volume');
+    if (s.lossVolume >= s.volume) throw new RangeError('Loss must be less than starting volume');
+    var kind = s.lossKind === undefined ? 'carry-out' : s.lossKind;
+    if (kind !== 'carry-out' && kind !== 'evaporation') throw new RangeError('Unknown loss kind');
+    var remaining = s.volume - s.lossVolume;
+    var concentrate = (kind === 'evaporation' ? s.volume : remaining) * s.currentPercent / 100;
+    var afterLossPercent = concentrate / remaining * 100; percent(afterLossPercent);
+    var finalPercent = (concentrate + s.lossVolume * s.mixPercent / 100) / s.volume * 100;
+    return Object.assign(result(s.volume, finalPercent, s.capacity), { afterLossVolume: remaining, afterLossPercent: afterLossPercent });
+  }
+  function convertVolume(v, from, to) {
+    nonnegative(v, 'Volume');
+    if (![from, to].every(function (u) { return u === 'L' || u === 'US gal'; })) throw new RangeError('Unknown volume unit');
+    var value = from === to ? v : from === 'L' ? v / 3.785411784 : v * 3.785411784;
+    nonnegative(value, 'Converted volume'); return value;
+  }
+  function format(v, digits) { return v.toFixed(digits === undefined ? 2 : digits); }
+  return { ratioToPercent: ratioToPercent, percentToRatio: percentToRatio, brixToPercent: brixToPercent,
+    correctSump: correctSump, topUp: topUp, convertVolume: convertVolume, format: format };
+});
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiCoolantMix);
+  if (node) module.exports = api; else root.CourseWikiCoolantMixDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  function esc(v) { return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  function sump(volume, percent, capacity, unit) {
+    var height = 120 * Math.min(1, volume / capacity);
+    return '<svg class="cm-sump" viewBox="0 0 280 210" role="img" aria-label="Sump: ' + esc(M.format(volume) + ' ' + unit + ', ' + M.format(percent) + '%; capacity ' + M.format(capacity) + ' ' + unit) + '" focusable="false">' +
+      '<rect class="cm-tank" x="30" y="20" width="220" height="120"/>' +
+      '<rect class="cm-liquid" x="30" y="' + (140 - height) + '" width="220" height="' + height + '" fill-opacity="' + (.12 + .8 * percent / 100) + '"/>' +
+      '<path class="cm-outline" d="M30 20V140H250V20"/>' +
+      '<text x="140" y="165" text-anchor="middle">' + esc(M.format(volume) + ' ' + unit + ' · ' + M.format(percent) + '%') + '</text>' +
+      '<text x="140" y="193" text-anchor="middle">' + (volume > capacity ? 'Exceeds capacity' : 'Capacity ' + esc(M.format(capacity) + ' ' + unit)) + '</text></svg>';
+  }
+  function ratioExample() {
+    return '<div class="cm-pair"><p><strong>20:1 water : concentrate</strong><br>1 ÷ (20 + 1) × 100 = ' + M.format(M.ratioToPercent(20, 1)) + '%</p>' +
+      '<p><strong>5.00% concentrate</strong><br>5 parts concentrate in 100 total parts.<br>95:5 = 19:1 water : concentrate.</p></div>';
+  }
+  function staticLesson() {
+    var r = M.correctSump({ volume: 100, currentPercent: 3, targetPercent: 5, capacity: 120 });
+    return '<h3>20:1 is not 5%</h3>' + ratioExample() +
+      '<h3>Brix needs the product factor</h3><p>6 Brix × an invented teaching factor of 1.0 = 6.00%. Use the actual product data sheet factor.</p>' +
+      '<h3>Correct a lean sump: account for the added volume</h3><p>Teaching example: 100 L at 3%, target 5%, capacity 120 L. With x litres of neat concentrate, the balance is 3 × 100 + 100x = 5(100 + x).</p>' +
+      '<p>x = 100(5 − 3) ÷ (100 − 5) = <strong>' + M.format(r.addition, 4) + ' L</strong>. Final volume = ' + M.format(r.finalVolume, 4) + ' L, within capacity. Check: (3 + 2.105263…) ÷ 102.105263… × 100 = 5.00%.</p>' +
+      sump(r.finalVolume, r.finalPercent, 120, 'L') +
+      '<p>This is a concentrate balance, not an instruction to pour neat concentrate into a sump. Use the product-approved makeup method described on this page.</p>' +
+      '<h3>Predict what water replaces</h3><p>Start with 100 L at 5%. Losing 20 L of well-mixed coolant leaves 80 L at 5%. Replace it with water: 4 L concentrate ÷ 100 L = 4%. Replace it with 5% premix: (4 + 1) ÷ 100 × 100 = 5%.</p>' +
+      '<p>If instead only 20 L of water evaporates, all 5 L of concentrate remains: 5 ÷ 80 × 100 = 6.25%. Replacing that water restores 5%; adding 5% premix raises it to 6%. The loss mechanism matters.</p>';
+  }
+  return { sump: sump, ratioExample: ratioExample, staticLesson: staticLesson };
+});
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiCoolantMix,
+    node ? require('./render.js') : root.CourseWikiCoolantMixDraw);
+  if (node) module.exports = api;
+  else if (typeof document !== 'undefined') document.querySelectorAll('[data-interactive="coolant-mix"]').forEach(api.init);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M, D) {
+  'use strict';
+  var sequence = 0;
+  function init(root) {
+    if (root.dataset.cmReady || !M || !D) return;
+    var id; do { id = 'cm-' + (++sequence); } while (document.getElementById(id + '-water'));
+    var unit = 'L', step = 0;
+    var lab = document.createElement('div'); lab.className = 'cm-lab';
+    function input(key, label, value) {
+      return '<label for="' + id + '-' + key + '">' + label + '<input id="' + id + '-' + key + '" data-cm-input="' + key + '" type="number" min="0" step="any" value="' + value + '"></label>';
+    }
+    lab.innerHTML = '<p><strong>Explore coolant concentration.</strong> All starting values are invented teaching defaults, not product recommendations. Percent means concentrate by volume; volumes are additive and mixtures uniform.</p>' +
+      '<div class="cm-actions" aria-label="Lesson steps">' + ['1. Ratio ↔ percent', '2. Refractometer', '3. Correct and top up'].map(function (label, i) { return '<button type="button" data-cm-step="' + i + '" aria-controls="' + id + '-step' + i + '">' + label + '</button>'; }).join('') + '</div>' +
+      '<div data-cm-panel="0" id="' + id + '-step0"><h3>Compare parts with the total mixture</h3>' + D.ratioExample() +
+      '<div class="cm-fields">' + input('water', 'Water parts (water : concentrate)', 20) + input('concentrate', 'Concentrate parts (water : concentrate)', 1) + input('percent', 'Percent to convert to water : concentrate', 5) + '</div><p data-cm-ratio role="status"></p></div>' +
+      '<div data-cm-panel="1" id="' + id + '-step1" hidden><h3>Multiply Brix by the product factor</h3><p>The default factor 1.0 is invented for teaching. Get the actual factor from the product data sheet. Brix is a scale reading, not automatically coolant percent.</p><div class="cm-fields">' + input('brix', 'Brix reading', 6) + input('factor', 'Product factor', 1) + '</div><p data-cm-brix role="status"></p></div>' +
+      '<div data-cm-panel="2" id="' + id + '-step2" hidden><h3>Balance concentrate and total volume</h3><label>Volume unit <select data-cm-unit><option>L</option><option>US gal</option></select></label><p>Changing units converts every volume input. All volumes below use <strong data-cm-unit-label>L</strong>.</p>' +
+      '<div class="cm-fields">' + input('volume', 'Starting sump volume', 100) + input('current', 'Starting concentration (%)', 3) + input('target', 'Correction target (%)', 5) + input('capacity', 'Sump capacity', 120) + '</div>' +
+      '<p>This correction assumes no loss. It solves for neat concentrate when lean, or water when rich, at a larger final volume. It is a balance calculation; use the product-approved makeup method on this page.</p>' +
+      '<div data-cm-correction role="status"></div><div class="cm-pair" data-cm-plots></div>' +
+      '<details class="deeper"><summary>Why the denominator changes</summary><p>With V as starting volume, c and t as percent numbers: cV + 100x = t(V + x), so concentrate x = V(t − c)/(100 − t). For water y, cV = t(V + y), so y = V(c − t)/t.</p></details>' +
+      '<h3>Separate experiment: replace a loss</h3><p>This experiment starts again from the starting volume and concentration above, before any correction. Well-mixed carry-out removes both ingredients; ideal water-only evaporation leaves concentrate behind.</p>' +
+      '<label>Loss mechanism <select data-cm-loss><option value="carry-out">Well-mixed coolant carried out</option><option value="evaporation">Water-only evaporation (ideal)</option></select></label>' +
+      '<div class="cm-fields">' + input('loss', 'Volume lost, then replaced', 20) + input('mix', 'Top-up premix concentration (%, 0 = water)', 5) + '</div>' +
+      '<fieldset class="cm-predict"><legend>Predict before revealing</legend><p>After this loss, will replacing it with plain water give a concentration lower than, equal to, or higher than the starting concentration?</p>' +
+      ['Lower', 'Equal', 'Higher'].map(function (label) { return '<label><input type="radio" name="' + id + '-guess" value="' + label + '"> ' + label + '</label>'; }).join('') +
+      '<button type="button" data-cm-reveal disabled>Compare water and premix</button></fieldset><div data-cm-top role="status">Choose a prediction first.</div></div>' +
+      '<p>Displayed results round to 2 decimal places (small nonzero values may display as 0.00). Calculations use unrounded values. Tint is a concentration cue, not a prediction of fluid colour; fill height is capped at capacity.</p>';
+    root.insertBefore(lab, root.firstChild);
+    var q = function (s) { return lab.querySelector(s); };
+    function value(k) { var el = q('[data-cm-input="' + k + '"]'); return el.value === '' ? NaN : Number(el.value); }
+    function sumpState() { return { volume: value('volume'), currentPercent: value('current'), targetPercent: value('target'), capacity: value('capacity') }; }
+    function topState(mix) { return Object.assign(sumpState(), { lossVolume: value('loss'), mixPercent: mix, lossKind: q('[data-cm-loss]').value }); }
+    function resetPrediction() {
+      lab.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+      q('[data-cm-reveal]').disabled = true; q('[data-cm-top]').textContent = 'Choose a prediction first.';
+    }
+    function update() {
+      try {
+        var p = M.ratioToPercent(value('water'), value('concentrate')), ratio = M.percentToRatio(value('percent'));
+        q('[data-cm-ratio]').textContent = 'Ratio → ' + M.format(p) + '%. Percent → ' + M.format(ratio.water) + ':' + ratio.concentrate + ' water : concentrate.';
+      } catch (e) { q('[data-cm-ratio]').textContent = e.message; }
+      try { q('[data-cm-brix]').textContent = value('brix') + ' Brix × ' + value('factor') + ' = ' + M.format(M.brixToPercent(value('brix'), value('factor'))) + '% concentrate.'; }
+      catch (e) { q('[data-cm-brix]').textContent = e.message; }
+      try {
+        var s = sumpState(), r = M.correctSump(s);
+        q('[data-cm-correction]').textContent = (r.addition === 0 ? 'Already at target. No addition.' : 'Calculated addition: ' + M.format(r.addition) + ' ' + unit + ' ' + r.substance + '.') +
+          ' Final: ' + M.format(r.finalVolume) + ' ' + unit + ' at ' + M.format(r.finalPercent) + '%.' + (r.exceedsCapacity ? ' Exceeds sump capacity. Do not use this addition at this capacity.' : ' Fits the entered capacity.');
+        q('[data-cm-plots]').innerHTML = '<figure><figcaption>Before correction</figcaption>' + D.sump(s.volume, s.currentPercent, s.capacity, unit) + '</figure><figure><figcaption>Calculated final state</figcaption>' + D.sump(r.finalVolume, r.finalPercent, s.capacity, unit) + '</figure>';
+      } catch (e) { q('[data-cm-correction]').textContent = e.message; q('[data-cm-plots]').innerHTML = ''; }
+    }
+    lab.querySelectorAll('[data-cm-step]').forEach(function (button) { button.addEventListener('click', function () { step = Number(button.dataset.cmStep); showStep(); }); });
+    function showStep() {
+      lab.querySelectorAll('[data-cm-panel]').forEach(function (p) { p.hidden = Number(p.dataset.cmPanel) !== step; });
+      lab.querySelectorAll('[data-cm-step]').forEach(function (b) { b.setAttribute('aria-pressed', String(Number(b.dataset.cmStep) === step)); });
+    }
+    lab.addEventListener('input', function (e) { if (e.target.matches('[data-cm-input]')) { update(); resetPrediction(); } });
+    q('[data-cm-loss]').addEventListener('change', resetPrediction);
+    q('[data-cm-unit]').addEventListener('change', function () {
+      var next = q('[data-cm-unit]').value;
+      ['volume', 'capacity', 'loss'].forEach(function (k) { var el = q('[data-cm-input="' + k + '"]'); if (el.value !== '' && Number.isFinite(value(k)) && value(k) >= 0) el.value = M.convertVolume(value(k), unit, next); });
+      unit = next; q('[data-cm-unit-label]').textContent = unit; update(); resetPrediction();
+    });
+    q('.cm-predict').addEventListener('change', function () { q('[data-cm-reveal]').disabled = !q('input[type="radio"]:checked'); });
+    q('[data-cm-reveal]').addEventListener('click', function () {
+      var guess = q('input[type="radio"]:checked'); if (!guess) return;
+      try {
+        var water = M.topUp(topState(0)), premix = M.topUp(topState(value('mix'))), start = value('current');
+        var answer = Math.abs(water.finalPercent - start) < 1e-10 ? 'Equal' : water.finalPercent < start ? 'Lower' : 'Higher';
+        q('[data-cm-top]').innerHTML = '<p>' + (guess.value === answer ? 'Prediction confirmed. ' : 'Compare the balance: ' + answer.toLowerCase() + '. ') +
+          'After loss: ' + M.format(water.afterLossVolume) + ' ' + unit + ' at ' + M.format(water.afterLossPercent) + '%. Replacing the loss with water gives ' + M.format(water.finalPercent) + '%; your premix gives ' + M.format(premix.finalPercent) + '%. Both return to ' + M.format(water.finalVolume) + ' ' + unit + '.' +
+          (water.exceedsCapacity ? ' Exceeds sump capacity.' : '') + '</p><div class="cm-pair"><figure><figcaption>Water top-up</figcaption>' + D.sump(water.finalVolume, water.finalPercent, value('capacity'), unit) + '</figure><figure><figcaption>Premix top-up</figcaption>' + D.sump(premix.finalVolume, premix.finalPercent, value('capacity'), unit) + '</figure></div>';
+      } catch (e) { q('[data-cm-top]').textContent = e.message; }
+    });
+    lab.addEventListener('keydown', function (e) { if (e.target.matches('input, select, button')) e.stopPropagation(); });
+    showStep(); update(); root.dataset.cmReady = 'true'; root.classList.add('cm-live');
+  }
+  return { init: init };
+});
+
 </script>
 </body>
 </html>

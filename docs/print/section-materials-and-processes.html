@@ -2947,6 +2947,37 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 [data-interactive="process-break-even"] input { width: 100%; margin-block: .75rem; }
 @media print { [data-interactive="process-break-even"] { display: none; } }
 
+[data-interactive="lumber-tally"] { padding:1rem; border:1px solid var(--rule); border-radius:.5rem; overflow-wrap:anywhere; }
+[data-interactive="lumber-tally"] fieldset { min-width:0; margin:.75rem 0; padding:.75rem; border:1px solid var(--rule); }
+[data-interactive="lumber-tally"] legend { max-width:100%; font-weight:700; }
+[data-interactive="lumber-tally"] .lt-controls,
+[data-interactive="lumber-tally"] .lt-bases { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 170px),1fr)); gap:.75rem; }
+[data-interactive="lumber-tally"] label { display:block; }
+[data-interactive="lumber-tally"] :is(input,select,button) { box-sizing:border-box; max-width:100%; min-height:44px; padding:.45rem; font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--rule); border-radius:4px; }
+[data-interactive="lumber-tally"] :is(input,select) { width:100%; min-width:0; }
+[data-interactive="lumber-tally"] .lt-same { display:flex; align-items:center; gap:.5rem; margin-top:.75rem; }
+[data-interactive="lumber-tally"] input[type="checkbox"] { width:1.25rem; flex-shrink:0; }
+[data-interactive="lumber-tally"] :is(input,select,button):focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+[data-interactive="lumber-tally"] .lt-totals { padding:.75rem; margin-top:1rem; font-weight:700; background:var(--surface-2); }
+[data-interactive="lumber-tally"] [hidden] { display:none; }
+@media print {
+  [data-interactive="lumber-tally"] :is(.lt-controls,.lt-bases,.lt-same,button) { display:none; }
+  [data-interactive="lumber-tally"] .lt-row { break-inside:avoid; }
+}
+
+[data-interactive="wood-movement"] { margin-block: 1rem; padding: 1rem; border: 1px solid var(--line, currentColor); border-radius: .5rem; color: var(--ink); background: var(--surface); overflow-wrap: anywhere; }
+[data-interactive="wood-movement"] .wm-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+[data-interactive="wood-movement"] label { display: block; min-width: 0; }
+[data-interactive="wood-movement"] input,
+[data-interactive="wood-movement"] select { box-sizing: border-box; display: block; width: 100%; min-width: 0; margin-top: .25rem; padding: .5rem; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid currentColor; border-radius: .25rem; }
+[data-interactive="wood-movement"] :is(input, select):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+[data-interactive="wood-movement"] .wm-result { font-weight: 700; }
+@media (max-width: 600px) { [data-interactive="wood-movement"] .wm-controls { grid-template-columns: minmax(0, 1fr); } }
+@media print {
+  [data-interactive="wood-movement"] .wm-controls { display: none; }
+  [data-interactive="wood-movement"] { background: transparent; color: inherit; border-color: currentColor; }
+}
+
 </style>
 </head>
 <body class="app skin-app aggregate" data-page="agg-section-materials-and-processes" data-base="">
@@ -4240,7 +4271,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p>Suppose a seller specifies a tally using nominal 1 in thickness, measured 7 in width, and 9 ft length. The tally is <code>1 × 7 × 9 / 12 = <strong>5.25 BF</strong></code>.</p>
 <p>If that board finishes at 3/4 in thick with the same width and length, its physical volume is <code>0.75 × 7 × 9 / 12 = 3.9375 BF</code>, or <strong>3.94 BF</strong> to two decimals. These answers describe different quantities. The finished volume does not change the stated sales agreement.</p>
 <p>A board tally is not a finished-parts yield. Allow for saw cuts, defects, flattening, trimming, and the layout of the parts. Appearance grades and structural grades answer different questions; an attractive board is not automatically suitable for a load-bearing member.</p>
-<p><a class="button" data-practice-add="wood-board-feet-tally" href="../practice.html#wood-board-feet-tally">Practice: sales tally</a> <a class="button" data-practice-add="wood-board-feet-actual" href="../practice.html#wood-board-feet-actual">Practice: physical volume</a> <a class="button" data-practice-add="wood-board-feet-batch" href="../practice.html#wood-board-feet-batch">Practice: several boards</a> <a class="button" data-practice-add="wood-board-feet-inches" href="../practice.html#wood-board-feet-inches">Practice: all-inch dimensions</a></p>
+<p>Build a list of boards below to compare the sales tally with actual volume, calculate cost, and estimate a material allowance.</p>
+<p><strong>Say which allowance you mean.</strong> This calculator treats the allowance as the share of the material you <em>buy</em> that will not end up in parts: BF to buy = needed BF ÷ (1 − allowance), so a 20% allowance means buying 1.25 times what you need. Many shop guides instead say &ldquo;add 20%&rdquo; to what you need (× 1.20), which is a different definition and buys less. Both are used; check which one a source or an instructor means before you compare numbers.</p>
+<div data-interactive="lumber-tally"></div>
+<p><a class="button" data-practice-add="wood-board-feet-tally" href="../practice.html#wood-board-feet-tally">Practice: sales tally</a> <a class="button" data-practice-add="wood-board-feet-actual" href="../practice.html#wood-board-feet-actual">Practice: physical volume</a> <a class="button" data-practice-add="wood-board-feet-batch" href="../practice.html#wood-board-feet-batch">Practice: several boards</a> <a class="button" data-practice-add="wood-board-feet-inches" href="../practice.html#wood-board-feet-inches">Practice: all-inch dimensions</a> <a class="button" data-practice-add="wood-board-feet-allowance" href="../practice.html#wood-board-feet-allowance">Practice: material allowance</a></p>
     </div>
   </details>
   <details class="xcard deck-wiki-only" id="buying-lumber-and-board-feet--further-reading-on-wood-properties-and-products" data-card="buying-lumber-and-board-feet--further-reading-on-wood-properties-and-products">
@@ -4583,6 +4617,14 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPlRhbmdlbnRpYWwsIHJhZGlhbCBhbmQgbG9uZ2l0dWRpbmFsIGRpcmVjdGlvbnMgaW4gd29vZDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZmRmNyIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHRleHQgeD0iMzAiIHk9IjM1IiBmb250LXNpemU9IjIzIj5Nb3ZlbWVudCBkaXJlY3Rpb25zIGluIG5vcm1hbCBzdHJhaWdodC1ncmFpbmVkIHdvb2Q8L3RleHQ+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxNTUiIGZpbGw9IiNmNWRlYjAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSI4NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIyNDUiIHI9IjUwIiBmaWxsPSJub25lIiBzdHJva2U9IiM4MDU5MjkiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjIzMCIgY3k9IjI0NSIgcj0iNSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNIDIzMCAyNDUgTCAzNDUgMjQ1IE0gMzM0IDIzNyBMIDM0NSAyNDUgTCAzMzQgMjUzIiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjI0NyIgeT0iMjMyIiBmb250LXNpemU9IjIwIj5SYWRpYWw8L3RleHQ+PHBhdGggZD0iTSAxMDYgMjA4IEEgMTMwIDEzMCAwIDAgMSAyMzAgMTE1IE0gMjE3IDEwOCBMIDIzMCAxMTUgTCAyMTkgMTI0IiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI3MCIgZm9udC1zaXplPSIxOSI+VGFuZ2VudGlhbDogYXJvdW5kIGEgcmluZzwvdGV4dD48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTgyZDQwIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjQiIGZpbGw9IiMxODJkNDAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDUwIiB5PSIxNDAiIGZvbnQtc2l6ZT0iMjIiPlRhbmdlbnRpYWw6IGdyZWF0ZXN0IG1vdmVtZW50PC90ZXh0Pjx0ZXh0IHg9IjQ1MCIgeT0iMTg1IiBmb250LXNpemU9IjIyIj5SYWRpYWw6IHNtYWxsZXIgbW92ZW1lbnQ8L3RleHQ+PHRleHQgeD0iNDUwIiB5PSIyMzAiIGZvbnQtc2l6ZT0iMjEiPkxvbmdpdHVkaW5hbDogdXN1YWxseSBtdWNoIHNtYWxsZXI8L3RleHQ+PHBhdGggZD0iTSAyNDYgMzE1IEggNDI1IiBzdHJva2U9IiMxODJkNDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQ1MCIgeT0iMzIwIiBmb250LXNpemU9IjIxIj5Mb25naXR1ZGluYWw6IG91dCBvZiB0aGlzIHZpZXc8L3RleHQ+PHRleHQgeD0iNDAiIHk9IjQ0NSIgZm9udC1zaXplPSIxOCI+Q29tcGFyZSBkaXJlY3Rpb25zLCBub3QgYXJyb3cgbGVuZ3RoczogdGhpcyBkaWFncmFtIGlzIG5vdCBhIHNocmlua2FnZSBzY2FsZS48L3RleHQ+PC9nPjwvc3ZnPg==" alt="End-grain view labels tangential direction around a growth ring and radial direction toward the center; longitudinal direction is along the trunk, out of the view. Typical movement is greatest tangentially, then radially, and much smaller longitudinally." data-natural-width="900" data-natural-height="480"></p></figure>
 <p>For normal straight-grained wood, shrinkage is usually greatest <strong>tangentially</strong> (along growth rings), smaller <strong>radially</strong> (across rings), and much smaller <strong>longitudinally</strong> (along the cells). Swelling reverses the moisture-loss trend. Actual amounts depend on species, grain orientation, and the moisture interval.</p>
 <p>Do not apply a green-to-oven-dry shrinkage percentage directly to a small seasonal humidity change. A movement estimate needs a species-specific coefficient, board orientation, starting MC, and expected service MC. Reaction wood and juvenile wood can also depart from ordinary longitudinal behavior.</p>
+<p>Estimate movement below using starting dimension × coefficient × (final MC − starting MC), with both MC values within 6–14%; then use the result in “Allow solid wood to change width” below.</p>
+<div data-interactive="wood-movement">
+<p><strong>Wood movement estimate</strong> &mdash; both moisture contents must be 6&ndash;14%.</p>
+<p>Change = starting dimension &times; coefficient &times; (final MC &minus; starting MC), with MC entered as a percentage (8, not 0.08). Negative means shrinkage; positive means swelling. Use the tangential coefficient C<sub>T</sub> for the width of a flat-sawn board or when the ring orientation is unknown, and the radial coefficient C<sub>R</sub> for the width of a quarter-sawn board or the thickness of a flat-sawn one.</p>
+<p><strong>Worked example (the Handbook's own):</strong> a flat-sawn white fir board 9.15 in wide at 8% MC, C<sub>T</sub> = 0.00245, reaching 11% MC: 9.15 &times; 0.00245 &times; (11 &minus; 8) = 0.067 in wider, about 9.22 in. In millimetres, 232 mm becomes about 233.7 mm.</p>
+<p>Commercial lumber is rarely perfectly flat- or quarter-sawn, so this method tends to overestimate width change and underestimate thickness change, and the straight-line assumption underestimates movement by about 5%. Outside 6&ndash;14% MC a different method applies.</p>
+<p>Source: USDA Wood Handbook (2021), chapter 13, Equation 13-3 and Table 13-5 (coefficients for 17 species are in the interactive estimator).</p>
+</div>
     </div>
   </details>
   <details class="xcard deck-slide" id="grain-and-moisture-movement--name-the-distortion-before-deciding-what-to-do" data-card="grain-and-moisture-movement--name-the-distortion-before-deciding-what-to-do">
@@ -6087,7 +6129,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <article>
         <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Wood</span><span class="sep">/</span><a href="#p-grain-and-moisture-movement">Grain and Moisture Movement</a></div>
         <h2><span class="deeper-addendum-number">Addendum 49.</span> Reference resources</h2>
-        <ul><li><a href="https://research.fs.usda.gov/treesearch/62200">USDA Forest Products Laboratory: Wood Handbook (2021), moisture and physical properties</a></li><li><a href="https://extension.oregonstate.edu/catalog/em-8600-wood-moisture-relationships">Oregon State Extension: Wood and Moisture Relationships</a></li></ul>
+        <ul><li><a href="https://research.fs.usda.gov/treesearch/62200">USDA Forest Products Laboratory: Wood Handbook (2021), moisture and physical properties</a></li><li><a href="https://research.fs.usda.gov/treesearch/62261">USDA Forest Products Laboratory: Wood Handbook (2021), chapter 13, Drying and Control of Moisture Content and Dimensional Changes</a></li><li><a href="https://extension.oregonstate.edu/catalog/em-8600-wood-moisture-relationships">Oregon State Extension: Wood and Moisture Relationships</a></li></ul>
         <p class="deeper-back"><a href="#deeper-ref-49">Back to reference 49</a></p>
       </article>
     </li>
@@ -8035,6 +8077,232 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       output.textContent = 'At ' + r.quantity + ' parts: A costs $' + r.a.toFixed(2) + ' total ($' + r.unitA.toFixed(2) + '/part); B costs $' + r.b.toFixed(2) + ' total ($' + r.unitB.toFixed(2) + '/part). ' + (r.cheaper === 'tie' ? 'Costs are equal.' : 'Process ' + r.cheaper + ' costs less.');
     }
     input.addEventListener('input', update);
+    update();
+  });
+})();
+
+(function (root) {
+  'use strict';
+  function number(value) {
+    const s = String(value).trim();
+    const f = s.match(/^(?:(\d+)[ -])?(\d+)\/(\d+)$/);
+    const n = f ? Number(f[1] || 0) + Number(f[2]) / Number(f[3])
+      : /^(?:\d+(?:\.\d*)?|\.\d+)$/.test(s) ? Number(s) : NaN;
+    if (!Number.isFinite(n)) throw new RangeError('Enter a nonnegative number or fraction, such as 3/4 or 1-1/2.');
+    return n;
+  }
+  function finite(n) {
+    if (!Number.isFinite(n)) throw new RangeError('The values exceed the calculator range.');
+    return n;
+  }
+  function boardFeet(dimensions, units) {
+    if (!['ft', 'in'].includes(units)) throw new RangeError('Choose feet or inches for length.');
+    const v = ['thickness', 'width', 'length'].map(k => number(dimensions[k]));
+    if (v.some(n => n <= 0)) throw new RangeError('All dimensions must be greater than zero.');
+    return finite(v[0] * v[1] * v[2] / (units === 'ft' ? 12 : 144));
+  }
+  function row({ quantity, sale, actual, same, units }) {
+    const q = number(quantity);
+    if (!Number.isSafeInteger(q) || q < 1) throw new RangeError('Quantity must be a positive whole number.');
+    if (typeof same !== 'boolean') throw new RangeError('Specify whether the dimensions are the same.');
+    const tallyEach = boardFeet(sale, units);
+    const physicalEach = boardFeet(same ? sale : actual || {}, units);
+    return { quantity: q, tallyEach, physicalEach, tally: finite(q * tallyEach), physical: finite(q * physicalEach) };
+  }
+  function total(rows) {
+    return rows.reduce((s, r) => ({ tally: finite(s.tally + r.tally), physical: finite(s.physical + r.physical) }), { tally: 0, physical: 0 });
+  }
+  function cost(tally, price) {
+    if (!Number.isFinite(tally) || tally < 0) throw new RangeError('A valid tally is required.');
+    return finite(tally * number(price));
+  }
+  // Allowance convention: percent is the share of the PURCHASED material that will not become parts,
+  // so buy = needed / (1 - p). 20% -> x1.25. The "add p% to what you need" convention (needed * (1 + p)) is NOT this.
+  function allowance(needed, percent) {
+    const n = number(needed), p = number(percent);
+    if (p >= 100) throw new RangeError('Allowance must be at least 0% and less than 100%.');
+    return finite(n / (1 - p / 100));
+  }
+  const api = Object.freeze({ number, boardFeet, row, total, cost, allowance });
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.CourseWikiLumberTally = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+(function () {
+  'use strict';
+  function init(root) {
+    if (root.dataset.ltReady) return;
+    const model = globalThis.CourseWikiLumberTally;
+    if (!model) return;
+    root.dataset.ltReady = 'true';
+    const field = (key, label, value = '') => `<label>${label}<input data-lt="${key}" type="text" value="${value}" autocomplete="off"></label>`;
+    root.innerHTML = `<p>Enter the seller's stated basis and measured actual dimensions. Thickness and width are always inches; choose length units for each row. Fractions work: 3/4, 4/4 (= 1 in), 8/4 (= 2 in), or 1-1/2.</p>
+      <p>BF per board = thickness × width × length ÷ 12 for length in feet, or ÷ 144 for length in inches. Row BF = quantity × BF per board. Changing length units reinterprets the entered length; enter the matching value.</p>
+      <div class="lt-rows"></div><button type="button" data-lt-add>Add board row</button>
+      <div class="lt-totals" role="status" aria-live="polite"></div>
+      <div class="lt-controls">${field('price', 'Price per tally BF ($, optional)')}</div><p data-lt-cost role="status"></p>
+      <h3>Estimate material to buy</h3><p>Saw kerf (material removed by the saw), defects, flattening and layout consume material; the allowance is your estimate.</p>
+      <p>BF to buy = needed BF ÷ (1 − allowance): the allowance is the share of what you <em>buy</em> that will not become parts, so 20% means × 1.25. (&ldquo;Add 20%&rdquo; to what you need, × 1.20, is a different convention.) Enter a physical-volume need and compare the result on that same basis; it does not automatically become a seller's tally or change the cost above.</p>
+      <div class="lt-controls">${field('needed', 'Needed physical volume (BF, optional)')}${field('allowance', 'Material allowance (%, optional)')}</div><p data-lt-buy role="status"></p>`;
+    const rows = root.querySelector('.lt-rows');
+    const get = (parent, key) => parent.querySelector(`[data-lt="${key}"]`);
+    const fmt = n => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    let serial = 0;
+    function add(example = false) {
+      const row = document.createElement('fieldset');
+      const id = ++serial;
+      row.className = 'lt-row';
+      const dims = (basis, t, w, l) => `<fieldset class="lt-dimensions"><legend>${basis === 'sale' ? 'Sales basis' : 'Actual dimensions'}</legend><div class="lt-controls">${field(basis + '-thickness', 'Thickness (in)', t)}${field(basis + '-width', 'Width (in)', w)}${field(basis + '-length', 'Length', l)}</div></fieldset>`;
+      row.innerHTML = `<legend>Board row ${id}${example ? ' — page example' : ''}</legend><div class="lt-controls">${field('quantity', 'Quantity', '1')}<label>Length units (both bases)<select data-lt="units"><option value="ft">Feet (divide by 12)</option><option value="in">Inches (divide by 144)</option></select></label></div>
+        <label class="lt-same"><input data-lt="same" type="checkbox"> Sales basis and actual dimensions are the same</label>
+        <div class="lt-bases">${dims('sale', example ? '4/4' : '', example ? '7' : '', example ? '9' : '')}${dims('actual', example ? '3/4' : '', example ? '7' : '', example ? '9' : '')}</div>
+        <p class="lt-row-result" role="status"></p><button type="button" data-lt-remove>Remove board row ${id}</button>`;
+      rows.append(row);
+      row.querySelector('[data-lt-remove]').addEventListener('click', () => {
+        row.remove(); update(); root.querySelector('[data-lt-add]').focus();
+      });
+      return row;
+    }
+    function update() {
+      const results = [];
+      let invalid = false;
+      rows.querySelectorAll('.lt-row').forEach(row => {
+        const same = get(row, 'same').checked;
+        const actual = row.querySelectorAll('.lt-dimensions')[1];
+        actual.disabled = same;
+        actual.hidden = same;
+        const data = { quantity: get(row, 'quantity').value, units: get(row, 'units').value, same };
+        ['sale', 'actual'].forEach(basis => {
+          data[basis] = {};
+          ['thickness', 'width', 'length'].forEach(k => { data[basis][k] = get(row, basis + '-' + k).value; });
+        });
+        const output = row.querySelector('.lt-row-result');
+        try {
+          const r = model.row(data); results.push(r);
+          const description = d => `${d.thickness} in × ${d.width} in × ${d.length} ${data.units}`;
+          output.textContent = `${r.quantity} board(s). Sales basis: ${description(data.sale)}. Actual: ${description(same ? data.sale : data.actual)}${same ? ' (explicitly the same)' : ''}. Tally: ${fmt(r.tallyEach)} BF/board; ${fmt(r.tally)} BF for row. Physical volume: ${fmt(r.physicalEach)} BF/board; ${fmt(r.physical)} BF for row.`;
+        } catch (e) { invalid = true; output.textContent = e.message; }
+      });
+      const totals = root.querySelector('.lt-totals');
+      const cost = root.querySelector('[data-lt-cost]');
+      try {
+        if (invalid || !results.length) throw new RangeError('Complete every row to show totals, or remove unused rows.');
+        const sum = model.total(results);
+        totals.textContent = `Tally (basis you entered for the sale): ${fmt(sum.tally)} BF. Physical volume (actual dimensions): ${fmt(sum.physical)} BF.`;
+        const price = get(root, 'price').value.trim();
+        try { cost.textContent = price === '' ? 'Enter a price to calculate cost.' : `Cost = tally BF × price per BF = $${fmt(model.cost(sum.tally, price))} at $${price}/BF (before any other charges).`; }
+        catch (e) { cost.textContent = `Price: ${e.message}`; }
+      } catch (e) { totals.textContent = e.message; cost.textContent = 'Cost needs a complete tally and a price.'; }
+      const needed = get(root, 'needed').value.trim(), percent = get(root, 'allowance').value.trim();
+      const buy = root.querySelector('[data-lt-buy]');
+      try {
+        buy.textContent = needed === '' || percent === '' ? 'Enter both needed BF and an allowance to estimate BF to buy.'
+          : `BF to buy = ${needed} ÷ (1 − ${model.number(percent) / 100}) = ${fmt(model.allowance(needed, percent))} BF of physical volume.`;
+      } catch (e) { buy.textContent = `Allowance estimate: ${e.message}`; }
+    }
+    root.querySelector('[data-lt-add]').addEventListener('click', () => { const row = add(); update(); get(row, 'quantity').focus(); });
+    root.addEventListener('input', update);
+    root.addEventListener('change', update);
+    add(true); update();
+  }
+  function boot() { document.querySelectorAll('[data-interactive="lumber-tally"]').forEach(init); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+
+/* USDA FPL-GTR-282 (2021), chapter 13, Table 13-5 and Equation 13-3.
+   Coefficients are per percentage point MC, not green-to-oven-dry percentages. */
+(function (root) {
+  'use strict';
+  const species = Object.freeze([
+    ['Ash, white', .00169, .00219],
+    ['Basswood, American', .00230, .00234],
+    ['Beech, American', .00190, .00330],
+    ['Birch, yellow', .00256, .00327],
+    ['Cherry, black', .00126, .00223],
+    ['Hickory, true', .00259, .00315],
+    ['Maple, red (soft maple)', .00102, .00252],
+    ['Maple, sugar (hard maple)', .00151, .00400],
+    ['Red oak, northern red', .00148, .00338],
+    ['White oak, white', .00183, .00462],
+    ['Poplar, yellow (yellow-poplar)', .00137, .00216],
+    ['Walnut, black', .00112, .00308],
+    ['Douglas-fir, Coast-type', .00165, .00267],
+    ['Fir, white', .00112, .00245],
+    ['Pine, loblolly (a southern yellow pine)', .00165, .00234],
+    ['Pine, ponderosa', .00133, .00252],
+    ['Cedar, western red', .00111, .00234]
+  ].map(([name, radial, tangential]) => Object.freeze({name, radial, tangential})));
+  const orientations = Object.freeze({
+    'flat-width': 'tangential', 'quarter-width': 'radial',
+    'flat-thickness': 'radial', unknown: 'tangential'
+  });
+  function calculate({speciesIndex, orientation, dimension, unit, initialMC, finalMC}) {
+    if (!Number.isInteger(speciesIndex) || !species[speciesIndex]) throw new RangeError('Choose a listed species.');
+    if (!Object.hasOwn(orientations, orientation)) throw new RangeError('Choose a listed orientation.');
+    if (unit !== 'in' && unit !== 'mm') throw new RangeError('Choose inches or millimeters.');
+    if (!Number.isFinite(dimension) || dimension <= 0) throw new RangeError('Enter a positive starting dimension.');
+    if (![initialMC, finalMC].every(m => Number.isFinite(m) && m >= 6 && m <= 14)) {
+      throw new RangeError('Both moisture contents must be between 6% and 14%, inclusive. Outside this range a different method applies; no estimate is given.');
+    }
+    const direction = orientations[orientation], coefficient = species[speciesIndex][direction];
+    const change = dimension * coefficient * (finalMC - initialMC);
+    const finalDimension = dimension + change;
+    if (!Number.isFinite(finalDimension)) throw new RangeError('Dimension is too large to calculate.');
+    return {change, finalDimension, direction, coefficient, unit};
+  }
+  const api = Object.freeze({species, calculate});
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiWoodMovement = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+(function () {
+  'use strict';
+  const model = globalThis.CourseWikiWoodMovement;
+  document.querySelectorAll('[data-interactive="wood-movement"]').forEach(function (root) {
+    if (root.dataset.wmReady) return;
+    root.dataset.wmReady = 'true';
+    root.innerHTML = `<p><strong>Wood movement estimate</strong> — both moisture contents must be 6–14%.</p>
+      <div class="wm-controls">
+        <label>Species<select data-wm="speciesIndex" aria-label="Species">${model.species.map((s, i) => `<option value="${i}"${s.name === 'Fir, white' ? ' selected' : ''}>${s.name}</option>`).join('')}</select></label>
+        <label>Orientation and measured direction<select data-wm="orientation" aria-label="Orientation and measured direction">
+          <option value="flat-width">Flat-sawn (plain-sawn) width</option>
+          <option value="quarter-width">Quarter-sawn width</option>
+          <option value="flat-thickness">Flat-sawn thickness</option>
+          <option value="unknown">Unknown / mixed ring orientation</option>
+        </select></label>
+        <label>Starting dimension<input data-wm="dimension" type="number" min="0" step="any" value="9.15" required></label>
+        <label>Dimension unit<select data-wm="unit" aria-label="Dimension unit"><option value="in">Inches (in)</option><option value="mm">Millimeters (mm)</option></select></label>
+        <label>Starting moisture content (%)<input data-wm="initialMC" type="number" min="6" max="14" step="any" value="8" required></label>
+        <label>Final moisture content (%)<input data-wm="finalMC" type="number" min="6" max="14" step="any" value="11" required></label>
+      </div>
+      <p class="wm-result" role="status" aria-live="polite" aria-atomic="true" data-wm-result></p>
+      <p data-wm-context></p>
+      <p>Change = starting dimension × coefficient × (final MC − starting MC). Enter MC as 8 for 8%, not 0.08. Negative means shrinkage; positive means swelling. Dimensions and results use the selected unit.</p>
+      <p>Commercial lumber is rarely perfectly flat- or quarter-sawn, so this method tends to overestimate width change and underestimate thickness change. The Handbook notes that the linear assumption underestimates movement by about 5%; no correction factor is added here. Unknown or mixed orientation uses the tangential coefficient.</p>
+      <p>Source: USDA Wood Handbook (2021), chapter 13, Equation 13-3 and Table 13-5. Western red cedar uses the table’s assumption that shrinkage starts at 22% MC (footnote b); the estimator still requires 6–14% MC.</p>`;
+    const fields = {};
+    root.querySelectorAll('[data-wm]').forEach(field => { fields[field.dataset.wm] = field; });
+    const result = root.querySelector('[data-wm-result]');
+    const context = root.querySelector('[data-wm-context]');
+    function update() {
+      context.textContent = '';
+      try {
+        const values = {};
+        Object.entries(fields).forEach(([name, field]) => {
+          values[name] = ['unit', 'orientation'].includes(name) ? field.value : field.value === '' ? NaN : Number(field.value);
+        });
+        const r = model.calculate(values), digits = r.unit === 'in' ? 2 : 1;
+        const magnitude = Math.abs(r.change).toFixed(digits);
+        const change = r.change === 0 ? '0' : Number(magnitude) === 0
+          ? (r.change < 0 ? 'shrinkage' : 'swelling') + ' less than ' + (r.unit === 'in' ? '0.01' : '0.1')
+          : (r.change < 0 ? '−' : '+') + magnitude;
+        result.textContent = 'Estimated change: ' + change + ' ' + r.unit + '; final dimension: ' + r.finalDimension.toFixed(digits) + ' ' + r.unit + '. ' +
+          (r.change === 0 ? 'No movement is predicted for unchanged MC.' : 'Allow for this estimated ' + (r.change < 0 ? 'contraction' : 'expansion') + ' across the measured direction in the joint design.');
+        context.textContent = model.species[values.speciesIndex].name + ', ' + fields.orientation.selectedOptions[0].textContent + ': ' + values.dimension + ' ' + r.unit + ', ' + values.initialMC + '% to ' + values.finalMC + '% MC. Using ' + r.direction + ' coefficient ' + r.coefficient.toFixed(5) + ' per percentage point MC.';
+      } catch (error) { result.textContent = error.message; }
+    }
+    Object.values(fields).forEach(field => field.addEventListener('input', update));
     update();
   });
 })();

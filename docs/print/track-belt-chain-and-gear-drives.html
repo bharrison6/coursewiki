@@ -2971,6 +2971,30 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="drive-selection"] .ds-result { break-inside: avoid; margin-bottom: .6rem; }
 }
 
+[data-interactive="belt-geometry"] { min-width: 0; font-size: 16px; overflow-wrap: anywhere; }
+[data-interactive="belt-geometry"] * { box-sizing: border-box; }
+[data-interactive="belt-geometry"] .bg-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; margin-bottom: .75rem; }
+[data-interactive="belt-geometry"] label { display: grid; gap: .3rem; font-size: 16px; }
+[data-interactive="belt-geometry"] :is(input, select, button) { min-width: 0; max-width: 100%; min-height: 44px; font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: .4rem; }
+[data-interactive="belt-geometry"] :is(input, select, button):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+[data-interactive="belt-geometry"] input:disabled { opacity: .7; }
+[data-interactive="belt-geometry"] .bg-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+[data-interactive="belt-geometry"] svg { display: block; width: 100%; max-width: 30rem; height: auto; margin: auto; color: var(--accent); }
+[data-interactive="belt-geometry"] svg text { fill: var(--ink); font: 18px sans-serif; }
+[data-interactive="belt-geometry"] .bg-wrap { stroke: var(--ink); stroke-dasharray: 3 2; }
+[data-interactive="belt-geometry"] :is(p, caption, th, td) { font-size: 16px; }
+[data-interactive="belt-geometry"] table { width: 100%; table-layout: fixed; }
+[data-interactive="belt-geometry"] th { width: 68%; text-align: left; }
+[data-interactive="belt-geometry"] :is(th, td) { padding: .35rem; white-space: normal; }
+[data-interactive="belt-geometry"] .bg-warning { border-left: 3px solid var(--accent); padding: .5rem; }
+@media (max-width: 48rem) { [data-interactive="belt-geometry"] .bg-grid { grid-template-columns: minmax(0, 1fr); } }
+@media screen { [data-interactive="belt-geometry"][data-bg-ready] > .bg-static { display: none; } }
+@media print {
+  [data-interactive="belt-geometry"] .bg-lab { display: none !important; }
+  [data-interactive="belt-geometry"] > .bg-static { display: block !important; }
+  [data-interactive="belt-geometry"] :is(table, svg) { break-inside: avoid; }
+}
+
 /* Gear experiment: scoped controls, drawings and print fallback. */
 [data-interactive="gear-ratios"] { min-width: 0; }
 .article:has([data-interactive="gear-ratios"]) { max-width: 76rem; }
@@ -3276,6 +3300,29 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Manufacturer references for belt geometry and faults.</p>
     </div>
   </details>
+  <details class="xcard deck-slide" id="belt-drives--explore-how-pulley-size-and-spacing-change-belt-length-and-wrap" data-card="belt-drives--explore-how-pulley-size-and-spacing-change-belt-length-and-wrap">
+    <summary>Explore how pulley size and spacing change belt length and wrap<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Explore how pulley size and spacing change belt length and wrap</h2>
+  <p>Use pitch diameters D (large) and d (small), and center distance C in one length unit. For an open belt, the approximate pitch length is <strong>L ≈ 2C + π(D + d)/2 + (D − d)²/(4C)</strong>. The last term is the correction for unequal pulleys. Increasing C increases length and brings small-pulley wrap closer to 180°; the no-slip speed ratio stays D/d.</p>
+  <p>Real belts come in standard lengths from the manufacturer's catalog. Pick the nearest stock length in the correct length convention, then use “Enter L → find C” to estimate the required shaft spacing. These calculations do not set installation tension or replace the manufacturer's selection procedure.</p>
+  <div data-interactive="belt-geometry">
+    <div class="bg-static">
+      <!-- BELT-GEOMETRY-STATIC -->
+      <svg viewBox="0 0 300 260" role="img" aria-label="Open belt with external tangent spans; small pulley left, large pulley right. The highlighted arc shows small-pulley contact."><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="43.63636363636364" cy="105" r="23.636363636363637"/><circle cx="232.72727272727275" cy="105" r="47.27272727272727"/><path stroke-width="4" d="M40.68181818181819 81.5490224701093L226.81818181818184 58.09804494021862A47.27272727272727 47.27272727272727 0 1 1 226.81818181818184 151.9019550597814L40.68181818181819 128.45097752989068"/><path class="bg-wrap" stroke-width="5" d="M40.68181818181819 128.45097752989068A23.636363636363637 23.636363636363637 0 0 1 40.68181818181819 81.5490224701093"/><path stroke-dasharray="3 3" d="M43.63636363636364 105H232.72727272727275"/></g><text x="20" y="21">d = 100 mm</text><text x="20" y="236">D = 200 mm</text><text x="20" y="257">C = 400 mm</text></svg><table><caption>Open belt: D = 200, d = 100 mm; n_small = 1200 r/min</caption><tbody><tr><th scope="row">Belt pitch length L (approx., mm)</th><td>1277.49</td></tr><tr><th scope="row">Center distance C (mm)</th><td>400</td></tr><tr><th scope="row">Speed ratio n_small / n_large</th><td>2</td></tr><tr><th scope="row">Large-pulley speed (r/min)</th><td>600</td></tr><tr><th scope="row">Belt speed (m/min)</th><td>376.991</td></tr><tr><th scope="row">Small-pulley wrap (degrees)</th><td>165.638</td></tr><tr><th scope="row">Unequal-pulley correction (mm)</th><td>6.25</td></tr></tbody></table><p class="bg-warning">Less wrap means less grip for a friction belt and fewer teeth engaged for a timing belt. This geometry model does not rate load capacity.</p><p>Worked example: D = 200 mm, d = 100 mm, C = 400 mm and n_small = 1200 r/min. L ≈ 800 + 150π + 6.25 = 1277.49 mm. The inverse returns C ≈ 400 mm. Ratio = 2; n_large = 600 r/min; v = π × 100 × 1200 / 1000 ≈ 376.99 m/min; wrap ≈ 165.64°.</p>
+      <!-- /BELT-GEOMETRY-STATIC -->
+    </div>
+    <noscript><p>The static worked table above works without JavaScript. Enable JavaScript to change pulley sizes, spacing and speed.</p></noscript>
+  </div>
+  <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Derive the inverse and check speed and wrap.</p>
+  <p>Practice the same method:</p>
+  <p><a class="button" data-practice-add="belt-open-length" href="../practice.html#belt-open-length">Belt length</a>
+    <a class="button" data-practice-add="belt-stock-center" href="../practice.html#belt-stock-center">Stock-length center distance</a>
+    <a class="button" data-practice-add="belt-driven-speed" href="../practice.html#belt-driven-speed">Driven speed</a>
+    <a class="button" data-practice-add="belt-linear-speed" href="../practice.html#belt-linear-speed">Belt speed</a>
+    <a class="button" data-practice-add="belt-small-wrap" href="../practice.html#belt-small-wrap">Small-pulley wrap</a></p>
+    </div>
+  </details>
 </div>
 
 </article>
@@ -3320,7 +3367,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </tbody>
   </table></div>
   <p>A suffix such as <strong>-1</strong> or <strong>-2</strong> counts parallel strands: simplex or duplex. #40-2 still has a 0.500 in pitch. Heavy-series suffixes and manufacturer prefixes carry other information; do not apply the pitch shortcut to every chain product code.</p>
-  <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Checked public wording behind the ANSI numbers.</p>
+  <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Checked public wording behind the ANSI numbers.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="chain-drives--metric-chain-still-needs-a-series-and-a-pitch" data-card="chain-drives--metric-chain-still-needs-a-series-and-a-pitch">
@@ -3335,7 +3382,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </table></div>
   <p>The common 06B, 08B and 10B sizes correspond to 6/16, 8/16 and 10/16 in pitch. <strong>Use the table for the exact designation:</strong> small sizes such as 05B do not follow that shortcut. B identifies the series; -1 identifies one strand.</p>
   <p><strong>Same pitch does not mean interchangeable.</strong> #40 and 08B both have 12.7 mm pitch, but roller diameter and inner width differ. Check series, pitch, width, roller diameter and strand count when matching a sprocket or replacement link.</p>
-  <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; ISO scope and the source of the millimeter dimensions.</p>
+  <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; ISO scope and the source of the millimeter dimensions.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="chain-drives--positive-engagement-still-permits-wear-and-speed-ripple" data-card="chain-drives--positive-engagement-still-permits-wear-and-speed-ripple">
@@ -3353,7 +3400,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
   <p>Use the specified lubricant, alignment and slack. A chain is not installed taut like a belt. Set inspection intervals and wear limits from the maker's guide; isolate the drive before measuring or servicing it. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a>.</p>
   <p><a class="button" data-practice-add="drive-chain35-pitch" href="../practice.html#drive-chain35-pitch">Practice reading chain pitch</a></p>
-  <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Chain selection and maintenance reference.</p>
+  <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Chain selection and maintenance reference.</p>
     </div>
   </details>
 </div>
@@ -3394,7 +3441,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div><dt>Addendum / dedendum</dt><dd>Radial tooth height from pitch circle to tip / radial depth from pitch circle to root. Neither is a diameter difference by itself.</dd></div>
     <div><dt>Backlash</dt><dd>Clearance between mating tooth flanks. It allows clearance in the mesh but creates lost motion when the load reverses.</dd></div>
   </dl>
-  <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Check the size definitions with one gear.</p>
+  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; Check the size definitions with one gear.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-drives--matching-pitch-is-necessary-but-not-sufficient" data-card="gear-drives--matching-pitch-is-necessary-but-not-sufficient">
@@ -3403,9 +3450,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Matching pitch is necessary, but not sufficient</h2>
   <p><strong>Ordinary spur gears intended to mesh must share module or diametral pitch and pressure angle.</strong> Matching outside diameter or tooth count does not establish compatibility. Check the tooth system, center distance, clearance and manufacturer's mating information too.</p>
   <p>For external helical gears on parallel shafts, match tooth size, pressure angle and helix angle. Use one right-hand and one left-hand gear (teeth slanting in opposite directions), and confirm the manufacturer's mating specification. Equal tooth counts are not required.</p>
-  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; Normal and transverse measurements use different planes.</p>
+  <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; Normal and transverse measurements use different planes.</p>
   <p>A larger tooth size can support more load when other conditions are comparable, but pitch alone cannot determine capacity, backlash or achievable reduction. Material, face width, heat treatment, alignment and speed remain part of the design.</p>
-  <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; Primary references for the geometry and helical mesh.</p>
+  <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Primary references for the geometry and helical mesh.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-drives--gear-damage-tells-you-where-the-load-went" data-card="gear-drives--gear-damage-tells-you-where-the-load-went">
@@ -3467,7 +3514,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>This lesson uses <strong>reduction ratio i = input speed ÷ output speed</strong>, with speed magnitudes. A 2:1 reduction means two input turns for one output turn. Ratios above 1 reduce speed; ratios below 1 increase it. At zero speed, use tooth counts to find the ratio; do not divide 0 by 0.</p>
   <p class="aside"><strong>Notation map:</strong> this page's original equations use N for teeth and n for speed. The course uses n for teeth, ω for angular velocity and τ for torque. Thus page N = course n; page speed n is written ω in the additions below. GR and i name the same reduction ratio.</p>
   <p>In course notation, using magnitudes: <code>GR = n<sub>out</sub>/n<sub>in</sub> = d<sub>out</sub>/d<sub>in</sub> = ω<sub>in</sub>/ω<sub>out</sub> = τ<sub>out</sub>/τ<sub>in</sub></code> for an <strong>ideal single pair</strong>. Here d is pitch diameter; the torque equality assumes no losses. For a compound train, multiply the stage ratios; the first and last tooth counts alone do not give the overall ratio.</p>
-  <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Why tooth counts work, and what the dashed circles mean.</p>
+  <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Why tooth counts work, and what the dashed circles mean.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-ratios--an-idler-and-a-compound-shaft-do-different-jobs" data-card="gear-ratios--an-idler-and-a-compound-shaft-do-different-jobs">
@@ -3491,7 +3538,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><strong>Torque is turning effort.</strong> In this ideal, lossless train at steady load, output torque magnitude = input torque magnitude × reduction ratio. A 2:1 reduction changes 120 rpm and 2 N·m into 60 rpm and 4 N·m. The 4:1 compound example gives 30 rpm and 8 N·m.</p>
   <p>Rotational power is torque × angular speed: <strong>P = T × 2πn/60</strong> when T is in N·m and n is in rpm. Both sides of either example carry 25.13 W ideally. Real friction and other losses leave less output power. Tooth strength, bearings, shafts, lubrication and the motor all limit usable torque.</p>
   <p>At zero speed, mechanical power is zero. A loaded, stationary gear train can still carry torque. The lab shows ideal static torque balance in that case; it does not model motor stall behavior or promise a safe load.</p>
-  <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Primary references and model boundaries.</p>
+  <p class="deeper-ref" id="deeper-ref-11">Supporting detail: <a href="#deeper-addendum-11"><strong>Addendum 11</strong></a> &mdash; Primary references and model boundaries.</p>
   <p>Connect the gears to <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/angular-motion.html" target="_blank" rel="noopener">Angular Motion</a>, <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/rotation-and-linear-speed.html" target="_blank" rel="noopener">Rotation and Linear Speed</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/torque.html" target="_blank" rel="noopener">Torque</a>.</p>
     </div>
   </details>
@@ -3522,7 +3569,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <figcaption>Power-flow schematic, with gear pairs shown by pitch circles. The stages are separated for clarity; each connecting shaft turns its attached gears together.</figcaption>
   </figure>
   <p>At 98% per stage, three stages give <code>0.98³ = 0.941192</code>: about <strong>5.88% total loss</strong>, not 6%. Fewer, higher-quality stages often beat many cheap stages for efficiency, provided they can meet the ratio and load requirements.</p>
-  <p class="deeper-ref" id="deeper-ref-11">Supporting detail: <a href="#deeper-addendum-11"><strong>Addendum 11</strong></a> &mdash; Why adding losses is only an approximation.</p>
+  <p class="deeper-ref" id="deeper-ref-12">Supporting detail: <a href="#deeper-addendum-12"><strong>Addendum 12</strong></a> &mdash; Why adding losses is only an approximation.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-ratios--positive-drives-keep-the-speed-ratio-losses-reduce-torque" data-card="gear-ratios--positive-drives-keep-the-speed-ratio-losses-reduce-torque">
@@ -3532,7 +3579,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>A <strong>positive drive</strong> keeps input and output linked in a fixed ratio without slipping. Gears, chains and timing belts are positive drives. A slipping flat belt or V-belt is not. Follow <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/rotation-and-linear-speed.html" target="_blank" rel="noopener">Rotation and Linear Speed</a> for the connection from rotation to belt travel.</p>
   <div class="panel"><p>At a stated steady input speed and load, use magnitudes:</p><p><strong>ω<sub>out</sub> = ω<sub>in</sub>/i</strong><br><strong>τ<sub>out</sub> = τ<sub>in</sub> × i × η<sub>total</sub></strong><br><strong>P<sub>out</sub> = η<sub>total</sub> × P<sub>in</sub></strong></p></div>
   <p>The teeth still set the speed exactly in this model. Efficiency reduces output torque from its ideal value. It does not reduce output rpm as well. Use matching torque units on both sides: lbf·ft or N·m. The course conversion is <strong>1 rpm ≈ 0.1047 rad/s</strong> when angular speed in rad/s is needed.</p>
-  <p class="deeper-ref" id="deeper-ref-12">Supporting detail: <a href="#deeper-addendum-12"><strong>Addendum 12</strong></a> &mdash; Follow both stages of one loaded train.</p>
+  <p class="deeper-ref" id="deeper-ref-13">Supporting detail: <a href="#deeper-addendum-13"><strong>Addendum 13</strong></a> &mdash; Follow both stages of one loaded train.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-ratios--count-stages-for-ratio-meshes-for-direction-and-stated-losses" data-card="gear-ratios--count-stages-for-ratio-meshes-for-direction-and-stated-losses">
@@ -3555,7 +3602,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li>Calculate output speed and torque, keeping full precision for both limit checks. Check direction by counting external meshes. An added idler may require recalculating losses.</li>
   </ul>
   <p>To choose the faster of feasible designs at the same input speed, compare their actual overall ratios: the smaller one is faster. A feasible design is not automatically the fastest possible design.</p>
-  <p class="deeper-ref" id="deeper-ref-13">Supporting detail: <a href="#deeper-addendum-13"><strong>Addendum 13</strong></a> &mdash; Worked design: a winch with a speed ceiling and torque floor.</p>
+  <p class="deeper-ref" id="deeper-ref-14">Supporting detail: <a href="#deeper-addendum-14"><strong>Addendum 14</strong></a> &mdash; Worked design: a winch with a speed ceiling and torque floor.</p>
   <p><a class="button" data-practice-add="gear-three-stage-efficiency" href="../practice.html#gear-three-stage-efficiency">Practice multiplying efficiencies</a> <a class="button" data-practice-add="gear-winch-stage-count" href="../practice.html#gear-winch-stage-count">Practice designing to limits</a></p>
     </div>
   </details>
@@ -3588,97 +3635,107 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </li>
     <li class="deeper-addendum" id="deeper-addendum-3" value="3">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-chain-drives">Chain Drives</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 3.</span> Checked public wording behind the ANSI numbers</h2>
-        <p><a href="https://catalog.ustsubaki.com/view/303981549/100/">Tsubaki, The Complete Guide to Chain, printed page 86</a>, states: <q>The numbers to the left of the right-hand digit refer to the chain pitch in eighths of an inch.</q> It also identifies the final 5 as bush construction and #41 as the narrow #40 variation. <a href="https://catalog.ustsubaki.com/view/303869790/8/">Tsubaki's Sprocket Catalog, “How to Order”</a>, lists the pitch sizes independently.</p>
-    <p>The checked ASME public listing names B29.1 as <q>Precision Power Transmission Roller Chains, Attachments, and Sprockets</q>, edition 2011 (R2022). See <a href="https://www.asme.org/codes-standards/find-codes-standards/b29-1-precision-power-transmission-roller-chains-attachments-sprockets">ASME B29.1</a>. The examples above come from public manufacturer tables, not an unread clause of the paid standard.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-belt-drives">Belt Drives</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 3.</span> Derive the inverse and check speed and wrap</h2>
+        <p>Multiply the length approximation by 4C: 4CL = 8C² + 2π(D + d)C + (D − d)². Set B = 4L − 2π(D + d), giving 8C² − BC + (D − d)² = 0. The quadratic formula gives <strong>C = [B + √(B² − 32(D − d)²)]/16</strong>. Use this larger root and require C &gt; (D + d)/2 so the pitch circles are separated. An impossible length produces no valid layout.</p>
+    <p>Assuming no slip, <strong>n_small / n_large = D/d</strong> and <strong>v = πd n_small</strong>. With d in mm, divide v by 1000 to get m/min; with d in inches, multiply by 0.0254. Speed n is in r/min; N remains the symbol for teeth.</p>
+    <p>The tangent-span angle is α = asin((D − d)/(2C)); small-pulley wrap is <strong>θ = 180° − 2α</strong>, with α expressed in degrees. Less wrap means less grip. The drawing uses circular arcs and tangent spans; the length equation approximates that geometry. Its error grows as (D − d)/(2C) grows, so very unequal, closely spaced pulleys need a more exact calculation for final selection.</p>
         <p class="deeper-back"><a href="#deeper-ref-3">Back to reference 3</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-4" value="4">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-chain-drives">Chain Drives</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 4.</span> ISO scope and the source of the millimeter dimensions</h2>
-        <p>The <a href="https://www.iso.org/standard/61232.html">ISO 606:2015 public abstract</a> describes <q>short-pitch precision roller and bush chains with associated sprockets</q>. Its scope includes dimensional and strength characteristics; a chain number alone is not a load rating. The dimension examples are from <a href="https://www.renold.com/media/228840/renold-brand-chain-tables.pdf">Renold Roller Chain tables</a>, “European (BS) Standard — Simplex.” <a href="https://www.renold.com/support/chain-info-index/chain-standards/">Renold's Chain Standards guide</a> explains series and strand suffixes.</p>
+        <h2><span class="deeper-addendum-number">Addendum 4.</span> Checked public wording behind the ANSI numbers</h2>
+        <p><a href="https://catalog.ustsubaki.com/view/303981549/100/">Tsubaki, The Complete Guide to Chain, printed page 86</a>, states: <q>The numbers to the left of the right-hand digit refer to the chain pitch in eighths of an inch.</q> It also identifies the final 5 as bush construction and #41 as the narrow #40 variation. <a href="https://catalog.ustsubaki.com/view/303869790/8/">Tsubaki's Sprocket Catalog, “How to Order”</a>, lists the pitch sizes independently.</p>
+    <p>The checked ASME public listing names B29.1 as <q>Precision Power Transmission Roller Chains, Attachments, and Sprockets</q>, edition 2011 (R2022). See <a href="https://www.asme.org/codes-standards/find-codes-standards/b29-1-precision-power-transmission-roller-chains-attachments-sprockets">ASME B29.1</a>. The examples above come from public manufacturer tables, not an unread clause of the paid standard.</p>
         <p class="deeper-back"><a href="#deeper-ref-4">Back to reference 4</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-5" value="5">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-chain-drives">Chain Drives</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 5.</span> Chain selection and maintenance reference</h2>
-        <p><a href="https://www.renold.com/media/165418/transmission-i-and-m-ren12-eng-10-10.pdf">Renold's transmission-chain installation and maintenance guide</a> covers installation, lubrication, wear measurement and sprocket condition. Compare other drive families in <a class="xref-page" href="#p-belt-chain-and-gear-drives">Belt, Chain and Gear Drives</a>.</p>
+        <h2><span class="deeper-addendum-number">Addendum 5.</span> ISO scope and the source of the millimeter dimensions</h2>
+        <p>The <a href="https://www.iso.org/standard/61232.html">ISO 606:2015 public abstract</a> describes <q>short-pitch precision roller and bush chains with associated sprockets</q>. Its scope includes dimensional and strength characteristics; a chain number alone is not a load rating. The dimension examples are from <a href="https://www.renold.com/media/228840/renold-brand-chain-tables.pdf">Renold Roller Chain tables</a>, “European (BS) Standard — Simplex.” <a href="https://www.renold.com/support/chain-info-index/chain-standards/">Renold's Chain Standards guide</a> explains series and strand suffixes.</p>
         <p class="deeper-back"><a href="#deeper-ref-5">Back to reference 5</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-6" value="6">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-gear-drives">Gear Drives and Tooth Geometry</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 6.</span> Check the size definitions with one gear</h2>
-        <p>A spur gear with 30 teeth and 60 mm reference diameter has m = 60/30 = 2 mm. The diameter is 60/25.4 in, so its equivalent diametral pitch is 30/(60/25.4) = 12.7 teeth/in. In general, m = 25.4/P<sub>d</sub>. Two gears can have different diameters and tooth counts while sharing the same tooth size.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-chain-drives">Chain Drives</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 6.</span> Chain selection and maintenance reference</h2>
+        <p><a href="https://www.renold.com/media/165418/transmission-i-and-m-ren12-eng-10-10.pdf">Renold's transmission-chain installation and maintenance guide</a> covers installation, lubrication, wear measurement and sprocket condition. Compare other drive families in <a class="xref-page" href="#p-belt-chain-and-gear-drives">Belt, Chain and Gear Drives</a>.</p>
         <p class="deeper-back"><a href="#deeper-ref-6">Back to reference 6</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-7" value="7">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-gear-drives">Gear Drives and Tooth Geometry</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 7.</span> Normal and transverse measurements use different planes</h2>
-        <p>The normal plane cuts across a tooth at right angles to its slant; the transverse plane cuts across the gear at right angles to its shaft. Module (tooth size) and pressure angle can be specified in either plane, so compare values measured in the same plane. For this helical pair, match normal module, normal pressure angle and helix-angle magnitude, with opposite helix hands.</p>
+        <h2><span class="deeper-addendum-number">Addendum 7.</span> Check the size definitions with one gear</h2>
+        <p>A spur gear with 30 teeth and 60 mm reference diameter has m = 60/30 = 2 mm. The diameter is 60/25.4 in, so its equivalent diametral pitch is 30/(60/25.4) = 12.7 teeth/in. In general, m = 25.4/P<sub>d</sub>. Two gears can have different diameters and tooth counts while sharing the same tooth size.</p>
         <p class="deeper-back"><a href="#deeper-ref-7">Back to reference 7</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-8" value="8">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-gear-drives">Gear Drives and Tooth Geometry</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 8.</span> Primary references for the geometry and helical mesh</h2>
-        <p><a href="https://khkgears.net/new/gear_knowledge/gear_technical_reference/calculation_gear_dimensions.html">KHK, Calculation of Gear Dimensions</a>, sections 4.1 and 4.3, distinguishes reference geometry, profile shifts, and normal/transverse helical dimensions. <a href="https://khkgears.us/media/fqrlut1m/abcs-of-gearing-b.pdf">KHK, ABCs of Gearing, B</a>, develops tooth terminology and spur/helical calculations. <a href="https://khkgears.net/pdf/2023/helical-gears.pdf">KHK's helical-gear catalog</a> gives mating-series and bearing-thrust cautions. Use the mating table for the exact product.</p>
+        <h2><span class="deeper-addendum-number">Addendum 8.</span> Normal and transverse measurements use different planes</h2>
+        <p>The normal plane cuts across a tooth at right angles to its slant; the transverse plane cuts across the gear at right angles to its shaft. Module (tooth size) and pressure angle can be specified in either plane, so compare values measured in the same plane. For this helical pair, match normal module, normal pressure angle and helix-angle magnitude, with opposite helix hands.</p>
         <p class="deeper-back"><a href="#deeper-ref-8">Back to reference 8</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-9" value="9">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 9.</span> Why tooth counts work, and what the dashed circles mean</h2>
-        <p>The gears here share one tooth size, called module, and a 20° pressure angle. Their pitch diameters are proportional to tooth count. The dashed pitch circles roll together at equal tangential speed, so n<sub>A</sub> × N<sub>A</sub> = −n<sub>B</sub> × N<sub>B</sub> when clockwise is positive on both shafts. Here n is signed rotational speed and N is tooth count.</p>
-    <p>Tooth flanks are involute curves. Actual tooth surfaces can slide during contact even though the pitch circles roll. The drawing samples those curves, simplifies the tooth roots and adds a small visual clearance. It is a motion model, not a manufacturing drawing.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-gear-drives">Gear Drives and Tooth Geometry</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 9.</span> Primary references for the geometry and helical mesh</h2>
+        <p><a href="https://khkgears.net/new/gear_knowledge/gear_technical_reference/calculation_gear_dimensions.html">KHK, Calculation of Gear Dimensions</a>, sections 4.1 and 4.3, distinguishes reference geometry, profile shifts, and normal/transverse helical dimensions. <a href="https://khkgears.us/media/fqrlut1m/abcs-of-gearing-b.pdf">KHK, ABCs of Gearing, B</a>, develops tooth terminology and spur/helical calculations. <a href="https://khkgears.net/pdf/2023/helical-gears.pdf">KHK's helical-gear catalog</a> gives mating-series and bearing-thrust cautions. Use the mating table for the exact product.</p>
         <p class="deeper-back"><a href="#deeper-ref-9">Back to reference 9</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-10" value="10">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 10.</span> Primary references and model boundaries</h2>
-        <ul>
-      <li><a href="https://khkgears.net/new/gear_knowledge/gear-nomenclature/idler-gear.html">KHK: Idler gear</a>. The intermediate tooth count cancels from the overall speed ratio.</li>
-      <li><a href="https://khkgears.net/new/gear_knowledge/gear_technical_reference/calculation_gear_dimensions.html">KHK: Calculation of Gear Dimensions</a>, section 4.1 and Table 4.1. Standard spur-gear pitch, base, tip and root dimensions and center spacing.</li>
-      <li><a href="https://ocw.mit.edu/courses/res-tll-004-stem-concept-videos-fall-2013/resources/gear-trains/">MIT OpenCourseWare: Gear Trains</a>. Gear bodies, shared shafts, and force and torque balance.</li>
-    </ul>
-    <p>The lab assumes rigid external spur gears, fixed shaft centers, matched tooth size and steady transmitted load. It starts lossless; its efficiency control applies the same specified loss to every actual mesh, including both meshes around an idler. Acceleration, elasticity, backlash dynamics, detailed friction, noise and tooth strength are omitted. Changing tooth counts moves the centers to maintain the correct mesh; it does not represent swapping a gear into a fixed gearbox housing.</p>
+        <h2><span class="deeper-addendum-number">Addendum 10.</span> Why tooth counts work, and what the dashed circles mean</h2>
+        <p>The gears here share one tooth size, called module, and a 20° pressure angle. Their pitch diameters are proportional to tooth count. The dashed pitch circles roll together at equal tangential speed, so n<sub>A</sub> × N<sub>A</sub> = −n<sub>B</sub> × N<sub>B</sub> when clockwise is positive on both shafts. Here n is signed rotational speed and N is tooth count.</p>
+    <p>Tooth flanks are involute curves. Actual tooth surfaces can slide during contact even though the pitch circles roll. The drawing samples those curves, simplifies the tooth roots and adds a small visual clearance. It is a motion model, not a manufacturing drawing.</p>
         <p class="deeper-back"><a href="#deeper-ref-10">Back to reference 10</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-11" value="11">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 11.</span> Why adding losses is only an approximation</h2>
-        <p>For a 1000 W input and three 96% stages, the losses are 40 W, 38.4 W and 36.864 W. Each 4% applies to a smaller incoming power. Adding 4% + 4% + 4% incorrectly takes every loss from the original 1000 W.</p>
+        <h2><span class="deeper-addendum-number">Addendum 11.</span> Primary references and model boundaries</h2>
+        <ul>
+      <li><a href="https://khkgears.net/new/gear_knowledge/gear-nomenclature/idler-gear.html">KHK: Idler gear</a>. The intermediate tooth count cancels from the overall speed ratio.</li>
+      <li><a href="https://khkgears.net/new/gear_knowledge/gear_technical_reference/calculation_gear_dimensions.html">KHK: Calculation of Gear Dimensions</a>, section 4.1 and Table 4.1. Standard spur-gear pitch, base, tip and root dimensions and center spacing.</li>
+      <li><a href="https://ocw.mit.edu/courses/res-tll-004-stem-concept-videos-fall-2013/resources/gear-trains/">MIT OpenCourseWare: Gear Trains</a>. Gear bodies, shared shafts, and force and torque balance.</li>
+    </ul>
+    <p>The lab assumes rigid external spur gears, fixed shaft centers, matched tooth size and steady transmitted load. It starts lossless; its efficiency control applies the same specified loss to every actual mesh, including both meshes around an idler. Acceleration, elasticity, backlash dynamics, detailed friction, noise and tooth strength are omitted. Changing tooth counts moves the centers to maintain the correct mesh; it does not represent swapping a gear into a fixed gearbox housing.</p>
         <p class="deeper-back"><a href="#deeper-ref-11">Back to reference 11</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-12" value="12">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 12.</span> Follow both stages of one loaded train</h2>
-        <p>A 24-tooth driver at 1440 rpm and 4 lbf·ft drives 48 teeth. That shaft also carries a 15-tooth driver for a 45-tooth output. Both stages are 96% efficient, with no other losses. After stage 1: 720 rpm and <code>4 × 2 × 0.96 = 7.68 lbf·ft</code>. The shared shaft carries that same 720 rpm into stage 2. Final output: <code>1440/(2 × 3) = 240 rpm</code> and <code>7.68 × 3 × 0.96 = 22.1184 lbf·ft</code>, versus 24 lbf·ft ideally. Overall efficiency is 0.9216.</p>
+        <h2><span class="deeper-addendum-number">Addendum 12.</span> Why adding losses is only an approximation</h2>
+        <p>For a 1000 W input and three 96% stages, the losses are 40 W, 38.4 W and 36.864 W. Each 4% applies to a smaller incoming power. Adding 4% + 4% + 4% incorrectly takes every loss from the original 1000 W.</p>
         <p class="deeper-back"><a href="#deeper-ref-12">Back to reference 12</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-13" value="13">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 13.</span> Worked design: a winch with a speed ceiling and torque floor</h2>
-        <p>A motor supplies 1680 rpm and 24 lbf·ft. The output must be at most 40 rpm and at least 950 lbf·ft. Available gears have 10–60 teeth, with unlimited copies; each reduction stage is at most 6:1 and 97% efficient. There are no idlers or other losses.</p><ol><li>Speed requires <code>i ≥ 1680/40 = 42</code>. Two stages give at most <code>6² = 36</code>, so try three.</li><li>Three stages give <code>η<sub>total</sub> = 0.97³ = 0.912673</code>. Torque requires <code>i ≥ 950/(24 × 0.912673) ≈ 43.3708</code>. Torque controls.</li><li>Choose 12 → 48, 15 → 45, and 16 → 60 teeth: <code>i = 4 × 3 × 3.75 = 45</code>. Every tooth count and stage ratio meets its limit.</li><li><code>ω<sub>out</sub> = 1680/45 ≈ 37.33 rpm ≤ 40 rpm</code>. <code>τ<sub>out</sub> = 24 × 45 × 0.912673 = 985.68684 lbf·ft ≥ 950 lbf·ft</code>. Both pass. Three external meshes make the output opposite to the input.</li></ol><p>This is one feasible train, not a claim of an optimum or a complete winch specification. For load force at a drum, continue to <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/torque.html" target="_blank" rel="noopener">Torque</a>; for travel speed, use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/rotation-and-linear-speed.html" target="_blank" rel="noopener">Rotation and Linear Speed</a>.</p>
+        <h2><span class="deeper-addendum-number">Addendum 13.</span> Follow both stages of one loaded train</h2>
+        <p>A 24-tooth driver at 1440 rpm and 4 lbf·ft drives 48 teeth. That shaft also carries a 15-tooth driver for a 45-tooth output. Both stages are 96% efficient, with no other losses. After stage 1: 720 rpm and <code>4 × 2 × 0.96 = 7.68 lbf·ft</code>. The shared shaft carries that same 720 rpm into stage 2. Final output: <code>1440/(2 × 3) = 240 rpm</code> and <code>7.68 × 3 × 0.96 = 22.1184 lbf·ft</code>, versus 24 lbf·ft ideally. Overall efficiency is 0.9216.</p>
         <p class="deeper-back"><a href="#deeper-ref-13">Back to reference 13</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-14" value="14">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 14.</span> Worked design: a winch with a speed ceiling and torque floor</h2>
+        <p>A motor supplies 1680 rpm and 24 lbf·ft. The output must be at most 40 rpm and at least 950 lbf·ft. Available gears have 10–60 teeth, with unlimited copies; each reduction stage is at most 6:1 and 97% efficient. There are no idlers or other losses.</p><ol><li>Speed requires <code>i ≥ 1680/40 = 42</code>. Two stages give at most <code>6² = 36</code>, so try three.</li><li>Three stages give <code>η<sub>total</sub> = 0.97³ = 0.912673</code>. Torque requires <code>i ≥ 950/(24 × 0.912673) ≈ 43.3708</code>. Torque controls.</li><li>Choose 12 → 48, 15 → 45, and 16 → 60 teeth: <code>i = 4 × 3 × 3.75 = 45</code>. Every tooth count and stage ratio meets its limit.</li><li><code>ω<sub>out</sub> = 1680/45 ≈ 37.33 rpm ≤ 40 rpm</code>. <code>τ<sub>out</sub> = 24 × 45 × 0.912673 = 985.68684 lbf·ft ≥ 950 lbf·ft</code>. Both pass. Three external meshes make the output opposite to the input.</li></ol><p>This is one feasible train, not a claim of an optimum or a complete winch specification. For load force at a drum, continue to <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/torque.html" target="_blank" rel="noopener">Torque</a>; for travel speed, use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/rotation-and-linear-speed.html" target="_blank" rel="noopener">Rotation and Linear Speed</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-14">Back to reference 14</a></p>
       </article>
     </li>
   </ol>
@@ -5590,6 +5647,157 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 }());
+
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiBeltGeometry = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  const DEFAULT = Object.freeze({ D: 200, d: 100, C: 400, L: 1277.488898038469, n: 1200, unit: 'mm', mode: 'center' });
+  function positive(v, name) {
+    if (!Number.isFinite(v) || v <= 0) throw new RangeError(name + ' must be finite and positive.');
+  }
+  function diameters(D, d) {
+    positive(D, 'D'); positive(d, 'd');
+    if (D < d) throw new RangeError('D must be at least d.');
+  }
+  function length(D, d, C) {
+    diameters(D, d); positive(C, 'C');
+    if (C <= (D + d) / 2) throw new RangeError('Separate the pulleys: C must exceed (D + d)/2.');
+    return 2 * C + Math.PI * (D + d) / 2 + (D - d) ** 2 / (4 * C);
+  }
+  function center(D, d, L) {
+    diameters(D, d); positive(L, 'L');
+    // 4CL = 8C² + 2π(D+d)C + (D-d)², hence 8C² - BC + (D-d)² = 0.
+    // The larger root is the separated-pulley branch; reject overlap below.
+    const B = 4 * L - 2 * Math.PI * (D + d);
+    const disc = B * B - 32 * (D - d) ** 2;
+    if (B <= 0 || disc < 0) throw new RangeError('That length cannot fit these pulleys. Increase L.');
+    const C = (B + Math.sqrt(disc)) / 16;
+    length(D, d, C);
+    return C;
+  }
+  function solve(s) {
+    if (!s || !['mm', 'in'].includes(s.unit) || !['center', 'length'].includes(s.mode)) throw new RangeError('Choose mm or in and a solve mode.');
+    if (!Number.isFinite(s.n) || s.n < 0) throw new RangeError('Small-pulley speed must be finite and nonnegative.');
+    const C = s.mode === 'length' ? center(s.D, s.d, s.L) : s.C;
+    const L = length(s.D, s.d, C), ratio = s.D / s.d;
+    const wrap = 180 - 2 * Math.asin((s.D - s.d) / (2 * C)) * 180 / Math.PI;
+    const result = { C, L, ratio, largeSpeed: s.n / ratio,
+      beltSpeed: Math.PI * s.d * s.n * (s.unit === 'mm' ? .001 : .0254),
+      wrap, correction: (s.D - s.d) ** 2 / (4 * C) };
+    if (Object.values(result).some(v => !Number.isFinite(v))) throw new RangeError('Values are too large to calculate.');
+    return result;
+  }
+  function convert(s, unit) {
+    if (!['mm', 'in'].includes(unit)) throw new RangeError('Choose mm or in.');
+    const factor = s.unit === unit ? 1 : unit === 'in' ? 1 / 25.4 : 25.4;
+    const out = Object.assign({}, s, { unit });
+    ['D', 'd', 'C', 'L'].forEach(k => { out[k] *= factor; });
+    return out;
+  }
+  const format = v => Number(v.toPrecision(6)).toString();
+  return { DEFAULT, length, center, solve, convert, format };
+});
+
+(function (root, factory) {
+  'use strict';
+  const node = typeof module === 'object' && module.exports;
+  const api = factory(node ? require('./model.js') : root.CourseWikiBeltGeometry);
+  if (node) module.exports = api; else root.CourseWikiBeltDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  const f = M.format;
+  function diagram(s) {
+    const r = M.solve(s), scale = Math.min(260 / (r.C + (s.D + s.d) / 2), 160 / s.D);
+    const small = s.d * scale / 2, large = s.D * scale / 2;
+    const x = 20 + small, X = x + r.C * scale, y = 105;
+    const a = Math.asin((s.D - s.d) / (2 * r.C));
+    const sx = x - small * Math.sin(a), sy = small * Math.cos(a);
+    const lx = X - large * Math.sin(a), ly = large * Math.cos(a);
+    return '<svg viewBox="0 0 300 260" role="img" aria-label="Open belt with external tangent spans; small pulley left, large pulley right. The highlighted arc shows small-pulley contact.">' +
+      '<g fill="none" stroke="currentColor" stroke-width="2"><circle cx="' + x + '" cy="' + y + '" r="' + small + '"/><circle cx="' + X + '" cy="' + y + '" r="' + large + '"/>' +
+      '<path stroke-width="4" d="M' + sx + ' ' + (y-sy) + 'L' + lx + ' ' + (y-ly) + 'A' + large + ' ' + large + ' 0 1 1 ' + lx + ' ' + (y+ly) + 'L' + sx + ' ' + (y+sy) + '"/>' +
+      '<path class="bg-wrap" stroke-width="5" d="M' + sx + ' ' + (y+sy) + 'A' + small + ' ' + small + ' 0 0 1 ' + sx + ' ' + (y-sy) + '"/>' +
+      '<path stroke-dasharray="3 3" d="M' + x + ' ' + y + 'H' + X + '"/></g>' +
+      '<text x="20" y="21">d = ' + f(s.d) + ' ' + s.unit + '</text><text x="20" y="236">D = ' + f(s.D) + ' ' + s.unit + '</text>' +
+      '<text x="20" y="257">C = ' + f(r.C) + ' ' + s.unit + '</text></svg>';
+  }
+  function results(s) {
+    const r = M.solve(s);
+    const rows = [['Belt pitch length L (approx., ' + s.unit + ')', r.L], ['Center distance C (' + s.unit + ')', r.C],
+      ['Speed ratio n_small / n_large', r.ratio], ['Large-pulley speed (r/min)', r.largeSpeed],
+      ['Belt speed (m/min)', r.beltSpeed], ['Small-pulley wrap (degrees)', r.wrap], ['Unequal-pulley correction (' + s.unit + ')', r.correction]];
+    return '<table><caption>Open belt: D = ' + f(s.D) + ', d = ' + f(s.d) + ' ' + s.unit + '; n_small = ' + f(s.n) + ' r/min</caption><tbody>' + rows.map(row => '<tr><th scope="row">' + row[0] + '</th><td>' + f(row[1]) + '</td></tr>').join('') + '</tbody></table>' +
+      '<p class="bg-warning">' + (r.wrap < 150 ? 'Reduced small-pulley contact. ' : '') + 'Less wrap means less grip for a friction belt and fewer teeth engaged for a timing belt. This geometry model does not rate load capacity.</p>';
+  }
+  function staticLesson() {
+    return diagram(M.DEFAULT) + results(M.DEFAULT) + '<p>Worked example: D = 200 mm, d = 100 mm, C = 400 mm and n_small = 1200 r/min. L ≈ 800 + 150π + 6.25 = 1277.49 mm. The inverse returns C ≈ 400 mm. Ratio = 2; n_large = 600 r/min; v = π × 100 × 1200 / 1000 ≈ 376.99 m/min; wrap ≈ 165.64°.</p>';
+  }
+  return { diagram, results, staticLesson };
+});
+
+(function (root, factory) {
+  'use strict';
+  const node = typeof module === 'object' && module.exports;
+  const api = factory(node ? require('./model.js') : root.CourseWikiBeltGeometry, node ? require('./render.js') : root.CourseWikiBeltDraw);
+  if (node) module.exports = api;
+  else document.querySelectorAll('[data-interactive="belt-geometry"]').forEach(api.init);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M, D) {
+  'use strict';
+  let sequence = 0;
+  function init(root) {
+    if (root.dataset.bgReady || !M || !D) return;
+    let id;
+    do { id = 'bg-' + (++sequence); } while (document.getElementById(id + '-D'));
+    let state = Object.assign({}, M.DEFAULT);
+    const lab = document.createElement('div'); lab.className = 'bg-lab';
+    lab.innerHTML = '<p>Predict first: increase C without changing the pulleys. Which changes: length, wrap or speed ratio?</p><div class="bg-controls">' +
+      '<label for="' + id + '-unit">Length unit<select id="' + id + '-unit" data-unit><option value="mm">Millimeters (mm)</option><option value="in">Inches (in)</option></select></label>' +
+      '<label for="' + id + '-mode">Solve mode<select id="' + id + '-mode" data-mode><option value="center">Enter C → find L</option><option value="length">Enter L → find C</option></select></label>' +
+      [['D','Large pitch diameter D'],['d','Small pitch diameter d'],['C','Center distance C'],['L','Chosen pitch length L'],['n','Small-pulley speed (r/min)']].map(([key,label]) => '<label for="' + id + '-' + key + '">' + label + '<input id="' + id + '-' + key + '" data-key="' + key + '" type="number" min="0" step="any" value="' + state[key] + '"></label>').join('') +
+      '</div><button type="button" data-reset>Reset example</button><p data-status role="status"></p><div class="bg-grid"><div data-figure></div><div data-results></div></div>';
+    root.prepend(lab);
+    const q = selector => lab.querySelector(selector), inputs = [...lab.querySelectorAll('input')];
+    function sync() {
+      inputs.forEach(e => { e.value = state[e.dataset.key]; e.disabled = e.dataset.key === (state.mode === 'center' ? 'L' : 'C'); });
+      q('[data-unit]').value = state.unit; q('[data-mode]').value = state.mode;
+    }
+    function update() {
+      try {
+        inputs.filter(e => !e.disabled).forEach(e => {
+          if (e.value.trim() === '' || !e.checkValidity()) throw new RangeError('Enter a number in every active field.');
+          state[e.dataset.key] = Number(e.value);
+        });
+        const r = M.solve(state); state.C = r.C; state.L = r.L;
+        q('[data-key="' + (state.mode === 'center' ? 'L' : 'C') + '"]').value = state.mode === 'center' ? r.L : r.C;
+        q('[data-figure]').innerHTML = D.diagram(state); q('[data-results]').innerHTML = D.results(state);
+        q('[data-status]').textContent = 'Results updated. All length inputs use ' + state.unit + '. Speeds assume no slip.';
+        return true;
+      } catch (error) {
+        q('[data-status]').textContent = error.message;
+        q('[data-figure]').replaceChildren(); q('[data-results]').replaceChildren();
+        inputs.filter(e => e.disabled).forEach(e => { e.value = ''; });
+        return false;
+      }
+    }
+    inputs.forEach(e => e.addEventListener('input', update));
+    lab.addEventListener('keydown', e => { if (e.target.matches('input, select, button')) e.stopPropagation(); });
+    q('[data-unit]').addEventListener('change', e => {
+      if (!update()) { e.target.value = state.unit; return; }
+      state = M.convert(state, e.target.value); sync(); update();
+    });
+    q('[data-mode]').addEventListener('change', e => {
+      if (!update()) { e.target.value = state.mode; return; }
+      state.mode = e.target.value; sync(); update();
+    });
+    q('[data-reset]').addEventListener('click', () => { state = Object.assign({}, M.DEFAULT); sync(); update(); });
+    sync(); update(); root.dataset.bgReady = 'true';
+  }
+  return { init };
+});
 
 (function (root, factory) {
   'use strict';
