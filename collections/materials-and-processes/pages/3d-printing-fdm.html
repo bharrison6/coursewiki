@@ -1,0 +1,49 @@
+@@ID: 3d-printing-fdm
+@@TITLE: FDM 3D Printing
+@@SECTION: Plastics
+@@SUMMARY: Read an FDM part as deposited roads and layers, then choose orientation, walls, infill and supports for its job.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>A slicer turns a solid model into deposited layers</h2>
+  <p><strong>Fused deposition modeling (FDM)</strong>, also called fused filament fabrication (FFF), feeds thermoplastic filament into a heated nozzle. The machine lays down narrow roads of softened material that bond as the part builds. Relative motion between the nozzle and build plate advances the layers; the nozzle itself does not have to move upward on every printer.</p>
+  <p>A <strong>slicer</strong> converts the model into tool paths, including walls, internal fill and any temporary supports. Preview those paths before printing. An enclosed shape on a CAD screen does not tell you how its underside will be supported.</p>
+  <figure><p>[[img:materials-and-processes/plastics-processing/fdm-section.svg|Schematic FDM cross-section: filament enters the heated nozzle above deposited layers; outer walls enclose sparse infill; removable supports stand beneath an overhang on the build plate.]]</p><figcaption>A section through a partly printed part. Walls, infill and supports are different tool paths. The large lines are illustrative, not a scale drawing.</figcaption></figure>
+  <details class="deeper"><summary>Where additive manufacturing fits the five process categories</summary><p>This topic treats FDM under <strong>Fabricating</strong>: successive deposits bond into a part. Some books classify additive manufacturing under <strong>Forming</strong> because it creates shape. Neither convention adds a sixth process category. The useful description is the mechanism: material is added layer by layer. Subsequent support removal is Separating; annealing is Conditioning; sanding or painting is Finishing. The material-family and plastic-forming topics provide the wider context.</p></details>
+</section>
+
+<section>
+  <h2>Layer height, walls and infill do different jobs</h2>
+  <p><strong>Layer height</strong> is the vertical increment between layers. A smaller height makes steps on sloping surfaces finer and usually adds print time. It does not make all small horizontal features printable: nozzle size, road width and motion accuracy also matter.</p>
+  <p><strong>Walls</strong> or perimeters trace the boundary. Top and bottom layers close the part. <strong>Infill</strong> is the pattern inside those boundaries. More infill generally adds material and time, but strength also depends on walls, orientation, bonding and load direction. A 20% infill setting does not mean the entire part uses 20% of its solid volume, because the walls and skins remain.</p>
+  <p><strong>Simple layer-count example:</strong> for a 24 mm height with every layer 0.20 mm thick, 24 ÷ 0.20 = 120 layers. Real slicers may use a different first-layer height or variable layers. Halving layer height roughly doubles the layer count, not necessarily the total print time.</p>
+</section>
+
+<section>
+  <h2>Orient for the load as well as for fewer supports</h2>
+  <p>FDM parts are <strong>anisotropic</strong>: properties depend on direction. A load that pulls layers apart can expose a weaker bond than a load carried along continuous deposited roads. Avoid placing the main tensile load across layer interfaces when an orientation can carry it along the layers. This is a design starting point, not a strength rating.</p>
+  <p>An <strong>overhang</strong> extends beyond the layer below. A short <strong>bridge</strong> spans between supported ends. A long unsupported underside may need temporary support material. Support contacts can leave marks, so keep them away from critical visible or mating surfaces where possible. There is no universal overhang angle that works for all materials and settings.</p>
+  <p>For a rectangular test bar pulled along its length, laying its length in the build plane usually gives a better starting orientation than standing it upright and pulling across stacked layers. A bracket may have several important load directions; choose a compromise or change the design, then test it.</p>
+  <ul class="boxes"><li>Mark the main load direction and critical fit surfaces on the model.</li><li>Compare orientations for layer direction, build-plate contact and unsupported undersides.</li><li>Preview walls, infill and supports one layer at a time.</li><li>Check that support can actually be removed from each enclosed space.</li></ul>
+</section>
+
+<section>
+  <h2>Choose filament for service conditions and printer capability</h2>
+  <table><thead><tr><th>Filament</th><th>Useful starting point</th><th>Check before choosing</th></tr></thead><tbody>
+    <tr><td>PLA</td><td>Stiff models and easy-to-print prototypes</td><td>Heat exposure and impact requirements; a neat print is not automatically suitable for a warm enclosure.</td></tr>
+    <tr><td>PETG</td><td>Tougher functional parts with useful layer bonding</td><td>Stringing, moisture and support-removal behavior for the grade.</td></tr>
+    <tr><td>ABS / ASA</td><td>Applications needing greater heat resistance than ordinary PLA; ASA is often chosen for outdoor exposure</td><td>Warping control, equipment capability and processing requirements.</td></tr>
+    <tr><td>TPU</td><td>Flexible parts</td><td>Hardness grade and whether the feed system can handle flexible filament.</td></tr>
+    <tr><td>Nylon (polyamide)</td><td>Tough engineering parts</td><td>Moisture control, dimensional change and the required printing conditions.</td></tr>
+  </tbody></table>
+  <p>PVA is used as a water-soluble support material in compatible multi-material systems; it is not a universal companion for every filament. Use the exact filament manufacturer's settings and the printer's limits. Consult [[equipment-operating-procedure]] and [[chemicals-and-sds]] for process controls.</p>
+  <details class="deeper"><summary>Material guidance is grade-specific</summary><p>Filament names describe families, not identical recipes. Pigments, fillers and blends change behavior. <a href="https://help.prusa3d.com/category/material-guide_220">Prusa's material guide</a> separates common filament families and their printing requirements. It does not establish what any particular shop printer can process.</p></details>
+</section>
+
+<section>
+  <h2>Estimate mass from deposited volume, not infill alone</h2>
+  <p>Mass = deposited volume × density. If a simplified model has 8 cm³ of solid walls and skins plus a 32 cm³ interior at 25% infill, its estimated deposited volume is 8 + (32 × 0.25) = 16 cm³. At an assumed density of 1.24 g/cm³, that is <strong>19.84 g</strong>. Supports, brims and purge material add more.</p>
+  <p>This estimate treats infill percentage as a volume fraction of the interior. A slicer estimates the actual paths more closely. Time also includes travel, acceleration, heating and cooling constraints; volume alone does not give an exact printing duration.</p>
+  <p>Post-processing choices are in [[conditioning-and-finishing-plastics]]. <a class="button" data-practice-add="plastics-filament-mass" href="../practice.html#plastics-filament-mass">Practice estimating filament mass</a></p>
+</section>
