@@ -6,12 +6,17 @@ const evidence = path.join(os.tmpdir(), 'acc-det102-sketch-constraint-lab');
 test('real first-use, keyboard, pointer, themes, phones, reference/conflict, print and independent roots', { skip: B.skip }, async () => {
   fs.mkdirSync(evidence, { recursive: true });
   const browser = await B.launch();
+  const lessonURL = B.browserURL.replace(/\/+$/, '') + '/engineering-graphics/fully-defined-sketches.html';
+  async function openLesson(page) {
+    const response = await page.goto(lessonURL);
+    assert.equal(response && response.status(), 200, 'Expected lesson HTTP 200 at ' + lessonURL);
+  }
   try {
     for (const width of [1280, 390, 375]) for (const theme of ['light', 'dark']) {
       const context = await browser.newContext({ viewport: { width, height: 1000 }, colorScheme: theme });
       const page = await context.newPage(), errors = [];
       page.on('pageerror', error => errors.push(String(error)));
-      await page.goto(B.browserURL + '/engineering-graphics/fully-defined-sketches.html');
+      await openLesson(page);
       await page.evaluate(t => { document.documentElement.dataset.theme = t; document.querySelectorAll('details.xcard').forEach(d => d.open = true); }, theme);
       const lab = page.locator('.sc-lab'), sc = key => lab.locator(`[data-sc="${key}"]`);
       await lab.waitFor();
@@ -85,7 +90,7 @@ test('real first-use, keyboard, pointer, themes, phones, reference/conflict, pri
       await context.close();
     }
     const context = await browser.newContext({ javaScriptEnabled: false });
-    const page = await context.newPage(); await page.goto(B.browserURL + '/engineering-graphics/fully-defined-sketches.html');
+    const page = await context.newPage(); await openLesson(page);
     await page.locator('details.xcard > summary').first().click();
     assert.equal(await page.locator('.sc-static').isVisible(), true);
     assert.match(await page.locator('.sc-static').textContent(), /DOF = 4 − rank/);
