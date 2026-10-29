@@ -1,12 +1,43 @@
-[data-interactive="wood-movement"] { margin-block: 1rem; padding: 1rem; border: 1px solid var(--line, currentColor); border-radius: .5rem; color: var(--ink); background: var(--surface); overflow-wrap: anywhere; }
-[data-interactive="wood-movement"] .wm-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
-[data-interactive="wood-movement"] label { display: block; min-width: 0; }
-[data-interactive="wood-movement"] input,
-[data-interactive="wood-movement"] select { box-sizing: border-box; display: block; width: 100%; min-width: 0; margin-top: .25rem; padding: .5rem; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid currentColor; border-radius: .25rem; }
-[data-interactive="wood-movement"] :is(input, select):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-[data-interactive="wood-movement"] .wm-result { font-weight: 700; }
-@media (max-width: 600px) { [data-interactive="wood-movement"] .wm-controls { grid-template-columns: minmax(0, 1fr); } }
-@media print {
-  [data-interactive="wood-movement"] .wm-controls { display: none; }
-  [data-interactive="wood-movement"] { background: transparent; color: inherit; border-color: currentColor; }
+[data-interactive="wood-movement"] { min-width: 0; overflow-wrap: anywhere; }
+.wm-ready > .wm-static { display: none; }
+.wm-live { font-family: var(--f-display); line-height: 1.45; }
+.wm-live p { margin-block: .6rem; }
+.wm-live .wm-heading { font-size: 1.15rem; }
+.wm-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; align-items: end; }
+.wm-controls label { display: grid; min-width: 0; gap: .25rem; }
+.wm-live :is(input,select,button) { box-sizing: border-box; min-height: 44px; min-width: 0; max-width: 100%; font: inherit; padding: .4rem .55rem; border: 1px solid var(--rule); border-radius: var(--radius-xs); color: var(--ink); background: var(--surface); }
+.wm-live :is(input,select) { width: 100%; }
+.wm-live :is(button,select,summary) { cursor: pointer; }
+.wm-live :is(input,select,button,summary):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.wm-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .65rem; }
+.wm-actions [data-wm-apply] { border: 2px solid var(--accent); font-weight: 700; }
+.wm-feedback { padding: .5rem .7rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+[data-wm-state="error"] .wm-feedback { border-left-style: double; border-left-width: 8px; }
+.wm-result { font-weight: 700; }
+.wm-comparison { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; }
+.wm-case { border: 1px solid var(--rule); background: var(--surface); min-width: 0; padding: .65rem; }
+.wm-case > strong { display: block; }
+.wm-diagram { display: block; width: 100%; height: auto; }
+.wm-support { fill: var(--surface-2); stroke: var(--rule); }
+.wm-board { fill: var(--flag-soft); stroke: var(--accent); stroke-width: 3; }
+.wm-grain { fill: none; stroke: var(--accent); stroke-width: 2; opacity: .55; }
+.wm-installed { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 6 5; }
+.wm-fixed { fill: var(--ink); stroke: var(--ink); stroke-width: 2; }
+.wm-window { fill: var(--cat1-soft); stroke: var(--accent); stroke-width: 2; }
+.wm-origin { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.wm-leader { fill: none; stroke: var(--accent); stroke-width: 2; }
+.wm-pin { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.wm-exceeded { fill: var(--ink); stroke: var(--msu-redorange); stroke-width: 4; }
+.wm-edge-readings { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .5rem; font-size: .92rem; }
+.wm-edge-readings :is(span,strong) { display: block; }
+.wm-edge-readings span { color: var(--ink-soft); }
+.wm-legend, .wm-limits, .wm-field-note { font-size: .9rem; color: var(--ink-soft); }
+.wm-settings { border-top: 1px solid var(--rule); margin-top: .7rem; padding-top: .3rem; }
+.wm-settings > summary { min-height: 44px; padding-block: .5rem; font-weight: 700; }
+.wm-settings > .wm-controls { margin-top: .5rem; }
+@media (max-width: 48rem) { .wm-comparison { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 34rem) {
+  .wm-controls { grid-template-columns: minmax(0,1fr); }
+  .wm-actions button { flex: 1 1 auto; }
 }
+@media print { .wm-ready > .wm-static { display: block !important; } .wm-live { display: none !important; } }

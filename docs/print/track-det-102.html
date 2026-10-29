@@ -3081,6 +3081,45 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 @media (max-width: 34rem) { .sc-first, .sc-inputs { grid-template-columns: minmax(0,1fr); } .sc-actions > button { width: 100%; } }
 @media print { .sc-live > .sc-static { display: block !important; } .sc-lab { display: none !important; } }
 
+/* Scoped module; the shared theme owns cards, practice, and printable page layout. */
+[data-interactive="assembly-motion-lab"] { min-width: 0; }
+.am-live > .am-static { display: none; }
+.am-lab { font-family: var(--f-display); line-height: 1.5; }
+.am-lab p { margin-block: .6rem; }
+.am-setup, .am-coordinates { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .75rem; }
+.am-lab label { display: grid; gap: .3rem; min-width: 0; }
+.am-lab :is(button,select,input[type="number"]) { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); min-height: 44px; min-width: 0; max-width: 100%; padding: .4rem .55rem; }
+.am-lab :is(button,select,summary) { cursor: pointer; }
+.am-lab :is(button,select,input,summary):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.am-lab fieldset { border: 1px solid var(--rule); min-width: 0; margin: .8rem 0; }
+.am-lab fieldset label { display: flex; align-items: center; gap: .6rem; min-height: 44px; }
+.am-lab input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent); flex: none; }
+.am-lab input[type="range"] { width: 100%; min-width: 0; height: 44px; accent-color: var(--accent); }
+.am-views { display: grid; grid-template-columns: 1.65fr 1fr; gap: .6rem; }
+.am-views figure { margin: 0; min-width: 0; border: 1px solid var(--rule); background: var(--paper); }
+.am-views svg { display: block; width: 100%; height: auto; }
+.am-views svg text { font: 15px var(--f-display); fill: var(--ink); }
+.am-views figcaption { font-size: .9rem; padding: .5rem; }
+.am-housing { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
+.am-ground { stroke: var(--ink); stroke-width: 2; fill: none; }
+.am-shaft { fill: var(--paper); stroke: var(--accent); stroke-width: 2; }
+.am-selected { stroke: var(--accent); stroke-width: 5; }
+.am-datum { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 5 4; }
+.am-axis { stroke: var(--accent); stroke-width: 2; fill: none; }
+.am-lever { stroke: var(--accent); stroke-width: 12; stroke-linecap: round; }
+.am-knob { stroke: var(--accent); stroke-width: 3; fill: var(--paper); }
+.am-status { display: block; font-weight: 700; padding: .65rem; border-left: 4px solid var(--accent); background: var(--surface); margin-block: .75rem; }
+.am-readings { font-weight: 700; margin-bottom: .75rem; }
+.am-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.am-feedback, .am-goal { padding: .5rem; border: 1px solid var(--rule); }
+.am-goal { font-weight: 700; }
+.am-edit { margin-top: .8rem; padding: .6rem; border: 1px solid var(--rule); }
+.am-edit summary { min-height: 44px; }
+.am-edit label { margin-bottom: .5rem; }
+.am-limits, .am-help { font-size: .9rem; }
+@media (max-width: 40rem) { .am-setup, .am-coordinates, .am-views { grid-template-columns: minmax(0,1fr); } .am-actions button { width: 100%; } .am-views figure:nth-child(2) svg { max-height: 230px; } }
+@media print { .am-live > .am-static { display: block !important; } .am-lab { display: none !important; } }
+
 </style>
 </head>
 <body class="app skin-app aggregate" data-page="agg-track-det-102" data-base="">
@@ -6994,6 +7033,48 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-66">Supporting detail: <a href="#deeper-addendum-66"><strong>Addendum 66</strong></a> &mdash; Why subtracting one DOF per mate gives the wrong answer.</p>
     </div>
   </details>
+  <details class="xcard deck-slide is-interactive" id="assembly-files-and-mates--test-a-shaft-joint-keep-the-motion-the-design-needs" data-card="assembly-files-and-mates--test-a-shaft-joint-keep-the-motion-the-design-needs" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Test a shaft joint: keep the motion the design needs<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Test a shaft joint: keep the motion the design needs</h2>
+  <p>The housing is grounded. The shaft and its attached lever start with their axes aligned to the housing bore. Predict the motions left, test them, then seat the shoulder. Finally add angular alignment: does a hinge still work?</p>
+  <div data-interactive="assembly-motion-lab">
+    <div class="am-static">
+      <h3>Worked experiment: 2 → 1 → 0 independent motions</h3>
+      <p>This original ideal joint begins <strong>after axis alignment</strong>, not as a free rigid body. Its only coordinates are axial position <strong>z</strong> in millimeters and spin <strong>θ</strong> in degrees. The housing is grounded; the lever moves with the shaft.</p>
+      <figure>
+        <svg viewBox="0 0 500 220" role="img" aria-label="Worked hinge after seating: shaft shoulder at housing datum z equals zero; lever at 65 degrees remains free to spin. Side view plus end view looking toward negative Z.">
+          <rect x="100" y="55" width="110" height="100" fill="none" stroke="currentColor" stroke-width="2"/>
+          <rect x="45" y="92" width="240" height="26" fill="var(--paper)" stroke="currentColor" stroke-width="2"/>
+          <rect x="85" y="72" width="15" height="66" fill="var(--paper)" stroke="currentColor" stroke-width="2"/>
+          <path d="M100 45V165 M20 105H305" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+          <path d="M295 100 305 105 295 110 M100 165H210 m-100 0 -10 10 m35 -10 -10 10 m35 -10 -10 10 m35 -10 -10 10" fill="none" stroke="currentColor"/>
+          <circle cx="400" cy="105" r="65" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="400" cy="105" r="15" fill="none" stroke="currentColor"/>
+          <path d="M400 105H475" stroke="currentColor" stroke-dasharray="5 4"/><path d="M400 105 429.6 41.6" stroke="currentColor" stroke-width="8"/>
+          <text x="35" y="25" fill="currentColor" font-size="17">SIDE · +z →</text><text x="330" y="25" fill="currentColor" font-size="17">END · toward −Z</text>
+          <text x="70" y="205" fill="currentColor" font-size="17">z = 0; slide blocked</text><text x="320" y="205" fill="currentColor" font-size="17">θ = 65°; spin free</text>
+        </svg>
+        <figcaption>Worked hinge state: shoulder at the housing datum, z = 0 mm; lever at θ = 65°. Looking toward −Z in the end view, positive spin is counterclockwise. Dashed lines show the joint axis and reference datums.</figcaption>
+      </figure>
+      <table>
+        <caption>Conditions remove independent motions, not one freedom per mate icon</caption>
+        <thead><tr><th scope="col">Condition after built-in axis alignment</th><th scope="col">Example coordinates</th><th scope="col">What can move?</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Neither additional condition</th><td>z = 12 mm, θ = 35° → test: 22 mm, 65°</td><td>Slide + spin: 2 DOF</td></tr>
+          <tr><th scope="row">Seat shoulder at z = 0</th><td>z = 0 mm, θ = 65°</td><td>Spin only: 1 DOF. Hinge goal met.</td></tr>
+          <tr><th scope="row">Also align lever at θ = 0°</th><td>z = 0 mm, θ = 0°</td><td>Neither: 0 DOF. Fixed goal met; hinge goal defeated.</td></tr>
+          <tr><th scope="row">Angular alignment only</th><td>z may vary, θ = 0°</td><td>Slide only: 1 DOF. Slider goal met.</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Diagnose and recover:</strong> to restore the hinge, remove angular alignment while keeping the shoulder seated. The shaft can turn again. For a slider, remove the shoulder condition and retain angular alignment. Choosing a goal alone does not change conditions.</p>
+      <p>The shoulder condition enforces <strong>z = 0</strong>; angular alignment enforces <strong>θ = 0°</strong>. They do not freeze an arbitrary current placement. Removing a condition permits motion without itself moving the component. Angles wrap every 360°.</p>
+      <p><strong>Model limits:</strong> axial travel −30 to +30 mm is a declared lab range, not physical stops. Axis alignment and rigid components are built in. Shoulder seating means ideal plane coincidence, holding z = 0 in both directions; physical shoulder contact alone would not retain a shaft against separation. Contact, collision/interference, friction and load capacity are outside this model. Schematic overlap does not establish a fit or clearance.</p>
+    </div>
+  </div>
+  <p>In a SOLIDWORKS geometric-mate sequence, concentric alignment followed by shoulder-face coincidence can leave shaft rotation free. This lab's conditions illustrate the resulting motion; they are not a vendor command recorder. Onshape expresses joint motion through mate connectors: <a href="https://cad.onshape.com/help/Content/Assembly/cylindrical_mate.htm">Cylindrical</a> permits axial translation and rotation (Tz, Rz), while <a href="https://cad.onshape.com/help/Content/Assembly/revolute_mate.htm">Revolute</a> permits rotation (Rz). These are not a one-to-one mapping of the SOLIDWORKS steps.</p>
+  <p>For coupled shaft rotations, continue with <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/gear-ratios.html" target="_blank" rel="noopener">Gear Ratios</a>. <a class="button" data-practice-add="assemblies-hinge-diagnosis" href="../practice.html#assemblies-hinge-diagnosis">Diagnose a locked hinge</a> <a class="button" data-practice-add="assemblies-slider-condition" href="../practice.html#assemblies-slider-condition">Preserve slider motion</a></p>
+    </div>
+  </details>
   <details class="xcard deck-slide" id="assembly-files-and-mates--parallel-and-perpendicular-mates-set-orientation" data-card="assembly-files-and-mates--parallel-and-perpendicular-mates-set-orientation">
     <summary>Parallel and perpendicular mates set orientation<span class="chev"></span></summary>
     <div class="body">
@@ -10749,6 +10830,119 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     function release() { drag = null; }
     svg.addEventListener('pointerup', release); svg.addEventListener('pointercancel', release); svg.addEventListener('lostpointercapture', release);
     render('Make a prediction, then grow. A fully defined sketch can still change when you edit a driving value.');
+  });
+})();
+
+/* Axis alignment is built in. This is a two-coordinate teaching joint, not a CAD solver. */
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.AssemblyMotionModel = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  var RANGE = 30;
+  var goals = {
+    hinge: { seat: true, lock: false, label: 'Hinge: spin, no slide' },
+    slider: { seat: false, lock: true, label: 'Slider: slide, no spin' },
+    fixed: { seat: true, lock: true, label: 'Fixed: no relative motion' }
+  };
+  function finite(value) { return typeof value === 'number' && Number.isFinite(value); }
+  function wrap(angle) {
+    var remainder = angle % 360;
+    var normalized = remainder < 0 ? remainder + 360 : remainder;
+    // Addition near 360 can round up for a tiny negative remainder.
+    return normalized >= 360 ? 0 : normalized || 0;
+  }
+  function valid(s) { return s && typeof s.seat === 'boolean' && typeof s.lock === 'boolean' && finite(s.z) && Math.abs(s.z) <= RANGE && finite(s.angle) && s.angle >= 0 && s.angle < 360 && (!s.seat || s.z === 0) && (!s.lock || s.angle === 0); }
+  function defaults() { return { seat: false, lock: false, z: 12, angle: 35 }; }
+  function freedoms(s) { return { slide: !s.seat, spin: !s.lock, dof: Number(!s.seat) + Number(!s.lock) }; }
+  // Selecting a condition enforces its stated datum. Removing it preserves current placement.
+  function conditions(s, seat, lock) {
+    if (!valid(s) || typeof seat !== 'boolean' || typeof lock !== 'boolean') return { ok: false, state: s, reason: 'Invalid joint state or condition.' };
+    return { ok: true, state: { seat: seat, lock: lock, z: seat ? 0 : s.z, angle: lock ? 0 : s.angle } };
+  }
+  function move(s, coordinate, value) {
+    if (!valid(s) || !['z', 'angle'].includes(coordinate) || !finite(value)) return { ok: false, state: s, reason: 'Enter a finite coordinate; the last valid placement remains.' };
+    if (coordinate === 'z' && Math.abs(value) > RANGE) return { ok: false, state: s, reason: 'Axial position must be within the declared lab range −30 to +30 mm.' };
+    var blocked = coordinate === 'z' ? s.seat : s.lock;
+    var next = Object.assign({}, s);
+    if (!blocked) next[coordinate] = coordinate === 'angle' ? wrap(value) : value;
+    return { ok: true, state: next, blocked: blocked, moved: next[coordinate] !== s[coordinate] };
+  }
+  function assess(s, goal) {
+    if (!valid(s) || !Object.prototype.hasOwnProperty.call(goals, goal)) return { ok: false, matches: false, message: 'Choose a valid joint goal.' };
+    var target = goals[goal], f = freedoms(s), matches = s.seat === target.seat && s.lock === target.lock;
+    var message = matches ? 'Goal met. ' + target.label + '.' :
+      goal === 'hinge' ? (s.lock ? 'The hinge cannot turn. Remove the angular lock to restore spin.' : 'The lever can slide off its axial location. Seat the shoulder at z = 0 while preserving spin.') :
+      goal === 'slider' ? (s.seat ? 'The slider cannot travel. Remove the shoulder condition to restore slide.' : 'The slider can spin. Lock its angular orientation at θ = 0° while preserving slide.') :
+      'The fixed goal needs both z = 0 and θ = 0°. Apply the missing locating condition.';
+    return { ok: true, matches: matches, freedoms: f, message: message };
+  }
+  return { RANGE: RANGE, goals: goals, defaults: defaults, valid: valid, wrap: wrap, freedoms: freedoms, conditions: conditions, move: move, assess: assess };
+});
+
+(function () {
+  'use strict';
+  var M = window.AssemblyMotionModel;
+  if (!M) return;
+  document.querySelectorAll('[data-interactive="assembly-motion-lab"]').forEach(function (root) {
+    if (root.dataset.assemblyReady) return;
+    root.dataset.assemblyReady = 'true';
+    var s = M.defaults(), goal = 'hinge';
+    var live = document.createElement('div'); live.className = 'am-lab';
+    // Labels wrap their controls. SVG uses no document IDs; each mount is independent.
+    live.innerHTML = '<p><strong>Original teaching joint:</strong> grounded housing + shaft/lever. Their axes are already aligned. Only axial position <b>z</b> and spin angle <b>θ</b> remain.</p>' +
+      '<div class="am-setup"><label>Joint goal<select data-am="goal"><option value="hinge">Hinge: spin, no slide</option><option value="slider">Slider: slide, no spin</option><option value="fixed">Fixed: no relative motion</option></select></label><label>Predict the current freedom count<select data-am="prediction"><option value="">Choose before testing</option><option value="0">0 DOF</option><option value="1">1 DOF</option><option value="2">2 DOF</option></select></label></div>' +
+      '<fieldset><legend>Locating conditions (axis alignment stays built in)</legend><label><input type="checkbox" data-am="seat">Seat shoulder plane on housing datum: z = 0 mm</label><label><input type="checkbox" data-am="lock">Align lever to angular datum: θ = 0°</label></fieldset>' +
+      '<div class="am-views"><figure><svg viewBox="0 0 480 230" role="img" aria-label="Side view along the shaft, showing grounded housing, shoulder plane and common Z axis"><path class="am-housing" d="M160 65H260V165H160Z M170 95H250V135H170Z" fill-rule="evenodd"/><path class="am-ground" d="M160 175H260 m-95 0 -10 10 m30 -10 -10 10 m30 -10 -10 10 m30 -10 -10 10 m30 -10 -10 10"/><g data-am="shaft"><rect class="am-shaft" x="90" y="102" width="280" height="26"/><rect class="am-shaft" x="140" y="83" width="20" height="64"/><line class="am-selected" x1="160" y1="78" x2="160" y2="152"/></g><line class="am-datum" x1="160" y1="55" x2="160" y2="165"/><path class="am-axis" d="M35 115H445 m-10 -5 10 5 -10 5"/><text x="30" y="35">SIDE · +z →</text><text x="165" y="205">Grounded housing</text><text x="30" y="225">Selected: shoulder plane + housing datum</text></svg><figcaption>Dashed datum: z = 0. Highlighted shoulder moves with the shaft. Housing stays fixed.</figcaption></figure>' +
+      '<figure><svg viewBox="0 0 260 230" role="img" aria-label="End view looking toward negative Z: lever spin is positive counterclockwise"><circle class="am-housing" cx="130" cy="115" r="55"/><circle class="am-shaft" cx="130" cy="115" r="18"/><path class="am-datum" d="M130 115H235"/><g data-am="lever"><path class="am-lever" d="M130 115H195"/><circle class="am-knob" cx="195" cy="115" r="8"/></g><path class="am-axis" d="M119 115H141 M130 104V126"/><text x="12" y="28">END · looking toward −Z</text><text x="18" y="215">+θ counterclockwise ↶</text></svg><figcaption>Rightward dashed ray: θ = 0°. The same Z axis points toward you (out of the end view). The lever is attached to the shaft.</figcaption></figure></div>' +
+      '<output class="am-status" data-am="status" aria-live="polite"></output><div class="am-readings" data-am="readings"></div>' +
+      '<div class="am-coordinates"><label>Request axial position z (mm)<input data-am="z" type="range" min="-30" max="30" step="1" value="12"></label><label>Request spin θ (degrees)<input data-am="angle" type="range" min="0" max="359" step="1" value="35"></label></div>' +
+      '<p class="am-help">Drag a slider, or focus it and use arrow keys. A blocked request keeps the actual coordinate unchanged.</p>' +
+      '<div class="am-actions"><button type="button" data-am="test">Test both motions</button><button type="button" data-am="recover">Restore goal motion</button><button type="button" data-am="reset">Reset experiment</button></div>' +
+      '<p class="am-feedback" data-am="feedback" aria-live="polite"></p><p class="am-goal" data-am="assessment" aria-live="polite"></p>' +
+      '<details class="am-edit"><summary>Enter an exact coordinate</summary><label>Coordinate<select data-am="coordinate"><option value="z">z (mm)</option><option value="angle">θ (degrees, wraps every 360°)</option></select></label><label>Requested value<input data-am="value" type="number" step="any" value="12"></label><button type="button" data-am="apply">Apply coordinate</button></details>' +
+      '<p class="am-limits">Lab travel: −30 to +30 mm, a display range, not physical stops. Spin wraps into 0–359…°. Shoulder seating means ideal plane coincidence: it holds z = 0 in both directions. A physical shoulder contact alone would not retain a shaft against separation. This model does not calculate contact, collision/interference, friction or load capacity. Schematic overlap is not a fit or clearance check.</p>';
+    root.appendChild(live); root.classList.add('am-live');
+    function el(k) { return live.querySelector('[data-am="' + k + '"]'); }
+    function number(n) { return String(n); }
+    function render(message) {
+      var f = M.freedoms(s), a = M.assess(s, goal);
+      el('seat').checked = s.seat; el('lock').checked = s.lock;
+      el('z').value = s.z; el('angle').value = s.angle;
+      el('z').setAttribute('aria-valuetext', number(s.z) + ' mm, slide ' + (f.slide ? 'allowed' : 'blocked'));
+      el('angle').setAttribute('aria-valuetext', number(s.angle) + ' degrees, spin ' + (f.spin ? 'allowed' : 'blocked'));
+      el('shaft').setAttribute('transform', 'translate(' + (s.z * 2) + ' 0)');
+      el('lever').setAttribute('transform', 'rotate(' + (-s.angle) + ' 130 115)');
+      el('status').textContent = f.dof + ' DOF · Slide ' + (f.slide ? 'allowed' : 'blocked') + ' · Spin ' + (f.spin ? 'allowed' : 'blocked');
+      el('readings').textContent = 'Actual z = ' + number(s.z) + ' mm · Actual θ = ' + number(s.angle) + '°';
+      el('assessment').textContent = a.message;
+      el('feedback').textContent = message || 'Conditions updated. Test the surviving motions and compare with the goal.';
+      live.dataset.dof = f.dof; live.dataset.goalMet = a.matches;
+    }
+    function request(coordinate, value) {
+      var r = M.move(s, coordinate, value);
+      if (!r.ok) { render(r.reason); return; }
+      s = r.state;
+      render(r.blocked ? (coordinate === 'z' ? 'Slide blocked by z = 0. Spin may still be allowed.' : 'Spin blocked by θ = 0°. Slide may still be allowed.') : (r.moved ? 'Requested motion is allowed. The other coordinate stayed unchanged.' : 'Already at that coordinate. Try a different value.'));
+    }
+    ['z', 'angle'].forEach(function (coordinate) { el(coordinate).addEventListener('input', function () { request(coordinate, Number(el(coordinate).value)); }); });
+    ['seat', 'lock'].forEach(function (condition) { el(condition).addEventListener('change', function () {
+      s = M.conditions(s, el('seat').checked, el('lock').checked).state;
+      el('prediction').value = '';
+      render('Locating conditions applied: selected shoulder sets z = 0; selected angular alignment sets θ = 0°. Removing a condition restores its motion.');
+    }); });
+    el('goal').addEventListener('change', function () { goal = el('goal').value; render('Goal changed; the current conditions and placement are retained. Compare allowed motions with this goal.'); });
+    el('test').addEventListener('click', function () {
+      var f = M.freedoms(s), prediction = el('prediction').value;
+      var slide = M.move(s, 'z', s.z <= 20 ? s.z + 10 : s.z - 10); s = slide.state;
+      var spin = M.move(s, 'angle', s.angle + 30); s = spin.state;
+      render((prediction ? (Number(prediction) === f.dof ? 'Prediction matches. ' : 'Compare your prediction with the surviving motions. ') : 'Choose a prediction before the next test. ') + 'Requested +/−10 mm slide: ' + (slide.blocked ? 'blocked' : 'moved') + '; +30° spin: ' + (spin.blocked ? 'blocked' : 'moved') + '. ' + f.dof + ' independent motion(s) remain.');
+    });
+    el('recover').addEventListener('click', function () { var t = M.goals[goal]; s = M.conditions(s, t.seat, t.lock).state; el('prediction').value = ''; render('Restored the conditions for this goal. Test both motions to verify what was preserved.'); });
+    el('reset').addEventListener('click', function () { s = M.defaults(); goal = 'hinge'; el('goal').value = goal; el('prediction').value = ''; el('value').value = '12'; render('Reset: predict the two motions left after axis alignment, then test.'); });
+    el('apply').addEventListener('click', function () { var raw = el('value').value; request(el('coordinate').value, raw.trim() === '' ? NaN : Number(raw)); });
+    render('Predict how many independent motions remain after axis alignment, then test both motions.');
   });
 })();
 

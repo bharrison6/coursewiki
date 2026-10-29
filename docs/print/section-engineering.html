@@ -3362,25 +3362,6 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="diagram-views"] figure h3 { break-after: avoid; page-break-after: avoid; }
 }
 
-[data-interactive="pwm-and-adc"] { min-width: 0; }
-[data-interactive="pwm-and-adc"] [hidden] { display: none !important; }
-[data-interactive="pwm-and-adc"] fieldset { min-width: 0; border: 1px solid var(--rule); border-radius: .4rem; margin: 1rem 0; padding: 1rem; }
-[data-interactive="pwm-and-adc"] legend { font-weight: bold; }
-[data-interactive="pwm-and-adc"] .pa-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
-[data-interactive="pwm-and-adc"] label { display: block; flex: 1 1 12rem; }
-[data-interactive="pwm-and-adc"] input { max-width: 100%; accent-color: var(--accent); }
-[data-interactive="pwm-and-adc"] input[type="number"] { display: block; width: 10rem; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: .5rem; }
-[data-interactive="pwm-and-adc"] svg { display: block; width: 100%; height: auto; color: var(--ink); }
-[data-interactive="pwm-and-adc"] svg text { fill: currentColor; font: 16px sans-serif; }
-[data-interactive="pwm-and-adc"] .pa-axis { fill: none; stroke: currentColor; }
-[data-interactive="pwm-and-adc"] .pa-square { fill: none; stroke: var(--accent); stroke-width: 2.5; }
-[data-interactive="pwm-and-adc"] .pa-filter { fill: none; stroke: currentColor; stroke-width: 3; stroke-dasharray: 7 4; }
-[data-interactive="pwm-and-adc"].pa-ready .pa-static { display: none; }
-@media print {
-  [data-interactive="pwm-and-adc"] .pa-live { display: none !important; }
-  [data-interactive="pwm-and-adc"] .pa-static { display: block !important; }
-}
-
 [data-interactive="series-parallel-circuits"] .circuit-controls { display: flex; flex-wrap: wrap; gap: 1rem; }
 [data-interactive="series-parallel-circuits"] [hidden] { display: none !important; }
 [data-interactive="series-parallel-circuits"] label { display: block; }
@@ -3401,6 +3382,65 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="series-parallel-circuits"] .circuit-table,
   [data-interactive="series-parallel-circuits"] .circuit-static { overflow: visible; }
   [data-interactive="series-parallel-circuits"] svg { max-height: 75mm; }
+}
+
+[data-interactive="circuit-voltage-probes"] { min-width: 0; margin-block: 1rem; }
+[data-interactive="circuit-voltage-probes"] * { box-sizing: border-box; }
+.cvp-live { display: grid; gap: .9rem; font: .96rem/1.45 var(--f-display); }
+.cvp-config, .cvp-leads, .cvp-predict { min-width: 0; border: 1px solid var(--rule); padding: .75rem; }
+.cvp-live legend { font-weight: 750; }
+.cvp-choice-row, .cvp-lead-row { display: flex; flex-wrap: wrap; gap: .5rem .9rem; }
+.cvp-choice-row label { display: inline-flex; align-items: center; min-height: 44px; gap: .35rem; }
+.cvp-lead-row button, .cvp-live button, .cvp-live input[type="number"] { min-height: 44px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .5rem .75rem; font: inherit; }
+.cvp-lead-row button[aria-pressed="true"] { border: 3px solid var(--accent); font-weight: 750; }
+.cvp-lead-row [data-lead="red"]::before { content: ""; display: inline-block; inline-size: .8rem; block-size: .8rem; margin-right: .35rem; border-radius: 50%; background: #C43D10; }
+.cvp-lead-row [data-lead="black"]::before { content: ""; display: inline-block; inline-size: .8rem; block-size: .8rem; margin-right: .35rem; border-radius: 50%; background: var(--ink); }
+.cvp-live :is(button,input,[data-probe-point],.cvp-diagram-scroll):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.cvp-diagram-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--rule); padding: .35rem; background: var(--surface); }
+.cvp-diagram-scroll svg { display: block; width: 680px; max-width: none; height: 350px; color: var(--ink); }
+.cvp-diagram-scroll svg text { fill: currentColor; stroke: none; font: 16px system-ui, sans-serif; }
+.cvp-diagram-scroll [data-probe-point] { cursor: pointer; }
+.cvp-diagram-scroll [data-probe-point] circle { fill: var(--surface); stroke: var(--accent); stroke-width: 4; }
+.cvp-diagram-scroll [data-probe-point].is-red circle { fill: #C43D10; stroke: #8F2A08; }
+.cvp-diagram-scroll [data-probe-point].is-black circle { fill: var(--ink); stroke: var(--paper); }
+.cvp-diagram-scroll [data-probe-point].is-red.is-black circle { fill: #C43D10; stroke: var(--ink); stroke-width: 9; stroke-dasharray: 10 5; }
+.cvp-diagram-scroll [data-probe-point].is-red text, .cvp-diagram-scroll [data-probe-point].is-black text { font-weight: 800; }
+.cvp-selection { margin: 0; font-weight: 700; }
+.cvp-predict label { display: grid; gap: .3rem; max-width: 22rem; font-weight: 650; }
+.cvp-predict-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .65rem; }
+.cvp-result { margin: 0; border-left: 4px solid var(--accent); padding: .65rem .8rem; background: var(--surface-2); }
+.cvp-result[data-state="waiting"] { border-left-color: var(--flag); }
+.cvp-limit { margin: 0; color: var(--ink-soft); }
+.cvp-table-scroll { max-width: 100%; overflow-x: auto; }
+.cvp-table-scroll:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.cvp-table-scroll table { min-width: 42rem; }
+@media (max-width: 32rem) { .xcard:has([data-interactive="circuit-voltage-probes"]) .body { padding-inline: .5rem; } }
+@media screen { [data-interactive="circuit-voltage-probes"][data-cvp-ready] > .cvp-static { display: none; } }
+@media print {
+  [data-interactive="circuit-voltage-probes"] .cvp-live { display: none !important; }
+  [data-interactive="circuit-voltage-probes"] > .cvp-static { display: block !important; }
+  [data-interactive="circuit-voltage-probes"] .cvp-table-scroll { overflow: visible; max-width: none; }
+  [data-interactive="circuit-voltage-probes"] .cvp-table-scroll table { width: 100%; min-width: 0; table-layout: fixed; font-size: .74rem; break-inside: avoid; }
+  [data-interactive="circuit-voltage-probes"] .cvp-table-scroll :is(th,td) { padding: .25rem; overflow-wrap: anywhere; }
+}
+
+[data-interactive="pwm-and-adc"] { min-width: 0; }
+[data-interactive="pwm-and-adc"] [hidden] { display: none !important; }
+[data-interactive="pwm-and-adc"] fieldset { min-width: 0; border: 1px solid var(--rule); border-radius: .4rem; margin: 1rem 0; padding: 1rem; }
+[data-interactive="pwm-and-adc"] legend { font-weight: bold; }
+[data-interactive="pwm-and-adc"] .pa-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+[data-interactive="pwm-and-adc"] label { display: block; flex: 1 1 12rem; }
+[data-interactive="pwm-and-adc"] input { max-width: 100%; accent-color: var(--accent); }
+[data-interactive="pwm-and-adc"] input[type="number"] { display: block; width: 10rem; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: .5rem; }
+[data-interactive="pwm-and-adc"] svg { display: block; width: 100%; height: auto; color: var(--ink); }
+[data-interactive="pwm-and-adc"] svg text { fill: currentColor; font: 16px sans-serif; }
+[data-interactive="pwm-and-adc"] .pa-axis { fill: none; stroke: currentColor; }
+[data-interactive="pwm-and-adc"] .pa-square { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+[data-interactive="pwm-and-adc"] .pa-filter { fill: none; stroke: currentColor; stroke-width: 3; stroke-dasharray: 7 4; }
+[data-interactive="pwm-and-adc"].pa-ready .pa-static { display: none; }
+@media print {
+  [data-interactive="pwm-and-adc"] .pa-live { display: none !important; }
+  [data-interactive="pwm-and-adc"] .pa-static { display: block !important; }
 }
 
 [data-interactive="wire-voltage-drop"] { min-width: 0; font-size: 16px; overflow-wrap: anywhere; }
@@ -6566,6 +6606,31 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkFtbWV0ZXIgaW4gc2VyaWVzIGFuZCB2b2x0bWV0ZXIgaW4gcGFyYWxsZWwiPjx0aXRsZT5BbW1ldGVyIGluIHNlcmllcyBhbmQgdm9sdG1ldGVyIGluIHBhcmFsbGVsPC90aXRsZT48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MTdweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0NX0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojMTcyYjQ1O3N0cm9rZS13aWR0aDozfTwvc3R5bGU+PHBhdGggY2xhc3M9IndpcmUiIGQ9Ik04MCA4MEgyMzUgTTI4NSA4MEg0MTAgTTQ5MCA4MEg2NjBWMjgwSDgwVjIwMCBNODAgMTUwVjgwIE0zNjUgODBWMTgwSDQyNSBNNDc1IDE4MEg1NTBWODAiLz48Y2lyY2xlIGNsYXNzPSJ3aXJlIiBjeD0iODAiIGN5PSIxNzUiIHI9IjI1Ii8+PHRleHQgeD0iNjgiIHk9IjE4MiI+REM8L3RleHQ+PGNpcmNsZSBjbGFzcz0id2lyZSIgY3g9IjI2MCIgY3k9IjgwIiByPSIyNSIvPjx0ZXh0IHg9IjI1NCIgeT0iODciPkE8L3RleHQ+PHJlY3QgY2xhc3M9IndpcmUiIHg9IjQxMCIgeT0iNjgiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNCIvPjx0ZXh0IHg9IjQxMCIgeT0iNTMiPlJlc2lzdG9yPC90ZXh0PjxjaXJjbGUgY2xhc3M9IndpcmUiIGN4PSI0NTAiIGN5PSIxODAiIHI9IjI1Ii8+PHRleHQgeD0iNDQ0IiB5PSIxODciPlY8L3RleHQ+PGNpcmNsZSBjeD0iMzY1IiBjeT0iODAiIHI9IjQiLz48Y2lyY2xlIGN4PSI1NTAiIGN5PSI4MCIgcj0iNCIvPjx0ZXh0IHg9IjE3NSIgeT0iMTMwIj5DdXJyZW50IGZsb3dzIHRocm91Z2ggQTwvdGV4dD48dGV4dCB4PSIzMzAiIHk9IjIzNSI+ViBtZWFzdXJlcyBiZXR3ZWVuIHRoZXNlIHR3byBub2RlczwvdGV4dD48dGV4dCB4PSIxODAiIHk9IjMyNSI+SWRlYWwgbWV0ZXJzOiBBIGhhcyB6ZXJvIHJlc2lzdGFuY2U7IFYgZHJhd3Mgbm8gY3VycmVudDwvdGV4dD48L3N2Zz4=" alt="A DC source supplies an ammeter and resistor in series. A voltmeter connects across the resistor, on two separate parallel leads." data-natural-width="760" data-natural-height="360"></p>
   <p>A meter set for current has a low-resistance input; connecting that input across a source makes a short circuit. Read <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a> before making physical measurements. The diagrams here explain connections, not a procedure for working on mains wiring.</p>
   <p class="deeper-ref" id="deeper-ref-68">Supporting detail: <a href="#deeper-addendum-68"><strong>Addendum 68</strong></a> &mdash; Real meters change the circuit a little.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide is-interactive" id="measuring-electric-circuits--place-both-voltage-probes-predict-the-sign-then-reveal" data-card="measuring-electric-circuits--place-both-voltage-probes-predict-the-sign-then-reveal" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Place both voltage probes, predict the sign, then reveal<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Place both voltage probes, predict the sign, then reveal</h2>
+  <p>A DC voltmeter reports an ordered difference: <code>V(red) − V(black)</code>. The two probes must touch the two named points you want to compare. Reversing them reverses the sign; putting both on the same conductor gives zero.</p>
+  <div data-interactive="circuit-voltage-probes">
+    <div class="cvp-static">
+      <p><strong>Static example:</strong> an ideal 12 V source supplies 30 Ω and 60 Ω resistors in series. Each resistor has an ideal switch immediately before it.</p>
+      <div class="unit-table-wrap cvp-table-scroll" tabindex="0" role="region" aria-label="Probe placement examples; scroll horizontally to see every column">
+        <table class="unit-table"><caption>Signed readings from the same ideal circuit</caption><thead><tr><th>Circuit state</th><th>Red point</th><th>Black point</th><th>Reading</th><th>Why</th></tr></thead><tbody>
+          <tr><th>S1 open</th><td>Supply +</td><td>After S1</td><td>+12 V</td><td>The single open switch takes the source voltage; no current flows.</td></tr>
+          <tr><th>Both closed</th><td>After S1</td><td>After R1</td><td>+4 V</td><td>Current is 12/(30+60) = 0.1333 A; R1 drops 4 V.</td></tr>
+          <tr><th>Both closed, probes reversed</th><td>After R1</td><td>After S1</td><td>−4 V</td><td>The two point potentials are unchanged; only the ordered subtraction reverses.</td></tr>
+          <tr><th>S2 open</th><td>After R1</td><td>After S2</td><td>+12 V</td><td>The upstream side stays at +12 V and the downstream side returns to 0 V.</td></tr>
+          <tr><th>Any supported state</th><td>One named point</td><td>The same point</td><td>0 V</td><td>A point cannot have a potential difference from itself.</td></tr>
+        </tbody></table>
+      </div>
+      <p>With two open switches, the conductor between them floats in this ideal model. Its voltage is not assigned. The interactive intentionally offers no two-open state.</p>
+    </div>
+    <noscript><p>The controls require JavaScript. The signed-reading table and practice links remain available.</p></noscript>
+  </div>
+  <p>This is a low-voltage ideal-circuit model with an infinite-impedance voltmeter. It does not authorize live work, mains measurements, or current-mode probing. Fluke's <a href="https://www.fluke.com/en-ca/learn/blog/digital-multimeters/how-to-measure-dc-voltage-with-a-digital-multimeter">DC-voltage guide</a> explains the V and COM inputs and the negative sign from reversed DC probes; its <a href="https://media.fluke.com/13bf493d-48ed-4f96-bc80-b2c600f9e640_original%20file.pdf#page=15">381 meter manual</a> shows that voltage probes touch the two desired test points.</p>
+  <p><a class="button" data-practice-add="probe-place-r1-positive" href="../practice.html#probe-place-r1-positive">Practice choosing probe points</a> <a class="button" data-practice-add="probe-open-s1-reading" href="../practice.html#probe-open-s1-reading">Practice open-switch readings</a></p>
     </div>
   </details>
   <details class="xcard deck-slide" id="measuring-electric-circuits--a-shunt-or-clamp-lets-you-measure-current-indirectly" data-card="measuring-electric-circuits--a-shunt-or-clamp-lets-you-measure-current-indirectly">
@@ -11026,6 +11091,265 @@ void loop() {
   });
 })();
 
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiCircuits = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  function solve({ voltage, mode, resistances, closed }) {
+    if (!Number.isFinite(voltage) || voltage < 0 || voltage > 48) throw new RangeError('Supply: use 0–48 V.');
+    if (!['series', 'parallel'].includes(mode)) throw new RangeError('Choose series or parallel.');
+    if (!Array.isArray(resistances) || ![2, 3].includes(resistances.length) ||
+        resistances.some(r => !Number.isFinite(r) || r < 1 || r > 1000)) throw new RangeError('Use two or three resistances from 1–1000 ohms.');
+    if (!Array.isArray(closed) || closed.length !== resistances.length || closed.some(c => typeof c !== 'boolean')) throw new RangeError('Each resistor needs a switch state.');
+    const conducting = mode === 'series' ? closed.every(Boolean) : closed.some(Boolean);
+    const resistance = !conducting ? Infinity : mode === 'series' ? resistances.reduce((a, r) => a + r, 0) :
+      1 / resistances.reduce((a, r, i) => a + (closed[i] ? 1 / r : 0), 0);
+    const current = conducting ? voltage / resistance : 0;
+    const elements = resistances.map((r, i) => {
+      const amps = mode === 'series' ? current : closed[i] ? voltage / r : 0;
+      return { resistance: r, closed: closed[i], current: amps, voltage: amps * r, power: amps * amps * r };
+    });
+    return { mode, voltage, resistance, current, power: voltage * current, elements };
+  }
+  function seriesPointIds(count) {
+    if (![2, 3].includes(count)) throw new RangeError('Use two or three series resistors.');
+    const ids = ['supply-positive'];
+    for (let i = 0; i < count; i++) {
+      ids.push(`switch-${i + 1}-out`);
+      if (i < count - 1) ids.push(`resistor-${i + 1}-out`);
+    }
+    ids.push('supply-negative');
+    return Object.freeze(ids);
+  }
+  function seriesNodePotentials({ voltage, resistances, closed }) {
+    const solution = solve({ voltage, mode: 'series', resistances, closed });
+    const ids = seriesPointIds(resistances.length), open = [];
+    closed.forEach((value, index) => { if (!value) open.push(index); });
+    const values = {};
+    if (open.length === 0) {
+      let potential = voltage;
+      values['supply-positive'] = potential;
+      resistances.forEach((resistance, index) => {
+        values[`switch-${index + 1}-out`] = potential;
+        potential -= solution.current * resistance;
+        if (index < resistances.length - 1) values[`resistor-${index + 1}-out`] = potential;
+      });
+      values['supply-negative'] = 0;
+    } else {
+      const firstBoundary = 2 * open[0], lastBoundary = 2 * open[open.length - 1];
+      ids.forEach((id, index) => {
+        values[id] = index <= firstBoundary ? voltage : index >= lastBoundary + 1 ? 0 : null;
+      });
+    }
+    return Object.freeze({ supported: open.length <= 1,
+      reason: open.length <= 1 ? null : 'More than one open switch leaves a floating node whose ideal voltage is not determined.',
+      points: Object.freeze(values), pointIds: ids, solution });
+  }
+  function probeVoltage(state, redId, blackId) {
+    if (!state || !state.points || !state.pointIds) throw new TypeError('Use a series-node-potential result.');
+    if (!state.pointIds.includes(redId) || !state.pointIds.includes(blackId)) throw new RangeError('Choose named probe points from this circuit.');
+    if (redId === blackId) return 0;
+    const red = state.points[redId], black = state.points[blackId];
+    return red === null || black === null ? null : red - black;
+  }
+  return { solve, seriesPointIds, seriesNodePotentials, probeVoltage };
+});
+
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiCircuitDrawing = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  function seriesProbeAnchors(count) {
+    if (![2, 3].includes(count)) throw new RangeError('Use two or three series resistors.');
+    const anchors = [{ id: 'supply-positive', label: 'Supply +', short: '+', x: 60, y: 60 }];
+    for (let i = 0; i < count; i++) {
+      const layout = seriesElementLayout(i);
+      anchors.push({ id: `switch-${i + 1}-out`, label: `After switch S${i + 1}`, short: String.fromCharCode(65 + 2 * i), x: layout.switchOut, y: 60 });
+      if (i < count - 1) anchors.push({ id: `resistor-${i + 1}-out`, label: `After resistor R${i + 1}`, short: String.fromCharCode(66 + 2 * i), x: layout.next, y: 60 });
+    }
+    anchors.push({ id: 'supply-negative', label: 'Supply −', short: '−', x: 60, y: 290 });
+    return anchors;
+  }
+  function probeMarkup(s, options) {
+    if (!options || !options.probePoints || s.mode !== 'series') return '';
+    const red = options.red || '', black = options.black || '';
+    return '<g class="circuit-probe-points">' + seriesProbeAnchors(s.elements.length).map(anchor => {
+      const selected = (anchor.id === red ? ' is-red' : '') + (anchor.id === black ? ' is-black' : '');
+      const assignments = [];
+      if (anchor.id === red) assignments.push('red');
+      if (anchor.id === black) assignments.push('black');
+      const assignment = assignments.length ? `${assignments.join(' and ')} probe${assignments.length > 1 ? 's' : ''} placed here` : 'no probe placed';
+      return `<g class="circuit-probe-point${selected}" data-probe-point="${anchor.id}" role="button" tabindex="0" aria-pressed="${assignments.length > 0}" aria-label="${anchor.label}; ${assignment}"><circle cx="${anchor.x}" cy="${anchor.y}" r="22"/><text x="${anchor.x}" y="${anchor.y + 5}" text-anchor="middle">${anchor.short}</text></g>`;
+    }).join('') + '</g>';
+  }
+  function seriesElementLayout(index) {
+    const x = 120 + index * 160;
+    return { x, switchOut: x + 46, resistorStart: x + 60, resistorEnd: x + 125, next: x + 160 };
+  }
+  function schematic(s, options) {
+    const line = (x1,y1,x2,y2) => `<path d="M${x1} ${y1} L${x2} ${y2}"/>`;
+    const switchAt = (x,y,closed) => line(x,y,x+10,y) + line(x+10,y,x+36,closed ? y : y-18) + line(x+36,y,x+46,y) +
+      `<circle cx="${x+10}" cy="${y}" r="3"/><circle cx="${x+36}" cy="${y}" r="3"/>`;
+    const text = (x,y,t) => `<text x="${x}" y="${y}" text-anchor="middle">${t}</text>`;
+    let drawing = '<path d="M60 60 V125 M60 175 V290"/><circle cx="60" cy="150" r="25"/>' + text(60,145,'+') + text(60,166,'−') + text(65,325,`${s.voltage} V DC`);
+    if (s.mode === 'series') {
+      drawing += '<path d="M60 60 H120 M60 290 H620 V60"/>';
+      s.elements.forEach((e,i) => {
+        const layout = seriesElementLayout(i);
+        drawing += switchAt(layout.x,60,e.closed) + line(layout.switchOut,60,layout.resistorStart,60) + `<rect x="${layout.resistorStart}" y="48" width="65" height="24"/>` +
+          line(layout.resistorEnd,60, i === s.elements.length-1 ? 620 : layout.next,60) + text(layout.x+90,105,`R${i+1}: ${e.resistance} Ω`) + text(layout.x+22,32,e.closed ? 'closed' : 'open');
+      });
+    } else {
+      // Separate rails connect all branches to the same two source terminals.
+      drawing = '<path d="M60 60 V125 M60 175 V290 H620 V60 M60 60 H170 V250"/><circle cx="60" cy="150" r="25"/>' +
+        text(60,145,'+') + text(60,166,'−') + text(65,325,`${s.voltage} V DC`) + s.elements.map((e,i) => {
+          const y = 100+i*75;
+          return line(170,y,230,y) + switchAt(230,y,e.closed) + line(276,y,340,y) + `<rect x="340" y="${y-12}" width="80" height="24"/>` + line(420,y,620,y) +
+            text(380,y-22,`R${i+1}: ${e.resistance} Ω`) + text(250,y+26,e.closed ? 'closed' : 'open') + `<circle cx="170" cy="${y}" r="3"/><circle cx="620" cy="${y}" r="3"/>`;
+        }).join('');
+    }
+    const interactive = !!(options && options.probePoints && s.mode === 'series');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 350" role="${interactive ? 'group' : 'img'}" aria-label="${interactive ? 'Interactive ' : ''}${s.mode} circuit with ${s.elements.length} switched resistors and a ${s.voltage} volt DC source"><g fill="none" stroke="currentColor" stroke-width="2">${drawing}</g>${probeMarkup(s, options)}</svg>`;
+  }
+  return { schematic, seriesProbeAnchors };
+});
+
+(function () {
+  'use strict';
+  document.querySelectorAll('[data-interactive="series-parallel-circuits"]').forEach(root => {
+    if (root.dataset.circuitsReady) return;
+    root.dataset.circuitsReady = 'true';
+    const controls = root.querySelector('.circuit-controls');
+    const live = root.querySelector('.circuit-live');
+    controls.innerHTML = '<label>Connection <select name="mode"><option value="series">Series</option><option value="parallel">Parallel</option></select></label>' +
+      '<label>Resistor count <select name="count"><option>2</option><option>3</option></select></label>' +
+      '<label>Supply (V DC) <input name="voltage" type="number" min="0" max="48" step="any" value="15"></label>' +
+      [30,60,90].map((r,i) => `<fieldset data-element="${i}"><legend>Resistor ${i+1}</legend><label>Resistance (Ω) <input name="r${i}" type="number" min="1" max="1000" step="any" value="${r}"></label><label><input name="s${i}" type="checkbox" checked> Switch closed</label></fieldset>`).join('') +
+      '<p class="circuit-error" role="status"></p>';
+    controls.hidden = false;
+    live.hidden = false;
+    const field = name => controls.querySelector(`[name="${name}"]`);
+    const fmt = n => Number.isFinite(n) ? Number(n.toPrecision(4)).toString() : '∞ (open circuit)';
+    function update() {
+      const count = Number(field('count').value);
+      controls.querySelector('[data-element="2"]').hidden = count !== 3;
+      try {
+        const s = window.CourseWikiCircuits.solve({ voltage: field('voltage').valueAsNumber, mode: field('mode').value,
+          resistances: Array.from({length:count},(_,i) => field('r'+i).valueAsNumber), closed: Array.from({length:count},(_,i) => field('s'+i).checked) });
+        controls.querySelector('.circuit-error').textContent = '';
+        live.innerHTML = window.CourseWikiCircuitDrawing.schematic(s) +
+          `<p aria-live="polite"><strong>${s.mode === 'series' ? 'Series' : 'Parallel'}, ${s.voltage} V DC.</strong> Equivalent resistance: ${fmt(s.resistance)} Ω; supply current: ${fmt(s.current)} A; total resistor power: ${fmt(s.power)} W.</p>` +
+          '<div class="circuit-table"><table><caption>Each resistor (switch excluded); values shown to four significant figures</caption><thead><tr><th>Element</th><th>Switch</th><th>Current (A)</th><th>Voltage (V)</th><th>Power (W)</th></tr></thead><tbody>' +
+          s.elements.map((e,i) => `<tr><th>R${i+1} (${e.resistance} Ω)</th><td>${e.closed ? 'Closed' : 'Open'}</td><td>${fmt(e.current)}</td><td>${fmt(e.voltage)}</td><td>${fmt(e.power)}</td></tr>`).join('') + '</tbody></table></div>';
+      } catch (error) {
+        controls.querySelector('.circuit-error').textContent = error.message;
+        live.innerHTML = '<p>Results unavailable until the inputs are valid.</p>';
+      }
+    }
+    controls.addEventListener('input', update);
+    update();
+  });
+})();
+
+(function () {
+  'use strict';
+  const circuits = globalThis.CourseWikiCircuits, drawing = globalThis.CourseWikiCircuitDrawing;
+  if (!circuits || !drawing) return;
+  const labels = Object.freeze({
+    'supply-positive': 'Supply +', 'switch-1-out': 'After S1', 'resistor-1-out': 'After R1',
+    'switch-2-out': 'After S2', 'supply-negative': 'Supply −'
+  });
+  let sequence = 0;
+  function nextId() {
+    do { sequence += 1; } while (document.getElementById(`cvp-${sequence}-prediction`));
+    return `cvp-${sequence}`;
+  }
+  function fmt(value) { return value === null ? 'undetermined' : `${Number(value.toPrecision(4))} V`; }
+  function init(root) {
+    if (root.dataset.cvpReady) return;
+    const id = nextId();
+    let activeLead = 'red', red = null, black = null, stateKey = 's1-open';
+    const live = document.createElement('div'); live.className = 'cvp-live';
+    live.innerHTML = `<fieldset class="cvp-config"><legend>Circuit state</legend><div class="cvp-choice-row">
+      <label><input type="radio" name="${id}-state" value="s1-open" checked> S1 open</label>
+      <label><input type="radio" name="${id}-state" value="closed"> Both closed</label>
+      <label><input type="radio" name="${id}-state" value="s2-open"> S2 open</label>
+      </div></fieldset>
+      <fieldset class="cvp-leads"><legend>Place the probes on named points</legend><div class="cvp-lead-row">
+      <button type="button" data-lead="red" aria-pressed="true">Place red probe</button>
+      <button type="button" data-lead="black" aria-pressed="false">Place black probe</button>
+      <button type="button" data-swap disabled>Swap red and black</button></div></fieldset>
+      <p class="cvp-selection" data-selection role="status" aria-live="polite" aria-atomic="true"></p>
+      <div class="cvp-diagram-scroll" tabindex="0" role="region" aria-label="Circuit diagram with horizontally scrollable probe points"><div data-diagram></div></div>
+      <fieldset class="cvp-predict"><legend>Predict before revealing</legend>
+      <label for="${id}-prediction">Signed meter reading, V(red) − V(black), in volts
+      <input id="${id}-prediction" data-prediction type="number" step="any" inputmode="decimal"></label>
+      <div class="cvp-predict-actions"><button type="button" data-reveal disabled>Reveal reading</button></div></fieldset>
+      <p class="cvp-result" data-result data-state="waiting" role="status">Place both probes, enter a signed prediction, then reveal.</p>
+      <p class="cvp-limit"><strong>Model boundary:</strong> ideal 12 V DC source, ideal wires and switches, 30 Ω and 60 Ω resistors, and an infinite-impedance voltmeter that does not load the circuit. This is not a mains-wiring procedure or a meter-safety qualification.</p>`;
+    root.insertBefore(live, root.firstChild); root.dataset.cvpReady = 'true';
+    const diagram = live.querySelector('[data-diagram]'), prediction = live.querySelector('[data-prediction]');
+    const reveal = live.querySelector('[data-reveal]'), result = live.querySelector('[data-result]');
+    const configuration = () => stateKey === 'closed' ? [true,true] : stateKey === 's1-open' ? [false,true] : [true,false];
+    function modelState() { return circuits.seriesNodePotentials({voltage:12,resistances:[30,60],closed:configuration()}); }
+    function updateReveal() { reveal.disabled = !red || !black || prediction.value.trim() === '' || !prediction.checkValidity(); }
+    function reset(message) {
+      prediction.value = ''; result.dataset.state = 'waiting';
+      result.textContent = message || 'Enter a signed prediction, then reveal.';
+      updateReveal();
+    }
+    function render(focusId, announcement) {
+      const state = modelState();
+      diagram.innerHTML = drawing.schematic(state.solution,{probePoints:true,red,black});
+      const current = `Red: ${red ? labels[red] : 'not placed'}. Black: ${black ? labels[black] : 'not placed'}. Active lead: ${activeLead}.`;
+      live.querySelector('[data-selection]').textContent = `${announcement || `${activeLead === 'red' ? 'Red' : 'Black'} probe active. Choose a diagram point.`} ${current} Diagram points: A = after S1, B = after R1, C = after S2.`;
+      live.querySelectorAll('[data-lead]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.lead === activeLead)));
+      live.querySelector('[data-swap]').disabled = !red || !black;
+      if (focusId) diagram.querySelector(`[data-probe-point="${focusId}"]`)?.focus();
+    }
+    function place(point, focusAfter) {
+      const placed = activeLead;
+      if (placed === 'red') red = point; else black = point;
+      activeLead = activeLead === 'red' ? 'black' : 'red'; reset('Probe moved. Enter a new signed prediction.');
+      render(focusAfter ? point : null, `${placed === 'red' ? 'Red' : 'Black'} probe placed at ${labels[point]}. Place ${activeLead} probe next.`);
+    }
+    live.addEventListener('click', event => {
+      const point = event.target.closest('[data-probe-point]');
+      if (point) { place(point.dataset.probePoint, true); return; }
+      const lead = event.target.closest('[data-lead]');
+      if (lead) { activeLead = lead.dataset.lead; render(null,`${activeLead === 'red' ? 'Red' : 'Black'} probe active. Choose a diagram point.`); return; }
+      if (event.target.closest('[data-swap]')) { [red,black] = [black,red]; reset('Probes swapped. Predict the reversed signed reading.'); render(null,'Red and black probes swapped. Enter a new signed prediction.'); }
+    });
+    live.addEventListener('keydown', event => {
+      const point = event.target.closest('[data-probe-point]');
+      if (point && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); place(point.dataset.probePoint, true); }
+      if (event.target.matches('input,button,[data-probe-point]')) event.stopPropagation();
+    });
+    live.querySelector('.cvp-config').addEventListener('change', event => {
+      if (!event.target.matches('input[type="radio"]')) return;
+      stateKey = event.target.value; reset('Circuit state changed. Enter a new signed prediction.'); render(null,'Circuit state changed. Probe positions are unchanged; enter a new signed prediction.');
+    });
+    prediction.addEventListener('input', updateReveal);
+    reveal.addEventListener('click', () => {
+      const state = modelState(), actual = circuits.probeVoltage(state,red,black), guess = Number(prediction.value);
+      if (actual === null) { result.dataset.state = 'waiting'; result.textContent = state.reason || 'This ideal reading is undetermined.'; return; }
+      const correct = Math.abs(guess - actual) <= .05;
+      result.dataset.state = correct ? 'correct' : 'incorrect';
+      const current = Number(state.solution.current.toPrecision(4));
+      result.textContent = `${correct ? 'Prediction confirmed.' : 'Compare the sign and probe order.'} Meter: ${fmt(actual)} because V(red) − V(black) = ${fmt(state.points[red])} − ${fmt(state.points[black])}. Circuit current is ${current} A; R1 and R2 drops are ${Number(state.solution.elements[0].voltage.toPrecision(4))} V and ${Number(state.solution.elements[1].voltage.toPrecision(4))} V.`;
+    });
+    render();
+  }
+  function initAll() { document.querySelectorAll('[data-interactive="circuit-voltage-probes"]').forEach(init); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',initAll,{once:true}); else initAll();
+})();
+
 (function (root) {
   'use strict';
   function range(value, min, max) {
@@ -11119,103 +11443,6 @@ void loop() {
     duty.addEventListener('input', draw); frequency.addEventListener('input', draw); smooth.addEventListener('change', draw);
     volts.addEventListener('input', () => convert(false)); code.addEventListener('input', () => convert(true));
     draw(); convert(false); live.hidden = false; root.classList.add('pa-ready');
-  });
-})();
-
-(function (root, factory) {
-  'use strict';
-  const api = factory();
-  if (typeof module === 'object' && module.exports) module.exports = api;
-  else root.CourseWikiCircuits = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-  'use strict';
-  function solve({ voltage, mode, resistances, closed }) {
-    if (!Number.isFinite(voltage) || voltage < 0 || voltage > 48) throw new RangeError('Supply: use 0–48 V.');
-    if (!['series', 'parallel'].includes(mode)) throw new RangeError('Choose series or parallel.');
-    if (!Array.isArray(resistances) || ![2, 3].includes(resistances.length) ||
-        resistances.some(r => !Number.isFinite(r) || r < 1 || r > 1000)) throw new RangeError('Use two or three resistances from 1–1000 ohms.');
-    if (!Array.isArray(closed) || closed.length !== resistances.length || closed.some(c => typeof c !== 'boolean')) throw new RangeError('Each resistor needs a switch state.');
-    const conducting = mode === 'series' ? closed.every(Boolean) : closed.some(Boolean);
-    const resistance = !conducting ? Infinity : mode === 'series' ? resistances.reduce((a, r) => a + r, 0) :
-      1 / resistances.reduce((a, r, i) => a + (closed[i] ? 1 / r : 0), 0);
-    const current = conducting ? voltage / resistance : 0;
-    const elements = resistances.map((r, i) => {
-      const amps = mode === 'series' ? current : closed[i] ? voltage / r : 0;
-      return { resistance: r, closed: closed[i], current: amps, voltage: amps * r, power: amps * amps * r };
-    });
-    return { mode, voltage, resistance, current, power: voltage * current, elements };
-  }
-  return { solve };
-});
-
-(function (root, factory) {
-  'use strict';
-  const api = factory();
-  if (typeof module === 'object' && module.exports) module.exports = api;
-  else root.CourseWikiCircuitDrawing = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-  'use strict';
-  function schematic(s) {
-    const line = (x1,y1,x2,y2) => `<path d="M${x1} ${y1} L${x2} ${y2}"/>`;
-    const switchAt = (x,y,closed) => line(x,y,x+10,y) + line(x+10,y,x+36,closed ? y : y-18) + line(x+36,y,x+46,y) +
-      `<circle cx="${x+10}" cy="${y}" r="3"/><circle cx="${x+36}" cy="${y}" r="3"/>`;
-    const text = (x,y,t) => `<text x="${x}" y="${y}" text-anchor="middle">${t}</text>`;
-    let drawing = '<path d="M60 60 V125 M60 175 V290"/><circle cx="60" cy="150" r="25"/>' + text(60,145,'+') + text(60,166,'−') + text(65,325,`${s.voltage} V DC`);
-    if (s.mode === 'series') {
-      drawing += '<path d="M60 60 H120 M60 290 H620 V60"/>';
-      s.elements.forEach((e,i) => {
-        const x = 120 + i * 160;
-        drawing += switchAt(x,60,e.closed) + line(x+46,60,x+60,60) + `<rect x="${x+60}" y="48" width="65" height="24"/>` +
-          line(x+125,60, i === s.elements.length-1 ? 620 : x+160,60) + text(x+90,105,`R${i+1}: ${e.resistance} Ω`) + text(x+22,32,e.closed ? 'closed' : 'open');
-      });
-    } else {
-      // Separate rails connect all branches to the same two source terminals.
-      drawing = '<path d="M60 60 V125 M60 175 V290 H620 V60 M60 60 H170 V250"/><circle cx="60" cy="150" r="25"/>' +
-        text(60,145,'+') + text(60,166,'−') + text(65,325,`${s.voltage} V DC`) + s.elements.map((e,i) => {
-          const y = 100+i*75;
-          return line(170,y,230,y) + switchAt(230,y,e.closed) + line(276,y,340,y) + `<rect x="340" y="${y-12}" width="80" height="24"/>` + line(420,y,620,y) +
-            text(380,y-22,`R${i+1}: ${e.resistance} Ω`) + text(250,y+26,e.closed ? 'closed' : 'open') + `<circle cx="170" cy="${y}" r="3"/><circle cx="620" cy="${y}" r="3"/>`;
-        }).join('');
-    }
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 350" role="img" aria-label="${s.mode} circuit with ${s.elements.length} switched resistors and a ${s.voltage} volt DC source"><g fill="none" stroke="currentColor" stroke-width="2">${drawing}</g></svg>`;
-  }
-  return { schematic };
-});
-
-(function () {
-  'use strict';
-  document.querySelectorAll('[data-interactive="series-parallel-circuits"]').forEach(root => {
-    if (root.dataset.circuitsReady) return;
-    root.dataset.circuitsReady = 'true';
-    const controls = root.querySelector('.circuit-controls');
-    const live = root.querySelector('.circuit-live');
-    controls.innerHTML = '<label>Connection <select name="mode"><option value="series">Series</option><option value="parallel">Parallel</option></select></label>' +
-      '<label>Resistor count <select name="count"><option>2</option><option>3</option></select></label>' +
-      '<label>Supply (V DC) <input name="voltage" type="number" min="0" max="48" step="any" value="15"></label>' +
-      [30,60,90].map((r,i) => `<fieldset data-element="${i}"><legend>Resistor ${i+1}</legend><label>Resistance (Ω) <input name="r${i}" type="number" min="1" max="1000" step="any" value="${r}"></label><label><input name="s${i}" type="checkbox" checked> Switch closed</label></fieldset>`).join('') +
-      '<p class="circuit-error" role="status"></p>';
-    controls.hidden = false;
-    live.hidden = false;
-    const field = name => controls.querySelector(`[name="${name}"]`);
-    const fmt = n => Number.isFinite(n) ? Number(n.toPrecision(4)).toString() : '∞ (open circuit)';
-    function update() {
-      const count = Number(field('count').value);
-      controls.querySelector('[data-element="2"]').hidden = count !== 3;
-      try {
-        const s = window.CourseWikiCircuits.solve({ voltage: field('voltage').valueAsNumber, mode: field('mode').value,
-          resistances: Array.from({length:count},(_,i) => field('r'+i).valueAsNumber), closed: Array.from({length:count},(_,i) => field('s'+i).checked) });
-        controls.querySelector('.circuit-error').textContent = '';
-        live.innerHTML = window.CourseWikiCircuitDrawing.schematic(s) +
-          `<p aria-live="polite"><strong>${s.mode === 'series' ? 'Series' : 'Parallel'}, ${s.voltage} V DC.</strong> Equivalent resistance: ${fmt(s.resistance)} Ω; supply current: ${fmt(s.current)} A; total resistor power: ${fmt(s.power)} W.</p>` +
-          '<div class="circuit-table"><table><caption>Each resistor (switch excluded); values shown to four significant figures</caption><thead><tr><th>Element</th><th>Switch</th><th>Current (A)</th><th>Voltage (V)</th><th>Power (W)</th></tr></thead><tbody>' +
-          s.elements.map((e,i) => `<tr><th>R${i+1} (${e.resistance} Ω)</th><td>${e.closed ? 'Closed' : 'Open'}</td><td>${fmt(e.current)}</td><td>${fmt(e.voltage)}</td><td>${fmt(e.power)}</td></tr>`).join('') + '</tbody></table></div>';
-      } catch (error) {
-        controls.querySelector('.circuit-error').textContent = error.message;
-        live.innerHTML = '<p>Results unavailable until the inputs are valid.</p>';
-      }
-    }
-    controls.addEventListener('input', update);
-    update();
   });
 })();
 

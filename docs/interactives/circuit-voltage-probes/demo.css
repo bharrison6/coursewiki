@@ -1,0 +1,39 @@
+[data-interactive="circuit-voltage-probes"] { min-width: 0; margin-block: 1rem; }
+[data-interactive="circuit-voltage-probes"] * { box-sizing: border-box; }
+.cvp-live { display: grid; gap: .9rem; font: .96rem/1.45 var(--f-display); }
+.cvp-config, .cvp-leads, .cvp-predict { min-width: 0; border: 1px solid var(--rule); padding: .75rem; }
+.cvp-live legend { font-weight: 750; }
+.cvp-choice-row, .cvp-lead-row { display: flex; flex-wrap: wrap; gap: .5rem .9rem; }
+.cvp-choice-row label { display: inline-flex; align-items: center; min-height: 44px; gap: .35rem; }
+.cvp-lead-row button, .cvp-live button, .cvp-live input[type="number"] { min-height: 44px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .5rem .75rem; font: inherit; }
+.cvp-lead-row button[aria-pressed="true"] { border: 3px solid var(--accent); font-weight: 750; }
+.cvp-lead-row [data-lead="red"]::before { content: ""; display: inline-block; inline-size: .8rem; block-size: .8rem; margin-right: .35rem; border-radius: 50%; background: #C43D10; }
+.cvp-lead-row [data-lead="black"]::before { content: ""; display: inline-block; inline-size: .8rem; block-size: .8rem; margin-right: .35rem; border-radius: 50%; background: var(--ink); }
+.cvp-live :is(button,input,[data-probe-point],.cvp-diagram-scroll):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.cvp-diagram-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--rule); padding: .35rem; background: var(--surface); }
+.cvp-diagram-scroll svg { display: block; width: 680px; max-width: none; height: 350px; color: var(--ink); }
+.cvp-diagram-scroll svg text { fill: currentColor; stroke: none; font: 16px system-ui, sans-serif; }
+.cvp-diagram-scroll [data-probe-point] { cursor: pointer; }
+.cvp-diagram-scroll [data-probe-point] circle { fill: var(--surface); stroke: var(--accent); stroke-width: 4; }
+.cvp-diagram-scroll [data-probe-point].is-red circle { fill: #C43D10; stroke: #8F2A08; }
+.cvp-diagram-scroll [data-probe-point].is-black circle { fill: var(--ink); stroke: var(--paper); }
+.cvp-diagram-scroll [data-probe-point].is-red.is-black circle { fill: #C43D10; stroke: var(--ink); stroke-width: 9; stroke-dasharray: 10 5; }
+.cvp-diagram-scroll [data-probe-point].is-red text, .cvp-diagram-scroll [data-probe-point].is-black text { font-weight: 800; }
+.cvp-selection { margin: 0; font-weight: 700; }
+.cvp-predict label { display: grid; gap: .3rem; max-width: 22rem; font-weight: 650; }
+.cvp-predict-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .65rem; }
+.cvp-result { margin: 0; border-left: 4px solid var(--accent); padding: .65rem .8rem; background: var(--surface-2); }
+.cvp-result[data-state="waiting"] { border-left-color: var(--flag); }
+.cvp-limit { margin: 0; color: var(--ink-soft); }
+.cvp-table-scroll { max-width: 100%; overflow-x: auto; }
+.cvp-table-scroll:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.cvp-table-scroll table { min-width: 42rem; }
+@media (max-width: 32rem) { .xcard:has([data-interactive="circuit-voltage-probes"]) .body { padding-inline: .5rem; } }
+@media screen { [data-interactive="circuit-voltage-probes"][data-cvp-ready] > .cvp-static { display: none; } }
+@media print {
+  [data-interactive="circuit-voltage-probes"] .cvp-live { display: none !important; }
+  [data-interactive="circuit-voltage-probes"] > .cvp-static { display: block !important; }
+  [data-interactive="circuit-voltage-probes"] .cvp-table-scroll { overflow: visible; max-width: none; }
+  [data-interactive="circuit-voltage-probes"] .cvp-table-scroll table { width: 100%; min-width: 0; table-layout: fixed; font-size: .74rem; break-inside: avoid; }
+  [data-interactive="circuit-voltage-probes"] .cvp-table-scroll :is(th,td) { padding: .25rem; overflow-wrap: anywhere; }
+}

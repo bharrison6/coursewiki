@@ -2996,18 +2996,49 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
   .deeper-back { display: none; }
 }
-[data-interactive="wood-movement"] { margin-block: 1rem; padding: 1rem; border: 1px solid var(--line, currentColor); border-radius: .5rem; color: var(--ink); background: var(--surface); overflow-wrap: anywhere; }
-[data-interactive="wood-movement"] .wm-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
-[data-interactive="wood-movement"] label { display: block; min-width: 0; }
-[data-interactive="wood-movement"] input,
-[data-interactive="wood-movement"] select { box-sizing: border-box; display: block; width: 100%; min-width: 0; margin-top: .25rem; padding: .5rem; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid currentColor; border-radius: .25rem; }
-[data-interactive="wood-movement"] :is(input, select):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-[data-interactive="wood-movement"] .wm-result { font-weight: 700; }
-@media (max-width: 600px) { [data-interactive="wood-movement"] .wm-controls { grid-template-columns: minmax(0, 1fr); } }
-@media print {
-  [data-interactive="wood-movement"] .wm-controls { display: none; }
-  [data-interactive="wood-movement"] { background: transparent; color: inherit; border-color: currentColor; }
+[data-interactive="wood-movement"] { min-width: 0; overflow-wrap: anywhere; }
+.wm-ready > .wm-static { display: none; }
+.wm-live { font-family: var(--f-display); line-height: 1.45; }
+.wm-live p { margin-block: .6rem; }
+.wm-live .wm-heading { font-size: 1.15rem; }
+.wm-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; align-items: end; }
+.wm-controls label { display: grid; min-width: 0; gap: .25rem; }
+.wm-live :is(input,select,button) { box-sizing: border-box; min-height: 44px; min-width: 0; max-width: 100%; font: inherit; padding: .4rem .55rem; border: 1px solid var(--rule); border-radius: var(--radius-xs); color: var(--ink); background: var(--surface); }
+.wm-live :is(input,select) { width: 100%; }
+.wm-live :is(button,select,summary) { cursor: pointer; }
+.wm-live :is(input,select,button,summary):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.wm-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .65rem; }
+.wm-actions [data-wm-apply] { border: 2px solid var(--accent); font-weight: 700; }
+.wm-feedback { padding: .5rem .7rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+[data-wm-state="error"] .wm-feedback { border-left-style: double; border-left-width: 8px; }
+.wm-result { font-weight: 700; }
+.wm-comparison { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; }
+.wm-case { border: 1px solid var(--rule); background: var(--surface); min-width: 0; padding: .65rem; }
+.wm-case > strong { display: block; }
+.wm-diagram { display: block; width: 100%; height: auto; }
+.wm-support { fill: var(--surface-2); stroke: var(--rule); }
+.wm-board { fill: var(--flag-soft); stroke: var(--accent); stroke-width: 3; }
+.wm-grain { fill: none; stroke: var(--accent); stroke-width: 2; opacity: .55; }
+.wm-installed { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 6 5; }
+.wm-fixed { fill: var(--ink); stroke: var(--ink); stroke-width: 2; }
+.wm-window { fill: var(--cat1-soft); stroke: var(--accent); stroke-width: 2; }
+.wm-origin { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.wm-leader { fill: none; stroke: var(--accent); stroke-width: 2; }
+.wm-pin { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.wm-exceeded { fill: var(--ink); stroke: var(--msu-redorange); stroke-width: 4; }
+.wm-edge-readings { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .5rem; font-size: .92rem; }
+.wm-edge-readings :is(span,strong) { display: block; }
+.wm-edge-readings span { color: var(--ink-soft); }
+.wm-legend, .wm-limits, .wm-field-note { font-size: .9rem; color: var(--ink-soft); }
+.wm-settings { border-top: 1px solid var(--rule); margin-top: .7rem; padding-top: .3rem; }
+.wm-settings > summary { min-height: 44px; padding-block: .5rem; font-weight: 700; }
+.wm-settings > .wm-controls { margin-top: .5rem; }
+@media (max-width: 48rem) { .wm-comparison { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 34rem) {
+  .wm-controls { grid-template-columns: minmax(0,1fr); }
+  .wm-actions button { flex: 1 1 auto; }
 }
+@media print { .wm-ready > .wm-static { display: block !important; } .wm-live { display: none !important; } }
 
 [data-interactive="lumber-tally"] { padding:1rem; border:1px solid var(--rule); border-radius:.5rem; overflow-wrap:anywhere; }
 [data-interactive="lumber-tally"] fieldset { min-width:0; margin:.75rem 0; padding:.75rem; border:1px solid var(--rule); }
@@ -3160,13 +3191,20 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPlRhbmdlbnRpYWwsIHJhZGlhbCBhbmQgbG9uZ2l0dWRpbmFsIGRpcmVjdGlvbnMgaW4gd29vZDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZmRmNyIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHRleHQgeD0iMzAiIHk9IjM1IiBmb250LXNpemU9IjIzIj5Nb3ZlbWVudCBkaXJlY3Rpb25zIGluIG5vcm1hbCBzdHJhaWdodC1ncmFpbmVkIHdvb2Q8L3RleHQ+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxNTUiIGZpbGw9IiNmNWRlYjAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSI4NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIyNDUiIHI9IjUwIiBmaWxsPSJub25lIiBzdHJva2U9IiM4MDU5MjkiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjIzMCIgY3k9IjI0NSIgcj0iNSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNIDIzMCAyNDUgTCAzNDUgMjQ1IE0gMzM0IDIzNyBMIDM0NSAyNDUgTCAzMzQgMjUzIiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjI0NyIgeT0iMjMyIiBmb250LXNpemU9IjIwIj5SYWRpYWw8L3RleHQ+PHBhdGggZD0iTSAxMDYgMjA4IEEgMTMwIDEzMCAwIDAgMSAyMzAgMTE1IE0gMjE3IDEwOCBMIDIzMCAxMTUgTCAyMTkgMTI0IiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI3MCIgZm9udC1zaXplPSIxOSI+VGFuZ2VudGlhbDogYXJvdW5kIGEgcmluZzwvdGV4dD48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTgyZDQwIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjQiIGZpbGw9IiMxODJkNDAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDUwIiB5PSIxNDAiIGZvbnQtc2l6ZT0iMjIiPlRhbmdlbnRpYWw6IGdyZWF0ZXN0IG1vdmVtZW50PC90ZXh0Pjx0ZXh0IHg9IjQ1MCIgeT0iMTg1IiBmb250LXNpemU9IjIyIj5SYWRpYWw6IHNtYWxsZXIgbW92ZW1lbnQ8L3RleHQ+PHRleHQgeD0iNDUwIiB5PSIyMzAiIGZvbnQtc2l6ZT0iMjEiPkxvbmdpdHVkaW5hbDogdXN1YWxseSBtdWNoIHNtYWxsZXI8L3RleHQ+PHBhdGggZD0iTSAyNDYgMzE1IEggNDI1IiBzdHJva2U9IiMxODJkNDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQ1MCIgeT0iMzIwIiBmb250LXNpemU9IjIxIj5Mb25naXR1ZGluYWw6IG91dCBvZiB0aGlzIHZpZXc8L3RleHQ+PHRleHQgeD0iNDAiIHk9IjQ0NSIgZm9udC1zaXplPSIxOCI+Q29tcGFyZSBkaXJlY3Rpb25zLCBub3QgYXJyb3cgbGVuZ3RoczogdGhpcyBkaWFncmFtIGlzIG5vdCBhIHNocmlua2FnZSBzY2FsZS48L3RleHQ+PC9nPjwvc3ZnPg==" alt="End-grain view labels tangential direction around a growth ring and radial direction toward the center; longitudinal direction is along the trunk, out of the view. Typical movement is greatest tangentially, then radially, and much smaller longitudinally." data-natural-width="900" data-natural-height="480"></p></figure>
 <p>For normal straight-grained wood, shrinkage is usually greatest <strong>tangentially</strong> (along growth rings), smaller <strong>radially</strong> (across rings), and much smaller <strong>longitudinally</strong> (along the cells). Swelling reverses the moisture-loss trend. Actual amounts depend on species, grain orientation, and the moisture interval.</p>
 <p>Do not apply a green-to-oven-dry shrinkage percentage directly to a small seasonal humidity change. A movement estimate needs a species-specific coefficient, board orientation, starting MC, and expected service MC. Reaction wood and juvenile wood can also depart from ordinary longitudinal behavior.</p>
-<p>Estimate movement below using starting dimension × coefficient × (final MC − starting MC), with both MC values within 6–14%; then use the result in “Allow solid wood to change width” below.</p>
+<p>Estimate movement using starting dimension × coefficient × (final MC − starting MC), with both MC values within 6–14%. The attachment experiment below separates total width change from travel at a particular point.</p>
 <div data-interactive="wood-movement">
-<p><strong>Wood movement estimate</strong> &mdash; both moisture contents must be 6&ndash;14%.</p>
+<div class="wm-static">
+<p><strong>Wood movement and attachment clearance</strong> &mdash; both moisture contents must be 6&ndash;14%.</p>
 <p>Change = starting dimension &times; coefficient &times; (final MC &minus; starting MC), with MC entered as a percentage (8, not 0.08). Negative means shrinkage; positive means swelling. Use the tangential coefficient C<sub>T</sub> for the width of a flat-sawn board or when the ring orientation is unknown, and the radial coefficient C<sub>R</sub> for the width of a quarter-sawn board or the thickness of a flat-sawn one.</p>
-<p><strong>Worked example (the Handbook's own):</strong> a flat-sawn white fir board 9.15 in wide at 8% MC, C<sub>T</sub> = 0.00245, reaching 11% MC: 9.15 &times; 0.00245 &times; (11 &minus; 8) = 0.067 in wider, about 9.22 in. In millimetres, 232 mm becomes about 233.7 mm.</p>
-<p>Commercial lumber is rarely perfectly flat- or quarter-sawn, so this method tends to overestimate width change and underestimate thickness change, and the straight-line assumption underestimates movement by about 5%. Outside 6&ndash;14% MC a different method applies.</p>
-<p>Source: USDA Wood Handbook (2021), chapter 13, Equation 13-3 and Table 13-5 (coefficients for 17 species are in the interactive estimator).</p>
+<p><strong>Worked example:</strong> a flat-sawn white fir board 9.15 in wide at 8% MC, C<sub>T</sub> = 0.00245, reaching 11% MC: 9.15 &times; 0.00245 &times; (11 &minus; 8) = <strong>0.0672525 in</strong> wider, about 9.2173 in final width. The exact conversion starts at 232.41 mm and ends at about 234.118 mm. The Handbook's separately rounded 232 mm example ends at about 233.705 mm.</p>
+<p><strong>Predict:</strong> with one ideal fixed reference on a stationary support, does center fixing make the right edge move half as far, the same distance, or not at all, compared with fixing the left edge?</p>
+<table><caption>Same total width change, different edge travel: 8% to 11% MC</caption><thead><tr><th scope="col">Fixed reference</th><th scope="col">Left edge travel</th><th scope="col">Right edge travel</th></tr></thead><tbody><tr><th scope="row">Center</th><td>0.0336 in outward</td><td>0.0336 in outward</td></tr><tr><th scope="row">Left edge</th><td>0 (fixed)</td><td>0.0673 in outward</td></tr></tbody></table>
+<p>For uniform free strain, signed point displacement = (signed distance from the fixed reference &divide; installed width) &times; total width change. Center fixing halves the edge travel, not the total width change. A point closer to the reference travels less.</p>
+<p>Compare available travel in each direction from the installed position. With 0.040 in outward travel, center-fixed edges remain inside the travel window, while the opposite edge of the left-edge-fixed board exceeds it. Drying reverses the movement: 8% to 6% MC gives 0.0224 in inward travel at each center-fixed edge, exceeding a separate 0.020 in inward allowance. Enough travel in one direction does not supply travel in the other.</p>
+<p>Each estimate starts from the installed dimension and MC. Edge points are geometric tracking points, not a fastening layout. The support is stationary, with one ideal fixed reference and otherwise free uniform width change; friction, warp, strength, restraint stress and cracking are not calculated. Exceeding a travel window does not predict what the restrained board will do. A result within the window does not approve a joint.</p>
+<p>Commercial lumber is rarely perfectly flat- or quarter-sawn, so this method can overestimate width shrinkage and underestimate thickness shrinkage. Board properties and ring angles vary. These are approximate estimates; no correction or safety factor is added. Outside 6&ndash;14% MC a different method applies.</p>
+<p>Moisture-movement source: <a href="https://research.fs.usda.gov/download/treesearch/62261.pdf#page=16">USDA Wood Handbook (2021), chapter 13, Equation 13-3 and Table 13-5</a>. The point-travel equation is derived geometry under the stated assumptions.</p>
+</div>
 </div>
     </div>
   </details>
@@ -3186,13 +3224,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
-    <summary>Allow solid wood to change width<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
+    <summary>Allow solid wood to change width<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Allow solid wood to change width</h2>
 <p>A solid-wood tabletop needs room to expand and contract across its grain. Suitable slotted attachments let it move relative to a supporting frame. A panel held in grooves needs clearance rather than rigid restraint across its full width. Details depend on the joint and expected movement.</p>
+<p>Choose the fixed reference deliberately, then check travel from each attachment's installed position in both moisture directions. Slot length alone does not give clear travel: the fastener occupies space, and its starting position divides the available movement. The experiment above uses clear travel directly rather than inferring a hardware size.</p>
 <p>Do not assume that a finish locks moisture out. It can slow moisture exchange, but does not eliminate seasonal movement. Plywood often solves a panel-stability problem better than simply making a solid board thicker.</p>
 <ul class="boxes"><li>Identify the grain direction and width that can move.</li><li>Check moisture against the intended service environment.</li><li>Inspect for warp, splits, and grain interruptions before laying out parts.</li><li>Check that attachments allow the expected movement.</li></ul>
 <p>Wood conditioning and fabricating cover drying and joint-making in more detail; <a class="xref-page" href="#p-engineered-wood-products">Engineered Wood Products</a> compares alternatives to solid lumber.</p>
+<p><a class="button" data-practice-add="wood-movement-center-travel" href="../practice.html#wood-movement-center-travel">Practice: center-fixed travel</a> <a class="button" data-practice-add="wood-movement-directional-window" href="../practice.html#wood-movement-directional-window">Practice: directional clearance</a></p>
     </div>
   </details>
   <details class="xcard deck-wiki-only" id="grain-and-moisture-movement--further-reading-on-wood-properties-and-products" data-card="grain-and-moisture-movement--further-reading-on-wood-properties-and-products">
@@ -5164,22 +5204,22 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 (function (root) {
   'use strict';
   const species = Object.freeze([
-    ['Ash, white', .00169, .00219],
-    ['Basswood, American', .00230, .00234],
-    ['Beech, American', .00190, .00330],
-    ['Birch, yellow', .00256, .00327],
-    ['Cherry, black', .00126, .00223],
-    ['Hickory, true', .00259, .00315],
-    ['Maple, red (soft maple)', .00102, .00252],
-    ['Maple, sugar (hard maple)', .00151, .00400],
-    ['Red oak, northern red', .00148, .00338],
-    ['White oak, white', .00183, .00462],
-    ['Poplar, yellow (yellow-poplar)', .00137, .00216],
-    ['Walnut, black', .00112, .00308],
+    ['Ash, white', .00169, .00274],
+    ['Basswood, American', .00230, .00330],
+    ['Beech, American', .00190, .00431],
+    ['Birch, yellow', .00256, .00338],
+    ['Cherry, black', .00126, .00248],
+    ['Hickory, true', .00259, .00411],
+    ['Maple, red (soft maple)', .00137, .00289],
+    ['Maple, sugar (hard maple)', .00165, .00353],
+    ['Red oak, northern red', .00137, .00304],
+    ['White oak, white', .00194, .00376],
+    ['Poplar, yellow (yellow-poplar)', .00158, .00289],
+    ['Walnut, black', .00190, .00274],
     ['Douglas-fir, Coast-type', .00165, .00267],
     ['Fir, white', .00112, .00245],
-    ['Pine, loblolly (a southern yellow pine)', .00165, .00234],
-    ['Pine, ponderosa', .00133, .00252],
+    ['Pine, loblolly (a southern yellow pine)', .00165, .00259],
+    ['Pine, ponderosa', .00133, .00216],
     ['Cedar, western red', .00111, .00234]
   ].map(([name, radial, tangential]) => Object.freeze({name, radial, tangential})));
   const orientations = Object.freeze({
@@ -5200,58 +5240,203 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (!Number.isFinite(finalDimension)) throw new RangeError('Dimension is too large to calculate.');
     return {change, finalDimension, direction, coefficient, unit};
   }
-  const api = Object.freeze({species, calculate});
+  // Derived geometry, not an additional USDA material law: uniform free strain,
+  // one fixed reference, and a stationary support. Points are ideal width edges.
+  function attachmentTravel(input) {
+    const movement = calculate(input);
+    const {anchor, inward, outward, dimension} = input;
+    if (!['center', 'left-edge'].includes(anchor)) throw new RangeError('Choose center or left-edge fixing.');
+    if (![inward, outward].every(n => Number.isFinite(n) && n >= 0)) {
+      throw new RangeError('Enter nonnegative finite inward and outward clear travel.');
+    }
+    if (input.orientation === 'flat-thickness') throw new RangeError('Choose a width direction for the attachment experiment.');
+    const reference = anchor === 'center' ? dimension / 2 : 0;
+    const strain = movement.change / dimension;
+    const points = [0, dimension].map((position, i) => {
+      // Normalizing first avoids overflow for otherwise valid large dimensions.
+      const fraction = (position - reference) / dimension;
+      const displacement = fraction * movement.change;
+      const signedTravel = Math.abs(fraction) * movement.change; // + away, − toward reference
+      const direction = signedTravel > 0 ? 'outward' : signedTravel < 0 ? 'inward' : 'none';
+      const demand = Math.abs(signedTravel), available = direction === 'inward' ? inward : outward;
+      const remaining = available - demand;
+      const epsilon = Number.EPSILON * 8 * Math.max(available, demand);
+      const status = direction === 'none' ? 'stationary' : remaining < -epsilon ? 'exceeds' : Math.abs(remaining) <= epsilon ? 'at-limit' : 'within';
+      return {edge: i === 0 ? 'left' : 'right', position, displacement, signedTravel, direction, demand, available, remaining, status};
+    });
+    return {...movement, anchor, reference, strain, inward, outward, points};
+  }
+  const api = Object.freeze({species, calculate, attachmentTravel});
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.CourseWikiWoodMovement = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 
+(function (root) {
+  'use strict';
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+  function format(value, unit, signed = false) {
+    if (value === 0) return '0';
+    const magnitude = Math.abs(value), digits = unit === 'in' ? 4 : 3;
+    const rounded = magnitude.toFixed(digits);
+    const number = Number(rounded) === 0 || magnitude >= 1e7 ? magnitude.toExponential(2) : rounded;
+    return (value < 0 ? '−' : signed ? '+' : '') + number;
+  }
+  function pointText(point, unit) {
+    if (point.direction === 'none') return '0 ' + unit + ' · stationary';
+    const travel = format(point.signedTravel, unit, true) + ' ' + unit + ' ' + point.direction;
+    if (point.status === 'exceeds') return travel + ' · exceeds by ' + format(-point.remaining, unit) + ' ' + unit;
+    if (point.status === 'at-limit') return travel + ' · at travel limit';
+    return travel + ' · ' + format(point.remaining, unit) + ' ' + unit + ' travel left';
+  }
+  function diagram(result, extent, preview = false) {
+    const {unit, points, anchor, inward, outward} = result;
+    const x0 = 95, x1 = 405, y = 47, boardHeight = 36;
+    // Divide first: 68 / a valid subnormal extent can overflow, even though
+    // each normalized displacement and its final display coordinate is bounded.
+    const displayDistance = value => extent > 0 ? value / extent * 68 : 0;
+    const displacement = points.map(p => preview ? 0 : displayDistance(p.displacement));
+    const reference = anchor === 'center' ? (x0 + x1) / 2 : x0;
+    const caption = preview ? 'Installed board; moisture change not applied yet.' : points.map(p => p.edge + ' edge: ' + pointText(p, unit)).join('. ');
+    // Stationary support windows: pin center may travel within these intervals.
+    // Clear travel is entered directly; no slot length or fastener size is inferred.
+    const gauges = points.map((p, i) => {
+      const x = i ? x1 : x0, sign = i ? 1 : -1;
+      const fixed = p.position === result.reference;
+      if (fixed) return '';
+      const low = Math.min(x - sign * displayDistance(inward), x + sign * displayDistance(outward));
+      const high = Math.max(x - sign * displayDistance(inward), x + sign * displayDistance(outward));
+      const moved = x + displacement[i];
+      return `<g class="wm-gauge" data-edge="${p.edge}" data-displacement="${preview ? 0 : p.displacement}">
+        <rect class="wm-window" x="${low}" y="103" width="${high-low}" height="18" rx="3"/>
+        <path class="wm-origin" d="M${x} 99v26"/>
+        <path class="wm-leader" d="M${moved} ${y+boardHeight}V112"/>
+        <circle class="wm-pin${!preview && p.status === 'exceeds' ? ' wm-exceeded' : ''}" cx="${moved}" cy="112" r="5"/>
+      </g>`;
+    }).join('');
+    return `<svg class="wm-diagram" viewBox="0 0 500 144" role="img" aria-label="${esc(caption)}" focusable="false">
+      <rect class="wm-support" x="12" y="93" width="476" height="38" rx="4"/>
+      <rect class="wm-board" x="${x0+displacement[0]}" y="${y}" width="${x1-x0+displacement[1]-displacement[0]}" height="${boardHeight}"/>
+      <path class="wm-grain" d="M${x0+displacement[0]+12} ${y+8}v20 M250 ${y+8}v20 M${x1+displacement[1]-12} ${y+8}v20"/>
+      <rect class="wm-installed" x="${x0}" y="${y}" width="${x1-x0}" height="${boardHeight}"/>
+      ${gauges}
+      <path class="wm-fixed" d="M${reference} 39v87 M${reference-9} 135l9-9 9 9Z"/>
+    </svg>`;
+  }
+  function comparison(center, edge, preview = false) {
+    // Common magnification for BOTH boards and their travel windows. Fit all
+    // extremes without clipping or constraining the free movement to a window.
+    const largest = Math.max(Math.abs(edge.change), center.inward, center.outward);
+    return [center, edge].map(r => `<div class="wm-case" data-anchor="${r.anchor}">
+      <strong>${r.anchor === 'center' ? 'Center fixed' : 'Left edge fixed'}</strong>
+      ${diagram(r, largest, preview)}
+      <div class="wm-edge-readings">${r.points.map(p => `<div><span>${p.edge === 'left' ? 'Left' : 'Right'} edge</span><strong>${preview ? 'At installation' : esc(pointText(p,r.unit))}</strong></div>`).join('')}</div>
+    </div>`).join('');
+  }
+  const api = Object.freeze({format, pointText, diagram, comparison});
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiWoodMovementRender = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
 (function () {
   'use strict';
-  const model = globalThis.CourseWikiWoodMovement;
+  const model = globalThis.CourseWikiWoodMovement, render = globalThis.CourseWikiWoodMovementRender;
+  if (!model || !render) return;
   document.querySelectorAll('[data-interactive="wood-movement"]').forEach(function (root) {
     if (root.dataset.wmReady) return;
-    root.dataset.wmReady = 'true';
-    root.innerHTML = `<p><strong>Wood movement estimate</strong> — both moisture contents must be 6–14%.</p>
-      <div class="wm-controls">
-        <label>Species<select data-wm="speciesIndex" aria-label="Species">${model.species.map((s, i) => `<option value="${i}"${s.name === 'Fir, white' ? ' selected' : ''}>${s.name}</option>`).join('')}</select></label>
-        <label>Orientation and measured direction<select data-wm="orientation" aria-label="Orientation and measured direction">
-          <option value="flat-width">Flat-sawn (plain-sawn) width</option>
-          <option value="quarter-width">Quarter-sawn width</option>
-          <option value="flat-thickness">Flat-sawn thickness</option>
-          <option value="unknown">Unknown / mixed ring orientation</option>
-        </select></label>
-        <label>Starting dimension<input data-wm="dimension" type="number" min="0" step="any" value="9.15" required></label>
-        <label>Dimension unit<select data-wm="unit" aria-label="Dimension unit"><option value="in">Inches (in)</option><option value="mm">Millimeters (mm)</option></select></label>
-        <label>Starting moisture content (%)<input data-wm="initialMC" type="number" min="6" max="14" step="any" value="8" required></label>
-        <label>Final moisture content (%)<input data-wm="finalMC" type="number" min="6" max="14" step="any" value="11" required></label>
-      </div>
-      <p class="wm-result" role="status" aria-live="polite" aria-atomic="true" data-wm-result></p>
+    const live = document.createElement('div');
+    live.className = 'wm-live';
+    live.innerHTML = `<p class="wm-heading"><strong>Same board. Different fixed point.</strong></p>
       <p data-wm-context></p>
-      <p>Change = starting dimension × coefficient × (final MC − starting MC). Enter MC as 8 for 8%, not 0.08. Negative means shrinkage; positive means swelling. Dimensions and results use the selected unit.</p>
-      <p>Commercial lumber is rarely perfectly flat- or quarter-sawn, so this method tends to overestimate width change and underestimate thickness change. The Handbook notes that the linear assumption underestimates movement by about 5%; no correction factor is added here. Unknown or mixed orientation uses the tangential coefficient.</p>
-      <p>Source: USDA Wood Handbook (2021), chapter 13, Equation 13-3 and Table 13-5. Western red cedar uses the table’s assumption that shrinkage starts at 22% MC (footnote b); the estimator still requires 6–14% MC.</p>`;
-    const fields = {};
-    root.querySelectorAll('[data-wm]').forEach(field => { fields[field.dataset.wm] = field; });
-    const result = root.querySelector('[data-wm-result]');
-    const context = root.querySelector('[data-wm-context]');
-    function update() {
-      context.textContent = '';
-      try {
-        const values = {};
-        Object.entries(fields).forEach(([name, field]) => {
-          values[name] = ['unit', 'orientation'].includes(name) ? field.value : field.value === '' ? NaN : Number(field.value);
-        });
-        const r = model.calculate(values), digits = r.unit === 'in' ? 2 : 1;
-        const magnitude = Math.abs(r.change).toFixed(digits);
-        const change = r.change === 0 ? '0' : Number(magnitude) === 0
-          ? (r.change < 0 ? 'shrinkage' : 'swelling') + ' less than ' + (r.unit === 'in' ? '0.01' : '0.1')
-          : (r.change < 0 ? '−' : '+') + magnitude;
-        result.textContent = 'Estimated change: ' + change + ' ' + r.unit + '; final dimension: ' + r.finalDimension.toFixed(digits) + ' ' + r.unit + '. ' +
-          (r.change === 0 ? 'No movement is predicted for unchanged MC.' : 'Allow for this estimated ' + (r.change < 0 ? 'contraction' : 'expansion') + ' across the measured direction in the joint design.');
-        context.textContent = model.species[values.speciesIndex].name + ', ' + fields.orientation.selectedOptions[0].textContent + ': ' + values.dimension + ' ' + r.unit + ', ' + values.initialMC + '% to ' + values.finalMC + '% MC. Using ' + r.direction + ' coefficient ' + r.coefficient.toFixed(5) + ' per percentage point MC.';
-      } catch (error) { result.textContent = error.message; }
+      <div class="wm-first wm-controls">
+        <label>Service moisture content (%)<input data-wm="finalMC" type="number" min="6" max="14" step="any" value="11" required></label>
+        <label>Predict right-edge travel<select data-wm-prediction><option value="">Center fixed, compared with left edge fixed…</option><option value="half">Half as far</option><option value="same">The same distance</option><option value="zero">No movement</option></select></label>
+      </div>
+      <div class="wm-actions"><button type="button" data-wm-apply>Apply moisture change</button><button type="button" data-wm-reset>Reset example</button></div>
+      <p class="wm-feedback" data-wm-feedback role="status" aria-live="polite" aria-atomic="true">Predict, then apply the moisture change.</p>
+      <p class="wm-result" data-wm-result></p>
+      <div class="wm-comparison" data-wm-comparison></div>
+      <p class="wm-legend">Dashed outline: installed width. Solid board and dots: free movement. Triangle: fixed reference. Shaded windows: clear travel on the stationary support.</p>
+      <p class="wm-legend">Movement and travel windows are enlarged equally in both drawings; board widths are schematic. Edge dots are ideal tracking points, not a hardware layout.</p>
+      <details class="wm-settings"><summary>Change installation and available travel</summary>
+        <div class="wm-controls">
+          <label>Species<select data-wm="speciesIndex">${model.species.map((s, i) => `<option value="${i}"${s.name === 'Fir, white' ? ' selected' : ''}>${s.name}</option>`).join('')}</select></label>
+          <label>Width direction<select data-wm="orientation"><option value="flat-width">Flat-sawn width (tangential)</option><option value="quarter-width">Quarter-sawn width (radial)</option><option value="unknown">Unknown / mixed (use tangential)</option></select></label>
+          <label>Installed width<input data-wm="dimension" type="number" min="0" step="any" value="9.15" required></label>
+          <label>Dimension unit<select data-wm="unit"><option value="in">Inches (in)</option><option value="mm">Millimeters (mm)</option></select></label>
+          <label>Installation moisture content (%)<input data-wm="initialMC" type="number" min="6" max="14" step="any" value="8" required></label>
+          <span class="wm-field-note">Both moisture contents: 6–14%. Enter 8 for 8%, not 0.08.</span>
+          <label>Outward clear travel (<span data-wm-unit>in</span>)<input data-wm="outward" type="number" min="0" step="any" value="0.04" required></label>
+          <label>Inward clear travel (<span data-wm-unit>in</span>)<input data-wm="inward" type="number" min="0" step="any" value="0.02" required></label>
+        </div>
+        <p>Travel is measured from each edge point’s installed position, with the same allowance at both edges. + outward means away from the fixed reference; − inward means toward it. Enter clear travel directly, not total slot length.</p>
+      </details>
+      <p class="wm-limits">Try drying below the installation MC. Does the inward allowance still cover the travel? Every estimate starts from the installed width and MC, even after repeated changes.</p>
+      <details class="wm-settings"><summary>Model, equation and source</summary>
+        <p>Estimated width change ΔW = installed width × coefficient × (service MC − installation MC). Signed travel at a point (positive outward) is (distance from the fixed reference ÷ installed width) × ΔW. This geometry assumes uniform free strain and one ideal fixed reference on a stationary support.</p>
+        <p>Source for moisture movement: <a href="https://research.fs.usda.gov/download/treesearch/62261.pdf#page=16">USDA Wood Handbook (2021), chapter 13, Equation 13-3</a> and Table 13-5. Coefficients are per percentage point MC; unknown orientation uses tangential. Western redcedar follows the table’s 22% fiber-saturation assumption. Actual boards and ring angles vary; these are approximate estimates, with no added correction or safety factor.</p>
+        <p>A point inside an edge moves in proportion to its distance from the reference. The windows compare geometry only. Passing this check does not approve a joint: friction, fastener retention, grain irregularity, warp, support movement, strength and cracking are not calculated. When travel is exceeded the drawing still shows free movement; it does not solve the restrained board.</p>
+      </details>`;
+    root.append(live);
+    root.classList.add('wm-ready');
+    root.dataset.wmReady = 'true';
+    // Native controls keep their keys when a playlist also listens for Space/arrows.
+    live.addEventListener('keydown', event => {
+      if (event.target.matches('input,select,button,summary')) event.stopPropagation();
+    });
+    const fields = Object.fromEntries([...live.querySelectorAll('[data-wm]')].map(n => [n.dataset.wm, n]));
+    const result = live.querySelector('[data-wm-result]'), context = live.querySelector('[data-wm-context]');
+    const comparison = live.querySelector('[data-wm-comparison]'), feedback = live.querySelector('[data-wm-feedback]');
+    const prediction = live.querySelector('[data-wm-prediction]');
+    let applied = false, previousUnit = fields.unit.value;
+    const defaults = Object.fromEntries(Object.entries(fields).map(([k,n]) => [k,n.value]));
+    function values() {
+      return Object.fromEntries(Object.entries(fields).map(([k,n]) => [k, ['unit','orientation'].includes(k) ? n.value : n.value === '' ? NaN : Number(n.value)]));
     }
-    Object.values(fields).forEach(field => field.addEventListener('input', update));
+    function update() {
+      context.textContent = ''; result.textContent = ''; comparison.innerHTML = '';
+      try {
+        const input = values();
+        const center = model.attachmentTravel({...input, anchor:'center'});
+        const edge = model.attachmentTravel({...input, anchor:'left-edge'});
+        context.textContent = model.species[input.speciesIndex].name + ' · ' + fields.orientation.selectedOptions[0].textContent + ' · installed ' + render.format(input.dimension,input.unit) + ' ' + input.unit + ' at ' + input.initialMC + '% MC.';
+        comparison.innerHTML = render.comparison(center,edge,!applied);
+        root.dataset.wmState = applied ? 'applied' : 'installed';
+        if (applied) {
+          result.textContent = 'Estimated width change: ' + render.format(center.change,input.unit,true) + ' ' + input.unit + '; final width: ' + render.format(center.finalDimension,input.unit) + ' ' + input.unit + '. Same width change in both boards.';
+          const exceeded = [center,edge].filter(r => r.points.some(p => p.status === 'exceeds')).map(r => r.anchor === 'center' ? 'Center fixed' : 'Left edge fixed');
+          feedback.textContent = (exceeded.length ? exceeded.join(' and ') + ': estimated movement exceeds available travel.' : 'Estimated movement is within or at the available travel limits.') + ' This compares geometry only.';
+        } else result.textContent = 'At installation. Apply the service MC to reveal the two movements.';
+      } catch (error) {
+        root.dataset.wmState = 'error';
+        result.textContent = 'No estimate: ' + error.message;
+        feedback.textContent = 'Correct the input to see the experiment.';
+      }
+    }
+    Object.entries(fields).forEach(([key,field]) => field.addEventListener('input', function () {
+      if (key === 'unit' && previousUnit !== field.value) {
+        const factor = field.value === 'mm' ? 25.4 : 1 / 25.4;
+        for (const k of ['dimension','inward','outward']) if (fields[k].value !== '') fields[k].value = String(Number(fields[k].value) * factor);
+        previousUnit = field.value;
+        live.querySelectorAll('[data-wm-unit]').forEach(n => { n.textContent = field.value; });
+      }
+      update();
+    }));
+    live.querySelector('[data-wm-apply]').addEventListener('click', function () {
+      update();
+      if (root.dataset.wmState === 'error') return;
+      if (!prediction.value) { feedback.textContent = 'Choose a prediction, then apply the moisture change.'; prediction.focus(); return; }
+      applied = true;
+      update();
+      const input = values(), noChange = input.initialMC === input.finalMC;
+      const matches = noChange ? prediction.value === 'zero' : prediction.value === 'half';
+      feedback.textContent = (matches ? 'Prediction matches. ' : 'Compare the two right edges. ') + (noChange ? 'Unchanged MC gives zero travel in both boards. ' : 'Center fixing puts the right edge half as far from the reference, so it travels half as far. ') + feedback.textContent;
+    });
+    live.querySelector('[data-wm-reset]').addEventListener('click', function () {
+      for (const [k,value] of Object.entries(defaults)) fields[k].value = value;
+      previousUnit = fields.unit.value; applied = false; prediction.value = '';
+      live.querySelectorAll('[data-wm-unit]').forEach(n => { n.textContent = previousUnit; });
+      update(); feedback.textContent = 'Predict, then apply the moisture change.';
+    });
     update();
   });
 })();

@@ -2996,18 +2996,49 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
   .deeper-back { display: none; }
 }
-[data-interactive="wood-movement"] { margin-block: 1rem; padding: 1rem; border: 1px solid var(--line, currentColor); border-radius: .5rem; color: var(--ink); background: var(--surface); overflow-wrap: anywhere; }
-[data-interactive="wood-movement"] .wm-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
-[data-interactive="wood-movement"] label { display: block; min-width: 0; }
-[data-interactive="wood-movement"] input,
-[data-interactive="wood-movement"] select { box-sizing: border-box; display: block; width: 100%; min-width: 0; margin-top: .25rem; padding: .5rem; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid currentColor; border-radius: .25rem; }
-[data-interactive="wood-movement"] :is(input, select):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-[data-interactive="wood-movement"] .wm-result { font-weight: 700; }
-@media (max-width: 600px) { [data-interactive="wood-movement"] .wm-controls { grid-template-columns: minmax(0, 1fr); } }
-@media print {
-  [data-interactive="wood-movement"] .wm-controls { display: none; }
-  [data-interactive="wood-movement"] { background: transparent; color: inherit; border-color: currentColor; }
+[data-interactive="wood-movement"] { min-width: 0; overflow-wrap: anywhere; }
+.wm-ready > .wm-static { display: none; }
+.wm-live { font-family: var(--f-display); line-height: 1.45; }
+.wm-live p { margin-block: .6rem; }
+.wm-live .wm-heading { font-size: 1.15rem; }
+.wm-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; align-items: end; }
+.wm-controls label { display: grid; min-width: 0; gap: .25rem; }
+.wm-live :is(input,select,button) { box-sizing: border-box; min-height: 44px; min-width: 0; max-width: 100%; font: inherit; padding: .4rem .55rem; border: 1px solid var(--rule); border-radius: var(--radius-xs); color: var(--ink); background: var(--surface); }
+.wm-live :is(input,select) { width: 100%; }
+.wm-live :is(button,select,summary) { cursor: pointer; }
+.wm-live :is(input,select,button,summary):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.wm-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .65rem; }
+.wm-actions [data-wm-apply] { border: 2px solid var(--accent); font-weight: 700; }
+.wm-feedback { padding: .5rem .7rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+[data-wm-state="error"] .wm-feedback { border-left-style: double; border-left-width: 8px; }
+.wm-result { font-weight: 700; }
+.wm-comparison { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; }
+.wm-case { border: 1px solid var(--rule); background: var(--surface); min-width: 0; padding: .65rem; }
+.wm-case > strong { display: block; }
+.wm-diagram { display: block; width: 100%; height: auto; }
+.wm-support { fill: var(--surface-2); stroke: var(--rule); }
+.wm-board { fill: var(--flag-soft); stroke: var(--accent); stroke-width: 3; }
+.wm-grain { fill: none; stroke: var(--accent); stroke-width: 2; opacity: .55; }
+.wm-installed { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 6 5; }
+.wm-fixed { fill: var(--ink); stroke: var(--ink); stroke-width: 2; }
+.wm-window { fill: var(--cat1-soft); stroke: var(--accent); stroke-width: 2; }
+.wm-origin { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.wm-leader { fill: none; stroke: var(--accent); stroke-width: 2; }
+.wm-pin { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.wm-exceeded { fill: var(--ink); stroke: var(--msu-redorange); stroke-width: 4; }
+.wm-edge-readings { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .5rem; font-size: .92rem; }
+.wm-edge-readings :is(span,strong) { display: block; }
+.wm-edge-readings span { color: var(--ink-soft); }
+.wm-legend, .wm-limits, .wm-field-note { font-size: .9rem; color: var(--ink-soft); }
+.wm-settings { border-top: 1px solid var(--rule); margin-top: .7rem; padding-top: .3rem; }
+.wm-settings > summary { min-height: 44px; padding-block: .5rem; font-weight: 700; }
+.wm-settings > .wm-controls { margin-top: .5rem; }
+@media (max-width: 48rem) { .wm-comparison { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 34rem) {
+  .wm-controls { grid-template-columns: minmax(0,1fr); }
+  .wm-actions button { flex: 1 1 auto; }
 }
+@media print { .wm-ready > .wm-static { display: block !important; } .wm-live { display: none !important; } }
 
 [data-interactive="lumber-tally"] { padding:1rem; border:1px solid var(--rule); border-radius:.5rem; overflow-wrap:anywhere; }
 [data-interactive="lumber-tally"] fieldset { min-width:0; margin:.75rem 0; padding:.75rem; border:1px solid var(--rule); }
@@ -3096,6 +3127,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><a href="#p-nonferrous-metals">Nonferrous Metals</a></li>
     <li><a href="#p-metal-stock-forms">Metal Stock Forms and Purchasing</a></li>
     <li><a href="#p-heat-treating-metals">Heat Treating Metals</a></li>
+    <li><a href="#p-forming-metal">Forming Metal</a></li>
+    <li><a href="#p-joining-metal">Joining Metal</a></li>
+    <li><a href="#p-fasteners-and-galvanic-corrosion">Fasteners and Galvanic Corrosion</a></li>
     <li><a href="#p-critical-dimensions-for-the-shop">Critical Dimensions for the Shop</a></li>
     <li><a href="#p-bills-of-materials">Bills of Materials</a></li>
     <li><a href="#p-operation-method-sheets">Operation Method Sheets</a></li>
@@ -6661,13 +6695,20 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <figure><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNDgwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPlRhbmdlbnRpYWwsIHJhZGlhbCBhbmQgbG9uZ2l0dWRpbmFsIGRpcmVjdGlvbnMgaW4gd29vZDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZmRmNyIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHRleHQgeD0iMzAiIHk9IjM1IiBmb250LXNpemU9IjIzIj5Nb3ZlbWVudCBkaXJlY3Rpb25zIGluIG5vcm1hbCBzdHJhaWdodC1ncmFpbmVkIHdvb2Q8L3RleHQ+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxNTUiIGZpbGw9IiNmNWRlYjAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSIxMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjMwIiBjeT0iMjQ1IiByPSI4NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIyNDUiIHI9IjUwIiBmaWxsPSJub25lIiBzdHJva2U9IiM4MDU5MjkiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjIzMCIgY3k9IjI0NSIgcj0iNSIgZmlsbD0iIzE4MmQ0MCIgc3Ryb2tlPSIjODA1OTI5IiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNIDIzMCAyNDUgTCAzNDUgMjQ1IE0gMzM0IDIzNyBMIDM0NSAyNDUgTCAzMzQgMjUzIiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjI0NyIgeT0iMjMyIiBmb250LXNpemU9IjIwIj5SYWRpYWw8L3RleHQ+PHBhdGggZD0iTSAxMDYgMjA4IEEgMTMwIDEzMCAwIDAgMSAyMzAgMTE1IE0gMjE3IDEwOCBMIDIzMCAxMTUgTCAyMTkgMTI0IiBzdHJva2U9IiMwMDVlODMiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI3MCIgZm9udC1zaXplPSIxOSI+VGFuZ2VudGlhbDogYXJvdW5kIGEgcmluZzwvdGV4dD48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjMTgyZDQwIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIzMTUiIHI9IjQiIGZpbGw9IiMxODJkNDAiIHN0cm9rZT0iIzgwNTkyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDUwIiB5PSIxNDAiIGZvbnQtc2l6ZT0iMjIiPlRhbmdlbnRpYWw6IGdyZWF0ZXN0IG1vdmVtZW50PC90ZXh0Pjx0ZXh0IHg9IjQ1MCIgeT0iMTg1IiBmb250LXNpemU9IjIyIj5SYWRpYWw6IHNtYWxsZXIgbW92ZW1lbnQ8L3RleHQ+PHRleHQgeD0iNDUwIiB5PSIyMzAiIGZvbnQtc2l6ZT0iMjEiPkxvbmdpdHVkaW5hbDogdXN1YWxseSBtdWNoIHNtYWxsZXI8L3RleHQ+PHBhdGggZD0iTSAyNDYgMzE1IEggNDI1IiBzdHJva2U9IiMxODJkNDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQ1MCIgeT0iMzIwIiBmb250LXNpemU9IjIxIj5Mb25naXR1ZGluYWw6IG91dCBvZiB0aGlzIHZpZXc8L3RleHQ+PHRleHQgeD0iNDAiIHk9IjQ0NSIgZm9udC1zaXplPSIxOCI+Q29tcGFyZSBkaXJlY3Rpb25zLCBub3QgYXJyb3cgbGVuZ3RoczogdGhpcyBkaWFncmFtIGlzIG5vdCBhIHNocmlua2FnZSBzY2FsZS48L3RleHQ+PC9nPjwvc3ZnPg==" alt="End-grain view labels tangential direction around a growth ring and radial direction toward the center; longitudinal direction is along the trunk, out of the view. Typical movement is greatest tangentially, then radially, and much smaller longitudinally." data-natural-width="900" data-natural-height="480"></p></figure>
 <p>For normal straight-grained wood, shrinkage is usually greatest <strong>tangentially</strong> (along growth rings), smaller <strong>radially</strong> (across rings), and much smaller <strong>longitudinally</strong> (along the cells). Swelling reverses the moisture-loss trend. Actual amounts depend on species, grain orientation, and the moisture interval.</p>
 <p>Do not apply a green-to-oven-dry shrinkage percentage directly to a small seasonal humidity change. A movement estimate needs a species-specific coefficient, board orientation, starting MC, and expected service MC. Reaction wood and juvenile wood can also depart from ordinary longitudinal behavior.</p>
-<p>Estimate movement below using starting dimension × coefficient × (final MC − starting MC), with both MC values within 6–14%; then use the result in “Allow solid wood to change width” below.</p>
+<p>Estimate movement using starting dimension × coefficient × (final MC − starting MC), with both MC values within 6–14%. The attachment experiment below separates total width change from travel at a particular point.</p>
 <div data-interactive="wood-movement">
-<p><strong>Wood movement estimate</strong> &mdash; both moisture contents must be 6&ndash;14%.</p>
+<div class="wm-static">
+<p><strong>Wood movement and attachment clearance</strong> &mdash; both moisture contents must be 6&ndash;14%.</p>
 <p>Change = starting dimension &times; coefficient &times; (final MC &minus; starting MC), with MC entered as a percentage (8, not 0.08). Negative means shrinkage; positive means swelling. Use the tangential coefficient C<sub>T</sub> for the width of a flat-sawn board or when the ring orientation is unknown, and the radial coefficient C<sub>R</sub> for the width of a quarter-sawn board or the thickness of a flat-sawn one.</p>
-<p><strong>Worked example (the Handbook's own):</strong> a flat-sawn white fir board 9.15 in wide at 8% MC, C<sub>T</sub> = 0.00245, reaching 11% MC: 9.15 &times; 0.00245 &times; (11 &minus; 8) = 0.067 in wider, about 9.22 in. In millimetres, 232 mm becomes about 233.7 mm.</p>
-<p>Commercial lumber is rarely perfectly flat- or quarter-sawn, so this method tends to overestimate width change and underestimate thickness change, and the straight-line assumption underestimates movement by about 5%. Outside 6&ndash;14% MC a different method applies.</p>
-<p>Source: USDA Wood Handbook (2021), chapter 13, Equation 13-3 and Table 13-5 (coefficients for 17 species are in the interactive estimator).</p>
+<p><strong>Worked example:</strong> a flat-sawn white fir board 9.15 in wide at 8% MC, C<sub>T</sub> = 0.00245, reaching 11% MC: 9.15 &times; 0.00245 &times; (11 &minus; 8) = <strong>0.0672525 in</strong> wider, about 9.2173 in final width. The exact conversion starts at 232.41 mm and ends at about 234.118 mm. The Handbook's separately rounded 232 mm example ends at about 233.705 mm.</p>
+<p><strong>Predict:</strong> with one ideal fixed reference on a stationary support, does center fixing make the right edge move half as far, the same distance, or not at all, compared with fixing the left edge?</p>
+<table><caption>Same total width change, different edge travel: 8% to 11% MC</caption><thead><tr><th scope="col">Fixed reference</th><th scope="col">Left edge travel</th><th scope="col">Right edge travel</th></tr></thead><tbody><tr><th scope="row">Center</th><td>0.0336 in outward</td><td>0.0336 in outward</td></tr><tr><th scope="row">Left edge</th><td>0 (fixed)</td><td>0.0673 in outward</td></tr></tbody></table>
+<p>For uniform free strain, signed point displacement = (signed distance from the fixed reference &divide; installed width) &times; total width change. Center fixing halves the edge travel, not the total width change. A point closer to the reference travels less.</p>
+<p>Compare available travel in each direction from the installed position. With 0.040 in outward travel, center-fixed edges remain inside the travel window, while the opposite edge of the left-edge-fixed board exceeds it. Drying reverses the movement: 8% to 6% MC gives 0.0224 in inward travel at each center-fixed edge, exceeding a separate 0.020 in inward allowance. Enough travel in one direction does not supply travel in the other.</p>
+<p>Each estimate starts from the installed dimension and MC. Edge points are geometric tracking points, not a fastening layout. The support is stationary, with one ideal fixed reference and otherwise free uniform width change; friction, warp, strength, restraint stress and cracking are not calculated. Exceeding a travel window does not predict what the restrained board will do. A result within the window does not approve a joint.</p>
+<p>Commercial lumber is rarely perfectly flat- or quarter-sawn, so this method can overestimate width shrinkage and underestimate thickness shrinkage. Board properties and ring angles vary. These are approximate estimates; no correction or safety factor is added. Outside 6&ndash;14% MC a different method applies.</p>
+<p>Moisture-movement source: <a href="https://research.fs.usda.gov/download/treesearch/62261.pdf#page=16">USDA Wood Handbook (2021), chapter 13, Equation 13-3 and Table 13-5</a>. The point-travel equation is derived geometry under the stated assumptions.</p>
+</div>
 </div>
     </div>
   </details>
@@ -6687,13 +6728,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card="grain-and-moisture-movement--allow-solid-wood-to-change-width" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
-    <summary>Allow solid wood to change width<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
+    <summary>Allow solid wood to change width<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Allow solid wood to change width</h2>
 <p>A solid-wood tabletop needs room to expand and contract across its grain. Suitable slotted attachments let it move relative to a supporting frame. A panel held in grooves needs clearance rather than rigid restraint across its full width. Details depend on the joint and expected movement.</p>
+<p>Choose the fixed reference deliberately, then check travel from each attachment's installed position in both moisture directions. Slot length alone does not give clear travel: the fastener occupies space, and its starting position divides the available movement. The experiment above uses clear travel directly rather than inferring a hardware size.</p>
 <p>Do not assume that a finish locks moisture out. It can slow moisture exchange, but does not eliminate seasonal movement. Plywood often solves a panel-stability problem better than simply making a solid board thicker.</p>
 <ul class="boxes"><li>Identify the grain direction and width that can move.</li><li>Check moisture against the intended service environment.</li><li>Inspect for warp, splits, and grain interruptions before laying out parts.</li><li>Check that attachments allow the expected movement.</li></ul>
 <p>Wood conditioning and fabricating cover drying and joint-making in more detail; <a class="xref-page" href="#p-engineered-wood-products">Engineered Wood Products</a> compares alternatives to solid lumber.</p>
+<p><a class="button" data-practice-add="wood-movement-center-travel" href="../practice.html#wood-movement-center-travel">Practice: center-fixed travel</a> <a class="button" data-practice-add="wood-movement-directional-window" href="../practice.html#wood-movement-directional-window">Practice: directional clearance</a></p>
     </div>
   </details>
   <details class="xcard deck-wiki-only" id="grain-and-moisture-movement--further-reading-on-wood-properties-and-products" data-card="grain-and-moisture-movement--further-reading-on-wood-properties-and-products">
@@ -7804,6 +7847,264 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 </div>
 
 </article>
+<article class="article bundled" id="p-forming-metal">
+  <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span></div>
+  <h1>Forming Metal</h1>
+  <p class="lede">Compare casting, bulk deformation, sheet forming and powder metallurgy by shape, material, tooling and production quantity.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide is-checklist" id="forming-metal--choose-the-shape-making-route-before-comparing-production-cost" data-card="forming-metal--choose-the-shape-making-route-before-comparing-production-cost" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Choose the shape-making route before comparing production cost<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Choose the shape-making route before comparing production cost</h2>
+  <p>Metal parts can begin as liquid poured into a mold, solid stock plastically deformed into a new shape, or powder pressed into a compact. <strong>Plastic deformation</strong> means a permanent shape change after the force is removed. Each route limits the shapes it can make and the tools it needs. A <strong>die</strong> is a tool that controls shape; a <strong>mold</strong> contains material while it takes shape.</p>
+  <p>These shape-making routes sit under <strong>Forming</strong> in the classification used by <a class="xref-page" href="#p-manufacturing-process-categories">Manufacturing Process Categories</a>. In metalworking references, <em>forming</em> often means solid-metal deformation specifically, with casting listed separately. Cutting is Separating; joining is Fabricating; property-changing treatment is Conditioning; surface protection or appearance is Finishing. Metals are one of the four families in <a class="xref-page" href="#p-material-families">Material Families</a>, alongside Plastics, Wood &amp; Composites, and Ceramics &amp; Glass. Metal properties and heat treatment are separate topics.</p>
+  <ul class="boxes">
+    <li>Identify the alloy, overall shape, holes and thin regions.</li>
+    <li>State the quantity and whether the design will change.</li>
+    <li>Check tool access and how the part will leave the mold or die.</li>
+    <li>Compare tooling cost, repeatability and production rate.</li>
+    <li>Allow for trimming, machining, joining and finishing afterward.</li>
+  </ul>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="forming-metal--casting-makes-a-shape-by-solidifying-metal-inside-a-mold" data-card="forming-metal--casting-makes-a-shape-by-solidifying-metal-inside-a-mold">
+    <summary>Casting makes a shape by solidifying metal inside a mold<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Casting makes a shape by solidifying metal inside a mold</h2>
+  <table>
+    <caption>Three casting routes and their trade-offs</caption>
+    <thead><tr><th scope="col">Route</th><th scope="col">How it works</th><th scope="col">Typical products and cost trade-off</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Sand casting</th><td>A pattern makes a cavity in bonded sand. Remove the pattern, assemble the mold, pour metal, then break away the mold after solidification.</td><td>Pump housings and large machine bases. Relatively flexible tooling can suit small batches; making a new mold for every part adds work.</td></tr>
+      <tr><th scope="row">Investment casting</th><td>A disposable pattern, often wax, receives a ceramic shell. Remove the pattern and fire the shell before pouring metal. Break away the shell afterward.</td><td>Detailed brackets, valve parts and turbine components. Fine detail can reduce later machining, but pattern and shell preparation add time and cost.</td></tr>
+      <tr><th scope="row">Pressure die casting</th><td>Inject molten metal into a reusable metal die, let it solidify, then open the die and eject the part.</td><td>Repeated aluminum or zinc housings. Expensive dies and equipment can pay off over long runs; alloy, size and geometry must suit the process.</td></tr>
+    </tbody>
+  </table>
+  <p>There is no universal quantity at which die casting becomes cheapest. Obtain estimates for the actual geometry, alloy, tool life and required secondary operations.</p>
+  <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; Sources for the casting routes.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="forming-metal--a-casting-needs-room-to-release-shrink-and-feed" data-card="forming-metal--a-casting-needs-room-to-release-shrink-and-feed">
+    <summary>A casting needs room to release, shrink and feed<span class="chev"></span></summary>
+    <div class="body">
+      <h2>A casting needs room to release, shrink and feed</h2>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MjAgNDQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlNhbmQtY2FzdGluZyBtb2xkIGNyb3NzLXNlY3Rpb248L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5Db3BlIGFuZCBkcmFnIGNvbnRhaW4gdGhlIGNhdml0eS4gQSB0YXBlcmVkIHNwcnVlIGFuZCBydW5uZXIgZmVlZCBpdC4gQSByaXNlciBmZWVkcyBzaHJpbmthZ2U7IGEgY29yZSBpcyBzdXBwb3J0ZWQgYXQgYm90aCBlbmRzLiBTY2hlbWF0aWMsIG5vdCBhIHRvb2xpbmcgZGVzaWduLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgyMCIgaGVpZ2h0PSI0NDAiIGZpbGw9IiNmZmYiLz4KPHN0eWxlPnRleHQge2ZvbnQtZmFtaWx5OkFyaWFsLHNhbnMtc2VyaWY7Zm9udC1zaXplOjE4cHg7ZmlsbDojMTQyYjQzfSAuc21hbGwge2ZvbnQtc2l6ZToxNXB4fSAuaGVhZCB7Zm9udC1zaXplOjIzcHg7Zm9udC13ZWlnaHQ6Ym9sZH0gLmxpbmUge3N0cm9rZTojMTQyYjQzO3N0cm9rZS13aWR0aDoyO2ZpbGw6bm9uZX0gLm1ldGFsIHtmaWxsOiNiOWQ1ZTc7c3Ryb2tlOiMxNDJiNDM7c3Ryb2tlLXdpZHRoOjJ9IC50b29sIHtmaWxsOiNjYmQwZDY7c3Ryb2tlOiMxNDJiNDM7c3Ryb2tlLXdpZHRoOjJ9PC9zdHlsZT4KPGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEwWiIgZmlsbD0iIzE0MmI0MyIvPjwvbWFya2VyPjwvZGVmcz4KCjx0ZXh0IHg9IjI1IiB5PSIzMiIgY2xhc3M9ImhlYWQiPkEgbW9sZCBzaGFwZXMgdGhlIG91dHNpZGU7IGEgY29yZSBjcmVhdGVzIGFuIG9wZW5pbmc8L3RleHQ+CjxyZWN0IHg9IjEzNSIgeT0iOTAiIHdpZHRoPSI1ODAiIGhlaWdodD0iMjg1IiBmaWxsPSIjZWVlMWM2IiBzdHJva2U9IiMxNDJiNDMiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMTc1IDkwSDIyMEwyMTEgMjg1SDE4NFogTTE4NCAyNzVIMzU1VjI5NUgxODRaIiBmaWxsPSIjZTlhYzQ1IiBzdHJva2U9IiMxNDJiNDMiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMzQ1IDE3NUg1OTVWMzI1SDM0NVogTTUzNSA5MEg1ODVWMTc1SDUzNVoiIGZpbGw9IiNlOWFjNDUiIHN0cm9rZT0iIzE0MmI0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxyZWN0IHg9IjMxNSIgeT0iMjI1IiB3aWR0aD0iMzEwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYjlkNWU3IiBzdHJva2U9IiMxNDJiNDMiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMTM1IDI1MEgzMTVNNjI1IDI1MEg3MTUiIGNsYXNzPSJsaW5lIiBzdHJva2UtZGFzaGFycmF5PSI2IDUiLz4KPHRleHQgeD0iMjUiIHk9IjE1NSI+Q29wZTwvdGV4dD48cGF0aCBkPSJNODUgMTUwSDEzMCIgY2xhc3M9ImxpbmUiLz4KPHRleHQgeD0iMjUiIHk9IjMzNSI+RHJhZzwvdGV4dD48cGF0aCBkPSJNODUgMzMwSDEzMCIgY2xhc3M9ImxpbmUiLz4KPHRleHQgeD0iMTU1IiB5PSI2NSI+U3BydWU8L3RleHQ+PHBhdGggZD0iTTE5NCA2OVY4NiIgY2xhc3M9ImxpbmUiLz4KPHRleHQgeD0iNTI1IiB5PSI2NSI+UmlzZXI8L3RleHQ+PHBhdGggZD0iTTU2MCA2OVY4NiIgY2xhc3M9ImxpbmUiLz4KPHRleHQgeD0iMzkwIiB5PSIyMDUiPk1ldGFsLWZpbGxlZCBjYXZpdHk8L3RleHQ+PHRleHQgeD0iMzc1IiB5PSIyNTciPlN1cHBvcnRlZCBjb3JlPC90ZXh0Pgo8dGV4dCB4PSIxODAiIHk9IjM1NSI+UnVubmVyPC90ZXh0PjxwYXRoIGQ9Ik0yMjAgMzM1VjMwMSIgY2xhc3M9ImxpbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+Cjx0ZXh0IHg9IjMzMCIgeT0iMzY1Ij5HYXRlPC90ZXh0PjxwYXRoIGQ9Ik0zNTAgMzQ1VjMwMSIgY2xhc3M9ImxpbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+Cjx0ZXh0IHg9IjI1IiB5PSI0MDkiIGNsYXNzPSJzbWFsbCI+R29sZDogbWV0YWwgLyBmZWVkIHBhc3NhZ2VzLiBCbHVlOiBjb3JlLiBEYXNoZWQgbGluZTogbW9sZCBwYXJ0aW5nIHBsYW5lLiBOb3QgdG8gc2NhbGUuPC90ZXh0Pjwvc3ZnPgo=" alt="Schematic sand mold with the cope above the drag, a sprue and runner feeding the cavity, a riser above it and a supported core forming an internal opening." data-natural-width="820" data-natural-height="440"></p>
+  <p>The <strong>cope</strong> is the upper mold half; the <strong>drag</strong> is the lower half. The <strong>sprue</strong> leads downward from the pouring opening, and a runner and gate lead into the cavity. A <strong>riser</strong> supplies liquid metal as the casting solidifies and contracts. A <strong>core</strong> occupies space that must remain hollow.</p>
+  <p><strong>Draft</strong> is a slight taper that helps a pattern or casting leave its tooling. A shrinkage allowance changes tooling dimensions to account for contraction. Neither is a universal number: alloy, geometry and process matter. Critical faces or holes may need machining afterward.</p>
+  <p class="deeper-ref" id="deeper-ref-78">Supporting detail: <a href="#deeper-addendum-78"><strong>Addendum 78</strong></a> &mdash; Why a larger pattern does not replace a riser.</p>
+  <p><a href="https://www.sfsa.org/tutorials/cs1_text/Castings_16.html">SFSA explains riser feeding and shrinkage voids</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="forming-metal--rolling-squeezes-forging-compresses-and-extrusion-pushes-through-a-die" data-card="forming-metal--rolling-squeezes-forging-compresses-and-extrusion-pushes-through-a-die">
+    <summary>Rolling squeezes, forging compresses and extrusion pushes through a die<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Rolling squeezes, forging compresses and extrusion pushes through a die</h2>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgMzUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlJvbGxpbmcsIGZvcmdpbmcgYW5kIGV4dHJ1c2lvbjwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlRocmVlIHNrZXRjaGVzIGNvbXBhcmUgdGhlIGRpcmVjdGlvbiBvZiBmb3JjZSBhbmQgdGhlIHJlc3VsdGluZyBzaGFwZS4gUm9sbGluZyByZWR1Y2VzIHRoaWNrbmVzcywgZm9yZ2luZyBjb21wcmVzc2VzIGEgd29ya3BpZWNlIGFuZCBleHRydXNpb24gcHVzaGVzIHRocm91Z2ggYW4gb3BlbmluZy48L2Rlc2M+CjxyZWN0IHdpZHRoPSI5MDAiIGhlaWdodD0iMzUwIiBmaWxsPSIjZmZmIi8+CjxzdHlsZT50ZXh0IHtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmO2ZvbnQtc2l6ZToxOHB4O2ZpbGw6IzE0MmI0M30gLnNtYWxsIHtmb250LXNpemU6MTVweH0gLmhlYWQge2ZvbnQtc2l6ZToyM3B4O2ZvbnQtd2VpZ2h0OmJvbGR9IC5saW5lIHtzdHJva2U6IzE0MmI0MztzdHJva2Utd2lkdGg6MjtmaWxsOm5vbmV9IC5tZXRhbCB7ZmlsbDojYjlkNWU3O3N0cm9rZTojMTQyYjQzO3N0cm9rZS13aWR0aDoyfSAudG9vbCB7ZmlsbDojY2JkMGQ2O3N0cm9rZTojMTQyYjQzO3N0cm9rZS13aWR0aDoyfTwvc3R5bGU+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMFoiIGZpbGw9IiMxNDJiNDMiLz48L21hcmtlcj48L2RlZnM+Cgo8dGV4dCB4PSIyNSIgeT0iMzUiIGNsYXNzPSJoZWFkIj5Sb2xsaW5nPC90ZXh0Pjx0ZXh0IHg9IjMyNSIgeT0iMzUiIGNsYXNzPSJoZWFkIj5Gb3JnaW5nPC90ZXh0Pjx0ZXh0IHg9IjYyNSIgeT0iMzUiIGNsYXNzPSJoZWFkIj5FeHRydXNpb248L3RleHQ+CjxwYXRoIGQ9Ik0zMDAgMjBWMzI1TTYwMCAyMFYzMjUiIGNsYXNzPSJsaW5lIi8+CjxwYXRoIGQ9Ik0yMCAxNDBIMTI1TDE2NSAxNTdIMjgwVjE3M0gxNjVMMTI1IDE5MEgyMFoiIGNsYXNzPSJtZXRhbCIvPgo8Y2lyY2xlIGN4PSIxNDUiIGN5PSIxMTAiIHI9IjQ3IiBjbGFzcz0idG9vbCIvPjxjaXJjbGUgY3g9IjE0NSIgY3k9IjIyMCIgcj0iNDciIGNsYXNzPSJ0b29sIi8+CjxwYXRoIGQ9Ik00MCAxMTBIOTUgTTIwNSAyMDVIMjY1IiBjbGFzcz0ibGluZSIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHRleHQgeD0iMjAiIHk9IjMwMiI+VGhpbm5lciwgbG9uZ2VyIHN0b2NrPC90ZXh0Pgo8cmVjdCB4PSIzMzUiIHk9IjEwNSIgd2lkdGg9IjIyNSIgaGVpZ2h0PSIzNSIgY2xhc3M9InRvb2wiLz48cmVjdCB4PSIzMzUiIHk9IjIzMCIgd2lkdGg9IjIyNSIgaGVpZ2h0PSIzNSIgY2xhc3M9InRvb2wiLz4KPHBhdGggZD0iTTM3NSAxOTBRNDQ4IDE1NSA1MjAgMTkwVjIyNUgzNzVaIiBjbGFzcz0ibWV0YWwiLz4KPHBhdGggZD0iTTQ0NSA2MFY5OCIgY2xhc3M9ImxpbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+PHBhdGggZD0iTTQ0NSAxNjBWMTg1IiBjbGFzcz0ibGluZSIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHRleHQgeD0iMzMwIiB5PSIzMDIiPkNvbXByZXNzZWQgYmV0d2VlbiBkaWVzPC90ZXh0Pgo8cmVjdCB4PSI2MjUiIHk9IjEzMCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI5MCIgY2xhc3M9InRvb2wiLz48cmVjdCB4PSI2NTAiIHk9IjE0NSIgd2lkdGg9IjEzNSIgaGVpZ2h0PSI2MCIgY2xhc3M9Im1ldGFsIi8+CjxwYXRoIGQ9Ik03OTAgMTI1SDgxNVYxNjNINzkwWiBNNzkwIDE4N0g4MTVWMjI1SDc5MFoiIGNsYXNzPSJ0b29sIi8+CjxyZWN0IHg9Ijc4NSIgeT0iMTYzIiB3aWR0aD0iOTUiIGhlaWdodD0iMjQiIGNsYXNzPSJtZXRhbCIvPgo8cGF0aCBkPSJNNjIwIDE3NUg2NzUiIGNsYXNzPSJsaW5lIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPgo8dGV4dCB4PSI2MjUiIHk9IjEwMCI+UmFtIOKGkiBiaWxsZXQg4oaSIGRpZTwvdGV4dD48dGV4dCB4PSI2MjUiIHk9IjMwMiI+TG9uZyBjb25zdGFudCBwcm9maWxlPC90ZXh0Pgo8dGV4dCB4PSIyNSIgeT0iMzM1IiBjbGFzcz0ic21hbGwiPkNvbmNlcHQgc2tldGNoZXM7IG5vIHRvb2xpbmcgZGltZW5zaW9ucyBvciBvcGVyYXRpbmcgc2V0dGluZ3MuPC90ZXh0Pjwvc3ZnPg==" alt="Side-by-side sketches: rolling reduces stock thickness between rolls; forging compresses stock between dies; extrusion pushes a billet through an opening into a long profile." data-natural-width="900" data-natural-height="350"></p>
+  <table>
+    <caption>Solid-metal forming routes</caption>
+    <thead><tr><th scope="col">Route</th><th scope="col">Shape and examples</th><th scope="col">Tooling and quantity</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Rolling</th><td>Rotating rolls reduce thickness or produce a section. Sheet, plate and structural shapes are common products.</td><td>Large equipment investment suits substantial throughput; a designer can often buy standard rolled stock.</td></tr>
+      <tr><th scope="row">Open-die forging</th><td>Dies compress a solid workpiece without enclosing its whole outline. Examples include large shafts and rings.</td><td>Relatively simple dies accommodate varied sizes; repeated positioning and later machining may be needed.</td></tr>
+      <tr><th scope="row">Closed-die forging</th><td>Shaped die cavities guide metal flow into repeated parts such as connecting rods and wrenches.</td><td>Dedicated tooling favors repeated production. Excess metal may form flash that is trimmed away.</td></tr>
+      <tr><th scope="row">Extrusion</th><td>A ram pushes a billet through a die opening. Long channels, rails and heat-sink profiles have a substantially constant cross-section.</td><td>A dedicated profile die can serve many lengths. Cut ends, cross holes and local pockets require later operations.</td></tr>
+      <tr><th scope="row">Wire drawing</th><td>Pull wire through a reducing die to make it thinner and longer. This is different from pushing stock through an extrusion die.</td><td>Die sets and handling equipment suit repeated lengths; several reductions may be needed.</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Hot working</strong> occurs at temperatures and deformation rates that allow recrystallization, the formation of new grains, during deformation. <strong>Cold working</strong> occurs where that process does not remove the work hardening as deformation proceeds. The boundary depends on the metal and processing conditions; it is not one temperature for every alloy. Hot rolling permits large shape changes, while cold rolling commonly improves dimensional control and surface quality and can increase strength through work hardening.</p>
+  <p class="deeper-ref" id="deeper-ref-79">Supporting detail: <a href="#deeper-addendum-79"><strong>Addendum 79</strong></a> &mdash; Cold forming does not guarantee an unchanged dimension.</p>
+  <p class="deeper-ref" id="deeper-ref-80">Supporting detail: <a href="#deeper-addendum-80"><strong>Addendum 80</strong></a> &mdash; Sources for solid-metal deformation.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="forming-metal--sheet-forming-changes-shape-blanking-and-shearing-separate-material" data-card="forming-metal--sheet-forming-changes-shape-blanking-and-shearing-separate-material">
+    <summary>Sheet forming changes shape; blanking and shearing separate material<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Sheet forming changes shape; blanking and shearing separate material</h2>
+  <p><strong>Bending</strong> changes the angle of sheet, as in a bracket or enclosure. A press brake uses a punch and die to make bends; adaptable tooling suits prototypes and short runs. <strong>Roll forming</strong> progressively bends strip through roll stations into a long profile, such as a channel. Its dedicated roll tooling favors repeated lengths. It is different from rolling sheet thinner.</p>
+  <p><strong>Deep drawing</strong> pulls sheet from a flat blank into a die cavity to make a cup or shell. Tooling must control material flow to limit tearing and wrinkling. Dedicated tools suit repeat production. This is different from pulling wire through a reducing die.</p>
+  <p><strong>Stamping</strong> names a press-based production route that can combine several operations. Bending and drawing are Forming; shearing and blanking are Separating. In blanking, the cut-out piece is the wanted blank; in punching a hole, the removed slug is usually scrap. A stamping line can therefore perform more than one process category.</p>
+  <p><strong>Bend allowance</strong> accounts for the material length within a bend when developing a flat pattern. The sheet stretches on the outside and compresses on the inside. Use a validated bend table or supplier data for the alloy, thickness, radius and tooling; adding outside leg dimensions alone does not give the correct blank length.</p>
+  <p><a class="button" data-practice-add="metal-process-bracket" href="../practice.html#metal-process-bracket">Practice selecting a sheet process</a></p>
+  <p class="deeper-ref" id="deeper-ref-81">Supporting detail: <a href="#deeper-addendum-81"><strong>Addendum 81</strong></a> &mdash; Sources for sheet forming and flat patterns.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="forming-metal--powder-metallurgy-presses-particles-then-bonds-them-by-sintering" data-card="forming-metal--powder-metallurgy-presses-particles-then-bonds-them-by-sintering">
+    <summary>Powder metallurgy presses particles, then bonds them by sintering<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Powder metallurgy presses particles, then bonds them by sintering</h2>
+  <p>In conventional press-and-sinter powder metallurgy, powder fills a die and is compressed into a <strong>green compact</strong>: a shaped part that is not yet fully bonded. Heating then bonds the particles during <strong>sintering</strong>, generally without melting the main metal throughout. Some systems include a liquid phase.</p>
+  <p>Small gears and porous bearings are typical products. Dedicated dies and presses favor repeat quantities and can produce a near-net shape, close to the finished dimensions. Tool access, ejection and density variation limit geometry; critical features may still require sizing or machining.</p>
+  <p class="deeper-ref" id="deeper-ref-82">Supporting detail: <a href="#deeper-addendum-82"><strong>Addendum 82</strong></a> &mdash; Porosity can be useful or unwanted.</p>
+  <p><a href="https://www.mpif.org/IntrotoPM/Processes/ConventionalPowderMetallurgy.aspx">MPIF explains conventional compaction, sintering and secondary operations</a>. This section describes that route, rather than every process that begins with metal powder.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="forming-metal--plan-the-separating-operations-that-finish-the-geometry" data-card="forming-metal--plan-the-separating-operations-that-finish-the-geometry">
+    <summary>Plan the separating operations that finish the geometry<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Plan the separating operations that finish the geometry</h2>
+  <p>Follow <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/milling-operations.html" target="_blank" rel="noopener">Milling Operations</a> for machined faces and pockets, <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/lathe-operations.html" target="_blank" rel="noopener">Lathe Operations</a> for turned features, and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/feeds-and-speeds.html" target="_blank" rel="noopener">Feeds and Speeds</a> for cutting-data concepts. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/tolerances-and-fits.html" target="_blank" rel="noopener">Tolerances and Fits</a> to decide which dimensions require close control and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/surface-texture.html" target="_blank" rel="noopener">Surface Texture and Finish</a> to distinguish a surface requirement from a process name.</p>
+  <p>Forming is often only the beginning of a route. A casting can be machined, joined and coated. These pages compare processes for design; operating procedures belong in <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a> and <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-joining-metal">
+  <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span></div>
+  <h1>Joining Metal</h1>
+  <p class="lede">Compare welding, brazing, soldering and mechanical assembly by joint access, heat input, production needs and service requirements.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="joining-metal--choose-a-joint-around-its-load-access-and-need-for-disassembly" data-card="joining-metal--choose-a-joint-around-its-load-access-and-need-for-disassembly">
+    <summary>Choose a joint around its load, access and need for disassembly<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Choose a joint around its load, access and need for disassembly</h2>
+  <p>Joining parts is <strong>Fabricating</strong>. First identify the metals, thicknesses, loading, service environment and whether the assembly must come apart. Then check access for the joining equipment and for inspection.</p>
+  <p>A welded frame can avoid a large casting tool, but fit-up, fixtures and inspection still cost money. A bolt-on cover allows service access, but needs clearance for the fasteners and tools. See <a class="xref-page" href="#p-fasteners-and-galvanic-corrosion">Fasteners and Galvanic Corrosion</a> for mechanical assembly.</p>
+  <p>This is a process-selection overview. For safety requirements, use <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>, <a class="xref-page" href="#p-fire-safety">Fire Safety</a>, <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a> and <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="joining-metal--welding-joins-the-base-metal-melting-is-not-required-in-every-process" data-card="joining-metal--welding-joins-the-base-metal-melting-is-not-required-in-every-process">
+    <summary>Welding joins the base metal; melting is not required in every process<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Welding joins the base metal; melting is not required in every process</h2>
+  <p><strong>Fusion welding</strong> melts base metal at the joint, with or without added filler metal. The pool solidifies to form the joint. The common arc, oxy-fuel and resistance spot processes below are fusion processes.</p>
+  <p><strong>Solid-state welding</strong> forms a bond without bulk melting of the base metals. Friction welding is one example. A solid-state process can still heat and alter nearby metal; “not melted” does not mean “unchanged.”</p>
+  <p>The <strong>heat-affected zone</strong> is nearby base metal whose structure or properties change because of the thermal cycle, without itself becoming weld metal. Selecting a process includes checking those changes and distortion, not merely whether a bead looks smooth.</p>
+  <p class="deeper-ref" id="deeper-ref-83">Supporting detail: <a href="#deeper-addendum-83"><strong>Addendum 83</strong></a> &mdash; Sources for fusion welding, solid-state welding and the heat-affected zone.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="joining-metal--compare-the-heat-source-filler-and-access-of-five-welding-processes" data-card="joining-metal--compare-the-heat-source-filler-and-access-of-five-welding-processes">
+    <summary>Compare the heat source, filler and access of five welding processes<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compare the heat source, filler and access of five welding processes</h2>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAwIDQ2MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5GaXZlIHdlbGRpbmcgcHJvY2Vzc2VzIGNvbXBhcmVkPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+VGFibGUgZ3JhcGhpYyBsaXN0aW5nIHByb2Nlc3MsIGhlYXQgc291cmNlLCBmaWxsZXIgc3VwcGx5IGFuZCB0eXBpY2FsIGFwcGxpY2F0aW9uLiBGdWxsIHRyYWRlLW9mZnMgYXBwZWFyIGluIHRoZSBhY2NvbXBhbnlpbmcgSFRNTCB0YWJsZS48L2Rlc2M+CjxyZWN0IHdpZHRoPSIxMDAwIiBoZWlnaHQ9IjQ2MCIgZmlsbD0iI2ZmZiIvPgo8c3R5bGU+dGV4dCB7Zm9udC1mYW1pbHk6QXJpYWwsc2Fucy1zZXJpZjtmb250LXNpemU6MThweDtmaWxsOiMxNDJiNDN9IC5zbWFsbCB7Zm9udC1zaXplOjE1cHh9IC5oZWFkIHtmb250LXNpemU6MjNweDtmb250LXdlaWdodDpib2xkfSAubGluZSB7c3Ryb2tlOiMxNDJiNDM7c3Ryb2tlLXdpZHRoOjI7ZmlsbDpub25lfSAubWV0YWwge2ZpbGw6I2I5ZDVlNztzdHJva2U6IzE0MmI0MztzdHJva2Utd2lkdGg6Mn0gLnRvb2wge2ZpbGw6I2NiZDBkNjtzdHJva2U6IzE0MmI0MztzdHJva2Utd2lkdGg6Mn08L3N0eWxlPgo8ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNyIgbWFya2VySGVpZ2h0PSI3IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+PHBhdGggZD0iTTAgMEwxMCA1TDAgMTBaIiBmaWxsPSIjMTQyYjQzIi8+PC9tYXJrZXI+PC9kZWZzPgo8dGV4dCB4PSIyMCIgeT0iMzIiIGNsYXNzPSJoZWFkIj5Db21wYXJlIHRoZSBqb2luaW5nIG1lY2hhbmlzbSBiZWZvcmUgdGhlIGVxdWlwbWVudDwvdGV4dD48dGV4dCB4PSIyMCIgeT0iNzUiIGZvbnQtd2VpZ2h0PSJib2xkIj5Qcm9jZXNzPC90ZXh0Pjx0ZXh0IHg9IjIyNSIgeT0iNzUiIGZvbnQtd2VpZ2h0PSJib2xkIj5IZWF0IHNvdXJjZTwvdGV4dD48dGV4dCB4PSI0MzAiIHk9Ijc1IiBmb250LXdlaWdodD0iYm9sZCI+RmlsbGVyPC90ZXh0Pjx0ZXh0IHg9IjcxMCIgeT0iNzUiIGZvbnQtd2VpZ2h0PSJib2xkIj5UeXBpY2FsIGZpdDwvdGV4dD48cmVjdCB4PSIxMCIgeT0iOTUiIHdpZHRoPSI5NzUiIGhlaWdodD0iNjAiIGZpbGw9IiNlZGYzZjciLz48cGF0aCBkPSJNMTAgMTU1SDk4NSIgY2xhc3M9ImxpbmUiLz48dGV4dCB4PSIyMCIgeT0iMTMxIj5PeHktZnVlbDwvdGV4dD48dGV4dCB4PSIyMjUiIHk9IjEzMSI+RmxhbWU8L3RleHQ+PHRleHQgeD0iNDMwIiB5PSIxMzEiPlNlcGFyYXRlIHJvZCwgaWYgbmVlZGVkPC90ZXh0Pjx0ZXh0IHg9IjcxMCIgeT0iMTMxIj5TZWxlY3RlZCB0aGluLXN0ZWVsIHdvcms8L3RleHQ+PHJlY3QgeD0iMTAiIHk9IjE1NyIgd2lkdGg9Ijk3NSIgaGVpZ2h0PSI2MCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0xMCAyMTdIOTg1IiBjbGFzcz0ibGluZSIvPjx0ZXh0IHg9IjIwIiB5PSIxOTMiPlN0aWNrIC8gU01BVzwvdGV4dD48dGV4dCB4PSIyMjUiIHk9IjE5MyI+RWxlY3RyaWMgYXJjPC90ZXh0Pjx0ZXh0IHg9IjQzMCIgeT0iMTkzIj5GbHV4LWNvYXRlZCByb2Q8L3RleHQ+PHRleHQgeD0iNzEwIiB5PSIxOTMiPlN0ZWVsIHJlcGFpcjwvdGV4dD48cmVjdCB4PSIxMCIgeT0iMjE5IiB3aWR0aD0iOTc1IiBoZWlnaHQ9IjYwIiBmaWxsPSIjZWRmM2Y3Ii8+PHBhdGggZD0iTTEwIDI3OUg5ODUiIGNsYXNzPSJsaW5lIi8+PHRleHQgeD0iMjAiIHk9IjI1NSI+R01BVyAoTUlHL01BRyk8L3RleHQ+PHRleHQgeD0iMjI1IiB5PSIyNTUiPkVsZWN0cmljIGFyYzwvdGV4dD48dGV4dCB4PSI0MzAiIHk9IjI1NSI+Q29udGludW91cyB3aXJlPC90ZXh0Pjx0ZXh0IHg9IjcxMCIgeT0iMjU1Ij5SZXBlYXRlZCBmYWJyaWNhdGlvbjwvdGV4dD48cmVjdCB4PSIxMCIgeT0iMjgxIiB3aWR0aD0iOTc1IiBoZWlnaHQ9IjYwIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTEwIDM0MUg5ODUiIGNsYXNzPSJsaW5lIi8+PHRleHQgeD0iMjAiIHk9IjMxNyI+VElHIC8gR1RBVzwvdGV4dD48dGV4dCB4PSIyMjUiIHk9IjMxNyI+RWxlY3RyaWMgYXJjPC90ZXh0Pjx0ZXh0IHg9IjQzMCIgeT0iMzE3Ij5TZXBhcmF0ZSBmaWxsZXIsIGlmIG5lZWRlZDwvdGV4dD48dGV4dCB4PSI3MTAiIHk9IjMxNyI+Q29udHJvbGxlZCB0aGluIGpvaW50czwvdGV4dD48cmVjdCB4PSIxMCIgeT0iMzQzIiB3aWR0aD0iOTc1IiBoZWlnaHQ9IjYwIiBmaWxsPSIjZWRmM2Y3Ii8+PHBhdGggZD0iTTEwIDQwM0g5ODUiIGNsYXNzPSJsaW5lIi8+PHRleHQgeD0iMjAiIHk9IjM3OSI+UmVzaXN0YW5jZSBzcG90PC90ZXh0Pjx0ZXh0IHg9IjIyNSIgeT0iMzc5Ij5SZXNpc3RhbmNlIGhlYXRpbmc8L3RleHQ+PHRleHQgeD0iNDMwIiB5PSIzNzkiPlVzdWFsbHkgbm9uZTwvdGV4dD48dGV4dCB4PSI3MTAiIHk9IjM3OSI+T3ZlcmxhcHBpbmcgc2hlZXQ8L3RleHQ+PHRleHQgeD0iMjAiIHk9IjQzOSIgY2xhc3M9InNtYWxsIj5FYWNoIGNob2ljZSBhbHNvIGRlcGVuZHMgb24gYWxsb3ksIGpvaW50IGdlb21ldHJ5LCBhY2Nlc3MgYW5kIHJlcXVpcmVkIHBlcmZvcm1hbmNlLjwvdGV4dD48L3N2Zz4=" alt="Comparison of oxy-fuel, stick, MIG, TIG and resistance spot welding by heat source, filler supply and typical application." data-natural-width="1000" data-natural-height="460"></p>
+  <table>
+    <caption>Starting candidates for process selection</caption>
+    <thead><tr><th scope="col">Process</th><th scope="col">How it works and where it fits</th><th scope="col">Trade-off</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Oxy-fuel welding</th><td>A fuel-and-oxygen flame heats the joint; a separate filler rod may be added. Oxyacetylene can suit selected thin-steel work and repair.</td><td>Flexible equipment, but slower and with more broadly distributed heating than many production arc processes.</td></tr>
+      <tr><th scope="row">SMAW / stick</th><td>An arc melts a flux-coated consumable rod. The coating supplies protection for the weld pool. Common for steel repair and construction work.</td><td>Portable equipment and flexibility; rods need replacement and slag needs removal between appropriate stages.</td></tr>
+      <tr><th scope="row">GMAW (MIG/MAG)</th><td>An arc melts continuously fed wire under external shielding gas. Common for repeated steel or aluminum fabrication with suitable wire, gas and settings.</td><td>Continuous wire supports production and automation; shielding and equipment access must suit the job.</td></tr>
+      <tr><th scope="row">GTAW / TIG</th><td>An arc from a non-consumable tungsten electrode heats the joint under inert gas. Filler, when needed, is supplied separately. Useful for controlled joints in thin stainless steel and aluminum.</td><td>Good control of heat and filler, but often slower than wire-fed production welding.</td></tr>
+      <tr><th scope="row">Resistance spot welding</th><td>Opposed electrodes press overlapping sheets together and pass current through them, forming a local fused nugget. Common in repeated sheet assemblies.</td><td>Rapid repeat joints with suitable equipment and fixtures; conventional arrangements require access to both sides. Separate spots do not make a sealed seam.</td></tr>
+    </tbody>
+  </table>
+  <p class="deeper-ref" id="deeper-ref-84">Supporting detail: <a href="#deeper-addendum-84"><strong>Addendum 84</strong></a> &mdash; Why MIG is a familiar name but GMAW is the broader term.</p>
+  <p class="deeper-ref" id="deeper-ref-85">Supporting detail: <a href="#deeper-addendum-85"><strong>Addendum 85</strong></a> &mdash; Sources for the five process mechanisms.</p>
+  <p><a class="button" data-practice-add="metal-process-spot" href="../practice.html#metal-process-spot">Practice choosing a joining method</a></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="joining-metal--brazing-and-soldering-melt-filler-while-the-base-parts-stay-solid" data-card="joining-metal--brazing-and-soldering-melt-filler-while-the-base-parts-stay-solid">
+    <summary>Brazing and soldering melt filler while the base parts stay solid<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Brazing and soldering melt filler while the base parts stay solid</h2>
+  <p>In brazing and soldering, a molten filler wets the solid base parts. In a suitable close-fitting joint, capillary action draws filler into the gap. The usual dividing temperature is <strong>450°C</strong>: the American Welding Society describes brazing fillers as having a <strong>liquidus</strong> above 450°C and soldering fillers below it. Liquidus is the temperature above which the filler is fully liquid. This distinction concerns the filler, not the flame temperature or the machine's setting. In both processes the base parts remain solid. Neither is simply a cooler version of fusion welding.</p>
+  <p>Brazing can join suitable dissimilar metals or attach a carbide tip to a steel tool body. Soldering is common in electrical connections. Choose filler and joint design for compatibility, temperature and loads; a soldered electrical connection is not automatically suitable for a structural load.</p>
+  <p>Joint clearance, surface condition and heating method matter. Brazing can be manual or performed in production equipment such as a furnace. Mechanization changes throughput and tooling costs; the process name alone does not identify the cheapest route.</p>
+  <p class="deeper-ref" id="deeper-ref-86">Supporting detail: <a href="#deeper-addendum-86"><strong>Addendum 86</strong></a> &mdash; Sources for the filler-temperature distinction and capillary joint.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide is-checklist" id="joining-metal--specify-the-required-joint-not-just-the-name-of-the-machine" data-card="joining-metal--specify-the-required-joint-not-just-the-name-of-the-machine" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Specify the required joint, not just the name of the machine<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Specify the required joint, not just the name of the machine</h2>
+  <ul class="boxes">
+    <li>Identify both base materials, thicknesses and any coatings.</li>
+    <li>Describe the joint location, overlap or preparation and equipment access.</li>
+    <li>State load, leak-tightness and appearance requirements.</li>
+    <li>Allow for distortion, inspection and any later machining.</li>
+    <li>Coordinate the finish and any assembly sequence constraints.</li>
+  </ul>
+  <p>A drawing and its referenced specification communicate the required weld and acceptance criteria. A process abbreviation alone does not specify weld size, extent or quality. Likewise, a visually neat joint does not establish internal soundness. Heat-treatment selection is a separate topic.</p>
+    </div>
+  </details>
+</div>
+
+</article>
+<article class="article bundled" id="p-fasteners-and-galvanic-corrosion">
+  <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span></div>
+  <h1>Fasteners and Galvanic Corrosion</h1>
+  <p class="lede">Choose mechanical joints for service access, thread compatibility and exposure to moisture and dissimilar metals.</p>
+<div class="cardtools">
+  <button type="button" data-act="expand">Expand all</button>
+  <button type="button" data-act="collapse">Collapse all</button>
+</div>
+<div class="cards">
+  <details class="xcard deck-slide" id="fasteners-and-galvanic-corrosion--match-the-fastener-to-the-assembly-and-its-service-access" data-card="fasteners-and-galvanic-corrosion--match-the-fastener-to-the-assembly-and-its-service-access">
+    <summary>Match the fastener to the assembly and its service access<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Match the fastener to the assembly and its service access</h2>
+  <table>
+    <caption>Common mechanical joining components</caption>
+    <thead><tr><th scope="col">Component</th><th scope="col">Purpose</th><th scope="col">Design check</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Bolt and nut</th><td>Provide a removable threaded connection that can clamp parts together.</td><td>Provide tool access, suitable thread engagement and a compatible strength and material specification.</td></tr>
+      <tr><th scope="row">Washer</th><td>Provides a bearing surface or distributes load where the design requires it.</td><td>A plain washer does not by itself prevent loosening or electrically isolate an entire joint.</td></tr>
+      <tr><th scope="row">Rivet</th><td>Forms a retaining head through permanent deformation.</td><td>Suitable for repeated sheet assembly; removal normally destroys the rivet. Blind rivets permit installation from one side.</td></tr>
+      <tr><th scope="row">Threaded insert</th><td>Provides an internal thread in a host part.</td><td>Select an insert designed for the host material and thickness. Check installation access, pull-out and resistance to rotation.</td></tr>
+    </tbody>
+  </table>
+  <p>Standard fasteners often reduce dedicated tooling for short runs, but every fastener adds parts and assembly time. Riveting or automated fastening may suit long runs. Removability, inspection and repair can justify a threaded joint even when another method is faster.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="fasteners-and-galvanic-corrosion--a-thread-size-alone-does-not-specify-a-complete-fastener" data-card="fasteners-and-galvanic-corrosion--a-thread-size-alone-does-not-specify-a-complete-fastener">
+    <summary>A thread size alone does not specify a complete fastener<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>A thread size alone does not specify a complete fastener</h2>
+  <p>The mating threads must agree in diameter, spacing and thread system. Similar-looking inch and metric parts are not interchangeable. <strong>Pitch</strong> describes axial spacing between adjacent thread forms; <strong>threads per inch</strong> describes a count over a unit length.</p>
+  <p>A purchase or drawing specification also needs the relevant length, head style, material or strength grade, coating and thread-fit requirements. The wrench size is not the thread diameter. Use the applicable thread reference and supplier drawing to decode a designation before choosing mating parts.</p>
+  <table>
+    <caption>Read diameter and thread spacing separately</caption>
+    <thead><tr><th scope="col">Example</th><th scope="col">Diameter</th><th scope="col">Spacing and system</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">1/4-20 UNC</th><td>Nominal thread diameter: 1/4 inch.</td><td>20 threads per inch; UNC is the Unified coarse series. The pitch is 1/20 inch, not 20 inches.</td></tr>
+      <tr><th scope="row">M6 × 1</th><td>Nominal metric thread diameter: 6 mm.</td><td>Pitch: 1 mm between corresponding points on adjacent threads. The 1 is not a count of threads per inch.</td></tr>
+    </tbody>
+  </table>
+  <p>These are thread-size examples, not complete fastener specifications. Nominal diameter identifies the size; tolerances govern the actual mating dimensions. A 1/4-20 thread and an M6 × 1 thread differ in both diameter and spacing.</p>
+  <p class="deeper-ref" id="deeper-ref-87">Supporting detail: <a href="#deeper-addendum-87"><strong>Addendum 87</strong></a> &mdash; Sources for thread names and size examples.</p>
+  <p><a class="button" data-practice-add="metal-process-inch-thread" href="../practice.html#metal-process-inch-thread">Practice decoding a thread designation</a></p>
+  <p>For dimensional fit concepts, see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/tolerances-and-fits.html" target="_blank" rel="noopener">Tolerances and Fits</a>. For a permanently joined alternative, see <a class="xref-page" href="#p-joining-metal">Joining Metal</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="fasteners-and-galvanic-corrosion--galvanic-corrosion-needs-a-metal-pair-electrical-contact-and-an-electrolyte" data-card="fasteners-and-galvanic-corrosion--galvanic-corrosion-needs-a-metal-pair-electrical-contact-and-an-electrolyte">
+    <summary>Galvanic corrosion needs a metal pair, electrical contact and an electrolyte<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Galvanic corrosion needs a metal pair, electrical contact and an electrolyte</h2>
+  <p>Dissimilar metals can form a corrosion cell when they are electrically connected and share a conductive liquid, called an <strong>electrolyte</strong>. Moisture containing salts can provide that liquid. The more active member of the pair acts as the <strong>anode</strong> and may corrode faster; the other acts as the <strong>cathode</strong>.</p>
+  <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4ODAgNDEwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkdhbHZhbmljIGNvbnRhY3QgYW5kIGVsZWN0cmljYWwgaXNvbGF0aW9uPC90aXRsZT48ZGVzYyBpZD0iZGVzYyI+TGVmdDogZGlzc2ltaWxhciBlbGVjdHJpY2FsbHkgY29ubmVjdGVkIG1ldGFscyBzaGFyZSBhIGNvbmR1Y3RpdmUgbGlxdWlkLiBSaWdodDogaW5zdWxhdGluZyB3YXNoZXJzIGFuZCBhIHNsZWV2ZSBpbnRlcnJ1cHQgY29udGFjdCBiZXR3ZWVuIGEgZmFzdGVuZXIgYW5kIHBsYXRlLiBDb25jZXB0IG9ubHksIG5vdCBhIHN0cnVjdHVyYWwgam9pbnQgZGV0YWlsLjwvZGVzYz4KPHJlY3Qgd2lkdGg9Ijg4MCIgaGVpZ2h0PSI0MTAiIGZpbGw9IiNmZmYiLz4KPHN0eWxlPnRleHQge2ZvbnQtZmFtaWx5OkFyaWFsLHNhbnMtc2VyaWY7Zm9udC1zaXplOjE4cHg7ZmlsbDojMTQyYjQzfSAuc21hbGwge2ZvbnQtc2l6ZToxNXB4fSAuaGVhZCB7Zm9udC1zaXplOjIzcHg7Zm9udC13ZWlnaHQ6Ym9sZH0gLmxpbmUge3N0cm9rZTojMTQyYjQzO3N0cm9rZS13aWR0aDoyO2ZpbGw6bm9uZX0gLm1ldGFsIHtmaWxsOiNiOWQ1ZTc7c3Ryb2tlOiMxNDJiNDM7c3Ryb2tlLXdpZHRoOjJ9IC50b29sIHtmaWxsOiNjYmQwZDY7c3Ryb2tlOiMxNDJiNDM7c3Ryb2tlLXdpZHRoOjJ9PC9zdHlsZT4KPGRlZnM+PG1hcmtlciBpZD0iYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEwWiIgZmlsbD0iIzE0MmI0MyIvPjwvbWFya2VyPjwvZGVmcz4KCjx0ZXh0IHg9IjIwIiB5PSIzNSIgY2xhc3M9ImhlYWQiPkNvbm5lY3RlZCBhbmQgd2V0PC90ZXh0Pjx0ZXh0IHg9IjQ2NSIgeT0iMzUiIGNsYXNzPSJoZWFkIj5JbnRlcnJ1cHQgdGhlIGVsZWN0cmljYWwgcGF0aDwvdGV4dD4KPHBhdGggZD0iTTQ0MCAxNVYzNjUiIGNsYXNzPSJsaW5lIi8+CjxwYXRoIGQ9Ik0zNSAxNDBRMTMwIDk1IDIyMCAxNDBUNDA1IDE0MFYxNzVIMzVaIiBmaWxsPSIjYzllYWZhIiBzdHJva2U9IiMxNDJiNDMiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSI3NSIgeT0iMTAwIj5Db25kdWN0aXZlIGxpcXVpZDwvdGV4dD4KPHJlY3QgeD0iMzUiIHk9IjE3NSIgd2lkdGg9IjE4NSIgaGVpZ2h0PSI3NSIgZmlsbD0iI2VlZDZhMCIgc3Ryb2tlPSIjMTQyYjQzIiBzdHJva2Utd2lkdGg9IjIiLz4KPHJlY3QgeD0iMjIwIiB5PSIxNzUiIHdpZHRoPSIxODUiIGhlaWdodD0iNzUiIGNsYXNzPSJtZXRhbCIvPgo8dGV4dCB4PSI1NSIgeT0iMjA1Ij5Nb3JlIGFjdGl2ZTwvdGV4dD48dGV4dCB4PSI1NSIgeT0iMjMyIj5tZXRhbDogYW5vZGU8L3RleHQ+PHRleHQgeD0iMjM1IiB5PSIyMDUiPk1vcmUgbm9ibGU8L3RleHQ+PHRleHQgeD0iMjM1IiB5PSIyMzIiPm1ldGFsOiBjYXRob2RlPC90ZXh0Pgo8dGV4dCB4PSI1NSIgeT0iMjk1Ij5FbGVjdHJpY2FsIGNvbnRhY3QgYXQgdGhlIGpvaW50PC90ZXh0Pjx0ZXh0IHg9IjU1IiB5PSIzMjUiPkFub2RlIGNhbiBsb3NlIG1ldGFsIGZhc3RlcjwvdGV4dD4KPHJlY3QgeD0iNTAwIiB5PSIxNzAiIHdpZHRoPSIxMzUiIGhlaWdodD0iNzUiIGNsYXNzPSJtZXRhbCIvPjxyZWN0IHg9IjY4NSIgeT0iMTcwIiB3aWR0aD0iMTM1IiBoZWlnaHQ9Ijc1IiBjbGFzcz0ibWV0YWwiLz4KPHJlY3QgeD0iNjM1IiB5PSIxNjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI5NSIgZmlsbD0iI2VlZDZhMCIgc3Ryb2tlPSIjMTQyYjQzIiBzdHJva2Utd2lkdGg9IjIiLz4KPHJlY3QgeD0iNjEwIiB5PSIxNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTUiIGZpbGw9IiNlZWQ2YTAiIHN0cm9rZT0iIzE0MmI0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxyZWN0IHg9IjYxMCIgeT0iMjU1IiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjE1IiBmaWxsPSIjZWVkNmEwIiBzdHJva2U9IiMxNDJiNDMiIHN0cm9rZS13aWR0aD0iMiIvPgo8cmVjdCB4PSI2NDkiIHk9IjE0MCIgd2lkdGg9IjIyIiBoZWlnaHQ9IjE0NSIgY2xhc3M9InRvb2wiLz48cmVjdCB4PSI2MjAiIHk9IjEyNSIgd2lkdGg9IjgwIiBoZWlnaHQ9IjI1IiBjbGFzcz0idG9vbCIvPjxyZWN0IHg9IjYyNSIgeT0iMjcwIiB3aWR0aD0iNzAiIGhlaWdodD0iMjgiIGNsYXNzPSJ0b29sIi8+Cjx0ZXh0IHg9IjQ5MCIgeT0iODUiPkluc3VsYXRpbmcgd2FzaGVycyArIHNsZWV2ZTwvdGV4dD48cGF0aCBkPSJNNjgwIDk1TDcwMCAxNDVNNjE1IDEwNUw2NDAgMTk1IiBjbGFzcz0ibGluZSIvPgo8dGV4dCB4PSI0OTAiIHk9IjMzMCI+Tm8gc2hhbmstdG8taG9sZS13YWxsIGNvbnRhY3Q8L3RleHQ+Cjx0ZXh0IHg9IjIwIiB5PSIzOTAiIGNsYXNzPSJzbWFsbCI+SXNvbGF0aW9uIG11c3Qgc3VpdCB0aGUgbG9hZHMgYW5kIGVudmlyb25tZW50OyBkcmFpbmFnZSBhbmQgY29hdGluZyBkZXNpZ24gc3RpbGwgbWF0dGVyLjwvdGV4dD48L3N2Zz4=" alt="A wet joint connects a more active metal to a more noble metal, completing a corrosion cell. A second sketch shows an insulating sleeve and washers separating a fastener from the surrounding plate." data-natural-width="880" data-natural-height="410"></p>
+  <p>A <strong>galvanic series</strong> ranks metals by their behavior in a specified environment. It helps screen combinations; it does not predict a service life. Alloy condition, surface films, wetting and exposed areas matter. A dry pair is not automatically a working galvanic cell.</p>
+  <p class="deeper-ref" id="deeper-ref-88">Supporting detail: <a href="#deeper-addendum-88"><strong>Addendum 88</strong></a> &mdash; Why the wetted areas matter.</p>
+  <p class="deeper-ref" id="deeper-ref-89">Supporting detail: <a href="#deeper-addendum-89"><strong>Addendum 89</strong></a> &mdash; Sources for galvanic contact, coatings and area effects.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide is-checklist" id="fasteners-and-galvanic-corrosion--review-the-complete-joint-before-calling-a-fastener-compatible" data-card="fasteners-and-galvanic-corrosion--review-the-complete-joint-before-calling-a-fastener-compatible" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
+    <summary>Review the complete joint before calling a fastener compatible<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Review the complete joint before calling a fastener compatible</h2>
+  <p>“Stainless” does not mean compatible with every metal, and a coating is not a permanent guarantee of isolation. Consider material pairing, durable electrical separation, drainage and a suitable protective finish together. An insulating washer under a head does not isolate a shank that still touches the hole wall.</p>
+  <ul class="boxes">
+    <li>Identify the base metal, fastener, washer and their coatings.</li>
+    <li>Identify where electrical contact and moisture can occur.</li>
+    <li>Check the material pairing for the actual service environment.</li>
+    <li>Review sleeves, washers or gaskets for complete isolation and mechanical suitability.</li>
+    <li>Provide drainage and an inspectable, maintainable finish.</li>
+  </ul>
+  <p>Compatibility review does not replace structural sizing or joint design.</p>
+  <p><a class="button" data-practice-add="metal-process-wet-pair" href="../practice.html#metal-process-wet-pair">Practice spotting a corrosion risk</a></p>
+    </div>
+  </details>
+</div>
+
+</article>
 <article class="article bundled" id="p-critical-dimensions-for-the-shop">
   <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span></div>
   <h1>Critical Dimensions for the Shop</h1>
@@ -7841,7 +8142,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </tbody>
   </table></div>
   <p>All features have requirements, including those not marked C. See <a class="xref-page" href="#p-operation-method-sheets">Operation Method Sheets</a> for the manufacturing sequence and <a class="xref-page" href="#p-bills-of-materials">Bills of Materials</a> for the matching parts list.</p>
-  <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; How to check a center when a caliper touches the hole edge.</p>
+  <p class="deeper-ref" id="deeper-ref-90">Supporting detail: <a href="#deeper-addendum-90"><strong>Addendum 90</strong></a> &mdash; How to check a center when a caliper touches the hole edge.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture" data-card="critical-dimensions-for-the-shop--dimension-the-part-so-it-can-be-made-without-measuring-the-picture" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
@@ -7886,7 +8187,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Material cost per part is its allocated stock share times stock price</h2>
   <p><strong>Estimated material cost per part = stock share allocated to that part × price of that stock unit.</strong> Keep both amounts on the same basis: length for constant-section bar, area for sheet of the same thickness, or mass when purchased by mass.</p>
   <p>Allow for the saw cut's width (<strong>kerf</strong>), trimming and unusable stock. Finished-part volume alone can understate what making the part consumes. State how you allocate waste and reusable leftovers so two estimates can be compared.</p>
-  <p class="deeper-ref" id="deeper-ref-78">Supporting detail: <a href="#deeper-addendum-78"><strong>Addendum 78</strong></a> &mdash; Consumption, purchase cost and batch yield answer different questions.</p>
+  <p class="deeper-ref" id="deeper-ref-91">Supporting detail: <a href="#deeper-addendum-91"><strong>Addendum 91</strong></a> &mdash; Consumption, purchase cost and batch yield answer different questions.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="bills-of-materials--worked-bom-one-display-label-assembly-costs-1-20-in-allocated-materials" data-card="bills-of-materials--worked-bom-one-display-label-assembly-costs-1-20-in-allocated-materials">
@@ -7966,7 +8267,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <figcaption>This is a planning pattern, not a mandatory route for every part.</figcaption>
   </figure>
   <p>Holes may be easier to make before small parts are cut free from a larger piece. Final finishing usually follows cutting and drilling, so those operations do not damage the finished surface. Inspect afterward too: finishing can change dimensions.</p>
-  <p class="deeper-ref" id="deeper-ref-79">Supporting detail: <a href="#deeper-addendum-79"><strong>Addendum 79</strong></a> &mdash; Why there is no universal operation order.</p>
+  <p class="deeper-ref" id="deeper-ref-92">Supporting detail: <a href="#deeper-addendum-92"><strong>Addendum 92</strong></a> &mdash; Why there is no universal operation order.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="operation-method-sheets--worked-method-sheet-a-hanging-display-label" data-card="operation-method-sheets--worked-method-sheet-a-hanging-display-label">
@@ -8062,7 +8363,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li>Complete a small compatibility trial and inspect its cure before the full pour.</li>
   </ul>
   <p><strong>Working time</strong> is the available time to mix and place the material under stated conditions. It is not the demolding time. Cure instructions may distinguish demolding from full properties or further treatment. Record the actual temperature and times; do not substitute a universal overnight wait.</p>
-  <p class="deeper-ref" id="deeper-ref-80">Supporting detail: <a href="#deeper-addendum-80"><strong>Addendum 80</strong></a> &mdash; Where to find product-specific instructions.</p>
+  <p class="deeper-ref" id="deeper-ref-93">Supporting detail: <a href="#deeper-addendum-93"><strong>Addendum 93</strong></a> &mdash; Where to find product-specific instructions.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume" data-card="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume">
@@ -8136,7 +8437,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p>For a simple batch model, <code>C = F + vQ</code> and <code>u = C/Q = F/Q + v</code>. C is total cost, F is fixed batch cost, v is variable cost per part, Q is the number of acceptable parts, and u is average unit cost. Use Q greater than zero.</p>
 <p>Fixed cost stays constant within the stated production range; variable cost grows with quantity. Setup and dedicated tooling may be fixed for a batch. Material and processing per part often contribute to v. State the period and cost boundary before classifying a cost.</p>
 <p>Illustrative process A costs $120 + $8Q. At 60 parts, total cost is $600 and unit cost is <strong>$10.00/part</strong>. Producing unwanted parts to spread fixed cost creates inventory; it does not create demand.</p>
-<p class="deeper-ref" id="deeper-ref-81">Supporting detail: <a href="#deeper-addendum-81"><strong>Addendum 81</strong></a> &mdash; Why a shorter cycle does not reduce every cost equally.</p>
+<p class="deeper-ref" id="deeper-ref-94">Supporting detail: <a href="#deeper-addendum-94"><strong>Addendum 94</strong></a> &mdash; Why a shorter cycle does not reduce every cost equally.</p>
 <p><a class="button" data-practice-add="economics-unit-cost" href="../practice.html#economics-unit-cost">Practice unit cost</a></p>
     </div>
   </details>
@@ -8147,7 +8448,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p>Compare routes that meet the same requirements at the same quantity. From <code>F_A + v_A Q = F_B + v_B Q</code>, obtain <code>Q* = (F_B − F_A)/(v_A − v_B)</code>.</p>
 <p>Let A cost $120 + $8Q and B cost $720 + $3Q. Then Q* = ($720 − $120)/($8 − $3) = <strong>120 parts</strong>. Both cost $1,080 total or $9/part. A costs less below 120; B costs less above 120.</p>
 <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgMzYwIiByb2xlPSJpbWciPjx0aXRsZT5Ud28gcHJvY2VzcyB1bml0LWNvc3QgY3VydmVzPC90aXRsZT48cmVjdCB3aWR0aD0iNzIwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2ZmZiIvPjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzE0MmI0OSI+PHRleHQgeD0iMjAiIHk9IjI2Ij5BdmVyYWdlIHVuaXQgY29zdCAoJC9wYXJ0KTwvdGV4dD48cGF0aCBkPSJNNzAgNDUgVjI4NSBINjcwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNDJiNDkiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjMwIiB5PSIyOTEuMCI+MDwvdGV4dD48dGV4dCB4PSIzMCIgeT0iMjM2LjAiPjEwPC90ZXh0Pjx0ZXh0IHg9IjMwIiB5PSIxODEuMCI+MjA8L3RleHQ+PHRleHQgeD0iMzAiIHk9IjEyNi4wIj4zMDwvdGV4dD48dGV4dCB4PSIzMCIgeT0iNzEuMCI+NDA8L3RleHQ+PHRleHQgeD0iNTgiIHk9IjMxMCI+MjA8L3RleHQ+PHRleHQgeD0iMjU4IiB5PSIzMTAiPjEyMDwvdGV4dD48dGV4dCB4PSI0NTgiIHk9IjMxMCI+MjIwPC90ZXh0Pjx0ZXh0IHg9IjYxOCIgeT0iMzEwIj4zMDA8L3RleHQ+PHBvbHlsaW5lIHBvaW50cz0iNzAsMjA4LjAwIDc0LDIxMS4wMCA3OCwyMTMuNTAgODIsMjE1LjYyIDg2LDIxNy40MyA5MCwyMTkuMDAgOTQsMjIwLjM4IDk4LDIyMS41OSAxMDIsMjIyLjY3IDEwNiwyMjMuNjMgMTEwLDIyNC41MCAxMTQsMjI1LjI5IDExOCwyMjYuMDAgMTIyLDIyNi42NSAxMjYsMjI3LjI1IDEzMCwyMjcuODAgMTM0LDIyOC4zMSAxMzgsMjI4Ljc4IDE0MiwyMjkuMjEgMTQ2LDIyOS42MiAxNTAsMjMwLjAwIDE1NCwyMzAuMzUgMTU4LDIzMC42OSAxNjIsMjMxLjAwIDE2NiwyMzEuMjkgMTcwLDIzMS41NyAxNzQsMjMxLjgzIDE3OCwyMzIuMDggMTgyLDIzMi4zMiAxODYsMjMyLjU0IDE5MCwyMzIuNzUgMTk0LDIzMi45NSAxOTgsMjMzLjE0IDIwMiwyMzMuMzMgMjA2LDIzMy41MCAyMTAsMjMzLjY3IDIxNCwyMzMuODMgMjE4LDIzMy45OCAyMjIsMjM0LjEyIDIyNiwyMzQuMjcgMjMwLDIzNC40MCAyMzQsMjM0LjUzIDIzOCwyMzQuNjUgMjQyLDIzNC43NyAyNDYsMjM0Ljg5IDI1MCwyMzUuMDAgMjU0LDIzNS4xMSAyNTgsMjM1LjIxIDI2MiwyMzUuMzEgMjY2LDIzNS40MSAyNzAsMjM1LjUwIDI3NCwyMzUuNTkgMjc4LDIzNS42OCAyODIsMjM1Ljc2IDI4NiwyMzUuODQgMjkwLDIzNS45MiAyOTQsMjM2LjAwIDI5OCwyMzYuMDcgMzAyLDIzNi4xNSAzMDYsMjM2LjIyIDMxMCwyMzYuMjkgMzE0LDIzNi4zNSAzMTgsMjM2LjQyIDMyMiwyMzYuNDggMzI2LDIzNi41NCAzMzAsMjM2LjYwIDMzNCwyMzYuNjYgMzM4LDIzNi43MSAzNDIsMjM2Ljc3IDM0NiwyMzYuODIgMzUwLDIzNi44OCAzNTQsMjM2LjkzIDM1OCwyMzYuOTggMzYyLDIzNy4wMiAzNjYsMjM3LjA3IDM3MCwyMzcuMTIgMzc0LDIzNy4xNiAzNzgsMjM3LjIxIDM4MiwyMzcuMjUgMzg2LDIzNy4yOSAzOTAsMjM3LjMzIDM5NCwyMzcuMzcgMzk4LDIzNy40MSA0MDIsMjM3LjQ1IDQwNiwyMzcuNDkgNDEwLDIzNy41MyA0MTQsMjM3LjU2IDQxOCwyMzcuNjAgNDIyLDIzNy42MyA0MjYsMjM3LjY3IDQzMCwyMzcuNzAgNDM0LDIzNy43MyA0MzgsMjM3Ljc2IDQ0MiwyMzcuODAgNDQ2LDIzNy44MyA0NTAsMjM3Ljg2IDQ1NCwyMzcuODkgNDU4LDIzNy45MiA0NjIsMjM3Ljk0IDQ2NiwyMzcuOTcgNDcwLDIzOC4wMCA0NzQsMjM4LjAzIDQ3OCwyMzguMDUgNDgyLDIzOC4wOCA0ODYsMjM4LjExIDQ5MCwyMzguMTMgNDk0LDIzOC4xNiA0OTgsMjM4LjE4IDUwMiwyMzguMjAgNTA2LDIzOC4yMyA1MTAsMjM4LjI1IDUxNCwyMzguMjcgNTE4LDIzOC4zMCA1MjIsMjM4LjMyIDUyNiwyMzguMzQgNTMwLDIzOC4zNiA1MzQsMjM4LjM4IDUzOCwyMzguNDAgNTQyLDIzOC40MiA1NDYsMjM4LjQ0IDU1MCwyMzguNDYgNTU0LDIzOC40OCA1NTgsMjM4LjUwIDU2MiwyMzguNTIgNTY2LDIzOC41NCA1NzAsMjM4LjU2IDU3NCwyMzguNTcgNTc4LDIzOC41OSA1ODIsMjM4LjYxIDU4NiwyMzguNjMgNTkwLDIzOC42NCA1OTQsMjM4LjY2IDU5OCwyMzguNjggNjAyLDIzOC42OSA2MDYsMjM4LjcxIDYxMCwyMzguNzIgNjE0LDIzOC43NCA2MTgsMjM4Ljc2IDYyMiwyMzguNzcgNjI2LDIzOC43OSA2MzAsMjM4LjgwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDNiNzEiIHN0cm9rZS13aWR0aD0iMyIvPjxwb2x5bGluZSBwb2ludHM9IjcwLDcwLjUwIDc0LDg4LjUwIDc4LDEwMy41MCA4MiwxMTYuMTkgODYsMTI3LjA3IDkwLDEzNi41MCA5NCwxNDQuNzUgOTgsMTUyLjAzIDEwMiwxNTguNTAgMTA2LDE2NC4yOSAxMTAsMTY5LjUwIDExNCwxNzQuMjEgMTE4LDE3OC41MCAxMjIsMTgyLjQxIDEyNiwxODYuMDAgMTMwLDE4OS4zMCAxMzQsMTkyLjM1IDEzOCwxOTUuMTcgMTQyLDE5Ny43OSAxNDYsMjAwLjIyIDE1MCwyMDIuNTAgMTU0LDIwNC42MyAxNTgsMjA2LjYyIDE2MiwyMDguNTAgMTY2LDIxMC4yNiAxNzAsMjExLjkzIDE3NCwyMTMuNTAgMTc4LDIxNC45OSAxODIsMjE2LjM5IDE4NiwyMTcuNzMgMTkwLDIxOS4wMCAxOTQsMjIwLjIxIDE5OCwyMjEuMzYgMjAyLDIyMi40NSAyMDYsMjIzLjUwIDIxMCwyMjQuNTAgMjE0LDIyNS40NiAyMTgsMjI2LjM3IDIyMiwyMjcuMjUgMjI2LDIyOC4wOSAyMzAsMjI4LjkwIDIzNCwyMjkuNjggMjM4LDIzMC40MiAyNDIsMjMxLjE0IDI0NiwyMzEuODMgMjUwLDIzMi41MCAyNTQsMjMzLjE0IDI1OCwyMzMuNzYgMjYyLDIzNC4zNiAyNjYsMjM0Ljk0IDI3MCwyMzUuNTAgMjc0LDIzNi4wNCAyNzgsMjM2LjU2IDI4MiwyMzcuMDcgMjg2LDIzNy41NiAyOTAsMjM4LjA0IDI5NCwyMzguNTAgMjk4LDIzOC45NSAzMDIsMjM5LjM4IDMwNiwyMzkuODAgMzEwLDI0MC4yMSAzMTQsMjQwLjYxIDMxOCwyNDEuMDAgMzIyLDI0MS4zOCAzMjYsMjQxLjc0IDMzMCwyNDIuMTAgMzM0LDI0Mi40NSAzMzgsMjQyLjc5IDM0MiwyNDMuMTIgMzQ2LDI0My40NCAzNTAsMjQzLjc1IDM1NCwyNDQuMDYgMzU4LDI0NC4zNSAzNjIsMjQ0LjY0IDM2NiwyNDQuOTMgMzcwLDI0NS4yMSAzNzQsMjQ1LjQ4IDM3OCwyNDUuNzQgMzgyLDI0Ni4wMCAzODYsMjQ2LjI1IDM5MCwyNDYuNTAgMzk0LDI0Ni43NCAzOTgsMjQ2Ljk4IDQwMiwyNDcuMjEgNDA2LDI0Ny40NCA0MTAsMjQ3LjY2IDQxNCwyNDcuODggNDE4LDI0OC4wOSA0MjIsMjQ4LjMwIDQyNiwyNDguNTAgNDMwLDI0OC43MCA0MzQsMjQ4LjkwIDQzOCwyNDkuMDkgNDQyLDI0OS4yOCA0NDYsMjQ5LjQ2IDQ1MCwyNDkuNjQgNDU0LDI0OS44MiA0NTgsMjUwLjAwIDQ2MiwyNTAuMTcgNDY2LDI1MC4zMyA0NzAsMjUwLjUwIDQ3NCwyNTAuNjYgNDc4LDI1MC44MiA0ODIsMjUwLjk4IDQ4NiwyNTEuMTMgNDkwLDI1MS4yOCA0OTQsMjUxLjQzIDQ5OCwyNTEuNTggNTAyLDI1MS43MiA1MDYsMjUxLjg2IDUxMCwyNTIuMDAgNTE0LDI1Mi4xNCA1MTgsMjUyLjI3IDUyMiwyNTIuNDAgNTI2LDI1Mi41MyA1MzAsMjUyLjY2IDUzNCwyNTIuNzkgNTM4LDI1Mi45MSA1NDIsMjUzLjAzIDU0NiwyNTMuMTUgNTUwLDI1My4yNyA1NTQsMjUzLjM5IDU1OCwyNTMuNTAgNTYyLDI1My42MSA1NjYsMjUzLjcyIDU3MCwyNTMuODMgNTc0LDI1My45NCA1NzgsMjU0LjA1IDU4MiwyNTQuMTUgNTg2LDI1NC4yNiA1OTAsMjU0LjM2IDU5NCwyNTQuNDYgNTk4LDI1NC41NiA2MDIsMjU0LjY1IDYwNiwyNTQuNzUgNjEwLDI1NC44NCA2MTQsMjU0Ljk0IDYxOCwyNTUuMDMgNjIyLDI1NS4xMiA2MjYsMjU1LjIxIDYzMCwyNTUuMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzljMzgwMCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI4IDUiLz48Y2lyY2xlIGN4PSIyNzAiIGN5PSIyMzUuNSIgcj0iNSIvPjxwYXRoIGQ9Ik0yNzAgMjM1IEwzNDUgMTc1IiBzdHJva2U9IiMxNDJiNDkiLz48dGV4dCB4PSIzNTAiIHk9IjE3MCI+MTIwIHBhcnRzOyAkOS9wYXJ0PC90ZXh0Pjx0ZXh0IHg9IjM4MCIgeT0iNjUiPkE6ICQxMjAgKyAkOC9wYXJ0IChzb2xpZCk8L3RleHQ+PHRleHQgeD0iMzgwIiB5PSI5MiI+QjogJDcyMCArICQzL3BhcnQgKGRhc2hlZCk8L3RleHQ+PHRleHQgeD0iMjkwIiB5PSIzNDUiPlF1YW50aXR5IChwYXJ0cyk8L3RleHQ+PC9nPjwvc3ZnPgo=" alt="Unit cost curves cross at 120 parts and 9 dollars per part. A costs less below the crossing and B above it." data-natural-width="720" data-natural-height="360"></p>
-<p class="deeper-ref" id="deeper-ref-82">Supporting detail: <a href="#deeper-addendum-82"><strong>Addendum 82</strong></a> &mdash; When there is no positive crossing.</p>
+<p class="deeper-ref" id="deeper-ref-95">Supporting detail: <a href="#deeper-addendum-95"><strong>Addendum 95</strong></a> &mdash; When there is no positive crossing.</p>
 <p><a class="button" data-practice-add="economics-break-even" href="../practice.html#economics-break-even">Practice break-even</a></p>
     </div>
   </details>
@@ -8188,7 +8489,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Use a consistent physical basis for utilization</h2>
 <p><code>Utilization = material in acceptable parts / material purchased × 100%</code>. Compare length for the same cross-section, area for the same thickness, or mass on a consistent basis.</p>
 <p>The bar example gives 980/1,000 × 100 = <strong>98.0%</strong>. The remaining 2% is kerf. Distinguish reusable offcuts from material discarded.</p>
-<p class="deeper-ref" id="deeper-ref-83">Supporting detail: <a href="#deeper-addendum-83"><strong>Addendum 83</strong></a> &mdash; Why 20% loss means a 25% increase per useful amount.</p>
+<p class="deeper-ref" id="deeper-ref-96">Supporting detail: <a href="#deeper-addendum-96"><strong>Addendum 96</strong></a> &mdash; Why 20% loss means a 25% increase per useful amount.</p>
 <p><a class="button" data-practice-add="economics-utilization" href="../practice.html#economics-utilization">Practice utilization</a></p>
     </div>
   </details>
@@ -8273,7 +8574,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Specify only the precision the function needs</h2>
 <p>A <strong>tolerance</strong> is the allowed variation in a dimension or other feature. Tight tolerances may require careful setups, slower processing and more capable inspection. Keep tight control where fit or function needs it; do not apply it everywhere by habit.</p>
 <p>No machine name guarantees a tolerance or price. Geometry, material, tooling, setup and measurement all matter. Confirm capability for the actual feature.</p>
-<p class="deeper-ref" id="deeper-ref-84">Supporting detail: <a href="#deeper-addendum-84"><strong>Addendum 84</strong></a> &mdash; Why the loosest tolerance is not automatically cheapest.</p>
+<p class="deeper-ref" id="deeper-ref-97">Supporting detail: <a href="#deeper-addendum-97"><strong>Addendum 97</strong></a> &mdash; Why the loosest tolerance is not automatically cheapest.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="design-for-manufacturing--reduce-material-loss-without-shortening-useful-life" data-card="design-for-manufacturing--reduce-material-loss-without-shortening-useful-life" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
@@ -8310,7 +8611,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Separate value creation from necessary support and avoidable waste</h2>
 <p>Value-added work changes the product or service toward the customer's requirement and is done correctly. Cutting a needed feature may add value; searching for a misplaced tool does not.</p>
 <p>Some non-value-added work is currently necessary: required checks, safety measures and records protect customers and workers. Improve how that work is done; do not delete a safeguard because it does not physically change the product.</p>
-<p class="deeper-ref" id="deeper-ref-85">Supporting detail: <a href="#deeper-addendum-85"><strong>Addendum 85</strong></a> &mdash; Process time is not automatically value-added time.</p>
+<p class="deeper-ref" id="deeper-ref-98">Supporting detail: <a href="#deeper-addendum-98"><strong>Addendum 98</strong></a> &mdash; Process time is not automatically value-added time.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="lean-value-and-flow--follow-the-work-across-handoffs" data-card="lean-value-and-flow--follow-the-work-across-handoffs">
@@ -8402,7 +8703,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Measure elapsed lead time separately from process time</h2>
 <p><strong>Lead time</strong> is elapsed time through the stated boundary, including waits. <strong>Process time</strong> is time actively spent doing the work within that boundary. Not all processing adds customer value.</p>
 <p>For one item in this simplified sequential example: cutting = 4 min, queue = 120 min, assembly = 6 min. Process time is <strong>10 min</strong>; lead time is <strong>130 min</strong>. No other delays or overlapping steps are included. Removing half the queue saves more elapsed time here than cutting one minute of processing.</p>
-<p class="deeper-ref" id="deeper-ref-86">Supporting detail: <a href="#deeper-addendum-86"><strong>Addendum 86</strong></a> &mdash; A queue suggests a question, not a proven cause.</p>
+<p class="deeper-ref" id="deeper-ref-99">Supporting detail: <a href="#deeper-addendum-99"><strong>Addendum 99</strong></a> &mdash; A queue suggests a question, not a proven cause.</p>
 <p><a class="button" data-practice-add="lean-lead-time" href="../practice.html#lean-lead-time">Practice lead time</a></p>
     </div>
   </details>
@@ -9389,82 +9690,186 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </li>
     <li class="deeper-addendum" id="deeper-addendum-77" value="77">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-critical-dimensions-for-the-shop">Critical Dimensions for the Shop</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 77.</span> How to check a center when a caliper touches the hole edge</h2>
-        <p>Measure from the reference edge to the nearest hole edge, then add half the measured hole diameter to obtain that center coordinate. Use the same reference and direction as the drawing. This example does not specify a precision pin fit; a more demanding interface needs a more capable measurement method and a reviewed tolerancing scheme.</p><p>The nominal hole spacing is 70 mm, derived from 85 − 15. The separate ±0.5 mm x-coordinate limits can allow spacing from 69 to 71 mm. If an interface needs a tighter spacing, the designer must change the requirements; the inspector must not invent a tighter limit.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-forming-metal">Forming Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 77.</span> Sources for the casting routes</h2>
+        <p>The <a href="https://www.sfsa.org/tutorials/cs1_text/Castings_25.html">Steel Founders' Society of America glossary</a> defines sand-mold features. The <a href="https://www.investmentcasting.org/uploads/8/1/9/8/81988734/the_investment_casting_process_-_website.pdf">Investment Casting Institute's process overview (PDF)</a> follows wax pattern, ceramic shell, pattern removal and casting. <a href="https://www.diecasting.org/faq/">NADCA's die-casting FAQ</a> explains pressure injection into reusable steel dies and suitable alloys.</p>
         <p class="deeper-back"><a href="#deeper-ref-77">Back to reference 77</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-78" value="78">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-bills-of-materials">Bills of Materials</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 78.</span> Consumption, purchase cost and batch yield answer different questions</h2>
-        <p>You may need to buy a whole sheet even when one part uses a small fraction. That purchase is a cash requirement; the allocated fraction is the material estimate for the part. For a batch that consumes the entire stock unit, dividing its cost by the number of acceptable parts includes the loss from rejected pieces. Avoid charging the same waste once in the allocated share and again as an added allowance.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-forming-metal">Forming Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 78.</span> Why a larger pattern does not replace a riser</h2>
+        <p>Pattern allowance addresses final size. Feeding addresses a different problem: a solidifying region may need more liquid metal to avoid an internal shrinkage void. A riser must remain able to feed that region. The diagram identifies parts of a mold, not a production gating design.</p>
         <p class="deeper-back"><a href="#deeper-ref-78">Back to reference 78</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-79" value="79">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-operation-method-sheets">Operation Method Sheets</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 79.</span> Why there is no universal operation order</h2>
-        <p>A feature may become inaccessible after assembly; a coating may need to be applied first. A larger blank may help holding, but its final cut must preserve the reference used for the holes. Record the reason for a departure from the usual sequence. The five <a class="xref-page" href="#p-manufacturing-process-categories">process categories</a> describe kinds of change, not a fixed order.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-forming-metal">Forming Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 79.</span> Cold forming does not guarantee an unchanged dimension</h2>
+        <p>Cold forming generally requires greater force than comparable hot forming. It avoids a separate hot-working step, but that does not prove every production cycle is faster. Springback, residual stress and later processing can change dimensions. Forging can also be hot, warm or cold; heat is not part of its definition.</p>
         <p class="deeper-back"><a href="#deeper-ref-79">Back to reference 79</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-80" value="80">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-making-silicone-molds-from-a-printed-pattern">Making Silicone Molds from a Printed Pattern</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 80.</span> Where to find product-specific instructions</h2>
-        <p>Start with the manufacturer's product documentation, such as <a href="https://www.smooth-on.com/documents/?doc=all">Smooth-On's technical bulletin and SDS directory</a>. Its <a href="https://www.smooth-on.com/support/faq/210/">printed-pattern compatibility FAQ</a> is a further-reading lead when investigating an uncured surface against a resin print. Check the complete instructions for the particular materials before selecting a treatment.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-forming-metal">Forming Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 80.</span> Sources for solid-metal deformation</h2>
+        <p>The <a href="https://www.forging.org/Common/Uploaded%20files/Forging%20101%20Presentation.pdf">Forging Industry Association's Forging 101 (PDF)</a> compares open- and closed-die processes and hot, warm and cold forging. <a href="https://www.qcforge.com/forging-knowledge/forging-benefits/hot-forging/">Queen City Forging explains recrystallization and temperature classification</a>. A <a href="https://defmech.engineering.dartmouth.edu/Chapter_19.htm">Dartmouth-hosted metal-forming case study</a> compares rolling, forging and drawing regimes. The <a href="https://aluminium.org.au/wp-content/uploads/2023/12/Aluminium-Extrusion-Manual-Dec23-1.pdf">Australian Aluminium Council's Extrusion Manual (PDF), page 10</a>, explains flow through a die into a uniform section. <a href="https://contenti.com/media/catalog/pdf/library/wire-drawing-process.pdf">Contenti's wire-drawing explanation (PDF)</a> identifies pulling through progressively smaller openings; its operating steps are outside this selection overview.</p>
         <p class="deeper-back"><a href="#deeper-ref-80">Back to reference 80</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-81" value="81">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Foundations</span><span class="sep">/</span><a href="#p-manufacturing-cost-and-volume">Manufacturing Cost and Volume</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 81.</span> Why a shorter cycle does not reduce every cost equally</h2>
-        <p>A 10% reduction in a time-based processing charge reduces that portion by 10%. Material, setup and rent do not automatically fall. Capacity limits, tool replacement, scrap and quantity discounts can change the model outside its assumed range.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-forming-metal">Forming Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 81.</span> Sources for sheet forming and flat patterns</h2>
+        <p><a href="https://www.ssab.com/en-us/services/processing/roll-forming">SSAB explains incremental roll forming and bending</a>. <a href="https://4ming.de/en/forming-handbook/blankholder-pressure/">4Ming's forming handbook</a> explains why low blank-holder pressure can allow wrinkling while excessive pressure can cause cracking. <a href="https://www.mate.com/cs/technical-resources/punch-press-resources/tips-techniques/punching/techniques/blanking/">Mate defines blanking by the retained piece</a>. <a href="https://blogs.solidworks.com/products/solidworks/understanding-bend-allowance-options-in-solidworks/">SOLIDWORKS explains bend allowance, bend deduction and bend tables</a>.</p>
         <p class="deeper-back"><a href="#deeper-ref-81">Back to reference 81</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-82" value="82">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Foundations</span><span class="sep">/</span><a href="#p-manufacturing-cost-and-volume">Manufacturing Cost and Volume</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 82.</span> When there is no positive crossing</h2>
-        <p>Equal variable costs mean the lower fixed cost wins, or both routes tie everywhere if fixed costs also match. A negative crossing lies outside positive production quantities. For a fractional crossing, compare costs at the neighboring whole-part quantities. This is process-cost break-even, not sales-revenue profit break-even.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-forming-metal">Forming Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 82.</span> Porosity can be useful or unwanted</h2>
+        <p>Oil impregnation fills connected pores in a bearing so it can retain lubricant. <a href="https://www.porite.com/oil-impregnated_bearing/">Porite describes this use of porous sintered metal</a>. That does not mean every powder-metal part is porous by design or that every part needs impregnation.</p>
         <p class="deeper-back"><a href="#deeper-ref-82">Back to reference 82</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-83" value="83">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Foundations</span><span class="sep">/</span><a href="#p-material-utilization-and-cost">Material Utilization and Cost</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 83.</span> Why 20% loss means a 25% increase per useful amount</h2>
-        <p>If 80% of purchased material reaches the product, one useful unit needs 1/0.80 = 1.25 purchased units, not 1.20. State whether a waste percentage is based on purchased material or on the useful amount.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-joining-metal">Joining Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 83.</span> Sources for fusion welding, solid-state welding and the heat-affected zone</h2>
+        <p><a href="https://www.twi-global.com/technical-knowledge/faqs/what-is-arc-welding">TWI describes arc fusion welding</a> and <a href="https://www.twi-global.com/technical-knowledge/faqs/what-is-solid-state-welding">solid-state welding without melting the base metal</a>. Its <a href="https://www.twi-global.com/technical-knowledge/faqs/what-is-the-heat-affected-zone">heat-affected-zone explanation</a> identifies thermal changes in unmelted base metal.</p>
         <p class="deeper-back"><a href="#deeper-ref-83">Back to reference 83</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-84" value="84">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Foundations</span><span class="sep">/</span><a href="#p-design-for-manufacturing">Design for Manufacturing</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 84.</span> Why the loosest tolerance is not automatically cheapest</h2>
-        <p>A tolerance that permits poor fit can increase assembly trouble, rework and failure. The goal is a manufacturable design that still meets requirements.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-joining-metal">Joining Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 84.</span> Why MIG is a familiar name but GMAW is the broader term</h2>
+        <p>MIG refers to metal inert gas welding. GMAW also covers processes using active shielding gases or mixtures, often called MAG. Gas and filler selection depend on the alloy and process; the familiar shop name is not a complete welding specification.</p>
         <p class="deeper-back"><a href="#deeper-ref-84">Back to reference 84</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-85" value="85">
       <article>
-        <div class="crumb"><span>Lean and Quality</span><span class="sep">/</span><span>Continuous Improvement</span><span class="sep">/</span><a href="#p-lean-value-and-flow">Lean Value and Flow</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 85.</span> Process time is not automatically value-added time</h2>
-        <p>Rework takes processing time but corrects a failure. Inspection does not itself create the desired feature. A necessary machine cycle can transform the product even while the operator waits. Name whose time and which activity you are classifying.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-joining-metal">Joining Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 85.</span> Sources for the five process mechanisms</h2>
+        <p>TWI compares <a href="https://www.twi-global.com/technical-knowledge/faqs/what-is-arc-welding">SMAW and GTAW arc processes</a> and explains <a href="https://www.twi-global.com/technical-knowledge/faqs/faq-what-is-mig-mag-welding">MIG/MAG wire feed and shielding</a>, <a href="https://www.twi-global.com/technical-knowledge/faqs/faq-what-is-oxy-fuel-welding">oxy-fuel fusion welding</a>, and <a href="https://www.twi-global.com/technical-knowledge/faqs/what-is-spot-welding">resistance spot welding</a>. These are process explanations, not approved settings or operating procedures for a particular job.</p>
         <p class="deeper-back"><a href="#deeper-ref-85">Back to reference 85</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-86" value="86">
       <article>
-        <div class="crumb"><span>Lean and Quality</span><span class="sep">/</span><span>Continuous Improvement</span><span class="sep">/</span><a href="#p-value-stream-mapping">Value Stream Mapping</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 86.</span> A queue suggests a question, not a proven cause</h2>
-        <p>A queue may reflect a capacity constraint, batching, missing information or an unreliable next step. Observe demand, timing and variation before calling one operation the bottleneck. A working day and a calendar day are not interchangeable time units.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-joining-metal">Joining Metal</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 86.</span> Sources for the filler-temperature distinction and capillary joint</h2>
+        <p>The <a href="https://www.aws.org/About/Industry-Partners/BSMC/">AWS Brazing and Soldering Manufacturers Committee</a> defines the liquidus distinction and explains wetting and applications. <a href="https://www.twi-global.com/what-we-do/services-and-support/vacuum-brazing">TWI's vacuum-brazing overview</a> describes filler flow by capillary action while the parent materials stay below their solidus, the temperature at which melting begins.</p>
         <p class="deeper-back"><a href="#deeper-ref-86">Back to reference 86</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-87" value="87">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-fasteners-and-galvanic-corrosion">Fasteners and Galvanic Corrosion</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 87.</span> Sources for thread names and size examples</h2>
+        <p><a href="https://www.mcmaster.com/info/how-to-measure-screw-thread-size.html">McMaster-Carr explains inch diameter/TPI and metric diameter/pitch</a>, including M6 × 1. Its <a href="https://www.mcmaster.com/products/tube-fittings/thread-type~unc/">UNC catalog</a> identifies 1/4-20 as UNC. <a href="https://ntrs.nasa.gov/api/citations/19900009424/downloads/19900009424.pdf">NASA's Fastener Design Manual (PDF), printed pages 12–13 / PDF pages 16–17</a>, explains Unified coarse/fine series and thread classes. The manual is background on thread terminology, not a current procurement specification.</p>
+        <p class="deeper-back"><a href="#deeper-ref-87">Back to reference 87</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-88" value="88">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-fasteners-and-galvanic-corrosion">Fasteners and Galvanic Corrosion</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 88.</span> Why the wetted areas matter</h2>
+        <p>A small active area coupled to a large noble area can suffer concentrated attack when both areas contact the electrolyte. That is why coating only the active member is not automatically a cure: a small defect in that coating can leave a small wetted anode coupled to a large cathode. The relevant areas are those participating in the wet corrosion cell, which can change as a joint dries. A compatibility decision must consider the complete joint and environment.</p>
+        <p class="deeper-back"><a href="#deeper-ref-88">Back to reference 88</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-89" value="89">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Metals</span><span class="sep">/</span><a href="#p-fasteners-and-galvanic-corrosion">Fasteners and Galvanic Corrosion</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 89.</span> Sources for galvanic contact, coatings and area effects</h2>
+        <p><a href="https://www.assda.asn.au/images/Resources/FAQs/Technical%20FAQ%201%20-%20Galvanic%20Dissimilar%20Metal%20Corrosion.pdf">ASSDA Technical FAQ 1 (PDF), pages 1–2</a>, explains electrical contact, conductive liquid, coating defects and relative wetted areas. <a href="https://www.hilti.ca/content/dam/urgent-folder/w1/pdf/tech-guides/W1_en_Corrosion_handbook_V0621_W4412.pdf">Hilti's Corrosion Handbook (PDF), printed pages 12 and 26–27</a>, illustrates the cell, separation measures and environment-specific material pairing.</p>
+        <p class="deeper-back"><a href="#deeper-ref-89">Back to reference 89</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-90" value="90">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-critical-dimensions-for-the-shop">Critical Dimensions for the Shop</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 90.</span> How to check a center when a caliper touches the hole edge</h2>
+        <p>Measure from the reference edge to the nearest hole edge, then add half the measured hole diameter to obtain that center coordinate. Use the same reference and direction as the drawing. This example does not specify a precision pin fit; a more demanding interface needs a more capable measurement method and a reviewed tolerancing scheme.</p><p>The nominal hole spacing is 70 mm, derived from 85 − 15. The separate ±0.5 mm x-coordinate limits can allow spacing from 69 to 71 mm. If an interface needs a tighter spacing, the designer must change the requirements; the inspector must not invent a tighter limit.</p>
+        <p class="deeper-back"><a href="#deeper-ref-90">Back to reference 90</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-91" value="91">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-bills-of-materials">Bills of Materials</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 91.</span> Consumption, purchase cost and batch yield answer different questions</h2>
+        <p>You may need to buy a whole sheet even when one part uses a small fraction. That purchase is a cash requirement; the allocated fraction is the material estimate for the part. For a batch that consumes the entire stock unit, dividing its cost by the number of acceptable parts includes the loss from rejected pieces. Avoid charging the same waste once in the allocated share and again as an added allowance.</p>
+        <p class="deeper-back"><a href="#deeper-ref-91">Back to reference 91</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-92" value="92">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-operation-method-sheets">Operation Method Sheets</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 92.</span> Why there is no universal operation order</h2>
+        <p>A feature may become inaccessible after assembly; a coating may need to be applied first. A larger blank may help holding, but its final cut must preserve the reference used for the holes. Record the reason for a departure from the usual sequence. The five <a class="xref-page" href="#p-manufacturing-process-categories">process categories</a> describe kinds of change, not a fixed order.</p>
+        <p class="deeper-back"><a href="#deeper-ref-92">Back to reference 92</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-93" value="93">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-making-silicone-molds-from-a-printed-pattern">Making Silicone Molds from a Printed Pattern</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 93.</span> Where to find product-specific instructions</h2>
+        <p>Start with the manufacturer's product documentation, such as <a href="https://www.smooth-on.com/documents/?doc=all">Smooth-On's technical bulletin and SDS directory</a>. Its <a href="https://www.smooth-on.com/support/faq/210/">printed-pattern compatibility FAQ</a> is a further-reading lead when investigating an uncured surface against a resin print. Check the complete instructions for the particular materials before selecting a treatment.</p>
+        <p class="deeper-back"><a href="#deeper-ref-93">Back to reference 93</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-94" value="94">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Foundations</span><span class="sep">/</span><a href="#p-manufacturing-cost-and-volume">Manufacturing Cost and Volume</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 94.</span> Why a shorter cycle does not reduce every cost equally</h2>
+        <p>A 10% reduction in a time-based processing charge reduces that portion by 10%. Material, setup and rent do not automatically fall. Capacity limits, tool replacement, scrap and quantity discounts can change the model outside its assumed range.</p>
+        <p class="deeper-back"><a href="#deeper-ref-94">Back to reference 94</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-95" value="95">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Foundations</span><span class="sep">/</span><a href="#p-manufacturing-cost-and-volume">Manufacturing Cost and Volume</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 95.</span> When there is no positive crossing</h2>
+        <p>Equal variable costs mean the lower fixed cost wins, or both routes tie everywhere if fixed costs also match. A negative crossing lies outside positive production quantities. For a fractional crossing, compare costs at the neighboring whole-part quantities. This is process-cost break-even, not sales-revenue profit break-even.</p>
+        <p class="deeper-back"><a href="#deeper-ref-95">Back to reference 95</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-96" value="96">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Foundations</span><span class="sep">/</span><a href="#p-material-utilization-and-cost">Material Utilization and Cost</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 96.</span> Why 20% loss means a 25% increase per useful amount</h2>
+        <p>If 80% of purchased material reaches the product, one useful unit needs 1/0.80 = 1.25 purchased units, not 1.20. State whether a waste percentage is based on purchased material or on the useful amount.</p>
+        <p class="deeper-back"><a href="#deeper-ref-96">Back to reference 96</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-97" value="97">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Foundations</span><span class="sep">/</span><a href="#p-design-for-manufacturing">Design for Manufacturing</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 97.</span> Why the loosest tolerance is not automatically cheapest</h2>
+        <p>A tolerance that permits poor fit can increase assembly trouble, rework and failure. The goal is a manufacturable design that still meets requirements.</p>
+        <p class="deeper-back"><a href="#deeper-ref-97">Back to reference 97</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-98" value="98">
+      <article>
+        <div class="crumb"><span>Lean and Quality</span><span class="sep">/</span><span>Continuous Improvement</span><span class="sep">/</span><a href="#p-lean-value-and-flow">Lean Value and Flow</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 98.</span> Process time is not automatically value-added time</h2>
+        <p>Rework takes processing time but corrects a failure. Inspection does not itself create the desired feature. A necessary machine cycle can transform the product even while the operator waits. Name whose time and which activity you are classifying.</p>
+        <p class="deeper-back"><a href="#deeper-ref-98">Back to reference 98</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-99" value="99">
+      <article>
+        <div class="crumb"><span>Lean and Quality</span><span class="sep">/</span><span>Continuous Improvement</span><span class="sep">/</span><a href="#p-value-stream-mapping">Value Stream Mapping</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 99.</span> A queue suggests a question, not a proven cause</h2>
+        <p>A queue may reflect a capacity constraint, batching, missing information or an unreliable next step. Observe demand, timing and variation before calling one operation the bottleneck. A working day and a calendar day are not interchangeable time units.</p>
+        <p class="deeper-back"><a href="#deeper-ref-99">Back to reference 99</a></p>
       </article>
     </li>
   </ol>
@@ -11242,22 +11647,22 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 (function (root) {
   'use strict';
   const species = Object.freeze([
-    ['Ash, white', .00169, .00219],
-    ['Basswood, American', .00230, .00234],
-    ['Beech, American', .00190, .00330],
-    ['Birch, yellow', .00256, .00327],
-    ['Cherry, black', .00126, .00223],
-    ['Hickory, true', .00259, .00315],
-    ['Maple, red (soft maple)', .00102, .00252],
-    ['Maple, sugar (hard maple)', .00151, .00400],
-    ['Red oak, northern red', .00148, .00338],
-    ['White oak, white', .00183, .00462],
-    ['Poplar, yellow (yellow-poplar)', .00137, .00216],
-    ['Walnut, black', .00112, .00308],
+    ['Ash, white', .00169, .00274],
+    ['Basswood, American', .00230, .00330],
+    ['Beech, American', .00190, .00431],
+    ['Birch, yellow', .00256, .00338],
+    ['Cherry, black', .00126, .00248],
+    ['Hickory, true', .00259, .00411],
+    ['Maple, red (soft maple)', .00137, .00289],
+    ['Maple, sugar (hard maple)', .00165, .00353],
+    ['Red oak, northern red', .00137, .00304],
+    ['White oak, white', .00194, .00376],
+    ['Poplar, yellow (yellow-poplar)', .00158, .00289],
+    ['Walnut, black', .00190, .00274],
     ['Douglas-fir, Coast-type', .00165, .00267],
     ['Fir, white', .00112, .00245],
-    ['Pine, loblolly (a southern yellow pine)', .00165, .00234],
-    ['Pine, ponderosa', .00133, .00252],
+    ['Pine, loblolly (a southern yellow pine)', .00165, .00259],
+    ['Pine, ponderosa', .00133, .00216],
     ['Cedar, western red', .00111, .00234]
   ].map(([name, radial, tangential]) => Object.freeze({name, radial, tangential})));
   const orientations = Object.freeze({
@@ -11278,58 +11683,203 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (!Number.isFinite(finalDimension)) throw new RangeError('Dimension is too large to calculate.');
     return {change, finalDimension, direction, coefficient, unit};
   }
-  const api = Object.freeze({species, calculate});
+  // Derived geometry, not an additional USDA material law: uniform free strain,
+  // one fixed reference, and a stationary support. Points are ideal width edges.
+  function attachmentTravel(input) {
+    const movement = calculate(input);
+    const {anchor, inward, outward, dimension} = input;
+    if (!['center', 'left-edge'].includes(anchor)) throw new RangeError('Choose center or left-edge fixing.');
+    if (![inward, outward].every(n => Number.isFinite(n) && n >= 0)) {
+      throw new RangeError('Enter nonnegative finite inward and outward clear travel.');
+    }
+    if (input.orientation === 'flat-thickness') throw new RangeError('Choose a width direction for the attachment experiment.');
+    const reference = anchor === 'center' ? dimension / 2 : 0;
+    const strain = movement.change / dimension;
+    const points = [0, dimension].map((position, i) => {
+      // Normalizing first avoids overflow for otherwise valid large dimensions.
+      const fraction = (position - reference) / dimension;
+      const displacement = fraction * movement.change;
+      const signedTravel = Math.abs(fraction) * movement.change; // + away, − toward reference
+      const direction = signedTravel > 0 ? 'outward' : signedTravel < 0 ? 'inward' : 'none';
+      const demand = Math.abs(signedTravel), available = direction === 'inward' ? inward : outward;
+      const remaining = available - demand;
+      const epsilon = Number.EPSILON * 8 * Math.max(available, demand);
+      const status = direction === 'none' ? 'stationary' : remaining < -epsilon ? 'exceeds' : Math.abs(remaining) <= epsilon ? 'at-limit' : 'within';
+      return {edge: i === 0 ? 'left' : 'right', position, displacement, signedTravel, direction, demand, available, remaining, status};
+    });
+    return {...movement, anchor, reference, strain, inward, outward, points};
+  }
+  const api = Object.freeze({species, calculate, attachmentTravel});
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.CourseWikiWoodMovement = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 
+(function (root) {
+  'use strict';
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+  function format(value, unit, signed = false) {
+    if (value === 0) return '0';
+    const magnitude = Math.abs(value), digits = unit === 'in' ? 4 : 3;
+    const rounded = magnitude.toFixed(digits);
+    const number = Number(rounded) === 0 || magnitude >= 1e7 ? magnitude.toExponential(2) : rounded;
+    return (value < 0 ? '−' : signed ? '+' : '') + number;
+  }
+  function pointText(point, unit) {
+    if (point.direction === 'none') return '0 ' + unit + ' · stationary';
+    const travel = format(point.signedTravel, unit, true) + ' ' + unit + ' ' + point.direction;
+    if (point.status === 'exceeds') return travel + ' · exceeds by ' + format(-point.remaining, unit) + ' ' + unit;
+    if (point.status === 'at-limit') return travel + ' · at travel limit';
+    return travel + ' · ' + format(point.remaining, unit) + ' ' + unit + ' travel left';
+  }
+  function diagram(result, extent, preview = false) {
+    const {unit, points, anchor, inward, outward} = result;
+    const x0 = 95, x1 = 405, y = 47, boardHeight = 36;
+    // Divide first: 68 / a valid subnormal extent can overflow, even though
+    // each normalized displacement and its final display coordinate is bounded.
+    const displayDistance = value => extent > 0 ? value / extent * 68 : 0;
+    const displacement = points.map(p => preview ? 0 : displayDistance(p.displacement));
+    const reference = anchor === 'center' ? (x0 + x1) / 2 : x0;
+    const caption = preview ? 'Installed board; moisture change not applied yet.' : points.map(p => p.edge + ' edge: ' + pointText(p, unit)).join('. ');
+    // Stationary support windows: pin center may travel within these intervals.
+    // Clear travel is entered directly; no slot length or fastener size is inferred.
+    const gauges = points.map((p, i) => {
+      const x = i ? x1 : x0, sign = i ? 1 : -1;
+      const fixed = p.position === result.reference;
+      if (fixed) return '';
+      const low = Math.min(x - sign * displayDistance(inward), x + sign * displayDistance(outward));
+      const high = Math.max(x - sign * displayDistance(inward), x + sign * displayDistance(outward));
+      const moved = x + displacement[i];
+      return `<g class="wm-gauge" data-edge="${p.edge}" data-displacement="${preview ? 0 : p.displacement}">
+        <rect class="wm-window" x="${low}" y="103" width="${high-low}" height="18" rx="3"/>
+        <path class="wm-origin" d="M${x} 99v26"/>
+        <path class="wm-leader" d="M${moved} ${y+boardHeight}V112"/>
+        <circle class="wm-pin${!preview && p.status === 'exceeds' ? ' wm-exceeded' : ''}" cx="${moved}" cy="112" r="5"/>
+      </g>`;
+    }).join('');
+    return `<svg class="wm-diagram" viewBox="0 0 500 144" role="img" aria-label="${esc(caption)}" focusable="false">
+      <rect class="wm-support" x="12" y="93" width="476" height="38" rx="4"/>
+      <rect class="wm-board" x="${x0+displacement[0]}" y="${y}" width="${x1-x0+displacement[1]-displacement[0]}" height="${boardHeight}"/>
+      <path class="wm-grain" d="M${x0+displacement[0]+12} ${y+8}v20 M250 ${y+8}v20 M${x1+displacement[1]-12} ${y+8}v20"/>
+      <rect class="wm-installed" x="${x0}" y="${y}" width="${x1-x0}" height="${boardHeight}"/>
+      ${gauges}
+      <path class="wm-fixed" d="M${reference} 39v87 M${reference-9} 135l9-9 9 9Z"/>
+    </svg>`;
+  }
+  function comparison(center, edge, preview = false) {
+    // Common magnification for BOTH boards and their travel windows. Fit all
+    // extremes without clipping or constraining the free movement to a window.
+    const largest = Math.max(Math.abs(edge.change), center.inward, center.outward);
+    return [center, edge].map(r => `<div class="wm-case" data-anchor="${r.anchor}">
+      <strong>${r.anchor === 'center' ? 'Center fixed' : 'Left edge fixed'}</strong>
+      ${diagram(r, largest, preview)}
+      <div class="wm-edge-readings">${r.points.map(p => `<div><span>${p.edge === 'left' ? 'Left' : 'Right'} edge</span><strong>${preview ? 'At installation' : esc(pointText(p,r.unit))}</strong></div>`).join('')}</div>
+    </div>`).join('');
+  }
+  const api = Object.freeze({format, pointText, diagram, comparison});
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiWoodMovementRender = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
 (function () {
   'use strict';
-  const model = globalThis.CourseWikiWoodMovement;
+  const model = globalThis.CourseWikiWoodMovement, render = globalThis.CourseWikiWoodMovementRender;
+  if (!model || !render) return;
   document.querySelectorAll('[data-interactive="wood-movement"]').forEach(function (root) {
     if (root.dataset.wmReady) return;
-    root.dataset.wmReady = 'true';
-    root.innerHTML = `<p><strong>Wood movement estimate</strong> — both moisture contents must be 6–14%.</p>
-      <div class="wm-controls">
-        <label>Species<select data-wm="speciesIndex" aria-label="Species">${model.species.map((s, i) => `<option value="${i}"${s.name === 'Fir, white' ? ' selected' : ''}>${s.name}</option>`).join('')}</select></label>
-        <label>Orientation and measured direction<select data-wm="orientation" aria-label="Orientation and measured direction">
-          <option value="flat-width">Flat-sawn (plain-sawn) width</option>
-          <option value="quarter-width">Quarter-sawn width</option>
-          <option value="flat-thickness">Flat-sawn thickness</option>
-          <option value="unknown">Unknown / mixed ring orientation</option>
-        </select></label>
-        <label>Starting dimension<input data-wm="dimension" type="number" min="0" step="any" value="9.15" required></label>
-        <label>Dimension unit<select data-wm="unit" aria-label="Dimension unit"><option value="in">Inches (in)</option><option value="mm">Millimeters (mm)</option></select></label>
-        <label>Starting moisture content (%)<input data-wm="initialMC" type="number" min="6" max="14" step="any" value="8" required></label>
-        <label>Final moisture content (%)<input data-wm="finalMC" type="number" min="6" max="14" step="any" value="11" required></label>
-      </div>
-      <p class="wm-result" role="status" aria-live="polite" aria-atomic="true" data-wm-result></p>
+    const live = document.createElement('div');
+    live.className = 'wm-live';
+    live.innerHTML = `<p class="wm-heading"><strong>Same board. Different fixed point.</strong></p>
       <p data-wm-context></p>
-      <p>Change = starting dimension × coefficient × (final MC − starting MC). Enter MC as 8 for 8%, not 0.08. Negative means shrinkage; positive means swelling. Dimensions and results use the selected unit.</p>
-      <p>Commercial lumber is rarely perfectly flat- or quarter-sawn, so this method tends to overestimate width change and underestimate thickness change. The Handbook notes that the linear assumption underestimates movement by about 5%; no correction factor is added here. Unknown or mixed orientation uses the tangential coefficient.</p>
-      <p>Source: USDA Wood Handbook (2021), chapter 13, Equation 13-3 and Table 13-5. Western red cedar uses the table’s assumption that shrinkage starts at 22% MC (footnote b); the estimator still requires 6–14% MC.</p>`;
-    const fields = {};
-    root.querySelectorAll('[data-wm]').forEach(field => { fields[field.dataset.wm] = field; });
-    const result = root.querySelector('[data-wm-result]');
-    const context = root.querySelector('[data-wm-context]');
-    function update() {
-      context.textContent = '';
-      try {
-        const values = {};
-        Object.entries(fields).forEach(([name, field]) => {
-          values[name] = ['unit', 'orientation'].includes(name) ? field.value : field.value === '' ? NaN : Number(field.value);
-        });
-        const r = model.calculate(values), digits = r.unit === 'in' ? 2 : 1;
-        const magnitude = Math.abs(r.change).toFixed(digits);
-        const change = r.change === 0 ? '0' : Number(magnitude) === 0
-          ? (r.change < 0 ? 'shrinkage' : 'swelling') + ' less than ' + (r.unit === 'in' ? '0.01' : '0.1')
-          : (r.change < 0 ? '−' : '+') + magnitude;
-        result.textContent = 'Estimated change: ' + change + ' ' + r.unit + '; final dimension: ' + r.finalDimension.toFixed(digits) + ' ' + r.unit + '. ' +
-          (r.change === 0 ? 'No movement is predicted for unchanged MC.' : 'Allow for this estimated ' + (r.change < 0 ? 'contraction' : 'expansion') + ' across the measured direction in the joint design.');
-        context.textContent = model.species[values.speciesIndex].name + ', ' + fields.orientation.selectedOptions[0].textContent + ': ' + values.dimension + ' ' + r.unit + ', ' + values.initialMC + '% to ' + values.finalMC + '% MC. Using ' + r.direction + ' coefficient ' + r.coefficient.toFixed(5) + ' per percentage point MC.';
-      } catch (error) { result.textContent = error.message; }
+      <div class="wm-first wm-controls">
+        <label>Service moisture content (%)<input data-wm="finalMC" type="number" min="6" max="14" step="any" value="11" required></label>
+        <label>Predict right-edge travel<select data-wm-prediction><option value="">Center fixed, compared with left edge fixed…</option><option value="half">Half as far</option><option value="same">The same distance</option><option value="zero">No movement</option></select></label>
+      </div>
+      <div class="wm-actions"><button type="button" data-wm-apply>Apply moisture change</button><button type="button" data-wm-reset>Reset example</button></div>
+      <p class="wm-feedback" data-wm-feedback role="status" aria-live="polite" aria-atomic="true">Predict, then apply the moisture change.</p>
+      <p class="wm-result" data-wm-result></p>
+      <div class="wm-comparison" data-wm-comparison></div>
+      <p class="wm-legend">Dashed outline: installed width. Solid board and dots: free movement. Triangle: fixed reference. Shaded windows: clear travel on the stationary support.</p>
+      <p class="wm-legend">Movement and travel windows are enlarged equally in both drawings; board widths are schematic. Edge dots are ideal tracking points, not a hardware layout.</p>
+      <details class="wm-settings"><summary>Change installation and available travel</summary>
+        <div class="wm-controls">
+          <label>Species<select data-wm="speciesIndex">${model.species.map((s, i) => `<option value="${i}"${s.name === 'Fir, white' ? ' selected' : ''}>${s.name}</option>`).join('')}</select></label>
+          <label>Width direction<select data-wm="orientation"><option value="flat-width">Flat-sawn width (tangential)</option><option value="quarter-width">Quarter-sawn width (radial)</option><option value="unknown">Unknown / mixed (use tangential)</option></select></label>
+          <label>Installed width<input data-wm="dimension" type="number" min="0" step="any" value="9.15" required></label>
+          <label>Dimension unit<select data-wm="unit"><option value="in">Inches (in)</option><option value="mm">Millimeters (mm)</option></select></label>
+          <label>Installation moisture content (%)<input data-wm="initialMC" type="number" min="6" max="14" step="any" value="8" required></label>
+          <span class="wm-field-note">Both moisture contents: 6–14%. Enter 8 for 8%, not 0.08.</span>
+          <label>Outward clear travel (<span data-wm-unit>in</span>)<input data-wm="outward" type="number" min="0" step="any" value="0.04" required></label>
+          <label>Inward clear travel (<span data-wm-unit>in</span>)<input data-wm="inward" type="number" min="0" step="any" value="0.02" required></label>
+        </div>
+        <p>Travel is measured from each edge point’s installed position, with the same allowance at both edges. + outward means away from the fixed reference; − inward means toward it. Enter clear travel directly, not total slot length.</p>
+      </details>
+      <p class="wm-limits">Try drying below the installation MC. Does the inward allowance still cover the travel? Every estimate starts from the installed width and MC, even after repeated changes.</p>
+      <details class="wm-settings"><summary>Model, equation and source</summary>
+        <p>Estimated width change ΔW = installed width × coefficient × (service MC − installation MC). Signed travel at a point (positive outward) is (distance from the fixed reference ÷ installed width) × ΔW. This geometry assumes uniform free strain and one ideal fixed reference on a stationary support.</p>
+        <p>Source for moisture movement: <a href="https://research.fs.usda.gov/download/treesearch/62261.pdf#page=16">USDA Wood Handbook (2021), chapter 13, Equation 13-3</a> and Table 13-5. Coefficients are per percentage point MC; unknown orientation uses tangential. Western redcedar follows the table’s 22% fiber-saturation assumption. Actual boards and ring angles vary; these are approximate estimates, with no added correction or safety factor.</p>
+        <p>A point inside an edge moves in proportion to its distance from the reference. The windows compare geometry only. Passing this check does not approve a joint: friction, fastener retention, grain irregularity, warp, support movement, strength and cracking are not calculated. When travel is exceeded the drawing still shows free movement; it does not solve the restrained board.</p>
+      </details>`;
+    root.append(live);
+    root.classList.add('wm-ready');
+    root.dataset.wmReady = 'true';
+    // Native controls keep their keys when a playlist also listens for Space/arrows.
+    live.addEventListener('keydown', event => {
+      if (event.target.matches('input,select,button,summary')) event.stopPropagation();
+    });
+    const fields = Object.fromEntries([...live.querySelectorAll('[data-wm]')].map(n => [n.dataset.wm, n]));
+    const result = live.querySelector('[data-wm-result]'), context = live.querySelector('[data-wm-context]');
+    const comparison = live.querySelector('[data-wm-comparison]'), feedback = live.querySelector('[data-wm-feedback]');
+    const prediction = live.querySelector('[data-wm-prediction]');
+    let applied = false, previousUnit = fields.unit.value;
+    const defaults = Object.fromEntries(Object.entries(fields).map(([k,n]) => [k,n.value]));
+    function values() {
+      return Object.fromEntries(Object.entries(fields).map(([k,n]) => [k, ['unit','orientation'].includes(k) ? n.value : n.value === '' ? NaN : Number(n.value)]));
     }
-    Object.values(fields).forEach(field => field.addEventListener('input', update));
+    function update() {
+      context.textContent = ''; result.textContent = ''; comparison.innerHTML = '';
+      try {
+        const input = values();
+        const center = model.attachmentTravel({...input, anchor:'center'});
+        const edge = model.attachmentTravel({...input, anchor:'left-edge'});
+        context.textContent = model.species[input.speciesIndex].name + ' · ' + fields.orientation.selectedOptions[0].textContent + ' · installed ' + render.format(input.dimension,input.unit) + ' ' + input.unit + ' at ' + input.initialMC + '% MC.';
+        comparison.innerHTML = render.comparison(center,edge,!applied);
+        root.dataset.wmState = applied ? 'applied' : 'installed';
+        if (applied) {
+          result.textContent = 'Estimated width change: ' + render.format(center.change,input.unit,true) + ' ' + input.unit + '; final width: ' + render.format(center.finalDimension,input.unit) + ' ' + input.unit + '. Same width change in both boards.';
+          const exceeded = [center,edge].filter(r => r.points.some(p => p.status === 'exceeds')).map(r => r.anchor === 'center' ? 'Center fixed' : 'Left edge fixed');
+          feedback.textContent = (exceeded.length ? exceeded.join(' and ') + ': estimated movement exceeds available travel.' : 'Estimated movement is within or at the available travel limits.') + ' This compares geometry only.';
+        } else result.textContent = 'At installation. Apply the service MC to reveal the two movements.';
+      } catch (error) {
+        root.dataset.wmState = 'error';
+        result.textContent = 'No estimate: ' + error.message;
+        feedback.textContent = 'Correct the input to see the experiment.';
+      }
+    }
+    Object.entries(fields).forEach(([key,field]) => field.addEventListener('input', function () {
+      if (key === 'unit' && previousUnit !== field.value) {
+        const factor = field.value === 'mm' ? 25.4 : 1 / 25.4;
+        for (const k of ['dimension','inward','outward']) if (fields[k].value !== '') fields[k].value = String(Number(fields[k].value) * factor);
+        previousUnit = field.value;
+        live.querySelectorAll('[data-wm-unit]').forEach(n => { n.textContent = field.value; });
+      }
+      update();
+    }));
+    live.querySelector('[data-wm-apply]').addEventListener('click', function () {
+      update();
+      if (root.dataset.wmState === 'error') return;
+      if (!prediction.value) { feedback.textContent = 'Choose a prediction, then apply the moisture change.'; prediction.focus(); return; }
+      applied = true;
+      update();
+      const input = values(), noChange = input.initialMC === input.finalMC;
+      const matches = noChange ? prediction.value === 'zero' : prediction.value === 'half';
+      feedback.textContent = (matches ? 'Prediction matches. ' : 'Compare the two right edges. ') + (noChange ? 'Unchanged MC gives zero travel in both boards. ' : 'Center fixing puts the right edge half as far from the reference, so it travels half as far. ') + feedback.textContent;
+    });
+    live.querySelector('[data-wm-reset]').addEventListener('click', function () {
+      for (const [k,value] of Object.entries(defaults)) fields[k].value = value;
+      previousUnit = fields.unit.value; applied = false; prediction.value = '';
+      live.querySelectorAll('[data-wm-unit]').forEach(n => { n.textContent = previousUnit; });
+      update(); feedback.textContent = 'Predict, then apply the moisture change.';
+    });
     update();
   });
 })();
