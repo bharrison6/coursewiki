@@ -12,10 +12,12 @@
 if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m);}}catch(e){}})();
 </script>
 <link rel="icon" href="../favicon.ico" sizes="32x32">
-<link rel="icon" href="../favicon.svg?v=7e1dbc4dad" type="image/svg+xml">
-<link rel="stylesheet" href="../theme/msu-theme.css?v=7e1dbc4dad">
-<link rel="stylesheet" href="../theme/app.css?v=7e1dbc4dad">
-<link rel="stylesheet" href="../interactives/dc-motor-curve/demo.css?v=7e1dbc4dad">
+<link rel="icon" href="../favicon.svg?v=fbc0e02b22" type="image/svg+xml">
+<link rel="stylesheet" href="../theme/msu-theme.css?v=fbc0e02b22">
+<link rel="stylesheet" href="../theme/app.css?v=fbc0e02b22">
+<link rel="stylesheet" href="../interactives/dc-motor-curve/demo.css?v=fbc0e02b22">
+<link rel="stylesheet" href="../interactives/gear-ratios/demo.css?v=fbc0e02b22">
+<link rel="stylesheet" href="../interactives/motor-load-matching/demo.css?v=fbc0e02b22">
 </head>
 <body class="app skin-app" data-page="dc-motor-curves" data-base="../">
 <a class="skip" href="#main">Skip to content</a>
@@ -599,7 +601,7 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
   <div data-interactive="dc-motor-curve">
     <div class="dmc-static">
       <p><strong>Predict first:</strong> a model motor has 0.8 N·m stall torque and 3,000 rpm no-load speed. A constant load asks for 0.2 N·m. Does the motor run above or below half speed?</p>
-      <p><img class="content-img" src="../media/electrical-systems/dc-motor-curve.svg?v=7e1dbc4dad" alt="Normalized torque falls from one at stall to zero at no-load speed. Normalized output power peaks at half no-load speed. A load of one-quarter stall torque operates at three-quarters no-load speed." data-natural-width="800" data-natural-height="430"></p>
+      <p><img class="content-img" src="../media/electrical-systems/dc-motor-curve.svg?v=fbc0e02b22" alt="Normalized torque falls from one at stall to zero at no-load speed. Normalized output power peaks at half no-load speed. A load of one-quarter stall torque operates at three-quarters no-load speed." data-natural-width="800" data-natural-height="430"></p>
       <p><strong>Static example:</strong> n = 3,000(1 − 0.2/0.8) = 2,250 rpm. Angular speed is 2,250 × 2π/60 = 235.6 rad/s, so output power is <strong>47.12 W</strong>. Peak power is <strong>62.83 W</strong> at 1,500 rpm and 0.4 N·m.</p>
     </div>
     <div class="dmc-live" hidden>
@@ -635,12 +637,26 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
   <details class="deeper"><summary>Manufacturer basis for the efficiency comparison</summary><p>Portescap's <a href="https://www.portescap.com/-/media/project/automation-specialty/portescap/portescap/pdf/whitepapers/ed_wp_brush_dc_motor_basics.pdf#page=1">Brush DC Motor Basics, p. 1, point 3</a>, states: <q>The maximum efficiency is obtained at high speed.</q> Its accompanying torque plot places the efficiency peak below the torque of peak power; the descending speed line therefore puts it at higher speed.</p></details>
     </div>
   </details>
-  <details class="xcard deck-slide" id="a-gearbox-changes-the-load-seen-by-the-motor" data-card="a-gearbox-changes-the-load-seen-by-the-motor">
-    <summary>A gearbox changes the load seen by the motor<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="match-the-motor-reduction-and-the-same-output-load" data-card="match-the-motor-reduction-and-the-same-output-load" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Match the motor, reduction, and the same output load<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
-      <h2>A gearbox changes the load seen by the motor</h2>
-  <p>A gearbox can move the operating point by changing the torque demanded at the motor shaft for the same output load. Reduction trades output speed for output torque; it does not add power. Use <a class="xref-page" href="gear-ratios.html">Gear Ratios</a> for the ratio calculation, then bring the resulting motor-shaft torque back to this curve.</p>
-  <p>Real loads may demand different torque at different speeds. Their operating point is an intersection of a load curve and a motor curve. This explorer uses a constant load so that the first calculation stays visible.</p>
+      <h2>Match the motor, reduction, and the same output load</h2>
+  <p>A gearbox changes the torque demanded at the motor shaft for the same output load. That can move the motor to a different point on its torque–speed curve. Predict both operating points before revealing them.</p>
+  <div data-interactive="motor-load-matching">
+    <div class="mlm-static">
+      <p><strong>Static example:</strong> a motor has 0.8 N·m stall torque and 120 rpm no-load speed. The output load resists with 0.6 N·m. Compare direct drive with a 20-tooth driver, 40-tooth driven gear, and a stated 90% running mesh efficiency.</p>
+      <div class="unit-table-wrap mlm-table-scroll" tabindex="0" role="region" aria-label="Motor and load comparison table; scroll horizontally to see every column">
+      <table class="unit-table"><caption>The same motor and output load, two connections</caption><thead><tr><th>Connection</th><th>Torque required at motor</th><th>Motor speed</th><th>Output speed</th><th>Motor shaft power</th><th>Modeled output power</th></tr></thead><tbody>
+        <tr><th>Direct</th><td>0.600 N·m</td><td>30.0 rpm</td><td>30.0 rpm</td><td>1.885 W</td><td>1.885 W</td></tr>
+        <tr><th>2:1 reduction, 90%</th><td>0.3333 N·m</td><td>70.0 rpm</td><td>35.0 rpm</td><td>2.443 W</td><td>2.199 W</td></tr>
+      </tbody></table>
+      </div>
+      <p><strong>Result:</strong> the reduction runs the output faster under this load, even though it divides motor speed. It reflects less load torque to the motor, so the motor reaches a higher speed. The gearbox did not create power: motor shaft power changed before the 10% modeled mesh loss.</p>
+    </div>
+  </div>
+  <p>This is a fixed-voltage steady-running comparison with a constant resisting torque. It does not establish starting ability, acceleration, thermal or continuous rating, back-driving, electrical input, or gear strength. At stall, speed and shaft output power are zero; if required motor torque exceeds stall torque, the model reports no forward steady operating point instead of assigning a fictitious speed.</p>
+  <details class="deeper"><summary>Source and the standstill boundary</summary><p>The running conversion follows maxon's <a href="https://www.maxongroup.com/medias/sys_master/root/8815461728286/gear-Technology-short-and-to-the-point-14-EN-36-37.pdf#page=1">gear conversion note</a>: motor speed equals reduction multiplied by load speed, while motor torque equals load torque divided by reduction and gear efficiency. The note also requires checking actual gear torque and speed limits. A separate <a href="https://support.maxongroup.com/hc/en-us/articles/360006034594-Gearhead-efficiency-at-blocked-state">maxon standstill note</a> explains that power efficiency is undefined when both input and output power are zero. This lesson therefore treats stall as a boundary; it does not calculate blocked-state efficiency or a permissible output torque.</p></details>
+  <p>Real loads may demand different torque at different speeds. Their operating point is an intersection of a load curve and a motor curve. <a class="button" data-practice-add="motor-match-reflected-torque" href="../practice.html#motor-match-reflected-torque">Practice reflected load</a> <a class="button" data-practice-add="motor-match-output-power" href="../practice.html#motor-match-output-power">Practice output power</a></p>
     </div>
   </details>
 </div>
@@ -661,16 +677,21 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
     <li><a href="#explore-the-load-point-and-the-peak-power-point">Explore the load point and the peak-power point</a></li>
     <li><a href="#peak-power-is-halfway-not-at-either-endpoint">Peak power is halfway, not at either endpoint</a></li>
     <li><a href="#peak-efficiency-needs-electrical-input-as-well-as-shaft-output">Peak efficiency needs electrical input as well as shaft output</a></li>
-    <li><a href="#a-gearbox-changes-the-load-seen-by-the-motor">A gearbox changes the load seen by the motor</a></li>
+    <li><a href="#match-the-motor-reduction-and-the-same-output-load">Match the motor, reduction, and the same output load</a></li>
   </ul>
 </aside>
 
 </div>
-<script src="../search-index.js?v=7e1dbc4dad"></script>
-<script src="../playlists.js?v=7e1dbc4dad"></script>
-<script src="../practice-index.js?v=7e1dbc4dad"></script>
-<script src="../theme/app.js?v=7e1dbc4dad"></script>
-<script src="../interactives/dc-motor-curve/model.js?v=7e1dbc4dad"></script>
-<script src="../interactives/dc-motor-curve/demo.js?v=7e1dbc4dad"></script>
+<script src="../search-index.js?v=fbc0e02b22"></script>
+<script src="../playlists.js?v=fbc0e02b22"></script>
+<script src="../practice-index.js?v=fbc0e02b22"></script>
+<script src="../theme/app.js?v=fbc0e02b22"></script>
+<script src="../interactives/dc-motor-curve/model.js?v=fbc0e02b22"></script>
+<script src="../interactives/dc-motor-curve/demo.js?v=fbc0e02b22"></script>
+<script src="../interactives/gear-ratios/model.js?v=fbc0e02b22"></script>
+<script src="../interactives/gear-ratios/render.js?v=fbc0e02b22"></script>
+<script src="../interactives/gear-ratios/demo.js?v=fbc0e02b22"></script>
+<script src="../interactives/motor-load-matching/model.js?v=fbc0e02b22"></script>
+<script src="../interactives/motor-load-matching/demo.js?v=fbc0e02b22"></script>
 </body>
 </html>
