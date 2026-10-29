@@ -1,5 +1,52 @@
-[data-interactive="process-break-even"] { padding: 1rem; border: 1px solid currentColor; border-radius: .5rem; }
-[data-interactive="process-break-even"] label,
-[data-interactive="process-break-even"] output { display: block; }
-[data-interactive="process-break-even"] input { width: 100%; margin-block: .75rem; }
-@media print { [data-interactive="process-break-even"] { display: none; } }
+[data-interactive="process-break-even"] { min-width: 0; overflow-wrap: anywhere; }
+.pb-ready > .pb-static { display: none; }
+.pb-static table { width: 100%; border-collapse: collapse; }
+.pb-static :is(th,td) { padding: .35rem .5rem; text-align: left; border-bottom: 1px solid var(--rule); }
+.pb-static caption { text-align: left; font-weight: 700; padding-block: .35rem; }
+.pb-live { font-family: var(--f-display); line-height: 1.45; }
+.pb-live p { margin-block: .55rem; }
+.pb-live .pb-goal { margin-top: 0; }
+.pb-costs, .pb-demand, .pb-totals { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; margin-block: .7rem; }
+.pb-live fieldset { min-width: 0; padding: .55rem .7rem .7rem; border: 1px solid var(--rule); border-radius: var(--radius-xs); }
+.pb-live legend { padding-inline: .25rem; font-weight: 700; }
+.pb-live label { display: grid; min-width: 0; gap: .25rem; }
+.pb-live fieldset label + label { margin-top: .55rem; }
+.pb-live :is(input,select,button) { box-sizing: border-box; min-width: 0; max-width: 100%; min-height: 44px; padding: .4rem .55rem; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); }
+.pb-live :is(input,select) { width: 100%; }
+.pb-live input[type="range"] { padding-inline: 0; accent-color: var(--accent); }
+.pb-live input:disabled { opacity: .5; }
+.pb-live :is(button,select,summary) { cursor: pointer; }
+.pb-live :is(input,select,button,summary,[tabindex]):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.pb-live [aria-invalid="true"] { border-width: 2px; border-style: dashed; }
+.pb-predict { display: flex; gap: .7rem; align-items: end; flex-wrap: wrap; }
+.pb-predict label { flex: 1 1 16rem; }
+.pb-predict button { border: 2px solid var(--accent); font-weight: 700; }
+.pb-feedback { padding: .5rem .7rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+.pb-verdict { font-weight: 700; }
+.pb-total { min-width: 0; padding: .7rem; border: 1px solid var(--rule); background: var(--surface); }
+.pb-total > strong { display: block; }
+.pb-note, .pb-figure figcaption { font-size: .9rem; color: var(--ink-soft); }
+.pb-figure { margin: .8rem 0; }
+.pb-figure [data-pb-chart], .pb-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.pb-figure svg { display: block; width: 100%; min-width: 520px; height: auto; }
+.pb-figure text { font: 16px var(--f-display); fill: var(--ink); }
+.pb-axis { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; }
+.pb-line-a { fill: none; stroke: var(--accent); stroke-width: 3; }
+.pb-line-b { fill: none; stroke: var(--ink); stroke-width: 3; stroke-dasharray: 9 6; }
+.pb-demand-line { stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 3 4; }
+.pb-a-point { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.pb-b-point { fill: var(--ink); stroke: var(--surface); stroke-width: 2; }
+.pb-cross-mark { fill: none; stroke: var(--ink); stroke-width: 3; }
+.pb-live table { margin-block: .6rem; width: 100%; font-variant-numeric: tabular-nums; }
+.pb-live :is(td,th) { padding: .4rem .5rem; text-align: left; white-space: nowrap; }
+.pb-live caption { font-weight: 700; text-align: left; white-space: normal; }
+.pb-assumptions { border-top: 1px solid var(--rule); padding-top: .4rem; margin-top: .7rem; }
+.pb-assumptions > summary { min-height: 44px; padding-block: .5rem; font-weight: 700; }
+@media (max-width: 34rem) {
+  .pb-costs, .pb-demand, .pb-totals { grid-template-columns: minmax(0,1fr); }
+  .pb-predict button { width: 100%; }
+}
+@media print {
+  .pb-ready > .pb-static { display: block !important; }
+  .pb-live { display: none !important; }
+}
