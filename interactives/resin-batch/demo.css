@@ -5,14 +5,23 @@
 .rb-predict { border: 1px solid var(--rule); padding: .8rem; min-width: 0; }
 .rb-predict legend { font-weight: 750; }
 .rb-predict label { display: flex; align-items: center; gap: .5rem; min-height: 44px; }
+.rb-history > summary, .rb-advanced > summary { cursor: pointer; min-height: 44px; padding: .6rem; font-weight: 650; }
+.rb-history[data-complete] { border: 1px solid var(--rule); color: var(--ink-soft); font-size: .9rem; margin-block: .7rem; }
+.rb-history[data-complete] .rb-predict { border: 0; }
+.rb-history[data-complete] > summary { font-weight: 500; }
+.rb-advanced { border: 1px solid var(--rule); padding: .25rem; margin-block: 1rem; }
+.rb-advanced[open] { padding-bottom: .6rem; }
+.rb-advanced .rb-controls { padding: .5rem; }
+.rb-explore-heading { scroll-margin-block-start: 5rem; }
 .rb-lab :is(button,input,select) { font: inherit; color: var(--ink); accent-color: var(--accent); }
 .rb-lab :is(button,input[type="number"],select) { min-height: 44px; border: 1px solid var(--rule); border-radius: var(--radius-xs); background: var(--surface); padding: .45rem .6rem; }
 .rb-lab button { cursor: pointer; }
 .rb-lab button:disabled { opacity: .55; cursor: default; }
-.rb-lab :is(input,select,button):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.rb-lab :is(input,select,button,summary,.rb-explore-heading):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .rb-presets { display: flex; flex-wrap: wrap; gap: .4rem; margin-block: 1rem; }
 .rb-presets > span { flex-basis: 100%; font-weight: 700; }
 .rb-controls { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; }
+.rb-controls.rb-primary { grid-template-columns: repeat(2,minmax(0,1fr)); margin-bottom: .8rem; }
 .rb-controls label { display: block; min-width: 0; font-weight: 650; }
 .rb-controls :is(input,select) { display: block; width: 100%; min-width: 0; margin-top: .3rem; }
 .rb-basis-note, .rb-spec-compare { padding: .7rem; border-left: 3px solid var(--accent); background: var(--surface); }
@@ -37,9 +46,10 @@
 .rb-static .unit-table { width: 100%; }
 @media (max-width: 50rem) { .rb-controls { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 36rem) {
-  .rb-controls,.rb-comparisons,.rb-components,.rb-scale { grid-template-columns: minmax(0,1fr); }
+  .rb-controls,.rb-controls.rb-primary,.rb-comparisons,.rb-components,.rb-scale { grid-template-columns: minmax(0,1fr); }
   .rb-presets button { width: 100%; }
   .rb-balance { min-height: 0; }
+  .rb-comparisons article[data-selected="true"] { order: -1; }
 }
 @media screen { [data-interactive="resin-batch"][data-rb-ready] > .rb-static { display: none; } }
 @media print {
