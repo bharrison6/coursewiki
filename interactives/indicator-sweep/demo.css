@@ -7,16 +7,19 @@
 .is-svg text { fill: var(--ink); font: 22px var(--f-display); }
 .is-svg .is-title { font-size: 24px; font-weight: 700; }
 .is-svg .is-note { font-size: 20px; }
-.is-reference, .is-axis { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 7 5; fill: none; }
-.is-tick { stroke: var(--ink); stroke-width: 1.5; fill: none; }
-.is-jaw, .is-reading { stroke: var(--accent); stroke-width: 4; fill: none; }
+.is-reference { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 7 5; fill: none; }
+.is-jaw { stroke: var(--accent); stroke-width: 4; fill: none; }
+.is-vise { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 1.5; }
+.is-pivot-line { stroke: var(--flag); stroke-width: 1.5; stroke-dasharray: 4 3; fill: none; }
+.is-pivot { fill: var(--paper); stroke: var(--flag); stroke-width: 3; }
 .is-body { fill: var(--surface-2); stroke: var(--ink); stroke-width: 2; }
+.is-display { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.is-svg .is-digital-value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.is-svg .is-digital-unit { font-size: 20px; }
 .is-stem, .is-toward { stroke: var(--ink); stroke-width: 2; fill: none; }
-.is-contact, .is-dot { fill: var(--flag); stroke: var(--paper); stroke-width: 2; }
-.is-zero { stroke: var(--flag); stroke-width: 2; stroke-dasharray: 4 4; }
+.is-contact { fill: var(--flag); stroke: var(--paper); stroke-width: 2; }
 .is-readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin-block: .6rem; font-variant-numeric: tabular-nums; }
 .is-readout span { padding: .45rem; border: 1px solid var(--rule); background: var(--surface); }
-.is-readout .is-contact-readout { border-left: 4px solid var(--flag); }
 .is-controls label, .is-predict legend { display: block; font-weight: 700; }
 .is-controls :is(select, input[type="number"], input[type="range"], button) { width: 100%; min-width: 0; min-height: 44px; margin: .2rem 0 .7rem; font: inherit; }
 .is-controls :is(select, input[type="number"], button) { color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .4rem .6rem; }
@@ -30,6 +33,7 @@
 .is-predict button { min-height: 44px; margin-top: .5rem; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .4rem .6rem; font: inherit; cursor: pointer; }
 .is-predict button:disabled { opacity: .55; cursor: default; }
 .is-predict button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.is-optional { margin-block: .8rem; }
 .is-feedback { min-height: 3em; padding: .6rem; background: var(--surface-2); }
 .is-static-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .is-static-grid figure { margin: 0; padding: .6rem; border: 1px solid var(--rule); break-inside: avoid; }
@@ -37,5 +41,14 @@
 @media (max-width: 58rem) { .is-workbench, .is-static-grid { grid-template-columns: 1fr; } }
 @media (max-width: 34rem) { .is-readout { grid-template-columns: 1fr 1fr; } .xcard:has([data-interactive="indicator-sweep"]) .body { padding-inline: .5rem; } }
 @media (prefers-reduced-motion: reduce) { [data-interactive="indicator-sweep"] * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
-@media print { .is-lab { display: none !important; } .is-live > .is-static { display: block !important; } .is-static-grid { grid-template-columns: 1fr 1fr; } .is-svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+@media print {
+  .is-lab { display: none !important; }
+  .is-live > .is-static { display: block !important; }
+  .is-static > p:first-child, .is-static-grid h3, .is-static-grid h4 { break-after: avoid; }
+  .is-static-grid { display: block; }
+  .is-static-grid > figure:first-child { break-inside: auto; }
+  .is-static-grid > figure + figure { margin-top: 1rem; }
+  .is-static-grid .is-svg, .is-static-grid .is-readout { break-inside: avoid; }
+  .is-svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
 
