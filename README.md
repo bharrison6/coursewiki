@@ -87,8 +87,9 @@ files in `tracks/` for examples.
 Collection groups are alphabetical by page title. A page may declare `@@PIN: true` to appear
 before the alphabetical pages in its existing group; multiple pinned pages are alphabetical
 with one another. `@@PIN: false` is equivalent to omitting the field. The build rejects any
-other value. A pin changes ordinary collection/sidebar and generated aggregate ordering only;
-authored track files retain their explicit sequence.
+other value. A pin changes the ordinary sidebar and collection index, the generated Everything
+playlist, and section/Everything aggregate ordering. Authored track files retain their explicit
+sequence.
 
 ## Interactive topic modules
 

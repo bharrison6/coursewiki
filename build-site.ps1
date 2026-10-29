@@ -1156,7 +1156,7 @@ function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$m
     $groupNames = if ($c.Groups.Count) { $c.Groups }
                   else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
     foreach ($g in $groupNames) {
-      $inGroup = Sort-GroupPages @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g })
+      $inGroup = @(Sort-GroupPages @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g }))
       if (-not $inGroup.Count) { continue }
       $gslug = ConvertTo-Slug "$($c.Id)-$g"
       # A group has no page of its own, but it does have a place: the block of
@@ -1941,7 +1941,7 @@ foreach ($c in $collections.Values) {
   $groupNames = if ($c.Groups.Count) { $c.Groups }
                 else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
   foreach ($g in $groupNames) {
-    $inGroup = Sort-GroupPages @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g })
+    $inGroup = @(Sort-GroupPages @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g }))
     if (-not $inGroup.Count) { continue }
     # Same slug the sidebar uses for this group's data-nav, so the group header
     # in the tree has somewhere real to point: this block, on this index.
