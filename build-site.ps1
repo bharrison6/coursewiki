@@ -75,6 +75,7 @@ $script:cardMarkers = @(
 # ---------------------------------------------------------------- helpers ----
 . (Join-Path $root 'scripts/read-conf.ps1')
 . (Join-Path $root 'scripts/interactive-assets.ps1')
+. (Join-Path $root 'scripts/page-order.ps1')
 
 # The image formats this site will inline. The MIME type has to be right per
 # extension: a data: URI carrying the wrong type is not decoded, and the
@@ -302,6 +303,7 @@ foreach ($cid in $collOrder) {
     if ($groups.Count -and $groups -notcontains $meta.SECTION) {
       throw "$($f.Name): @@SECTION '$($meta.SECTION)' is not in collection '$cid' @@GROUPS"
     }
+    $pin = ConvertTo-PagePin $meta $f.Name
 
     $body = Expand-ActivityNotes $split[1].Trim()
     $secs = @(); $i = 0
@@ -341,6 +343,7 @@ foreach ($cid in $collOrder) {
       Section    = $meta.SECTION
       Summary    = $meta.SUMMARY
       Status     = $meta.STATUS
+      Pin        = $pin
       Collection = $cid
       Sections   = $secs
       Body       = $body
@@ -1153,7 +1156,7 @@ function New-Sidebar([string]$up, [string]$curPage, [string]$curColl, [string]$m
     $groupNames = if ($c.Groups.Count) { $c.Groups }
                   else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
     foreach ($g in $groupNames) {
-      $inGroup = @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
+      $inGroup = @(Sort-GroupPages @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g }))
       if (-not $inGroup.Count) { continue }
       $gslug = ConvertTo-Slug "$($c.Id)-$g"
       # A group has no page of its own, but it does have a place: the block of
@@ -1599,7 +1602,7 @@ function New-PlaylistData {
       $groupNames = if ($c.Groups.Count) { $c.Groups }
                     else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
       foreach ($g in $groupNames) {
-        foreach ($p in @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)) {
+        foreach ($p in (Sort-GroupPages @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g }))) {
           $allItems += '{"id":"' + (ConvertTo-Json1 $p.Id) +
                        '","title":"' + (ConvertTo-Json1 $p.Title) +
                        '","collection":"' + (ConvertTo-Json1 $c.Title) +
@@ -1938,7 +1941,7 @@ foreach ($c in $collections.Values) {
   $groupNames = if ($c.Groups.Count) { $c.Groups }
                 else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
   foreach ($g in $groupNames) {
-    $inGroup = @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
+    $inGroup = @(Sort-GroupPages @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g }))
     if (-not $inGroup.Count) { continue }
     # Same slug the sidebar uses for this group's data-nav, so the group header
     # in the tree has somewhere real to point: this block, on this index.
@@ -2140,7 +2143,7 @@ foreach ($c in $collections.Values) {
   $groupNames = if ($c.Groups.Count) { $c.Groups }
                 else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
   foreach ($g in $groupNames) {
-    $list += @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
+    $list += Sort-GroupPages @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g })
   }
   New-Aggregate ('section-' + $c.Id) $c.Title $c.Summary $list 'Section'
 }
@@ -2155,7 +2158,7 @@ foreach ($c in $collections.Values) {
   $gn = if ($c.Groups.Count) { $c.Groups }
         else { @($c.PageIds | ForEach-Object { $pages[$_].Section } | Select-Object -Unique) }
   foreach ($g in $gn) {
-    $allList += @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g } | Sort-Object Title)
+    $allList += Sort-GroupPages @($c.PageIds | ForEach-Object { $pages[$_] } | Where-Object { $_.Section -eq $g })
   }
 }
 New-Aggregate 'track-everything' 'Everything' $site.SUMMARY $allList 'Playlist'

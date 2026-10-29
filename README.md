@@ -82,6 +82,15 @@ Program tracks contain their child courses through `@@PARENT`; their page lists 
 from those children. This keeps shared content in one source of truth. See the existing
 files in `tracks/` for examples.
 
+### Navigation ordering
+
+Collection groups are alphabetical by page title. A page may declare `@@PIN: true` to appear
+before the alphabetical pages in its existing group; multiple pinned pages are alphabetical
+with one another. `@@PIN: false` is equivalent to omitting the field. The build rejects any
+other value. A pin changes the ordinary sidebar and collection index, the generated Everything
+playlist, and section/Everything aggregate ordering. Authored track files retain their explicit
+sequence.
+
 ## Interactive topic modules
 
 Keep each simulation in `interactives/<topic>/`, with its calculations in `model.js`,
