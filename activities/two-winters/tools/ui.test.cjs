@@ -79,10 +79,12 @@ test('Two Winters UI browser acceptance', { skip }, async () => {
       await page.locator('#btn-selftest').click();
       check((await page.locator('.st-head').textContent()).includes('all 17 checks pass'), 'Embedded source/deck checks');
       await page.locator('#presentation-btn').click();
-      await page.locator('#settings .notes-open').click();
+      const headerNotes = page.locator('.top-tools .notes-open');
+      check(await headerNotes.isVisible(), 'Presentation exposes header Notes trigger');
+      await headerNotes.click();
       check(await page.locator('#presenter-notes .guide-scope').isVisible(), 'Canonical notes open');
       await page.keyboard.press('Escape');
-      check(await page.locator('#settings-open').evaluate(e => e === document.activeElement), 'Notes focus returns to Settings trigger');
+      check(await headerNotes.evaluate(e => e === document.activeElement), 'Notes focus returns to header trigger');
       await page.locator('#settings-open').click();
       await page.locator('#reset-btn').click();
       check(await page.locator('#intro').isVisible(), 'Reset returns opening');
