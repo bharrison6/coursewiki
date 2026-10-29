@@ -1,6 +1,14 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {browserURL,skip,launch}=require('../../tests/support/browser.cjs');
+function fixtureDemoURL(source){const url=new URL(source);url.searchParams.set('two-roots','1');return url.href;}
+test('two-root fixture URL preserves root and deployed-prefix script locations',()=>{
+  const root='https://example.test/interactives/end-mill-anatomy/demo.js?v=root-build&mode=a&mode=b',prefixed='https://example.test/coursewiki/interactives/end-mill-anatomy/demo.js?v=prefix-build&mode=a&mode=b';
+  const rootFixture=new URL(fixtureDemoURL(root)),prefixFixture=new URL(fixtureDemoURL(prefixed));
+  assert.equal(rootFixture.pathname,'/interactives/end-mill-anatomy/demo.js');assert.equal(rootFixture.searchParams.get('v'),'root-build');assert.deepEqual(rootFixture.searchParams.getAll('mode'),['a','b']);assert.equal(rootFixture.searchParams.get('two-roots'),'1');
+  assert.equal(prefixFixture.pathname,'/coursewiki/interactives/end-mill-anatomy/demo.js');assert.equal(prefixFixture.searchParams.get('v'),'prefix-build');assert.deepEqual(prefixFixture.searchParams.getAll('mode'),['a','b']);assert.equal(prefixFixture.searchParams.get('two-roots'),'1');
+  assert.notEqual(prefixFixture.pathname,rootFixture.pathname,'deployed prefix is not collapsed to the origin root');assert.notEqual(prefixFixture.href,prefixed,'fixture query is actually added');
+});
 test('end-mill anatomy web, phone, fallback and independent roots',{skip},async()=>{
   const out=fs.mkdtempSync(path.join(os.tmpdir(),'coursewiki-end-mill-anatomy-')),browser=await launch();
   try{
@@ -26,8 +34,10 @@ test('end-mill anatomy web, phone, fallback and independent roots',{skip},async(
     }
     const multi=await browser.newPage({viewport:{width:1200,height:900}});await multi.route('**/end-mill-anatomy/demo.js*',route=>route.abort());await multi.goto(url,{waitUntil:'networkidle'});await multi.locator('details').evaluateAll(ns=>ns.forEach(n=>n.open=true));
     assert.equal(await multi.locator('[data-interactive="end-mill-anatomy"] [id]').count(),0,'static fallback is ID-free before JavaScript');
+    const emittedDemoURL=await multi.locator('script[src*="/end-mill-anatomy/demo.js"]').evaluate(node=>node.src),fixtureURL=fixtureDemoURL(emittedDemoURL),emitted=new URL(emittedDemoURL),fixture=new URL(fixtureURL);
+    assert.equal(fixture.origin,emitted.origin);assert.equal(fixture.pathname,emitted.pathname);const preserved=new URL(fixture);preserved.searchParams.delete('two-roots');assert.deepEqual([...preserved.searchParams],[...emitted.searchParams]);assert.equal(fixture.searchParams.get('two-roots'),'1');assert.notEqual(fixture.href,emitted.href);
     await multi.evaluate(()=>{const a=document.querySelector('[data-interactive="end-mill-anatomy"]');a.after(a.cloneNode(true));});await multi.unroute('**/end-mill-anatomy/demo.js*');
-    const mounts=await multi.evaluate(()=>{const s=document.createElement('script');s.src='/interactives/end-mill-anatomy/demo.js?two-roots';document.body.append(s);return new Promise(r=>setTimeout(()=>r(document.querySelectorAll('[data-ema-ready]').length),250));});
+    const mounts=await multi.evaluate(src=>{const s=document.createElement('script');s.src=src;document.body.append(s);return new Promise(r=>setTimeout(()=>r(document.querySelectorAll('[data-ema-ready]').length),250));},fixtureURL);
     assert.equal(mounts,2);assert.equal(await multi.locator('canvas.ema-webgl').count(),2);
     const roots=multi.locator('[data-interactive="end-mill-anatomy"]');await roots.nth(1).locator('[data-ema="projection"]').selectOption('85');
     assert.match(await roots.nth(0).locator('[data-ema-readout]').textContent(),/Holder projection 75 mm/);assert.match(await roots.nth(1).locator('[data-ema-readout]').textContent(),/Holder projection 85 mm/);
