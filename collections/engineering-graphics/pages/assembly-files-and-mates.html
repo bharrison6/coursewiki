@@ -56,6 +56,46 @@
 </section>
 
 <section>
+  <h2>Test a shaft joint: keep the motion the design needs</h2>
+  <p>The housing is grounded. The shaft and its attached lever start with their axes aligned to the housing bore. Predict the motions left, test them, then seat the shoulder. Finally add angular alignment: does a hinge still work?</p>
+  <div data-interactive="assembly-motion-lab">
+    <div class="am-static">
+      <h3>Worked experiment: 2 → 1 → 0 independent motions</h3>
+      <p>This original ideal joint begins <strong>after axis alignment</strong>, not as a free rigid body. Its only coordinates are axial position <strong>z</strong> in millimeters and spin <strong>θ</strong> in degrees. The housing is grounded; the lever moves with the shaft.</p>
+      <figure>
+        <svg viewBox="0 0 500 220" role="img" aria-label="Worked hinge after seating: shaft shoulder at housing datum z equals zero; lever at 65 degrees remains free to spin. Side view plus end view looking toward negative Z.">
+          <rect x="100" y="55" width="110" height="100" fill="none" stroke="currentColor" stroke-width="2"/>
+          <rect x="45" y="92" width="240" height="26" fill="var(--paper)" stroke="currentColor" stroke-width="2"/>
+          <rect x="85" y="72" width="15" height="66" fill="var(--paper)" stroke="currentColor" stroke-width="2"/>
+          <path d="M100 45V165 M20 105H305" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+          <path d="M295 100 305 105 295 110 M100 165H210 m-100 0 -10 10 m35 -10 -10 10 m35 -10 -10 10 m35 -10 -10 10" fill="none" stroke="currentColor"/>
+          <circle cx="400" cy="105" r="65" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="400" cy="105" r="15" fill="none" stroke="currentColor"/>
+          <path d="M400 105H475" stroke="currentColor" stroke-dasharray="5 4"/><path d="M400 105 429.6 41.6" stroke="currentColor" stroke-width="8"/>
+          <text x="35" y="25" fill="currentColor" font-size="17">SIDE · +z →</text><text x="330" y="25" fill="currentColor" font-size="17">END · toward −Z</text>
+          <text x="70" y="205" fill="currentColor" font-size="17">z = 0; slide blocked</text><text x="320" y="205" fill="currentColor" font-size="17">θ = 65°; spin free</text>
+        </svg>
+        <figcaption>Worked hinge state: shoulder at the housing datum, z = 0 mm; lever at θ = 65°. Looking toward −Z in the end view, positive spin is counterclockwise. Dashed lines show the joint axis and reference datums.</figcaption>
+      </figure>
+      <table>
+        <caption>Conditions remove independent motions, not one freedom per mate icon</caption>
+        <thead><tr><th scope="col">Condition after built-in axis alignment</th><th scope="col">Example coordinates</th><th scope="col">What can move?</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Neither additional condition</th><td>z = 12 mm, θ = 35° → test: 22 mm, 65°</td><td>Slide + spin: 2 DOF</td></tr>
+          <tr><th scope="row">Seat shoulder at z = 0</th><td>z = 0 mm, θ = 65°</td><td>Spin only: 1 DOF. Hinge goal met.</td></tr>
+          <tr><th scope="row">Also align lever at θ = 0°</th><td>z = 0 mm, θ = 0°</td><td>Neither: 0 DOF. Fixed goal met; hinge goal defeated.</td></tr>
+          <tr><th scope="row">Angular alignment only</th><td>z may vary, θ = 0°</td><td>Slide only: 1 DOF. Slider goal met.</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Diagnose and recover:</strong> to restore the hinge, remove angular alignment while keeping the shoulder seated. The shaft can turn again. For a slider, remove the shoulder condition and retain angular alignment. Choosing a goal alone does not change conditions.</p>
+      <p>The shoulder condition enforces <strong>z = 0</strong>; angular alignment enforces <strong>θ = 0°</strong>. They do not freeze an arbitrary current placement. Removing a condition permits motion without itself moving the component. Angles wrap every 360°.</p>
+      <p><strong>Model limits:</strong> axial travel −30 to +30 mm is a declared lab range, not physical stops. Axis alignment and rigid components are built in. Shoulder seating means ideal plane coincidence, holding z = 0 in both directions; physical shoulder contact alone would not retain a shaft against separation. Contact, collision/interference, friction and load capacity are outside this model. Schematic overlap does not establish a fit or clearance.</p>
+    </div>
+  </div>
+  <p>In a SOLIDWORKS geometric-mate sequence, concentric alignment followed by shoulder-face coincidence can leave shaft rotation free. This lab's conditions illustrate the resulting motion; they are not a vendor command recorder. Onshape expresses joint motion through mate connectors: <a href="https://cad.onshape.com/help/Content/Assembly/cylindrical_mate.htm">Cylindrical</a> permits axial translation and rotation (Tz, Rz), while <a href="https://cad.onshape.com/help/Content/Assembly/revolute_mate.htm">Revolute</a> permits rotation (Rz). These are not a one-to-one mapping of the SOLIDWORKS steps.</p>
+  <p>For coupled shaft rotations, continue with [[gear-ratios]]. <a class="button" data-practice-add="assemblies-hinge-diagnosis" href="../practice.html#assemblies-hinge-diagnosis">Diagnose a locked hinge</a> <a class="button" data-practice-add="assemblies-slider-condition" href="../practice.html#assemblies-slider-condition">Preserve slider motion</a></p>
+</section>
+
+<section>
   <h2>Parallel and perpendicular mates set orientation</h2>
   <p><strong>Parallel</strong> keeps selected planes parallel without setting their separation. <strong>Perpendicular</strong> keeps selected planes at a right angle. Neither condition alone fully locates the part. These diagrams show the planes edge-on.</p>
   <figure>[[img:engineering-graphics/assemblies/parallel.svg|Before: two planes have different orientations. After: the planes are parallel with a gap that is not fixed by this mate.]]</figure>
