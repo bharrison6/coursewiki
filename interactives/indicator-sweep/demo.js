@@ -47,7 +47,7 @@
       update();
     }
     control('kind').addEventListener('change', function () { preset(this.value); q('[data-is-feedback]').textContent = 'Case changed. Read the entire sweep before interpreting it.'; });
-    control('response').addEventListener('change', function () { state = M.withResponse(state, Number(this.value)); update(); q('[data-is-feedback]').textContent = 'A different demonstrated contact response was selected and re-zeroed at the stored zero position. The physical jaw did not move; displayed signs reversed.'; });
+    control('response').addEventListener('change', function () { state = M.withResponse(state, Number(this.value)); update(); q('[data-is-feedback]').textContent = 'A different demonstrated contact-response scenario was selected. That scenario stores a new zero at ' + M.format(state.zeroX) + ' mm. Vise geometry and alignment did not change; readings were recomputed from the new response and reference.'; });
     control('position').addEventListener('input', function () { state = Object.assign({}, state, { position: Number(this.value) }); update(); });
     control('pivot').addEventListener('change', function () { state = M.withPivot(state, Number(this.value)); update(); q('[data-is-feedback]').textContent = 'Next world pivot selected at P=(' + M.format(state.pivot) + ', 0) mm. The current vise pose and stored zero did not change.'; });
     control('increment').addEventListener('change', function () { increment = Number(this.value); q('[data-is-feedback]').textContent = 'Rotation increment staged. Apply it when ready; changing this field alone does not move the vise.'; });
