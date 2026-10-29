@@ -2996,6 +2996,61 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
   .deeper-back { display: none; }
 }
+[data-interactive="indicator-sweep"] { min-width: 0; margin-block: 1rem; }
+.is-live > .is-static { display: none; }
+.is-lab { font: .95rem/1.45 var(--f-display); }
+.is-workbench { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(15rem, .8fr); gap: 1rem; align-items: start; }
+.is-stage, .is-controls, .is-static-grid > figure { min-width: 0; }
+.is-svg { display: block; width: 100%; height: auto; background: var(--paper); border: 1px solid var(--rule); }
+.is-svg text { fill: var(--ink); font: 22px var(--f-display); }
+.is-svg .is-title { font-size: 24px; font-weight: 700; }
+.is-svg .is-note { font-size: 20px; }
+.is-reference { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 7 5; fill: none; }
+.is-jaw { stroke: var(--accent); stroke-width: 4; fill: none; }
+.is-vise { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 1.5; }
+.is-pivot-line { stroke: var(--flag); stroke-width: 1.5; stroke-dasharray: 4 3; fill: none; }
+.is-pivot { fill: var(--paper); stroke: var(--flag); stroke-width: 3; }
+.is-body { fill: var(--surface-2); stroke: var(--ink); stroke-width: 2; }
+.is-display { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.is-svg .is-digital-value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.is-svg .is-digital-unit { font-size: 20px; }
+.is-stem, .is-toward { stroke: var(--ink); stroke-width: 2; fill: none; }
+.is-contact { fill: var(--flag); stroke: var(--paper); stroke-width: 2; }
+.is-readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin-block: .6rem; font-variant-numeric: tabular-nums; }
+.is-readout span { padding: .45rem; border: 1px solid var(--rule); background: var(--surface); }
+.is-controls label, .is-predict legend { display: block; font-weight: 700; }
+.is-controls :is(select, input[type="number"], input[type="range"], button) { width: 100%; min-width: 0; min-height: 44px; margin: .2rem 0 .7rem; font: inherit; }
+.is-controls :is(select, input[type="number"], button) { color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .4rem .6rem; }
+.is-controls input { accent-color: var(--accent); }
+.is-controls :is(input, select, button):focus-visible, .is-table-scroll:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.is-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.is-actions button { width: auto; flex: 1 1 9rem; }
+.is-predict { border: 1px solid var(--rule); border-left: 4px solid var(--flag); padding: .7rem; margin-block: .8rem; }
+.is-predict label { display: flex; gap: .5rem; align-items: center; min-height: 44px; font-weight: 400; }
+.is-predict input { width: auto; min-height: auto; margin: 0; }
+.is-predict button { min-height: 44px; margin-top: .5rem; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .4rem .6rem; font: inherit; cursor: pointer; }
+.is-predict button:disabled { opacity: .55; cursor: default; }
+.is-predict button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.is-optional { margin-block: .8rem; }
+.is-feedback { min-height: 3em; padding: .6rem; background: var(--surface-2); }
+.is-static-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.is-static-grid figure { margin: 0; padding: .6rem; border: 1px solid var(--rule); break-inside: avoid; }
+.is-source { font-size: .9rem; }
+@media (max-width: 58rem) { .is-workbench, .is-static-grid { grid-template-columns: 1fr; } }
+@media (max-width: 34rem) { .is-readout { grid-template-columns: 1fr 1fr; } .xcard:has([data-interactive="indicator-sweep"]) .body { padding-inline: .5rem; } }
+@media (prefers-reduced-motion: reduce) { [data-interactive="indicator-sweep"] * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+@media print {
+  .is-lab { display: none !important; }
+  .is-live > .is-static { display: block !important; }
+  .is-static > p:first-child, .is-static-grid h3, .is-static-grid h4 { break-after: avoid; }
+  .is-static-grid { display: block; }
+  .is-static-grid > figure:first-child { break-inside: auto; }
+  .is-static-grid > figure + figure { margin-top: 1rem; }
+  .is-static-grid .is-svg, .is-static-grid .is-readout { break-inside: avoid; }
+  .is-svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+
+
 </style>
 </head>
 <body class="app skin-app aggregate" data-page="agg-track-mill-setup-and-tooling" data-base="">
@@ -3080,24 +3135,29 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Choose a grip that leaves access for the cutter while supporting the cut. A part perched high above shallow jaw contact is a different setup from a part seated low in the vise. For the operating rules that govern this work, use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a>.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="milling-workholding--sweep-the-fixed-jaw-adjust-tighten-then-sweep-again" data-card="milling-workholding--sweep-the-fixed-jaw-adjust-tighten-then-sweep-again">
-    <summary>Sweep the fixed jaw, adjust, tighten, then sweep again<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="milling-workholding--sweep-the-fixed-jaw-adjust-tighten-then-sweep-again" data-card="milling-workholding--sweep-the-fixed-jaw-adjust-tighten-then-sweep-again" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Sweep the fixed jaw, adjust, tighten, then sweep again<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Sweep the fixed jaw, adjust, tighten, then sweep again</h2>
   <ol>
     <li>Mount the vise with its fasteners engaged. Snug one mounting point enough to act as a pivot and leave the other adjustable.</li>
     <li>Mount an indicator rigidly with the spindle stopped. Contact a clean, undamaged part of the fixed jaw's locating face with some preload. See <a class="xref-page" href="#p-mill-indicating-and-zero">indicator setup</a>.</li>
-    <li>Zero near one end. Traverse the table so the contact point follows the jaw toward the other end, keeping the contact height and indicator orientation unchanged.</li>
+    <li>Choose a convenient reference near one end; zero there if it makes comparison easier. Traverse so the contact point follows the jaw toward the other end, keeping contact height and indicator orientation unchanged. Alignment comes from the differences across the sweep, whether or not you re-zero.</li>
     <li>Read the difference, then tap the adjustable end of the vise body lightly with a suitable soft mallet. Sweep again. Use the demonstrated indicator response to choose the direction.</li>
     <li>Tighten the mounting fasteners to the vise/mounting instructions and repeat the full sweep. Accept the setup against the job's alignment requirement, not an invented universal tolerance.</li>
   </ol>
-  <figure>
-    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkludGVycHJldGluZyBhIGZpeGVkLWphdyBzd2VlcDwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlRvcCB2aWV3LiBUaGUgbGVmdCBlbmQgaXMgdGhlIHBpdm90LiBUaGUgcmlnaHQgZW5kIHJlYWRzIHBsdXMgMC4wNiBtaWxsaW1ldGVyLCB3aXRoIHBvc2l0aXZlIHJlYWRpbmdzIGRlZmluZWQgYXMgdGhlIGphdyBtb3ZpbmcgdG93YXJkIHRoZSBpbmRpY2F0b3IuIFRhcCB0aGUgcmlnaHQgZW5kIGF3YXkgZnJvbSB0aGUgaW5kaWNhdG9yLiBUaWx0IGlzIGV4YWdnZXJhdGVkLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0NjAiIHJ4PSIxMiIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjMiIGZpbGw9IiMwMDIxNDQiPgo8dGV4dCB4PSIyOCIgeT0iMzgiIGZvbnQtd2VpZ2h0PSJib2xkIj5GSVhFRCBKQVcg4oCiIFRPUCBWSUVXIOKAoiBUSUxUIEVYQUdHRVJBVEVEPC90ZXh0Pgo8cGF0aCBkPSJNMTE1IDEzNUg2ODAiIHN0cm9rZT0iIzYwNzA4MCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI4IDYiLz48dGV4dCB4PSIzMTAiIHk9IjEwOCI+VGFyZ2V0OiBwYXJhbGxlbCB0byBYIHRyYXZlbDwvdGV4dD4KPHBhdGggZD0iTTExNSAxMzVMNjgwIDE3MFYyMjBMMTE1IDE4NVoiIGZpbGw9IiNjZGQ4ZTIiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxjaXJjbGUgY3g9IjE0NSIgY3k9IjE1NCIgcj0iOCIgZmlsbD0iIzAwMjE0NCIvPjx0ZXh0IHg9IjMwIiB5PSI4NiI+TGVmdCBwaXZvdDwvdGV4dD48cGF0aCBkPSJNMTE1IDkyTDE0MyAxNDMiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik02ODAgMTU4Vjk5bS04IDEzIDgtMTMgOCAxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjQiLz4KPHRleHQgeD0iNTY1IiB5PSI2NiIgZmlsbD0iIzAwMjE0NCI+VGFwIHJpZ2h0IGVuZCBhd2F5PC90ZXh0Pgo8cGF0aCBkPSJNMTU0IDI0Mkg2NDRtLTEyLTggMTIgOC0xMiA4IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSIyMTAiIHk9IjI4MCI+Q29udGFjdC1wb2ludCBzd2VlcDogbGVmdCDihpIgcmlnaHQ8L3RleHQ+CjxjaXJjbGUgY3g9IjE0NSIgY3k9IjMzMCIgcj0iMzAiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTE0NSAzMDBWMTg5IiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMyIvPjxjaXJjbGUgY3g9IjE0NSIgY3k9IjE4OCIgcj0iNSIgZmlsbD0iIzAwMjE0NCIvPjxwYXRoIGQ9Ik0xNDUgMzMwbC0xNS0xNiIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz4KPGNpcmNsZSBjeD0iNjc1IiBjeT0iMzMwIiByPSIzMCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNNjc1IDMwMFYyMjEiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIzIi8+PGNpcmNsZSBjeD0iNjc1IiBjeT0iMjIwIiByPSI1IiBmaWxsPSIjMDAyMTQ0Ii8+PHBhdGggZD0iTTY3NSAzMzBsMTYtMTciIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIzIi8+Cjx0ZXh0IHg9IjkxIiB5PSIzODgiPjAuMDAgbW08L3RleHQ+PHRleHQgeD0iNjA1IiB5PSIzODgiPiswLjA2IG1tPC90ZXh0Pgo8dGV4dCB4PSIyNjMiIHk9IjMzMCI+SW5kaWNhdG9yIG9uIHRoaXMgc2lkZTwvdGV4dD48dGV4dCB4PSIyNTQiIHk9IjM2MSI+VHdvIHBvc2l0aW9ucyBzaG93bjwvdGV4dD4KPHRleHQgeD0iMjgiIHk9IjQzMyIgZm9udC13ZWlnaHQ9ImJvbGQiPkRlZmluZWQgcmVzcG9uc2U6IGphdyB0b3dhcmQgaW5kaWNhdG9yIOKGkiBoaWdoZXIgcmVhZGluZzwvdGV4dD4KPC9nPjwvc3ZnPgo=" alt="Top-view fixed jaw sweep: indicator body on the operator side; increasing readings mean the jaw is closer to the indicator. Left reads zero and right plus 0.06 mm, so move the right end away from the indicator." data-natural-width="800" data-natural-height="460"></p>
-    <figcaption>The arrow follows the contact point along the jaw. It does not label the physical direction of table travel. Jaw tilt is exaggerated.</figcaption>
-  </figure>
+  <div data-interactive="indicator-sweep">
+    <div class="is-static">
+      <p><strong>First use:</strong> apply the same small corrective rotation about different illustrative pivots. The tilt can disappear while both ends settle at different common offsets; re-zeroing afterward is optional convenience.</p>
+      <!-- INDICATOR-SWEEP-STATIC -->
+      <div class="is-static-grid"><figure><h3>Rotate about a chosen illustrative pivot</h3><svg class="is-svg" viewBox="0 0 640 230" role="img" aria-label="Exaggerated top-view vise, chosen next pivot and functional digital indicator. Contact at 100.000 mm reads +0.060 mm. Moving the jaw toward the body increases the reading." focusable="false"><text class="is-title" x="18" y="25">Physical contact — deviation exaggerated, not to scale</text><path class="is-reference" d="M66 82H574M66 76V88M574 76V88"/><path class="is-vise" d="M60.92 81.69L69.28 82.20L77.63 82.71L85.99 83.23L94.35 83.74L102.71 84.25L111.06 84.77L119.42 85.28L127.78 85.79L136.14 86.31L144.49 86.82L152.85 87.33L161.21 87.85L169.57 88.36L177.92 88.87L186.28 89.39L194.64 89.90L203.00 90.41L211.35 90.93L219.71 91.44L228.07 91.95L236.43 92.47L244.78 92.98L253.14 93.49L261.50 94.01L269.86 94.52L278.21 95.03L286.57 95.55L294.93 96.06L303.29 96.57L311.64 97.09L320.00 97.60L328.36 98.11L336.71 98.63L345.07 99.14L353.43 99.65L361.79 100.17L370.14 100.68L378.50 101.19L386.86 101.71L395.22 102.22L403.57 102.73L411.93 103.25L420.29 103.76L428.65 104.27L437.00 104.79L445.36 105.30L453.72 105.81L462.08 106.33L470.43 106.84L478.79 107.35L487.15 107.87L495.51 108.38L503.86 108.89L512.22 109.41L520.58 109.92L528.94 110.43L537.29 110.95L545.65 111.46L554.01 111.97L562.37 112.49L570.72 113.00L579.08 113.51L579.08 79.51L570.72 79.00L562.37 78.49L554.01 77.97L545.65 77.46L537.29 76.95L528.94 76.43L520.58 75.92L512.22 75.41L503.86 74.89L495.51 74.38L487.15 73.87L478.79 73.35L470.43 72.84L462.08 72.33L453.72 71.81L445.36 71.30L437.00 70.79L428.65 70.27L420.29 69.76L411.93 69.25L403.57 68.73L395.22 68.22L386.86 67.71L378.50 67.19L370.14 66.68L361.79 66.17L353.43 65.65L345.07 65.14L336.71 64.63L328.36 64.11L320.00 63.60L311.64 63.09L303.29 62.57L294.93 62.06L286.57 61.55L278.21 61.03L269.86 60.52L261.50 60.01L253.14 59.49L244.78 58.98L236.43 58.47L228.07 57.95L219.71 57.44L211.35 56.93L203.00 56.41L194.64 55.90L186.28 55.39L177.92 54.87L169.57 54.36L161.21 53.85L152.85 53.33L144.49 52.82L136.14 52.31L127.78 51.79L119.42 51.28L111.06 50.77L102.71 50.25L94.35 49.74L85.99 49.23L77.63 48.71L69.28 48.20L60.92 47.69Z"/><path class="is-jaw" d="M60.92 81.69L69.28 82.20L77.63 82.71L85.99 83.23L94.35 83.74L102.71 84.25L111.06 84.77L119.42 85.28L127.78 85.79L136.14 86.31L144.49 86.82L152.85 87.33L161.21 87.85L169.57 88.36L177.92 88.87L186.28 89.39L194.64 89.90L203.00 90.41L211.35 90.93L219.71 91.44L228.07 91.95L236.43 92.47L244.78 92.98L253.14 93.49L261.50 94.01L269.86 94.52L278.21 95.03L286.57 95.55L294.93 96.06L303.29 96.57L311.64 97.09L320.00 97.60L328.36 98.11L336.71 98.63L345.07 99.14L353.43 99.65L361.79 100.17L370.14 100.68L378.50 101.19L386.86 101.71L395.22 102.22L403.57 102.73L411.93 103.25L420.29 103.76L428.65 104.27L437.00 104.79L445.36 105.30L453.72 105.81L462.08 106.33L470.43 106.84L478.79 107.35L487.15 107.87L495.51 108.38L503.86 108.89L512.22 109.41L520.58 109.92L528.94 110.43L537.29 110.95L545.65 111.46L554.01 111.97L562.37 112.49L570.72 113.00L579.08 113.51"/><path class="is-pivot-line" d="M193.00 65V76.00"/><circle class="is-pivot" cx="193.00" cy="82.00" r="6"/><text class="is-pivot-label" x="203.00" y="74" text-anchor="start">P25.000</text><rect class="is-body" x="529.00" y="133" width="90" height="48" rx="5"/><rect class="is-display" x="536.00" y="140" width="76" height="24" rx="2"/><text class="is-digital-value" x="574.00" y="159" text-anchor="middle">+0.060</text><text class="is-digital-unit" x="574.00" y="178" text-anchor="middle">mm</text><path class="is-stem" d="M574.00 133V118.20"/><circle class="is-contact" cx="574.00" cy="113.20" r="5"/><path class="is-toward" d="M120 105V150M114 141L120 150L126 141"/><text x="132" y="136">toward body</text><text x="574.00" y="198" text-anchor="end">contact 100.000 mm</text><text class="is-note" x="18" y="220">Illustrative pose and pivot — the digital value uses the exact model</text></svg><figcaption><h4>Before: +0.060 mm tilt, old zero at the left</h4><div class="is-readout"><span>Measuring span <strong>0–100 mm; 1 mm face margins</strong></span><span>Stored zero <strong>at 0.000 mm</strong></span><span>Next pivot <strong>P=(25.000, 0) mm</strong></span><span>Accumulated |d| <strong>0.0000 / 0.0040 mm/mm</strong></span><span>Left reference <strong>0.000 mm</strong></span><span>Center reference <strong>+0.030 mm</strong></span><span>Right reference <strong>+0.060 mm</strong></span><span>Right − left <strong>+0.060 mm</strong></span><span>Model summary — full sweep range <strong>0.060 mm</strong></span></div><h4>After −0.0006 about 25 mm: both ends +0.015 mm</h4><svg class="is-svg" viewBox="0 0 640 230" role="img" aria-label="Exaggerated top-view vise, chosen next pivot and functional digital indicator. Contact at 100.000 mm reads +0.015 mm. Moving the jaw toward the body increases the reading." focusable="false"><text class="is-title" x="18" y="25">Physical contact — deviation exaggerated, not to scale</text><path class="is-reference" d="M66 82H574M66 76V88M574 76V88"/><path class="is-vise" d="M60.92 89.80L69.28 89.80L77.63 89.80L85.99 89.80L94.35 89.80L102.71 89.80L111.06 89.80L119.42 89.80L127.78 89.80L136.14 89.80L144.49 89.80L152.85 89.80L161.21 89.80L169.57 89.80L177.92 89.80L186.28 89.80L194.64 89.80L203.00 89.80L211.35 89.80L219.71 89.80L228.07 89.80L236.43 89.80L244.78 89.80L253.14 89.80L261.50 89.80L269.86 89.80L278.21 89.80L286.57 89.80L294.93 89.80L303.29 89.80L311.64 89.80L320.00 89.80L328.36 89.80L336.71 89.80L345.07 89.80L353.43 89.80L361.79 89.80L370.14 89.80L378.50 89.80L386.86 89.80L395.22 89.80L403.57 89.80L411.93 89.80L420.29 89.80L428.65 89.80L437.00 89.80L445.36 89.80L453.72 89.80L462.08 89.80L470.43 89.80L478.79 89.80L487.15 89.80L495.51 89.80L503.86 89.80L512.22 89.80L520.58 89.80L528.94 89.80L537.29 89.80L545.65 89.80L554.01 89.80L562.37 89.80L570.72 89.80L579.08 89.80L579.08 55.80L570.72 55.80L562.37 55.80L554.01 55.80L545.65 55.80L537.29 55.80L528.94 55.80L520.58 55.80L512.22 55.80L503.86 55.80L495.51 55.80L487.15 55.80L478.79 55.80L470.43 55.80L462.08 55.80L453.72 55.80L445.36 55.80L437.00 55.80L428.65 55.80L420.29 55.80L411.93 55.80L403.57 55.80L395.22 55.80L386.86 55.80L378.50 55.80L370.14 55.80L361.79 55.80L353.43 55.80L345.07 55.80L336.71 55.80L328.36 55.80L320.00 55.80L311.64 55.80L303.29 55.80L294.93 55.80L286.57 55.80L278.21 55.80L269.86 55.80L261.50 55.80L253.14 55.80L244.78 55.80L236.43 55.80L228.07 55.80L219.71 55.80L211.35 55.80L203.00 55.80L194.64 55.80L186.28 55.80L177.92 55.80L169.57 55.80L161.21 55.80L152.85 55.80L144.49 55.80L136.14 55.80L127.78 55.80L119.42 55.80L111.06 55.80L102.71 55.80L94.35 55.80L85.99 55.80L77.63 55.80L69.28 55.80L60.92 55.80Z"/><path class="is-jaw" d="M60.92 89.80L69.28 89.80L77.63 89.80L85.99 89.80L94.35 89.80L102.71 89.80L111.06 89.80L119.42 89.80L127.78 89.80L136.14 89.80L144.49 89.80L152.85 89.80L161.21 89.80L169.57 89.80L177.92 89.80L186.28 89.80L194.64 89.80L203.00 89.80L211.35 89.80L219.71 89.80L228.07 89.80L236.43 89.80L244.78 89.80L253.14 89.80L261.50 89.80L269.86 89.80L278.21 89.80L286.57 89.80L294.93 89.80L303.29 89.80L311.64 89.80L320.00 89.80L328.36 89.80L336.71 89.80L345.07 89.80L353.43 89.80L361.79 89.80L370.14 89.80L378.50 89.80L386.86 89.80L395.22 89.80L403.57 89.80L411.93 89.80L420.29 89.80L428.65 89.80L437.00 89.80L445.36 89.80L453.72 89.80L462.08 89.80L470.43 89.80L478.79 89.80L487.15 89.80L495.51 89.80L503.86 89.80L512.22 89.80L520.58 89.80L528.94 89.80L537.29 89.80L545.65 89.80L554.01 89.80L562.37 89.80L570.72 89.80L579.08 89.80"/><path class="is-pivot-line" d="M193.00 65V76.00"/><circle class="is-pivot" cx="193.00" cy="82.00" r="6"/><text class="is-pivot-label" x="203.00" y="74" text-anchor="start">P25.000</text><rect class="is-body" x="529.00" y="133" width="90" height="48" rx="5"/><rect class="is-display" x="536.00" y="140" width="76" height="24" rx="2"/><text class="is-digital-value" x="574.00" y="159" text-anchor="middle">+0.015</text><text class="is-digital-unit" x="574.00" y="178" text-anchor="middle">mm</text><path class="is-stem" d="M574.00 133V94.80"/><circle class="is-contact" cx="574.00" cy="89.80" r="5"/><path class="is-toward" d="M120 105V150M114 141L120 150L126 141"/><text x="132" y="136">toward body</text><text x="574.00" y="198" text-anchor="end">contact 100.000 mm</text><text class="is-note" x="18" y="220">Illustrative pose and pivot — the digital value uses the exact model</text></svg><div class="is-readout"><span>Measuring span <strong>0–100 mm; 1 mm face margins</strong></span><span>Stored zero <strong>at 0.000 mm</strong></span><span>Next pivot <strong>P=(25.000, 0) mm</strong></span><span>Accumulated |d| <strong>0.0006 / 0.0040 mm/mm</strong></span><span>Left reference <strong>+0.015 mm</strong></span><span>Center reference <strong>+0.015 mm</strong></span><span>Right reference <strong>+0.015 mm</strong></span><span>Right − left <strong>0.000 mm</strong></span><span>Model summary — full sweep range <strong>0.000 mm</strong></span></div><h4>Optional convenience: re-zero at 50 mm</h4><div class="is-readout"><span>Measuring span <strong>0–100 mm; 1 mm face margins</strong></span><span>Stored zero <strong>at 50.000 mm</strong></span><span>Next pivot <strong>P=(25.000, 0) mm</strong></span><span>Accumulated |d| <strong>0.0006 / 0.0040 mm/mm</strong></span><span>Left reference <strong>0.000 mm</strong></span><span>Center reference <strong>0.000 mm</strong></span><span>Right reference <strong>0.000 mm</strong></span><span>Right − left <strong>0.000 mm</strong></span><span>Model summary — full sweep range <strong>0.000 mm</strong></span></div><p>The rotation removes the linear tilt while the chosen pivot determines the common offset. Re-zeroing changes the displayed references, not the alignment.</p></figcaption></figure><figure><h3>Equal endpoints can hide a local high spot</h3><svg class="is-svg" viewBox="0 0 640 230" role="img" aria-label="Exaggerated top-view vise, chosen next pivot and functional digital indicator. Contact at 50.000 mm reads +0.080 mm. Moving the jaw toward the body increases the reading." focusable="false"><text class="is-title" x="18" y="25">Physical contact — deviation exaggerated, not to scale</text><path class="is-reference" d="M66 82H574M66 76V88M574 76V88"/><path class="is-vise" d="M60.92 82.00L69.28 82.00L77.63 82.00L85.99 82.00L94.35 82.00L102.71 82.00L111.06 82.00L119.42 82.00L127.78 82.00L136.14 82.00L144.49 82.00L152.85 82.00L161.21 82.00L169.57 82.00L177.92 82.00L186.28 82.00L194.64 82.00L203.00 82.00L211.35 82.00L219.71 82.00L228.07 82.00L236.43 82.00L244.78 82.00L253.14 82.00L261.50 82.00L269.86 82.00L278.21 82.00L286.57 82.00L294.93 82.00L303.29 82.00L311.64 82.00L320.00 82.00L328.36 82.00L336.71 82.00L345.07 82.00L353.43 82.00L361.79 82.00L370.14 82.00L378.50 82.00L386.86 82.00L395.22 82.00L403.57 82.00L411.93 82.00L420.29 82.00L428.65 82.00L437.00 82.00L445.36 82.00L453.72 82.00L462.08 82.00L470.43 82.00L478.79 82.00L487.15 82.00L495.51 82.00L503.86 82.00L512.22 82.00L520.58 82.00L528.94 82.00L537.29 82.00L545.65 82.00L554.01 82.00L562.37 82.00L570.72 82.00L579.08 82.00L579.08 48.00L570.72 48.00L562.37 48.00L554.01 48.00L545.65 48.00L537.29 48.00L528.94 48.00L520.58 48.00L512.22 48.00L503.86 48.00L495.51 48.00L487.15 48.00L478.79 48.00L470.43 48.00L462.08 48.00L453.72 48.00L445.36 48.00L437.00 48.00L428.65 48.00L420.29 48.00L411.93 48.00L403.57 48.00L395.22 48.00L386.86 48.00L378.50 48.00L370.14 48.00L361.79 48.00L353.43 48.00L345.07 48.00L336.71 48.00L328.36 48.00L320.00 48.00L311.64 48.00L303.29 48.00L294.93 48.00L286.57 48.00L278.21 48.00L269.86 48.00L261.50 48.00L253.14 48.00L244.78 48.00L236.43 48.00L228.07 48.00L219.71 48.00L211.35 48.00L203.00 48.00L194.64 48.00L186.28 48.00L177.92 48.00L169.57 48.00L161.21 48.00L152.85 48.00L144.49 48.00L136.14 48.00L127.78 48.00L119.42 48.00L111.06 48.00L102.71 48.00L94.35 48.00L85.99 48.00L77.63 48.00L69.28 48.00L60.92 48.00Z"/><path class="is-jaw" d="M60.92 80.32L69.28 83.07L77.63 85.72L85.99 88.29L94.35 90.77L102.71 93.15L111.06 95.45L119.42 97.66L127.78 99.78L136.14 101.80L144.49 103.74L152.85 105.59L161.21 107.34L169.57 109.01L177.92 110.58L186.28 112.07L194.64 113.47L203.00 114.77L211.35 115.99L219.71 117.11L228.07 118.15L236.43 119.10L244.78 119.95L253.14 120.72L261.50 121.39L269.86 121.98L278.21 122.47L286.57 122.88L294.93 123.19L303.29 123.42L311.64 123.55L320.00 123.60L328.36 123.55L336.71 123.42L345.07 123.19L353.43 122.88L361.79 122.47L370.14 121.98L378.50 121.39L386.86 120.72L395.22 119.95L403.57 119.10L411.93 118.15L420.29 117.11L428.65 115.99L437.00 114.77L445.36 113.47L453.72 112.07L462.08 110.58L470.43 109.01L478.79 107.34L487.15 105.59L495.51 103.74L503.86 101.80L512.22 99.78L520.58 97.66L528.94 95.45L537.29 93.15L545.65 90.77L554.01 88.29L562.37 85.72L570.72 83.07L579.08 80.32"/><path class="is-pivot-line" d="M193.00 65V76.00"/><circle class="is-pivot" cx="193.00" cy="82.00" r="6"/><text class="is-pivot-label" x="203.00" y="74" text-anchor="start">P25.000</text><rect class="is-body" x="275.00" y="133" width="90" height="48" rx="5"/><rect class="is-display" x="282.00" y="140" width="76" height="24" rx="2"/><text class="is-digital-value" x="320.00" y="159" text-anchor="middle">+0.080</text><text class="is-digital-unit" x="320.00" y="178" text-anchor="middle">mm</text><path class="is-stem" d="M320.00 133V128.60"/><circle class="is-contact" cx="320.00" cy="123.60" r="5"/><path class="is-toward" d="M120 105V150M114 141L120 150L126 141"/><text x="132" y="136">toward body</text><text x="320.00" y="198" text-anchor="middle">contact 50.000 mm</text><text class="is-note" x="18" y="220">Illustrative pose and pivot — the digital value uses the exact model</text></svg><figcaption><div class="is-readout"><span>Measuring span <strong>0–100 mm; 1 mm face margins</strong></span><span>Stored zero <strong>at 0.000 mm</strong></span><span>Next pivot <strong>P=(25.000, 0) mm</strong></span><span>Accumulated |d| <strong>0.0000 / 0.0040 mm/mm</strong></span><span>Left reference <strong>0.000 mm</strong></span><span>Center reference <strong>+0.080 mm</strong></span><span>Right reference <strong>0.000 mm</strong></span><span>Right − left <strong>0.000 mm</strong></span><span>Model summary — full sweep range <strong>0.080 mm</strong></span></div><p>The endpoints both read 0.000 mm, while the center reads +0.080 mm. Traverse the whole jaw instead of checking only its ends.</p></figcaption></figure></div><p><strong>Model:</strong> physical jaw position is a + m·x + b·4(x/L)(1 − x/L). Displayed reading = response × physical position − the raw reading stored as zero. A small illustrative rotation d about world pivot P=(p, 0) updates m to m + d and a to a − p·d; the stored zero is unchanged. The fixed 100 mm measuring span is inset 1 mm from each end of the finite modeled face. This is a first-order small-angle model with |d| ≤ 0.001 mm/mm, 0.0001 mm/mm control steps, and total rotation travel ≤ 0.004. The step is model resolution, not real-vise quantization. It does not model adjustment force. The drawing exaggerates deviation and is not a literal scale.</p><p><strong>Worked example:</strong> over 100 mm, start with left 0.000 and right +0.060 mm. Apply d = −0.0006 about 25 mm: both ends become +0.015 mm, so the tilt is gone but the old zero reveals a common offset. About 50 mm both become +0.030 mm; about 0 mm both become 0.000 mm. Re-zeroing is optional convenience, not an alignment requirement. A real setup is accepted against the job requirement, not a universal tolerance from this model.</p><p class="is-source">Alignment procedure: <a href="https://ocw.mit.edu/courses/2-670-mechanical-engineering-tools-january-iap-2004/69ddc43986801c51a7fbfa97d6b5b63f_mill.pdf">MIT, Introduction to the Mill</a>, pp. 2–3. The comparison geometry and examples here are original.</p>
+      <!-- /INDICATOR-SWEEP-STATIC -->
+      <noscript><p>The controls require JavaScript. The model-derived examples above retain the comparison lesson for print and no-JavaScript readers.</p></noscript>
+    </div>
+  </div>
   <p><strong>Prove the sign first.</strong> Check which way the reading changes when the contact is displaced a known small amount toward the indicator body. With the response shown above, a higher right-end reading means that end is nearer the indicator: move it away. A lower right-end reading needs the opposite correction. Reverse the contact arrangement and the tap direction can reverse.</p>
   <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Read the whole sweep, not just two endpoints.</p>
-  <p><a class="button" data-practice-add="mill-vise-positive" href="../practice.html#mill-vise-positive">Practice tap direction</a></p>
+  <p><a class="button" data-practice-add="mill-vise-positive" href="../practice.html#mill-vise-positive">Practice tap direction</a> <a class="button" data-practice-add="indicator-rezero-left" href="../practice.html#indicator-rezero-left">Practice re-zeroing</a> <a class="button" data-practice-add="indicator-hidden-midspan" href="../practice.html#indicator-hidden-midspan">Practice full-sweep interpretation</a></p>
     </div>
   </details>
   <details class="xcard deck-slide" id="milling-workholding--parallels-establish-height-soft-jaws-establish-a-shaped-seat" data-card="milling-workholding--parallels-establish-height-soft-jaws-establish-a-shaped-seat">
@@ -3317,51 +3377,162 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <article class="article bundled" id="p-milling-chatter">
   <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Milling</span></div>
   <h1>Diagnosing Milling Chatter</h1>
-  <p class="lede">Recognize vibration in a cut and work through seating, rigidity, engagement, spindle speed and feed in a useful order.</p>
+  <p class="lede">Use the finish, setup and cutting conditions as evidence, then check the whole force path before changing one permitted variable at a time.</p>
 <div class="cardtools">
   <button type="button" data-act="expand">Expand all</button>
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="milling-chatter--chatter-is-vibration-of-the-cutting-system-that-leaves-a-repeating-pattern" data-card="milling-chatter--chatter-is-vibration-of-the-cutting-system-that-leaves-a-repeating-pattern">
-    <summary>Chatter is vibration of the cutting system that leaves a repeating pattern<span class="chev"></span></summary>
+  <details class="xcard deck-slide" id="milling-chatter--a-repeating-mark-or-loud-cut-is-evidence-not-a-diagnosis" data-card="milling-chatter--a-repeating-mark-or-loud-cut-is-evidence-not-a-diagnosis">
+    <summary>A repeating mark or loud cut is evidence, not a diagnosis<span class="chev"></span></summary>
     <div class="body">
-      <h2>Chatter is vibration of the cutting system that leaves a repeating pattern</h2>
-  <p>The tool, holder, spindle, workpiece and fixture can all vibrate. Chatter often produces a strong sound and repeated ripples on the surface. Ordinary tooth marks, runout and a loose part can also spoil a finish; a sound alone does not prove which component is responsible.</p>
-  <p>End the cut using the machine's operating procedure before inspecting or changing the setup. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a> for those rules.</p>
-  <p class="deeper-ref" id="deeper-ref-11">Supporting detail: <a href="#deeper-addendum-11"><strong>Addendum 11</strong></a> &mdash; How one tooth can leave trouble for the next.</p>
+      <h2>A repeating mark or loud cut is evidence, not a diagnosis</h2>
+  <p>A common mechanism, <strong>regenerative chatter</strong>, is self-excited: one cutting edge leaves a waviness that changes the chip thickness seen by the next edge, and the changing force can reinforce the motion. That mechanism does not describe every vibration or finish defect. A repeating surface pattern and a strong sound can be clues; they do not prove the cause by themselves.</p>
+  <p class="deeper-ref" id="deeper-ref-11">Supporting detail: <a href="#deeper-addendum-11"><strong>Addendum 11</strong></a> &mdash; Several faults can look or sound like chatter.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="milling-chatter--fix-seating-and-rigidity-before-tuning-the-cut" data-card="milling-chatter--fix-seating-and-rigidity-before-tuning-the-cut">
-    <summary>Fix seating and rigidity before tuning the cut<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-gate" id="milling-chatter--stop-the-cut-before-inspecting-or-changing-the-setup" data-card="milling-chatter--stop-the-cut-before-inspecting-or-changing-the-setup" data-card-edge="watch" style="--card-marker:var(--mark-watch)">
+    <summary>Stop the cut before inspecting or changing the setup<span class="card-tags"><span class="card-tag" data-marker="watch" style="--card-marker:var(--mark-watch)"><span class="marker-separator">; </span>Watch out</span></span><span class="chev"></span></summary>
     <div class="body">
-      <h2>Fix seating and rigidity before tuning the cut</h2>
-  <ol>
-    <li><strong>Check what changed.</strong> Look for a loose or lifted workpiece, incomplete holder seating, a damaged edge, packed chips or excessive runout. Correct the cause before another trial.</li>
-    <li><strong>Shorten and support.</strong> Reduce unnecessary tool and holder reach, improve the part's support and grip, and minimize quill extension where applicable. Keep the required shank engagement. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/tool-deflection.html" target="_blank" rel="noopener">Tool Stickout and Deflection</a> and <a class="xref-page" href="#p-milling-workholding">Milling Vises and Strap Clamps</a>.</li>
-    <li><strong>Reduce or smooth engagement.</strong> Review width and depth of cut, especially at inside corners where more of the cutter enters the material. A smaller radial engagement or revised path may remove the trigger. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/milling-operations.html" target="_blank" rel="noopener">Milling Operations</a>.</li>
-    <li><strong>Change spindle speed deliberately.</strong> Test a different permitted speed to change the excitation timing. A stable speed may be higher or lower; “always slow down” is not a complete rule.</li>
-    <li><strong>Recheck feed per tooth.</strong> When changing speed, review feed with it. Too little feed can rub, while excessive feed overloads the edge. Use the tool maker's range and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/feeds-and-speeds.html" target="_blank" rel="noopener">Feeds and Speeds</a>.</li>
-    <li><strong>Reconsider the tool.</strong> A different diameter, flute spacing, helix, or cutter geometry may suit the remaining reach and engagement better. Change one factor at a time and record the result.</li>
-  </ol>
-  <p>This is a diagnostic order, not a guarantee that every case needs every step. If the part moved, speed tuning is not the next experiment.</p>
+      <h2>Stop the cut before inspecting or changing the setup</h2>
+  <p>End the cut with the approved machine procedure before approaching or changing anything. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/equipment-operating-procedure.html" target="_blank" rel="noopener">Equipment Operating Procedure</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/machine-hazards.html" target="_blank" rel="noopener">Machine Hazards and Housekeeping</a> for the operating rules.</p>
+  <div class="gate"><strong>Do not tune around a part, tool or holder that moved.</strong> A shifted workpiece, incomplete seating, damaged edge or visibly slipping tool is a mechanical problem to correct or report before another cutting trial.</div>
     </div>
   </details>
-  <details class="xcard deck-slide" id="milling-chatter--use-the-location-of-the-symptom-to-choose-the-next-check" data-card="milling-chatter--use-the-location-of-the-symptom-to-choose-the-next-check">
-    <summary>Use the location of the symptom to choose the next check<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+  <details class="xcard deck-slide" id="milling-chatter--record-the-evidence-before-trying-another-cut" data-card="milling-chatter--record-the-evidence-before-trying-another-cut">
+    <summary>Record the evidence before trying another cut<span class="chev"></span></summary>
     <div class="body">
-      <h2>Use the location of the symptom to choose the next check</h2>
-  <table>
-    <thead><tr><th>Observation</th><th>First useful check</th></tr></thead>
-    <tbody>
-      <tr><td>Chatter began after fitting a longer tool.</td><td>Compare unsupported reach and holder engagement with the previous setup.</td></tr>
-      <tr><td>Straight walls cut cleanly; inside corners chatter.</td><td>Check the increase in radial engagement and the programmed corner path.</td></tr>
-      <tr><td>Only the unsupported end of a thin part vibrates.</td><td>Review part support and clamping without distorting the part.</td></tr>
-      <tr><td>A rigid, correctly seated setup chatters at one speed.</td><td>Try a permitted speed change and keep the intended chip load by reviewing feed.</td></tr>
-    </tbody>
-  </table>
+      <h2>Record the evidence before trying another cut</h2>
+  <p>Record where the symptom began, where it appears on the part, which operation and tool were active, and the actual speed, feed, engagement and holder projection. This creates a comparison for the next check instead of relying on sound or memory.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--trace-force-through-the-complete-cutting-system" data-card="milling-chatter--trace-force-through-the-complete-cutting-system">
+    <summary>Trace force through the complete cutting system<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Trace force through the complete cutting system</h2>
+  <figure class="fig-narrow">
+    <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MjAgNTcwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPlRyYWNlIHZpYnJhdGlvbiB0aHJvdWdoIHRoZSBtaWxsaW5nIHN5c3RlbTwvdGl0bGU+CjxkZXNjIGlkPSJkZXNjIj5Ud28gZm9yY2UgcGF0aHMgc2hhcmUgdGhlIG1hY2hpbmUgc3RydWN0dXJlIGFuZCBtZWV0IGF0IHRoZSBjdXQuIFRoZSB1cHBlciB0b29sIHBhdGggcnVucyBmcm9tIG1hY2hpbmUgYW5kIHNwaW5kbGUgdGhyb3VnaCBpbnRlcmZhY2UgYW5kIGhvbGRlciB0byB0aGUgY3V0dGVyLiBUaGUgbG93ZXIgd29yayBwYXRoIHJ1bnMgZnJvbSB0YWJsZSBhbmQgbWFjaGluZSB0aHJvdWdoIGZpeHR1cmUgdG8gd29ya3BpZWNlLiBFdmlkZW5jZSBhdCB0aGUgY3V0IGluY2x1ZGVzIHdoZXJlIHRoZSBwYXR0ZXJuIHN0YXJ0cywgZW5nYWdlbWVudCwgc3BlZWQgYW5kIGZlZWQsIGFuZCBjaGlwcy48L2Rlc2M+CjxkZWZzPgogIDxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI4IiBtYXJrZXJIZWlnaHQ9IjgiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMFoiIGZpbGw9IiMwMDIxNDQiLz48L21hcmtlcj4KICA8c3R5bGU+LnRpdGxle2ZvbnQ6NzAwIDI5cHggQXJpYWwsc2Fucy1zZXJpZjtmaWxsOiMwMDIxNDR9LmxhbmV7Zm9udDo3MDAgMjNweCBBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzAwMjE0NH0uaGVhZHtmb250OjcwMCAyMXB4IEFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMDAyMTQ0fS5ib2R5e2ZvbnQ6MjBweCBBcmlhbCxzYW5zLXNlcmlmO2ZpbGw6IzIwMjAyMH0uc21hbGx7Zm9udDoxOHB4IEFyaWFsLHNhbnMtc2VyaWY7ZmlsbDojMjAyMDIwfS5ib3h7ZmlsbDojZjVmMmVjO3N0cm9rZTojMDAyMTQ0O3N0cm9rZS13aWR0aDozfS5jdXR7ZmlsbDojZmZmNGQ1O3N0cm9rZTojZmY0NTAwO3N0cm9rZS13aWR0aDo0fS5saW5le3N0cm9rZTojMDAyMTQ0O3N0cm9rZS13aWR0aDo0O2ZpbGw6bm9uZTttYXJrZXItZW5kOnVybCgjYXJyb3cpfS5mcmFtZXtzdHJva2U6I2VjYWMwMDtzdHJva2Utd2lkdGg6NjtmaWxsOm5vbmV9PC9zdHlsZT4KPC9kZWZzPgo8cmVjdCB3aWR0aD0iOTIwIiBoZWlnaHQ9IjU3MCIgcng9IjE4IiBmaWxsPSIjZmZmIi8+Cjx0ZXh0IGNsYXNzPSJ0aXRsZSIgeD0iMzAiIHk9IjQ1Ij5UUkFDRSBCT1RIIEZPUkNFIFBBVEhTIEJFRk9SRSBUVU5JTkcgVEhFIENVVDwvdGV4dD4KPHRleHQgY2xhc3M9ImxhbmUiIHg9IjMwIiB5PSI4OCI+VG9vbCBzaWRlPC90ZXh0Pgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMCAxMDUpIj48cmVjdCBjbGFzcz0iYm94IiB3aWR0aD0iMTk1IiBoZWlnaHQ9IjExMCIgcng9IjEyIi8+PHRleHQgY2xhc3M9ImhlYWQiIHg9IjE1IiB5PSIzMSI+TWFjaGluZSArIHNwaW5kbGU8L3RleHQ+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNSIgeT0iNjIiPnJlcGVhdHMgYWZ0ZXIgc2V0dXA8L3RleHQ+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNSIgeT0iODciPmFibm9ybWFsIG1vdGlvbjwvdGV4dD48L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1NSAxMDUpIj48cmVjdCBjbGFzcz0iYm94IiB3aWR0aD0iMTk1IiBoZWlnaHQ9IjExMCIgcng9IjEyIi8+PHRleHQgY2xhc3M9ImhlYWQiIHg9IjE1IiB5PSIzMSI+SW50ZXJmYWNlICsgaG9sZGVyPC90ZXh0Pjx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iMTUiIHk9IjYyIj5zZWF0aW5nIOKAoiBjb25kaXRpb248L3RleHQ+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNSIgeT0iODciPnJ1bm91dCDigKIgcHJvamVjdGlvbjwvdGV4dD48L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ4MCAxMDUpIj48cmVjdCBjbGFzcz0iYm94IiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjExMCIgcng9IjEyIi8+PHRleHQgY2xhc3M9ImhlYWQiIHg9IjE1IiB5PSIzMSI+Q3V0dGVyPC90ZXh0Pjx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iMTUiIHk9IjYyIj53ZWFyIOKAoiBjaGlwcGVkIGVkZ2U8L3RleHQ+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNSIgeT0iODciPmJ1aWx0LXVwIGVkZ2U8L3RleHQ+PC9nPgo8dGV4dCBjbGFzcz0ibGFuZSIgeD0iMzAiIHk9IjM0MyI+V29yayBzaWRlPC90ZXh0Pgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMCAzNjApIj48cmVjdCBjbGFzcz0iYm94IiB3aWR0aD0iMTk1IiBoZWlnaHQ9IjExMCIgcng9IjEyIi8+PHRleHQgY2xhc3M9ImhlYWQiIHg9IjE1IiB5PSIzMSI+VGFibGUgKyBtYWNoaW5lPC90ZXh0Pjx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iMTUiIHk9IjYyIj5zdXBwb3J0aW5nIHN0cnVjdHVyZTwvdGV4dD48dGV4dCBjbGFzcz0ic21hbGwiIHg9IjE1IiB5PSI4NyI+YXV0aG9yaXplZCBpbnNwZWN0aW9uPC90ZXh0PjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU1IDM2MCkiPjxyZWN0IGNsYXNzPSJib3giIHdpZHRoPSIxOTUiIGhlaWdodD0iMTEwIiByeD0iMTIiLz48dGV4dCBjbGFzcz0iaGVhZCIgeD0iMTUiIHk9IjMxIj5GaXh0dXJlPC90ZXh0Pjx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iMTUiIHk9IjYyIj5zZWF0aW5nIOKAoiBsb2NhdG9yczwvdGV4dD48dGV4dCBjbGFzcz0ic21hbGwiIHg9IjE1IiB5PSI4NyI+Y2xhbXAtZm9yY2UgcGF0aDwvdGV4dD48L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ4MCAzNjApIj48cmVjdCBjbGFzcz0iYm94IiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjExMCIgcng9IjEyIi8+PHRleHQgY2xhc3M9ImhlYWQiIHg9IjE1IiB5PSIzMSI+V29ya3BpZWNlPC90ZXh0Pjx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iMTUiIHk9IjYyIj51bnN1cHBvcnRlZCBzcGFuPC90ZXh0Pjx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iMTUiIHk9Ijg3Ij50aGluIHdhbGwg4oCiIGRpc3RvcnRpb248L3RleHQ+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3MDAgMTA1KSI+PHJlY3QgY2xhc3M9ImN1dCIgd2lkdGg9IjE5MCIgaGVpZ2h0PSIzNjUiIHJ4PSIxNSIvPjx0ZXh0IGNsYXNzPSJoZWFkIiB4PSIxNSIgeT0iMzgiPlRIRSBDVVQ8L3RleHQ+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNSIgeT0iNzUiPndoZXJlIHBhdHRlcm4gYmVnaW5zPC90ZXh0Pjx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iMTUiIHk9IjEwNSI+ZW5nYWdlbWVudCArIHBhdGg8L3RleHQ+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNSIgeT0iMTM1Ij5zcGVlZCArIGZlZWQvdG9vdGg8L3RleHQ+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNSIgeT0iMTY1Ij5jaGlwIGV2YWN1YXRpb248L3RleHQ+PHBhdGggZD0iTTIwIDIyMHEyOC0zMCA1NiAwdDU2IDB0MzggMCIgc3Ryb2tlPSIjZmY0NTAwIiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiLz48dGV4dCBjbGFzcz0ic21hbGwiIHg9IjE1IiB5PSIyNzUiPk9ic2VydmUgbG9jYXRpb24sPC90ZXh0Pjx0ZXh0IGNsYXNzPSJzbWFsbCIgeD0iMTUiIHk9IjMwMiI+ZmluaXNoLCBzb3VuZCBhbmQ8L3RleHQ+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNSIgeT0iMzI5Ij5lZGdlIGNvbmRpdGlvbi48L3RleHQ+PC9nPgo8cGF0aCBjbGFzcz0ibGluZSIgZD0iTTIyNSAxNjBIMjU1TTQ1MCAxNjBINDgwTTY2MCAxNjBINzAwTTIyNSA0MTVIMjU1TTQ1MCA0MTVINDgwTTY2MCA0MTVINzAwIi8+CjxwYXRoIGNsYXNzPSJmcmFtZSIgZD0iTTEyNyAyMTVWMzYwIi8+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNDgiIHk9IjI3NSI+TWFjaGluZSBzdHJ1Y3R1cmU8L3RleHQ+PHRleHQgY2xhc3M9InNtYWxsIiB4PSIxNDgiIHk9IjMwMCI+Y29ubmVjdHMgYm90aCBzaWRlczwvdGV4dD4KPHRleHQgY2xhc3M9ImJvZHkiIHg9IjE2NyIgeT0iNTM1Ij5DdXR0aW5nIGZvcmNlIHRyYXZlbHMgdGhyb3VnaCBib3RoIHBhdGhzOyBmbGV4aWJpbGl0eSBhdCBhbnkgbGluayBjYW4gcmVzcG9uZC48L3RleHQ+Cjwvc3ZnPgo=" alt="Two connected force paths meet at the cut. The tool path runs from machine and spindle through the spindle interface, holder and collet, and cutter. The work path runs from the machine table through fixture and workholding to the workpiece. The cut, programmed engagement and chip evacuation connect both paths. Each link names evidence to inspect." data-natural-width="920" data-natural-height="570"></p>
+    <figcaption>The cut closes the loop. A stiff cutter cannot compensate for a moving part, and rigid workholding cannot correct a damaged holder interface.</figcaption>
+  </figure>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--route-suspected-machine-or-spindle-faults-to-authorized-staff" data-card="milling-chatter--route-suspected-machine-or-spindle-faults-to-authorized-staff">
+    <summary>Route suspected machine or spindle faults to authorized staff<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Route suspected machine or spindle faults to authorized staff</h2>
+  <p>After the cutter, holder, workholding, path and chips have been checked, a persistent symptom is evidence worth giving to authorized staff. Abnormal motion or a visibly damaged or contaminated interface also calls for that route. It does not prove one component failed. Do not remove covers, adjust bearings or gibs, or service a drawbar; manufacturer guidance treats those as separate checks for trained personnel.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--check-the-holder-collet-and-cutter-as-one-assembly" data-card="milling-chatter--check-the-holder-collet-and-cutter-as-one-assembly">
+    <summary>Check the holder, collet and cutter as one assembly<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Check the holder, collet and cutter as one assembly</h2>
+  <p>Confirm the correct holder and collet, complete seating, clean contact surfaces under the approved procedure, adequate shank engagement, and no visible damage. Compare tool and holder projection with the last stable setup. Inspect for wear, chipping, built-up material and chip damage. Check runout only with the approved instrument and method; compare it with the tool, holder and job requirements. See <a class="xref-page" href="#p-mill-toolholding">Mill Toolholders and Collets</a>, <a class="xref-page" href="#p-milling-cutter-selection">End Mill Anatomy and Cutter Selection</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/tool-deflection.html" target="_blank" rel="noopener">Tool Stickout and Deflection</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--check-the-fixture-workpiece-and-support" data-card="milling-chatter--check-the-fixture-workpiece-and-support">
+    <summary>Check the fixture, workpiece and support<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Check the fixture, workpiece and support</h2>
+  <p>Check that the fixture is seated and secured, the work is against its locators, clamps direct force into supports, and the part is not perched or springing. A symptom confined to an unsupported end, thin wall or one clamping orientation points first toward support and force direction. Do not keep tightening until the part distorts. See <a class="xref-page" href="#p-milling-workholding">Milling Vises and Strap Clamps</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--check-engagement-path-and-chip-evacuation" data-card="milling-chatter--check-engagement-path-and-chip-evacuation">
+    <summary>Check engagement, path and chip evacuation<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Check engagement, path and chip evacuation</h2>
+  <p>Compare where the pattern begins with changes in radial or axial engagement, entry and exit, cornering, cutter engagement, and chip evacuation. A clean straight wall followed by chatter in an inside corner is evidence to inspect the corner path and the sudden engagement change. Packed or re-cut chips call for the approved chip-control method and a review of the operation, not an automatic speed change. See <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/milling-operations.html" target="_blank" rel="noopener">Milling Operations</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/cutting-fluids.html" target="_blank" rel="noopener">Cutting Fluids and Application Methods</a>.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--it-changed-with-a-longer-tool-or-holder" data-card="milling-chatter--it-changed-with-a-longer-tool-or-holder">
+    <summary>It changed with a longer tool or holder<span class="chev"></span></summary>
+    <div class="body">
+      <h2>It changed with a longer tool or holder</h2>
+  <p><strong>Check:</strong> tool projection, holder projection, shank engagement and both interfaces. <strong>Next:</strong> restore the shortest permitted assembly that reaches the feature, then repeat the same cut conditions.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--straight-walls-are-clean-an-inside-corner-chatters" data-card="milling-chatter--straight-walls-are-clean-an-inside-corner-chatters">
+    <summary>Straight walls are clean; an inside corner chatters<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Straight walls are clean; an inside corner chatters</h2>
+  <p><strong>Check:</strong> the engaged arc, chip load through the corner and programmed path. <strong>Next:</strong> use an approved path or engagement change, then compare the same corner again.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--only-an-unsupported-or-thin-area-vibrates" data-card="milling-chatter--only-an-unsupported-or-thin-area-vibrates">
+    <summary>Only an unsupported or thin area vibrates<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Only an unsupported or thin area vibrates</h2>
+  <p><strong>Check:</strong> workpiece support, clamp-force path and local flexibility. <strong>Next:</strong> improve support or revise force direction without distorting the work; verify the setup before cutting.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--one-edge-is-chipped-or-marks-repeat-once-per-revolution" data-card="milling-chatter--one-edge-is-chipped-or-marks-repeat-once-per-revolution">
+    <summary>One edge is chipped or marks repeat once per revolution<span class="chev"></span></summary>
+    <div class="body">
+      <h2>One edge is chipped or marks repeat once per revolution</h2>
+  <p><strong>Check:</strong> edge condition, chip re-cutting, holder seating and runout. <strong>Next:</strong> correct the physical cause or replace the damaged tool before tuning speed.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--it-persists-after-the-student-controlled-setup-checks" data-card="milling-chatter--it-persists-after-the-student-controlled-setup-checks">
+    <summary>It persists after the student-controlled setup checks<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>It persists after the student-controlled setup checks</h2>
+  <p><strong>Check:</strong> after the cutter, holder and workholding are verified, ask whether the symptom still follows the same path, engagement or chip condition. <strong>Next:</strong> if it persists across different permitted cutting conditions, stop and give the complete evidence to authorized staff. It is evidence for inspection, not proof of a spindle fault.</p>
   <p><a class="button" data-practice-add="mill-chatter-reach" href="../practice.html#mill-chatter-reach">Practice chatter diagnosis</a></p>
-  <p class="deeper-ref" id="deeper-ref-12">Supporting detail: <a href="#deeper-addendum-12"><strong>Addendum 12</strong></a> &mdash; Public demonstration and application reference.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--clear-mechanical-causes-and-unnecessary-leverage-first" data-card="milling-chatter--clear-mechanical-causes-and-unnecessary-leverage-first">
+    <summary>Clear mechanical causes and unnecessary leverage first<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Clear mechanical causes and unnecessary leverage first</h2>
+  <ol>
+    <li><strong>Clear mechanical causes first.</strong> Verify seating, condition, projection, support and chip clearance. Do not use a parameter change to hide motion or damage.</li>
+    <li><strong>Reduce unnecessary leverage.</strong> Shorten the permitted tool and holder projection, improve support, or choose a more suitable assembly. Keep the required shank engagement and feature clearance.</li>
+  </ol>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--review-engagement-and-cutter-geometry-after-the-setup-is-sound" data-card="milling-chatter--review-engagement-and-cutter-geometry-after-the-setup-is-sound">
+    <summary>Review engagement and cutter geometry after the setup is sound<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Review engagement and cutter geometry after the setup is sound</h2>
+  <ol start="3">
+    <li><strong>Review engagement and force direction.</strong> A smaller radial or axial engagement, different entry, or revised corner path may reduce the force variation. Stay inside the approved process and tool limits.</li>
+    <li><strong>Reconsider cutter geometry.</strong> Diameter, flute count and pitch, helix, edge geometry and material suitability can change force and excitation. Record the selected tool and why it was changed.</li>
+  </ol>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--run-one-permitted-speed-trial" data-card="milling-chatter--run-one-permitted-speed-trial">
+    <summary>Run one permitted speed trial<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Run one permitted speed trial</h2>
+  <p>A stable speed can be higher or lower. Change to one permitted speed, then compare the same feature. Do not assume that slowing down is always the answer.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--review-feed-when-speed-changes" data-card="milling-chatter--review-feed-when-speed-changes">
+    <summary>Review feed when speed changes<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Review feed when speed changes</h2>
+  <p>If the trial is intended to preserve feed per tooth, calculate the matching table feed rather than changing chip load accidentally. Too little feed can rub; excessive feed can overload the edge. Use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/feeds-and-speeds.html" target="_blank" rel="noopener">Feeds and Speeds</a> and the tool maker's data.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="milling-chatter--record-the-controlled-result" data-card="milling-chatter--record-the-controlled-result">
+    <summary>Record the controlled result<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Record the controlled result</h2>
+  <p>Record the observation, the one intentional change and the result. If two settings move together to preserve a stated quantity such as feed per tooth, record both and the quantity held constant. That is one controlled trial, not two unexplained changes.</p>
+    </div>
+  </details>
+  <details class="xcard deck-wiki-only" id="milling-chatter--manufacturer-references-behind-this-diagnostic-order" data-card="milling-chatter--manufacturer-references-behind-this-diagnostic-order">
+    <summary>Manufacturer references behind this diagnostic order<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Manufacturer references behind this diagnostic order</h2>
+  <ul>
+    <li><a href="https://www.haascnc.com/video/chatter/rkpxfzx3sxe.html">Haas: Avoid Chatter on Your Mill</a> is the existing public demonstration.</li>
+    <li><a href="https://www.haascnc.com/service/troubleshooting-and-how-to/troubleshooting/mill-chatter---troubleshooting.html">Haas TG0100: Mill Chatter Troubleshooting</a> separates tool wear, projection, chip load, engaged flutes, toolpath, corners, coolant, drawbar force and machine support. Its drawbar and foundation actions belong to authorized machine work.</li>
+    <li><a href="https://knowledgebase.tormach.com/pcnc-440/chatter">Tormach: Chatter</a> separates tool wear, toolholding, workholding and toolpath causes. Its drawbar, pressure and gib instructions are machine-specific maintenance—not generic student steps.</li>
+    <li><a href="https://www.sandvik.coromant.com/en-gb/tools/silent-tools/what-is-silent-tools/application-guide-silent-tools/milling-appl-guide">Sandvik Coromant: milling vibration guidance</a> connects workpiece and machine stability with overhang, engagement, force direction, pitch and toolpath.</li>
+    <li><a href="https://www.secotools.com/article/what_is_vibration_in_machining_and_how_to_reduce_v?language=en">Seco: vibration in machining</a> explains resonance, overhang and why a stable speed may be above or below the current speed.</li>
+    <li><a href="https://www.secotools.com/article/n11_tool_wear_patterns_when_machining_with_end_mil?language=en">Seco: end-mill wear patterns</a> distinguishes chipping, built-up edge and chip-evacuation damage.</li>
+  </ul>
     </div>
   </details>
 </div>
@@ -3461,7 +3632,11 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <article>
         <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Milling</span><span class="sep">/</span><a href="#p-milling-workholding">Milling Vises and Strap Clamps</a></div>
         <h2><span class="deeper-addendum-number">Addendum 2.</span> Read the whole sweep, not just two endpoints</h2>
-        <p>A smooth change suggests angular misalignment. A sudden jump at one spot suggests a chip, burr, damaged jaw or unstable contact. Tightening can move the vise, which is why the final sweep matters. Equal endpoint readings alone cannot reveal a bowed or damaged face between them.</p>
+        <figure>
+      <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPkludGVycHJldGluZyBhIGZpeGVkLWphdyBzd2VlcDwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPlRvcCB2aWV3LiBUaGUgbGVmdCBlbmQgaXMgdGhlIHBpdm90LiBUaGUgcmlnaHQgZW5kIHJlYWRzIHBsdXMgMC4wNiBtaWxsaW1ldGVyLCB3aXRoIHBvc2l0aXZlIHJlYWRpbmdzIGRlZmluZWQgYXMgdGhlIGphdyBtb3ZpbmcgdG93YXJkIHRoZSBpbmRpY2F0b3IuIFRhcCB0aGUgcmlnaHQgZW5kIGF3YXkgZnJvbSB0aGUgaW5kaWNhdG9yLiBUaWx0IGlzIGV4YWdnZXJhdGVkLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0NjAiIHJ4PSIxMiIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjMiIGZpbGw9IiMwMDIxNDQiPgo8dGV4dCB4PSIyOCIgeT0iMzgiIGZvbnQtd2VpZ2h0PSJib2xkIj5GSVhFRCBKQVcg4oCiIFRPUCBWSUVXIOKAoiBUSUxUIEVYQUdHRVJBVEVEPC90ZXh0Pgo8cGF0aCBkPSJNMTE1IDEzNUg2ODAiIHN0cm9rZT0iIzYwNzA4MCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI4IDYiLz48dGV4dCB4PSIzMTAiIHk9IjEwOCI+VGFyZ2V0OiBwYXJhbGxlbCB0byBYIHRyYXZlbDwvdGV4dD4KPHBhdGggZD0iTTExNSAxMzVMNjgwIDE3MFYyMjBMMTE1IDE4NVoiIGZpbGw9IiNjZGQ4ZTIiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxjaXJjbGUgY3g9IjE0NSIgY3k9IjE1NCIgcj0iOCIgZmlsbD0iIzAwMjE0NCIvPjx0ZXh0IHg9IjMwIiB5PSI4NiI+TGVmdCBwaXZvdDwvdGV4dD48cGF0aCBkPSJNMTE1IDkyTDE0MyAxNDMiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik02ODAgMTU4Vjk5bS04IDEzIDgtMTMgOCAxMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjQiLz4KPHRleHQgeD0iNTY1IiB5PSI2NiIgZmlsbD0iIzAwMjE0NCI+VGFwIHJpZ2h0IGVuZCBhd2F5PC90ZXh0Pgo8cGF0aCBkPSJNMTU0IDI0Mkg2NDRtLTEyLTggMTIgOC0xMiA4IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSIyMTAiIHk9IjI4MCI+Q29udGFjdC1wb2ludCBzd2VlcDogbGVmdCDihpIgcmlnaHQ8L3RleHQ+CjxjaXJjbGUgY3g9IjE0NSIgY3k9IjMzMCIgcj0iMzAiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTE0NSAzMDBWMTg5IiBzdHJva2U9IiMwMDIxNDQiIHN0cm9rZS13aWR0aD0iMyIvPjxjaXJjbGUgY3g9IjE0NSIgY3k9IjE4OCIgcj0iNSIgZmlsbD0iIzAwMjE0NCIvPjxwYXRoIGQ9Ik0xNDUgMzMwbC0xNS0xNiIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz4KPGNpcmNsZSBjeD0iNjc1IiBjeT0iMzMwIiByPSIzMCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMDAyMTQ0IiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNNjc1IDMwMFYyMjEiIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIzIi8+PGNpcmNsZSBjeD0iNjc1IiBjeT0iMjIwIiByPSI1IiBmaWxsPSIjMDAyMTQ0Ii8+PHBhdGggZD0iTTY3NSAzMzBsMTYtMTciIHN0cm9rZT0iIzAwMjE0NCIgc3Ryb2tlLXdpZHRoPSIzIi8+Cjx0ZXh0IHg9IjkxIiB5PSIzODgiPjAuMDAgbW08L3RleHQ+PHRleHQgeD0iNjA1IiB5PSIzODgiPiswLjA2IG1tPC90ZXh0Pgo8dGV4dCB4PSIyNjMiIHk9IjMzMCI+SW5kaWNhdG9yIG9uIHRoaXMgc2lkZTwvdGV4dD48dGV4dCB4PSIyNTQiIHk9IjM2MSI+VHdvIHBvc2l0aW9ucyBzaG93bjwvdGV4dD4KPHRleHQgeD0iMjgiIHk9IjQzMyIgZm9udC13ZWlnaHQ9ImJvbGQiPkRlZmluZWQgcmVzcG9uc2U6IGphdyB0b3dhcmQgaW5kaWNhdG9yIOKGkiBoaWdoZXIgcmVhZGluZzwvdGV4dD4KPC9nPjwvc3ZnPgo=" alt="Top-view fixed jaw sweep: indicator body on the operator side; increasing readings mean the jaw is closer to the indicator. Left reads zero and right plus 0.06 mm, so move the right end away from the indicator." data-natural-width="800" data-natural-height="460"></p>
+      <figcaption>The simplified direction diagram is another view of the linear preset. Jaw tilt is exaggerated; the traverse arrow follows the contact point and does not name physical table travel.</figcaption>
+    </figure>
+    <p>A smooth change suggests angular misalignment. A sudden jump at one spot suggests a chip, burr, damaged jaw or unstable contact. Tightening can move the vise, which is why the final sweep matters. Equal endpoint readings alone cannot reveal a bowed or damaged face between them.</p>
     <p>Public demonstration: <a href="https://www.haascnc.com/video/tipoftheday/cn05fx55pqc.html">Haas: How to Square and Indicate a Vise</a>. The alignment principle transfers; machine controls do not.</p>
         <p class="deeper-back"><a href="#deeper-ref-2">Back to reference 2</a></p>
       </article>
@@ -3535,18 +3710,15 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li class="deeper-addendum" id="deeper-addendum-11" value="11">
       <article>
         <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Milling</span><span class="sep">/</span><a href="#p-milling-chatter">Diagnosing Milling Chatter</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 11.</span> How one tooth can leave trouble for the next</h2>
-        <p>A vibrating edge leaves a wavy surface. The next edge encounters changing chip thickness, which changes the force and can reinforce the vibration. This feedback is called regenerative chatter. Tooth impacts can also excite a flexible setup. Speed changes the timing; stiffness and engagement change how strongly the system responds.</p>
+        <h2><span class="deeper-addendum-number">Addendum 11.</span> Several faults can look or sound like chatter</h2>
+        <ul>
+      <li><strong>Runout or one damaged edge</strong> can make one flute carry more load and leave uneven tooth marks or non-uniform edge wear.</li>
+      <li><strong>Rubbing or built-up edge</strong> can smear material, generate heat and produce a poor finish without a regenerative vibration.</li>
+      <li><strong>Chip re-cutting</strong> can scratch the finish and damage edges when chips remain in the cutting zone.</li>
+      <li><strong>A forced vibration</strong> follows a repeating input from the cutter, interrupted cut, drive or surrounding system. Chatter is the self-reinforcing case; both still require finding the flexible path and the excitation.</li>
+    </ul>
+    <p>After the approved safe stop, inspect the pattern, cutter and setup together. Sound is useful for noticing a change, not for identifying the failed component.</p>
         <p class="deeper-back"><a href="#deeper-ref-11">Back to reference 11</a></p>
-      </article>
-    </li>
-    <li class="deeper-addendum" id="deeper-addendum-12" value="12">
-      <article>
-        <div class="crumb"><span>Machining</span><span class="sep">/</span><span>Milling</span><span class="sep">/</span><a href="#p-milling-chatter">Diagnosing Milling Chatter</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 12.</span> Public demonstration and application reference</h2>
-        <p><a href="https://www.haascnc.com/video/chatter/rkpxfzx3sxe.html">Haas: Avoid Chatter on Your Mill</a> is a public demonstration. <a href="https://videos.sandvik.coromant.com/tips-film-long-overhang">Sandvik Coromant: Long overhang—optimizing machining conditions</a> discusses reach, force direction and tool choices. Neither supplies a universal speed for a different setup.</p>
-    <p><a href="https://knowledgebase.tormach.com/1100mx/chatter">Tormach's chatter troubleshooting reference</a> covers wear, toolholding, workholding and toolpath checks. Machine-specific settings in that reference apply only to the configuration it describes.</p>
-        <p class="deeper-back"><a href="#deeper-ref-12">Back to reference 12</a></p>
       </article>
     </li>
   </ol>
@@ -3578,6 +3750,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   var PAGE = document.body.getAttribute('data-page') || 'site';
   var $  = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* Horizontal arrows belong to a focused scroll region before they belong
+     to page or presentation navigation. Test the actual focused element and
+     its ancestors rather than naming a table class: any real horizontal
+     overflow with native scrolling gets to keep both arrows, including at
+     either edge where falling through would unexpectedly leave the page. */
+  function focusedHorizontalScrollerOwns(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return false;
+    var node = document.activeElement;
+    while (node && node !== document.documentElement) {
+      if (node.nodeType === 1) {
+        var overflow = getComputedStyle(node).overflowX;
+        if (/^(auto|scroll|overlay)$/.test(overflow) && node.scrollWidth > node.clientWidth) return true;
+      }
+      node = node.parentElement;
+    }
+    return false;
+  }
 
   /* ---- theme ------------------------------------------------------------
      Three states: light, dark, and system (no attribute). The inline head
@@ -4056,6 +4246,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       addEventListener('keydown', function (e) {
         if (e.metaKey || e.ctrlKey || e.altKey) return;
         if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        if (focusedHorizontalScrollerOwns(e)) return;
         switch (e.key) {
           case 'ArrowRight': case 'PageDown': case ' ': e.preventDefault(); go(at() + 1); break;
           case 'ArrowLeft':  case 'PageUp':            e.preventDefault(); go(at() - 1); break;
@@ -4067,6 +4258,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       addEventListener('keydown', function (e) {
         if (e.metaKey || e.ctrlKey || e.altKey) return;
         if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        if (focusedHorizontalScrollerOwns(e)) return;
         if (e.key === 'ArrowRight' && next) { location.href = urlFor(next, false); }
         if (e.key === 'ArrowLeft'  && prev) { location.href = urlFor(prev, false); }
       });
@@ -5319,6 +5511,253 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
   })();
 })();
+(function (root, factory) {
+  'use strict';
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiIndicatorSweep = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  var PRESETS = Object.freeze({
+    slope: Object.freeze({ kind: 'slope', length: 100, margin: 1, a: 0, m: 0.0006, bump: 0, pivot: 25, pivotY: 0, travel: 0, response: 1, zeroX: 0, zeroValue: 0, position: 100 }),
+    aligned: Object.freeze({ kind: 'aligned', length: 100, margin: 1, a: 0, m: 0, bump: 0, pivot: 25, pivotY: 0, travel: 0, response: 1, zeroX: 0, zeroValue: 0, position: 100 }),
+    bump: Object.freeze({ kind: 'bump', length: 100, margin: 1, a: 0, m: 0, bump: 0.08, pivot: 25, pivotY: 0, travel: 0, response: 1, zeroX: 0, zeroValue: 0, position: 50 })
+  });
+  function finite(v, key) {
+    if (!Number.isFinite(v)) throw new RangeError(key + ' must be a finite number');
+    return v;
+  }
+  function onIncrementGrid(v) { return Math.abs(v / 0.0001 - Math.round(v / 0.0001)) <= 1e-9; }
+  function validate(s) {
+    if (!s || !Object.prototype.hasOwnProperty.call(PRESETS, s.kind)) throw new RangeError('Choose a defined jaw case');
+    finite(s.length, 'Sweep length'); finite(s.margin, 'Face margin'); finite(s.a, 'Common offset'); finite(s.m, 'Linear slope'); finite(s.bump, 'Midspan bump');
+    finite(s.pivot, 'Chosen pivot'); finite(s.pivotY, 'Pivot y'); finite(s.travel, 'Accumulated rotation travel');
+    finite(s.zeroX, 'Zero position'); finite(s.zeroValue, 'Stored zero reading'); finite(s.position, 'Contact position');
+    if (s.length !== 100) throw new RangeError('This lesson models one 100 mm sweep');
+    if (s.margin !== 1) throw new RangeError('This lesson requires a 1 mm face margin at each end');
+    if (Math.abs(s.a) > 0.25) throw new RangeError('Common offset must stay within ±0.25 mm');
+    if (Math.abs(s.m) > 0.002) throw new RangeError('Linear slope must stay within ±0.002 mm per mm');
+    if (Math.abs(s.bump) > 0.2) throw new RangeError('Midspan bump must stay within ±0.20 mm');
+    if (s.pivotY !== 0) throw new RangeError('The illustrative world pivot uses y = 0 mm');
+    if (s.travel < 0 || s.travel > 0.004) throw new RangeError('Accumulated rotation travel must stay from 0 to 0.004');
+    if (!onIncrementGrid(s.travel)) throw new RangeError('Accumulated rotation travel must use 0.0001 mm/mm steps');
+    if (s.response !== 1 && s.response !== -1) throw new RangeError('Contact response must be +1 or -1');
+    if (s.pivot < 0 || s.pivot > s.length || s.zeroX < 0 || s.zeroX > s.length || s.position < 0 || s.position > s.length) throw new RangeError('Pivot, contact and zero positions must lie on the sweep');
+    return s;
+  }
+  // Positive physical displacement means the jaw is closer to the indicator body.
+  function surface(s, x) {
+    validate(s); finite(x, 'Position');
+    if (x < -s.margin || x > s.length + s.margin) throw new RangeError('Position must lie on the finite vise face');
+    var t = x / s.length;
+    return s.a + s.m * x + s.bump * 4 * t * (1 - t);
+  }
+  function raw(s, x) { return validate(s).response * surface(s, x); }
+  // zeroValue is the raw comparator value stored when the bezel/reference was set.
+  // Geometry can change later without silently changing that stored reference.
+  function reading(s, x) { return raw(s, x) - validate(s).zeroValue; }
+  function samples(s, count) {
+    validate(s); count = count === undefined ? 41 : count;
+    if (!Number.isInteger(count) || count < 3 || count > 501) throw new RangeError('Sample count must be an integer from 3 to 501');
+    return Array.from({ length: count }, function (_, i) {
+      var x = s.length * i / (count - 1);
+      return { x: x, surface: surface(s, x), reading: reading(s, x) };
+    });
+  }
+  function result(s) {
+    validate(s);
+    var candidates = [0, s.length], linear = s.m * s.length;
+    // The ideal bump is quadratic. Include its exact stationary point so the lesson's
+    // peak is a model result, not an artifact of the drawing's sampling interval.
+    if (s.bump !== 0) {
+      var t = (4 * s.bump + linear) / (8 * s.bump);
+      if (t > 0 && t < 1) candidates.push(t * s.length);
+    }
+    var readings = candidates.map(function (x) { return reading(s, x); });
+    var min = Math.min.apply(null, readings), max = Math.max.apply(null, readings);
+    return Object.freeze({
+      left: reading(s, 0), center: reading(s, s.length / 2), right: reading(s, s.length),
+      endpointDifference: reading(s, s.length) - reading(s, 0), range: max - min,
+      min: min, max: max, physicalEndpointDifference: surface(s, s.length) - surface(s, 0)
+    });
+  }
+  function withZero(s, x) {
+    validate(s); finite(x, 'Zero position');
+    if (x < 0 || x > s.length) throw new RangeError('Zero position must lie on the sweep');
+    return Object.assign({}, s, { zeroX: x, zeroValue: raw(s, x) });
+  }
+  function withResponse(s, response) {
+    validate(s);
+    var next = Object.assign({}, s, { response: response, zeroValue: 0 });
+    validate(next);
+    return withZero(next, s.zeroX);
+  }
+  function withPivot(s, pivot) {
+    validate(s); finite(pivot, 'Chosen pivot');
+    var next = Object.assign({}, s, { pivot: pivot });
+    return validate(next);
+  }
+  function rotate(s, increment, pivot) {
+    validate(s); finite(increment, 'Rotation increment'); finite(pivot, 'Chosen pivot');
+    // First-order small-angle pose update over this lesson's fixed 100 mm span.
+    // It illustrates alignment geometry; it does not model adjustment forces.
+    if (Math.abs(increment) > 0.001) throw new RangeError('Rotation increment must stay within ±0.001 mm per mm');
+    if (!onIncrementGrid(increment)) throw new RangeError('Rotation increment must be a multiple of 0.0001 mm per mm');
+    increment = Math.round(increment / 0.0001) * 0.0001;
+    var travel = Math.round((s.travel + Math.abs(increment)) / 0.0001) * 0.0001;
+    var next = Object.assign({}, s, { pivot: pivot, m: s.m + increment, a: s.a - pivot * increment, travel: travel });
+    return validate(next);
+  }
+  function format(v) { return (Math.abs(v) < 0.0005 ? 0 : v).toFixed(3); }
+  function formatFine(v) { return (Math.abs(v) < 0.00005 ? 0 : v).toFixed(4); }
+  return Object.freeze({ PRESETS: PRESETS, DEFAULT: PRESETS.slope, validate: validate, surface: surface,
+    raw: raw, reading: reading, samples: samples, result: result, withZero: withZero, withResponse: withResponse,
+    withPivot: withPivot, rotate: rotate, format: format, formatFine: formatFine });
+});
+
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiIndicatorSweep);
+  if (node) module.exports = api; else root.CourseWikiIndicatorSweepDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  function n(v) { return Number(v).toFixed(2); }
+  function signed(v) { var f = M.format(v); return v > 0.0005 ? '+' + f : v < -0.0005 ? '−' + M.format(Math.abs(v)) : f; }
+  function esc(v) { return String(v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  function draw(s) {
+    M.validate(s);
+    var pts = M.samples(s, 61), x0 = 66, x1 = 574, w = x1 - x0;
+    var facePts = Array.from({ length: 63 }, function (_, i) {
+      var xx = -s.margin + (s.length + 2 * s.margin) * i / 62;
+      return { x: xx, surface: M.surface(s, xx) };
+    });
+    var physicalExtent = Math.max.apply(null, facePts.map(function (p) { return Math.abs(p.surface); }).concat([0.08]));
+    // Preserve the useful exaggeration for hundredths while keeping every admitted
+    // ±1 mm adjustment inside the physical panel.
+    var physicalScale = Math.min(520, 44 / physicalExtent);
+    function x(v) { return x0 + v / s.length * w; }
+    // The indicator body is below the jaw in this top view; positive physical
+    // displacement is therefore drawn downward, toward the body.
+    function jawY(v) { return 82 + v * physicalScale; }
+    var jaw = facePts.map(function (p, i) { return (i ? 'L' : 'M') + n(x(p.x)) + ' ' + n(jawY(p.surface)); }).join('');
+    var linear = facePts.map(function (p) { return { x: p.x, y: jawY(s.a + s.m * p.x) }; });
+    var vise = linear.map(function (p, i) { return (i ? 'L' : 'M') + n(x(p.x)) + ' ' + n(p.y); }).join('') +
+      linear.slice().reverse().map(function (p) { return 'L' + n(x(p.x)) + ' ' + n(p.y - 34); }).join('') + 'Z';
+    var contactX = x(s.position), contactY = jawY(M.surface(s, s.position));
+    var contactAnchor = s.position < s.length * .2 ? 'start' : s.position > s.length * .8 ? 'end' : 'middle';
+    // P=(p,0) is a world reference, so its marker stays on y=0 even as the
+    // vise pose moves. The dashed leader shows its relation to the vise.
+    var pivotX = x(s.pivot), pivotY = jawY(s.pivotY);
+    var pivotLineEnd = pivotY < 65 ? pivotY + 6 : pivotY - 6;
+    var pivotAtRight = s.pivot > s.length * .8, pivotAnchor = pivotAtRight ? 'end' : 'start';
+    var pivotLabelX = pivotX + (pivotAtRight ? -10 : 10);
+    var toward = s.response === 1 ? 'increases' : 'decreases';
+    var current = signed(M.reading(s, s.position));
+    return '<svg class="is-svg" viewBox="0 0 640 230" role="img" aria-label="' + esc('Exaggerated top-view vise, chosen next pivot and functional digital indicator. Contact at ' + M.format(s.position) + ' mm reads ' + current + ' mm. Moving the jaw toward the body ' + toward + ' the reading.') + '" focusable="false">' +
+      '<text class="is-title" x="18" y="25">Physical contact — deviation exaggerated, not to scale</text>' +
+      '<path class="is-reference" d="M' + x0 + ' 82H' + x1 + 'M' + x0 + ' 76V88M' + x1 + ' 76V88"/><path class="is-vise" d="' + vise + '"/><path class="is-jaw" d="' + jaw + '"/>' +
+      '<path class="is-pivot-line" d="M' + n(pivotX) + ' 65V' + n(pivotLineEnd) + '"/><circle class="is-pivot" cx="' + n(pivotX) + '" cy="' + n(pivotY) + '" r="6"/><text class="is-pivot-label" x="' + n(pivotLabelX) + '" y="74" text-anchor="' + pivotAnchor + '">P' + M.format(s.pivot) + '</text>' +
+      '<rect class="is-body" x="' + n(contactX - 45) + '" y="133" width="90" height="48" rx="5"/><rect class="is-display" x="' + n(contactX - 38) + '" y="140" width="76" height="24" rx="2"/><text class="is-digital-value" x="' + n(contactX) + '" y="159" text-anchor="middle">' + current + '</text><text class="is-digital-unit" x="' + n(contactX) + '" y="178" text-anchor="middle">mm</text><path class="is-stem" d="M' + n(contactX) + ' 133V' + n(contactY + 5) + '"/>' +
+      '<circle class="is-contact" cx="' + n(contactX) + '" cy="' + n(contactY) + '" r="5"/>' +
+      '<path class="is-toward" d="M120 105V150M114 141L120 150L126 141"/><text x="132" y="136">toward body</text>' +
+      '<text x="' + n(contactX) + '" y="198" text-anchor="' + contactAnchor + '">contact ' + M.format(s.position) + ' mm</text>' +
+      '<text class="is-note" x="18" y="220">Illustrative pose and pivot — the digital value uses the exact model</text>' +
+      '</svg>';
+  }
+  function readout(s) {
+    var r = M.result(s);
+    return '<div class="is-readout"><span>Measuring span <strong>0–100 mm; 1 mm face margins</strong></span><span>Stored zero <strong>at ' + M.format(s.zeroX) + ' mm</strong></span><span>Next pivot <strong>P=(' + M.format(s.pivot) + ', 0) mm</strong></span><span>Accumulated |d| <strong>' + M.formatFine(s.travel) + ' / 0.0040 mm/mm</strong></span><span>Left reference <strong>' + signed(r.left) + ' mm</strong></span><span>Center reference <strong>' + signed(r.center) + ' mm</strong></span><span>Right reference <strong>' + signed(r.right) + ' mm</strong></span><span>Right − left <strong>' + signed(r.endpointDifference) + ' mm</strong></span><span>Model summary — full sweep range <strong>' + M.format(r.range) + ' mm</strong></span></div>';
+  }
+  function staticLesson() {
+    var slope = Object.assign({}, M.PRESETS.slope), rotated = M.rotate(slope, -0.0006, 25);
+    var rezeroed = M.withZero(rotated, 50), bump = Object.assign({}, M.PRESETS.bump);
+    return '<div class="is-static-grid"><figure><h3>Rotate about a chosen illustrative pivot</h3>' + draw(slope) + '<figcaption><h4>Before: +0.060 mm tilt, old zero at the left</h4>' + readout(slope) + '<h4>After −0.0006 about 25 mm: both ends +0.015 mm</h4>' + draw(rotated) + readout(rotated) + '<h4>Optional convenience: re-zero at 50 mm</h4>' + readout(rezeroed) + '<p>The rotation removes the linear tilt while the chosen pivot determines the common offset. Re-zeroing changes the displayed references, not the alignment.</p></figcaption></figure>' +
+      '<figure><h3>Equal endpoints can hide a local high spot</h3>' + draw(bump) + '<figcaption>' + readout(bump) + '<p>The endpoints both read 0.000 mm, while the center reads +0.080 mm. Traverse the whole jaw instead of checking only its ends.</p></figcaption></figure></div>' +
+      '<p><strong>Model:</strong> physical jaw position is a + m·x + b·4(x/L)(1 − x/L). Displayed reading = response × physical position − the raw reading stored as zero. A small illustrative rotation d about world pivot P=(p, 0) updates m to m + d and a to a − p·d; the stored zero is unchanged. The fixed 100 mm measuring span is inset 1 mm from each end of the finite modeled face. This is a first-order small-angle model with |d| ≤ 0.001 mm/mm, 0.0001 mm/mm control steps, and total rotation travel ≤ 0.004. The step is model resolution, not real-vise quantization. It does not model adjustment force. The drawing exaggerates deviation and is not a literal scale.</p>' +
+      '<p><strong>Worked example:</strong> over 100 mm, start with left 0.000 and right +0.060 mm. Apply d = −0.0006 about 25 mm: both ends become +0.015 mm, so the tilt is gone but the old zero reveals a common offset. About 50 mm both become +0.030 mm; about 0 mm both become 0.000 mm. Re-zeroing is optional convenience, not an alignment requirement. A real setup is accepted against the job requirement, not a universal tolerance from this model.</p>' +
+      '<p class="is-source">Alignment procedure: <a href="https://ocw.mit.edu/courses/2-670-mechanical-engineering-tools-january-iap-2004/69ddc43986801c51a7fbfa97d6b5b63f_mill.pdf">MIT, Introduction to the Mill</a>, pp. 2–3. The comparison geometry and examples here are original.</p>';
+  }
+  return Object.freeze({ draw: draw, readout: readout, staticLesson: staticLesson });
+});
+
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiIndicatorSweep,
+    node ? require('./render.js') : root.CourseWikiIndicatorSweepDraw);
+  if (node) module.exports = api;
+  else if (typeof document !== 'undefined') document.querySelectorAll('[data-interactive="indicator-sweep"]').forEach(api.init);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M, D) {
+  'use strict';
+  var sequence = 0;
+  function signed(value) { return value > 0.0005 ? '+' + M.format(value) : value < -0.0005 ? '−' + M.format(Math.abs(value)) : M.format(value); }
+  function prediction(before, after) {
+    return { before: M.result(before).endpointDifference, after: M.result(after).endpointDifference };
+  }
+  function init(root) {
+    if (root.dataset.isReady || !M || !D) return;
+    var id;
+    do { id = 'is-' + (++sequence); } while (document.getElementById(id + '-kind'));
+    var state = Object.assign({}, M.DEFAULT), increment = -0.0006;
+    var lab = document.createElement('div'); lab.className = 'is-lab';
+    function field(key, label, markup) { return '<label for="' + id + '-' + key + '">' + label + '</label>' + markup.replace('CONTROL', 'id="' + id + '-' + key + '" data-is="' + key + '"'); }
+    lab.innerHTML = '<p><strong>Sweep, choose a pivot, then apply a small illustrative rotation.</strong> This first-order model uses a fixed 100 mm measuring span inset within a finite vise face and does not simulate mallet force. Rotation inputs use 0.0001 mm/mm control steps; that is model resolution, not real-vise quantization. The vise pose is exaggerated; the digital indicator and numeric summary carry the actual model values. Zero only when it is useful.</p>' +
+      '<div class="is-workbench"><div class="is-stage"><div data-is-drawing></div><div data-is-readout></div><p><strong>Stated response:</strong> <span data-is-response></span> The arrow in the drawing points toward the indicator body.</p></div>' +
+      '<div class="is-controls">' + field('kind', 'Jaw case', '<select CONTROL><option value="slope">+0.060 mm smooth rise over 100 mm</option><option value="aligned">Aligned ideal jaw</option><option value="bump">Equal endpoints, +0.080 mm center bump</option></select>') +
+      field('response', 'Verified contact response', '<select CONTROL><option value="1">Toward body increases reading</option><option value="-1">Toward body decreases reading</option></select>') +
+      field('position', 'Contact position (mm)', '<input CONTROL type="range" min="0" max="100" step="1" value="100"><output data-is-position>100 mm</output>') +
+      field('pivot', 'World pivot for next rotation (y = 0 mm)', '<select CONTROL><option value="0">Left measurement point · x = 0 mm</option><option value="25" selected>Quarter span · x = 25 mm</option><option value="50">Midspan · x = 50 mm</option><option value="100">Right measurement point · x = 100 mm</option></select>') +
+      field('increment', 'Small rotation increment (mm per mm)', '<input CONTROL type="number" min="-0.001" max="0.001" step="0.0001" value="-0.0006">') +
+      '<div class="is-actions"><button type="button" data-is-apply>Apply rotation about pivot</button><button type="button" data-is-zero>Optional: zero at contact</button><button type="button" data-is-reset>Reset case</button></div></div></div>' +
+      '<p class="is-feedback" data-is-feedback role="status" aria-live="polite">Choose the next pivot and rotation increment. Selecting a pivot alone does not move the vise.</p>' +
+      '<details class="is-optional"><summary>Optional practice: what does re-zeroing change?</summary><fieldset class="is-predict"><legend>If the same tilted jaw is zeroed at 50 mm, what happens to right minus left?</legend><label><input type="radio" name="' + id + '-prediction" value="changes">It changes</label><label><input type="radio" name="' + id + '-prediction" value="same">It stays the same</label><button type="button" data-is-test disabled>Check the isolated example</button><p data-is-predict-feedback role="status" aria-live="polite">This optional example does not change the main vise.</p></fieldset></details>';
+    root.append(lab);
+    function q(s) { return lab.querySelector(s); }
+    function control(key) { return q('[data-is="' + key + '"]'); }
+    function update() {
+      q('[data-is-drawing]').innerHTML = D.draw(state); q('[data-is-readout]').innerHTML = D.readout(state);
+      q('[data-is-position]').textContent = M.format(state.position) + ' mm';
+      q('[data-is-response]').textContent = state.response === 1 ? 'Moving the jaw toward the body increases the reading.' : 'Moving the jaw toward the body decreases the reading.';
+      control('kind').value = state.kind; control('response').value = String(state.response);
+      control('position').max = String(state.length); control('position').value = String(state.position);
+      control('pivot').value = String(state.pivot); control('increment').value = String(increment);
+    }
+    function preset(kind) {
+      var response = state.response, position = state.position;
+      state = Object.assign({}, M.PRESETS[kind], { response: response, position: Math.min(position, M.PRESETS[kind].length) });
+      increment = -0.0006;
+      update();
+    }
+    control('kind').addEventListener('change', function () { preset(this.value); q('[data-is-feedback]').textContent = 'Case changed. Read the entire sweep before interpreting it.'; });
+    control('response').addEventListener('change', function () { state = M.withResponse(state, Number(this.value)); update(); q('[data-is-feedback]').textContent = 'A different demonstrated contact-response scenario was selected. That scenario stores a new zero at ' + M.format(state.zeroX) + ' mm. Vise geometry and alignment did not change; readings were recomputed from the new response and reference.'; });
+    control('position').addEventListener('input', function () { state = Object.assign({}, state, { position: Number(this.value) }); update(); });
+    control('pivot').addEventListener('change', function () { state = M.withPivot(state, Number(this.value)); update(); q('[data-is-feedback]').textContent = 'Next world pivot selected at P=(' + M.format(state.pivot) + ', 0) mm. The current vise pose and stored zero did not change.'; });
+    control('increment').addEventListener('change', function () { increment = Number(this.value); q('[data-is-feedback]').textContent = 'Rotation increment staged. Apply it when ready; changing this field alone does not move the vise.'; });
+    q('[data-is-apply]').addEventListener('click', function () {
+      try {
+        var before = state, next = M.rotate(state, increment, state.pivot);
+        var leftMove = M.surface(next, 0) - M.surface(before, 0), rightMove = M.surface(next, next.length) - M.surface(before, before.length);
+        state = next; update();
+        q('[data-is-feedback]').textContent = 'Rotation applied about ' + M.format(state.pivot) + ' mm. Left moved ' + signed(leftMove) + ' mm; right moved ' + signed(rightMove) + ' mm. The stored zero was not changed.';
+      } catch (error) { q('[data-is-feedback]').textContent = error.message + '.'; }
+    });
+    q('[data-is-zero]').addEventListener('click', function () { state = M.withZero(state, state.position); update(); q('[data-is-feedback]').textContent = 'Stored zero moved to ' + M.format(state.position) + ' mm. The reading there is now 0.000 mm; the shape and sweep differences did not change.'; });
+    q('[data-is-reset]').addEventListener('click', function () { state = Object.assign({}, M.PRESETS[control('kind').value]); increment = -0.0006; update(); q('[data-is-feedback]').textContent = 'Case reset.'; });
+    q('.is-predict').addEventListener('change', function () { q('[data-is-test]').disabled = !q('input[type="radio"]:checked'); });
+    q('[data-is-test]').addEventListener('click', function () {
+      var guess = q('input[type="radio"]:checked'), before = Object.assign({}, M.PRESETS.slope), after = M.withZero(before, 50), test = prediction(before, after);
+      q('[data-is-predict-feedback]').textContent = (guess && guess.value === 'same' ? 'Prediction confirmed. ' : 'Compare the isolated example. ') + 'Right minus left was ' + signed(test.before) + ' mm and remains ' + signed(test.after) + ' mm. The main vise was not changed.';
+    });
+    lab.addEventListener('keydown', function (event) { if (event.target.matches('input, select, button')) event.stopPropagation(); });
+    update(); root.dataset.isReady = 'true'; root.classList.add('is-live');
+  }
+  return Object.freeze({ init: init, prediction: prediction });
+});
+
+
 </script>
 </body>
 </html>

@@ -3413,6 +3413,24 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   var $  = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
+  /* Horizontal arrows belong to a focused scroll region before they belong
+     to page or presentation navigation. Test the actual focused element and
+     its ancestors rather than naming a table class: any real horizontal
+     overflow with native scrolling gets to keep both arrows, including at
+     either edge where falling through would unexpectedly leave the page. */
+  function focusedHorizontalScrollerOwns(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return false;
+    var node = document.activeElement;
+    while (node && node !== document.documentElement) {
+      if (node.nodeType === 1) {
+        var overflow = getComputedStyle(node).overflowX;
+        if (/^(auto|scroll|overlay)$/.test(overflow) && node.scrollWidth > node.clientWidth) return true;
+      }
+      node = node.parentElement;
+    }
+    return false;
+  }
+
   /* ---- theme ------------------------------------------------------------
      Three states: light, dark, and system (no attribute). The inline head
      script has already applied the stored choice to avoid a flash; this only
@@ -3890,6 +3908,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       addEventListener('keydown', function (e) {
         if (e.metaKey || e.ctrlKey || e.altKey) return;
         if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        if (focusedHorizontalScrollerOwns(e)) return;
         switch (e.key) {
           case 'ArrowRight': case 'PageDown': case ' ': e.preventDefault(); go(at() + 1); break;
           case 'ArrowLeft':  case 'PageUp':            e.preventDefault(); go(at() - 1); break;
@@ -3901,6 +3920,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       addEventListener('keydown', function (e) {
         if (e.metaKey || e.ctrlKey || e.altKey) return;
         if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        if (focusedHorizontalScrollerOwns(e)) return;
         if (e.key === 'ArrowRight' && next) { location.href = urlFor(next, false); }
         if (e.key === 'ArrowLeft'  && prev) { location.href = urlFor(prev, false); }
       });
