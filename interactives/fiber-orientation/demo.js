@@ -20,7 +20,7 @@
       '</fieldset>' +
       '<p class="fo-feedback" data-fo="feedback" role="status" aria-live="polite">Choose a direction first.</p>' +
       '<div class="fo-experiment" data-fo="experiment" hidden>' +
-        '<div class="fo-controls"><label for="' + id + '-angle">Fiber angle to the load <output data-fo="angle-output">0°</output>' +
+        '<div class="fo-controls"><label for="' + id + '-angle">Starting fiber angle to the load <output data-fo="angle-output">0°</output>' +
           '<input id="' + id + '-angle" data-fo="angle" type="range" min="-90" max="90" step="1" value="0"></label>' +
           '<div class="fo-presets" aria-label="Fiber-angle presets"><button type="button" data-angle="-45">−45°</button><button type="button" data-angle="0">0°</button><button type="button" data-angle="45">+45°</button><button type="button" data-angle="90">90°</button></div>' +
         '</div>' +
@@ -36,7 +36,7 @@
         '<div class="fo-compare" data-fo="compare"></div>' +
         '<p class="fo-coupling" data-fo="coupling"></p>' +
       '</div>';
-    root.insertBefore(live, root.firstChild);
+    root.insertBefore(live, root.querySelector('.fo-static'));
     root.dataset.foReady = 'true';
 
     function radio(name, value, label) {
@@ -99,7 +99,7 @@
       var shear = result.globalStrain.gammaXY;
       one('[data-fo="coupling"]').innerHTML = Math.abs(shear) < 1e-10 ? '<strong>No extension–shear coupling at this principal direction.</strong> The patch stretches and narrows without skewing.' :
         '<strong>Off-axis extension also skews the free patch.</strong> At the opposite angle, axial stiffness and axial strain stay the same while the shear sign reverses.';
-      one('[data-fo="svg-desc"]').textContent = 'Fibers at ' + signed + ' degrees in a free material patch under 10 megapascals axial stress. Axial strain is ' + percent(result.globalStrain.epsilonX) + ', transverse strain is ' + percent(result.globalStrain.epsilonY) + ', and engineering shear strain is ' + micro(shear) + '. Deformation is exaggerated 120 times.';
+      one('[data-fo="svg-desc"]').textContent = 'Fibers at ' + signed + ' degrees in the unloaded patch, measured from the horizontal load axis. The free material patch carries 10 megapascals axial stress. Axial strain is ' + percent(result.globalStrain.epsilonX) + ', transverse strain is ' + percent(result.globalStrain.epsilonY) + ', and engineering shear strain is ' + micro(shear) + '. Deformation is exaggerated 120 times; the drawn fibers follow that deformation.';
       one('[data-fo="svg"]').setAttribute('aria-label', one('[data-fo="svg-desc"]').textContent);
     }
 
