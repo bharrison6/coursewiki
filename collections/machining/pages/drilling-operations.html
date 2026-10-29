@@ -35,6 +35,25 @@
 </section>
 
 <section>
+  <h2>Compare advance, retracing and withdrawal paths</h2>
+  <p>Open [[gcode-and-toolpaths|G-code and Toolpaths]]. In the playground's <strong>Program</strong> picker, choose these named examples in order: <strong>Drilling path: continuous advance</strong>, <strong>Drilling path: short in-bore retract</strong>, and <strong>Drilling path: withdrawal above the mouth</strong>. Use <strong>Step</strong> to follow each G0 and G1 move.</p>
+  <table><thead><tr><th>Program</th><th>Motion to watch</th><th>What the model reports</th></tr></thead><tbody>
+    <tr><td>Continuous advance</td><td><code>G1 Z-8</code></td><td>One feed enters new modeled stock to final depth.</td></tr>
+    <tr><td>Short in-bore retract</td><td><code>G0 Z-1</code>, then <code>G1 Z-4</code> and <code>G1 Z-8</code></td><td>The first feed back removes no additional modeled stock; the separate deeper feed does.</td></tr>
+    <tr><td>Withdrawal above the mouth</td><td><code>G0 Z2</code>, then <code>G1 Z-4</code> and <code>G1 Z-8</code></td><td>The first feed back removes no additional modeled stock; the separate deeper feed does.</td></tr>
+  </tbody></table>
+  <ol>
+    <li>Mark where the drill enters material that has not yet been removed. That is new cutting in this geometric model.</li>
+    <li>Mark where the drill returns through the bore it already made. That travel retraces the prior path and removes no additional modeled stock; the separate deeper feed begins after the point reaches the previous bottom. The model does not show possible wall or chip contact, rubbing, force or heat during the return.</li>
+    <li>Compare the retraction heights with the raw top at Z+1. The short retraction stays inside the bore. The other withdrawal carries the point above the hole mouth, creating a clearer opportunity for chips to leave the hole.</li>
+    <li>Compare the finished holes. The three illustrative programs intentionally reach the same final tip depth and geometry even though their travel paths differ.</li>
+  </ol>
+  <p>The playground shows programmed motion and removed geometry. It does <strong>not</strong> model chip transport or packing, cutting heat or force, coolant delivery, or whether chips actually cleared. A retraction creates an opportunity for chip escape; it is neither proof of chip clearance nor the only way chips can leave. Haas describes its G83 return as a chip-clearing motion and places the R plane above the cut so chips can get out, but these G0/G1 illustrations are not G73, G83 or Q implementations.</p>
+  <p>The coordinates, spindle speed and feed in these three examples are comparison values for the simulator, not operating recommendations. Select any real drilling cycle, retract amount, speed and feed from the drill maker's guidance, the machine/control manual and the approved shop procedure. Continue to follow the machine instructions and [[metal-chips|Metal Chips]] for observation and chip handling.</p>
+  <p class="aside"><strong>Primary source:</strong> <a href="https://legacy-aem.haascnc.com/content/haascnc/en/service/codes-settings.type%3Dgcode.machine%3Dmill.value%3DG83.html">Haas Automation, G83 Normal Peck Drilling Canned Cycle</a> (R-plane return and chip-clearing motion). Controller details differ; use the manual for the machine in front of you.</p>
+</section>
+
+<section>
   <h2>Check the hole before calling it finished</h2>
   <ul class="boxes">
     <li>Confirm the hole location, required diameter and whether it is through or blind.</li>

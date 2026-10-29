@@ -9,6 +9,7 @@ const path = require('node:path');
 const MOD = path.join(__dirname, '..', '..', 'interactives', 'gcode-playground');
 const G = require(path.join(MOD, 'gcode.js'));
 const X = require(path.join(MOD, 'machine.js'));
+const B = require(path.join(MOD, 'blocks.js'));
 const Sim = require(path.join(__dirname, '..', '..', 'interactives', 'milling-simulator', 'model.js'));
 
 const HEAD = ['G21 G90 G17', 'T1 M6', 'S2500 M3'];
@@ -381,6 +382,56 @@ test('the holes example drills four holes to depth with the cycle', () => {
   assert.equal(m.alarm, null);
   for (const [x, y] of [[15, 15], [85, 15], [85, 45], [15, 45]]) assert.ok(near(m.sim.heightAt(x, y), -8), 'hole at ' + x + ', ' + y);
   assert.ok(near(m.sim.heightAt(50, 30), Sim.SETUP.stock.rawTop));
+});
+
+test('the three named drilling paths use different phases but cut the same final hole', () => {
+  const ids = ['drill-continuous', 'drill-short-retract', 'drill-clear-retract'];
+  const runs = ids.map((id) => {
+    const example = B.example(id);
+    assert.equal(example.id, id, id + ' is a named picker example');
+    return { example, ...run(example.text) };
+  });
+  for (const { m } of runs) assert.equal(m.alarm, null);
+
+  const zPaths = runs.map(({ p }) => p.moves
+    .filter((mv) => mv.from.x === 50 && mv.from.y === 30 && mv.to.x === 50 && mv.to.y === 30)
+    .map((mv) => [mv.kind, mv.from.z, mv.to.z]));
+  assert.deepEqual(zPaths[0], [['rapid', 20, 2], ['feed', 2, -8], ['rapid', -8, 20]]);
+  assert.deepEqual(zPaths[1], [['rapid', 20, 2], ['feed', 2, -4], ['rapid', -4, -1], ['feed', -1, -4], ['feed', -4, -8], ['rapid', -8, 20]]);
+  assert.deepEqual(zPaths[2], [['rapid', 20, 2], ['feed', 2, -4], ['rapid', -4, 2], ['feed', 2, -4], ['feed', -4, -8], ['rapid', -8, 20]]);
+
+  const geometry = runs.map(({ m }) => Array.from(m.sim.raster));
+  assert.deepEqual(geometry[1], geometry[0], 'the short retract leaves the same full stock grid');
+  assert.deepEqual(geometry[2], geometry[0], 'the above-mouth withdrawal leaves the same full stock grid');
+  for (const { m } of runs) {
+    assert.deepEqual(m.position(), { x: 50, y: 30, z: 20 });
+    assert.equal(m.sim.tool.id, 'dr6');
+    assert.ok(near(m.sim.removed, runs[0].m.sim.removed));
+  }
+  assert.ok(zPaths[1].some((mv) => mv[0] === 'rapid' && mv[2] === -1 && mv[2] < Sim.SETUP.stock.rawTop), 'the short retract stays below the raw top');
+  assert.ok(zPaths[2].some((mv) => mv[0] === 'rapid' && mv[2] === 2 && mv[2] > Sim.SETUP.stock.rawTop), 'the withdrawal rises above the raw top');
+});
+
+test('returning through the prior bore removes nothing until the drill passes the old bottom', () => {
+  for (const id of ['drill-short-retract', 'drill-clear-retract']) {
+    const example = B.example(id);
+    const p = prog(example.text);
+    const reentryLine = example.text.findIndex((line, i) => i > 7 && line === 'G1 Z-4 F120');
+    const deeperLine = example.text.findIndex((line, i) => i > reentryLine && line === 'G1 Z-8 F120');
+    const m = X.create().load(p).seek(reentryLine);
+    m.runLine();
+    assert.ok(near(m.position().z, -4), id + ' returns to the prior bottom');
+    assert.ok(near(m.info[reentryLine].volume, 0), id + ' retrace removes no additional modeled stock');
+    m.runLine();
+    assert.ok(m.info[deeperLine].volume > 0, id + ' separate deeper advance removes new modeled stock');
+  }
+});
+
+test('a rapid may retrace the cleared bore but still alarms if it goes beyond the cleared depth', () => {
+  const { m } = run(['G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-4 F120', 'G0 Z2', 'G0 Z-8', 'M30']);
+  assert.equal(m.alarm.line, 7);
+  assert.match(m.alarm.message, /rapid \(G0\) would drive the drill/i);
+  assert.ok(near(m.contact.z, -4, 1e-4), 'the alarm occurs at the bottom of the cleared bore');
 });
 
 /* ======================================================================
