@@ -22,6 +22,16 @@ function go(s, target) {
   assert.equal(r.blocked, null, r.blocked && r.blocked.message);
   return r;
 }
+function loadSummary(s, id) {
+  const commit = s.commit.bind(s);
+  let summary = null;
+  s.commit = () => (summary = commit());
+  const result = s.loadTool(id);
+  s.commit = commit;
+  assert.equal(result.ok, true, result.message);
+  assert.ok(summary, 'the tool change committed an engine summary');
+  return summary;
+}
 /* One face-mill pass half a millimetre too deep along the front of the block. */
 function deepPass(s) {
   s.loadTool('fm50');
@@ -183,6 +193,95 @@ test('every move says whether it cut, and an air move says how far above the met
   m = U.describeMove(r, s);
   assert.equal(m.title, 'Stopped.');
   assert.equal(m.warn, true);
+});
+
+test('move feedback separates modeled small removal, sub-grid evidence, true zero and stops', () => {
+  const face = M.create();
+  face.loadTool('fm50');
+  go(face, { x: -30, y: 30, z: 20 }); go(face, { z: 0 });
+  const faceCut = go(face, { x: 130 });
+  assert.ok(faceCut.volume > 0.05);
+  let m = U.describeMove(faceCut, face);
+  assert.equal(m.title, 'Cut.');
+  assert.match(m.text, /Removed approximately .* \(grid estimate\)/);
+
+  const drill = M.create();
+  drill.loadTool('dr6.6');
+  go(drill, { x: 15, y: 30, z: 2 });
+  const normal = go(drill, { z: -21.94 });
+  assert.ok(normal.volume > 0.05);
+  m = U.describeMove(normal, drill);
+  assert.equal(m.title, 'Cut.');
+  assert.match(m.text, /Removed approximately 709 mm³ \(grid estimate\)/);
+
+  const before = I.inspect(drill, J.BY_ID.pocket).rows.find((r) => r.id === 'hole-left');
+  assert.match(before.checks.map((c) => c.text).join(' '), /Not through yet/);
+  const small = go(drill, { z: -23 });
+  assert.ok(small.volume > 0 && small.volume < 0.05, small.volume);
+  assert.equal(small.subGridCut, false);
+  const after = I.inspect(drill, J.BY_ID.pocket).rows.find((r) => r.id === 'hole-left');
+  assert.match(after.checks.map((c) => c.text).join(' '), /Through at the minimum allowed diameter/);
+  m = U.describeMove(small, drill);
+  assert.equal(m.title, 'Cut.');
+  assert.equal(m.kind, 'cut');
+  assert.match(m.text, /small modeled amount \(positive grid estimate below the displayed volume precision\)/);
+  assert.doesNotMatch(m.text, /sub-grid|between display samples|0\.0 mm³/i);
+
+  const repeated = go(drill, { z: -23 });
+  assert.equal(repeated.volume, 0);
+  assert.equal(repeated.subGridCut, false);
+  m = U.describeMove(repeated, drill);
+  assert.equal(m.title, 'Nothing cut.');
+  assert.equal(m.kind, 'air');
+  assert.match(m.text, /no modeled metal under its footprint/);
+  assert.doesNotMatch(m.text, /beside the block/);
+
+  const outside = M.create();
+  outside.loadTool('fm50');
+  m = U.describeMove(go(outside, { x: -40 }), outside);
+  assert.equal(m.title, 'Nothing cut.');
+  assert.match(m.text, /beside the block: there is no modeled metal under the cutter/);
+
+  const air = M.create();
+  air.loadTool('fm50');
+  m = U.describeMove(go(air, { x: 50 }), air);
+  assert.equal(m.title, 'Nothing cut.');
+  assert.match(m.text, /19\.00 mm above the metal/);
+
+  const subGrid = M.create();
+  subGrid.loadTool('fm50');
+  go(subGrid, { x: -30, y: 18, z: 20 }); go(subGrid, { z: 0 }); go(subGrid, { x: 130 });
+  go(subGrid, { y: 42 }); go(subGrid, { x: -30 });
+  subGrid.loadTool('em12');
+  go(subGrid, { x: 81, y: -10, z: 20 }); go(subGrid, { z: -6 }); go(subGrid, { y: 70 });
+  go(subGrid, { x: 92 }); go(subGrid, { y: -10 }); go(subGrid, { x: 100 }); go(subGrid, { y: 70 }); go(subGrid, { z: 20 });
+  subGrid.loadTool('sp12'); go(subGrid, { x: 10, y: 10, z: 2 });
+  const unresolved = go(subGrid, { z: -0.15 });
+  assert.equal(unresolved.volume, 0);
+  assert.equal(unresolved.subGridCut, true);
+  m = U.describeMove(unresolved, subGrid);
+  assert.equal(m.title, 'Cut.');
+  assert.match(m.text, /between display samples/);
+  assert.doesNotMatch(m.text, /positive grid estimate/);
+
+  const stopped = M.create();
+  stopped.loadTool('em6'); go(stopped, { x: 50, y: 30, z: 5 });
+  const blocked = stopped.moveTo({ z: -20 });
+  assert.ok(blocked.volume > 0, 'the move removed material before the stop');
+  assert.equal(blocked.blocked.code, 'reach');
+  m = U.describeMove(blocked, stopped);
+  assert.equal(m.title, 'Stopped.');
+  assert.equal(m.kind, 'stop');
+  assert.equal(m.warn, true);
+  assert.doesNotMatch(m.text, /Removed approximately|small modeled amount/);
+
+  const changed = M.create();
+  const tool = loadSummary(changed, 'fm50');
+  assert.equal(tool.kind, 'tool');
+  m = U.describeMove(tool, changed);
+  assert.equal(m.title, 'Tool changed.');
+  assert.equal(m.kind, 'info');
+  assert.match(m.text, /Face mill Ø50 loaded/);
 });
 
 test('the first-use suggestions are ordinary moves that face the top and then stop', () => {
