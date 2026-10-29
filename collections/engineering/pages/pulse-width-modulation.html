@@ -22,15 +22,26 @@
   <h2>Change duty and frequency, then compare an ADC reading</h2>
   <div data-interactive="pwm-and-adc">
     <div class="pa-live" hidden></div>
-    <div class="pa-static"><p><strong>Print / static example:</strong> 25% duty at 500 Hz gives a 2 ms period, 0.5 ms on-time and 1.25 V average for a 0–5 V waveform. An unloaded RC filter with R = 10 kΩ and C = 1 µF has a 10 ms time constant; after settling, its output ripples around 1.25 V. With a 5.000 V ADC reference, 3.000 V gives code 614 in the ideal bin model; code 800 gives a lower-edge estimate of 3.90625 V.</p></div>
+    <div class="pa-static">
+      <p><strong>Print / static comparison:</strong> 25% duty at 500 Hz gives a 2 ms period, 0.5 ms HIGH time and a 1.25 V complete-cycle time mean for an ideal 0–5 V waveform. A point sample is one instant, not that average.</p>
+      <div class="unit-table-wrap"><table class="unit-table"><caption>The same PWM waveform sampled at different phases</caption><thead><tr><th>Finite sample set</th><th>Each raw sample</th><th>Selected-sample mean</th><th>ADC code / lower edge</th></tr></thead><tbody>
+        <tr><th>500 samples/s, phase 10%</th><td>5 V</td><td>5 V</td><td>1023 / 4.995117 V</td></tr>
+        <tr><th>500 samples/s, phase 60%</th><td>0 V</td><td>0 V</td><td>0 / 0 V</td></tr>
+        <tr><th>2000 samples/s, phases 1%, 26%, 51%, 76%</th><td>5, 0, 0, 0 V</td><td>1.25 V</td><td>Mean lower edge 1.248779 V</td></tr>
+      </tbody></table></div>
+      <p>An unloaded 10 kΩ / 1 µF RC filter has a 10 ms time constant. In the settled repeating response its 25%, 500 Hz ripple runs from about 1.1579 V to 1.3453 V while its cycle mean remains 1.25 V. Changing a control recomputes that settled response; this model does not show startup.</p>
+      <p>With a separate 5.000 V ADC input, 3.000 V gives code 614; code 800 has lower edge 3.90625 V.</p>
+    </div>
     <noscript><p>The controls require JavaScript. The equations, duty-cycle figure and worked example remain available.</p></noscript>
   </div>
-  <p>The explorer is a model, not a board connection. Its frequency control does not configure an Uno. ADC controls use the ideal bin convention on [[analog-to-digital-conversion]]; 5.000 V is assumed exact.</p>
+  <p>The explorer is a model, not a board connection. Its frequency and sampling controls do not configure an Uno or claim a board throughput. A raw sample uses normalized phase with HIGH on <code>[0, D)</code> and LOW on <code>[D, 1)</code>; the stated finite sample count defines the reported sample mean. ADC controls use the ideal bin convention on [[analog-to-digital-conversion]]; 5.000 V is assumed exact.</p>
+  <details class="deeper"><summary>Why more samples can still give the wrong mean</summary><p>If the sample clock repeatedly lands at the same PWM phase, every point can read HIGH or every point can read LOW even though the full-cycle time mean is 1.25 V. A sample-and-hold output keeps the most recent point value between samples; holding is not averaging. A carefully spaced finite set can match the cycle mean, but a higher rate or larger count alone does not guarantee an unbiased result. This bounded comparison does not claim reconstruction of an unbandlimited switching edge from a Nyquist test.</p></details>
 </section>
 <section>
   <h2>An RC filter smooths PWM but leaves ripple</h2>
   <p>Put a resistor in series with the PWM signal and a capacitor from the output node to ground; measure the voltage across the capacitor. This <strong>RC low-pass filter</strong> slows voltage changes. The capacitor charges while PWM is HIGH and discharges while it is LOW.</p>
   <p>The time constant is <code>τ = R × C</code>. A longer time constant relative to the PWM period reduces ripple but makes the output respond more slowly when duty changes. The explorer shows the settled waveform with τ = 10 ms, assuming an ideal source and no load. A load changes the result; the filter is not a motor power supply.</p>
+  <p>Microchip's <a href="https://onlinedocs.microchip.com/oxy/GUID-15F56EF1-EBFF-405A-9412-E41CC95BAACF-en-US-2/GUID-34AC5DDB-B9AE-4272-842B-E2A1CEE69B6B.html">AVR131 PWM filtering note</a> explains the tradeoff: the low-pass filter must reject PWM base-frequency ripple without removing the slower signal of interest, and a low-impedance load can discharge the capacitor unless buffered. This explorer deliberately assumes no load.</p>
   <details class="deeper"><summary>What the smoothed trace calculates</summary><p>During each constant input interval, <code>V(t) = V<sub>target</sub> + (V<sub>start</sub> − V<sub>target</sub>)e<sup>−t/τ</sup></code>. The model solves for a repeating steady state, then draws the charging and discharging curves. It omits startup, output resistance, component tolerances and loading. At 0% or 100%, the settled output is simply 0 V or 5 V.</p></details>
 </section>
 <section>

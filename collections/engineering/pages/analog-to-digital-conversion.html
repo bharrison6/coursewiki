@@ -21,5 +21,8 @@
 <section>
   <h2>Explore the steps and check the units</h2>
   <p>The two-way ADC controls in the [[pulse-width-modulation|PWM and ADC explorer]] let you enter a voltage or a code. Try nearby voltages within one bin, then cross its boundary. In reverse, code 1023 gives 4.9951171875 V as its lower edge, not proof that the input equals that value.</p>
+  <p>The same explorer also separates <strong>when a voltage is sampled</strong> from how its code is calculated. It shows instantaneous raw PWM or settled RC values, the finite mean of the selected point samples, and the mean of their reconstructed lower-edge voltages. Those are different from the waveform's complete-cycle time mean. A held code is the latest point result, not a window average.</p>
+  <details class="deeper"><summary>Quantize first or average first?</summary><p>ADC conversion floors each individual ideal sample into a bin. Averaging the reconstructed lower edges therefore need not equal converting the analog sample mean. For a 25% raw 0–5 V sequence with one HIGH and three LOW samples, the analog sample mean is 1.25 V; the lower-edge reconstructions average 4.9951171875/4 = 1.248779296875 V. Neither operation recovers information between sample instants.</p></details>
   <p><a class="button" data-practice-add="micro-adc-volts" href="../practice.html#micro-adc-volts">Practice converting a reading to volts</a></p>
+  <p><a class="button" data-practice-add="pwm-sample-phase-high" href="../practice.html#pwm-sample-phase-high">Practice sampling phase</a></p>
 </section>

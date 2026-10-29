@@ -1,0 +1,33 @@
+@@ID: pwm-sampling
+@@TITLE: PWM Sampling and ADC Timing Practice
+@@SUMMARY: Predict point samples, finite sample means and ideal ADC lower-edge reconstructions.
+@@END
+
+<section><h2>Separate point samples from the cycle mean</h2>
+<div class="panel" id="pwm-sample-phase-high" data-practice data-practice-id="pwm-sample-phase-high" data-practice-title="Phase-locked PWM sample" data-practice-source="pulse-width-modulation" data-answer="1" data-tolerance="0" data-unit="choice">
+<p><strong>Phase-locked PWM sample.</strong> An ideal 0–5 V PWM waveform is HIGH for normalized phase <code>[0, 0.25)</code> and LOW for <code>[0.25, 1)</code>. A point sampler runs once per PWM period, always at phase 0.10. What does every sample read? 1 = 5 V; 2 = 1.25 V; 3 = 0 V; 4 = it alternates.</p>
+<label for="pwm-sample-phase-high-answer">Choice number</label><input id="pwm-sample-phase-high-answer" data-practice-input type="number" step="1" min="1" max="4" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a choice, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p><strong>1.</strong> Phase 0.10 lies inside the HIGH interval, so every point sample is 5 V. The complete-cycle time mean is still 25% × 5 V = 1.25 V; the sampler is not averaging a cycle.</p></details></div>
+
+<div class="panel" id="pwm-sample-phase-low" data-practice data-practice-id="pwm-sample-phase-low" data-practice-title="LOW-phase finite sample mean" data-practice-source="pulse-width-modulation" data-answer="0" data-tolerance="0.001" data-unit="V">
+<p><strong>LOW-phase finite sample mean.</strong> An ideal 25%, 0–5 V waveform is HIGH on normalized phase <code>[0, 0.25)</code> and LOW on <code>[0.25, 1)</code>. It is sampled once per PWM period at phase 0.60 for 20 point samples. What is the mean of those selected samples?</p>
+<label for="pwm-sample-phase-low-answer">Selected-sample mean in V</label><input id="pwm-sample-phase-low-answer" data-practice-input type="number" step="any" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p>Phase 0.60 is LOW on every cycle, so all 20 samples are 0 V and their mean is <strong>0 V</strong>. A larger count does not remove phase locking.</p></details></div>
+
+<div class="panel" id="pwm-four-phase-mean" data-practice data-practice-id="pwm-four-phase-mean" data-practice-title="Four-phase PWM sample mean" data-practice-source="pulse-width-modulation" data-answer="1.25" data-tolerance="0.001" data-unit="V">
+<p><strong>Four-phase PWM sample mean.</strong> An ideal 25%, 0–5 V waveform is HIGH on normalized phase <code>[0, 0.25)</code> and LOW on <code>[0.25, 1)</code>. One repeating four-sample lattice lands at phases 0.01, 0.26, 0.51 and 0.76. What is the analog mean of those four point values?</p>
+<label for="pwm-four-phase-mean-answer">Selected-sample mean in V</label><input id="pwm-four-phase-mean-answer" data-practice-input type="number" step="any" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p>Only phase 0.01 is HIGH: <code>(5 + 0 + 0 + 0)/4 = <strong>1.25 V</strong></code>. This chosen lattice matches the complete-cycle time mean; faster sampling by itself does not guarantee that result.</p></details></div>
+</section>
+
+<section><h2>Keep quantization and RC ripple distinct</h2>
+<div class="panel" id="pwm-reconstructed-mean" data-practice data-practice-id="pwm-reconstructed-mean" data-practice-title="Mean of ADC lower edges" data-practice-source="analog-to-digital-conversion" data-answer="1.248779296875" data-tolerance="0.0006" data-unit="V">
+<p><strong>Mean of ADC lower edges.</strong> In the ideal 10-bit, 5.000 V bin model, the four raw samples 5, 0, 0 and 0 V convert to codes 1023, 0, 0 and 0. Code 1023 reconstructs to lower edge 4.9951171875 V. What is the mean of the four reconstructed lower edges?</p>
+<label for="pwm-reconstructed-mean-answer">Mean reconstructed voltage in V</label><input id="pwm-reconstructed-mean-answer" data-practice-input type="number" step="any" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p><code>(4.9951171875 + 0 + 0 + 0)/4 = <strong>1.248779296875 V</strong></code>. That is slightly below the 1.25 V analog sample mean because each code represents its bin's lower edge.</p></details></div>
+
+<div class="panel" id="pwm-rc-bottom-sample" data-practice data-practice-id="pwm-rc-bottom-sample" data-practice-title="Settled RC ripple below the mean" data-practice-source="pulse-width-modulation" data-answer="0.0921305858589871" data-tolerance="0.001" data-unit="V">
+<p><strong>Settled RC ripple below the mean.</strong> The lesson's ideal unloaded RC model uses 25% duty, 500 Hz and τ = 10 ms. Its complete-cycle mean is 1.25 V; after settling, the phase-0 point is 1.157869414 V. How far below the cycle mean is that point, to four decimal places?</p>
+<label for="pwm-rc-bottom-sample-answer">Difference in V</label><input id="pwm-rc-bottom-sample-answer" data-practice-input type="number" step="any" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p><code>1.25 − 1.157869414 = <strong>0.092130586 V</strong></code>, or 0.0921 V. The phase-0 sample is instantaneous settled ripple, not the cycle mean, and this model does not simulate startup.</p></details></div>
+</section>
