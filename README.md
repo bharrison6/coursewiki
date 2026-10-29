@@ -113,6 +113,15 @@ load before their consumers and appear once even when multiple demos use them in
 aggregate. Missing dependencies, duplicate declarations and dependency cycles fail before
 generation. Keep a shared operation in its owning module rather than copying its code.
 
+`three-runtime` supplies the self-hosted Three.js 0.186.1 and matching OrbitControls as
+the classic-script global `CourseWikiThree`. A 3D consumer declares
+`@@REQUIRES: three-runtime`; it does not copy the bundle or depend on the milling simulator
+to obtain it. The loader places the runtime once before its consumers on the web and in
+offline aggregates. Its pinned recipe, lockfile and license notice live in
+`interactives/three-runtime/`. Reproduce it with `npm ci --ignore-scripts` followed by
+`npm run build` in that directory. Milling's separate recipe retains its polygon/mesh and
+worker bundles; run the same commands in `interactives/milling-simulator/` to reproduce them.
+
 `feeds-and-speeds/cutting-data.js` owns the generic carbide material guidance, source links,
 diameter interpolation bounds, and the conversion from published power factors to cutting
 energy per solid volume. Consumers use that data directly rather than maintaining their own

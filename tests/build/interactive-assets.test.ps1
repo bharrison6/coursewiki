@@ -114,3 +114,20 @@ $documentReader = 'process.stdout.write(JSON.stringify([{id:"probe",title:"Synth
 [IO.File]::WriteAllText((Join-Path $fixture 'scripts/read-activities.cjs'), $documentReader)
 Assert (Refuses { Initialize-InteractiveAssets $fixture } 'duplicate interactive identity') 'standalone documents and inline modules cannot share an identity'
 Write-Output "$script:checks checks passed; fixtures are synthetic and retained"
+
+# The actual milling consumer and its G-code consumer resolve the shared runtime once.
+Initialize-InteractiveAssets $codeRoot
+$actual = '<div data-interactive="milling-simulator"></div><div data-interactive="gcode-playground"></div>'
+$actualOrder = @(Get-InteractiveIds $actual)
+Assert (@($actualOrder | Where-Object { $_ -ceq 'three-runtime' }).Count -eq 1) 'actual milling and G-code dependency closure includes one shared runtime'
+Assert ([array]::IndexOf($actualOrder, 'three-runtime') -lt [array]::IndexOf($actualOrder, 'milling-simulator')) 'actual runtime dependency precedes milling'
+$actualWeb = @(Get-InteractiveWebAssets $actual '../' 'JS') -join "`n"
+Assert ([regex]::Matches($actualWeb, '/three-runtime/three-bundle\.js\?').Count -eq 1) 'web scripts reference one shared Three bundle'
+Assert ($actualWeb.IndexOf('/three-runtime/three-bundle.js') -lt $actualWeb.IndexOf('/milling-simulator/scene3d.js')) 'web runtime script loads before the milling scene'
+Assert ($actualWeb -notmatch '/milling-simulator/three-bundle\.js') 'web scripts omit the retired local runtime path'
+$actualInline = @(Get-InteractiveInlineAssets $actual 'JS') -join "`n"
+Assert ([regex]::Matches($actualInline, 'var CourseWikiThree=').Count -eq 1) 'offline consumers inline one actual shared runtime'
+$sceneSource = [IO.File]::ReadAllText((Join-Path $codeRoot 'interactives/milling-simulator/scene3d.js'))
+$sceneOffset = $actualInline.IndexOf($sceneSource)
+Assert ($sceneOffset -gt $actualInline.IndexOf('var CourseWikiThree=')) 'offline runtime initializes before the complete milling scene source'
+Write-Output "$script:checks checks passed including actual source dependencies"
