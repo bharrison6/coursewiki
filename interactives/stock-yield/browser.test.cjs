@@ -42,6 +42,9 @@ test('stock-yield actual page: thresholds, clearing, every interval, keyboard an
       const lab = page.locator('.sy-live').first(), field = key => lab.locator(`[data-sy-input="${key}"]`);
       await lab.waitFor();
       const headline=lab.locator('[data-sy-headline]'), result=lab.locator('[data-sy-result]');
+      const baseline='Test resets to page example: 1,000 mm stock; 98 mm blanks; 2 mm starting kerf; $48.00.';
+      assert.match(await lab.locator(':scope > p').first().innerText(),/3 mm kerf\?$/,'question states applied kerf before the prediction choice');
+      assert.equal(await lab.locator('[data-sy-prediction]').innerText(),baseline,'initial prediction identifies the reset baseline');
       assert.match(await headline.innerText(),/10 acceptable blanks.*10 separating cuts.*98.0%/);
       assert.equal(await result.locator('[data-sy-blank]').count(),10);
       assert.equal(await result.locator('[data-sy-cut]').count(),10);
@@ -52,6 +55,9 @@ test('stock-yield actual page: thresholds, clearing, every interval, keyboard an
         assert.ok(distance<=800,`default phone diagram ends ${distance}px below lab start`);
       }
       await lab.screenshot({path:path.join(evidence,`${width}-${theme}-${mode}-first.png`)});
+      // QA only: focus can start a smooth scroll whose intermediate position is
+      // not a valid no-navigation baseline. Keep the native key behavior intact.
+      await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';document.body.style.scrollBehavior='auto';});
       const initialURL=page.url();
       await lab.locator('.sy-settings > summary').focus(); await page.keyboard.press('Space');
       assert.equal(await lab.locator('.sy-settings').evaluate(n=>n.open),true,'settings open by native disclosure');
@@ -60,12 +66,36 @@ test('stock-yield actual page: thresholds, clearing, every interval, keyboard an
       assert.equal(await lab.locator('.sy-explanation').evaluate(n=>n.open),true,'assumptions open by native keyboard');
       await page.keyboard.press('Space');
       assert.equal(await lab.locator('.sy-explanation').evaluate(n=>n.open),false,'assumptions close by native keyboard');
+      for (const [key,value] of [['length','800'],['blank','100'],['kerf','4'],['left','10'],['right','20'],['price','60']]) await field(key).fill(value);
+      assert.equal(await lab.locator('[data-sy-prediction]').innerText(),`Current inputs changed. ${baseline}`,'custom inputs do not relabel the test baseline');
+      assert.match(await headline.innerText(),/7 acceptable blanks/);
       await lab.locator('[data-sy-predict]').selectOption('9');
-      await lab.locator('[data-sy-test]').focus(); await page.keyboard.press('Space');
-      assert.match(await lab.locator('[data-sy-prediction]').innerText(),/prediction matches/);
+      await lab.locator('[data-sy-test]').scrollIntoViewIfNeeded();
+      await lab.locator('[data-sy-test]').focus();
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      const beforeTest=await page.evaluate(()=>{
+        const rect=document.querySelector('[data-sy-test]').getBoundingClientRect();
+        const cards=[...document.querySelectorAll('.xcard:not(.deck-wiki-only)')];
+        return {y:window.scrollY,top:rect.top,visible:rect.top>=0&&rect.bottom<=innerHeight,panel:cards.map((n,i)=>({i,d:Math.abs(n.getBoundingClientRect().top)})).sort((a,b)=>a.d-b.d)[0].i};
+      });
+      assert.equal(beforeTest.visible,true,'Test is visible before the keypress baseline');
+      await page.keyboard.press('Space');
+      assert.match(await lab.locator('[data-sy-prediction]').innerText(),/Page example reset\. Your prediction matches/);
+      for (const [key,value] of Object.entries({length:'1000',blank:'98',kerf:'3',left:'0',right:'0',price:'48'})) assert.equal(await field(key).inputValue(),value,`Test resets ${key} to the page example`);
       assert.match(await headline.innerText(),/9 acceptable blanks.*9 separating cuts.*88.2%/);
       assert.match(await lab.locator('[data-sy-cost]').innerText(),/\$5.33/);
       assert.match(await lab.locator('[data-sy-threshold]').innerText(),/1,010 mm/);
+      assert.equal(page.url(),initialURL,'prediction Test stays on the current lesson');
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      const afterTest=await page.evaluate(()=>{
+        const rect=document.querySelector('[data-sy-test]').getBoundingClientRect();
+        const cards=[...document.querySelectorAll('.xcard:not(.deck-wiki-only)')];
+        return {y:window.scrollY,top:rect.top,visible:rect.top>=0&&rect.bottom<=innerHeight,panel:cards.map((n,i)=>({i,d:Math.abs(n.getBoundingClientRect().top)})).sort((a,b)=>a.d-b.d)[0].i};
+      });
+      assert.equal(afterTest.panel,beforeTest.panel,'native Test does not advance presentation panels');
+      assert.equal(afterTest.visible,true,'Test stays visible after native activation');
+      assert.ok(Math.abs(afterTest.top-beforeTest.top)<=2,`native Test retains viewport position: ${JSON.stringify({beforeTest,afterTest})}`);
+      assert.ok(Math.abs(afterTest.y-beforeTest.y)<=2,`native Test does not scroll the page: ${JSON.stringify({beforeTest,afterTest})}`);
       await field('blank').fill('400'); assert.match(await headline.innerText(),/2 acceptable blanks/);
       await lab.locator('[data-sy-short]').focus(); await page.keyboard.press('Space');
       assert.equal(await field('length').inputValue(),'999.99'); assert.match(await headline.innerText(),/9 acceptable blanks/);
@@ -132,6 +162,19 @@ test('stock-yield actual page: thresholds, clearing, every interval, keyboard an
         await second.locator('[data-sy-input="blank"]').fill('100');
         assert.match(await second.locator('[data-sy-headline]').innerText(),/9 acceptable blanks/);
         assert.match(await headline.innerText(),/60 acceptable blanks/);
+        // Binding control: a separate root gets different canonical defaults.
+        // This tests the displayed baseline only, not an alternative prediction experiment.
+        await page.evaluate(()=>{
+          const original=globalThis.CourseWikiStockYield;
+          globalThis.syOriginalModel=original;
+          globalThis.CourseWikiStockYield=Object.freeze({...original,defaults:Object.freeze({...original.defaults,length:'1100',blank:'100',kerf:'4',price:'55'})});
+          const first=document.querySelector('[data-interactive="stock-yield"]'),copy=first.cloneNode(true);
+          copy.querySelector('.sy-live').remove();delete copy.dataset.syReady;first.after(copy);
+        });
+        await page.addScriptTag({url:new URL(src,page.url()).href});
+        const alternate=page.locator('.sy-live').nth(1);
+        assert.equal(await alternate.locator('[data-sy-prediction]').innerText(),'Test resets to page example: 1,100 mm stock; 100 mm blanks; 4 mm starting kerf; $55.00.','baseline follows canonical defaults rather than copied literals');
+        await page.evaluate(()=>{globalThis.CourseWikiStockYield=globalThis.syOriginalModel;delete globalThis.syOriginalModel;});
       }
       if (mode==='reading') {
         const next=await page.locator('a.seq.next').getAttribute('href');
