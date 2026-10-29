@@ -32,6 +32,13 @@ function loadSummary(s, id) {
   assert.ok(summary, 'the tool change committed an engine summary');
   return summary;
 }
+function drillToNearThrough() {
+  const s = M.create();
+  s.loadTool('dr6.6');
+  go(s, { x: 15, y: 30, z: 2 });
+  const normal = go(s, { z: -21.94 });
+  return { s, normal };
+}
 /* One face-mill pass half a millimetre too deep along the front of the block. */
 function deepPass(s) {
   s.loadTool('fm50');
@@ -205,10 +212,7 @@ test('move feedback separates modeled small removal, sub-grid evidence, true zer
   assert.equal(m.title, 'Cut.');
   assert.match(m.text, /Removed approximately .* \(grid estimate\)/);
 
-  const drill = M.create();
-  drill.loadTool('dr6.6');
-  go(drill, { x: 15, y: 30, z: 2 });
-  const normal = go(drill, { z: -21.94 });
+  const prepared = drillToNearThrough(), drill = prepared.s, normal = prepared.normal;
   assert.ok(normal.volume > 0.05);
   m = U.describeMove(normal, drill);
   assert.equal(m.title, 'Cut.');
@@ -226,6 +230,35 @@ test('move feedback separates modeled small removal, sub-grid evidence, true zer
   assert.equal(m.kind, 'cut');
   assert.match(m.text, /small modeled amount \(positive grid estimate below the displayed volume precision\)/);
   assert.doesNotMatch(m.text, /sub-grid|between display samples|0\.0 mm³/i);
+
+  const instant = drillToNearThrough().s;
+  const whole = go(instant, { z: -23 });
+  assert.equal(whole.subGridCut, false, 'one full advance records only its positive grid volume');
+  const sliced = drillToNearThrough().s, plan = sliced.plan({ z: -23 });
+  assert.equal(plan.legs.length, 1);
+  const leg = plan.legs[0], historyBefore = sliced.history.length, trace = [];
+  sliced.begin('move', 'Move');
+  let step;
+  do {
+    const beforeVolume = sliced.entry.tally.volume;
+    step = sliced.advance(leg, 0.1);
+    assert.equal(step.blocked, undefined);
+    trace.push({ added: sliced.entry.tally.volume - beforeVolume, flag: !!sliced.entry.subGridCut });
+  } while (!step.done);
+  const mixed = sliced.commit();
+  assert.equal(sliced.history.length, historyBefore + 1, 'all advances committed as one active move');
+  assert.ok(trace[0].added > 0 && !trace[0].flag, 'the first slice records positive grid volume');
+  assert.ok(trace.slice(1).some((one) => one.added === 0 && one.flag), 'a later zero-volume stamp sets the sticky witness');
+  assert.equal(mixed.volume, whole.volume);
+  assert.equal(mixed.subGridCut, true);
+  const slicedRaster = Buffer.from(sliced.raster.buffer, sliced.raster.byteOffset, sliced.raster.byteLength);
+  const instantRaster = Buffer.from(instant.raster.buffer, instant.raster.byteOffset, instant.raster.byteLength);
+  assert.equal(slicedRaster.equals(instantRaster), true, 'advance size does not change the final raster');
+  assert.deepEqual(sliced.pos, instant.pos);
+  const wholeFeedback = U.describeMove(whole, instant), mixedFeedback = U.describeMove(mixed, sliced);
+  assert.deepEqual(mixedFeedback, wholeFeedback, 'equal positive removal gets the same feedback despite the sticky witness');
+  assert.match(mixedFeedback.text, /small modeled amount \(positive grid estimate below the displayed volume precision\)/);
+  assert.doesNotMatch(mixedFeedback.text, /between display samples|no additional volume/);
 
   const repeated = go(drill, { z: -23 });
   assert.equal(repeated.volume, 0);
@@ -261,8 +294,9 @@ test('move feedback separates modeled small removal, sub-grid evidence, true zer
   assert.equal(unresolved.subGridCut, true);
   m = U.describeMove(unresolved, subGrid);
   assert.equal(m.title, 'Cut.');
-  assert.match(m.text, /between display samples/);
-  assert.doesNotMatch(m.text, /positive grid estimate/);
+  assert.match(m.text, /model marked a surface change between display samples/);
+  assert.match(m.text, /no additional volume recorded on the display grid/);
+  assert.doesNotMatch(m.text, /small|positive grid estimate|cannot resolve all of this removal/i);
 
   const stopped = M.create();
   stopped.loadTool('em6'); go(stopped, { x: 50, y: 30, z: 5 });
