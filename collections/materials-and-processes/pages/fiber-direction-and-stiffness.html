@@ -1,0 +1,48 @@
+@@ID: fiber-direction-and-stiffness
+@@TITLE: Fiber Direction and Elastic Stiffness
+@@SECTION: Foundations
+@@SUMMARY: Predict how one unidirectional composite layer stretches and skews when its fibers turn relative to the same applied stress.
+@@STATUS: ready
+@@END
+
+<section>
+  <h2>Fiber direction changes elastic response</h2>
+  <p>A fiber-reinforced composite combines a <strong>reinforcement</strong> with a surrounding <strong>matrix</strong>. In a unidirectional layer, the reinforcement is continuous and parallel. The layer is much stiffer along the fibers than across them, so its elastic response depends on direction.</p>
+  <p><strong>Stress</strong> is force divided by loaded area. This lesson compares patches under the same uniform axial stress, so each square millimeter carries the same applied force. <strong>Strain</strong> is deformation divided by original dimension. <strong>Elastic stiffness</strong> connects stress to strain in the reversible small-strain model.</p>
+  <p>The illustrative material uses <code>E<sub>1</sub> = 40 GPa</code> along the fibers, <code>E<sub>2</sub> = 10 GPa</code> across them, <code>G<sub>12</sub> = 5 GPa</code>, and <code>ν<sub>12</sub> = 0.30</code>. These round teaching values do not describe a named composite and are not design allowables.</p>
+  <p>Review [[plastics-as-materials]] for reinforcement, matrix, thermosets, and thermoplastics. Review [[plastic-forming-processes]] for hand layup and other forming routes.</p>
+</section>
+
+<section>
+  <h2>Predict the least stretch, then turn the fibers</h2>
+  <div data-interactive="fiber-orientation">
+    <div class="fo-static">
+      <p><strong>Predict first:</strong> identical free material patches carry uniform axial stress <code>σ<sub>x</sub> = 10 MPa</code>, with no applied transverse or shear stress. Which orientation stretches least: 0°, 45°, or 90°?</p>
+      <div class="unit-table-wrap" tabindex="0" role="region" aria-label="Fiber orientation elastic comparison table; scroll horizontally to see every column">
+        <table class="unit-table"><caption>Same illustrative lamina and same 10 MPa stress</caption><thead><tr><th>Fiber angle</th><th>Effective axial stiffness</th><th>Axial strain</th><th>Transverse strain</th><th>Engineering shear strain</th></tr></thead><tbody>
+          <tr><th>0°</th><td>40.00 GPa</td><td>0.0250%</td><td>−0.0075%</td><td>0 µε</td></tr>
+          <tr><th>+45°</th><td>12.90 GPa</td><td>0.0775%</td><td>−0.0225%</td><td>−375 µε</td></tr>
+          <tr><th>−45°</th><td>12.90 GPa</td><td>0.0775%</td><td>−0.0225%</td><td>+375 µε</td></tr>
+          <tr><th>90°</th><td>10.00 GPa</td><td>0.1000%</td><td>−0.0075%</td><td>0 µε</td></tr>
+        </tbody></table>
+      </div>
+      <p><strong>Result:</strong> 0° stretches least because the stiff fiber direction is aligned with the load. Opposite 45° angles have the same axial stiffness and stretch, but their shear strain has opposite sign.</p>
+    </div>
+  </div>
+  <p>This is a freely deforming material patch loaded by uniform edge traction. It is not a tensile-test coupon held in rigid grips: grips would restrain the off-axis skew and create another boundary-value problem.</p>
+</section>
+
+<section>
+  <h2>Off-axis extension can also create shear strain</h2>
+  <p>At 0° and 90°, the loading direction matches a principal material direction. The patch stretches and narrows without extension–shear coupling. At an off-axis angle, an axial stress can also make the free patch skew. Turning +45° to −45° mirrors that skew while leaving the axial stiffness unchanged.</p>
+  <p>The interactive drawing exaggerates every strain by the same factor of 120. A larger drawn change therefore means a larger calculated strain; the display does not secretly rescale each angle to fill the frame.</p>
+  <details class="deeper"><summary>How the axial stiffness is calculated</summary><p>Let <code>m = cos θ</code> and <code>n = sin θ</code>. For this plane-stress orthotropic layer, the compliance in the load direction is <code>S̄<sub>11</sub> = m⁴/E<sub>1</sub> + n⁴/E<sub>2</sub> + m²n²(1/G<sub>12</sub> − 2ν<sub>12</sub>/E<sub>1</sub>)</code>. Then <code>E<sub>x</sub> = 1/S̄<sub>11</sub></code> and <code>ε<sub>x</sub> = σ<sub>x</sub>/E<sub>x</sub></code>. The full stress and strain transformation supplies transverse and shear strain.</p></details>
+</section>
+
+<section>
+  <h2>Stiffness does not predict strength</h2>
+  <p>A smaller strain under the same stress means greater elastic stiffness. It does <strong>not</strong> say when the material fails, which direction is safest, or which laminate should be built. Strength needs failure data and criteria; a laminate also needs its complete stacking sequence, ply thicknesses, bonding, environment, loading, and boundary conditions.</p>
+  <p>This lesson models one thin, continuous-fiber lamina in small-strain linear elasticity and plane stress. It omits failure, damage, buckling, bending, temperature, moisture, manufacturing defects, grips, and interaction between multiple plies.</p>
+  <details class="deeper"><summary>Primary mechanics source and model boundary</summary><p><a href="https://ntrs.nasa.gov/api/citations/19950009349/downloads/19950009349.pdf">NASA Reference Publication 1351, <em>Basic Mechanics of Laminated Composite Plates</em></a>, sections I and II, defines isotropic and orthotropic behavior, develops plane-stress compliance and off-axis transformation, and identifies extension–shear coupling. Its stated scope separates elastic response from strength. The constants and examples on this page are original illustrative teaching inputs, not values from that report.</p></details>
+  <p><a class="button" data-practice-add="fiber-axis-strain" href="../practice.html#fiber-axis-strain">Practice axial strain</a> <a class="button" data-practice-add="fiber-angle-symmetry" href="../practice.html#fiber-angle-symmetry">Practice angle symmetry</a> <a class="button" data-practice-add="fiber-stiffness-not-strength" href="../practice.html#fiber-stiffness-not-strength">Practice model limits</a></p>
+</section>
