@@ -2996,6 +2996,58 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
   .deeper-back { display: none; }
 }
+[data-interactive="transfer-batch-flow"] { border: 1px solid var(--rule); border-radius: var(--radius); padding: 1rem; margin: 1rem 0; min-width: 0; }
+[data-interactive="transfer-batch-flow"] .tb-live { font-family: var(--f-display); line-height: 1.45; }
+[data-interactive="transfer-batch-flow"] .tb-live p { margin-block: .6rem; }
+[data-interactive="transfer-batch-flow"] .tb-live h3 { font-size: 1.15rem; }
+[data-interactive="transfer-batch-flow"] h3 { margin-top: 0; }
+[data-interactive="transfer-batch-flow"] .tb-case h4 { margin: .65rem 0 .3rem; }
+[data-interactive="transfer-batch-flow"] .tb-metrics { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; margin: .3rem 0; font-size: .9rem; }
+[data-interactive="transfer-batch-flow"] .tb-metrics span { display: grid; }
+[data-interactive="transfer-batch-flow"] .tb-scroll { overflow-x: auto; max-width: 100%; }
+[data-interactive="transfer-batch-flow"] .tb-scroll:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+[data-interactive="transfer-batch-flow"] .tb-diagram { display: block; width: 100%; min-width: 410px; max-height: none; }
+[data-interactive="transfer-batch-flow"] .tb-diagram text { fill: var(--ink); font: 13px system-ui, sans-serif; }
+[data-interactive="transfer-batch-flow"] .tb-job text { fill: var(--cat-ink); font-size: 12px; }
+[data-interactive="transfer-batch-flow"] .tb-a { fill: var(--cat1-soft); stroke: var(--msu-liteblue); stroke-width: .8; }
+[data-interactive="transfer-batch-flow"] .tb-b { fill: var(--cat2-soft); stroke: var(--msu-gold); stroke-width: .8; }
+[data-interactive="transfer-batch-flow"] .tb-selected rect { stroke: var(--ink); stroke-width: 2.5; }
+[data-interactive="transfer-batch-flow"] .tb-gate { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+[data-interactive="transfer-batch-flow"] .tb-axis { fill: none; stroke: var(--ink); stroke-width: 1; }
+[data-interactive="transfer-batch-flow"] .tb-settings { margin: .75rem 0; }
+[data-interactive="transfer-batch-flow"] .tb-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .7rem; padding: .6rem 0; }
+[data-interactive="transfer-batch-flow"] label { display: grid; gap: .25rem; min-width: 0; }
+[data-interactive="transfer-batch-flow"] :is(input,select,button) { min-height: 44px; min-width: 0; max-width: 100%; box-sizing: border-box; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .4rem .55rem; }
+[data-interactive="transfer-batch-flow"] :is(input,select) { width: 100%; }
+[data-interactive="transfer-batch-flow"] :is(button,select,summary) { cursor: pointer; }
+[data-interactive="transfer-batch-flow"] :is(input,select,button,summary):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+[data-interactive="transfer-batch-flow"] button, [data-interactive="transfer-batch-flow"] summary { min-height: 44px; }
+[data-interactive="transfer-batch-flow"] .tb-predict { display: flex; flex-wrap: wrap; gap: .5rem; align-items: end; }
+[data-interactive="transfer-batch-flow"] .tb-predict label { flex: 1 1 14rem; }
+[data-interactive="transfer-batch-flow"] .tb-status { margin: .5rem 0; }
+[data-interactive="transfer-batch-flow"] .tb-live .tb-status { border-left: 3px solid var(--accent); background: var(--surface-2); padding: .5rem .7rem; }
+[data-interactive="transfer-batch-flow"] .tb-equation { border-left: 3px solid var(--accent); padding-left: .7rem; }
+[data-interactive="transfer-batch-flow"] table { font-size: .85rem; min-width: 620px; }
+[data-interactive="transfer-batch-flow"] [hidden] { display: none !important; }
+[data-interactive="transfer-batch-flow"][data-tb-mounted] > .tb-static { display: none; }
+.tb-support-table .tb-scroll { overflow-x: auto; max-width: 100%; }
+.tb-support-table table { min-width: 620px; font-size: .85rem; }
+[data-interactive="transfer-batch-flow"][data-tb-mounted] + .tb-static-support { display: none; }
+@media print {
+  [data-interactive="transfer-batch-flow"] > .tb-live { display: none !important; }
+  [data-interactive="transfer-batch-flow"][data-tb-mounted] > .tb-static { display: block !important; }
+  [data-interactive="transfer-batch-flow"] .tb-controls { display: none !important; }
+  [data-interactive="transfer-batch-flow"] .tb-scroll { overflow: visible; }
+  [data-interactive="transfer-batch-flow"] .tb-diagram { min-width: 0; }
+  [data-interactive="transfer-batch-flow"] .tb-static .tb-diagram { max-width: 570px; margin-inline: auto; }
+  [data-interactive="transfer-batch-flow"][data-tb-mounted] + .tb-static-support { display: block; }
+  .tb-support-table .tb-scroll { overflow: visible; break-inside: avoid; }
+  .tb-support-table table { min-width: 0; width: 100%; font-size: 8pt; }
+  [data-interactive="transfer-batch-flow"] table { min-width: 0; width: 100%; font-size: 8pt; }
+  [data-interactive="transfer-batch-flow"] .tb-case, [data-interactive="transfer-batch-flow"] tr { break-inside: avoid; }
+  [data-interactive="transfer-batch-flow"] details::details-content { content-visibility: visible !important; }
+}
+
 </style>
 </head>
 <body class="app skin-app aggregate" data-page="agg-track-lean-thinking-and-improvement" data-base="">
@@ -3205,14 +3257,27 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p>This original sketch uses common conventions: a rectangle for a process, a triangle marked I for inventory, attached data boxes for measurements and arrows for flow. The legend distinguishes material movement from information. This is a teaching sketch, not a complete symbol standard.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="value-stream-mapping--measure-elapsed-lead-time-separately-from-process-time" data-card="value-stream-mapping--measure-elapsed-lead-time-separately-from-process-time">
-    <summary>Measure elapsed lead time separately from process time<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="value-stream-mapping--measure-elapsed-lead-time-separately-from-process-time" data-card="value-stream-mapping--measure-elapsed-lead-time-separately-from-process-time" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Measure elapsed lead time separately from process time<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Measure elapsed lead time separately from process time</h2>
 <p><strong>Lead time</strong> is elapsed time through the stated boundary, including waits. <strong>Process time</strong> is time actively spent doing the work within that boundary. Not all processing adds customer value.</p>
+<!-- TRANSFER-BATCH-STATIC:START -->
+<div data-interactive="transfer-batch-flow"><div class="tb-static"><h3>Transfer size changes when jobs finish</h3>
+<p>10 jobs; A = 4 min/job, B = 6 min/job. Compare transfer-all with transfer-one.</p>
+<div class="tb-case"><h4>Transfer all 10 jobs</h4><p class="tb-metrics"><span>First item <strong>46 min</strong></span><span>Full order <strong>100 min</strong></span><span>Processing / job <strong>10 min</strong></span></p><div class="tb-scroll" tabindex="0" role="region" aria-label="Transfer all 10 jobs station timeline, minutes from order release"><svg class="tb-diagram" viewBox="0 0 570 150" role="img" aria-label="Transfer 10 at a time: A on top, B below. First job finishes 46 min; full order 100 min." focusable="false"><text x="10" y="47">A</text><text x="10" y="105">B</text><path class="tb-axis" d="M42 118H552"/><path class="tb-axis" d="M42 118v4"/><text x="42" y="140" text-anchor="middle">0</text><path class="tb-axis" d="M169.5 118v4"/><text x="169.5" y="140" text-anchor="middle">25</text><path class="tb-axis" d="M297 118v4"/><text x="297" y="140" text-anchor="middle">50</text><path class="tb-axis" d="M424.5 118v4"/><text x="424.5" y="140" text-anchor="middle">75</text><path class="tb-axis" d="M552 118v4"/><text x="552" y="140" text-anchor="middle">100</text><path class="tb-gate" data-release="40" d="M246 57V84"><title>Jobs 1–10 transfer at 40 min</title></path><g data-job="1" data-station="A" data-start="0" data-end="4" class="tb-job tb-selected"><title>Job 1, station A: 0–4 min</title><rect x="42" y="30" width="20.400000000000006" height="25" class="tb-a"/><text x="52.2" y="47" text-anchor="middle">1</text></g><g data-job="1" data-station="B" data-start="40" data-end="46" class="tb-job tb-selected"><title>Job 1, station B: 40–46 min</title><rect x="246" y="88" width="30.600000000000023" height="25" class="tb-b"/><text x="261.3" y="105" text-anchor="middle">1</text></g><g data-job="2" data-station="A" data-start="4" data-end="8" class="tb-job"><title>Job 2, station A: 4–8 min</title><rect x="62.400000000000006" y="30" width="20.400000000000006" height="25" class="tb-a"/><text x="72.60000000000001" y="47" text-anchor="middle">2</text></g><g data-job="2" data-station="B" data-start="46" data-end="52" class="tb-job"><title>Job 2, station B: 46–52 min</title><rect x="276.6" y="88" width="30.599999999999966" height="25" class="tb-b"/><text x="291.9" y="105" text-anchor="middle">2</text></g><g data-job="3" data-station="A" data-start="8" data-end="12" class="tb-job"><title>Job 3, station A: 8–12 min</title><rect x="82.80000000000001" y="30" width="20.399999999999977" height="25" class="tb-a"/><text x="93" y="47" text-anchor="middle">3</text></g><g data-job="3" data-station="B" data-start="52" data-end="58" class="tb-job"><title>Job 3, station B: 52–58 min</title><rect x="307.2" y="88" width="30.599999999999966" height="25" class="tb-b"/><text x="322.5" y="105" text-anchor="middle">3</text></g><g data-job="4" data-station="A" data-start="12" data-end="16" class="tb-job"><title>Job 4, station A: 12–16 min</title><rect x="103.19999999999999" y="30" width="20.40000000000002" height="25" class="tb-a"/><text x="113.4" y="47" text-anchor="middle">4</text></g><g data-job="4" data-station="B" data-start="58" data-end="64" class="tb-job"><title>Job 4, station B: 58–64 min</title><rect x="337.79999999999995" y="88" width="30.60000000000008" height="25" class="tb-b"/><text x="353.1" y="105" text-anchor="middle">4</text></g><g data-job="5" data-station="A" data-start="16" data-end="20" class="tb-job"><title>Job 5, station A: 16–20 min</title><rect x="123.60000000000001" y="30" width="20.39999999999999" height="25" class="tb-a"/><text x="133.8" y="47" text-anchor="middle">5</text></g><g data-job="5" data-station="B" data-start="64" data-end="70" class="tb-job"><title>Job 5, station B: 64–70 min</title><rect x="368.40000000000003" y="88" width="30.599999999999966" height="25" class="tb-b"/><text x="383.70000000000005" y="105" text-anchor="middle">5</text></g><g data-job="6" data-station="A" data-start="20" data-end="24" class="tb-job"><title>Job 6, station A: 20–24 min</title><rect x="144" y="30" width="20.399999999999977" height="25" class="tb-a"/><text x="154.2" y="47" text-anchor="middle">6</text></g><g data-job="6" data-station="B" data-start="70" data-end="76" class="tb-job"><title>Job 6, station B: 70–76 min</title><rect x="399" y="88" width="30.600000000000023" height="25" class="tb-b"/><text x="414.3" y="105" text-anchor="middle">6</text></g><g data-job="7" data-station="A" data-start="24" data-end="28" class="tb-job"><title>Job 7, station A: 24–28 min</title><rect x="164.39999999999998" y="30" width="20.400000000000034" height="25" class="tb-a"/><text x="174.6" y="47" text-anchor="middle">7</text></g><g data-job="7" data-station="B" data-start="76" data-end="82" class="tb-job"><title>Job 7, station B: 76–82 min</title><rect x="429.6" y="88" width="30.599999999999966" height="25" class="tb-b"/><text x="444.9" y="105" text-anchor="middle">7</text></g><g data-job="8" data-station="A" data-start="28" data-end="32" class="tb-job"><title>Job 8, station A: 28–32 min</title><rect x="184.8" y="30" width="20.400000000000006" height="25" class="tb-a"/><text x="195" y="47" text-anchor="middle">8</text></g><g data-job="8" data-station="B" data-start="82" data-end="88" class="tb-job"><title>Job 8, station B: 82–88 min</title><rect x="460.2" y="88" width="30.600000000000023" height="25" class="tb-b"/><text x="475.5" y="105" text-anchor="middle">8</text></g><g data-job="9" data-station="A" data-start="32" data-end="36" class="tb-job"><title>Job 9, station A: 32–36 min</title><rect x="205.20000000000002" y="30" width="20.399999999999977" height="25" class="tb-a"/><text x="215.4" y="47" text-anchor="middle">9</text></g><g data-job="9" data-station="B" data-start="88" data-end="94" class="tb-job"><title>Job 9, station B: 88–94 min</title><rect x="490.8" y="88" width="30.599999999999966" height="25" class="tb-b"/><text x="506.1" y="105" text-anchor="middle">9</text></g><g data-job="10" data-station="A" data-start="36" data-end="40" class="tb-job"><title>Job 10, station A: 36–40 min</title><rect x="225.6" y="30" width="20.400000000000006" height="25" class="tb-a"/><text x="235.8" y="47" text-anchor="middle">10</text></g><g data-job="10" data-station="B" data-start="94" data-end="100" class="tb-job"><title>Job 10, station B: 94–100 min</title><rect x="521.4" y="88" width="30.600000000000023" height="25" class="tb-b"/><text x="536.7" y="105" text-anchor="middle">10</text></g></svg></div></div><div class="tb-case"><h4>Transfer 1 at a time</h4><p class="tb-metrics"><span>First item <strong>10 min</strong></span><span>Full order <strong>64 min</strong></span><span>Processing / job <strong>10 min</strong></span></p><div class="tb-scroll" tabindex="0" role="region" aria-label="Transfer 1 at a time station timeline, minutes from order release"><svg class="tb-diagram" viewBox="0 0 570 150" role="img" aria-label="Transfer 1 at a time: A on top, B below. First job finishes 10 min; full order 64 min." focusable="false"><text x="10" y="47">A</text><text x="10" y="105">B</text><path class="tb-axis" d="M42 118H552"/><path class="tb-axis" d="M42 118v4"/><text x="42" y="140" text-anchor="middle">0</text><path class="tb-axis" d="M169.5 118v4"/><text x="169.5" y="140" text-anchor="middle">25</text><path class="tb-axis" d="M297 118v4"/><text x="297" y="140" text-anchor="middle">50</text><path class="tb-axis" d="M424.5 118v4"/><text x="424.5" y="140" text-anchor="middle">75</text><path class="tb-axis" d="M552 118v4"/><text x="552" y="140" text-anchor="middle">100</text><path class="tb-gate" data-release="4" d="M62.400000000000006 57V84"><title>Jobs 1–1 transfer at 4 min</title></path><path class="tb-gate" data-release="8" d="M82.80000000000001 57V84"><title>Jobs 2–2 transfer at 8 min</title></path><path class="tb-gate" data-release="12" d="M103.19999999999999 57V84"><title>Jobs 3–3 transfer at 12 min</title></path><path class="tb-gate" data-release="16" d="M123.60000000000001 57V84"><title>Jobs 4–4 transfer at 16 min</title></path><path class="tb-gate" data-release="20" d="M144 57V84"><title>Jobs 5–5 transfer at 20 min</title></path><path class="tb-gate" data-release="24" d="M164.39999999999998 57V84"><title>Jobs 6–6 transfer at 24 min</title></path><path class="tb-gate" data-release="28" d="M184.8 57V84"><title>Jobs 7–7 transfer at 28 min</title></path><path class="tb-gate" data-release="32" d="M205.20000000000002 57V84"><title>Jobs 8–8 transfer at 32 min</title></path><path class="tb-gate" data-release="36" d="M225.6 57V84"><title>Jobs 9–9 transfer at 36 min</title></path><path class="tb-gate" data-release="40" d="M246 57V84"><title>Jobs 10–10 transfer at 40 min</title></path><g data-job="1" data-station="A" data-start="0" data-end="4" class="tb-job tb-selected"><title>Job 1, station A: 0–4 min</title><rect x="42" y="30" width="20.400000000000006" height="25" class="tb-a"/><text x="52.2" y="47" text-anchor="middle">1</text></g><g data-job="1" data-station="B" data-start="4" data-end="10" class="tb-job tb-selected"><title>Job 1, station B: 4–10 min</title><rect x="62.400000000000006" y="88" width="30.599999999999994" height="25" class="tb-b"/><text x="77.7" y="105" text-anchor="middle">1</text></g><g data-job="2" data-station="A" data-start="4" data-end="8" class="tb-job"><title>Job 2, station A: 4–8 min</title><rect x="62.400000000000006" y="30" width="20.400000000000006" height="25" class="tb-a"/><text x="72.60000000000001" y="47" text-anchor="middle">2</text></g><g data-job="2" data-station="B" data-start="10" data-end="16" class="tb-job"><title>Job 2, station B: 10–16 min</title><rect x="93" y="88" width="30.60000000000001" height="25" class="tb-b"/><text x="108.30000000000001" y="105" text-anchor="middle">2</text></g><g data-job="3" data-station="A" data-start="8" data-end="12" class="tb-job"><title>Job 3, station A: 8–12 min</title><rect x="82.80000000000001" y="30" width="20.399999999999977" height="25" class="tb-a"/><text x="93" y="47" text-anchor="middle">3</text></g><g data-job="3" data-station="B" data-start="16" data-end="22" class="tb-job"><title>Job 3, station B: 16–22 min</title><rect x="123.60000000000001" y="88" width="30.59999999999998" height="25" class="tb-b"/><text x="138.9" y="105" text-anchor="middle">3</text></g><g data-job="4" data-station="A" data-start="12" data-end="16" class="tb-job"><title>Job 4, station A: 12–16 min</title><rect x="103.19999999999999" y="30" width="20.40000000000002" height="25" class="tb-a"/><text x="113.4" y="47" text-anchor="middle">4</text></g><g data-job="4" data-station="B" data-start="22" data-end="28" class="tb-job"><title>Job 4, station B: 22–28 min</title><rect x="154.2" y="88" width="30.600000000000023" height="25" class="tb-b"/><text x="169.5" y="105" text-anchor="middle">4</text></g><g data-job="5" data-station="A" data-start="16" data-end="20" class="tb-job"><title>Job 5, station A: 16–20 min</title><rect x="123.60000000000001" y="30" width="20.39999999999999" height="25" class="tb-a"/><text x="133.8" y="47" text-anchor="middle">5</text></g><g data-job="5" data-station="B" data-start="28" data-end="34" class="tb-job"><title>Job 5, station B: 28–34 min</title><rect x="184.8" y="88" width="30.599999999999994" height="25" class="tb-b"/><text x="200.10000000000002" y="105" text-anchor="middle">5</text></g><g data-job="6" data-station="A" data-start="20" data-end="24" class="tb-job"><title>Job 6, station A: 20–24 min</title><rect x="144" y="30" width="20.399999999999977" height="25" class="tb-a"/><text x="154.2" y="47" text-anchor="middle">6</text></g><g data-job="6" data-station="B" data-start="34" data-end="40" class="tb-job"><title>Job 6, station B: 34–40 min</title><rect x="215.4" y="88" width="30.599999999999994" height="25" class="tb-b"/><text x="230.7" y="105" text-anchor="middle">6</text></g><g data-job="7" data-station="A" data-start="24" data-end="28" class="tb-job"><title>Job 7, station A: 24–28 min</title><rect x="164.39999999999998" y="30" width="20.400000000000034" height="25" class="tb-a"/><text x="174.6" y="47" text-anchor="middle">7</text></g><g data-job="7" data-station="B" data-start="40" data-end="46" class="tb-job"><title>Job 7, station B: 40–46 min</title><rect x="246" y="88" width="30.600000000000023" height="25" class="tb-b"/><text x="261.3" y="105" text-anchor="middle">7</text></g><g data-job="8" data-station="A" data-start="28" data-end="32" class="tb-job"><title>Job 8, station A: 28–32 min</title><rect x="184.8" y="30" width="20.400000000000006" height="25" class="tb-a"/><text x="195" y="47" text-anchor="middle">8</text></g><g data-job="8" data-station="B" data-start="46" data-end="52" class="tb-job"><title>Job 8, station B: 46–52 min</title><rect x="276.6" y="88" width="30.599999999999966" height="25" class="tb-b"/><text x="291.9" y="105" text-anchor="middle">8</text></g><g data-job="9" data-station="A" data-start="32" data-end="36" class="tb-job"><title>Job 9, station A: 32–36 min</title><rect x="205.20000000000002" y="30" width="20.399999999999977" height="25" class="tb-a"/><text x="215.4" y="47" text-anchor="middle">9</text></g><g data-job="9" data-station="B" data-start="52" data-end="58" class="tb-job"><title>Job 9, station B: 52–58 min</title><rect x="307.2" y="88" width="30.599999999999966" height="25" class="tb-b"/><text x="322.5" y="105" text-anchor="middle">9</text></g><g data-job="10" data-station="A" data-start="36" data-end="40" class="tb-job"><title>Job 10, station A: 36–40 min</title><rect x="225.6" y="30" width="20.400000000000006" height="25" class="tb-a"/><text x="235.8" y="47" text-anchor="middle">10</text></g><g data-job="10" data-station="B" data-start="58" data-end="64" class="tb-job"><title>Job 10, station B: 58–64 min</title><rect x="337.79999999999995" y="88" width="30.60000000000008" height="25" class="tb-b"/><text x="353.1" y="105" text-anchor="middle">10</text></g></svg></div></div>
+<p>A is upper blue, B lower gold; bars are jobs, dashed lines completed-batch transfers. Minutes from order release 0; both plots share a scale.</p>
+<p><strong>Job 10 with transfer-one:</strong> 36 min waiting before A + 0 held for batch + 18 waiting at B = <strong>54 min waiting</strong>. Add 10 min processing: <strong>64 min elapsed</strong> from order release 0.</p>
+<p><strong>Ideal schedule:</strong> all equal jobs arrive at 0; serial single-job A then B, first come first served. A never blocks; waiting space is unlimited. Completed batches transfer immediately; the last may be smaller. Constant times; no setup, transport, failure, rework or variation. Finite-order illustration, not a factory forecast or a universal best batch.</p></div></div>
+<div class="tb-static-support">
+<p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Default 10-job example: exact transfer-one schedule.</p>
+<p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Bounded model reference: scheduling equations and limits.</p></div>
+<!-- TRANSFER-BATCH-STATIC:END -->
+<p>The transfer-batch experiment above schedules a whole order. The earlier map sketch uses a fixed queue for <em>one item</em>:</p>
 <p>For one item in this simplified sequential example: cutting = 4 min, queue = 120 min, assembly = 6 min. Process time is <strong>10 min</strong>; lead time is <strong>130 min</strong>. No other delays or overlapping steps are included. Removing half the queue saves more elapsed time here than cutting one minute of processing.</p>
-<p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; A queue suggests a question, not a proven cause.</p>
+<p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; A queue suggests a question, not a proven cause.</p>
 <p><a class="button" data-practice-add="lean-lead-time" href="../practice.html#lean-lead-time">Practice lead time</a></p>
+<p><a class="button" data-practice-add="transfer-batch-first" href="../practice.html#transfer-batch-first">Practice transfer batches</a></p>
     </div>
   </details>
   <details class="xcard deck-slide" id="value-stream-mapping--draw-a-future-state-and-test-a-specific-change" data-card="value-stream-mapping--draw-a-future-state-and-test-a-specific-change">
@@ -3282,9 +3347,25 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li class="deeper-addendum" id="deeper-addendum-2" value="2">
       <article>
         <div class="crumb"><span>Lean and Quality</span><span class="sep">/</span><span>Continuous Improvement</span><span class="sep">/</span><a href="#p-value-stream-mapping">Value Stream Mapping</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 2.</span> A queue suggests a question, not a proven cause</h2>
-        <p>A queue may reflect a capacity constraint, batching, missing information or an unreliable next step. Observe demand, timing and variation before calling one operation the bottleneck. A working day and a calendar day are not interchangeable time units.</p>
+        <h2><span class="deeper-addendum-number">Addendum 2.</span> Default 10-job example: exact transfer-one schedule</h2>
+        <div class="tb-support-table"><p><strong>Fixed default example:</strong> 10 jobs; A = 4 min/job, B = 6 min/job; transfer one job at a time. This table does not update with live settings.</p><div class="tb-scroll" tabindex="0" role="region" aria-label="Exact job schedule, all times in minutes"><table class="unit-table"><caption>Transfer 1 at a time · minutes from order release at 0</caption><thead><tr><th scope="col">Job</th><th scope="col">A start–end</th><th scope="col">Transfer</th><th scope="col">B start–end</th><th scope="col">Wait before A</th><th scope="col">Held for batch</th><th scope="col">Wait at B</th><th scope="col">Total wait</th></tr></thead><tbody><tr><th scope="row">1</th><td>0–4</td><td>4</td><td>4–10</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><th scope="row">2</th><td>4–8</td><td>8</td><td>10–16</td><td>4</td><td>0</td><td>2</td><td>6</td></tr><tr><th scope="row">3</th><td>8–12</td><td>12</td><td>16–22</td><td>8</td><td>0</td><td>4</td><td>12</td></tr><tr><th scope="row">4</th><td>12–16</td><td>16</td><td>22–28</td><td>12</td><td>0</td><td>6</td><td>18</td></tr><tr><th scope="row">5</th><td>16–20</td><td>20</td><td>28–34</td><td>16</td><td>0</td><td>8</td><td>24</td></tr><tr><th scope="row">6</th><td>20–24</td><td>24</td><td>34–40</td><td>20</td><td>0</td><td>10</td><td>30</td></tr><tr><th scope="row">7</th><td>24–28</td><td>28</td><td>40–46</td><td>24</td><td>0</td><td>12</td><td>36</td></tr><tr><th scope="row">8</th><td>28–32</td><td>32</td><td>46–52</td><td>28</td><td>0</td><td>14</td><td>42</td></tr><tr><th scope="row">9</th><td>32–36</td><td>36</td><td>52–58</td><td>32</td><td>0</td><td>16</td><td>48</td></tr><tr><th scope="row">10</th><td>36–40</td><td>40</td><td>58–64</td><td>36</td><td>0</td><td>18</td><td>54</td></tr></tbody></table></div></div>
         <p class="deeper-back"><a href="#deeper-ref-2">Back to reference 2</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-3" value="3">
+      <article>
+        <div class="crumb"><span>Lean and Quality</span><span class="sep">/</span><span>Continuous Improvement</span><span class="sep">/</span><a href="#p-value-stream-mapping">Value Stream Mapping</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 3.</span> Bounded model reference: scheduling equations and limits</h2>
+        <p>These equations describe the bounded ideal model; they do not report the current live settings.</p><p>For job i: A start = (i − 1)tA; A end = i × tA; transfer = min(ceil(i / batch) × batch, N) × tA. B start is the later of transfer and previous B finish; B end = B start + tB. Waiting before A = A start; held for batch = transfer − A end; waiting at B = B start − transfer. The three waits plus tA + tB equal that job’s completion time from order release 0.</p><p>Bounds: N 1–20 jobs, transfer 1–N, station times 1–20 whole min/job. This original scheduling example is separate from the map’s fixed 120-minute queue. It does not diagnose a factory or identify a universal optimal batch. Real setup, transport, limited space and variation can change the decision; no demand, quality or capacity forecast is made.</p>
+        <p class="deeper-back"><a href="#deeper-ref-3">Back to reference 3</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-4" value="4">
+      <article>
+        <div class="crumb"><span>Lean and Quality</span><span class="sep">/</span><span>Continuous Improvement</span><span class="sep">/</span><a href="#p-value-stream-mapping">Value Stream Mapping</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 4.</span> A queue suggests a question, not a proven cause</h2>
+        <p>A queue may reflect a capacity constraint, batching, missing information or an unreliable next step. Observe demand, timing and variation before calling one operation the bottleneck. A working day and a calendar day are not interchangeable time units.</p>
+        <p class="deeper-back"><a href="#deeper-ref-4">Back to reference 4</a></p>
       </article>
     </li>
   </ol>
@@ -5101,6 +5182,126 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
   })();
 })();
+(function (root) {
+  'use strict';
+  const defaults = Object.freeze({n: 10, batch: 1, a: 4, b: 6});
+  // Minutes from the common order release at 0. Jobs retain their order at B.
+  function schedule({n, batch, a, b}) {
+    if (!Number.isInteger(n) || n < 1 || n > 20) throw new RangeError('Order size must be 1–20 whole jobs.');
+    if (!Number.isInteger(batch) || batch < 1 || batch > n) throw new RangeError('Transfer size must be 1–order size whole jobs.');
+    if (![a, b].every(t => Number.isInteger(t) && t >= 1 && t <= 20)) throw new RangeError('Station times must be 1–20 whole minutes per job.');
+    const jobs = [], gates = [];
+    let finish = 0;
+    for (let first = 1; first <= n; first += batch) {
+      const last = Math.min(first + batch - 1, n);
+      gates.push({first, last, time: last * a});
+      for (let id = first; id <= last; id++) {
+        const aStart = (id - 1) * a, aEnd = id * a, release = last * a;
+        const bStart = Math.max(release, finish), bEnd = bStart + b;
+        const beforeA = aStart, held = release - aEnd, atB = bStart - release;
+        jobs.push({id, aStart, aEnd, release, bStart, bEnd, beforeA, held, atB, waiting: beforeA + held + atB});
+        finish = bEnd;
+      }
+    }
+    return {n, batch, a, b, jobs, gates, processing: a + b, first: jobs[0].bEnd, last: finish};
+  }
+  const api = Object.freeze({defaults, schedule});
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiTransferBatch = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+(function (root) {
+  'use strict';
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+  function diagram(s, extent, selected) {
+    const left = 42, width = 510, x = t => left + t / extent * width;
+    const bars = s.jobs.map(j => [
+      ['A', j.aStart, j.aEnd, 30], ['B', j.bStart, j.bEnd, 88]
+    ].map(([station, start, end, y]) => `<g data-job="${j.id}" data-station="${station}" data-start="${start}" data-end="${end}" class="tb-job${j.id === selected ? ' tb-selected' : ''}"><title>Job ${j.id}, station ${station}: ${start}–${end} min</title><rect x="${x(start)}" y="${y}" width="${x(end)-x(start)}" height="25" class="tb-${station.toLowerCase()}"/>${x(end)-x(start) >= 14 ? `<text x="${(x(start)+x(end))/2}" y="${y+17}" text-anchor="middle">${j.id}</text>` : ''}</g>`).join('')).join('');
+    const gates = s.gates.map(g => `<path class="tb-gate" data-release="${g.time}" d="M${x(g.time)} 57V84"><title>Jobs ${g.first}–${g.last} transfer at ${g.time} min</title></path>`).join('');
+    const ticks = [...new Set([0, Math.round(extent/4), Math.round(extent/2), Math.round(3*extent/4), extent])];
+    return `<svg class="tb-diagram" viewBox="0 0 570 150" role="img" aria-label="${esc(`Transfer ${s.batch} at a time: A on top, B below. First job finishes ${s.first} min; full order ${s.last} min.`)}" focusable="false"><text x="10" y="47">A</text><text x="10" y="105">B</text><path class="tb-axis" d="M42 118H552"/>${ticks.map(t => `<path class="tb-axis" d="M${x(t)} 118v4"/><text x="${x(t)}" y="140" text-anchor="middle">${t}</text>`).join('')}${gates}${bars}</svg>`;
+  }
+  function card(s, extent, selected, title) {
+    return `<div class="tb-case"><h4>${esc(title)}</h4><p class="tb-metrics"><span>First item <strong>${s.first} min</strong></span><span>Full order <strong>${s.last} min</strong></span><span>Processing / job <strong>${s.processing} min</strong></span></p><div class="tb-scroll" tabindex="0" role="region" aria-label="${esc(title)} station timeline, minutes from order release">${diagram(s, extent, selected)}</div></div>`;
+  }
+  function comparison(baseline, current, selected) {
+    const extent = Math.max(baseline.last, current.last);
+    return card(baseline, extent, selected, `Transfer all ${baseline.n} jobs`) + card(current, extent, selected, `Transfer ${current.batch} at a time`);
+  }
+  function detail(s, selected) {
+    const j = s.jobs[selected - 1];
+    return `<p class="tb-equation"><strong>Job ${j.id}: ${j.bEnd} min elapsed</strong> = ${j.beforeA} waiting before A + ${s.a} at A + ${j.held} held for batch + ${j.atB} waiting at B + ${s.b} at B.</p><p>It leaves A at ${j.aEnd}, transfers at ${j.release}, starts B at ${j.bStart} and finishes at ${j.bEnd} min. Total waiting: <strong>${j.waiting} min</strong>; processing: <strong>${s.processing} min</strong>.</p>`;
+  }
+  function table(s) {
+    return `<div class="tb-scroll" tabindex="0" role="region" aria-label="Exact job schedule, all times in minutes"><table class="unit-table"><caption>Transfer ${s.batch} at a time · minutes from order release at 0</caption><thead><tr><th scope="col">Job</th><th scope="col">A start–end</th><th scope="col">Transfer</th><th scope="col">B start–end</th><th scope="col">Wait before A</th><th scope="col">Held for batch</th><th scope="col">Wait at B</th><th scope="col">Total wait</th></tr></thead><tbody>${s.jobs.map(j => `<tr><th scope="row">${j.id}</th><td>${j.aStart}–${j.aEnd}</td><td>${j.release}</td><td>${j.bStart}–${j.bEnd}</td><td>${j.beforeA}</td><td>${j.held}</td><td>${j.atB}</td><td>${j.waiting}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  const api = Object.freeze({diagram, card, comparison, detail, table});
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiTransferBatchRender = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+(function () {
+  'use strict';
+  const M = globalThis.CourseWikiTransferBatch, R = globalThis.CourseWikiTransferBatchRender;
+  if (!M || !R) return;
+  document.querySelectorAll('[data-interactive="transfer-batch-flow"]').forEach(root => {
+    if (root.dataset.tbMounted) return;
+    const fallback = root.innerHTML;
+    root.dataset.tbMounted = 'true';
+    root.innerHTML = `<div class="tb-live"><h3>When can the next station start?</h3>
+      <p>Try this example: ten jobs, A takes 4 min/job, B takes 6. Instead of holding all ten at A, transfer each completed job. Predict what changes.</p>
+      <div class="tb-controls"><div class="tb-predict"><label>Your prediction<select data-tb="prediction"><option value="">Choose before testing</option><option value="both">First item and full order finish earlier; processing/job stays 10 min</option><option value="first">Only the first item finishes earlier</option><option value="processing">Each job needs less processing</option></select></label><button type="button" class="button" data-tb="test">Test 10-job example</button></div></div>
+      <p class="tb-status" role="status" aria-live="polite" data-tb="status">Compare the transfer-all schedule below with your prediction.</p>
+      <div data-tb="plots"></div>
+      <p>A is the upper blue row; B is the lower gold row. Each bar is one job; dashed lines mark when completed batches leave A. Both plots use the same minutes-from-order-release scale. Outline = inspected job.</p>
+      <details class="tb-settings tb-controls"><summary>Change the order or station times</summary><div class="tb-fields">
+        <label>Order size (jobs)<input data-tb="n" type="number" min="1" max="20" step="1" value="10"></label>
+        <label>Transfer size (jobs)<input data-tb="batch" type="number" min="1" max="10" step="1" value="10"></label>
+        <label>A (min/job)<input data-tb="a" type="number" min="1" max="20" step="1" value="4"></label>
+        <label>B (min/job)<input data-tb="b" type="number" min="1" max="20" step="1" value="6"></label>
+      </div><button type="button" class="button" data-tb="reset">Reset 10 jobs at 4 / 6 min</button></details>
+      <div data-tb="evidence"><div class="tb-controls"><label>Inspect a job in the changed schedule<select data-tb="job"></select></label></div><div data-tb="detail"></div><details><summary>Exact schedule and waiting for every job</summary><div data-tb="table"></div></details></div>
+      <details><summary>Ideal system, equations and limits</summary><p>All equal jobs are available at order time 0. A and B each process one job at a time, in order (first come, first served). A never blocks; waiting space is unlimited. A completed transfer batch moves immediately. The last batch may be smaller. Setup, transport, failures, rework and variation are zero.</p><p>For job i, A starts at (i − 1)tA and ends at i × tA. Its batch transfers at min(ceil(i / batch) × batch, N) × tA. B starts at the later of transfer time and the previous job’s B finish, then takes tB. Waiting before A + time at A + held for batch + waiting at B + time at B = that job’s finish time, measured from 0.</p><p>These are ideal schedules, not a factory diagnosis or a universal best batch size. Setup, transport, capacity limits and variability can change a real decision. No demand, quality or capacity forecast is made.</p></details></div>${fallback}`;
+    const el = name => root.querySelector(`[data-tb="${name}"]`);
+    let compared = false, selected = 1;
+    function values() {
+      return Object.fromEntries(['n', 'batch', 'a', 'b'].map(k => [k, el(k).value === '' ? NaN : Number(el(k).value)]));
+    }
+    function draw(message) {
+      try {
+        const v = values(), current = M.schedule(v), baseline = M.schedule({...v, batch: v.n});
+        selected = Math.min(selected, v.n);
+        el('n').removeAttribute('aria-invalid'); el('batch').max = String(v.n);
+        el('plots').innerHTML = compared ? R.comparison(baseline, current, selected) : R.card(baseline, baseline.last, selected, `Transfer all ${baseline.n} jobs`);
+        // Before the experiment, the single baseline keeps the prediction useful.
+        el('job').innerHTML = current.jobs.map(j => `<option value="${j.id}"${j.id === selected ? ' selected' : ''}>Job ${j.id}</option>`).join('');
+        el('evidence').hidden = !compared;
+        el('detail').innerHTML = R.detail(current, selected);
+        el('table').innerHTML = R.table(current);
+        if (message) el('status').textContent = message;
+        else el('status').textContent = compared ? `Transfer ${v.batch}: first ${current.first} min, full order ${current.last} min. Processing remains ${current.processing} min/job.` : 'Compare the transfer-all schedule below with your prediction.';
+      } catch (error) {
+        el('plots').innerHTML = ''; el('detail').innerHTML = ''; el('table').innerHTML = ''; el('evidence').hidden = true;
+        el('status').textContent = error.message + ' No schedule is shown until the entries are valid.';
+      }
+    }
+    ['n', 'batch', 'a', 'b'].forEach(k => el(k).addEventListener('input', () => { compared = true; draw(); }));
+    el('job').addEventListener('change', () => { selected = Number(el('job').value); draw(); });
+    el('test').addEventListener('click', () => {
+      if (!el('prediction').value) { el('status').textContent = 'Choose a prediction, then test it.'; el('prediction').focus(); return; }
+      ['n', 'batch', 'a', 'b'].forEach(k => { el(k).value = String(M.defaults[k]); });
+      compared = true; selected = 1;
+      draw((el('prediction').value === 'both' ? 'Your prediction matches. ' : 'Compare the result with your prediction: ') + 'First item: 46 → 10 min; full order: 100 → 64 min. Every job still needs 4 + 6 = 10 min of processing.');
+    });
+    el('reset').addEventListener('click', () => {
+      ['n', 'batch', 'a', 'b'].forEach(k => { el(k).value = String(k === 'batch' ? 10 : M.defaults[k]); });
+      compared = false; selected = 1; el('prediction').value = ''; draw();
+    });
+    draw();
+  });
+})();
+
 </script>
 </body>
 </html>

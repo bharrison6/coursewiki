@@ -16,21 +16,23 @@
       return '<label for="' + id + '-' + key + '">' + label + '<input id="' + id + '-' + key + '" data-rb-input="' + key + '" type="number" inputmode="decimal" step="any" min="' + minimum + '" value="' + value + '"></label>';
     }
     lab.innerHTML = '<p><strong>Two components, two meanings of “220 g”.</strong> These invented A/B values teach arithmetic. They are not a product recipe.</p>' +
-      '<fieldset class="rb-predict"><legend>Predict the mass balance</legend><p>For an illustrative 10:1 A:B ratio <strong>by mass</strong>, compare a 220 g target total with starting from 220 g of A alone. Which gives more total material after adding B?</p>' +
+      '<details class="rb-history" data-rb="history" open><summary data-rb="history-summary" hidden>Initial 10:1 / 220 g example: prediction and explanation</summary><fieldset class="rb-predict"><legend>Predict the mass balance</legend><p>For an illustrative 10:1 A:B ratio <strong>by mass</strong>, compare a 220 g target total with starting from 220 g of A alone. Which gives more total material after adding B?</p>' +
       ['total|The 220 g target total', 'given-a|Starting from 220 g of A', 'same|Both give the same total'].map(function (option) { var p = option.split('|'); return '<label><input type="radio" name="' + id + '-prediction" value="' + p[0] + '"> ' + p[1] + '</label>'; }).join('') +
-      '<button type="button" data-rb="reveal" disabled aria-controls="' + id + '-experiment">Reveal and explore</button><p data-rb="feedback" role="status">Choose a prediction first.</p></fieldset>' +
-      '<div id="' + id + '-experiment" data-rb="experiment" hidden>' +
+      '<button type="button" data-rb="reveal" disabled aria-controls="' + id + '-experiment">Reveal and explore</button><p data-rb="feedback" role="status">Choose a prediction first.</p></fieldset></details>' +
+      '<div id="' + id + '-experiment" data-rb="experiment" hidden><h3 class="rb-explore-heading" data-rb="explore-heading" tabindex="-1">Explore the current batch</h3>' +
       '<div class="rb-presets" aria-label="Change illustrative specification"><span>Change illustrative specification:</span><button type="button" data-rb-preset="initial">10:1 by mass · 220 g</button><button type="button" data-rb-preset="mass">2:1 by mass · 300 g</button><button type="button" data-rb-preset="volume">2:1 by volume · 300 g</button></div>' +
-      '<div class="rb-controls">' +
+      '<div class="rb-controls rb-primary">' +
       '<label for="' + id + '-mode">What does the given mass mean?<select id="' + id + '-mode" data-rb="mode"><option value="total">Target total material mass</option><option value="given-a">Given component A mass</option></select></label>' +
+      '<label for="' + id + '-basis">Ratio basis (changes specification)<select id="' + id + '-basis" data-rb="basis"><option value="mass">A:B by mass</option><option value="volume">A:B by volume</option></select></label></div>' +
+      '<p class="rb-error" data-rb="error" role="status"></p><div data-rb="results" aria-live="polite"></div>' +
+      '<details class="rb-advanced" data-rb="advanced"><summary>Adjust mass, ratio parts, densities and tare</summary><div class="rb-controls">' +
       '<label for="' + id + '-unit">Mass unit (same physical batch)<select id="' + id + '-unit" data-rb="unit"><option value="g">g</option><option value="kg">kg</option></select></label>' +
       number('amount', 'Given mass (<span data-rb="unit-label">g</span>)', 220, 0) +
       number('tare', 'Empty container mass / tare (<span data-rb="unit-label">g</span>)', 35, 0) +
-      '<label for="' + id + '-basis">Ratio basis (changes specification)<select id="' + id + '-basis" data-rb="basis"><option value="mass">A:B by mass</option><option value="volume">A:B by volume</option></select></label>' +
       number('ratio-a', 'A ratio parts', 10, 0) + number('ratio-b', 'B ratio parts', 1, 0) +
       number('density-a', 'A density (g/mL)', 1.2, 0) + number('density-b', 'B density (g/mL)', 0.8, 0) + '</div>' +
-      '<p class="rb-basis-note">Changing g ↔ kg converts the given mass and tare together. Changing ratio parts or mass ↔ volume changes the illustrative specification; it is not a unit conversion or an instruction to change a product ratio.</p>' +
-      '<p class="rb-error" data-rb="error" role="status"></p><div data-rb="results" aria-live="polite"></div>' +
+      '<p class="rb-basis-note">Changing g ↔ kg converts the given mass and tare together. Changing ratio parts or mass ↔ volume changes the illustrative specification; it is not a unit conversion or an instruction to change a product ratio.</p></details>' +
+      '<div data-rb="details"></div>' +
       '<p>Displayed numbers round to at most four decimal places; very small or large numbers use scientific notation. All calculations use unrounded values. Ideal readings assume no material loss or scale error; displayed precision is not physical accuracy.</p></div>' +
       '<p>Use the actual product’s TDS/SDS for its ratio basis and processing/handling instructions. This model predicts no cure, exotherm, working time, compatibility or mixed/cured volume.</p>';
     root.insertBefore(lab, root.firstChild);
@@ -56,6 +58,7 @@
     }
     function render() {
       q('[data-rb="results"]').innerHTML = ''; // Invalid inputs must clear numbers AND bars.
+      q('[data-rb="details"]').innerHTML = '';
       q('[data-rb="error"]').textContent = '';
       try {
         var s = state(), total = M.batch(Object.assign({}, s, { mode: 'total' })), given = M.batch(Object.assign({}, s, { mode: 'given-a' }));
@@ -64,10 +67,10 @@
         var working = s.basis === 'mass' ?
           '<p>For a target total, divide by <strong>a + b</strong>, the total number of ratio parts: A = ' + mass(s.amountG) + ' × ' + f(s.ratioA) + '/(' + f(s.ratioA) + ' + ' + f(s.ratioB) + ') = ' + mass(total.massAG) + '; B = ' + mass(s.amountG) + ' × ' + f(s.ratioB) + '/(' + f(s.ratioA) + ' + ' + f(s.ratioB) + ') = ' + mass(total.massBG) + '. For A alone, divide by <strong>a</strong>: B = ' + mass(s.amountG) + ' × ' + f(s.ratioB) + '/' + f(s.ratioA) + ' = ' + mass(given.massBG) + '.</p>' :
           '<p>First convert volume parts into mass weights: aρ<sub>A</sub>:bρ<sub>B</sub> = (' + f(s.ratioA) + ' × ' + f(s.densityA) + '):(' + f(s.ratioB) + ' × ' + f(s.densityB) + ') = <strong>' + f(s.ratioA * s.densityA) + ':' + f(s.ratioB * s.densityB) + '</strong>. Split the target total in these mass weights: m<sub>A</sub> = M aρ<sub>A</sub>/(aρ<sub>A</sub> + bρ<sub>B</sub>) and m<sub>B</sub> = M bρ<sub>B</sub>/(aρ<sub>A</sub> + bρ<sub>B</sub>).</p><p>For A alone, find V<sub>A</sub> = m<sub>A</sub>/ρ<sub>A</sub>, then V<sub>B</sub> = V<sub>A</sub> b/a and m<sub>B</sub> = V<sub>B</sub>ρ<sub>B</sub>. Here ' + f(given.massAG) + ' g ÷ ' + f(s.densityA) + ' g/mL = ' + f(given.volumeAMl) + ' mL of A; B needs ' + f(given.volumeBMl) + ' mL × ' + f(s.densityB) + ' g/mL = ' + mass(given.massBG) + '.</p>';
-        q('[data-rb="results"]').innerHTML = '<h3>Follow the material mass</h3><p>Specification: <strong>' + f(s.ratioA) + ':' + f(s.ratioB) + ' A:B by ' + s.basis + '</strong>. The same entered ' + mass(s.amountG) + ' is interpreted two ways below.</p>' +
+        q('[data-rb="results"]').innerHTML = '<h3>Current batch comparison</h3><p>Selected: <strong>' + mass(s.amountG) + (s.mode === 'total' ? ' target total material mass' : ' of component A alone') + '</strong>; <strong>' + f(s.ratioA) + ':' + f(s.ratioB) + ' A:B by ' + s.basis + '</strong>. Both interpretations are compared below.</p>' +
           '<div class="rb-comparisons">' + balance(total, 'total', Math.max(total.totalG, given.totalG)) + balance(given, 'given-a', Math.max(total.totalG, given.totalG)) + '</div>' +
-          '<p>Bars share one mass scale: the full track represents ' + mass(Math.max(total.totalG, given.totalG)) + '. <span class="rb-a">A is solid</span>; <span class="rb-b">B is striped</span>. They show component mass, not container fill or cavity volume.</p>' +
-          '<div class="rb-working"><h3>Why the denominator changes</h3>' + working + '</div>' +
+          '<p>Bars share one mass scale: the full track represents ' + mass(Math.max(total.totalG, given.totalG)) + '. <span class="rb-a">A is solid</span>; <span class="rb-b">B is striped</span>. They show component mass, not container fill or cavity volume.</p>';
+        q('[data-rb="details"]').innerHTML = '<div class="rb-working"><h3>Why the denominator changes</h3>' + working + '</div>' +
           '<h3>Selected batch: each component’s own volume</h3><div class="rb-components"><article><h4>Component A</h4><strong>' + mass(r.massAG) + '</strong><p>' + f(r.massAG) + ' g ÷ ' + f(s.densityA) + ' g/mL = <strong>' + f(r.volumeAMl) + ' mL</strong></p></article>' +
           '<article><h4>Component B</h4><strong>' + mass(r.massBG) + '</strong><p>' + f(r.massBG) + ' g ÷ ' + f(s.densityB) + ' g/mL = <strong>' + f(r.volumeBMl) + ' mL</strong></p></article></div>' +
           '<p data-rb="equivalent">This same batch has A:B mass ratio <strong>' + f(r.massRatioAtoB) + ':1</strong> and individual component volume ratio <strong>' + f(r.volumeRatioAtoB) + ':1</strong>. These are two descriptions of the same quantities. The component volumes do not establish mixed/cured volume or cavity fill.</p>' +
@@ -82,8 +85,14 @@
     q('.rb-predict').addEventListener('change', function () { q('[data-rb="reveal"]').disabled = !q('input[type="radio"]:checked'); });
     q('[data-rb="reveal"]').addEventListener('click', function () {
       var guess = q('input[type="radio"]:checked'); if (!guess) return;
-      q('[data-rb="feedback"]').textContent = (guess.value === 'given-a' ? 'Prediction confirmed. ' : 'Compare what 220 g includes. ') + 'A 220 g target is 200 g A + 20 g B. Starting from 220 g A needs 22 g B, giving 242 g total. The ratio stays 10:1; the given mass means something different.';
+      q('[data-rb="feedback"]').textContent = 'Initial 10:1 / 220 g example only. ' + (guess.value === 'given-a' ? 'Prediction confirmed. ' : 'Compare what 220 g includes. ') + 'A 220 g target is 200 g A + 20 g B. Starting from 220 g A needs 22 g B, giving 242 g total. The ratio stays 10:1; the given mass means something different.';
       q('[data-rb="experiment"]').hidden = false; render();
+      q('[data-rb="history-summary"]').hidden = false;
+      q('[data-rb="history"]').dataset.complete = 'true'; q('[data-rb="history"]').open = false;
+      // Reveal's button is now in a closed history disclosure. Give focus a
+      // visible continuation instead of leaving it on the hidden button.
+      q('[data-rb="explore-heading"]').focus({ preventScroll: true });
+      q('[data-rb="explore-heading"]').scrollIntoView({ block: 'start', behavior: 'instant' });
     });
     lab.addEventListener('input', function (event) { if (event.target.matches('[data-rb-input]')) render(); });
     ['mode', 'basis'].forEach(function (key) { q('[data-rb="' + key + '"]').addEventListener('change', render); });

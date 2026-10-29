@@ -17625,19 +17625,23 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
     var t = sim.tool;
     if (!t) return null;
     var top = sim.maxHeightIn(sim.pos.x, sim.pos.y, t.dia / 2);
-    if (top === -Infinity) return { beside: true };
+    if (top === -Infinity) {
+      var touchesBlock = sim.capsuleTouchesStock(sim.pos, sim.pos, t.dia / 2);
+      return { beside: !touchesBlock, noMetal: true };
+    }
     return { top: top, gap: sim.pos.z - top };
   }
   function where(sim) {
     return 'X ' + fmtSigned(sim.pos.x, 2) + ', Y ' + fmtSigned(sim.pos.y, 2) + ', Z ' + fmtSigned(sim.pos.z, 2);
   }
+  function modeledCut(sum) { return sum.volume > 0 || sum.subGridCut; }
 
   /* Plain-language account of a finished move, for the status line. It
      always says whether metal was cut, and where the tool now is. */
   function describeMove(sum, sim) {
     if (sum.blocked) return { kind: 'stop', title: 'Stopped.', text: sum.blocked.message, warn: true };
     var parts = [], threaded = sum.notes.some(function (n) { return /^Thread cut/.test(n); });
-    var cut = sum.volume > 0.05 || sum.subGridCut;
+    var cut = modeledCut(sum);
     if (sum.volume > 0.05) {
       var v = sum.volume >= 1000 ? fmt(sum.volume / 1000, 2) + ' cm³' : fmt(sum.volume, sum.volume < 10 ? 1 : 0) + ' mm³';
       parts.push('Removed approximately ' + v + ' (grid estimate).');
@@ -17645,6 +17649,7 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
       else if (sum.side === 'conventional') parts.push('A side cut with the metal on the left of the cutter: conventional milling.');
       else if (sum.side === 'both') parts.push('The cutter had metal on both sides, like a slot.');
     }
+    else if (sum.volume > 0) parts.push('Removed a small modeled amount (positive grid estimate below the displayed volume precision).');
     if (sum.subGridCut) parts.push('A small cut changed the surface between display samples; the volume grid cannot resolve all of this removal. Inspect for its marked location.');
     sum.notes.forEach(function (n) { parts.push(n); });
     if (sum.kind === 'tool') return { kind: 'info', title: 'Tool changed.', text: parts.join(' '), warn: false };
@@ -17653,7 +17658,8 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
       return { kind: 'cut', title: threaded && !cut ? 'Threaded.' : 'Cut.', text: parts.join(' '), warn: false };
     }
     var c = clearance(sim);
-    parts.push(!c ? 'At ' + where(sim) + '.' : c.beside ? 'The tool is at ' + where(sim) + ', beside the block: there is no metal under the cutter.'
+    parts.push(!c ? 'At ' + where(sim) + '.' : c.beside ? 'The tool is at ' + where(sim) + ', beside the block: there is no modeled metal under the cutter.'
+      : c.noMetal ? 'The tool is at ' + where(sim) + ', with no modeled metal under its footprint.'
       : c.gap > 0.005 ? 'The tool is at ' + where(sim) + '. Its tip is ' + fmt(c.gap, 2) + ' mm above the metal under it. ' +
         (sim.tool && sim.tool.kind === 'face' ? 'For a facing cut, lower it beside the block, then feed across.' : 'This move stayed above the work.')
       : 'The tool is at ' + where(sim) + ', touching the metal.');
@@ -18186,7 +18192,8 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
       if (!t) return 'Top view of the block in the vise. No tool loaded.' + target;
       var c = clearance(s);
       return 'Top view. ' + M.toolLabel(t) + ' at ' + where(s) +
-        (c.beside ? ', beside the block.' : '; the highest metal under it is at Z ' + fmtSigned(c.top, 2) + '.') + target;
+        (c.beside ? ', beside the block.' : c.noMetal ? ', with no modeled metal under its footprint.'
+          : '; the highest metal under it is at Z ' + fmtSigned(c.top, 2) + '.') + target;
     }
 
     var isoTimer = 0;
@@ -18364,8 +18371,9 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
       var c = clearance(s), busy = !!state.running || !!state.drag;
       // the tool cuts its own footprint as it goes, so a cut in progress
       // shows as removed volume on the open move, not as metal in the circle
-      var cutting = busy && !!s.entry && s.entry.tally.volume > 0.05;
+      var cutting = busy && !!s.entry && modeledCut({ volume: s.entry.tally.volume, subGridCut: !!s.entry.subGridCut });
       droUnder.textContent = (cutting ? 'cutting' : !c ? 'choose a tool to begin' : c.beside ? 'beside the block, no metal under it'
+        : c.noMetal ? 'no modeled metal under the tool footprint'
         : c.gap > 0.005 ? fmt(c.gap, 2) + ' mm above the metal under it' : c.gap > -0.005 ? 'level with the metal under it' : 'in the metal, ' + fmt(-c.gap, 2) + ' mm deep');
       dro.classList.toggle('is-cutting', cutting);
       syncTools();

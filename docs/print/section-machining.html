@@ -8649,6 +8649,25 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-34">Supporting detail: <a href="#deeper-addendum-34"><strong>Addendum 34</strong></a> &mdash; A nominal tool size is not a finished-hole guarantee.</p>
     </div>
   </details>
+  <details class="xcard deck-slide" id="hole-finishing--compare-the-old-opening-with-the-final-bore-envelope" data-card="hole-finishing--compare-the-old-opening-with-the-final-bore-envelope">
+    <summary>Compare the old opening with the final bore envelope<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compare the old opening with the final bore envelope</h2>
+  <p>A centered final bore can remove material around a smaller opening when that entire opening lies inside the final bore's removal circle. It cannot add material back where an earlier opening protrudes outside that circle. Setting the boring head to the drawing diameter does not erase the earlier geometry.</p>
+  <p>Open <a class="xref-page" href="#p-milling-operations">Milling Operations</a> and choose <strong>Job 4 / Boss and bore</strong>. From <strong>View</strong>, choose <strong>2D sections</strong>. Before <em>each</em> case, choose <strong>Start this job over</strong>, then <strong>Sure? Start over</strong>, so each comparison begins with a fresh block. Use the <strong>Move to</strong> X, Y and Z inputs and <strong>Move</strong>. Keep tool and boring-head changes at Z&nbsp;+20 by using <strong>Raise to Z +20</strong>.</p>
+  <table><thead><tr><th>Fresh-block case</th><th>Illustrative simulator moves</th><th>Individual bore inspection</th></tr></thead><tbody>
+    <tr><td>Previous opening stays inside</td><td>Load the drill Ø10. At X&nbsp;50.5, Y&nbsp;30, move the tip to Z&nbsp;&minus;24. Raise to Z&nbsp;+20. Load the boring head Ø20.00, move to X&nbsp;50, Y&nbsp;30, then bore to Z&nbsp;&minus;21.</td><td>The modeled Ø20 bore contains the earlier opening. Its row reports measured Ø20.00 through, with no diameter-too-big, centre-position or <strong>CUT TOO FAR</strong> failure; the unfinished whole job does not need to pass.</td></tr>
+    <tr><td>Previous opening extends outside</td><td>Load the drill Ø10. At X&nbsp;52, Y&nbsp;30, move the tip to Z&nbsp;&minus;24. Raise to Z&nbsp;+20. Load the boring head, enter 18 in <strong>Boring Ø</strong> and choose <strong>Set</strong>; bore at X&nbsp;52, Y&nbsp;30 to Z&nbsp;&minus;21. Raise, set Ø20, then bore at X&nbsp;50, Y&nbsp;30 to Z&nbsp;&minus;21.</td><td><strong>CUT TOO FAR — Bore Ø20.00 ±0.05 through</strong> reports about Ø20.41, 0.41 too big, with the fitted centre about 0.38 from target. THRU also fails because inspection tests a full allowed diameter around the fitted irregular opening; it does not mean the centered boring-head move stopped short. The centered final pass cannot replace the material removed outside its circle.</td></tr>
+  </tbody></table>
+  <ol>
+    <li>In the first case, where is the edge of the Ø10 opening relative to the centered Ø20 removal circle?</li>
+    <li>In the second case, which individual checks show that the result is not simply a centered Ø20 hole: diameter, position, overcut, or all three?</li>
+    <li>Why does a final DRO of X&nbsp;50, Y&nbsp;30 not undo the earlier off-axis removal?</li>
+  </ol>
+  <p>These coordinates, depths, offsets and fitted/grid inspection numbers belong only to this idealized simulator. They are not acceptable cleanup allowance, safe boring offset, rework instructions or physical gauge results. The model does not predict boring-bar entry or interrupted-cut behavior, rigidity, deflection, chatter, force, finish, alignment uncertainty or workholding. Geometric containment is necessary here, not sufficient for a real process: use the drawing, measured hole, complete setup, tool-maker guidance and responsible process authority.</p>
+  <p>The top, boss and chamfers remain unfinished in both cases, so the overall feature row or job may still be incomplete. Read the bore's <strong>diameter</strong>, <strong>position</strong> and <strong>overcut</strong> checks for this comparison.</p>
+    </div>
+  </details>
   <details class="xcard deck-slide" id="hole-finishing--match-the-head-seat-to-the-fastener-drawing" data-card="hole-finishing--match-the-head-seat-to-the-fastener-drawing">
     <summary>Match the head seat to the fastener drawing<span class="chev"></span></summary>
     <div class="body">
@@ -24794,19 +24813,23 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
     var t = sim.tool;
     if (!t) return null;
     var top = sim.maxHeightIn(sim.pos.x, sim.pos.y, t.dia / 2);
-    if (top === -Infinity) return { beside: true };
+    if (top === -Infinity) {
+      var touchesBlock = sim.capsuleTouchesStock(sim.pos, sim.pos, t.dia / 2);
+      return { beside: !touchesBlock, noMetal: true };
+    }
     return { top: top, gap: sim.pos.z - top };
   }
   function where(sim) {
     return 'X ' + fmtSigned(sim.pos.x, 2) + ', Y ' + fmtSigned(sim.pos.y, 2) + ', Z ' + fmtSigned(sim.pos.z, 2);
   }
+  function modeledCut(sum) { return sum.volume > 0 || sum.subGridCut; }
 
   /* Plain-language account of a finished move, for the status line. It
      always says whether metal was cut, and where the tool now is. */
   function describeMove(sum, sim) {
     if (sum.blocked) return { kind: 'stop', title: 'Stopped.', text: sum.blocked.message, warn: true };
     var parts = [], threaded = sum.notes.some(function (n) { return /^Thread cut/.test(n); });
-    var cut = sum.volume > 0.05 || sum.subGridCut;
+    var cut = modeledCut(sum);
     if (sum.volume > 0.05) {
       var v = sum.volume >= 1000 ? fmt(sum.volume / 1000, 2) + ' cm³' : fmt(sum.volume, sum.volume < 10 ? 1 : 0) + ' mm³';
       parts.push('Removed approximately ' + v + ' (grid estimate).');
@@ -24814,6 +24837,7 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
       else if (sum.side === 'conventional') parts.push('A side cut with the metal on the left of the cutter: conventional milling.');
       else if (sum.side === 'both') parts.push('The cutter had metal on both sides, like a slot.');
     }
+    else if (sum.volume > 0) parts.push('Removed a small modeled amount (positive grid estimate below the displayed volume precision).');
     if (sum.subGridCut) parts.push('A small cut changed the surface between display samples; the volume grid cannot resolve all of this removal. Inspect for its marked location.');
     sum.notes.forEach(function (n) { parts.push(n); });
     if (sum.kind === 'tool') return { kind: 'info', title: 'Tool changed.', text: parts.join(' '), warn: false };
@@ -24822,7 +24846,8 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
       return { kind: 'cut', title: threaded && !cut ? 'Threaded.' : 'Cut.', text: parts.join(' '), warn: false };
     }
     var c = clearance(sim);
-    parts.push(!c ? 'At ' + where(sim) + '.' : c.beside ? 'The tool is at ' + where(sim) + ', beside the block: there is no metal under the cutter.'
+    parts.push(!c ? 'At ' + where(sim) + '.' : c.beside ? 'The tool is at ' + where(sim) + ', beside the block: there is no modeled metal under the cutter.'
+      : c.noMetal ? 'The tool is at ' + where(sim) + ', with no modeled metal under its footprint.'
       : c.gap > 0.005 ? 'The tool is at ' + where(sim) + '. Its tip is ' + fmt(c.gap, 2) + ' mm above the metal under it. ' +
         (sim.tool && sim.tool.kind === 'face' ? 'For a facing cut, lower it beside the block, then feed across.' : 'This move stayed above the work.')
       : 'The tool is at ' + where(sim) + ', touching the metal.');
@@ -25355,7 +25380,8 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
       if (!t) return 'Top view of the block in the vise. No tool loaded.' + target;
       var c = clearance(s);
       return 'Top view. ' + M.toolLabel(t) + ' at ' + where(s) +
-        (c.beside ? ', beside the block.' : '; the highest metal under it is at Z ' + fmtSigned(c.top, 2) + '.') + target;
+        (c.beside ? ', beside the block.' : c.noMetal ? ', with no modeled metal under its footprint.'
+          : '; the highest metal under it is at Z ' + fmtSigned(c.top, 2) + '.') + target;
     }
 
     var isoTimer = 0;
@@ -25533,8 +25559,9 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
       var c = clearance(s), busy = !!state.running || !!state.drag;
       // the tool cuts its own footprint as it goes, so a cut in progress
       // shows as removed volume on the open move, not as metal in the circle
-      var cutting = busy && !!s.entry && s.entry.tally.volume > 0.05;
+      var cutting = busy && !!s.entry && modeledCut({ volume: s.entry.tally.volume, subGridCut: !!s.entry.subGridCut });
       droUnder.textContent = (cutting ? 'cutting' : !c ? 'choose a tool to begin' : c.beside ? 'beside the block, no metal under it'
+        : c.noMetal ? 'no modeled metal under the tool footprint'
         : c.gap > 0.005 ? fmt(c.gap, 2) + ' mm above the metal under it' : c.gap > -0.005 ? 'level with the metal under it' : 'in the metal, ' + fmt(-c.gap, 2) + ' mm deep');
       dro.classList.toggle('is-cutting', cutting);
       syncTools();
