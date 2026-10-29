@@ -23,6 +23,47 @@
 </section>
 
 <section>
+  <h2>Compare signed mean, RMS, and ideal-resistor heating</h2>
+  <p>A sine can have a signed average of zero over one cycle and still produce heating. Add a DC offset and the
+  signed mean moves with the waveform, while total RMS combines the offset and the changing component. Predict
+  first, then compare the same sine centered on zero, shifted by an offset, kept above zero, or reduced to pure DC.</p>
+  <div data-interactive="ac-waveform">
+    <div class="acw-static">
+      <p><strong>Print / static comparison:</strong> use the analytic waveform
+      <code>v(t) = offset + amplitude × sin(2πft)</code> over one complete cycle. The resistor is ideal and fixed at
+      100 Ω. These are low illustrative voltages, not mains or wiring examples.</p>
+      <div class="unit-table-wrap acw-table-scroll" tabindex="0" role="region" aria-label="Whole-cycle sine-wave comparison table; scroll horizontally for all columns">
+      <table class="unit-table"><caption>The same 2 V sine amplitude with different DC offsets</caption><thead><tr>
+      <th>Waveform</th><th>Signed mean</th><th>AC-component RMS</th><th>Total RMS</th><th>Minimum / maximum</th><th>Average resistor power</th></tr></thead><tbody>
+      <tr><th>0 V offset</th><td>0 V</td><td>1.414 V</td><td>1.414 V</td><td>−2 / +2 V</td><td>20 mW</td></tr>
+      <tr><th>+1 V offset</th><td>+1 V</td><td>1.414 V</td><td>1.732 V</td><td>−1 / +3 V</td><td>30 mW</td></tr>
+      <tr><th>+3 V offset</th><td>+3 V</td><td>1.414 V</td><td>3.317 V</td><td>+1 / +5 V</td><td>110 mW</td></tr>
+      </tbody></table></div>
+      <p>The centered sine has zero signed mean but nonzero RMS and average power. The +3 V offset keeps the total
+      waveform positive even though it still contains a sine component. A constant pure-DC value has RMS equal to
+      its magnitude and has no unique oscillation period.</p>
+    </div>
+    <noscript><p>The controls require JavaScript. The comparison table, equations, limits and worked values remain available.</p></noscript>
+  </div>
+  <p>The live explorer evaluates one complete ideal sine cycle analytically; the drawn points only illustrate the
+  equation. For <code>v(t) = V<sub>DC</sub> + A sin(2πft)</code>, the signed mean is
+  <code>V<sub>DC</sub></code>, the sine component has RMS <code>A/√2</code>, and total RMS is
+  <code>√(V<sub>DC</sub>² + A²/2)</code>. In one ideal resistor, <strong>average</strong> power is
+  <code>V<sub>RMS</sub>²/R</code>; “RMS power” is not the quantity being calculated.</p>
+  <details class="deeper"><summary>Why RMS answers the heating question</summary>
+    <p>Analog Devices' <a href="https://www.analog.com/en/resources/analog-dialogue/raqs/raq-issue-54.html">RMS explanation</a>
+    shows why ordinary signed or absolute averages do not predict heating for arbitrary waveforms. Its
+    <a href="https://www.analog.com/en/resources/analog-dialogue/raqs/2020/04/01/14/20/raq-issue-177.html">power note</a>
+    distinguishes average power from the RMS value of a power waveform: RMS voltage or current can calculate
+    meaningful average power in the stated load. This classroom explorer uses a purely resistive fixed load; it
+    does not model impedance, power factor, temperature, a meter's coupling mode, or an actual circuit.</p>
+  </details>
+  <p><a class="button" data-practice-add="ac-wave-zero-mean-rms" href="../practice.html#ac-wave-zero-mean-rms">Practice zero-mean RMS</a>
+  <a class="button" data-practice-add="ac-wave-offset-rms" href="../practice.html#ac-wave-offset-rms">Practice RMS with offset</a>
+  <a class="button" data-practice-add="ac-wave-resistor-power" href="../practice.html#ac-wave-resistor-power">Practice average resistor power</a></p>
+</section>
+
+<section>
   <h2>Higher transmission voltage reduces current and line loss</h2>
   <p>For the same transmitted power, a higher voltage allows a lower current. The line's resistive heating is <code>P<sub>loss</sub> = I<sup>2</sup>R<sub>line</sub></code>. Halve the current and the loss becomes one quarter, if line resistance stays the same. Here <code>R<sub>line</sub></code> includes the complete current path.</p>
   <p>Transformers made it practical to step AC voltage up for transmission and down for use. That advantage helped the AC systems associated with Westinghouse and Tesla prevail over Edison's early DC distribution system in the “war of the currents.” It was not one inventor winning every part of electrical engineering.</p>
