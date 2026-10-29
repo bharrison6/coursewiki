@@ -134,7 +134,7 @@ test('module contract: manifest, pure script, token-only stylesheet', () => {
   const conf = fs.readFileSync(path.join(MOD, 'interactive.conf'), 'utf8');
   assert.match(conf, /^@@ID: cutter-geometry$/m);
   assert.match(conf, /^@@CSS: cutter\.css$/m);
-  assert.match(conf, /^@@JS: cutter\.js$/m);
+  assert.match(conf, /^@@JS: cutter\.js, axial\.js$/m, 'canonical 2D cutter loads before the additive axial helper');
   assert.match(conf, /^@@END$/m);
   const js = fs.readFileSync(path.join(MOD, 'cutter.js'), 'utf8');
   assert.ok(!/\bdocument\b|\bwindow\b|Math\.random|Date\.now/.test(js.replace(/\/\*[\s\S]*?\*\//g, '')), 'pure');
