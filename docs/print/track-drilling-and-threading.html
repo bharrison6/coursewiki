@@ -3132,6 +3132,26 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="aside"><strong>Primary source:</strong> <a href="https://legacy-aem.haascnc.com/content/haascnc/en/service/codes-settings.type%3Dgcode.machine%3Dmill.value%3DG83.html">Haas Automation, G83 Normal Peck Drilling Canned Cycle</a> (R-plane return and chip-clearing motion). Controller details differ; use the manual for the machine in front of you.</p>
     </div>
   </details>
+  <details class="xcard deck-slide" id="drilling-operations--read-point-depth-and-full-diameter-breakthrough-separately" data-card="drilling-operations--read-point-depth-and-full-diameter-breakthrough-separately">
+    <summary>Read point depth and full-diameter breakthrough separately<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Read point depth and full-diameter breakthrough separately</h2>
+  <p>Open <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/milling-operations.html" target="_blank" rel="noopener">Milling Operations</a> and its simulator. Choose <strong>Job 2 / Pocket and holes</strong>. From <strong>View</strong>, choose <strong>2D sections</strong>. Under <strong>Drill: choose a size</strong>, choose <strong>Load the drill Ø6.6</strong>. With the tool clear above the block, use the <strong>Move to</strong> X and Y inputs to place it at X&nbsp;15, Y&nbsp;30, then use the Z input and <strong>Move</strong> to advance to each row below. Watch the <strong>Front</strong> section and DRO, then scroll to <strong>Inspection of the part as it is now</strong> and find <strong>Ø6.6 through at X 15, Y 30</strong>.</p>
+  <p>These are illustrative coordinates in this simulator: its raw top is Z&nbsp;+1 and its stock bottom is Z&nbsp;&minus;20. They are not operating depths, safe overtravel or an allowance for a real part.</p>
+  <table><thead><tr><th>Drill-tip DRO</th><th>What the Front section represents</th><th>Read the individual checks</th></tr></thead><tbody>
+    <tr><td>Z&nbsp;&minus;20</td><td>The point reaches the stock bottom, but the full drill diameter stops higher.</td><td>Diameter can read Ø6.60 while THRU says <em>Not through yet: full size only to Z&nbsp;&minus;18.02.</em></td></tr>
+    <tr><td>Z&nbsp;&minus;21</td><td>The point extends below the stock and leaves a partial bottom opening; the full diameter still has not reached the bottom.</td><td>Diameter can still read Ø6.60 while THRU says <em>Not through yet: full size only to Z&nbsp;&minus;19.02.</em></td></tr>
+    <tr><td>Z&nbsp;&minus;22</td><td>The modeled opening at the bottom reaches the inspection's minimum allowed diameter.</td><td>THRU changes to <em>Through at the minimum allowed diameter.</em></td></tr>
+  </tbody></table>
+  <ol>
+    <li>Why does a drill-tip DRO of Z&nbsp;&minus;20 not mean the full Ø6.6 body has reached Z&nbsp;&minus;20?</li>
+    <li>Which inspection result changes between Z&nbsp;&minus;21 and Z&nbsp;&minus;22: the measured diameter, the THRU subcheck, or both?</li>
+    <li>Why can the left hole's diameter subcheck pass before its THRU subcheck?</li>
+    <li>Why can the feature row or overall job remain incomplete even after this THRU subcheck passes?</li>
+  </ol>
+  <p>For this feature, THRU checks the bottom opening against a minimum allowed diameter of 6.50&nbsp;mm. Passing it does not guarantee an exact Ø6.6 opening, and the unfinished top face, pocket or right-hand hole can keep other checks incomplete. Read the <strong>Diameter</strong> and <strong>THRU</strong> subchecks separately; do not use the overall job result as the answer to this comparison.</p>
+    </div>
+  </details>
   <details class="xcard deck-slide is-checklist" id="drilling-operations--check-the-hole-before-calling-it-finished" data-card="drilling-operations--check-the-hole-before-calling-it-finished" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
     <summary>Check the hole before calling it finished<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">

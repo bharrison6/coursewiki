@@ -12,9 +12,10 @@
 if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m);}}catch(e){}})();
 </script>
 <link rel="icon" href="../favicon.ico" sizes="32x32">
-<link rel="icon" href="../favicon.svg?v=fd3ac30d22" type="image/svg+xml">
-<link rel="stylesheet" href="../theme/msu-theme.css?v=fd3ac30d22">
-<link rel="stylesheet" href="../theme/app.css?v=fd3ac30d22">
+<link rel="icon" href="../favicon.svg?v=8accc3b124" type="image/svg+xml">
+<link rel="stylesheet" href="../theme/msu-theme.css?v=8accc3b124">
+<link rel="stylesheet" href="../theme/app.css?v=8accc3b124">
+<link rel="stylesheet" href="../interactives/cad-state-history/demo.css?v=8accc3b124">
 </head>
 <body class="app skin-app" data-page="cad-history-and-sharing" data-base="../">
 <a class="skip" href="#main">Skip to content</a>
@@ -613,14 +614,41 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
   <details class="deeper"><summary>Rollback follows the regeneration sequence</summary><p><a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_rollback_bar.htm">SOLIDWORKS Rollback Bar help</a> explains moving through the feature sequence. A file can be saved with its bar rolled back, so inspect the bar's position when reopening a model.</p></details>
     </div>
   </details>
-  <details class="xcard deck-slide" id="onshape-history-records-edits-versions-preserve-milestones" data-card="onshape-history-records-edits-versions-preserve-milestones">
-    <summary>Onshape history records edits; versions preserve milestones<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="onshape-history-records-edits-versions-preserve-milestones" data-card="onshape-history-records-edits-versions-preserve-milestones" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Onshape history records edits; versions preserve milestones<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Onshape history records edits; versions preserve milestones</h2>
   <p>Onshape records completed edits in document history. The feature list shows the modeling sequence; history records changes to the document over time. Editing an early sketch today changes the history today even though the sketch remains early in the feature list.</p>
   <p>A <strong>version</strong> captures the design state of the workspace, including its tabs, at a named point. That captured design state is read-only. Use a meaningful milestone name and description so a reviewer knows which state you mean.</p>
   <p>A <strong>branch</strong> starts from a version and provides a separate workspace for further edits. Use it to explore an alternative while preserving the starting version. Compare changes before merging; merging needs review, not just a button click.</p>
   <details class="deeper"><summary>Viewing history, restoring, and branching serve different purposes</summary><p>Viewing an earlier state is inspection. Restoring changes a workspace back to an earlier state. Branching gives you a separate place to continue editing. Check the active workspace before any restore or merge. See <a href="https://cad.onshape.com/help/Content/Document/versions_and_history.htm">Onshape Versions and History</a> and <a href="https://cad.onshape.com/help/Content/Document/document_management.htm">Document Management</a>.</p></details>
+  <div data-interactive="cad-state-history">
+    <div class="csh-static" data-csh-static-scenario="bracket-milestones">
+      <h3>Worked symbolic timeline: feature order stays put while edits accumulate</h3>
+      <p><strong>What:</strong> the feature list remains Mounting sketch → Base extrude → Edge fillet. <strong>Why:</strong> editing the first feature later should add a new history event, not move that feature to the end of the regeneration sequence.</p>
+      <ol>
+        <li>Start Main workspace: sketch width 60 mm, extrude depth 12 mm, fillet radius 2 mm.</li>
+        <li>Edit the early Mounting sketch now: width 60 → 72 mm. It remains feature 1.</li>
+        <li>Create the fixed <strong>Design review</strong> snapshot: 72 / 12 / 2 mm.</li>
+        <li>Edit Main again: sketch width 72 → 84 mm. The snapshot still reads 72 / 12 / 2 mm.</li>
+        <li>Create <strong>Lightweight branch</strong> from Design review, then edit only its extrude depth 12 → 8 mm.</li>
+      </ol>
+      <ol aria-label="Canonical feature order">
+        <li data-csh-static-feature="mount-sketch" data-csh-static-value="60"><strong>1 · Mounting sketch</strong> — width starts at 60 mm.</li>
+        <li data-csh-static-feature="base-extrude" data-csh-static-value="12"><strong>2 · Base extrude</strong> — depth starts at 12 mm.</li>
+        <li data-csh-static-feature="edge-fillet" data-csh-static-value="2"><strong>3 · Edge fillet</strong> — radius starts at 2 mm.</li>
+      </ol>
+      <table class="csh-static-table">
+        <thead><tr><th>State after the worked actions</th><th>Sketch width</th><th>Extrude depth</th><th>Fillet radius</th></tr></thead>
+        <tbody>
+          <tr data-csh-static-state="main"><th>Main workspace · editable</th><td>84 mm</td><td>12 mm</td><td>2 mm</td></tr>
+          <tr data-csh-static-state="design-review"><th>Design review · fixed snapshot</th><td>72 mm</td><td>12 mm</td><td>2 mm</td></tr>
+          <tr data-csh-static-state="lightweight"><th>Lightweight branch · editable</th><td>72 mm</td><td>8 mm</td><td>2 mm</td></tr>
+        </tbody>
+      </table>
+      <p>This is a symbolic in-memory model, not Onshape or SOLIDWORKS. It performs no rollback, restore, merge, save, file operation, or permission change.</p>
+    </div>
+  </div>
     </div>
   </details>
   <details class="xcard deck-slide" id="a-solidworks-save-or-file-copy-needs-its-own-revision-plan" data-card="a-solidworks-save-or-file-copy-needs-its-own-revision-plan">
@@ -669,9 +697,13 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
 </aside>
 
 </div>
-<script src="../search-index.js?v=fd3ac30d22"></script>
-<script src="../playlists.js?v=fd3ac30d22"></script>
-<script src="../practice-index.js?v=fd3ac30d22"></script>
-<script src="../theme/app.js?v=fd3ac30d22"></script>
+<script src="../search-index.js?v=8accc3b124"></script>
+<script src="../playlists.js?v=8accc3b124"></script>
+<script src="../practice-index.js?v=8accc3b124"></script>
+<script src="../theme/app.js?v=8accc3b124"></script>
+<script src="../interactives/cad-state-history/model.js?v=8accc3b124"></script>
+<script src="../interactives/cad-state-history/scenarios.js?v=8accc3b124"></script>
+<script src="../interactives/cad-state-history/render.js?v=8accc3b124"></script>
+<script src="../interactives/cad-state-history/demo.js?v=8accc3b124"></script>
 </body>
 </html>

@@ -12,9 +12,10 @@
 if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m);}}catch(e){}})();
 </script>
 <link rel="icon" href="../favicon.ico" sizes="32x32">
-<link rel="icon" href="../favicon.svg?v=fd3ac30d22" type="image/svg+xml">
-<link rel="stylesheet" href="../theme/msu-theme.css?v=fd3ac30d22">
-<link rel="stylesheet" href="../theme/app.css?v=fd3ac30d22">
+<link rel="icon" href="../favicon.svg?v=8accc3b124" type="image/svg+xml">
+<link rel="stylesheet" href="../theme/msu-theme.css?v=8accc3b124">
+<link rel="stylesheet" href="../theme/app.css?v=8accc3b124">
+<link rel="stylesheet" href="../interactives/ac-waveform/demo.css?v=8accc3b124">
 </head>
 <body class="app skin-app" data-page="ac-and-dc" data-base="../">
 <a class="skip" href="#main">Skip to content</a>
@@ -617,11 +618,54 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
     <div class="body">
       <h2>A 120 V sine wave peaks near positive and negative 170 V</h2>
   <p>The nominal 120 V of a US receptacle is an <strong>RMS</strong> value: root mean square. For a sine wave, <code>V<sub>peak</sub> = V<sub>RMS</sub> &times; &radic;2</code>, and <code>V<sub>RMS</sub> = V<sub>peak</sub> / &radic;2</code>. Thus <code>120 &times; &radic;2 = 169.7 V</code>. The instantaneous voltage swings between about +170 V and &minus;170 V, or about 340 V peak to peak.</p>
-  <p><img class="content-img" src="../media/electrical-systems/ac-sine.svg?v=fd3ac30d22" alt="One cycle of a sine wave: positive peak 169.7 V, negative peak minus 169.7 V, and RMS reference 120 V. RMS is not the waveform's average voltage." data-natural-width="760" data-natural-height="360"></p>
+  <p><img class="content-img" src="../media/electrical-systems/ac-sine.svg?v=8accc3b124" alt="One cycle of a sine wave: positive peak 169.7 V, negative peak minus 169.7 V, and RMS reference 120 V. RMS is not the waveform's average voltage." data-natural-width="760" data-natural-height="360"></p>
   <p><strong>Frequency</strong> counts complete cycles per second, in hertz (Hz). A 60 Hz waveform completes 60 whole cycles per second; a 50 Hz waveform completes 50. A cycle returns to the same phase, rather than ending at the opposite peak. US household mains is 60 Hz; many other countries use 50 Hz (<a href="https://www.energy.gov/oe/electricity-101">DOE, Electricity 101</a>).</p>
   <details class="deeper"><summary>Why use RMS instead of the average voltage?</summary>
     <p>A symmetrical sine wave averages to zero over a whole cycle, yet it still heats a resistor. RMS is the DC voltage that would produce the same average heating in that resistance. Square the instantaneous voltage, average those squares over a cycle, then take the square root. The square-root-of-two conversion applies to a sine wave; do not apply it to an arbitrary inverter waveform.</p>
   </details>
+    </div>
+  </details>
+  <details class="xcard deck-slide is-interactive" id="compare-signed-mean-rms-and-ideal-resistor-heating" data-card="compare-signed-mean-rms-and-ideal-resistor-heating" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Compare signed mean, RMS, and ideal-resistor heating<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compare signed mean, RMS, and ideal-resistor heating</h2>
+  <p>A sine can have a signed average of zero over one cycle and still produce heating. Add a DC offset and the
+  signed mean moves with the waveform, while total RMS combines the offset and the changing component. Predict
+  first, then compare the same sine centered on zero, shifted by an offset, kept above zero, or reduced to pure DC.</p>
+  <div data-interactive="ac-waveform">
+    <div class="acw-static">
+      <p><strong>Print / static comparison:</strong> use the analytic waveform
+      <code>v(t) = offset + amplitude × sin(2πft)</code> over one complete cycle. The resistor is ideal and fixed at
+      100 Ω. These are low illustrative voltages, not mains or wiring examples.</p>
+      <div class="unit-table-wrap acw-table-scroll" tabindex="0" role="region" aria-label="Whole-cycle sine-wave comparison table; scroll horizontally for all columns">
+      <table class="unit-table"><caption>The same 2 V sine amplitude with different DC offsets</caption><thead><tr>
+      <th>Waveform</th><th>Signed mean</th><th>AC-component RMS</th><th>Total RMS</th><th>Minimum / maximum</th><th>Average resistor power</th></tr></thead><tbody>
+      <tr><th>0 V offset</th><td>0 V</td><td>1.414 V</td><td>1.414 V</td><td>−2 / +2 V</td><td>20 mW</td></tr>
+      <tr><th>+1 V offset</th><td>+1 V</td><td>1.414 V</td><td>1.732 V</td><td>−1 / +3 V</td><td>30 mW</td></tr>
+      <tr><th>+3 V offset</th><td>+3 V</td><td>1.414 V</td><td>3.317 V</td><td>+1 / +5 V</td><td>110 mW</td></tr>
+      </tbody></table></div>
+      <p>The centered sine has zero signed mean but nonzero RMS and average power. The +3 V offset keeps the total
+      waveform positive even though it still contains a sine component. A constant pure-DC value has RMS equal to
+      its magnitude and has no unique oscillation period.</p>
+    </div>
+    <noscript><p>The controls require JavaScript. The comparison table, equations, limits and worked values remain available.</p></noscript>
+  </div>
+  <p>The live explorer evaluates one complete ideal sine cycle analytically; the drawn points only illustrate the
+  equation. For <code>v(t) = V<sub>DC</sub> + A sin(2πft)</code>, the signed mean is
+  <code>V<sub>DC</sub></code>, the sine component has RMS <code>A/√2</code>, and total RMS is
+  <code>√(V<sub>DC</sub>² + A²/2)</code>. In one ideal resistor, <strong>average</strong> power is
+  <code>V<sub>RMS</sub>²/R</code>; “RMS power” is not the quantity being calculated.</p>
+  <details class="deeper"><summary>Why RMS answers the heating question</summary>
+    <p>Analog Devices' <a href="https://www.analog.com/en/resources/analog-dialogue/raqs/raq-issue-54.html">RMS explanation</a>
+    shows why ordinary signed or absolute averages do not predict heating for arbitrary waveforms. Its
+    <a href="https://www.analog.com/en/resources/analog-dialogue/raqs/2020/04/01/14/20/raq-issue-177.html">power note</a>
+    distinguishes average power from the RMS value of a power waveform: RMS voltage or current can calculate
+    meaningful average power in the stated load. This classroom explorer uses a purely resistive fixed load; it
+    does not model impedance, power factor, temperature, a meter's coupling mode, or an actual circuit.</p>
+  </details>
+  <p><a class="button" data-practice-add="ac-wave-zero-mean-rms" href="../practice.html#ac-wave-zero-mean-rms">Practice zero-mean RMS</a>
+  <a class="button" data-practice-add="ac-wave-offset-rms" href="../practice.html#ac-wave-offset-rms">Practice RMS with offset</a>
+  <a class="button" data-practice-add="ac-wave-resistor-power" href="../practice.html#ac-wave-resistor-power">Practice average resistor power</a></p>
     </div>
   </details>
   <details class="xcard deck-slide" id="higher-transmission-voltage-reduces-current-and-line-loss" data-card="higher-transmission-voltage-reduces-current-and-line-loss">
@@ -675,6 +719,7 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
   <ul>
     <li><a href="#dc-flows-one-way-ac-reverses-direction">DC flows one way; AC reverses direction</a></li>
     <li><a href="#a-120-v-sine-wave-peaks-near-positive-and-negative-170-v">A 120 V sine wave peaks near positive and negative 170 V</a></li>
+    <li><a href="#compare-signed-mean-rms-and-ideal-resistor-heating">Compare signed mean, RMS, and ideal-resistor heating</a></li>
     <li><a href="#higher-transmission-voltage-reduces-current-and-line-loss">Higher transmission voltage reduces current and line loss</a></li>
     <li><a href="#a-rectifier-is-one-stage-of-an-ac-to-dc-power-supply">A rectifier is one stage of an AC-to-DC power supply</a></li>
     <li><a href="#an-inverter-makes-ac-from-dc-the-waveform-matters">An inverter makes AC from DC; the waveform matters</a></li>
@@ -682,9 +727,12 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
 </aside>
 
 </div>
-<script src="../search-index.js?v=fd3ac30d22"></script>
-<script src="../playlists.js?v=fd3ac30d22"></script>
-<script src="../practice-index.js?v=fd3ac30d22"></script>
-<script src="../theme/app.js?v=fd3ac30d22"></script>
+<script src="../search-index.js?v=8accc3b124"></script>
+<script src="../playlists.js?v=8accc3b124"></script>
+<script src="../practice-index.js?v=8accc3b124"></script>
+<script src="../theme/app.js?v=8accc3b124"></script>
+<script src="../interactives/ac-waveform/model.js?v=8accc3b124"></script>
+<script src="../interactives/ac-waveform/render.js?v=8accc3b124"></script>
+<script src="../interactives/ac-waveform/demo.js?v=8accc3b124"></script>
 </body>
 </html>

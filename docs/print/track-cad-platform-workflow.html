@@ -2996,6 +2996,104 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
   .deeper-back { display: none; }
 }
+[data-interactive="cad-reference-transfer"] { min-width: 0; margin-block: 1rem; }
+.crt-live > .crt-static { display: none; }
+.crt-lab { font: .94rem/1.45 var(--f-display); }
+.crt-heading { display: grid; grid-template-columns: minmax(13rem,.7fr) minmax(0,1.3fr); gap: .75rem; align-items: end; }
+.crt-lab label { min-width: 0; }
+.crt-heading label { display: grid; gap: .3rem; font-weight: 700; }
+.crt-lab select, .crt-lab button { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); min-height: 44px; padding: .45rem .6rem; }
+.crt-lab :is(select,button,input):focus-visible, .crt-graph-scroll:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.crt-scope { padding: .65rem; border-left: 4px solid var(--accent); background: var(--surface); }
+.crt-workbench { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(16rem,.65fr); gap: 1rem; align-items: start; }
+.crt-graph-scroll { overflow-x: auto; max-width: 100%; border: 1px solid var(--rule); background: var(--paper); }
+.crt-svg { display: block; min-width: 42rem; width: 100%; height: auto; }
+.crt-svg marker path { fill: var(--ink-soft); }
+.crt-edge { fill: none; stroke: var(--ink-soft); stroke-width: 2; }
+.crt-edge-broken { stroke: var(--mark-stop, #c43d10); stroke-dasharray: 7 5; }
+.crt-node rect { fill: var(--surface); stroke: var(--rule); stroke-width: 2; }
+.crt-node text { fill: var(--ink); font: 13px var(--f-display); }
+.crt-node-label { font-weight: 700; }
+.crt-node-locator { font: 12px var(--f-mono); fill: var(--ink-soft); }
+.crt-node.crt-root rect { stroke: var(--accent); stroke-width: 4; }
+.crt-node.crt-included rect { fill: var(--cat1-soft); stroke: var(--cat1); }
+.crt-node.crt-missing rect, .crt-node.crt-unavailable rect, .crt-node.crt-unresolved rect { fill: var(--flag-soft); stroke: var(--mark-stop, #c43d10); }
+.crt-node.crt-extra rect { stroke-dasharray: 5 4; }
+.crt-legend { display: flex; flex-wrap: wrap; gap: .25rem .65rem; align-items: center; color: var(--ink-soft); font-size: .85rem; }
+.crt-key { width: 1.1rem; height: .75rem; display: inline-block; border: 2px solid var(--rule); background: var(--surface); }
+.crt-key-root { border-color: var(--accent); } .crt-key-included { border-color: var(--cat1); background: var(--cat1-soft); } .crt-key-missing, .crt-key-unavailable { border-color: var(--mark-stop, #c43d10); background: var(--flag-soft); }
+.crt-choices { display: grid; gap: .75rem; }
+.crt-lab fieldset { min-width: 0; margin: 0; border: 1px solid var(--rule); }
+.crt-lab legend { font-weight: 700; }
+.crt-choices label, .crt-predict label { display: flex; align-items: flex-start; gap: .55rem; min-height: 44px; padding-block: .25rem; }
+.crt-choices input, .crt-predict input { width: 21px; height: 21px; flex: none; accent-color: var(--accent); }
+.crt-choices small { display: block; color: var(--ink-soft); overflow-wrap: anywhere; }
+.crt-choice-unavailable { text-decoration: none; }
+.crt-choice-unavailable small { color: var(--mark-stop, #c43d10); font-weight: 700; }
+.crt-predict { margin-block: 1rem !important; }
+.crt-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.crt-lab button { cursor: pointer; }
+.crt-status { display: block; margin-block: .75rem; padding: .7rem; border-left: 4px solid var(--flag); background: var(--surface); font-weight: 700; }
+.crt-results { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: .5rem; }
+.crt-results > div { padding: .55rem; border: 1px solid var(--rule); min-width: 0; }
+.crt-results strong { display: block; font-size: 1.25rem; }
+.crt-results span { font-size: .82rem; color: var(--ink-soft); }
+.crt-repair { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .6rem; align-items: center; margin-top: .7rem; padding: .6rem; border: 1px solid var(--mark-stop, #c43d10); }
+.crt-repair p { margin: 0; min-width: 0; }
+.crt-repair code { overflow-wrap: anywhere; }
+.crt-static-graph { overflow-x: auto; border: 1px solid var(--rule); }
+.crt-static-graph svg { display: block; min-width: 40rem; width: 100%; height: auto; }
+@media (max-width: 54rem) { .crt-workbench { grid-template-columns: minmax(0,1fr); } .crt-results { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 36rem) { .crt-heading, .crt-repair { grid-template-columns: minmax(0,1fr); } .crt-results { grid-template-columns: repeat(2,minmax(0,1fr)); } .crt-actions button, .crt-repair button { width: 100%; } .xcard:has([data-interactive="cad-reference-transfer"]) .body { padding-inline: .5rem; } }
+@media (prefers-reduced-motion: reduce) { [data-interactive="cad-reference-transfer"] * { animation: none !important; transition: none !important; } }
+@media print { .crt-lab { display: none !important; } .crt-live > .crt-static { display: block !important; } .crt-static-graph svg { min-width: 0; } }
+
+/* Scoped module; shared CourseWiki styles own the page card and print shell. */
+[data-interactive="cad-state-history"] { min-width: 0; }
+.csh-live > .csh-static { display: none; }
+.csh-lab { display: grid; gap: .8rem; font-family: var(--f-display); line-height: 1.5; min-width: 0; }
+.csh-intro, .csh-panel, .csh-feedback { border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .75rem; background: var(--surface); }
+.csh-panel { min-width: 0; }
+.csh-intro p, .csh-lab p { margin-block: .35rem; }
+.csh-controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .75rem; }
+.csh-controls fieldset { min-width: 0; margin: 0; border: 1px solid var(--rule); }
+.csh-feature-choice { display: grid; gap: .25rem; margin-bottom: .6rem; }
+.csh-feature-choice label { display: flex; align-items: center; gap: .45rem; min-height: 44px; }
+.csh-feature-choice input { width: 20px; height: 20px; accent-color: var(--accent); }
+.csh-lab label { display: block; font-weight: 700; }
+.csh-lab :is(button,select,input[type="number"]) { box-sizing: border-box; min-height: 44px; max-width: 100%; border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .45rem .6rem; color: var(--ink); background: var(--paper); font: inherit; }
+.csh-lab :is(button,select,input) { width: 100%; }
+.csh-lab button { cursor: pointer; font-weight: 700; margin-top: .5rem; }
+.csh-lab button:disabled { cursor: not-allowed; opacity: .55; }
+.csh-lab :is(button,select,input):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.csh-range { display: block; font-size: .88rem; margin-top: .2rem; }
+.csh-milestones { display: flex; flex-direction: column; }
+.csh-navigation { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .6rem; align-items: end; }
+.csh-panels { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .75rem; }
+.csh-panel h3 { margin-block: 0 .55rem; font-size: 1rem; }
+.csh-feature-list, .csh-history-list { margin: 0; padding-left: 1.65rem; }
+.csh-feature { padding: .35rem; }
+.csh-feature span { display: block; font-size: .9rem; }
+.csh-history-event { display: grid; grid-template-columns: 2rem minmax(0,1fr); gap: .35rem; align-items: start; margin-block: .35rem; }
+.csh-sequence { display: grid; place-items: center; min-height: 2rem; border-radius: 50%; background: var(--accent); color: var(--paper); font-weight: 800; }
+.csh-table-wrap { min-width: 0; max-width: 100%; overflow-x: auto; }
+.csh-comparison { width: 100%; border-collapse: collapse; min-width: 36rem; }
+.csh-comparison :is(th,td) { border: 1px solid var(--rule); padding: .45rem; text-align: left; }
+.csh-comparison thead { background: var(--paper); }
+.csh-feedback { border-left: 5px solid var(--accent); font-weight: 700; }
+.csh-limits { font-size: .9rem; }
+.csh-static-table { width: 100%; border-collapse: collapse; }
+.csh-static-table :is(th,td) { border: 1px solid var(--rule); padding: .4rem; text-align: left; }
+@media (max-width: 42rem) {
+  .csh-controls, .csh-panels, .csh-navigation { grid-template-columns: minmax(0,1fr); }
+  .csh-navigation { grid-column: auto; }
+}
+@media print {
+  .csh-live > .csh-static { display: block !important; }
+  .csh-lab { display: none !important; }
+  .csh-static { break-inside: avoid; }
+}
+
 </style>
 </head>
 <body class="app skin-app aggregate" data-page="agg-track-cad-platform-workflow" data-base="">
@@ -3075,6 +3173,34 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><a class="button" data-practice-add="cad-file-references" href="../practice.html#cad-file-references">Check file references</a> <a class="button" data-practice-add="cad-part-studio" href="../practice.html#cad-part-studio">Choose a tab</a> <a class="button" data-practice-add="cad-unit-change" href="../practice.html#cad-unit-change">Check units</a></p>
     </div>
   </details>
+  <details class="xcard deck-slide is-interactive" id="cad-files-and-documents--practice-choosing-a-complete-reference-package" data-card="cad-files-and-documents--practice-choosing-a-complete-reference-package" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Practice choosing a complete reference package<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Practice choosing a complete reference package</h2>
+  <p>A <strong>reference</strong> is a stored relationship from one design document to another. In this lesson's declared graph, an arrow <strong>A → B</strong> means document A requires document B. A drawing may require a model; an assembly may require parts and subassemblies; each subassembly may require more components.</p>
+  <p>Start with the document you intend to deliver, then follow every required arrow. This is the <strong>dependency closure</strong>: the starting document plus every directly and transitively required document. A shared component appears once even when two parents require it.</p>
+  <div data-interactive="cad-reference-transfer">
+    <div class="crt-static">
+      <p><strong>Static worked case — clamp drawing:</strong> the drawing requires the clamp assembly. The assembly requires left and right arm subassemblies plus the base. Both arm subassemblies require the same pivot pin, so the complete six-document set contains the pin once.</p>
+      <div class="crt-static-graph" tabindex="0" role="region" aria-label="Static clamp reference graph; scroll horizontally if needed">
+        <svg viewBox="0 0 820 280" role="img" aria-label="Clamp drawing requires clamp assembly; assembly requires two arm subassemblies and a base; both arms require one shared pivot pin">
+          <g fill="none" stroke="currentColor" stroke-width="2"><path d="M150 140H215"/><path d="M365 140H410V65H470"/><path d="M365 140H470"/><path d="M365 140H410V225H470"/><path d="M620 65H650V140H690"/><path d="M620 140H690"/></g>
+          <g fill="currentColor"><path d="M215 140l-9-5v10Z"/><path d="M470 65l-9-5v10Z"/><path d="M470 140l-9-5v10Z"/><path d="M470 225l-9-5v10Z"/><path d="M690 140l-9-5v10Z"/></g>
+          <g font-family="sans-serif" font-size="14" text-anchor="middle"><g><rect x="10" y="112" width="140" height="56" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><text x="80" y="136">Clamp drawing</text><text x="80" y="156">clamp.slddrw</text></g><g><rect x="215" y="112" width="150" height="56" rx="6" fill="none" stroke="currentColor"/><text x="290" y="136">Clamp assembly</text><text x="290" y="156">clamp.sldasm</text></g><g><rect x="470" y="37" width="150" height="56" rx="6" fill="none" stroke="currentColor"/><text x="545" y="61">Left arm</text><text x="545" y="81">left-arm.sldasm</text></g><g><rect x="470" y="112" width="150" height="56" rx="6" fill="none" stroke="currentColor"/><text x="545" y="136">Right arm</text><text x="545" y="156">right-arm.sldasm</text></g><g><rect x="470" y="197" width="150" height="56" rx="6" fill="none" stroke="currentColor"/><text x="545" y="221">Clamp base</text><text x="545" y="241">base.sldprt</text></g><g><rect x="690" y="112" width="120" height="56" rx="6" fill="none" stroke="currentColor"/><text x="750" y="136">Shared pin</text><text x="750" y="156">pivot-pin.sldprt</text></g></g>
+        </svg>
+      </div>
+      <dl class="dims">
+        <div><dt>Available but omitted</dt><dd>The source file exists, but it was not selected for this package. Add the required document.</dd></div>
+        <div><dt>Unavailable at source</dt><dd>The declared required document cannot be obtained in the scenario. Checking its box cannot create it; locate or restore the actual source first.</dd></div>
+        <div><dt>Changed symbolic locator</dt><dd>The intended node still has the same stable identity, but one declared edge expects an old locator. Explicitly retarget that edge. A same-looking or same-named substitute is not automatically the intended document.</dd></div>
+      </dl>
+      <p>This graph is a teaching model, not actual CAD file management. It performs no file operations, uploads, downloads, renames, Pack and Go command, cloud lookup, or PDM action. Real CAD systems can use paths, internal identifiers, search locations, platform records, and workflow rules beyond this declared graph.</p>
+    </div>
+  </div>
+  <p>Use a reference-aware workflow to inspect and collect the real design. In SOLIDWORKS, Find References can list documents referenced by the active file, Pack and Go can gather related files, and File Utilities can update references during supported rename, replace, or move operations. Review the result and open the transferred design to check it.</p>
+  <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Why this lab does not imitate a folder copy.</p>
+    </div>
+  </details>
 </div>
 
 </article>
@@ -3103,7 +3229,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Front, rear, top, bottom, left, and right are standard model directions. <strong>Normal to</strong> a planar face or sketch plane means looking along a direction perpendicular to it. An inclined face can therefore have a normal view that is different from every standard view.</p>
   <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNTEwIiB2aWV3Qm94PSIwIDAgNDAwIDUxMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5TdGFuZGFyZCBkaXJlY3Rpb25zIGFuZCBub3JtYWwgdG8gYSBwbGFuZTwvdGl0bGU+CjxkZXNjIGlkPSJkZXNjIj5BbiBvYmxpcXVlIGN1YmUgd2l0aCBpdHMgZnJvbnQgbWFya2VkIEYsIGZyb250IGFuZCB0b3AgcHJvamVjdGlvbnMsIGFuZCBhIHBlcnBlbmRpY3VsYXIgdmlld2luZyBkaXJlY3Rpb24gdG93YXJkIGEgcGxhbmUgc2hvd24gZWRnZS1vbi48L2Rlc2M+CjxkZWZzPjxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMFoiIGZpbGw9IiMxNTJjNDMiLz48L21hcmtlcj48L2RlZnM+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNTEwIiBmaWxsPSIjZmZmIi8+CjxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzE1MmM0MyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+Cjx0ZXh0IHg9IjIwIiB5PSIyNSI+T2JsaXF1ZSB2aWV3OiBpZGVudGlmeSB0aGUgZnJvbnQ8L3RleHQ+CjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIj4KPHBhdGggZD0iTTEzNSA5MEwyMDAgNTJMMjY1IDkwTDIwMCAxMjhaIiBmaWxsPSIjZDdlN2YwIi8+CjxwYXRoIGQ9Ik0xMzUgOTBMMjAwIDEyOEwyMDAgMjAzTDEzNSAxNjVaIiBmaWxsPSIjYThjY2RmIi8+CjxwYXRoIGQ9Ik0yMDAgMTI4TDI2NSA5MEwyNjUgMTY1TDIwMCAyMDNaIiBmaWxsPSIjNjM5YmI4Ii8+CjxwYXRoIGQ9Ik04MCAxNzVMMTMyIDE0NSIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KPHBhdGggZD0iTTIwMCAzMEwyMDAgNzAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjwvZz4KPHRleHQgeD0iMTYwIiB5PSIxNTAiPkY8L3RleHQ+PHRleHQgeD0iMjAiIHk9IjE5MyI+RnJvbnQ8L3RleHQ+PHRleHQgeD0iMjIyIiB5PSI0NSI+VG9wPC90ZXh0Pgo8dGV4dCB4PSIzMCIgeT0iMjQ1Ij5Gcm9udCB2aWV3PC90ZXh0Pjx0ZXh0IHg9IjIzMCIgeT0iMjQ1Ij5Ub3AgdmlldzwvdGV4dD4KPHJlY3QgeD0iNDAiIHk9IjI2NSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNhOGNjZGYiIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjgzIiB5PSIzMjAiPkY8L3RleHQ+CjxyZWN0IHg9IjI0MCIgeT0iMjY1IiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Q3ZTdmMCIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiLz4KPHRleHQgeD0iMjAiIHk9IjQwMSI+Tm9ybWFsIHRvOiBsb29rIHBlcnBlbmRpY3VsYXIgdG8gYSBwbGFuZTwvdGV4dD4KPHBhdGggZD0iTTIwNSA0MjVMMjk1IDQ4NSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTIyMCA1MDBMMjUwIDQ1NSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CjxwYXRoIGQ9Ik0yNDIgNDY3TDI1NCA0NzVMMjYyIDQ2MyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiLz4KPHRleHQgeD0iMjAiIHk9IjQzMCI+UGxhbmUgc2VlbiBlZGdlLW9uPC90ZXh0Pgo8dGV4dCB4PSIzMDAiIHk9IjQ4MCI+OTDCsDwvdGV4dD4KPC9nPgo8L3N2Zz4K" alt="A cube shown obliquely, then straight-on front and top views. A separate edge-on plane has a viewing arrow perpendicular to it and a right-angle marker." data-natural-width="400" data-natural-height="510"><figcaption>The face marked F establishes the front. Normal to depends on the selected plane, not on the name of a standard view.</figcaption></figure>
   <p>Isometric, dimetric, and trimetric are angled parallel-projection views. The three principal axes have equal foreshortening in isometric, two equal in dimetric, and three different in trimetric. Perspective adds apparent size change with distance; turn it off when comparing parallel projected shapes.</p>
-  <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Viewing direction is separate from drawing layout.</p>
+  <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Viewing direction is separate from drawing layout.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="cad-model-views-and-checks--choose-a-display-style-for-the-edges-you-need-to-inspect" data-card="cad-model-views-and-checks--choose-a-display-style-for-the-edges-you-need-to-inspect">
@@ -3120,7 +3246,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </dl>
   <figure><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNjcwIiB2aWV3Qm94PSIwIDAgNDAwIDY3MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgo8dGl0bGUgaWQ9InRpdGxlIj5Db21wYXJlIGRpc3BsYXkgc3R5bGVzIG9uIHRoZSBzYW1lIGN1YmU8L3RpdGxlPjxkZXNjIGlkPSJkZXNjIj5TaXggcGFuZWxzIHByZXNlcnZlIG9uZSB2aWV3aW5nIGRpcmVjdGlvbi4gSGlkZGVuIGVkZ2VzIGFyZSBkYXNoZWQgd2hlbiBkaXN0aW5ndWlzaGVkIGFuZCBzb2xpZCBpbiB3aXJlZnJhbWUuPC9kZXNjPgo8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjY3MCIgZmlsbD0iI2ZmZiIvPgo8ZyBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMxNTJjNDMiPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMCAxMCkiPjx0ZXh0IHg9IjAiIHk9IjIwIj5TaGFkZWQsIG5vIGVkZ2VzPC90ZXh0PjxnIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZDdlN2YwIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNhOGNjZGYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjNjM5YmI4Ii8+PC9nPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwIDEwKSI+PHRleHQgeD0iMCIgeT0iMjAiPlNoYWRlZCB3aXRoIGVkZ2VzPC90ZXh0PjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZDdlN2YwIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNhOGNjZGYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjNjM5YmI4Ii8+PC9nPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAgMjMwKSI+PHRleHQgeD0iMCIgeT0iMjAiPkhpZGRlbiByZW1vdmVkPC90ZXh0PjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjZmZmIi8+PC9nPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwIDIzMCkiPjx0ZXh0IHg9IjAiIHk9IjIwIj5IaWRkZW4gdmlzaWJsZTwvdGV4dD48ZyBzdHJva2U9IiMxNTJjNDMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTIwIDg1IEw2NSA1NSBMMTQwIDg1IEw5NSAxMTUgWiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMCA4NSBMOTUgMTE1IEw5NSAxODUgTDIwIDE1NSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTk1IDExNSBMMTQwIDg1IEwxNDAgMTU1IEw5NSAxODUgWiIgZmlsbD0iI2ZmZiIvPjwvZz48cGF0aCBkPSJNMjAgMTU1IEw2NSAxMjUgTDE0MCAxNTUgTTY1IDEyNSBMNjUgNTUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgLTApIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNTJjNDMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSA1Ii8+PC9nPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMCA0NTApIj48dGV4dCB4PSIwIiB5PSIyMCI+V2lyZWZyYW1lPC90ZXh0PjxnIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgODUgTDY1IDU1IEwxNDAgODUgTDk1IDExNSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTIwIDg1IEw5NSAxMTUgTDk1IDE4NSBMMjAgMTU1IFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOTUgMTE1IEwxNDAgODUgTDE0MCAxNTUgTDk1IDE4NSBaIiBmaWxsPSIjZmZmIi8+PC9nPjxwYXRoIGQ9Ik0yMCAxNTUgTDY1IDEyNSBMMTQwIDE1NSBNNjUgMTI1IEw2NSA1NSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAtMCkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE1MmM0MyIgc3Ryb2tlLXdpZHRoPSIyIiAvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjEwIDQ1MCkiPjx0ZXh0IHg9IjAiIHk9IjIwIj5TaGFkZWQgKyBoaWRkZW48L3RleHQ+PGcgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCA4NSBMNjUgNTUgTDE0MCA4NSBMOTUgMTE1IFoiIGZpbGw9IiNkN2U3ZjAiLz48cGF0aCBkPSJNMjAgODUgTDk1IDExNSBMOTUgMTg1IEwyMCAxNTUgWiIgZmlsbD0iI2E4Y2NkZiIvPjxwYXRoIGQ9Ik05NSAxMTUgTDE0MCA4NSBMMTQwIDE1NSBMOTUgMTg1IFoiIGZpbGw9IiM2MzliYjgiLz48L2c+PHBhdGggZD0iTTIwIDE1NSBMNjUgMTI1IEwxNDAgMTU1IE02NSAxMjUgTDY1IDU1IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIC0wKSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTUyYzQzIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUgNSIvPjwvZz4KPC9nPjwvc3ZnPgo=" alt="Six views of the same cube: shaded without edges, shaded with edges, hidden edges removed, hidden edges visible with dashed concealed edges, wireframe with all edges solid, and shaded with dashed hidden edges." data-natural-width="400" data-natural-height="670"><figcaption>Original schematic: dashed lines mark concealed edges where they are distinguished. Colors and exact edge treatments vary with software settings.</figcaption></figure>
   <p>Onshape also provides translucent display and shaded display with hidden edges. Translucency lets you see through faces; hidden-edge display highlights concealed boundaries. Neither removes material.</p>
-  <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Find the view options in vendor help.</p>
+  <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Find the view options in vendor help.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="cad-model-views-and-checks--a-model-section-view-reveals-the-inside-without-cutting-the-part" data-card="cad-model-views-and-checks--a-model-section-view-reveals-the-inside-without-cutting-the-part">
@@ -3143,7 +3269,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li>Read the measurement type and unit with the value.</li>
     <li>Compare the result with a known dimension or a simple estimate.</li>
   </ul>
-  <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Measurement reference.</p>
+  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; Measurement reference.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="cad-model-views-and-checks--mass-needs-material-density-as-well-as-geometry" data-card="cad-model-views-and-checks--mass-needs-material-density-as-well-as-geometry">
@@ -3152,7 +3278,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Mass needs material density as well as geometry</h2>
   <p>Assign a material to the intended part or body before relying on mass properties. A color or metallic appearance alone is not proof that the material density is correct. Check which bodies or components are included, the units, and any overrides before accepting mass or center of mass.</p>
   <p>For a uniform solid, mass = density × volume. A correct volume with the wrong density still gives the wrong mass. Center of mass describes how mass is distributed; it need not lie inside the solid material of a hollow or curved part.</p>
-  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; Material assignment and mass-property help.</p>
+  <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; Material assignment and mass-property help.</p>
   <p><a class="button" data-practice-add="cad-hidden-edges" href="../practice.html#cad-hidden-edges">Choose a display style</a> <a class="button" data-practice-add="cad-normal-view" href="../practice.html#cad-normal-view">Check normal to</a> <a class="button" data-practice-add="cad-section-view" href="../practice.html#cad-section-view">Check a section</a> <a class="button" data-practice-add="cad-mass-density" href="../practice.html#cad-mass-density">Check mass</a> <a class="button" data-practice-add="cad-measure-selection" href="../practice.html#cad-measure-selection">Check a selection</a></p>
     </div>
   </details>
@@ -3175,17 +3301,44 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>The SOLIDWORKS FeatureManager design tree and the Onshape feature list help you find sketches and modeling features. Later features can depend on earlier geometry. Rename important features so another reader can tell what they do.</p>
   <p>A tree also contains items such as planes, bodies, or components; not every row is a modeling operation. To understand how features build a part, continue with <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/feature-based-modeling.html" target="_blank" rel="noopener">Feature-based Modeling</a>.</p>
   <p>A <strong>rollback bar</strong> lets you work at an earlier position in the feature sequence while later features are temporarily left out of regeneration. Move it forward again to evaluate the complete model and check dependent features. Rolling back does not retrieve an old saved revision, and it is not the same operation as separately suppressing one feature.</p>
-  <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; Rollback follows the regeneration sequence.</p>
+  <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Rollback follows the regeneration sequence.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="cad-history-and-sharing--onshape-history-records-edits-versions-preserve-milestones" data-card="cad-history-and-sharing--onshape-history-records-edits-versions-preserve-milestones">
-    <summary>Onshape history records edits; versions preserve milestones<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="cad-history-and-sharing--onshape-history-records-edits-versions-preserve-milestones" data-card="cad-history-and-sharing--onshape-history-records-edits-versions-preserve-milestones" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Onshape history records edits; versions preserve milestones<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Onshape history records edits; versions preserve milestones</h2>
   <p>Onshape records completed edits in document history. The feature list shows the modeling sequence; history records changes to the document over time. Editing an early sketch today changes the history today even though the sketch remains early in the feature list.</p>
   <p>A <strong>version</strong> captures the design state of the workspace, including its tabs, at a named point. That captured design state is read-only. Use a meaningful milestone name and description so a reviewer knows which state you mean.</p>
   <p>A <strong>branch</strong> starts from a version and provides a separate workspace for further edits. Use it to explore an alternative while preserving the starting version. Compare changes before merging; merging needs review, not just a button click.</p>
-  <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Viewing history, restoring, and branching serve different purposes.</p>
+  <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Viewing history, restoring, and branching serve different purposes.</p>
+  <div data-interactive="cad-state-history">
+    <div class="csh-static" data-csh-static-scenario="bracket-milestones">
+      <h3>Worked symbolic timeline: feature order stays put while edits accumulate</h3>
+      <p><strong>What:</strong> the feature list remains Mounting sketch → Base extrude → Edge fillet. <strong>Why:</strong> editing the first feature later should add a new history event, not move that feature to the end of the regeneration sequence.</p>
+      <ol>
+        <li>Start Main workspace: sketch width 60 mm, extrude depth 12 mm, fillet radius 2 mm.</li>
+        <li>Edit the early Mounting sketch now: width 60 → 72 mm. It remains feature 1.</li>
+        <li>Create the fixed <strong>Design review</strong> snapshot: 72 / 12 / 2 mm.</li>
+        <li>Edit Main again: sketch width 72 → 84 mm. The snapshot still reads 72 / 12 / 2 mm.</li>
+        <li>Create <strong>Lightweight branch</strong> from Design review, then edit only its extrude depth 12 → 8 mm.</li>
+      </ol>
+      <ol aria-label="Canonical feature order">
+        <li data-csh-static-feature="mount-sketch" data-csh-static-value="60"><strong>1 · Mounting sketch</strong> — width starts at 60 mm.</li>
+        <li data-csh-static-feature="base-extrude" data-csh-static-value="12"><strong>2 · Base extrude</strong> — depth starts at 12 mm.</li>
+        <li data-csh-static-feature="edge-fillet" data-csh-static-value="2"><strong>3 · Edge fillet</strong> — radius starts at 2 mm.</li>
+      </ol>
+      <table class="csh-static-table">
+        <thead><tr><th>State after the worked actions</th><th>Sketch width</th><th>Extrude depth</th><th>Fillet radius</th></tr></thead>
+        <tbody>
+          <tr data-csh-static-state="main"><th>Main workspace · editable</th><td>84 mm</td><td>12 mm</td><td>2 mm</td></tr>
+          <tr data-csh-static-state="design-review"><th>Design review · fixed snapshot</th><td>72 mm</td><td>12 mm</td><td>2 mm</td></tr>
+          <tr data-csh-static-state="lightweight"><th>Lightweight branch · editable</th><td>72 mm</td><td>8 mm</td><td>2 mm</td></tr>
+        </tbody>
+      </table>
+      <p>This is a symbolic in-memory model, not Onshape or SOLIDWORKS. It performs no rollback, restore, merge, save, file operation, or permission change.</p>
+    </div>
+  </div>
     </div>
   </details>
   <details class="xcard deck-slide" id="cad-history-and-sharing--a-solidworks-save-or-file-copy-needs-its-own-revision-plan" data-card="cad-history-and-sharing--a-solidworks-save-or-file-copy-needs-its-own-revision-plan">
@@ -3248,50 +3401,58 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </li>
     <li class="deeper-addendum" id="deeper-addendum-4" value="4">
       <article>
-        <div class="crumb"><span>Engineering Graphics and CAD</span><span class="sep">/</span><span>CAD Modeling</span><span class="sep">/</span><a href="#p-cad-model-views-and-checks">CAD Model Views and Checks</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 4.</span> Viewing direction is separate from drawing layout</h2>
-        <p>A standard view tells you where you look from. First-angle or third-angle projection tells you where that view belongs on a drawing sheet. Explore the geometry in <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/orthographic-projection.html" target="_blank" rel="noopener">Orthographic Projection and the Glass Box</a>. An angled model view is useful for recognizing shape but is not a substitute for dimensions.</p>
+        <div class="crumb"><span>Engineering Graphics and CAD</span><span class="sep">/</span><span>CAD Modeling</span><span class="sep">/</span><a href="#p-cad-files-and-documents">CAD Files and Documents</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 4.</span> Why this lab does not imitate a folder copy</h2>
+        <p>A plain folder copy can omit a component stored elsewhere, but real reference resolution is more complicated than matching visible filenames. This local in-memory lesson predicts a declared graph only. It does not claim that copying these names would repair a real design, and it does not model Onshape documents, cloud permissions, or PDM-managed identities.</p>
         <p class="deeper-back"><a href="#deeper-ref-4">Back to reference 4</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-5" value="5">
       <article>
         <div class="crumb"><span>Engineering Graphics and CAD</span><span class="sep">/</span><span>CAD Modeling</span><span class="sep">/</span><a href="#p-cad-model-views-and-checks">CAD Model Views and Checks</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 5.</span> Find the view options in vendor help</h2>
-        <p><a href="https://cad.onshape.com/help/Content/View/camera_and_render_options.htm">Onshape camera and render options</a> links to navigation and display controls. Current browser controls can separate shading choices from hidden-edge choices; older outlines may list them as combined styles.</p>
+        <h2><span class="deeper-addendum-number">Addendum 5.</span> Viewing direction is separate from drawing layout</h2>
+        <p>A standard view tells you where you look from. First-angle or third-angle projection tells you where that view belongs on a drawing sheet. Explore the geometry in <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/orthographic-projection.html" target="_blank" rel="noopener">Orthographic Projection and the Glass Box</a>. An angled model view is useful for recognizing shape but is not a substitute for dimensions.</p>
         <p class="deeper-back"><a href="#deeper-ref-5">Back to reference 5</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-6" value="6">
       <article>
         <div class="crumb"><span>Engineering Graphics and CAD</span><span class="sep">/</span><span>CAD Modeling</span><span class="sep">/</span><a href="#p-cad-model-views-and-checks">CAD Model Views and Checks</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 6.</span> Measurement reference</h2>
-        <p><a href="https://cad.onshape.com/help/Content/View/measure_tool.htm">Onshape Measure Tool</a> describes how results depend on selected entities.</p>
+        <h2><span class="deeper-addendum-number">Addendum 6.</span> Find the view options in vendor help</h2>
+        <p><a href="https://cad.onshape.com/help/Content/View/camera_and_render_options.htm">Onshape camera and render options</a> links to navigation and display controls. Current browser controls can separate shading choices from hidden-edge choices; older outlines may list them as combined styles.</p>
         <p class="deeper-back"><a href="#deeper-ref-6">Back to reference 6</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-7" value="7">
       <article>
         <div class="crumb"><span>Engineering Graphics and CAD</span><span class="sep">/</span><span>CAD Modeling</span><span class="sep">/</span><a href="#p-cad-model-views-and-checks">CAD Model Views and Checks</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 7.</span> Material assignment and mass-property help</h2>
-        <p>See <a href="https://cad.onshape.com/help/Content/PartStudio/customizing_part_materials.htm">Onshape material assignment</a>, <a href="https://cad.onshape.com/help/Content/View/mass_properties_tool.htm">Onshape Mass Properties</a>, and <a href="https://help.solidworks.com/2026/English/SolidWorks/sldworks/t_displaying_mass_properites.htm">SOLIDWORKS Mass Properties</a> for selection and override controls.</p>
+        <h2><span class="deeper-addendum-number">Addendum 7.</span> Measurement reference</h2>
+        <p><a href="https://cad.onshape.com/help/Content/View/measure_tool.htm">Onshape Measure Tool</a> describes how results depend on selected entities.</p>
         <p class="deeper-back"><a href="#deeper-ref-7">Back to reference 7</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-8" value="8">
       <article>
-        <div class="crumb"><span>Engineering Graphics and CAD</span><span class="sep">/</span><span>CAD Modeling</span><span class="sep">/</span><a href="#p-cad-history-and-sharing">CAD History, Versions, and Sharing</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 8.</span> Rollback follows the regeneration sequence</h2>
-        <p><a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_rollback_bar.htm">SOLIDWORKS Rollback Bar help</a> explains moving through the feature sequence. A file can be saved with its bar rolled back, so inspect the bar's position when reopening a model.</p>
+        <div class="crumb"><span>Engineering Graphics and CAD</span><span class="sep">/</span><span>CAD Modeling</span><span class="sep">/</span><a href="#p-cad-model-views-and-checks">CAD Model Views and Checks</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 8.</span> Material assignment and mass-property help</h2>
+        <p>See <a href="https://cad.onshape.com/help/Content/PartStudio/customizing_part_materials.htm">Onshape material assignment</a>, <a href="https://cad.onshape.com/help/Content/View/mass_properties_tool.htm">Onshape Mass Properties</a>, and <a href="https://help.solidworks.com/2026/English/SolidWorks/sldworks/t_displaying_mass_properites.htm">SOLIDWORKS Mass Properties</a> for selection and override controls.</p>
         <p class="deeper-back"><a href="#deeper-ref-8">Back to reference 8</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-9" value="9">
       <article>
         <div class="crumb"><span>Engineering Graphics and CAD</span><span class="sep">/</span><span>CAD Modeling</span><span class="sep">/</span><a href="#p-cad-history-and-sharing">CAD History, Versions, and Sharing</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 9.</span> Viewing history, restoring, and branching serve different purposes</h2>
-        <p>Viewing an earlier state is inspection. Restoring changes a workspace back to an earlier state. Branching gives you a separate place to continue editing. Check the active workspace before any restore or merge. See <a href="https://cad.onshape.com/help/Content/Document/versions_and_history.htm">Onshape Versions and History</a> and <a href="https://cad.onshape.com/help/Content/Document/document_management.htm">Document Management</a>.</p>
+        <h2><span class="deeper-addendum-number">Addendum 9.</span> Rollback follows the regeneration sequence</h2>
+        <p><a href="https://help.solidworks.com/2026/english/SolidWorks/sldworks/c_rollback_bar.htm">SOLIDWORKS Rollback Bar help</a> explains moving through the feature sequence. A file can be saved with its bar rolled back, so inspect the bar's position when reopening a model.</p>
         <p class="deeper-back"><a href="#deeper-ref-9">Back to reference 9</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-10" value="10">
+      <article>
+        <div class="crumb"><span>Engineering Graphics and CAD</span><span class="sep">/</span><span>CAD Modeling</span><span class="sep">/</span><a href="#p-cad-history-and-sharing">CAD History, Versions, and Sharing</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 10.</span> Viewing history, restoring, and branching serve different purposes</h2>
+        <p>Viewing an earlier state is inspection. Restoring changes a workspace back to an earlier state. Branching gives you a separate place to continue editing. Check the active workspace before any restore or merge. See <a href="https://cad.onshape.com/help/Content/Document/versions_and_history.htm">Onshape Versions and History</a> and <a href="https://cad.onshape.com/help/Content/Document/document_management.htm">Document Management</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-10">Back to reference 10</a></p>
       </article>
     </li>
   </ol>
@@ -5108,6 +5269,733 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
   })();
 })();
+(function (root, factory) {
+  'use strict';
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiCadReferenceTransfer = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  var KINDS = Object.freeze(['part', 'subassembly', 'assembly', 'drawing']);
+
+  var SCENARIOS = Object.freeze({
+    drawing: Object.freeze({
+      id: 'drawing', title: 'Drawing and model', prompt: 'Package the drawing so its model view can resolve.',
+      roots: Object.freeze(['bracket-drawing']), initiallySelected: Object.freeze(['bracket-drawing']),
+      nodes: Object.freeze([
+        Object.freeze({ id: 'bracket-drawing', label: 'Bracket drawing', kind: 'drawing', locator: 'bracket.slddrw', available: true }),
+        Object.freeze({ id: 'bracket-model', label: 'Bracket model', kind: 'part', locator: 'bracket.sldprt', available: true })
+      ]),
+      edges: Object.freeze([Object.freeze({ from: 'bracket-drawing', to: 'bracket-model', locator: 'bracket.sldprt' })])
+    }),
+    shared: Object.freeze({
+      id: 'shared', title: 'Assembly with a shared component',
+      prompt: 'Follow every required edge. The shared pin belongs in the package once.',
+      roots: Object.freeze(['clamp-drawing']), initiallySelected: Object.freeze(['clamp-drawing', 'clamp-assembly', 'left-arm', 'base']),
+      nodes: Object.freeze([
+        Object.freeze({ id: 'clamp-drawing', label: 'Clamp drawing', kind: 'drawing', locator: 'clamp.slddrw', available: true }),
+        Object.freeze({ id: 'clamp-assembly', label: 'Clamp assembly', kind: 'assembly', locator: 'clamp.sldasm', available: true }),
+        Object.freeze({ id: 'left-arm', label: 'Left arm subassembly', kind: 'subassembly', locator: 'left-arm.sldasm', available: true }),
+        Object.freeze({ id: 'right-arm', label: 'Right arm subassembly', kind: 'subassembly', locator: 'right-arm.sldasm', available: true }),
+        Object.freeze({ id: 'shared-pin', label: 'Shared pivot pin', kind: 'part', locator: 'pivot-pin.sldprt', available: true }),
+        Object.freeze({ id: 'base', label: 'Clamp base', kind: 'part', locator: 'base.sldprt', available: true })
+      ]),
+      edges: Object.freeze([
+        Object.freeze({ from: 'clamp-drawing', to: 'clamp-assembly', locator: 'clamp.sldasm' }),
+        Object.freeze({ from: 'clamp-assembly', to: 'left-arm', locator: 'left-arm.sldasm' }),
+        Object.freeze({ from: 'clamp-assembly', to: 'right-arm', locator: 'right-arm.sldasm' }),
+        Object.freeze({ from: 'clamp-assembly', to: 'base', locator: 'base.sldprt' }),
+        Object.freeze({ from: 'left-arm', to: 'shared-pin', locator: 'pivot-pin.sldprt' }),
+        Object.freeze({ from: 'right-arm', to: 'shared-pin', locator: 'pivot-pin.sldprt' })
+      ])
+    }),
+    unavailable: Object.freeze({
+      id: 'unavailable', title: 'Unavailable source component',
+      prompt: 'A checked box cannot create a source file that is unavailable.',
+      roots: Object.freeze(['fixture-assembly']), initiallySelected: Object.freeze(['fixture-assembly', 'frame', 'motor']),
+      nodes: Object.freeze([
+        Object.freeze({ id: 'fixture-assembly', label: 'Test fixture assembly', kind: 'assembly', locator: 'fixture.sldasm', available: true }),
+        Object.freeze({ id: 'frame', label: 'Fixture frame', kind: 'part', locator: 'frame.sldprt', available: true }),
+        Object.freeze({ id: 'motor', label: 'Purchased motor model', kind: 'part', locator: 'motor-42.sldprt', available: false })
+      ]),
+      edges: Object.freeze([
+        Object.freeze({ from: 'fixture-assembly', to: 'frame', locator: 'frame.sldprt' }),
+        Object.freeze({ from: 'fixture-assembly', to: 'motor', locator: 'motor-42.sldprt' })
+      ])
+    }),
+    retarget: Object.freeze({
+      id: 'retarget', title: 'Changed symbolic locator',
+      prompt: 'The cover has a new declared locator. Retarget the exact reference that still expects the old locator.',
+      roots: Object.freeze(['guard-drawing']), initiallySelected: Object.freeze(['guard-drawing', 'guard-assembly', 'cover']),
+      nodes: Object.freeze([
+        Object.freeze({ id: 'guard-drawing', label: 'Guard drawing', kind: 'drawing', locator: 'guard.slddrw', available: true }),
+        Object.freeze({ id: 'guard-assembly', label: 'Guard assembly', kind: 'assembly', locator: 'guard.sldasm', available: true }),
+        Object.freeze({ id: 'cover', label: 'Clear cover', kind: 'part', locator: 'cover-rev-b.sldprt', available: true })
+      ]),
+      edges: Object.freeze([
+        Object.freeze({ from: 'guard-drawing', to: 'guard-assembly', locator: 'guard.sldasm' }),
+        Object.freeze({ from: 'guard-assembly', to: 'cover', locator: 'cover.sldprt' })
+      ])
+    })
+  });
+
+  function fail(message) { throw new TypeError(message); }
+  function isText(value) { return typeof value === 'string' && value.trim().length > 0; }
+  function copyGraph(graph) {
+    var copy = Object.assign({}, graph, {
+      nodes: graph.nodes.map(function (node) { return Object.assign({}, node); }),
+      edges: graph.edges.map(function (edge) { return Object.assign({}, edge); })
+    });
+    if (Array.isArray(graph.roots)) copy.roots = graph.roots.slice();
+    if (Array.isArray(graph.initiallySelected)) copy.initiallySelected = graph.initiallySelected.slice();
+    return copy;
+  }
+
+  function validateGraph(graph) {
+    if (!graph || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) fail('Graph requires node and edge arrays.');
+    var byId = Object.create(null);
+    graph.nodes.forEach(function (node, index) {
+      if (!node || !isText(node.id) || !isText(node.label) || !isText(node.locator)) fail('Node ' + index + ' requires id, label, and locator.');
+      if (KINDS.indexOf(node.kind) < 0) fail('Node ' + node.id + ' has an unknown kind.');
+      if (typeof node.available !== 'boolean') fail('Node ' + node.id + ' requires a source-availability flag.');
+      if (byId[node.id]) fail('Duplicate node id: ' + node.id + '.');
+      byId[node.id] = node;
+    });
+    var edgeKeys = Object.create(null);
+    graph.edges.forEach(function (edge, index) {
+      if (!edge || !isText(edge.from) || !isText(edge.to) || !isText(edge.locator)) fail('Edge ' + index + ' requires from, to, and locator.');
+      if (!byId[edge.from] || !byId[edge.to]) fail('Edge ' + edge.from + ' -> ' + edge.to + ' names an unknown node.');
+      var key = edge.from + '\u0000' + edge.to;
+      if (edgeKeys[key]) fail('Duplicate required edge: ' + edge.from + ' -> ' + edge.to + '.');
+      edgeKeys[key] = true;
+    });
+    return { graph: graph, byId: byId };
+  }
+
+  function uniqueIds(ids, label, byId, allowEmpty) {
+    if (!Array.isArray(ids) || (!allowEmpty && ids.length === 0)) fail(label + ' requires at least one id.');
+    var seen = Object.create(null);
+    return ids.map(function (id) {
+      if (!isText(id) || !byId[id]) fail(label + ' names unknown id: ' + id + '.');
+      if (seen[id]) fail(label + ' repeats id: ' + id + '.');
+      seen[id] = true; return id;
+    });
+  }
+
+  function closure(graph, rootIds) {
+    var checked = validateGraph(graph), roots = uniqueIds(rootIds, 'Roots', checked.byId), outgoing = Object.create(null);
+    graph.edges.forEach(function (edge) { (outgoing[edge.from] || (outgoing[edge.from] = [])).push(edge); });
+    var queue = roots.slice(), visited = Object.create(null), required = [], edges = [];
+    while (queue.length) {
+      var id = queue.shift();
+      if (visited[id]) continue;
+      visited[id] = true; required.push(id);
+      (outgoing[id] || []).forEach(function (edge) { edges.push(edge); if (!visited[edge.to]) queue.push(edge.to); });
+    }
+    return { roots: roots, required: required, edges: edges };
+  }
+
+  function analyzePackage(graph, rootIds, selectedIds) {
+    var checked = validateGraph(graph), selected = uniqueIds(selectedIds, 'Package selection', checked.byId, true);
+    var reach = closure(graph, rootIds), requiredSet = Object.create(null), selectedSet = Object.create(null);
+    reach.required.forEach(function (id) { requiredSet[id] = true; }); selected.forEach(function (id) { selectedSet[id] = true; });
+    var unavailable = reach.required.filter(function (id) { return !checked.byId[id].available; });
+    var missing = reach.required.filter(function (id) { return checked.byId[id].available && !selectedSet[id]; });
+    var unresolved = reach.edges.filter(function (edge) { return edge.locator !== checked.byId[edge.to].locator; }).map(function (edge) {
+      return { from: edge.from, to: edge.to, expected: edge.locator, actual: checked.byId[edge.to].locator };
+    });
+    var included = selected.filter(function (id) { return checked.byId[id].available; });
+    var selectedButUnavailable = selected.filter(function (id) { return !checked.byId[id].available; });
+    return { complete: missing.length === 0 && unavailable.length === 0 && unresolved.length === 0,
+      roots: reach.roots, required: reach.required, included: included, missingFromPackage: missing,
+      unavailableFromSource: unavailable, selectedButUnavailable: selectedButUnavailable,
+      unresolvedReferences: unresolved, extras: selected.filter(function (id) { return !requiredSet[id]; }) };
+  }
+
+  function retarget(graph, fromId, toId) {
+    var checked = validateGraph(graph), found = false, next = copyGraph(graph);
+    next.edges = next.edges.map(function (edge) {
+      if (edge.from !== fromId || edge.to !== toId) return edge;
+      found = true; return Object.assign({}, edge, { locator: checked.byId[toId].locator });
+    });
+    if (!found) fail('No required edge exists from ' + fromId + ' to ' + toId + '.');
+    return next;
+  }
+
+  function scenario(id) {
+    if (!Object.prototype.hasOwnProperty.call(SCENARIOS, id)) fail('Unknown scenario: ' + id + '.');
+    return copyGraph(SCENARIOS[id]);
+  }
+
+  return { KINDS: KINDS, SCENARIOS: SCENARIOS, scenario: scenario, validateGraph: validateGraph,
+    closure: closure, analyzePackage: analyzePackage, retarget: retarget };
+});
+
+(function (root, factory) {
+  'use strict';
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiCadReferenceDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  var rank = { drawing: 0, assembly: 1, subassembly: 2, part: 3 };
+  function esc(value) { return String(value).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  function lookup(list) { var out = Object.create(null); list.forEach(function (value) { out[value] = true; }); return out; }
+  function graph(graph, report, prefix) {
+    var groups = [[], [], [], []], roots = lookup(report.roots), required = lookup(report.required), included = lookup(report.included);
+    var missing = lookup(report.missingFromPackage), unavailable = lookup(report.unavailableFromSource), extras = lookup(report.extras);
+    var unresolved = Object.create(null), unresolvedEdges = Object.create(null);
+    report.unresolvedReferences.forEach(function (edge) { unresolved[edge.to] = true; unresolvedEdges[edge.from + '\u0000' + edge.to] = true; });
+    graph.nodes.forEach(function (node) { groups[rank[node.kind]].push(node); });
+    var maxRows = Math.max.apply(Math, groups.map(function (items) { return Math.max(1, items.length); }));
+    var width = 850, height = Math.max(190, maxRows * 92 + 70), nodeW = 166, nodeH = 58, positions = Object.create(null);
+    groups.forEach(function (items, column) {
+      var available = height - 70, step = available / Math.max(1, items.length);
+      items.forEach(function (node, row) { positions[node.id] = { x: 25 + column * 215, y: 42 + row * step, node: node }; });
+    });
+    var marker = esc(prefix) + '-arrow', out = [];
+    out.push('<svg class="crt-svg" viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Directed CAD reference graph. Arrows point from a document to each document it requires."><defs><marker id="' + marker + '" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z"/></marker></defs>');
+    graph.edges.forEach(function (edge) {
+      var from = positions[edge.from], to = positions[edge.to];
+      if (!from || !to) return;
+      var x1 = from.x + nodeW, y1 = from.y + nodeH / 2, x2 = to.x, y2 = to.y + nodeH / 2;
+      var bend = (x1 + x2) / 2, broken = unresolvedEdges[edge.from + '\u0000' + edge.to] ? ' crt-edge-broken' : '';
+      out.push('<path class="crt-edge' + broken + '" d="M' + x1 + ' ' + y1 + 'H' + bend + 'V' + y2 + 'H' + x2 + '" marker-end="url(#' + marker + ')"><title>' + esc(from.node.label + ' requires ' + to.node.label) + '</title></path>');
+    });
+    graph.nodes.forEach(function (node) {
+      var p = positions[node.id], classes = ['crt-node'];
+      if (roots[node.id]) classes.push('crt-root');
+      if (unavailable[node.id]) classes.push('crt-unavailable');
+      else if (unresolved[node.id]) classes.push('crt-unresolved');
+      else if (missing[node.id]) classes.push('crt-missing');
+      else if (included[node.id]) classes.push('crt-included');
+      else if (extras[node.id]) classes.push('crt-extra');
+      else if (required[node.id]) classes.push('crt-required');
+      out.push('<g class="' + classes.join(' ') + '"><rect x="' + p.x + '" y="' + p.y + '" width="' + nodeW + '" height="' + nodeH + '" rx="7"/><text x="' + (p.x + 10) + '" y="' + (p.y + 22) + '"><tspan class="crt-node-label">' + esc(node.label) + '</tspan><tspan x="' + (p.x + 10) + '" dy="20" class="crt-node-locator">' + esc(node.locator) + '</tspan></text></g>');
+    });
+    out.push('</svg>'); return out.join('');
+  }
+  return { graph: graph };
+});
+
+(function () {
+  'use strict';
+  var M = window.CourseWikiCadReferenceTransfer, D = window.CourseWikiCadReferenceDraw, sequence = 0;
+  if (!M || !D) return;
+  document.querySelectorAll('[data-interactive="cad-reference-transfer"]').forEach(function (root) {
+    if (root.dataset.crtReady) return;
+    root.dataset.crtReady = 'true';
+    var instance = 'crt-' + (++sequence), scenarioId = 'drawing', graph, roots, selected;
+    var live = document.createElement('div'); live.className = 'crt-lab';
+    live.innerHTML = '<div class="crt-heading"><label for="' + instance + '-scenario">Teaching scenario<select id="' + instance + '-scenario" data-crt="scenario"></select></label><p data-crt="prompt"></p></div>' +
+      '<p class="crt-scope"><strong>Declared teaching graph:</strong> each stable node ID represents one intended document; its display label and symbolic locator are separate. This lab reads or changes no files and does not reproduce a CAD system\'s search, cloud, or PDM rules.</p>' +
+      '<div class="crt-workbench"><div><div class="crt-graph-scroll" tabindex="0" role="region" aria-label="Reference graph; scroll horizontally if needed" data-crt="graph"></div><p class="crt-legend"><span class="crt-key crt-key-root"></span> intended deliverable <span class="crt-key crt-key-included"></span> included <span class="crt-key crt-key-missing"></span> omitted <span class="crt-key crt-key-unavailable"></span> unavailable or unresolved. Arrow A → B means A requires B.</p></div><div class="crt-choices"><fieldset data-crt="roots"><legend>1 · Intended deliverables</legend></fieldset><fieldset data-crt="package"><legend>2 · Files selected for the package</legend></fieldset></div></div>' +
+      '<fieldset class="crt-predict"><legend>3 · Predict before checking</legend><label><input type="radio" name="' + instance + '-prediction" value="complete"> All required references resolve</label><label><input type="radio" name="' + instance + '-prediction" value="incomplete"> At least one required reference is unresolved</label></fieldset>' +
+      '<div class="crt-actions"><button type="button" data-crt="check">Check this package</button><button type="button" data-crt="collect">Select reachable available files</button><button type="button" data-crt="reset">Reset scenario</button></div>' +
+      '<output class="crt-status" data-crt="status" aria-live="polite">Choose a scenario, intended deliverable, and package.</output><div class="crt-results" data-crt="results"></div><div class="crt-repairs" data-crt="repairs"></div>';
+    root.insertBefore(live, root.firstChild); root.classList.add('crt-live');
+    function q(key) { return live.querySelector('[data-crt="' + key + '"]'); }
+    Object.keys(M.SCENARIOS).forEach(function (id) { var option = document.createElement('option'); option.value = id; option.textContent = M.SCENARIOS[id].title; q('scenario').appendChild(option); });
+    function node(id) { return graph.nodes.find(function (item) { return item.id === id; }); }
+    function checkedValues(box) { return Array.from(box.querySelectorAll('input:checked')).map(function (input) { return input.value; }); }
+    function checkbox(node, name, checked, unavailable) {
+      var label = document.createElement('label'); label.className = unavailable ? 'crt-choice-unavailable' : '';
+      label.innerHTML = '<input type="checkbox" name="' + name + '" value="' + node.id + '"' + (checked ? ' checked' : '') + '><span><strong>' + node.label + '</strong><small>' + node.kind + ' · ' + node.locator + (unavailable ? ' · unavailable at source' : '') + '</small></span>';
+      return label;
+    }
+    function report() { return M.analyzePackage(graph, roots, selected); }
+    function list(ids) { return ids.length ? ids.map(function (id) { return node(id).label; }).join(', ') : 'none'; }
+    function draw() { q('graph').innerHTML = D.graph(graph, report(), instance); }
+    function renderChoices() {
+      q('roots').querySelectorAll('label').forEach(function (label) { label.remove(); });
+      q('package').querySelectorAll('label').forEach(function (label) { label.remove(); });
+      graph.nodes.forEach(function (item) {
+        q('roots').appendChild(checkbox(item, instance + '-root', roots.indexOf(item.id) >= 0, !item.available));
+        q('package').appendChild(checkbox(item, instance + '-package', selected.indexOf(item.id) >= 0, !item.available));
+      });
+      q('roots').querySelectorAll('input').forEach(function (input) { input.addEventListener('change', function () {
+        var next = checkedValues(q('roots'));
+        if (!next.length) { input.checked = true; q('status').textContent = 'Keep at least one intended deliverable selected.'; return; }
+        roots = next; update('Deliverables changed. Recheck the package against the new reachable set.');
+      }); });
+      q('package').querySelectorAll('input').forEach(function (input) { input.addEventListener('change', function () { selected = checkedValues(q('package')); update('Package selection changed. Predict, then check its actual reference state.'); }); });
+    }
+    function renderResults() {
+      var r = report();
+      q('results').innerHTML = '<div><strong>' + r.required.length + '</strong><span>reachable required nodes</span></div><div><strong>' + r.included.length + '</strong><span>available and selected</span></div><div><strong>' + r.missingFromPackage.length + '</strong><span>available but omitted</span></div><div><strong>' + r.unavailableFromSource.length + '</strong><span>unavailable at source</span></div><div><strong>' + r.unresolvedReferences.length + '</strong><span>symbolic-reference mismatch</span></div>';
+      q('repairs').innerHTML = '';
+      r.unresolvedReferences.forEach(function (edge) {
+        var row = document.createElement('div'); row.className = 'crt-repair';
+        row.innerHTML = '<p><strong>' + node(edge.from).label + '</strong> expects <code>' + edge.expected + '</code>, while the intended <strong>' + node(edge.to).label + '</strong> declares <code>' + edge.actual + '</code>.</p><button type="button">Retarget this declared edge</button>';
+        row.querySelector('button').addEventListener('click', function () { graph = M.retarget(graph, edge.from, edge.to); update('Retargeted the exact declared edge. The node identity did not change; recheck package completeness.'); });
+        q('repairs').appendChild(row);
+      });
+    }
+    function update(message) { draw(); renderResults(); if (message) q('status').textContent = message; }
+    function load(id) {
+      scenarioId = id; graph = M.scenario(id); roots = graph.roots.slice(); selected = graph.initiallySelected.slice();
+      q('scenario').value = id; q('prompt').textContent = graph.prompt; live.querySelectorAll('.crt-predict input').forEach(function (input) { input.checked = false; });
+      renderChoices(); update('Scenario loaded. Select intended deliverables and package files, then predict before checking.');
+    }
+    q('scenario').addEventListener('change', function () { load(this.value); });
+    q('check').addEventListener('click', function () {
+      var r = report(), prediction = live.querySelector('.crt-predict input:checked'), matched = prediction && ((prediction.value === 'complete') === r.complete);
+      var detail = r.complete ? 'Every reachable required edge resolves in this teaching graph.' : 'Available but omitted: ' + list(r.missingFromPackage) + '. Unavailable at source: ' + list(r.unavailableFromSource) + '. Locator mismatches: ' + r.unresolvedReferences.length + '.';
+      q('status').textContent = (prediction ? (matched ? 'Prediction matches. ' : 'Compare your prediction. ') : 'Choose a prediction before the next check. ') + (r.complete ? 'Package complete. ' : 'Package incomplete. ') + detail;
+    });
+    q('collect').addEventListener('click', function () {
+      var r = report(); selected = r.required.filter(function (id) { return node(id).available; }); renderChoices();
+      update('Selected every reachable file that is available in this scenario. Source-unavailable nodes and locator mismatches still require separate repair.');
+    });
+    q('reset').addEventListener('click', function () { load(scenarioId); });
+    load(scenarioId);
+  });
+})();
+
+/* Symbolic state-history model. It distinguishes feature/regeneration order from
+   chronological edit order. A snapshot is a fixed, deeply copied teaching state;
+   a branch is an independent editable workspace created from one snapshot.
+   Restore, rollback, merge, permissions, files, and vendor CAD APIs are not modeled. */
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CadStateHistoryModel = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  var ID_RX = /^[a-z][a-z0-9-]{0,39}$/;
+  var own = function (object, key) { return Object.prototype.hasOwnProperty.call(object, key); };
+  function plain(value) {
+    if (!value || Object.prototype.toString.call(value) !== '[object Object]') return false;
+    var prototype = Object.getPrototypeOf(value);
+    return prototype === Object.prototype || prototype === null;
+  }
+  function clone(value) {
+    if (Array.isArray(value)) return value.map(clone);
+    if (plain(value)) {
+      var copy = {};
+      Object.keys(value).forEach(function (key) { copy[key] = clone(value[key]); });
+      return copy;
+    }
+    return value;
+  }
+  function freeze(value) {
+    if (Array.isArray(value) || plain(value)) {
+      Object.keys(value).forEach(function (key) { freeze(value[key]); });
+      Object.freeze(value);
+    }
+    return value;
+  }
+  function validId(value) { return typeof value === 'string' && ID_RX.test(value); }
+  function validName(value) {
+    return typeof value === 'string' && value === value.trim() && value.length >= 1 && value.length <= 60 && !/[\x00-\x1f\x7f]/.test(value);
+  }
+  function finite(value) { return typeof value === 'number' && Number.isFinite(value); }
+  function failure(state, error) { return { ok: false, state: state || null, error: error }; }
+  function freezeFixedState(state) {
+    freeze(state.scenario);
+    Object.keys(state.snapshots).forEach(function (id) { freeze(state.snapshots[id]); });
+    return state;
+  }
+  function validateScenario(scenario) {
+    if (!plain(scenario) || !validId(scenario.id) || !validName(scenario.name)) return 'The scenario needs a valid ID and name.';
+    if (!plain(scenario.workspace) || !validId(scenario.workspace.id) || !validName(scenario.workspace.name)) return 'The starting workspace needs a valid ID and name.';
+    if (!Array.isArray(scenario.features) || scenario.features.length < 2) return 'The scenario needs at least two ordered features.';
+    var ids = Object.create(null);
+    for (var i = 0; i < scenario.features.length; i++) {
+      var feature = scenario.features[i];
+      if (!plain(feature) || !validId(feature.id) || !validName(feature.name) || !validName(feature.parameter) || !validName(feature.unit)) return 'Every feature needs valid labels and an ID.';
+      if (ids[feature.id]) return 'Feature IDs must be unique.';
+      ids[feature.id] = true;
+      if (![feature.value, feature.min, feature.max].every(finite) || feature.min > feature.max || feature.value < feature.min || feature.value > feature.max) return 'Feature values and ranges must be finite and internally consistent.';
+    }
+    return '';
+  }
+  function exactKeys(object, expected) {
+    if (!plain(object)) return false;
+    var actual = Object.keys(object).sort(), wanted = expected.slice().sort();
+    return actual.length === wanted.length && actual.every(function (key, index) { return key === wanted[index]; });
+  }
+  function validFeatureState(item, orderedIds, features) {
+    if (!Array.isArray(item.featureOrder) || item.featureOrder.length !== orderedIds.length ||
+      !item.featureOrder.every(function (id, index) { return id === orderedIds[index]; }) ||
+      !exactKeys(item.values, orderedIds)) return false;
+    return orderedIds.every(function (id) {
+      var value = item.values[id], feature = features[id];
+      return finite(value) && value >= feature.min && value <= feature.max;
+    });
+  }
+  function validHistory(history, features, snapshots, nextSequence) {
+    if (!Array.isArray(history) || history.length < 1) return false;
+    var previous = 0;
+    return history.every(function (entry) {
+      if (!plain(entry) || !Number.isSafeInteger(entry.sequence) || entry.sequence <= previous || entry.sequence >= nextSequence ||
+        !['workspace-created', 'feature-edited', 'snapshot-created', 'branch-created'].includes(entry.type) || !validName(entry.label)) return false;
+      previous = entry.sequence;
+      if (entry.type === 'feature-edited') {
+        return validId(entry.featureId) && own(features, entry.featureId) && finite(entry.value) &&
+          entry.value >= features[entry.featureId].min && entry.value <= features[entry.featureId].max;
+      }
+      if (entry.type === 'snapshot-created' || entry.type === 'branch-created') {
+        return validId(entry.snapshotId) && own(snapshots, entry.snapshotId);
+      }
+      return true;
+    });
+  }
+  function validState(state) {
+    if (!plain(state) || state.schema !== 'cad-state-history/1' || validateScenario(state.scenario) ||
+      !plain(state.workspaces) || !plain(state.snapshots) || !Number.isSafeInteger(state.nextSequence) || state.nextSequence < 2) return false;
+    var orderedIds = state.scenario.features.map(function (feature) { return feature.id; }), features = {};
+    state.scenario.features.forEach(function (feature) { features[feature.id] = feature; });
+    var snapshotIds = Object.keys(state.snapshots);
+    if (!snapshotIds.every(function (key) {
+      var item = state.snapshots[key];
+      return validId(key) && plain(item) && item.id === key && validName(item.name) && validId(item.sourceWorkspaceId) &&
+        Number.isSafeInteger(item.createdSequence) && item.createdSequence > 0 && validFeatureState(item, orderedIds, features) &&
+        validHistory(item.history, features, state.snapshots, state.nextSequence) &&
+        item.history[item.history.length - 1].sequence === item.createdSequence &&
+        item.history[item.history.length - 1].type === 'snapshot-created' && item.history[item.history.length - 1].snapshotId === key;
+    })) return false;
+    var workspaceIds = Object.keys(state.workspaces);
+    if (workspaceIds.length < 1 || !workspaceIds.every(function (key) {
+      var item = state.workspaces[key], originValid = item && (item.originSnapshotId === null ||
+        (validId(item.originSnapshotId) && own(state.snapshots, item.originSnapshotId)));
+      return validId(key) && plain(item) && item.id === key && validName(item.name) && originValid &&
+        validFeatureState(item, orderedIds, features) && validHistory(item.history, features, state.snapshots, state.nextSequence) &&
+        (item.originSnapshotId === null || item.history.some(function (entry) { return entry.type === 'branch-created' && entry.snapshotId === item.originSnapshotId; }));
+    })) return false;
+    if (!snapshotIds.every(function (id) { return own(state.workspaces, state.snapshots[id].sourceWorkspaceId); })) return false;
+    if (!validId(state.activeWorkspaceId) || !own(state.workspaces, state.activeWorkspaceId) || !plain(state.view) ||
+      !['workspace', 'snapshot'].includes(state.view.kind) || !validId(state.view.id)) return false;
+    var viewed = state.view.kind === 'workspace' ? state.workspaces : state.snapshots;
+    return own(viewed, state.view.id);
+  }
+  function initialWorkspace(scenario) {
+    var order = scenario.features.map(function (feature) { return feature.id; });
+    var values = {};
+    scenario.features.forEach(function (feature) { values[feature.id] = feature.value; });
+    return {
+      id: scenario.workspace.id,
+      name: scenario.workspace.name,
+      originSnapshotId: null,
+      featureOrder: order,
+      values: values,
+      history: [{ sequence: 1, type: 'workspace-created', label: 'Starting teaching state' }]
+    };
+  }
+  function initialize(input) {
+    var error = validateScenario(input);
+    if (error) return failure(null, error);
+    var scenario = freeze(clone(input));
+    var workspace = initialWorkspace(scenario), workspaces = {};
+    workspaces[workspace.id] = workspace;
+    return { ok: true, state: {
+      schema: 'cad-state-history/1', scenario: scenario, workspaces: workspaces, snapshots: {},
+      activeWorkspaceId: workspace.id, view: { kind: 'workspace', id: workspace.id }, nextSequence: 2
+    } };
+  }
+  function featureById(state, id) {
+    return state.scenario.features.find(function (feature) { return feature.id === id; });
+  }
+  function event(sequence, type, data) { return Object.assign({ sequence: sequence, type: type }, data); }
+  function editFeature(state, command) {
+    if (!validState(state) || !plain(command)) return failure(state, 'A valid state and edit command are required.');
+    if (!validId(command.workspaceId) || !own(state.workspaces, command.workspaceId)) return failure(state, 'Choose an existing workspace.');
+    if (!validId(command.featureId)) return failure(state, 'Choose a valid feature ID.');
+    var feature = featureById(state, command.featureId);
+    if (!feature || !own(state.workspaces[command.workspaceId].values, command.featureId)) return failure(state, 'Choose a feature in this teaching state.');
+    if (!finite(command.value) || command.value < feature.min || command.value > feature.max) return failure(state, 'Enter a finite value inside the declared feature range.');
+    if (!validName(command.summary)) return failure(state, 'Describe the edit with a short name.');
+    var next = clone(state), workspace = next.workspaces[command.workspaceId];
+    workspace.values[command.featureId] = command.value;
+    workspace.history.push(event(next.nextSequence, 'feature-edited', {
+      featureId: feature.id, value: command.value, label: command.summary
+    }));
+    next.nextSequence++;
+    return { ok: true, state: freezeFixedState(next), event: clone(workspace.history[workspace.history.length - 1]) };
+  }
+  function createSnapshot(state, command) {
+    if (!validState(state) || !plain(command)) return failure(state, 'A valid state and snapshot command are required.');
+    if (!validId(command.workspaceId) || !own(state.workspaces, command.workspaceId)) return failure(state, 'Choose an existing workspace.');
+    if (!validId(command.snapshotId) || own(state.snapshots, command.snapshotId)) return failure(state, 'Use a new valid snapshot ID.');
+    if (!validName(command.name)) return failure(state, 'Use a snapshot name from 1 to 60 characters.');
+    var next = clone(state), workspace = next.workspaces[command.workspaceId];
+    workspace.history.push(event(next.nextSequence, 'snapshot-created', { snapshotId: command.snapshotId, label: command.name }));
+    var snapshot = freeze({
+      id: command.snapshotId, name: command.name, sourceWorkspaceId: workspace.id,
+      createdSequence: next.nextSequence, featureOrder: clone(workspace.featureOrder),
+      values: clone(workspace.values), history: clone(workspace.history)
+    });
+    next.snapshots[command.snapshotId] = snapshot;
+    next.nextSequence++;
+    return { ok: true, state: freezeFixedState(next), snapshotId: snapshot.id };
+  }
+  function createBranch(state, command) {
+    if (!validState(state) || !plain(command)) return failure(state, 'A valid state and branch command are required.');
+    if (!validId(command.snapshotId) || !own(state.snapshots, command.snapshotId)) return failure(state, 'Choose an existing snapshot.');
+    if (!validId(command.workspaceId) || own(state.workspaces, command.workspaceId)) return failure(state, 'Use a new valid workspace ID.');
+    if (!validName(command.name)) return failure(state, 'Use a workspace name from 1 to 60 characters.');
+    var snapshot = state.snapshots[command.snapshotId], next = clone(state);
+    next.workspaces[command.workspaceId] = {
+      id: command.workspaceId, name: command.name, originSnapshotId: snapshot.id,
+      featureOrder: clone(snapshot.featureOrder), values: clone(snapshot.values), history: clone(snapshot.history).concat([
+        event(next.nextSequence, 'branch-created', { snapshotId: snapshot.id, label: command.name })
+      ])
+    };
+    next.nextSequence++;
+    return { ok: true, state: freezeFixedState(next), workspaceId: command.workspaceId };
+  }
+  function activateWorkspace(state, workspaceId) {
+    if (!validState(state) || !validId(workspaceId) || !own(state.workspaces, workspaceId)) return failure(state, 'Choose an existing workspace.');
+    var next = clone(state);
+    next.activeWorkspaceId = workspaceId;
+    next.view = { kind: 'workspace', id: workspaceId };
+    return { ok: true, state: freezeFixedState(next) };
+  }
+  function viewState(state, reference) {
+    if (!validState(state) || !plain(reference) || !['workspace', 'snapshot'].includes(reference.kind) || !validId(reference.id)) return failure(state, 'Choose a valid workspace or snapshot to view.');
+    var collection = reference.kind === 'workspace' ? state.workspaces : state.snapshots;
+    if (!own(collection, reference.id)) return failure(state, 'That state does not exist.');
+    var next = clone(state);
+    next.view = { kind: reference.kind, id: reference.id };
+    return { ok: true, state: freezeFixedState(next) };
+  }
+  function inspect(state, reference) {
+    if (!validState(state) || !plain(reference) || !['workspace', 'snapshot'].includes(reference.kind) || !validId(reference.id)) return { ok: false, view: null, error: 'Choose a valid workspace or snapshot to inspect.' };
+    var collection = reference.kind === 'workspace' ? state.workspaces : state.snapshots;
+    if (!own(collection, reference.id)) return { ok: false, view: null, error: 'That state does not exist.' };
+    var item = collection[reference.id];
+    return { ok: true, view: {
+      kind: reference.kind, id: item.id, name: item.name, editable: reference.kind === 'workspace',
+      featureOrder: clone(item.featureOrder), values: clone(item.values), history: clone(item.history)
+    } };
+  }
+  function reset(state) {
+    if (!validState(state)) return failure(state, 'A valid lab state is required.');
+    return initialize(state.scenario);
+  }
+
+  return {
+    validateScenario: validateScenario, initialize: initialize, editFeature: editFeature,
+    createSnapshot: createSnapshot, createBranch: createBranch, activateWorkspace: activateWorkspace,
+    viewState: viewState, inspect: inspect, reset: reset
+  };
+});
+
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CadStateHistoryScenarios = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  var intro = {
+    id: 'bracket-milestones',
+    name: 'Mounting bracket milestones',
+    workspace: { id: 'main', name: 'Main workspace' },
+    features: [
+      { id: 'mount-sketch', name: 'Mounting sketch', parameter: 'width', unit: 'mm', value: 60, min: 30, max: 100 },
+      { id: 'base-extrude', name: 'Base extrude', parameter: 'depth', unit: 'mm', value: 12, min: 4, max: 30 },
+      { id: 'edge-fillet', name: 'Edge fillet', parameter: 'radius', unit: 'mm', value: 2, min: 0, max: 6 }
+    ]
+  };
+
+  return { intro: intro };
+});
+
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CadStateHistoryRender = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  function node(doc, tag, className, text) {
+    var element = doc.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
+  }
+  function featureMap(scenario) {
+    var map = {};
+    scenario.features.forEach(function (feature) { map[feature.id] = feature; });
+    return map;
+  }
+  function eventText(entry, features) {
+    if (entry.type === 'workspace-created') return entry.label;
+    if (entry.type === 'feature-edited') {
+      var feature = features[entry.featureId];
+      return entry.label + ': ' + feature.name + ' ' + feature.parameter + ' = ' + entry.value + ' ' + feature.unit;
+    }
+    if (entry.type === 'snapshot-created') return 'Snapshot fixed: ' + entry.label;
+    if (entry.type === 'branch-created') return 'Branch workspace created: ' + entry.label;
+    return entry.label;
+  }
+  function renderFeatureOrder(container, scenario, view) {
+    var doc = container.ownerDocument, features = featureMap(scenario), list = node(doc, 'ol', 'csh-feature-list');
+    view.featureOrder.forEach(function (id) {
+      var feature = features[id], item = node(doc, 'li', 'csh-feature');
+      item.appendChild(node(doc, 'strong', '', feature.name));
+      item.appendChild(node(doc, 'span', '', feature.parameter + ': ' + view.values[id] + ' ' + feature.unit));
+      list.appendChild(item);
+    });
+    container.replaceChildren(list);
+  }
+  function renderHistory(container, scenario, view) {
+    var doc = container.ownerDocument, features = featureMap(scenario), list = node(doc, 'ol', 'csh-history-list');
+    view.history.forEach(function (entry) {
+      var item = node(doc, 'li', 'csh-history-event');
+      item.appendChild(node(doc, 'span', 'csh-sequence', String(entry.sequence)));
+      item.appendChild(node(doc, 'span', '', eventText(entry, features)));
+      list.appendChild(item);
+    });
+    container.replaceChildren(list);
+  }
+  function stateRows(state) {
+    var rows = [];
+    Object.keys(state.workspaces).forEach(function (id) { rows.push({ kind: 'workspace', item: state.workspaces[id] }); });
+    Object.keys(state.snapshots).forEach(function (id) { rows.push({ kind: 'snapshot', item: state.snapshots[id] }); });
+    return rows;
+  }
+  function renderComparison(container, scenario, state) {
+    var doc = container.ownerDocument, table = node(doc, 'table', 'csh-comparison'), head = node(doc, 'thead'), headRow = node(doc, 'tr');
+    ['State'].concat(scenario.features.map(function (feature) { return feature.name; })).forEach(function (label) { headRow.appendChild(node(doc, 'th', '', label)); });
+    head.appendChild(headRow); table.appendChild(head);
+    var body = node(doc, 'tbody');
+    stateRows(state).forEach(function (row) {
+      var tr = node(doc, 'tr');
+      tr.appendChild(node(doc, 'th', '', row.item.name + (row.kind === 'snapshot' ? ' · fixed snapshot' : ' · editable')));
+      scenario.features.forEach(function (feature) { tr.appendChild(node(doc, 'td', '', row.item.values[feature.id] + ' ' + feature.unit)); });
+      body.appendChild(tr);
+    });
+    table.appendChild(body); container.replaceChildren(table);
+  }
+  return { renderFeatureOrder: renderFeatureOrder, renderHistory: renderHistory, renderComparison: renderComparison };
+});
+
+(function () {
+  'use strict';
+  var M = window.CadStateHistoryModel, scenarios = window.CadStateHistoryScenarios, R = window.CadStateHistoryRender;
+  if (!M || !scenarios || !R) return;
+  var mountCount = 0;
+
+  document.querySelectorAll('[data-interactive="cad-state-history"]').forEach(function (root) {
+    if (root.dataset.cshReady) return;
+    root.dataset.cshReady = 'true';
+    mountCount++;
+    var prefix = 'csh-' + mountCount, scenario = scenarios.intro, state = M.initialize(scenario).state;
+    var live = document.createElement('div'); live.className = 'csh-lab';
+    root.appendChild(live); root.classList.add('csh-live');
+
+    function make(tag, className, text) {
+      var element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+    function labelFor(text, control) {
+      var label = make('label', '', text); label.htmlFor = control.id; return label;
+    }
+    function control(tag, key, idSuffix) {
+      var element = make(tag); element.dataset.csh = key; element.id = prefix + '-' + idSuffix; return element;
+    }
+
+    var intro = make('div', 'csh-intro');
+    intro.appendChild(make('p', '', 'Goal: edit the early Mounting sketch now, capture a fixed Design review snapshot, then make an independent Lightweight branch.'));
+    intro.appendChild(make('p', '', 'Feature order answers “what regenerates first?” Chronological history answers “what changed when?” A snapshot is view-only; a workspace is editable.'));
+    live.appendChild(intro);
+
+    var controls = make('div', 'csh-controls'), edit = make('fieldset', 'csh-edit');
+    edit.appendChild(make('legend', '', '1 · Record an edit in the active workspace'));
+    var radios = make('div', 'csh-feature-choice');
+    scenario.features.forEach(function (feature, index) {
+      var option = control('input', 'feature', 'feature-' + feature.id); option.type = 'radio';
+      option.name = prefix + '-feature'; option.value = feature.id; option.checked = index === 0;
+      var wrapper = make('label'); wrapper.htmlFor = option.id; wrapper.appendChild(option); wrapper.appendChild(document.createTextNode(feature.name)); radios.appendChild(wrapper);
+    });
+    edit.appendChild(radios);
+    var value = control('input', 'value', 'value'); value.type = 'number'; value.step = 'any';
+    edit.appendChild(labelFor('New parameter value', value)); edit.appendChild(value);
+    var range = make('span', 'csh-range'); range.dataset.csh = 'range'; edit.appendChild(range);
+    var apply = control('button', 'edit', 'edit'); apply.type = 'button'; apply.textContent = 'Record edit now'; edit.appendChild(apply);
+    controls.appendChild(edit);
+
+    var milestones = make('fieldset', 'csh-milestones'); milestones.appendChild(make('legend', '', '2 · Preserve and explore a milestone'));
+    var snapshotButton = control('button', 'snapshot', 'snapshot'); snapshotButton.type = 'button'; snapshotButton.textContent = 'Create “Design review” snapshot';
+    var branchButton = control('button', 'branch', 'branch'); branchButton.type = 'button'; branchButton.textContent = 'Create “Lightweight” branch';
+    milestones.appendChild(snapshotButton); milestones.appendChild(branchButton); controls.appendChild(milestones);
+
+    var navigation = make('div', 'csh-navigation');
+    var workspace = control('select', 'workspace', 'workspace'); navigation.appendChild(labelFor('Active editable workspace', workspace)); navigation.appendChild(workspace);
+    var viewed = control('select', 'view', 'view'); navigation.appendChild(labelFor('State shown below', viewed)); navigation.appendChild(viewed);
+    var reset = control('button', 'reset', 'reset'); reset.type = 'button'; reset.textContent = 'Reset lab'; navigation.appendChild(reset);
+    controls.appendChild(navigation); live.appendChild(controls);
+
+    var feedback = make('p', 'csh-feedback'); feedback.dataset.csh = 'feedback'; feedback.setAttribute('aria-live', 'polite'); live.appendChild(feedback);
+    var panels = make('div', 'csh-panels');
+    var orderPanel = make('section', 'csh-panel'); orderPanel.appendChild(make('h3', '', 'Feature order · regeneration sequence')); var order = make('div'); order.dataset.csh = 'order'; orderPanel.appendChild(order);
+    var historyPanel = make('section', 'csh-panel'); historyPanel.appendChild(make('h3', '', 'Chronological edit history')); var history = make('div'); history.dataset.csh = 'history'; historyPanel.appendChild(history);
+    panels.appendChild(orderPanel); panels.appendChild(historyPanel); live.appendChild(panels);
+    var comparePanel = make('section', 'csh-panel csh-compare'); comparePanel.appendChild(make('h3', '', 'Declared state comparison')); var comparison = make('div', 'csh-table-wrap'); comparison.dataset.csh = 'comparison'; comparePanel.appendChild(comparison); live.appendChild(comparePanel);
+    live.appendChild(make('p', 'csh-limits', 'Symbolic teaching model only: it changes local in-memory numbers and event cards. It does not open CAD, save files, restore or roll back a workspace, merge branches, or change sharing permissions. Vendor workflows and managed data systems can differ.'));
+
+    function find(key) { return live.querySelector('[data-csh="' + key + '"]'); }
+    function chosenFeature() { return live.querySelector('input[data-csh="feature"]:checked').value; }
+    function feature(id) { return scenario.features.find(function (item) { return item.id === id; }); }
+    function setFeedback(text) { feedback.textContent = text; }
+    function refillSelect(select, options, selected) {
+      select.replaceChildren();
+      options.forEach(function (option) { var element = make('option', '', option.label); element.value = option.value; select.appendChild(element); });
+      if (options.some(function (option) { return option.value === selected; })) select.value = selected;
+    }
+    function updateEditor() {
+      var selected = feature(chosenFeature()), active = state.workspaces[state.activeWorkspaceId];
+      value.min = selected.min; value.max = selected.max; value.value = active.values[selected.id];
+      range.textContent = selected.parameter + ' · ' + selected.min + '–' + selected.max + ' ' + selected.unit;
+    }
+    function render() {
+      var workspaceOptions = Object.keys(state.workspaces).map(function (id) { return { value: id, label: state.workspaces[id].name }; });
+      refillSelect(workspace, workspaceOptions, state.activeWorkspaceId);
+      var viewOptions = workspaceOptions.map(function (item) { return { value: 'workspace:' + item.value, label: item.label + ' · editable' }; });
+      Object.keys(state.snapshots).forEach(function (id) { viewOptions.push({ value: 'snapshot:' + id, label: state.snapshots[id].name + ' · fixed snapshot' }); });
+      refillSelect(viewed, viewOptions, state.view.kind + ':' + state.view.id);
+      var inspected = M.inspect(state, state.view).view;
+      R.renderFeatureOrder(order, scenario, inspected); R.renderHistory(history, scenario, inspected); R.renderComparison(comparison, scenario, state);
+      snapshotButton.disabled = Object.prototype.hasOwnProperty.call(state.snapshots, 'design-review');
+      branchButton.disabled = !Object.prototype.hasOwnProperty.call(state.snapshots, 'design-review') || Object.prototype.hasOwnProperty.call(state.workspaces, 'lightweight');
+      updateEditor();
+      live.dataset.activeWorkspace = state.activeWorkspaceId; live.dataset.view = state.view.kind + ':' + state.view.id;
+    }
+    function accept(result, success) {
+      if (!result.ok) { setFeedback(result.error); return false; }
+      state = result.state; setFeedback(success); render(); return true;
+    }
+    live.querySelectorAll('input[data-csh="feature"]').forEach(function (radio) { radio.addEventListener('change', updateEditor); });
+    apply.addEventListener('click', function () {
+      var selected = feature(chosenFeature()), raw = value.value.trim(), numeric = raw === '' ? NaN : Number(raw);
+      accept(M.editFeature(state, { workspaceId: state.activeWorkspaceId, featureId: selected.id, value: numeric,
+        summary: 'Edited ' + selected.name }), 'Edit recorded now. The feature stayed in position ' + (scenario.features.indexOf(selected) + 1) + ' of the feature order.');
+    });
+    snapshotButton.addEventListener('click', function () {
+      accept(M.createSnapshot(state, { workspaceId: state.activeWorkspaceId, snapshotId: 'design-review', name: 'Design review' }), 'Snapshot created. Future workspace edits will not change its captured values.');
+    });
+    branchButton.addEventListener('click', function () {
+      var result = M.createBranch(state, { snapshotId: 'design-review', workspaceId: 'lightweight', name: 'Lightweight branch' });
+      if (!result.ok) { setFeedback(result.error); return; }
+      state = result.state; state = M.activateWorkspace(state, 'lightweight').state;
+      setFeedback('Branch created from the fixed snapshot. Edits now affect only Lightweight branch. Try Base extrude = 8 mm.'); render();
+    });
+    workspace.addEventListener('change', function () { accept(M.activateWorkspace(state, workspace.value), 'Active workspace changed. No design edit was recorded.'); });
+    viewed.addEventListener('change', function () {
+      var parts = viewed.value.split(':');
+      accept(M.viewState(state, { kind: parts[0], id: parts[1] }), parts[0] === 'snapshot' ? 'Viewing a fixed snapshot. This did not restore or edit either workspace.' : 'Viewing an editable workspace.');
+    });
+    reset.addEventListener('click', function () { accept(M.reset(state), 'Reset to the original teaching state.'); });
+    setFeedback('First: keep Mounting sketch selected, enter 72 mm, and record the edit.'); render();
+  });
+})();
+
 </script>
 </body>
 </html>

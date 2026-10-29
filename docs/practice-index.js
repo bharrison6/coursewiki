@@ -1,4 +1,9 @@
 window.PRACTICE_ITEMS = [
+{"id":"ac-wave-zero-mean-rms","title":"Zero-mean sine RMS","source":"ac-and-dc","sourceTitle":"AC and DC","bank":"ac-waveforms","url":"practice.html#ac-wave-zero-mean-rms"},
+{"id":"ac-wave-offset-rms","title":"Total RMS with DC offset","source":"ac-and-dc","sourceTitle":"AC and DC","bank":"ac-waveforms","url":"practice.html#ac-wave-offset-rms"},
+{"id":"ac-wave-vpp","title":"Peak-to-peak voltage","source":"ac-and-dc","sourceTitle":"AC and DC","bank":"ac-waveforms","url":"practice.html#ac-wave-vpp"},
+{"id":"ac-wave-period","title":"Period from frequency","source":"ac-and-dc","sourceTitle":"AC and DC","bank":"ac-waveforms","url":"practice.html#ac-wave-period"},
+{"id":"ac-wave-resistor-power","title":"Average ideal-resistor power","source":"ac-and-dc","sourceTitle":"AC and DC","bank":"ac-waveforms","url":"practice.html#ac-wave-resistor-power"},
 {"id":"bearing-load-direction","title":"Identify a radial load","source":"bearing-types-and-loads","sourceTitle":"Bearing Types and Loads","bank":"bearings-and-shaft-support","url":"practice.html#bearing-load-direction"},
 {"id":"bearing-combined-load","title":"Recognize combined loading","source":"bearing-types-and-loads","sourceTitle":"Bearing Types and Loads","bank":"bearings-and-shaft-support","url":"practice.html#bearing-combined-load"},
 {"id":"bearing-speed-selection","title":"Select for repeated starts","source":"bearing-types-and-loads","sourceTitle":"Bearing Types and Loads","bank":"bearings-and-shaft-support","url":"practice.html#bearing-speed-selection"},

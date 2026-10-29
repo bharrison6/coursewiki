@@ -2996,6 +2996,21 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
   .deeper-back { display: none; }
 }
+[data-interactive="ac-waveform"] { min-width:0; margin-block:1rem; } [data-interactive="ac-waveform"] * { box-sizing:border-box; }
+.acw-live { display:grid; gap:.85rem; font:.96rem/1.45 var(--f-display); } .acw-live fieldset { min-width:0; border:1px solid var(--rule); padding:.75rem; } .acw-live legend { font-weight:750; }
+.acw-presets,.acw-choice-row { display:flex; flex-wrap:wrap; gap:.5rem; } .acw-presets button,.acw-live button,.acw-live input[type="number"] { min-height:44px; color:var(--ink); background:var(--surface); border:1px solid var(--rule); border-radius:var(--radius-xs); padding:.5rem .7rem; font:inherit; }
+.acw-live :is(button,input,summary,.acw-plot-scroll):focus-visible { outline:3px solid var(--accent); outline-offset:2px; } .acw-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; } .acw-controls label { display:grid; gap:.25rem; font-weight:650; } .acw-controls input { width:100%; }
+.acw-choice-row label { display:inline-flex; min-height:44px; align-items:center; gap:.3rem; } .acw-predict button { margin-top:.5rem; } .acw-context,.acw-limit { color:var(--ink-soft); }
+.acw-plot-scroll { max-width:100%; overflow-x:auto; border:1px solid var(--rule); background:var(--surface); } .acw-plot-scroll svg { display:block; width:680px; max-width:none; height:250px; color:var(--ink); } .acw-plot-scroll svg text { fill:currentColor; font:15px sans-serif; }
+.acw-axis { fill:none; stroke:var(--rule); stroke-width:1.5; } .acw-zero { stroke:var(--ink-soft); stroke-width:1.5; } .acw-mean { stroke:var(--flag); stroke-width:2; stroke-dasharray:8 5; } .acw-wave { fill:none; stroke:var(--accent); stroke-width:3; } .acw-max,.acw-min { fill:var(--flag); stroke:var(--ink); }
+.acw-status { margin:0; border-left:4px solid var(--flag); padding:.6rem .75rem; background:var(--surface-2); } .acw-results dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem; } .acw-results dl div { display:grid; grid-template-columns:minmax(8rem,1fr) auto; gap:.5rem; border-bottom:1px solid var(--rule); padding:.4rem 0; } .acw-results dt { font-weight:650; } .acw-results dd { margin:0; text-align:right; }
+.acw-settings { margin:.2rem 0 .6rem; border-left:4px solid var(--flag); padding:.55rem .7rem; background:var(--surface-2); } .acw-plot-note { margin:.45rem 0; color:var(--ink-soft); font-size:.9em; line-height:1.35; }
+.acw-advanced { border:1px solid var(--rule); margin:0; padding:.7rem; } .acw-advanced > summary { cursor:pointer; display:flex; align-items:center; min-height:44px; font-weight:750; } .acw-advanced > fieldset { margin:.7rem 0 0; }
+.acw-table-scroll { max-width:100%; overflow-x:auto; } .acw-table-scroll:focus-visible { outline:3px solid var(--accent); } .acw-table-scroll table { min-width:42rem; }
+@media (max-width:32rem) { .acw-controls,.acw-results dl { grid-template-columns:1fr; } }
+@media screen { [data-interactive="ac-waveform"][data-acw-ready] > .acw-static { display:none; } }
+@media print { [data-interactive="ac-waveform"] .acw-live { display:none !important; } [data-interactive="ac-waveform"] > .acw-static { display:block !important; } .acw-table-scroll { overflow:visible; max-width:none; } .acw-table-scroll table { width:100%; min-width:0; table-layout:fixed; font-size:.76rem; break-inside:avoid; } .acw-table-scroll :is(th,td) { padding:.25rem; overflow-wrap:anywhere; } }
+
 [data-interactive="wire-voltage-drop"] { min-width: 0; font-size: 16px; overflow-wrap: anywhere; }
 [data-interactive="wire-voltage-drop"] * { box-sizing: border-box; }
 [data-interactive="wire-voltage-drop"] .wvd-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; }
@@ -3128,13 +3143,49 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-1">Supporting detail: <a href="#deeper-addendum-1"><strong>Addendum 1</strong></a> &mdash; Why use RMS instead of the average voltage?.</p>
     </div>
   </details>
+  <details class="xcard deck-slide is-interactive" id="ac-and-dc--compare-signed-mean-rms-and-ideal-resistor-heating" data-card="ac-and-dc--compare-signed-mean-rms-and-ideal-resistor-heating" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Compare signed mean, RMS, and ideal-resistor heating<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compare signed mean, RMS, and ideal-resistor heating</h2>
+  <p>A sine can have a signed average of zero over one cycle and still produce heating. Add a DC offset and the
+  signed mean moves with the waveform, while total RMS combines the offset and the changing component. Predict
+  first, then compare the same sine centered on zero, shifted by an offset, kept above zero, or reduced to pure DC.</p>
+  <div data-interactive="ac-waveform">
+    <div class="acw-static">
+      <p><strong>Print / static comparison:</strong> use the analytic waveform
+      <code>v(t) = offset + amplitude × sin(2πft)</code> over one complete cycle. The resistor is ideal and fixed at
+      100 Ω. These are low illustrative voltages, not mains or wiring examples.</p>
+      <div class="unit-table-wrap acw-table-scroll" tabindex="0" role="region" aria-label="Whole-cycle sine-wave comparison table; scroll horizontally for all columns">
+      <table class="unit-table"><caption>The same 2 V sine amplitude with different DC offsets</caption><thead><tr>
+      <th>Waveform</th><th>Signed mean</th><th>AC-component RMS</th><th>Total RMS</th><th>Minimum / maximum</th><th>Average resistor power</th></tr></thead><tbody>
+      <tr><th>0 V offset</th><td>0 V</td><td>1.414 V</td><td>1.414 V</td><td>−2 / +2 V</td><td>20 mW</td></tr>
+      <tr><th>+1 V offset</th><td>+1 V</td><td>1.414 V</td><td>1.732 V</td><td>−1 / +3 V</td><td>30 mW</td></tr>
+      <tr><th>+3 V offset</th><td>+3 V</td><td>1.414 V</td><td>3.317 V</td><td>+1 / +5 V</td><td>110 mW</td></tr>
+      </tbody></table></div>
+      <p>The centered sine has zero signed mean but nonzero RMS and average power. The +3 V offset keeps the total
+      waveform positive even though it still contains a sine component. A constant pure-DC value has RMS equal to
+      its magnitude and has no unique oscillation period.</p>
+    </div>
+    <noscript><p>The controls require JavaScript. The comparison table, equations, limits and worked values remain available.</p></noscript>
+  </div>
+  <p>The live explorer evaluates one complete ideal sine cycle analytically; the drawn points only illustrate the
+  equation. For <code>v(t) = V<sub>DC</sub> + A sin(2πft)</code>, the signed mean is
+  <code>V<sub>DC</sub></code>, the sine component has RMS <code>A/√2</code>, and total RMS is
+  <code>√(V<sub>DC</sub>² + A²/2)</code>. In one ideal resistor, <strong>average</strong> power is
+  <code>V<sub>RMS</sub>²/R</code>; “RMS power” is not the quantity being calculated.</p>
+  <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; Why RMS answers the heating question.</p>
+  <p><a class="button" data-practice-add="ac-wave-zero-mean-rms" href="../practice.html#ac-wave-zero-mean-rms">Practice zero-mean RMS</a>
+  <a class="button" data-practice-add="ac-wave-offset-rms" href="../practice.html#ac-wave-offset-rms">Practice RMS with offset</a>
+  <a class="button" data-practice-add="ac-wave-resistor-power" href="../practice.html#ac-wave-resistor-power">Practice average resistor power</a></p>
+    </div>
+  </details>
   <details class="xcard deck-slide" id="ac-and-dc--higher-transmission-voltage-reduces-current-and-line-loss" data-card="ac-and-dc--higher-transmission-voltage-reduces-current-and-line-loss">
     <summary>Higher transmission voltage reduces current and line loss<span class="chev"></span></summary>
     <div class="body">
       <h2>Higher transmission voltage reduces current and line loss</h2>
   <p>For the same transmitted power, a higher voltage allows a lower current. The line's resistive heating is <code>P<sub>loss</sub> = I<sup>2</sup>R<sub>line</sub></code>. Halve the current and the loss becomes one quarter, if line resistance stays the same. Here <code>R<sub>line</sub></code> includes the complete current path.</p>
   <p>Transformers made it practical to step AC voltage up for transmission and down for use. That advantage helped the AC systems associated with Westinghouse and Tesla prevail over Edison's early DC distribution system in the “war of the currents.” It was not one inventor winning every part of electrical engineering.</p>
-  <p class="deeper-ref" id="deeper-ref-2">Supporting detail: <a href="#deeper-addendum-2"><strong>Addendum 2</strong></a> &mdash; A comparison with the same power and the same line.</p>
+  <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; A comparison with the same power and the same line.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="ac-and-dc--a-rectifier-is-one-stage-of-an-ac-to-dc-power-supply" data-card="ac-and-dc--a-rectifier-is-one-stage-of-an-ac-to-dc-power-supply">
@@ -3186,7 +3237,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>A smaller AWG number means a thicker conductor</h2>
   <p><strong>American Wire Gauge (AWG)</strong> uses smaller numbers for larger conductor cross sections. For the same material, length and temperature, a thicker conductor has less resistance. See <a href="https://learn.adafruit.com/wires-and-connections/wire-gauges">Adafruit’s wire-gauge explanation</a>. Under comparable installation and temperature conditions, it can carry more current without exceeding its temperature limit.</p>
   <p><strong>Ampacity</strong> means the allowable current under specified conditions. Gauge alone is not an ampacity rating: material, insulation temperature rating, ambient temperature, bundling and installation all matter. Use the applicable manufacturer data and installation requirements for a real selection; this page is not a wire-sizing table. <a href="https://www.iewc.com/resources/technical-guide/suggested-ampacities">IEWC explains these ampacity factors</a>. Choosing a wire involves voltage drop as well as allowable current.</p>
-  <p class="deeper-ref" id="deeper-ref-3">Supporting detail: <a href="#deeper-addendum-3"><strong>Addendum 3</strong></a> &mdash; Why a long wire can matter even below its current limit.</p>
+  <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Why a long wire can matter even below its current limit.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="wire-and-wire-gauge--count-the-return-wire-explore-voltage-drop-and-heating" data-card="wire-and-wire-gauge--count-the-return-wire-explore-voltage-drop-and-heating" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -3203,7 +3254,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <noscript><p>The worked table and comparison above work without JavaScript. Enable JavaScript to vary the inputs.</p></noscript>
   </div>
   <p>This model assumes solid copper at 20 °C, equal outgoing and return wires, and DC/resistive behavior. Current is an input, not a prediction of how a particular load responds. Heating loss is not a temperature prediction; copper resistance rises with temperature (approx. 0.393%/°C near 20 °C). Connections and AC reactance are omitted.</p>
-  <p class="deeper-ref" id="deeper-ref-4">Supporting detail: <a href="#deeper-addendum-4"><strong>Addendum 4</strong></a> &mdash; Definitions used to calculate every result.</p>
+  <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Definitions used to calculate every result.</p>
   <p>Practice:
     <a data-practice-add="wire-loop-resistance" href="../practice.html#wire-loop-resistance">Loop resistance</a> ·
     <a data-practice-add="wire-run-drop" href="../practice.html#wire-run-drop">Voltage drop</a> ·
@@ -3246,7 +3297,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li>Two parallel resistors: <code>R<sub>eq</sub> = R<sub>1</sub>R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>)</code>.</li>
   </ul>
   <p>Check the result: series resistance is greater than any one positive resistor; parallel resistance is smaller than the smallest connected resistor when two or more branches are connected. An open circuit has no conducting path and is represented by infinite equivalent resistance.</p>
-  <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Why the parallel formula uses reciprocals.</p>
+  <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Why the parallel formula uses reciprocals.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="series-and-parallel-circuits--change-a-resistor-or-open-a-switch-and-predict-what-changes" data-card="series-and-parallel-circuits--change-a-resistor-or-open-a-switch-and-predict-what-changes" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -3298,7 +3349,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>A <strong>voltmeter</strong> measures the potential difference between two points. Connect it across the component, in parallel. A <strong>series ammeter</strong> becomes part of the current path: open the path and insert it in series with the element whose current you want.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkFtbWV0ZXIgaW4gc2VyaWVzIGFuZCB2b2x0bWV0ZXIgaW4gcGFyYWxsZWwiPjx0aXRsZT5BbW1ldGVyIGluIHNlcmllcyBhbmQgdm9sdG1ldGVyIGluIHBhcmFsbGVsPC90aXRsZT48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MTdweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0NX0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojMTcyYjQ1O3N0cm9rZS13aWR0aDozfTwvc3R5bGU+PHBhdGggY2xhc3M9IndpcmUiIGQ9Ik04MCA4MEgyMzUgTTI4NSA4MEg0MTAgTTQ5MCA4MEg2NjBWMjgwSDgwVjIwMCBNODAgMTUwVjgwIE0zNjUgODBWMTgwSDQyNSBNNDc1IDE4MEg1NTBWODAiLz48Y2lyY2xlIGNsYXNzPSJ3aXJlIiBjeD0iODAiIGN5PSIxNzUiIHI9IjI1Ii8+PHRleHQgeD0iNjgiIHk9IjE4MiI+REM8L3RleHQ+PGNpcmNsZSBjbGFzcz0id2lyZSIgY3g9IjI2MCIgY3k9IjgwIiByPSIyNSIvPjx0ZXh0IHg9IjI1NCIgeT0iODciPkE8L3RleHQ+PHJlY3QgY2xhc3M9IndpcmUiIHg9IjQxMCIgeT0iNjgiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNCIvPjx0ZXh0IHg9IjQxMCIgeT0iNTMiPlJlc2lzdG9yPC90ZXh0PjxjaXJjbGUgY2xhc3M9IndpcmUiIGN4PSI0NTAiIGN5PSIxODAiIHI9IjI1Ii8+PHRleHQgeD0iNDQ0IiB5PSIxODciPlY8L3RleHQ+PGNpcmNsZSBjeD0iMzY1IiBjeT0iODAiIHI9IjQiLz48Y2lyY2xlIGN4PSI1NTAiIGN5PSI4MCIgcj0iNCIvPjx0ZXh0IHg9IjE3NSIgeT0iMTMwIj5DdXJyZW50IGZsb3dzIHRocm91Z2ggQTwvdGV4dD48dGV4dCB4PSIzMzAiIHk9IjIzNSI+ViBtZWFzdXJlcyBiZXR3ZWVuIHRoZXNlIHR3byBub2RlczwvdGV4dD48dGV4dCB4PSIxODAiIHk9IjMyNSI+SWRlYWwgbWV0ZXJzOiBBIGhhcyB6ZXJvIHJlc2lzdGFuY2U7IFYgZHJhd3Mgbm8gY3VycmVudDwvdGV4dD48L3N2Zz4=" alt="A DC source supplies an ammeter and resistor in series. A voltmeter connects across the resistor, on two separate parallel leads." data-natural-width="760" data-natural-height="360"></p>
   <p>A meter set for current has a low-resistance input; connecting that input across a source makes a short circuit. Read <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a> before making physical measurements. The diagrams here explain connections, not a procedure for working on mains wiring.</p>
-  <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Real meters change the circuit a little.</p>
+  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; Real meters change the circuit a little.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="measuring-electric-circuits--place-both-voltage-probes-predict-the-sign-then-reveal" data-card="measuring-electric-circuits--place-both-voltage-probes-predict-the-sign-then-reveal" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -3364,43 +3415,56 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li class="deeper-addendum" id="deeper-addendum-2" value="2">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-ac-and-dc">AC and DC</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 2.</span> A comparison with the same power and the same line</h2>
-        <p>In an ideal DC or unity-power-factor comparison, transmitting 8,000 W at 400 V requires 20 A. At 4,000 V it requires 2 A. If the complete line resistance is 0.5 &Omega;, the losses are 200 W and 2 W. Ten times the voltage gives one hundredth the resistive loss. This simplified comparison omits converter losses and voltage regulation; it is not a design for a real transmission line. For AC loads with a phase shift, see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/power-and-efficiency.html" target="_blank" rel="noopener">Power and Efficiency</a>.</p>
-    <p>The historical advantage belongs to the equipment available at the time. Modern converters also make high-voltage DC transmission practical.</p>
+        <h2><span class="deeper-addendum-number">Addendum 2.</span> Why RMS answers the heating question</h2>
+        <p>Analog Devices' <a href="https://www.analog.com/en/resources/analog-dialogue/raqs/raq-issue-54.html">RMS explanation</a>
+    shows why ordinary signed or absolute averages do not predict heating for arbitrary waveforms. Its
+    <a href="https://www.analog.com/en/resources/analog-dialogue/raqs/2020/04/01/14/20/raq-issue-177.html">power note</a>
+    distinguishes average power from the RMS value of a power waveform: RMS voltage or current can calculate
+    meaningful average power in the stated load. This classroom explorer uses a purely resistive fixed load; it
+    does not model impedance, power factor, temperature, a meter's coupling mode, or an actual circuit.</p>
         <p class="deeper-back"><a href="#deeper-ref-2">Back to reference 2</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-3" value="3">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 3.</span> Why a long wire can matter even below its current limit</h2>
-        <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/current-voltage-and-resistance.html" target="_blank" rel="noopener">Current, Voltage, and Resistance</a> shows the calculation.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-ac-and-dc">AC and DC</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 3.</span> A comparison with the same power and the same line</h2>
+        <p>In an ideal DC or unity-power-factor comparison, transmitting 8,000 W at 400 V requires 20 A. At 4,000 V it requires 2 A. If the complete line resistance is 0.5 &Omega;, the losses are 200 W and 2 W. Ten times the voltage gives one hundredth the resistive loss. This simplified comparison omits converter losses and voltage regulation; it is not a design for a real transmission line. For AC loads with a phase shift, see <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/power-and-efficiency.html" target="_blank" rel="noopener">Power and Efficiency</a>.</p>
+    <p>The historical advantage belongs to the equipment available at the time. Modern converters also make high-voltage DC transmission practical.</p>
         <p class="deeper-back"><a href="#deeper-ref-3">Back to reference 3</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-4" value="4">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 4.</span> Definitions used to calculate every result</h2>
-        <p>For AWG number n, diameter d = 0.127 × 92<sup>(36 − n)/39</sup> mm. Convert d to meters, then A = πd²/4 in m². Using annealed-copper resistivity ρ = 1.724 × 10<sup>−8</sup> Ω·m at 20 °C, R = ρL/A. One foot is exactly 0.3048 m.</p>
-    <p>With one-way run ℓ, L = 2ℓ and R<sub>loop</sub> = ρ(2ℓ)/A. V<sub>drop</sub> = IR<sub>loop</sub>; percent drop = 100V<sub>drop</sub>/V<sub>source</sub>; V<sub>load</sub> = V<sub>source</sub> − V<sub>drop</sub>; wire loss P = I²R<sub>loop</sub>. A two-wire single-phase resistive approximation uses the same return path, but this model does not include AC effects.</p>
+        <h2><span class="deeper-addendum-number">Addendum 4.</span> Why a long wire can matter even below its current limit</h2>
+        <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/current-voltage-and-resistance.html" target="_blank" rel="noopener">Current, Voltage, and Resistance</a> shows the calculation.</p>
         <p class="deeper-back"><a href="#deeper-ref-4">Back to reference 4</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-5" value="5">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 5.</span> Why the parallel formula uses reciprocals</h2>
-        <p>Each branch draws the supply voltage divided by its resistance. Add those branch currents, then divide by the common voltage. The result is a sum of <code>1/R</code> terms. This reciprocal of resistance is called conductance: parallel branches add ways for current to flow.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 5.</span> Definitions used to calculate every result</h2>
+        <p>For AWG number n, diameter d = 0.127 × 92<sup>(36 − n)/39</sup> mm. Convert d to meters, then A = πd²/4 in m². Using annealed-copper resistivity ρ = 1.724 × 10<sup>−8</sup> Ω·m at 20 °C, R = ρL/A. One foot is exactly 0.3048 m.</p>
+    <p>With one-way run ℓ, L = 2ℓ and R<sub>loop</sub> = ρ(2ℓ)/A. V<sub>drop</sub> = IR<sub>loop</sub>; percent drop = 100V<sub>drop</sub>/V<sub>source</sub>; V<sub>load</sub> = V<sub>source</sub> − V<sub>drop</sub>; wire loss P = I²R<sub>loop</sub>. A two-wire single-phase resistive approximation uses the same return path, but this model does not include AC effects.</p>
         <p class="deeper-back"><a href="#deeper-ref-5">Back to reference 5</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-6" value="6">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-measuring-electric-circuits">Measuring Electric Circuits</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 6.</span> Real meters change the circuit a little</h2>
-        <p>An ideal voltmeter draws no current. A real one has high but finite input resistance. An ideal ammeter drops no voltage. A real one has some resistance and a voltage drop, sometimes called burden voltage. The practice problems use ideal meters unless stated otherwise.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 6.</span> Why the parallel formula uses reciprocals</h2>
+        <p>Each branch draws the supply voltage divided by its resistance. Add those branch currents, then divide by the common voltage. The result is a sum of <code>1/R</code> terms. This reciprocal of resistance is called conductance: parallel branches add ways for current to flow.</p>
         <p class="deeper-back"><a href="#deeper-ref-6">Back to reference 6</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-7" value="7">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-measuring-electric-circuits">Measuring Electric Circuits</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 7.</span> Real meters change the circuit a little</h2>
+        <p>An ideal voltmeter draws no current. A real one has high but finite input resistance. An ideal ammeter drops no voltage. A real one has some resistance and a voltage drop, sometimes called burden voltage. The practice problems use ideal meters unless stated otherwise.</p>
+        <p class="deeper-back"><a href="#deeper-ref-7">Back to reference 7</a></p>
       </article>
     </li>
   </ol>
@@ -5217,6 +5281,126 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
   })();
 })();
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiAcWaveform = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  const TAU = 2 * Math.PI;
+  function finite(name, value) {
+    if (!Number.isFinite(value)) throw new RangeError(`${name} must be finite.`);
+    return value;
+  }
+  function analyze({ offset, amplitude, frequency, resistance }) {
+    [offset, amplitude, frequency, resistance].forEach((value, index) => finite(['Offset', 'Amplitude', 'Frequency', 'Resistance'][index], value));
+    if (offset < -10 || offset > 10) throw new RangeError('Use a DC offset from −10 to 10 V.');
+    if (amplitude < 0 || amplitude > 10) throw new RangeError('Use a sine amplitude from 0 to 10 V.');
+    if (frequency < 0 || frequency > 1000 || (amplitude > 0 && frequency < .1)) throw new RangeError('Use 0.1–1000 Hz for a sine; pure DC may use 0 Hz.');
+    if (resistance < .1 || resistance > 10000) throw new RangeError('Use a resistance from 0.1 to 10,000 Ω.');
+    const acRms = amplitude / Math.SQRT2;
+    const totalRms = Math.hypot(offset, acRms);
+    if (![totalRms, totalRms * totalRms / resistance].every(Number.isFinite)) throw new RangeError('The derived RMS and power must stay finite.');
+    return Object.freeze({ offset, amplitude, frequency, resistance,
+      mean: offset, acRms, totalRms, minimum: offset - amplitude, maximum: offset + amplitude,
+      peakToPeak: 2 * amplitude, period: amplitude === 0 ? null : 1 / frequency,
+      averagePower: totalRms * totalRms / resistance,
+      crossesZero: amplitude > 0 && Math.abs(offset) < amplitude,
+      touchesZero: amplitude > 0 && Math.abs(offset) === amplitude });
+  }
+  function instantaneous(input, phase) {
+    const result = analyze(input);
+    finite('Phase', phase);
+    if (phase < 0 || phase >= 1) throw new RangeError('Use normalized phase from 0 up to, but not including, 1.');
+    return result.offset + result.amplitude * Math.sin(TAU * phase);
+  }
+  function samples(input, count = 161) {
+    if (!Number.isInteger(count) || count < 2 || count > 2001) throw new RangeError('Use 2–2001 whole drawing samples.');
+    return Object.freeze(Array.from({ length: count }, (_, index) => {
+      const phase = index / (count - 1);
+      const wrapped = phase === 1 ? 0 : phase;
+      return Object.freeze({ phase, value: instantaneous(input, wrapped) });
+    }));
+  }
+  return Object.freeze({ TAU, analyze, instantaneous, samples });
+});
+
+(function (root, factory) {
+  'use strict';
+  const api = factory(root.CourseWikiAcWaveform || (typeof require === 'function' ? require('./model.js') : null));
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiAcWaveformDrawing = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (model) {
+  'use strict';
+  if (!model) throw new Error('The AC waveform model is required.');
+  function diagram(input) {
+    const result = model.analyze(input), points = model.samples(input, 241);
+    const lo = Math.min(-.5, result.minimum), hi = Math.max(.5, result.maximum), span = hi - lo;
+    const x = phase => 54 + phase * 580, y = value => 205 - (value - lo) * 160 / span;
+    const path = points.map((point, index) => `${index ? 'L' : 'M'}${x(point.phase).toFixed(2)} ${y(point.value).toFixed(2)}`).join(' ');
+    const meanY = y(result.mean), zeroY = y(0), isDc = result.amplitude === 0;
+    const windowLabels = isDc ? '<text x="54" y="237">display start</text><text x="634" y="237" text-anchor="end">display end · constant DC</text>' : '<text x="54" y="237">phase 0</text><text x="634" y="237" text-anchor="end">phase 1 · one cycle</text>';
+    const extrema = isDc ? `<circle class="acw-max" cx="344" cy="${y(result.mean).toFixed(2)}" r="4"/><text x="344" y="${(y(result.mean) - 10).toFixed(2)}" text-anchor="middle">constant ${result.mean.toFixed(2)} V</text>` : `<circle class="acw-max" cx="199" cy="${y(result.maximum).toFixed(2)}" r="4"/><text x="199" y="${(y(result.maximum) - 10).toFixed(2)}" text-anchor="middle">max ${result.maximum.toFixed(2)} V</text><circle class="acw-min" cx="489" cy="${y(result.minimum).toFixed(2)}" r="4"/><text x="489" y="${(y(result.minimum) + 17).toFixed(2)}" text-anchor="middle">min ${result.minimum.toFixed(2)} V</text>`;
+    return `<svg viewBox="0 0 680 250" role="img" data-cycle-count="${isDc ? 0 : 1}" aria-label="${isDc ? 'Constant DC waveform display with no oscillation period' : 'One complete cycle of a sine waveform with DC offset, zero axis and signed cycle mean'}">
+      <path class="acw-axis" d="M54 25V215H640"/>
+      <path class="acw-zero" d="M54 ${zeroY.toFixed(2)}H634"/><text x="48" y="${(zeroY - 5).toFixed(2)}" text-anchor="end">0 V</text>
+      <path class="acw-mean" d="M54 ${meanY.toFixed(2)}H634"/><text x="638" y="${(meanY - 5).toFixed(2)}" text-anchor="end">mean ${result.mean.toFixed(2)} V</text>
+      <path class="acw-wave" d="${path}"/>${windowLabels}${extrema}
+    </svg>`;
+  }
+  return Object.freeze({ diagram });
+});
+
+(function () {
+  'use strict';
+  const model = globalThis.CourseWikiAcWaveform, drawing = globalThis.CourseWikiAcWaveformDrawing;
+  if (!model || !drawing) return;
+  let sequence = 0;
+  function nextName() { let name; do { name = `acw-${++sequence}-prediction`; } while (document.querySelector(`input[name="${name}"]`)); return name; }
+  function fmt(value, digits = 6) { return Number(value.toPrecision(digits)).toString(); }
+  function init(root) {
+    if (root.dataset.acwReady) return;
+    root.dataset.acwReady = 'true';
+    const predictionName = nextName(), live = document.createElement('div'); live.className = 'acw-live';
+    live.innerHTML = `<fieldset class="acw-first-use"><legend>Compare signed mean, RMS, and the waveform</legend>
+      <p class="acw-settings" data-settings aria-live="polite"></p>
+      <div class="acw-presets"><button type="button" data-preset="centered">Zero-mean sine</button>
+      <button type="button" data-preset="offset">Add 1 V offset</button><button type="button" data-preset="positive">Keep it positive</button><button type="button" data-preset="dc">Pure DC</button></div>
+      <div class="acw-plot-scroll" tabindex="0" role="region" aria-label="Ideal voltage waveform diagram; scroll horizontally"><div data-diagram></div></div>
+      <p class="acw-plot-note" data-plot-note></p>
+      <fieldset class="acw-predict"><legend>Predict before revealing</legend><p>How does total RMS compare with the magnitude of the signed cycle mean?</p>
+      <div class="acw-choice-row"><label><input type="radio" name="${predictionName}" value="higher"> RMS is higher</label>
+      <label><input type="radio" name="${predictionName}" value="same"> They are equal</label><label><input type="radio" name="${predictionName}" value="lower"> RMS is lower</label></div>
+      <button type="button" data-reveal disabled>Reveal whole-cycle statistics</button></fieldset>
+      <p class="acw-status" data-status role="status" aria-live="polite">Choose a prediction, then reveal the statistics.</p><div class="acw-results" data-results hidden></div>
+      <p class="acw-limit"><strong>Model boundary:</strong> an analytic sine plus DC offset over a whole cycle and one ideal fixed resistor. The plotted points illustrate that equation; they do not define the statistics. This is not a meter simulation, wiring procedure, mains-safety model, motor load, or prediction of impedance, power factor, or temperature.</p></fieldset>
+      <details class="acw-advanced"><summary>Adjust waveform and resistor settings</summary>
+      <fieldset><legend>Ideal waveform and resistor</legend><div class="acw-controls">
+      <label>DC offset (V) <input data-offset type="number" min="-10" max="10" step="0.1" value="0"></label>
+      <label>Sine amplitude (V) <input data-amplitude type="number" min="0" max="10" step="0.1" value="2"></label>
+      <label>Frequency (Hz) <input data-frequency type="number" min="0.1" max="1000" step="0.1" value="50"></label>
+      <label>Ideal resistance (Ω) <input data-resistance type="number" min="0.1" max="10000" step="0.1" value="100"></label></div>
+      <p class="acw-context">For a sine, the model <code>v(t) = offset + amplitude × sin(2πft)</code> is evaluated over one complete cycle. With zero amplitude it is constant DC, with no physical cycle. Resistance is fixed and purely resistive.</p></fieldset></details>`;
+    root.insertBefore(live, root.firstChild);
+    const field = key => live.querySelector(`[data-${key}]`), diagram = field('diagram'), status = field('status'), results = field('results'), reveal = field('reveal');
+    const inputs = ['offset','amplitude','frequency','resistance'].map(field), prediction = () => live.querySelector(`input[name="${predictionName}"]:checked`);
+    function values() { return { offset:field('offset').valueAsNumber, amplitude:field('amplitude').valueAsNumber, frequency:field('frequency').valueAsNumber, resistance:field('resistance').valueAsNumber }; }
+    function clear(message) { diagram.replaceChildren(); results.hidden=true; results.replaceChildren(); live.querySelectorAll(`input[name="${predictionName}"]`).forEach(input=>{input.checked=false;}); reveal.disabled=true; status.textContent=message||'Inputs changed. Choose a new prediction.'; }
+    function settingsSummary(result) { field('settings').textContent=result.amplitude===0?`${fmt(result.offset)} V offset · constant DC (0 V sine amplitude; no oscillation) · ${fmt(result.resistance)} Ω ideal resistor.`:`${fmt(result.offset)} V offset · ${fmt(result.amplitude)} V sine amplitude at ${fmt(result.frequency)} Hz · ${fmt(result.resistance)} Ω ideal resistor.`; }
+    function invalidSummary(message) { field('settings').textContent=`Settings need attention: ${message} Open “Adjust waveform and resistor settings” to review the current values.`;field('plot-note').textContent='No waveform is drawn until every setting is valid.'; }
+    function update() { try { let input=values(); if(input.amplitude>0&&input.frequency===0){field('frequency').value='50';input=values();}const result=model.analyze(input); diagram.innerHTML=drawing.diagram(input); field('frequency').disabled=result.amplitude===0;settingsSummary(result);field('plot-note').textContent=result.amplitude===0?'Constant DC is shown across a display span; it has no physical cycle or oscillation period.':'One complete sine cycle is shown. The zero axis, signed mean, minimum, and maximum use the current values.';live.querySelector('.acw-plot-scroll').setAttribute('aria-label',result.amplitude===0?'Constant DC voltage diagram; scroll horizontally':'One complete sine-cycle voltage diagram; scroll horizontally');status.textContent=result.amplitude===0?'Pure DC has no oscillation period. Choose a prediction for the remaining statistics.':'Choose a prediction, then reveal the whole-cycle statistics.'; } catch(error) { field('frequency').disabled=false; clear(error.message);invalidSummary(error.message); } }
+    inputs.forEach(input=>input.addEventListener('input',()=>{clear();update();}));
+    live.querySelector('.acw-predict').addEventListener('change',()=>{reveal.disabled=!prediction()||!diagram.firstElementChild;});
+    const presets={centered:[0,2,50,100],offset:[1,2,50,100],positive:[3,2,50,100],dc:[2,0,0,100]};
+    live.querySelectorAll('[data-preset]').forEach(button=>button.addEventListener('click',()=>{[field('offset').value,field('amplitude').value,field('frequency').value,field('resistance').value]=presets[button.dataset.preset];clear(`${button.textContent} selected. Choose a new prediction.`);update();button.focus();}));
+    reveal.addEventListener('click',()=>{ if(!prediction())return; try { const result=model.analyze(values()),meanMagnitude=Math.abs(result.mean);const relation=result.amplitude===0?'same':'higher',relationText=relation==='same'?'equal to':'higher than',roundedSame=relation==='higher'&&fmt(result.totalRms)===fmt(meanMagnitude);status.textContent=`${prediction().value===relation?'Prediction confirmed.':'Compare mean and RMS.'} Total RMS ${fmt(result.totalRms)} V is ${relationText} |mean| ${fmt(meanMagnitude)} V.${roundedSame?' The analytic values differ, although they round to the same displayed value.':''}`;const period=result.period===null?'not applicable (pure DC)':`${fmt(result.period*1000)} ms`;const polarity=result.amplitude===0?'constant DC':result.crossesZero?'crosses zero':result.touchesZero?'touches zero':'stays one polarity';results.innerHTML=`<dl><div><dt>Signed cycle mean</dt><dd>${fmt(result.mean)} V</dd></div><div><dt>AC-component RMS</dt><dd>${fmt(result.acRms)} V</dd></div><div><dt>Total RMS / equivalent DC magnitude</dt><dd>${fmt(result.totalRms)} V</dd></div><div><dt>Minimum / maximum</dt><dd>${fmt(result.minimum)} / ${fmt(result.maximum)} V</dd></div><div><dt>Peak-to-peak</dt><dd>${fmt(result.peakToPeak)} V</dd></div><div><dt>Period</dt><dd>${period}</dd></div><div><dt>Average power in ${fmt(result.resistance)} Ω</dt><dd>${fmt(result.averagePower*1000)} mW</dd></div><div><dt>Total waveform</dt><dd>${polarity}</dd></div></dl><p><strong>Heating connection:</strong> in this ideal fixed resistor, average power is <code>V<sub>RMS</sub><sup>2</sup>/R</code>. The signed mean can be zero while RMS and average power remain nonzero.</p>`;results.hidden=false;} catch(error){clear(error.message);} });
+    update();
+  }
+  function initAll(){document.querySelectorAll('[data-interactive="ac-waveform"]').forEach(init);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAll,{once:true});else initAll();
+})();
+
 (function (root, factory) {
   'use strict';
   const api = factory();

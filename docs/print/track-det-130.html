@@ -3058,6 +3058,47 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="lumber-tally"] .lt-row { break-inside:avoid; }
 }
 
+[data-interactive="straight-pull"] { min-width: 0; margin-block: 1rem; }
+[data-interactive="straight-pull"] * { box-sizing: border-box; }
+.sp-lab { font: .96rem/1.5 var(--f-display); }
+.sp-lab [hidden] { display:none !important; }
+.sp-predict { min-width:0; padding:.75rem; border:1px solid var(--rule); }
+.sp-predict legend { font-weight:750; }
+.sp-predict label { display:flex; align-items:center; gap:.5rem; min-height:44px; }
+.sp-lab :is(button,select,input) { font:inherit; color:var(--ink); accent-color:var(--accent); }
+.sp-lab :is(button,select) { border:1px solid var(--rule); border-radius:var(--radius-xs); min-height:44px; background:var(--surface); padding:.4rem .6rem; }
+.sp-lab button { cursor:pointer; }
+.sp-lab button:disabled { opacity:.55; cursor:default; }
+.sp-lab :is(button,select,input):focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+.sp-controls { margin-top:1rem; display:grid; gap:.7rem; }
+.sp-controls label { display:grid; gap:.3rem; font-weight:650; }
+.sp-controls select { width:100%; min-width:0; }
+.sp-controls input[type="range"] { min-height:44px; width:100%; margin:0; }
+.sp-presets { display:flex; flex-wrap:wrap; gap:.4rem; }
+.sp-path { font-weight:750; border-left:4px solid var(--accent); padding:.6rem; background:var(--surface); }
+.sp-lab figure { margin:1rem 0; }
+.sp-diagram { display:block; width:100%; height:auto; max-width:30rem; margin-inline:auto; background:var(--paper); }
+.sp-diagram text { fill:var(--ink); font:700 22px var(--f-display); }
+.sp-mold { fill:var(--surface-2); stroke:var(--rule); stroke-width:2; }
+.sp-opening { stroke:var(--ink-soft); stroke-width:1.5; stroke-dasharray:4 5; }
+.sp-cavity { fill:none; stroke:var(--ink); stroke-width:3; }
+.sp-ghost { fill:var(--accent); fill-opacity:.17; stroke:var(--accent); stroke-width:2.5; stroke-dasharray:7 5; }
+.sp-interference { fill:var(--mark-stop,#b8321c); fill-opacity:.3; stroke:var(--ink); stroke-width:2; stroke-dasharray:2 2; }
+.sp-witness { fill:none; stroke:var(--ink); stroke-width:2.5; }
+.sp-arrow { fill:none; stroke:var(--ink); stroke-width:3; }
+.sp-readings { border:1px solid var(--rule); padding:.7rem; }
+.sp-readings h3 { margin:.1rem 0 .5rem; font-size:1.05rem; }
+.sp-static .unit-table { width:100%; }
+@media (max-width:36rem) { .sp-presets button { flex:1 1 100%; } }
+@media (prefers-reduced-motion:reduce) { [data-interactive="straight-pull"] * { animation:none !important; transition:none !important; } }
+@media screen { [data-interactive="straight-pull"][data-sp-ready] > .sp-static { display:none; } }
+@media print {
+  [data-interactive="straight-pull"] .sp-lab { display:none !important; }
+  [data-interactive="straight-pull"] > .sp-static { display:block !important; }
+  .sp-static .sp-diagram { max-width:23rem; }
+  .sp-static .unit-table { min-width:0; font-size:.88rem; }
+}
+
 [data-interactive="resin-batch"] { min-width: 0; margin-block: 1rem; }
 [data-interactive="resin-batch"] * { box-sizing: border-box; }
 .rb-lab { font: .96rem/1.5 var(--f-display); }
@@ -8481,12 +8522,26 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <button type="button" data-act="collapse">Collapse all</button>
 </div>
 <div class="cards">
-  <details class="xcard deck-slide" id="making-silicone-molds-from-a-printed-pattern--a-printed-pattern-defines-the-cavity-in-the-silicone-mold" data-card="making-silicone-molds-from-a-printed-pattern--a-printed-pattern-defines-the-cavity-in-the-silicone-mold">
-    <summary>A printed pattern defines the cavity in the silicone mold<span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="making-silicone-molds-from-a-printed-pattern--a-printed-pattern-defines-the-cavity-in-the-silicone-mold" data-card="making-silicone-molds-from-a-printed-pattern--a-printed-pattern-defines-the-cavity-in-the-silicone-mold" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>A printed pattern defines the cavity in the silicone mold<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A printed pattern defines the cavity in the silicone mold</h2>
   <p>A <strong>pattern</strong> is the original shape copied by a mold. For a simple one-part, open-face mold, use a shape with a flat back and features that can be withdrawn through the opening. An original example is a small decorative relief tile with a flat back, gently sloping sides and no hooked details.</p>
   <p><strong>Draft</strong> is a slight taper that helps a part leave the mold. Let the shape widen toward the opening. A flat parting face, where the pattern meets the mold-box base, defines the open back of this mold. Avoid undercuts that hook behind the silicone; flexibility does not make every trapped shape removable.</p>
+  <div data-interactive="straight-pull">
+    <div class="sp-static">
+      <p><strong>A wide mouth does not rule out an interior hook.</strong> This illustrative model uses an exact-fit, centered, symmetric rigid 2D pattern and rigid cavity. Opening depth is 0; positive depth points down into the mold. The only permitted motion is outward translation upward at fixed orientation, into unobstructed space. Units are arbitrary consistent diagram units.</p>
+      <figure><svg class="sp-diagram" viewBox="0 0 420 430" role="img" focusable="false" aria-label="Hypothetical rigid trial pose, Wide mouth with a local shoulder, outward pull 5. Opening at depth zero; positive depth downward. Outlined interference bands on both sides, largest at depth 20."><text x="12" y="30">Hypothetical pose · pull 5</text><path class="sp-arrow" d="M395 145V70 m-8 12 8-12 8 12"/><text x="12" y="78">Outward ↑</text><path class="sp-mold" fill-rule="evenodd" d="M115 200H390V390H115Z M130,200 L162,280 L146,300 L190,360 L310,360 L354,300 L338,280 L370,200Z"/><line class="sp-opening" x1="115" y1="200" x2="390" y2="200"/><polygon class="sp-cavity" points="130,200 162,280 146,300 190,360 310,360 354,300 338,280 370,200"/><polygon class="sp-ghost" points="130,180 162,260 146,280 190,340 310,340 354,280 338,260 370,180"/><polygon class="sp-interference" points="156.666667,266.666667 146,280 153.652174,290.434783 153.652174,290.434783 162,280 156.666667,266.666667"/><polygon class="sp-interference" points="343.333333,266.666667 354,280 346.347826,290.434783 346.347826,290.434783 338,280 343.333333,266.666667"/><path class="sp-witness" d="M162 280H146 M149 275l10 10 m-10 0 l10 -10"/><path class="sp-witness" d="M338 280H354 M341 275l10 10 m-10 0 l10 -10"/><text x="5" y="198">Depth 0</text><text x="5" y="225">opening</text><text x="12" y="418">Depth 40 ↓ into mold</text></svg><figcaption>Hypothetical local-shoulder pose at outward pull 5. The original depth-25 section moves to cavity depth 20: pattern half-width 26 meets cavity half-width 22, a geometric overlap of 4 per side. Outlined bands and × marks locate interference; this is not physical passage through rigid material.</figcaption></figure>
+      <div class="unit-table-wrap" role="region" aria-label="Four fixed straight-pull profiles; scroll horizontally if needed" tabindex="0"><table class="unit-table">
+        <caption>Exact piecewise-linear sections: stations are (depth, half-width)</caption>
+        <thead><tr><th scope="col">Profile</th><th scope="col">Stations</th><th scope="col">Trial pull 5</th><th scope="col">Whole path</th></tr></thead>
+        <tbody><tr><td>Taper</td><td>(0,30), (40,20)</td><td>1.25 side separation</td><td>No positive interference</td></tr><tr><td>Parallel</td><td>(0,25), (40,25)</td><td>Side contact</td><td>No positive interference; contact persists</td></tr><tr><td>Reverse taper</td><td>(0,20), (40,30)</td><td>1.25 interference per side</td><td>Blocked</td></tr><tr><td>Local shoulder</td><td>(0,30), (20,22), (25,26), (40,15)</td><td>Maximum 4 interference per side at depth 20</td><td>Blocked despite widest mouth</td></tr></tbody>
+      </table></div>
+      <p>At cavity depth d, an outward pull t places pattern half-width w(d+t) against cavity half-width w(d). Positive Δ(d) = w(d+t) − w(d) means overlap. For the local shoulder at t = 5, the positive interval is <strong>(50/3, 520/23)</strong>, approximately (16.6667, 22.6087); endpoints are zero-contact boundaries.</p>
+      <p><strong>The continuous path requires width to be nonincreasing with depth.</strong> A deeper section wider than a shallower section provides an obstruction. For each pose, Δ is linear between original and translated knots; checking these knots and solving zero crossings is analytical, not an animation-frame test. At t = 0 every profile is in initial contact. At t = 40 there is no interior overlap, but the reverse taper and local shoulder still have blocked paths: a clear endpoint does not prove a reachable endpoint.</p>
+      <p>Comparisons use a numerical threshold of 64 × machine epsilon × maximum half-width, separate from physical clearance and manufacturing tolerance. Values within that floating-point threshold are treated as contact. This is geometric interference only: it omits friction, adhesion, shrinkage, forces, damage, cure, rotation, lateral motion, deformation and unshown 3D features. No-interference does not establish practical release; a rigid obstruction does not establish flexible-silicone failure.</p>
+    </div>
+  </div>
   <figure>
     <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPk9uZS1wYXJ0IG1vbGQgZnJvbSBhIHByaW50ZWQgcGF0dGVybjwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPkZvdXIgY3Jvc3Mtc2VjdGlvbnMgc2hvdyBhIHRhcGVyZWQgcHJpbnRlZCBwYXR0ZXJuIG9uIGEgZmxhdCBiYXNlLCBzaWxpY29uZSBhcm91bmQgdGhlIHBhdHRlcm4sIHRoZSBpbnZlcnRlZCBvcGVuIG1vbGQgYWZ0ZXIgcGF0dGVybiByZW1vdmFsLCBhbmQgYSBjYXN0aW5nIGZpbGxpbmcgdGhhdCBjYXZpdHkuIFRoZSBwYXR0ZXJuIGlzIHdpZGVyIGF0IGl0cyBmbGF0IGJhY2sgc28gdGhlIGZpbmFsIGNhdml0eSB3aWRlbnMgdG93YXJkIGl0cyBvcGVuaW5nLjwvZGVzYz4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiNmZmYiLz4KPGcgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjMTcyYjNhIj4KPHRleHQgeD0iMzAiIHk9IjM1IiBmb250LXNpemU9IjI1IiBmb250LXdlaWdodD0iYm9sZCI+UGF0dGVybiDihpIgc2lsaWNvbmUgY2F2aXR5IOKGkiBjYXN0aW5nPC90ZXh0Pgo8dGV4dCB4PSIzNSIgeT0iODAiPjEuIEZsYXQgYmFjayBvbiBib3ggYmFzZTwvdGV4dD48dGV4dCB4PSI0MzUiIHk9IjgwIj4yLiBTaWxpY29uZSBzdXJyb3VuZHMgcGF0dGVybjwvdGV4dD4KPGcgc3Ryb2tlPSIjMjQzNzQ2IiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik00NSAxMTBWMjMwSDM0NVYxMTAiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTIwIDIzMEwxNDUgMTUwSDI0NUwyNzAgMjMwWiIgZmlsbD0iI2VkYzU2YyIvPgo8cGF0aCBkPSJNNDQ1IDExMFYyMzBINzQ1VjExMCIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik00NDUgMTMwSDc0NVYyMzBINjcwTDY0NSAxNTBINTQ1TDUyMCAyMzBINDQ1WiIgZmlsbD0iI2I0ZGNlYSIvPjxwYXRoIGQ9Ik01MjAgMjMwTDU0NSAxNTBINjQ1TDY3MCAyMzBaIiBmaWxsPSIjZWRjNTZjIi8+PC9nPgo8dGV4dCB4PSI1NSIgeT0iMjY0IiBmb250LXNpemU9IjE3Ij5TbG9wZWQgc2lkZXMgZ2l2ZSBkcmFmdC48L3RleHQ+PHRleHQgeD0iNDQ4IiB5PSIyNjQiIGZvbnQtc2l6ZT0iMTciPkN1cmUgYXMgdGhlIHByb2R1Y3Qgc3BlY2lmaWVzLjwvdGV4dD4KPHRleHQgeD0iMzUiIHk9IjMyMiI+My4gSW52ZXJ0OyByZW1vdmUgcGF0dGVybjwvdGV4dD48dGV4dCB4PSI0MzUiIHk9IjMyMiI+NC4gRmlsbCB0aGUgb3BlbiBjYXZpdHk8L3RleHQ+CjxnIHN0cm9rZT0iIzI0Mzc0NiIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNNDUgMzUwSDEyMEwxNDUgNDMwSDI0NUwyNzAgMzUwSDM0NVY0NjBINDVaIiBmaWxsPSIjYjRkY2VhIi8+PHBhdGggZD0iTTQ0NSAzNTBINTIwTDU0NSA0MzBINjQ1TDY3MCAzNTBINzQ1VjQ2MEg0NDVaIiBmaWxsPSIjYjRkY2VhIi8+PHBhdGggZD0iTTUyMCAzNTBINjcwTDY0NSA0MzBINTQ1WiIgZmlsbD0iI2QyZDhkZCIvPjwvZz4KPHBhdGggZD0iTTE5NSA0MDBWMzQ1TTE4NSAzNTVMMTk1IDM0NUwyMDUgMzU1IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNDM3NDYiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSI1NSIgeT0iNDkwIiBmb250LXNpemU9IjE3Ij5PcGVuaW5nIGlzIHRoZSB3aWRlc3Qgc2VjdGlvbi48L3RleHQ+PHRleHQgeD0iNDQ4IiB5PSI0OTAiIGZvbnQtc2l6ZT0iMTciPkN1cmUsIHJlbW92ZSBhbmQgaW5zcGVjdCBjYXN0aW5nLjwvdGV4dD4KPHJlY3QgeD0iMzUiIHk9IjUyMSIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiBmaWxsPSIjZWRjNTZjIiBzdHJva2U9IiMyNDM3NDYiLz48dGV4dCB4PSI2MyIgeT0iNTM3IiBmb250LXNpemU9IjE3Ij5QcmludGVkIHBhdHRlcm48L3RleHQ+PHJlY3QgeD0iMjc1IiB5PSI1MjEiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgZmlsbD0iI2I0ZGNlYSIgc3Ryb2tlPSIjMjQzNzQ2Ii8+PHRleHQgeD0iMzAzIiB5PSI1MzciIGZvbnQtc2l6ZT0iMTciPlNpbGljb25lIG1vbGQ8L3RleHQ+PHJlY3QgeD0iNTEwIiB5PSI1MjEiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgZmlsbD0iI2QyZDhkZCIgc3Ryb2tlPSIjMjQzNzQ2Ii8+PHRleHQgeD0iNTM4IiB5PSI1MzciIGZvbnQtc2l6ZT0iMTciPkNhc3RpbmcgbWF0ZXJpYWw8L3RleHQ+CjwvZz48L3N2Zz4K" alt="Cross-section sequence: printed pattern with flat back on the box base; silicone cured around it; mold inverted and pattern removed; casting material fills the open cavity. The cavity widens toward its opening." data-natural-width="800" data-natural-height="560"></p>
     <figcaption>The mold copies the pattern's surface. Smooth and inspect the print before making the mold.</figcaption>
@@ -12251,6 +12306,193 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
+
+(function (root, factory) {
+  'use strict';
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiStraightPull = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  var profiles = [
+    { id: 'draft', name: 'Taper toward the bottom', stations: [[0, 30], [40, 20]] },
+    { id: 'parallel', name: 'Parallel sides', stations: [[0, 25], [40, 25]] },
+    { id: 'reverse', name: 'Wider toward the bottom', stations: [[0, 20], [40, 30]] },
+    { id: 'hook', name: 'Wide mouth with a local shoulder', stations: [[0, 30], [20, 22], [25, 26], [40, 15]] }
+  ];
+  profiles.forEach(function (p) { p.stations.forEach(Object.freeze); Object.freeze(p.stations); Object.freeze(p); }); Object.freeze(profiles);
+  function validate(stations) {
+    if (!Array.isArray(stations) || stations.length < 2) throw new RangeError('At least two profile stations are required.');
+    stations.forEach(function (p, i) {
+      if (!Array.isArray(p) || p.length !== 2 || !Number.isFinite(p[0]) || !Number.isFinite(p[1]) || p[1] <= 0 || (i === 0 ? p[0] !== 0 : p[0] <= stations[i - 1][0])) throw new RangeError('Stations need finite positive half-widths and strictly increasing depths starting at zero.');
+    });
+    var H = stations[stations.length - 1][0];
+    if (!Number.isFinite(H) || H <= 0) throw new RangeError('Profile depth must be finite and positive.');
+    var widthScale = Math.max.apply(null, stations.map(function (p) { return p[1]; }));
+    return { H: H, tolerance: Math.max(Number.MIN_VALUE, 64 * Number.EPSILON * widthScale) };
+  }
+  function interpolate(stations, depth) {
+    for (var i = 1; i < stations.length; i++) {
+      if (depth <= stations[i][0]) {
+        var lo = stations[i - 1], hi = stations[i], fraction = (depth - lo[0]) / (hi[0] - lo[0]);
+        if (depth <= lo[0] || lo[1] === hi[1]) return lo[1];
+        if (depth >= hi[0]) return hi[1];
+        // Difference form preserves constant positive subnormals. Clamp to the
+        // endpoint range so interpolation roundoff cannot invent a wider station.
+        var width = lo[1] + (hi[1] - lo[1]) * fraction;
+        return Math.max(Math.min(lo[1], hi[1]), Math.min(Math.max(lo[1], hi[1]), width));
+      }
+    }
+    return stations[stations.length - 1][1];
+  }
+  function widthAt(stations, depth) {
+    var info = validate(stations);
+    if (!Number.isFinite(depth) || depth < 0 || depth > info.H) throw new RangeError('Depth lies outside the profile.');
+    return interpolate(stations, depth);
+  }
+  function inspect(stations, pull) {
+    var info = validate(stations), H = info.H, tolerance = info.tolerance;
+    if (!Number.isFinite(pull) || pull < 0 || pull > H) throw new RangeError('Attempted pull must be finite and between zero and full profile depth.');
+    // Nonincrease at successive stations is necessary and sufficient for this
+    // exact-fit, centered, rigid, fixed-orientation, outward-only 2D path.
+    var rises = [], minimum = stations[0];
+    for (var i = 1; i < stations.length; i++) {
+      // Compare with the preceding minimum, so individually sub-tolerance
+      // increments cannot accumulate into an undetected larger obstruction.
+      var increase = stations[i][1] - minimum[1];
+      if (increase > tolerance) rises.push({ shallow: minimum[0], deep: stations[i][0], increase: increase });
+      if (stations[i][1] < minimum[1]) minimum = stations[i];
+    }
+    var result = { H: H, pull: pull, tolerance: tolerance, pathBlocked: rises.length > 0, rises: rises,
+      points: [], positiveIntervals: [], status: 'clear-endpoint', maxDelta: 0, maxDepth: null };
+    if (pull === H) return result; // No interior overlap; this does NOT clear a blocked path.
+    var end = H - pull, knots = [0, end];
+    stations.forEach(function (p) {
+      if (p[0] > 0 && p[0] < end) knots.push(p[0]);
+      var translated = p[0] - pull;
+      if (translated > 0 && translated < end) knots.push(translated);
+    });
+    knots.sort(function (a, b) { return a - b; });
+    knots = knots.filter(function (v, i) { return i === 0 || v !== knots[i - 1]; });
+    result.points = knots.map(function (depth) {
+      var cavityWidth = interpolate(stations, depth), patternWidth = interpolate(stations, Math.min(H, depth + pull));
+      return { depth: depth, cavityWidth: cavityWidth, patternWidth: patternWidth, delta: patternWidth - cavityWidth };
+    });
+    var maximum = result.points.reduce(function (best, p) { return p.delta > best.delta ? p : best; });
+    result.maxDelta = maximum.delta; result.maxDepth = maximum.depth;
+    result.status = maximum.delta > tolerance ? 'interference' : result.points.some(function (p) { return Math.abs(p.delta) <= tolerance; }) ? 'contact' : 'separation';
+    // Delta is linear on each combined-knot interval. Solve its zero crossing;
+    // numerical near-zeros use the stated scale-relative tolerance, not clearance.
+    for (var j = 1; j < result.points.length; j++) {
+      var p = result.points[j - 1], q = result.points[j];
+      var a = Math.abs(p.delta) <= tolerance ? 0 : p.delta, b = Math.abs(q.delta) <= tolerance ? 0 : q.delta;
+      if (a <= 0 && b <= 0) continue;
+      var start = p.depth, finish = q.depth;
+      if (a < 0 || b < 0) {
+        var scale = Math.max(Math.abs(a), Math.abs(b)), fraction = (Math.abs(a) / scale) / (Math.abs(a) / scale + Math.abs(b) / scale);
+        var zero = p.depth * (1 - fraction) + q.depth * fraction;
+        if (a < 0) start = zero; else finish = zero;
+      }
+      var interval = { start: start, end: finish, startClosed: a > 0, endClosed: b > 0 };
+      var previous = result.positiveIntervals[result.positiveIntervals.length - 1];
+      if (previous && previous.end === interval.start && previous.endClosed && interval.startClosed) {
+        previous.end = interval.end; previous.endClosed = interval.endClosed;
+      } else result.positiveIntervals.push(interval);
+    }
+    return result;
+  }
+  return { profiles: profiles, inspect: inspect, widthAt: widthAt };
+});
+
+(function (root, factory) {
+  'use strict';
+  var api = factory(typeof module === 'object' && module.exports ? require('./model.js') : root.CourseWikiStraightPull);
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiStraightPullDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  function f(n) { return String(Number(n.toFixed(6))); }
+  function diagram(id, pull) {
+    var profile = M.profiles.find(function (p) { return p.id === id; });
+    if (!profile) throw new RangeError('Unknown fixed profile.');
+    var s = profile.stations, r = M.inspect(s, pull), x = function (width) { return 250 + width * 4; }, y = function (depth) { return 200 + depth * 4; };
+    function polygon(stations, offset) { return stations.map(function (p) { return f(x(-p[1])) + ',' + f(y(p[0] - offset)); }).concat(stations.slice().reverse().map(function (p) { return f(x(p[1])) + ',' + f(y(p[0] - offset)); })).join(' '); }
+    var cavity = polygon(s, 0), ghost = polygon(s, pull), bands = '';
+    r.positiveIntervals.forEach(function (interval) {
+      var depths = [interval.start].concat(r.points.filter(function (p) { return p.depth > interval.start && p.depth < interval.end; }).map(function (p) { return p.depth; }), [interval.end]);
+      [-1, 1].forEach(function (side) {
+        var outer = depths.map(function (d) { return f(x(side * M.widthAt(s, Math.min(r.H, d + pull)))) + ',' + f(y(d)); });
+        var inner = depths.slice().reverse().map(function (d) { return f(x(side * M.widthAt(s, d))) + ',' + f(y(d)); });
+        bands += '<polygon class="sp-interference" points="' + outer.concat(inner).join(' ') + '"/>';
+      });
+    });
+    var witness = '';
+    if (r.status === 'interference') {
+      var a = M.widthAt(s, r.maxDepth), b = M.widthAt(s, r.maxDepth + pull), yy = y(r.maxDepth);
+      [-1,1].forEach(function (side) {
+        var xx = x(side * (a+b)/2);
+        witness += '<path class="sp-witness" d="M' + f(x(side*a)) + ' ' + f(yy) + 'H' + f(x(side*b)) + ' M' + f(xx-5) + ' ' + f(yy-5) + 'l10 10 m-10 0 l10 -10"/>';
+      });
+    }
+    return '<svg class="sp-diagram" viewBox="0 0 420 430" role="img" focusable="false" aria-label="Hypothetical rigid trial pose, ' + profile.name + ', outward pull ' + f(pull) + '. Opening at depth zero; positive depth downward. ' + (r.status === 'interference' ? 'Outlined interference bands on both sides, largest at depth ' + f(r.maxDepth) + '.' : r.status === 'clear-endpoint' ? 'No interior overlap at this endpoint; inspect the full-path verdict.' : r.status === 'contact' ? 'Side contact.' : 'Side separation.') + '">' +
+      '<text x="12" y="30">Hypothetical pose · pull ' + f(pull) + '</text><path class="sp-arrow" d="M395 145V70 m-8 12 8-12 8 12"/><text x="12" y="78">Outward ↑</text>' +
+      '<path class="sp-mold" fill-rule="evenodd" d="M115 200H390V390H115Z M' + cavity.replace(/ /g,' L') + 'Z"/>' +
+      '<line class="sp-opening" x1="115" y1="200" x2="390" y2="200"/>' +
+      '<polygon class="sp-cavity" points="' + cavity + '"/><polygon class="sp-ghost" points="' + ghost + '"/>' + bands + witness +
+      '<text x="5" y="198">Depth 0</text><text x="5" y="225">opening</text><text x="12" y="418">Depth 40 ↓ into mold</text></svg>';
+  }
+  return { diagram: diagram };
+});
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiStraightPull, node ? require('./render.js') : root.CourseWikiStraightPullDraw);
+  if (node) module.exports = api;
+  else { root.CourseWikiStraightPullDemo = api; if (typeof document !== 'undefined') document.querySelectorAll('[data-interactive="straight-pull"]').forEach(api.init); }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M,D) {
+  'use strict';
+  var sequence = 0;
+  function init(root) {
+    if (root.dataset.spReady || !M || !D) return;
+    var id; do { id = 'sp-' + (++sequence); } while (document.getElementById(id + '-pull'));
+    var lab = document.createElement('div'); lab.className = 'sp-lab';
+    lab.innerHTML = '<p><strong>Can every intermediate section fit?</strong> This is an exact-fit, centered, symmetric <strong>rigid 2D</strong> pattern and cavity. The only allowed motion is straight upward at fixed orientation into unobstructed space. Diagram units are illustrative.</p>' +
+      '<figure data-sp="context">'+D.diagram('hook',0)+'<figcaption>Starting geometry, before any pull. Local-shoulder stations (depth, half-width): <strong>(0,30), (20,22), (25,26), (40,15)</strong>. Compare the widths at depths 20 and 25 before choosing.</figcaption></figure>' +
+      '<fieldset class="sp-predict"><legend>Locate the obstruction before revealing</legend><p>The local-shoulder profile has its widest opening at depth 0. At an attempted outward pull of 5, where can it overlap the rigid cavity?</p>' +
+      ['mouth|Nowhere: the mouth is widest','shoulder|Inside, near depth 20','bottom|Only at the bottom, depth 40'].map(function (o) { var p=o.split('|'); return '<label><input type="radio" name="' + id + '-guess" value="' + p[0] + '"> ' + p[1] + '</label>'; }).join('') +
+      '<button type="button" data-sp="reveal" disabled aria-controls="' + id + '-experiment">Reveal and test trial poses</button><p data-sp="feedback" role="status">Choose a prediction first.</p></fieldset>' +
+      '<div id="' + id + '-experiment" data-sp="experiment" hidden><div class="sp-controls"><label for="' + id + '-profile">Illustrative section<select id="' + id + '-profile" data-sp="profile">' + M.profiles.map(function (p) { return '<option value="' + p.id + '"' + (p.id==='hook'?' selected':'') + '>' + p.name + '</option>'; }).join('') + '</select></label>' +
+      '<label for="' + id + '-pull">Attempted outward displacement: <output data-sp="pull-label">5</output><input id="' + id + '-pull" data-sp="pull" type="range" min="0" max="40" step="1" value="5"></label>' +
+      '<div class="sp-presets"><button type="button" data-sp-pull="0">Initial contact · 0</button><button type="button" data-sp-pull="5">Trial pose · 5</button><button type="button" data-sp-pull="40">Outside endpoint · 40</button></div></div>' +
+      '<p class="sp-path" data-sp="path" role="status"></p><figure><div data-sp="drawing"></div><figcaption>Solid cavity outline stays fixed; dashed pattern is a hypothetical translated pose. Outlined bands and × marks locate overlap. This is not an animation of rigid material passing through a mold.</figcaption></figure>' +
+      '<div class="sp-readings" data-sp="readings" aria-live="polite"></div><details class="deeper"><summary>Why checking the whole path differs from checking one pose</summary><p>With opening depth 0, half-width w(d), and outward displacement t, the trial pattern at cavity depth d has half-width w(d+t). It fits only where Δ(d) = w(d+t) − w(d) ≤ 0. A complete exact-fit straight-pull path requires w to be nonincreasing with depth. Each deeper station is checked against the preceding minimum width, so cumulative small increases cannot disappear from the verdict.</p><p>For each pose, Δ is linear between original and translated profile knots. Endpoints and those combined knots give the maximum; zero crossings give each positive-overlap interval. Slider frames are illustrations, not proof. t = 0 is initial contact; t = 40 has no remaining interior overlap but cannot make a blocked path pass.</p><p data-sp="tolerance"></p></details></div>' +
+      '<p>This predicts only geometric interference. It omits friction, adhesion, shrinkage, forces, damage, cure, rotation, lateral motion, deformation and unshown 3D features. No-interference is not practical release; rigid interference does not establish failure of flexible silicone.</p>';
+    root.insertBefore(lab,root.firstChild);
+    var q = function (key) { return lab.querySelector('[data-sp="'+key+'"]'); };
+    function f(v) { return String(Number(v.toFixed(4))); }
+    function update() {
+      var profile=M.profiles.find(function(p){return p.id===q('profile').value;}), pull=Number(q('pull').value), r=M.inspect(profile.stations,pull);
+      q('pull-label').textContent=f(pull); q('drawing').innerHTML=D.diagram(profile.id,pull);
+      q('path').textContent = r.pathBlocked ? 'Whole path: BLOCKED in this rigid 2D model. A deeper half-width exceeds an earlier width: depth '+f(r.rises[0].shallow)+' → '+f(r.rises[0].deep)+'. This verdict stays blocked at the outside endpoint.' : 'Whole path: no positive geometric interference. Half-width does not increase with depth. Contact can still occur; this is not a practical-release prediction.';
+      var text;
+      if (r.status==='clear-endpoint') text='<h3>Current trial: no interior overlap</h3><p>The pattern is outside at t = 40. This endpoint says nothing about whether it could get there along the permitted rigid path.</p>';
+      else if (r.status==='interference') {
+        var cw=M.widthAt(profile.stations,r.maxDepth), pw=M.widthAt(profile.stations,r.maxDepth+pull);
+        text='<h3>Current trial: geometric interference</h3><p>At cavity depth <strong>'+f(r.maxDepth)+'</strong>, translated pattern half-width <strong>'+f(pw)+'</strong> exceeds cavity half-width <strong>'+f(cw)+'</strong>: <strong>'+f(r.maxDelta)+' per side</strong>.</p><p>Positive overlap at depths '+r.positiveIntervals.map(function(i){return (i.startClosed?'[':'(')+f(i.start)+', '+f(i.end)+(i.endClosed?']':')');}).join(' and ')+'. Parentheses exclude zero-contact boundaries; brackets include overlapping domain endpoints.</p>';
+      } else if (r.status==='contact') text='<h3>Current trial: side contact</h3><p>'+(pull===0?'Initial exact fit: every section starts in contact. This pose alone does not prove a continuous path.':'No positive interference at this pose, but some side contact persists. Parallel sides remain in contact throughout their overlap.')+'</p>';
+      else text='<h3>Current trial: side separation</h3><p>Minimum side clearance within the remaining overlap: <strong>'+f(-r.maxDelta)+'</strong> diagram units. This is geometric separation in the ideal model.</p>';
+      q('readings').innerHTML=text;
+      q('tolerance').textContent='Numerical comparisons use 64 × machine epsilon × maximum half-width ('+r.tolerance.toExponential(3)+' width units here). Values within this scale-relative floating-point threshold are treated as contact. This is numerical bookkeeping, not physical clearance or a manufacturing tolerance. Readouts round to four decimals; calculations use unrounded values.';
+    }
+    lab.querySelector('.sp-predict').addEventListener('change',function(){q('reveal').disabled=!lab.querySelector('input[type="radio"]:checked');});
+    q('reveal').addEventListener('click',function(){var guess=lab.querySelector('input[type="radio"]:checked');if(!guess)return;q('feedback').textContent=(guess.value==='shoulder'?'Prediction confirmed. ':'Check the interior shoulder. ')+'At pull 5, the section originally at depth 25 moves to cavity depth 20: half-width 26 meets 22, giving 4 interference per side. The wide mouth alone is insufficient.';q('context').hidden=true;q('experiment').hidden=false;update();});
+    q('profile').addEventListener('change',update);q('pull').addEventListener('input',update);
+    lab.querySelectorAll('[data-sp-pull]').forEach(function(b){b.addEventListener('click',function(){q('pull').value=b.dataset.spPull;update();});});
+    root.dataset.spReady='true';
+  }
+  return {init:init};
+});
 
 (function (root, factory) {
   'use strict';

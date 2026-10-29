@@ -12,9 +12,10 @@
 if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m);}}catch(e){}})();
 </script>
 <link rel="icon" href="../favicon.ico" sizes="32x32">
-<link rel="icon" href="../favicon.svg?v=fd3ac30d22" type="image/svg+xml">
-<link rel="stylesheet" href="../theme/msu-theme.css?v=fd3ac30d22">
-<link rel="stylesheet" href="../theme/app.css?v=fd3ac30d22">
+<link rel="icon" href="../favicon.svg?v=8accc3b124" type="image/svg+xml">
+<link rel="stylesheet" href="../theme/msu-theme.css?v=8accc3b124">
+<link rel="stylesheet" href="../theme/app.css?v=8accc3b124">
+<link rel="stylesheet" href="../interactives/cad-reference-transfer/demo.css?v=8accc3b124">
 </head>
 <body class="app skin-app" data-page="cad-files-and-documents" data-base="../">
 <a class="skip" href="#main">Skip to content</a>
@@ -657,6 +658,34 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
   <p><a class="button" data-practice-add="cad-file-references" href="../practice.html#cad-file-references">Check file references</a> <a class="button" data-practice-add="cad-part-studio" href="../practice.html#cad-part-studio">Choose a tab</a> <a class="button" data-practice-add="cad-unit-change" href="../practice.html#cad-unit-change">Check units</a></p>
     </div>
   </details>
+  <details class="xcard deck-slide is-interactive" id="practice-choosing-a-complete-reference-package" data-card="practice-choosing-a-complete-reference-package" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Practice choosing a complete reference package<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Practice choosing a complete reference package</h2>
+  <p>A <strong>reference</strong> is a stored relationship from one design document to another. In this lesson's declared graph, an arrow <strong>A → B</strong> means document A requires document B. A drawing may require a model; an assembly may require parts and subassemblies; each subassembly may require more components.</p>
+  <p>Start with the document you intend to deliver, then follow every required arrow. This is the <strong>dependency closure</strong>: the starting document plus every directly and transitively required document. A shared component appears once even when two parents require it.</p>
+  <div data-interactive="cad-reference-transfer">
+    <div class="crt-static">
+      <p><strong>Static worked case — clamp drawing:</strong> the drawing requires the clamp assembly. The assembly requires left and right arm subassemblies plus the base. Both arm subassemblies require the same pivot pin, so the complete six-document set contains the pin once.</p>
+      <div class="crt-static-graph" tabindex="0" role="region" aria-label="Static clamp reference graph; scroll horizontally if needed">
+        <svg viewBox="0 0 820 280" role="img" aria-label="Clamp drawing requires clamp assembly; assembly requires two arm subassemblies and a base; both arms require one shared pivot pin">
+          <g fill="none" stroke="currentColor" stroke-width="2"><path d="M150 140H215"/><path d="M365 140H410V65H470"/><path d="M365 140H470"/><path d="M365 140H410V225H470"/><path d="M620 65H650V140H690"/><path d="M620 140H690"/></g>
+          <g fill="currentColor"><path d="M215 140l-9-5v10Z"/><path d="M470 65l-9-5v10Z"/><path d="M470 140l-9-5v10Z"/><path d="M470 225l-9-5v10Z"/><path d="M690 140l-9-5v10Z"/></g>
+          <g font-family="sans-serif" font-size="14" text-anchor="middle"><g><rect x="10" y="112" width="140" height="56" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><text x="80" y="136">Clamp drawing</text><text x="80" y="156">clamp.slddrw</text></g><g><rect x="215" y="112" width="150" height="56" rx="6" fill="none" stroke="currentColor"/><text x="290" y="136">Clamp assembly</text><text x="290" y="156">clamp.sldasm</text></g><g><rect x="470" y="37" width="150" height="56" rx="6" fill="none" stroke="currentColor"/><text x="545" y="61">Left arm</text><text x="545" y="81">left-arm.sldasm</text></g><g><rect x="470" y="112" width="150" height="56" rx="6" fill="none" stroke="currentColor"/><text x="545" y="136">Right arm</text><text x="545" y="156">right-arm.sldasm</text></g><g><rect x="470" y="197" width="150" height="56" rx="6" fill="none" stroke="currentColor"/><text x="545" y="221">Clamp base</text><text x="545" y="241">base.sldprt</text></g><g><rect x="690" y="112" width="120" height="56" rx="6" fill="none" stroke="currentColor"/><text x="750" y="136">Shared pin</text><text x="750" y="156">pivot-pin.sldprt</text></g></g>
+        </svg>
+      </div>
+      <dl class="dims">
+        <div><dt>Available but omitted</dt><dd>The source file exists, but it was not selected for this package. Add the required document.</dd></div>
+        <div><dt>Unavailable at source</dt><dd>The declared required document cannot be obtained in the scenario. Checking its box cannot create it; locate or restore the actual source first.</dd></div>
+        <div><dt>Changed symbolic locator</dt><dd>The intended node still has the same stable identity, but one declared edge expects an old locator. Explicitly retarget that edge. A same-looking or same-named substitute is not automatically the intended document.</dd></div>
+      </dl>
+      <p>This graph is a teaching model, not actual CAD file management. It performs no file operations, uploads, downloads, renames, Pack and Go command, cloud lookup, or PDM action. Real CAD systems can use paths, internal identifiers, search locations, platform records, and workflow rules beyond this declared graph.</p>
+    </div>
+  </div>
+  <p>Use a reference-aware workflow to inspect and collect the real design. In SOLIDWORKS, Find References can list documents referenced by the active file, Pack and Go can gather related files, and File Utilities can update references during supported rename, replace, or move operations. Review the result and open the transferred design to check it.</p>
+  <details class="deeper"><summary>Why this lab does not imitate a folder copy</summary><p>A plain folder copy can omit a component stored elsewhere, but real reference resolution is more complicated than matching visible filenames. This local in-memory lesson predicts a declared graph only. It does not claim that copying these names would repair a real design, and it does not model Onshape documents, cloud permissions, or PDM-managed identities.</p></details>
+    </div>
+  </details>
 </div>
 
   <div class="usedin">
@@ -675,13 +704,17 @@ if(m==='light'||m==='dark'){document.documentElement.setAttribute('data-theme',m
     <li><a href="#an-onshape-document-holds-tabs-inside-a-workspace">An Onshape document holds tabs inside a workspace</a></li>
     <li><a href="#check-the-template-and-units-before-entering-dimensions">Check the template and units before entering dimensions</a></li>
     <li><a href="#keep-referenced-files-together-when-you-transfer-a-design">Keep referenced files together when you transfer a design</a></li>
+    <li><a href="#practice-choosing-a-complete-reference-package">Practice choosing a complete reference package</a></li>
   </ul>
 </aside>
 
 </div>
-<script src="../search-index.js?v=fd3ac30d22"></script>
-<script src="../playlists.js?v=fd3ac30d22"></script>
-<script src="../practice-index.js?v=fd3ac30d22"></script>
-<script src="../theme/app.js?v=fd3ac30d22"></script>
+<script src="../search-index.js?v=8accc3b124"></script>
+<script src="../playlists.js?v=8accc3b124"></script>
+<script src="../practice-index.js?v=8accc3b124"></script>
+<script src="../theme/app.js?v=8accc3b124"></script>
+<script src="../interactives/cad-reference-transfer/model.js?v=8accc3b124"></script>
+<script src="../interactives/cad-reference-transfer/render.js?v=8accc3b124"></script>
+<script src="../interactives/cad-reference-transfer/demo.js?v=8accc3b124"></script>
 </body>
 </html>
