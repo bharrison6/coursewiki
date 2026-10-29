@@ -21,5 +21,46 @@
     });
     return { mode, voltage, resistance, current, power: voltage * current, elements };
   }
-  return { solve };
+  function seriesPointIds(count) {
+    if (![2, 3].includes(count)) throw new RangeError('Use two or three series resistors.');
+    const ids = ['supply-positive'];
+    for (let i = 0; i < count; i++) {
+      ids.push(`switch-${i + 1}-out`);
+      if (i < count - 1) ids.push(`resistor-${i + 1}-out`);
+    }
+    ids.push('supply-negative');
+    return Object.freeze(ids);
+  }
+  function seriesNodePotentials({ voltage, resistances, closed }) {
+    const solution = solve({ voltage, mode: 'series', resistances, closed });
+    const ids = seriesPointIds(resistances.length), open = [];
+    closed.forEach((value, index) => { if (!value) open.push(index); });
+    const values = {};
+    if (open.length === 0) {
+      let potential = voltage;
+      values['supply-positive'] = potential;
+      resistances.forEach((resistance, index) => {
+        values[`switch-${index + 1}-out`] = potential;
+        potential -= solution.current * resistance;
+        if (index < resistances.length - 1) values[`resistor-${index + 1}-out`] = potential;
+      });
+      values['supply-negative'] = 0;
+    } else {
+      const firstBoundary = 2 * open[0], lastBoundary = 2 * open[open.length - 1];
+      ids.forEach((id, index) => {
+        values[id] = index <= firstBoundary ? voltage : index >= lastBoundary + 1 ? 0 : null;
+      });
+    }
+    return Object.freeze({ supported: open.length <= 1,
+      reason: open.length <= 1 ? null : 'More than one open switch leaves a floating node whose ideal voltage is not determined.',
+      points: Object.freeze(values), pointIds: ids, solution });
+  }
+  function probeVoltage(state, redId, blackId) {
+    if (!state || !state.points || !state.pointIds) throw new TypeError('Use a series-node-potential result.');
+    if (!state.pointIds.includes(redId) || !state.pointIds.includes(blackId)) throw new RangeError('Choose named probe points from this circuit.');
+    if (redId === blackId) return 0;
+    const red = state.points[redId], black = state.points[blackId];
+    return red === null || black === null ? null : red - black;
+  }
+  return { solve, seriesPointIds, seriesNodePotentials, probeVoltage };
 });
