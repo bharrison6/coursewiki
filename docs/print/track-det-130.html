@@ -13103,6 +13103,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (root.dataset.syReady) return;
     const model = globalThis.CourseWikiStockYield, render = globalThis.CourseWikiStockYieldRender;
     if (!model || !render) return;
+    const example = model.calculate(model.defaults).ticks;
+    const baseline = `Test resets to page example: ${render.mm(example.length)} mm stock; ${render.mm(example.blank)} mm blanks; ${render.mm(example.kerf)} mm starting kerf; ${render.money(example.price)}.`;
     const live = document.createElement('div');
     live.className = 'sy-live';
     const fields = [
@@ -13112,8 +13114,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       ['right', 'Right excluded trim (mm)', '0–150 mm, including its cut loss'],
       ['price', 'Whole stock price ($)', '$0–500; no remnant credit']
     ];
-    live.innerHTML = `<p><strong>Predict:</strong> 3 mm kerf instead of 2 — still ten blanks?</p>
-      <div class="sy-exercise"><div class="sy-actions"><label>Predicted blank count<select data-sy-predict><option value="">Choose before testing</option><option value="10">10 blanks</option><option value="9">9 blanks</option><option value="8">8 blanks</option></select></label><button type="button" data-sy-test>Test 3 mm kerf</button></div><p data-sy-prediction role="status">Page example; $48 stock.</p></div>
+    live.innerHTML = `<p><strong>10 blanks at 3 mm kerf?</strong></p>
+      <div class="sy-exercise"><div class="sy-actions"><label>Predicted blank count<select data-sy-predict><option value="">Choose before testing</option><option value="10">10 blanks</option><option value="9">9 blanks</option><option value="8">8 blanks</option></select></label><button type="button" data-sy-test>Test 3 mm kerf</button></div><p data-sy-prediction role="status">${baseline}</p></div>
       <p><strong>Cut policy:</strong> one full separating kerf per blank, including last; excluded trims include their own cut losses.</p>
       <div class="sy-result" data-sy-result hidden>
         <p class="sy-headline" data-sy-headline role="status" aria-live="polite"></p>
@@ -13171,17 +13173,17 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     }
     live.addEventListener('input', event => {
       if (!event.target.matches('[data-sy-input]')) return;
-      put('[data-sy-prediction]', 'Inputs changed. The prediction test below uses the page example with 3 mm kerf.');
+      put('[data-sy-prediction]', `Current inputs changed. ${baseline}`);
       update();
     });
     query('[data-sy-test]').addEventListener('click', () => {
       const prediction = query('[data-sy-predict]').value;
       set({ ...model.defaults, kerf: '3' });
-      put('[data-sy-prediction]', prediction === '' ? 'Observed: 9 blanks. Ten would need 1,010 mm, so the $48 stock charge is now shared by nine blanks.' : `${prediction === '9' ? 'Your prediction matches.' : `You predicted ${prediction}; the layout fits 9.`} Ten would need 1,010 mm, so the $48 stock charge is now shared by nine blanks.`);
+      put('[data-sy-prediction]', `Page example reset. ${prediction === '' ? 'Observed: 9 blanks.' : prediction === '9' ? 'Your prediction matches.' : `You predicted ${prediction}; the layout fits 9.`} Ten would need 1,010 mm, so the $48 stock charge is now shared by nine blanks.`);
     });
     query('[data-sy-reset]').addEventListener('click', () => {
       set(model.defaults); query('[data-sy-predict]').value = '';
-      put('[data-sy-prediction]', 'Page example restored: predict the 2 to 3 mm kerf change, then test it.');
+      put('[data-sy-prediction]', `Page example restored. ${baseline}`);
     });
     query('[data-sy-short]').addEventListener('click', () => {
       set({ ...model.defaults, length: '999.99' });
