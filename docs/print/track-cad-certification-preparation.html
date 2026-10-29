@@ -3025,7 +3025,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Use certification as a goal for building dependable CAD skills</h2>
   <p>A CAD certification gives you a way to demonstrate skills assessed by its provider. Preparing for one can help you become more productive, build models that survive changes, and describe your skills on a resume. Passing does not guarantee a job or prove that every design you make will work.</p>
-  <p>The Certified SOLIDWORKS Associate (CSWA) is the worked case here, offered through Dassault Systèmes' SOLIDWORKS certification program. CourseWiki is an independent learning resource and is not affiliated with or endorsed by Dassault Systèmes.</p>
+  <p>The Certified SOLIDWORKS Associate (CSWA) is the worked case here, offered through Dassault Systèmes' SOLIDWORKS certification program. Its hands-on modeling workflow does not describe every vendor exam: some routes use selected-response questions, testing-center delivery, platform roles, or different software-access rules. Compare those routes first in <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering-graphics/cad-certifications.html" target="_blank" rel="noopener">CAD Certifications</a>. CourseWiki is an independent learning resource and is not affiliated with or endorsed by Dassault Systèmes.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="cad-certification-preparation--find-the-current-exam-rules-before-you-register" data-card="cad-certification-preparation--find-the-current-exam-rules-before-you-register" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
@@ -3039,7 +3039,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li>Check software, computer, account, and testing-client requirements, plus the rules for permitted resources and retakes.</li>
     <li>Find the official sample or practice resources linked from the certification page and read their use instructions.</li>
   </ul>
-  <p>For current numerical exam details, see the official page. This guide does not reproduce an exam specification or sample exam. The <a href="https://www.solidworks.com/support/frequently-asked-questions?term_id=418">official certification FAQ</a> is another starting point for registration and testing questions.</p>
+  <p>For current numerical exam details, see the official page. This guide does not reproduce an exam specification, exam questions, answer keys, or sample parts. The <a href="https://www.solidworks.com/support/frequently-asked-questions?term_id=418">official certification FAQ</a> is another starting point for registration and testing questions. Academic and ordinary CSWP routes have different conditions, and student software access does not by itself prove an exam voucher is included.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="cad-certification-preparation--practise-reading-modeling-assembling-and-checking" data-card="cad-certification-preparation--practise-reading-modeling-assembling-and-checking">
@@ -3237,6 +3237,18 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       node = node.parentElement;
     }
     return false;
+  }
+
+  /* Enter and Space belong to the focused control before they belong to
+     presentation navigation. Check semantics rather than demo-specific
+     classes so native buttons, links, disclosures and custom button/link
+     controls keep their ordinary keyboard activation. */
+  function focusedNativeActivationOwns(e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return false;
+    var node = document.activeElement;
+    if (!node || node === document.body || node === document.documentElement) return false;
+    if (node.isContentEditable) return true;
+    return !!node.closest('button, a[href], summary, [role="button"], [role="link"]');
   }
 
   /* ---- theme ------------------------------------------------------------
@@ -3692,7 +3704,18 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (presenting) {
       document.body.classList.add('presenting');
       var panels = $$('.xcard:not(.deck-wiki-only)');
-      panels.forEach(function (c) { c.open = true; });   // a collapsed panel is a blank slide
+      panels.forEach(function (c) {
+        c.open = true;   // a collapsed panel is a blank slide
+        /* A panel heading is presentation structure, not a disclosure. Keep
+           it open and out of the tab order; controls and nested disclosures
+           inside the panel remain native keyboard targets. */
+        var heading = c.firstElementChild;
+        if (heading && heading.tagName === 'SUMMARY') {
+          heading.tabIndex = -1;
+          heading.setAttribute('aria-disabled', 'true');
+          heading.addEventListener('click', function (e) { e.preventDefault(); c.open = true; });
+        }
+      });
 
       var toggle = document.createElement('a');
       toggle.className = 'present-exit';
@@ -3716,6 +3739,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       addEventListener('keydown', function (e) {
         if (e.metaKey || e.ctrlKey || e.altKey) return;
         if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        if (focusedNativeActivationOwns(e)) return;
         if (focusedHorizontalScrollerOwns(e)) return;
         switch (e.key) {
           case 'ArrowRight': case 'PageDown': case ' ': e.preventDefault(); go(at() + 1); break;

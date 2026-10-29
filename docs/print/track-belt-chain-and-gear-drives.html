@@ -3841,6 +3841,18 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     return false;
   }
 
+  /* Enter and Space belong to the focused control before they belong to
+     presentation navigation. Check semantics rather than demo-specific
+     classes so native buttons, links, disclosures and custom button/link
+     controls keep their ordinary keyboard activation. */
+  function focusedNativeActivationOwns(e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return false;
+    var node = document.activeElement;
+    if (!node || node === document.body || node === document.documentElement) return false;
+    if (node.isContentEditable) return true;
+    return !!node.closest('button, a[href], summary, [role="button"], [role="link"]');
+  }
+
   /* ---- theme ------------------------------------------------------------
      Three states: light, dark, and system (no attribute). The inline head
      script has already applied the stored choice to avoid a flash; this only
@@ -4294,7 +4306,18 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     if (presenting) {
       document.body.classList.add('presenting');
       var panels = $$('.xcard:not(.deck-wiki-only)');
-      panels.forEach(function (c) { c.open = true; });   // a collapsed panel is a blank slide
+      panels.forEach(function (c) {
+        c.open = true;   // a collapsed panel is a blank slide
+        /* A panel heading is presentation structure, not a disclosure. Keep
+           it open and out of the tab order; controls and nested disclosures
+           inside the panel remain native keyboard targets. */
+        var heading = c.firstElementChild;
+        if (heading && heading.tagName === 'SUMMARY') {
+          heading.tabIndex = -1;
+          heading.setAttribute('aria-disabled', 'true');
+          heading.addEventListener('click', function (e) { e.preventDefault(); c.open = true; });
+        }
+      });
 
       var toggle = document.createElement('a');
       toggle.className = 'present-exit';
@@ -4318,6 +4341,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       addEventListener('keydown', function (e) {
         if (e.metaKey || e.ctrlKey || e.altKey) return;
         if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        if (focusedNativeActivationOwns(e)) return;
         if (focusedHorizontalScrollerOwns(e)) return;
         switch (e.key) {
           case 'ArrowRight': case 'PageDown': case ' ': e.preventDefault(); go(at() + 1); break;
