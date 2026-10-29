@@ -6,6 +6,23 @@
 @@END
 
 <section>
+  <h2>Predict how an anchored rectangle grows, then test its remaining motion</h2>
+  <div data-interactive="sketch-constraint-lab">
+    <div class="sc-static">
+      <p><strong>Rectangle constraint lab.</strong> Start with a 64 × 22 mm rectangular label blank. Predict where its left and right edges will be when the driving width changes to 80 mm. Compare a lower-left corner at the origin with a center at the origin.</p>
+      <figure><svg viewBox="0 0 600 210" role="img" aria-label="Two rectangles share the same scale. A corner-anchored rectangle grows rightward from the origin; a centered rectangle grows equally left and right." style="width:100%;max-width:600px;height:auto"><g fill="none" stroke="currentColor" stroke-width="2"><path d="M20 150H270M55 60V180M320 150H580M450 60V180"/><path stroke-dasharray="6 5" d="M55 106H183V150H55ZM386 128H514V172H386Z"/><path stroke-width="4" d="M55 106H215V150H55ZM370 128H530V172H370Z"/></g></svg><figcaption>Dashed: 64 mm width. Solid: 80 mm width. Left: corner anchored. Right: centered. Both retain 22 mm height.</figcaption></figure>
+      <div class="unit-table-wrap"><table class="unit-table"><caption>Width changes from 64 to 80 mm; both sketches are fully defined before and after</caption><thead><tr><th scope="col">Origin choice</th><th scope="col">Left x (mm)</th><th scope="col">Right x (mm)</th><th scope="col">Free motion</th></tr></thead><tbody><tr><th scope="row">Lower-left corner</th><td>0 → 0</td><td>64 → 80</td><td>0 DOF</td></tr><tr><th scope="row">Center</th><td>−32 → −40</td><td>32 → 40</td><td>0 DOF</td></tr></tbody></table></div>
+      <p><strong>Diagnose the freedom:</strong> keep width and height driving, but remove only the horizontal anchor. The rectangle can translate horizontally: 1 DOF remains. Remove the width instead while retaining both anchors and height; the corner-anchored rectangle's right edge can move, or the centered rectangle can grow symmetrically. Restore the conditions before testing the intended size edit.</p>
+      <p><strong>Measure versus constrain:</strong> a top-edge reference dimension reports the current width and adds no equation. A second driving width that agrees with the first repeats the same equation: five displayed conditions can still have only four independent conditions. A different second driving width contradicts the first; there is no feasible rectangle, so the lab retains its last valid drawing rather than displaying an invented solution.</p>
+      <p><strong>Bounded model:</strong> one closed axis-aligned rectangle, with four variables [left x, right x, bottom y, top y]. Closure, rectangular shape and orientation are built in. For a feasible set, DOF = 4 − rank (the independent equation count). Width and height stay between 1 and 120 mm; these bounds restrict admissible sizes and do not count as equality constraints. The lab projects toward the nearest solution of the active equalities and rejects changes outside its size range. It models no rotation or other sketch entities and does not reproduce a vendor's solver or error colors.</p>
+      <p>With JavaScript enabled, use the prediction, size controls and two draggable corners. Keyboard: focus a corner and press arrow keys; Shift changes the requested step from 1 to 5 mm. Undo diagnostic motion restores the previous drawing.</p>
+      <noscript><p>The interactive controls need JavaScript. The worked comparison and diagnosis above provide the same reasoning for reading and printing.</p></noscript>
+    </div>
+  </div>
+  <p><a class="button" data-practice-add="sketch-centered-growth" href="../practice.html#sketch-centered-growth">Practice: predict centered growth</a> <a class="button" data-practice-add="sketch-reference-freedom" href="../practice.html#sketch-reference-freedom">Practice: reference dimensions and freedom</a></p>
+</section>
+
+<section>
   <h2>Count independent ways the geometry can still change</h2>
   <p class="lede">A <strong>degree of freedom (DOF)</strong> is one independent variable still available to change. Constraints remove freedom. Count the geometry's possible motion, not the number of icons.</p>
   <div class="unit-table-wrap"><table class="unit-table">
