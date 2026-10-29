@@ -3182,11 +3182,155 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="lumber-tally"] .lt-row { break-inside:avoid; }
 }
 
-[data-interactive="process-break-even"] { padding: 1rem; border: 1px solid currentColor; border-radius: .5rem; }
-[data-interactive="process-break-even"] label,
-[data-interactive="process-break-even"] output { display: block; }
-[data-interactive="process-break-even"] input { width: 100%; margin-block: .75rem; }
-@media print { [data-interactive="process-break-even"] { display: none; } }
+[data-interactive="resin-batch"] { min-width: 0; margin-block: 1rem; }
+[data-interactive="resin-batch"] * { box-sizing: border-box; }
+.rb-lab { font: .96rem/1.5 var(--f-display); }
+.rb-lab [hidden] { display: none !important; }
+.rb-predict { border: 1px solid var(--rule); padding: .8rem; min-width: 0; }
+.rb-predict legend { font-weight: 750; }
+.rb-predict label { display: flex; align-items: center; gap: .5rem; min-height: 44px; }
+.rb-lab :is(button,input,select) { font: inherit; color: var(--ink); accent-color: var(--accent); }
+.rb-lab :is(button,input[type="number"],select) { min-height: 44px; border: 1px solid var(--rule); border-radius: var(--radius-xs); background: var(--surface); padding: .45rem .6rem; }
+.rb-lab button { cursor: pointer; }
+.rb-lab button:disabled { opacity: .55; cursor: default; }
+.rb-lab :is(input,select,button):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.rb-presets { display: flex; flex-wrap: wrap; gap: .4rem; margin-block: 1rem; }
+.rb-presets > span { flex-basis: 100%; font-weight: 700; }
+.rb-controls { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; }
+.rb-controls label { display: block; min-width: 0; font-weight: 650; }
+.rb-controls :is(input,select) { display: block; width: 100%; min-width: 0; margin-top: .3rem; }
+.rb-basis-note, .rb-spec-compare { padding: .7rem; border-left: 3px solid var(--accent); background: var(--surface); }
+.rb-error { font-weight: 700; }
+.rb-error:empty { display: none; }
+.rb-comparisons, .rb-components { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .6rem; margin-block: .8rem; }
+.rb-comparisons article, .rb-components article { border: 1px solid var(--rule); padding: .7rem; min-width: 0; background: var(--paper); }
+.rb-comparisons article[data-selected="true"] { box-shadow: inset 0 3px var(--accent); }
+.rb-lab :is(h3,h4) { margin-block: .2rem .5rem; }
+.rb-lab h3 { font-size: 1.05rem; }
+.rb-lab h4 { font-size: 1rem; }
+.rb-balance { min-height: 4.5em; }
+.rb-balance span { display: inline-block; }
+.rb-a { font-weight: 750; }
+.rb-b { font-weight: 750; text-decoration: underline; text-decoration-style: dashed; text-underline-offset: .2em; }
+.rb-bar { height: 2.3rem; display: flex; width: 100%; background: var(--surface); border: 1px solid var(--rule); }
+.rb-bar-a { background: var(--ink); }
+.rb-bar-b { background: repeating-linear-gradient(135deg,var(--ink) 0 2px,var(--paper) 2px 7px); }
+.rb-components p, .rb-balance, .rb-scale strong { overflow-wrap: anywhere; }
+.rb-scale { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; padding-left: 1.3rem; }
+.rb-scale li { padding: .4rem; border-top: 2px solid var(--rule); }
+.rb-static .unit-table { width: 100%; }
+@media (max-width: 50rem) { .rb-controls { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 36rem) {
+  .rb-controls,.rb-comparisons,.rb-components,.rb-scale { grid-template-columns: minmax(0,1fr); }
+  .rb-presets button { width: 100%; }
+  .rb-balance { min-height: 0; }
+}
+@media screen { [data-interactive="resin-batch"][data-rb-ready] > .rb-static { display: none; } }
+@media print {
+  [data-interactive="resin-batch"] .rb-lab { display: none !important; }
+  [data-interactive="resin-batch"] > .rb-static { display: block !important; }
+  .rb-static .unit-table { min-width: 0; font-size: .9rem; }
+}
+
+[data-interactive="process-break-even"] { min-width: 0; overflow-wrap: anywhere; }
+.pb-ready > .pb-static { display: none; }
+.pb-static table { width: 100%; border-collapse: collapse; }
+.pb-static :is(th,td) { padding: .35rem .5rem; text-align: left; border-bottom: 1px solid var(--rule); }
+.pb-static caption { text-align: left; font-weight: 700; padding-block: .35rem; }
+.pb-live { font-family: var(--f-display); line-height: 1.45; }
+.pb-live p { margin-block: .55rem; }
+.pb-live .pb-goal { margin-top: 0; }
+.pb-costs, .pb-demand, .pb-totals { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; margin-block: .7rem; }
+.pb-live fieldset { min-width: 0; padding: .55rem .7rem .7rem; border: 1px solid var(--rule); border-radius: var(--radius-xs); }
+.pb-live legend { padding-inline: .25rem; font-weight: 700; }
+.pb-live label { display: grid; min-width: 0; gap: .25rem; }
+.pb-live fieldset label + label { margin-top: .55rem; }
+.pb-live :is(input,select,button) { box-sizing: border-box; min-width: 0; max-width: 100%; min-height: 44px; padding: .4rem .55rem; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); }
+.pb-live :is(input,select) { width: 100%; }
+.pb-live input[type="range"] { padding-inline: 0; accent-color: var(--accent); }
+.pb-live input:disabled { opacity: .5; }
+.pb-live :is(button,select,summary) { cursor: pointer; }
+.pb-live :is(input,select,button,summary,[tabindex]):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.pb-live [aria-invalid="true"] { border-width: 2px; border-style: dashed; }
+.pb-predict { display: flex; gap: .7rem; align-items: end; flex-wrap: wrap; }
+.pb-predict label { flex: 1 1 16rem; }
+.pb-predict button { border: 2px solid var(--accent); font-weight: 700; }
+.pb-feedback { padding: .5rem .7rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+.pb-verdict { font-weight: 700; }
+.pb-total { min-width: 0; padding: .7rem; border: 1px solid var(--rule); background: var(--surface); }
+.pb-total > strong { display: block; }
+.pb-note, .pb-figure figcaption { font-size: .9rem; color: var(--ink-soft); }
+.pb-figure { margin: .8rem 0; }
+.pb-figure [data-pb-chart], .pb-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.pb-figure svg { display: block; width: 100%; min-width: 520px; height: auto; }
+.pb-figure text { font: 16px var(--f-display); fill: var(--ink); }
+.pb-axis { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; }
+.pb-line-a { fill: none; stroke: var(--accent); stroke-width: 3; }
+.pb-line-b { fill: none; stroke: var(--ink); stroke-width: 3; stroke-dasharray: 9 6; }
+.pb-demand-line { stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 3 4; }
+.pb-a-point { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.pb-b-point { fill: var(--ink); stroke: var(--surface); stroke-width: 2; }
+.pb-cross-mark { fill: none; stroke: var(--ink); stroke-width: 3; }
+.pb-live table { margin-block: .6rem; width: 100%; font-variant-numeric: tabular-nums; }
+.pb-live :is(td,th) { padding: .4rem .5rem; text-align: left; white-space: nowrap; }
+.pb-live caption { font-weight: 700; text-align: left; white-space: normal; }
+.pb-assumptions { border-top: 1px solid var(--rule); padding-top: .4rem; margin-top: .7rem; }
+.pb-assumptions > summary { min-height: 44px; padding-block: .5rem; font-weight: 700; }
+@media (max-width: 34rem) {
+  .pb-costs, .pb-demand, .pb-totals { grid-template-columns: minmax(0,1fr); }
+  .pb-predict button { width: 100%; }
+}
+@media print {
+  .pb-ready > .pb-static { display: block !important; }
+  .pb-live { display: none !important; }
+}
+
+[data-interactive="stock-yield"] { border:1px solid var(--rule); border-radius:.5rem; padding:1rem; min-width:0; overflow-wrap:anywhere; }
+[data-interactive="stock-yield"] [hidden],
+[data-interactive="stock-yield"][data-sy-ready] > .sy-fallback { display:none !important; }
+[data-interactive="stock-yield"] .sy-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; margin:.8rem 0; }
+[data-interactive="stock-yield"] label { display:block; font-weight:650; }
+[data-interactive="stock-yield"] label small { display:block; font-weight:400; color:var(--ink-soft); }
+[data-interactive="stock-yield"] :is(input,select,button) { font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--rule); border-radius:.25rem; min-height:44px; box-sizing:border-box; max-width:100%; padding:.4rem .55rem; }
+[data-interactive="stock-yield"] :is(input,select) { display:block; width:100%; min-width:0; margin-top:.25rem; }
+[data-interactive="stock-yield"] :is(button,summary) { cursor:pointer; }
+[data-interactive="stock-yield"] :is(input,select,button,summary,[tabindex]):focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+[data-interactive="stock-yield"] .sy-actions { display:flex; flex-wrap:wrap; gap:.5rem; align-items:end; margin:.6rem 0; }
+[data-interactive="stock-yield"] .sy-actions label { flex:1 1 15rem; }
+[data-interactive="stock-yield"] .sy-result { border-top:1px solid var(--rule); margin-top:.8rem; padding-top:.8rem; }
+[data-interactive="stock-yield"] .sy-headline { font-size:1.15em; font-weight:750; margin:0 0 .5rem; }
+[data-interactive="stock-yield"] .sy-legend { display:flex; flex-wrap:wrap; gap:.4rem 1rem; font-size:.9em; margin:.5rem 0; }
+[data-interactive="stock-yield"] .sy-swatch { display:inline-block; width:1rem; height:.7rem; border:1px solid var(--ink); margin-right:.3rem; }
+[data-interactive="stock-yield"] .sy-blank { fill:var(--surface-2); stroke:var(--ink); stroke-width:.8; background:var(--surface-2); }
+[data-interactive="stock-yield"] .sy-kerf { fill:var(--accent); background:var(--accent); }
+[data-interactive="stock-yield"] .sy-trim { fill:var(--ink-soft); background:var(--ink-soft); }
+[data-interactive="stock-yield"] .sy-offcut { fill:var(--gold,#D9B65A); background:var(--gold,#D9B65A); }
+[data-interactive="stock-yield"] .sy-outline { fill:none; stroke:var(--ink); stroke-width:1; }
+[data-interactive="stock-yield"] .sy-scroll { overflow-x:auto; margin:.4rem 0; border:1px solid var(--rule); background:var(--surface); }
+[data-interactive="stock-yield"] .sy-scroll svg { display:block; width:100%; min-width:720px; max-width:none; height:auto; }
+[data-interactive="stock-yield"] svg text { fill:var(--ink); font:20px sans-serif; }
+[data-interactive="stock-yield"] .sy-balance { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.5rem; margin:.7rem 0; }
+[data-interactive="stock-yield"] .sy-balance > div { border:1px solid var(--rule); padding:.5rem; background:var(--surface); }
+[data-interactive="stock-yield"] .sy-balance dt { color:var(--ink-soft); font-size:.9em; }
+[data-interactive="stock-yield"] .sy-balance dd { margin:0; font-weight:700; }
+[data-interactive="stock-yield"] .sy-equation { font-variant-numeric:tabular-nums; background:var(--surface-2); padding:.6rem; }
+[data-interactive="stock-yield"] .sy-error { border-left:4px solid var(--accent); padding:.6rem; font-weight:650; }
+[data-interactive="stock-yield"] .sy-position-list { padding-left:1.6rem; font-variant-numeric:tabular-nums; }
+[data-interactive="stock-yield"] details > summary { min-height:44px; padding:.5rem 0; }
+[data-interactive="stock-yield"] .sy-settings { border-block:1px solid var(--rule); margin:.7rem 0; }
+@media (max-width:48rem) {
+  [data-interactive="stock-yield"] .sy-controls { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  [data-interactive="stock-yield"] .sy-balance { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:24rem) {
+  [data-interactive="stock-yield"] { padding:.7rem; }
+}
+@media print {
+  [data-interactive="stock-yield"] :is(.sy-settings,.sy-controls,.sy-actions,.sy-exercise,.sy-scroll-hint,.sy-position-details) { display:none !important; }
+  [data-interactive="stock-yield"] .sy-scroll { overflow:visible; }
+  [data-interactive="stock-yield"] .sy-scroll svg { min-width:0; width:100%; }
+  [data-interactive="stock-yield"] .sy-balance { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
 
 [data-interactive="measurement-reading"] { min-width: 0; }
 .article:has([data-interactive="measurement-reading"]) { max-width: 76rem; }
@@ -6865,16 +7009,26 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 [data-interactive="pwm-and-adc"] .pa-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
 [data-interactive="pwm-and-adc"] label { display: block; flex: 1 1 12rem; }
 [data-interactive="pwm-and-adc"] input { max-width: 100%; accent-color: var(--accent); }
-[data-interactive="pwm-and-adc"] input[type="number"] { display: block; width: 10rem; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: .5rem; }
-[data-interactive="pwm-and-adc"] svg { display: block; width: 100%; height: auto; color: var(--ink); }
+[data-interactive="pwm-and-adc"] :is(input[type="number"],select,button) { min-height: 44px; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .5rem; font: inherit; }
+[data-interactive="pwm-and-adc"] input[type="number"] { display: block; width: 10rem; }
+[data-interactive="pwm-and-adc"] :is(input,select,button,.pa-plot-scroll):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+[data-interactive="pwm-and-adc"] .pa-plot-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+[data-interactive="pwm-and-adc"] svg { display: block; width: 660px; max-width: none; height: 250px; color: var(--ink); }
 [data-interactive="pwm-and-adc"] svg text { fill: currentColor; font: 16px sans-serif; }
 [data-interactive="pwm-and-adc"] .pa-axis { fill: none; stroke: currentColor; }
 [data-interactive="pwm-and-adc"] .pa-square { fill: none; stroke: var(--accent); stroke-width: 2.5; }
 [data-interactive="pwm-and-adc"] .pa-filter { fill: none; stroke: currentColor; stroke-width: 3; stroke-dasharray: 7 4; }
+[data-interactive="pwm-and-adc"] .pa-hold { fill: none; stroke: var(--flag); stroke-width: 2.5; }
+[data-interactive="pwm-and-adc"] .pa-samples circle { fill: var(--flag); stroke: var(--ink); stroke-width: 1.5; }
+[data-interactive="pwm-and-adc"] .pa-quick,.pa-choice-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: .65rem; }
+[data-interactive="pwm-and-adc"] .pa-choice-row label { display: inline-flex; align-items: center; flex: 0 1 auto; min-height: 44px; gap: .3rem; }
+[data-interactive="pwm-and-adc"] .pa-predict { margin-block: .75rem; }
+[data-interactive="pwm-and-adc"] .pa-limit { color: var(--ink-soft); }
 [data-interactive="pwm-and-adc"].pa-ready .pa-static { display: none; }
 @media print {
   [data-interactive="pwm-and-adc"] .pa-live { display: none !important; }
   [data-interactive="pwm-and-adc"] .pa-static { display: block !important; }
+  [data-interactive="pwm-and-adc"] .pa-static table { break-inside: avoid; }
 }
 
 [data-interactive="battery-pack"] { margin: 1rem 0; padding: 1rem; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); min-width: 0; }
@@ -14933,14 +15087,30 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-161">Supporting detail: <a href="#deeper-addendum-161"><strong>Addendum 161</strong></a> &mdash; Where to find product-specific instructions.</p>
     </div>
   </details>
-  <details class="xcard deck-slide" id="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume" data-card="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume">
-    <summary>A ratio by weight is not automatically a ratio by volume<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+  <details class="xcard deck-slide is-interactive" id="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume" data-card="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>A ratio by weight is not automatically a ratio by volume<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>A ratio by weight is not automatically a ratio by volume</h2>
-  <p>For a specified <strong>A:B = a:b by weight</strong> and total mixed mass M:</p>
-  <p><strong>A = M × a / (a + b)</strong><br><strong>B = M × b / (a + b)</strong></p>
-  <p>Arithmetic example only: suppose the stated ratio is 10:1 by weight and the required total is 220 g. There are 11 ratio parts, so A = 220 × 10/11 = <strong>200 g</strong>, and B = 220 × 1/11 = <strong>20 g</strong>. The total is 220 g. If instead you already have 220 g of A, B would be 22 g and the total 242 g. Read what the given mass represents.</p>
-  <p>Tare the container so its mass is excluded. Weigh with a scale suitable for the quantities. For a volume ratio, measure volumes as directed. Different component densities mean equal masses need not occupy equal volumes. Use only the ratio basis provided for that product.</p>
+  <div data-interactive="resin-batch">
+    <div class="rb-static">
+      <p><strong>Read what the given mass represents.</strong> These invented A/B examples teach arithmetic for two-component materials; they are not silicone or resin recipes. For A:B = a:b <strong>by mass</strong> and target total material mass M, m<sub>A</sub> = M a/(a+b) and m<sub>B</sub> = M b/(a+b). If A is already measured, m<sub>B</sub> = m<sub>A</sub> b/a.</p>
+      <div class="unit-table-wrap" role="region" aria-label="Mass interpretation examples; scroll horizontally if needed" tabindex="0"><table class="unit-table">
+        <caption>Same 10:1 mass specification, different meaning of 220 g</caption>
+        <thead><tr><th scope="col">Given</th><th scope="col">A</th><th scope="col">B</th><th scope="col">Material total</th></tr></thead>
+        <tbody><tr><td>220 g target total</td><td>200 g</td><td>20 g</td><td>220 g</td></tr><tr><td>220 g of A alone</td><td>220 g</td><td>22 g</td><td>242 g</td></tr></tbody>
+      </table></div>
+      <p><strong>Density connects mass and each component’s own volume:</strong> V<sub>A</sub> = m<sub>A</sub>/ρ<sub>A</sub> and V<sub>B</sub> = m<sub>B</sub>/ρ<sub>B</sub>. For a:b <strong>by volume</strong>, divide target total mass using weights aρ<sub>A</sub>:bρ<sub>B</sub>. For given A mass, V<sub>A</sub> = m<sub>A</sub>/ρ<sub>A</sub>, V<sub>B</sub> = V<sub>A</sub> b/a, then m<sub>B</sub> = V<sub>B</sub>ρ<sub>B</sub>.</p>
+      <p>Use illustrative densities ρ<sub>A</sub> = 1.2 g/mL and ρ<sub>B</sub> = 0.8 g/mL with a 300 g target total:</p>
+      <div class="unit-table-wrap" role="region" aria-label="Mass versus volume specification examples; scroll horizontally if needed" tabindex="0"><table class="unit-table">
+        <caption>Changing the basis while keeping 2:1 changes the specification</caption>
+        <thead><tr><th scope="col">A:B specification</th><th scope="col">A mass / volume</th><th scope="col">B mass / volume</th></tr></thead>
+        <tbody><tr><td>2:1 by mass</td><td>200 g / 500/3 mL (≈166.6667 mL)</td><td>100 g / 125 mL</td></tr><tr><td>2:1 by volume</td><td>225 g / 187.5 mL</td><td>75 g / 93.75 mL</td></tr></tbody>
+      </table></div>
+      <p>The first row has a <strong>4:3 component-volume ratio</strong>; the second has a <strong>3:1 mass ratio</strong>. Those are equivalent descriptions of their respective batches. Converting 300 g to 0.3 kg keeps the same physical batch. Switching 2:1 from mass to volume does not. Individual component volumes do not establish mixed/cured volume, yield or cavity fill.</p>
+      <p><strong>Ideal cumulative scale example:</strong> for 200 g A + 20 g B in a 35 g container, readings with <em>no tare</em> are 35 g empty → 235 g after A → 255 g after B. Tare once with the empty container on the scale and the readings are 0 g → 200 g → 220 g. The final reading includes A and B; B alone is 20 g. Container mass changes the gross reading, not the material ratio. This comparison does not re-tare after A.</p>
+      <p>Weigh with a scale suitable for the actual quantities and follow the product’s specified ratio basis, measurement and mixing procedure. The arithmetic assumes no material loss; it predicts no cure, exotherm, working time, compatibility or actual mixed/cured volume. The actual product’s TDS/SDS remain authoritative.</p>
+    </div>
+  </div>
   <p><a class="button" data-practice-add="documentation-silicone-total" href="../practice.html#documentation-silicone-total">Practice a total-mass mix</a> <a class="button" data-practice-add="documentation-silicone-base" href="../practice.html#documentation-silicone-base">Practice a given-A mix</a></p>
     </div>
   </details>
@@ -15023,8 +15193,21 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <summary>Move the volume slider and predict which process wins<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Move the volume slider and predict which process wins</h2>
-<p>Predict the cheaper process at 60 and 240 parts. Fixed costs are spread over different quantities while variable cost per part stays constant.</p>
-<div data-interactive="process-break-even"><label>Quantity (parts) <input data-volume type="range" min="20" max="300" step="1" value="120"></label><output data-result aria-live="polite">At 120 parts, A and B both cost $1,080 total and $9.00/part.</output></div>
+<p>Start with the original A/B costs and predict the cheaper process at 60 and 240 parts. Then change a setup cost or variable cost and compare at the same demanded quantity. The case selector also includes fractional crossings, parallel lines, an everywhere tie, and a crossing beyond the chart.</p>
+<div data-interactive="process-break-even">
+<div class="pb-static">
+<p><strong>Process-cost explorer.</strong> Compare <code>C = F + vQ</code> and <code>u = F/Q + v</code> for two routes supplying the same demanded quantity of equivalent acceptable parts in one batch. Use the same included costs and period for each route, count each cost once, and assume the entered rates stay constant. The exercise does not establish equivalent quality, capacity or demand, or recommend a purchase.</p>
+<p>Predict, calculate total cost for each route, then divide by the demanded quantity. With A = $120 + $8Q and B = $720 + $3Q:</p>
+<table><caption>Original comparison at three demanded quantities</caption><thead><tr><th scope="col">Parts</th><th scope="col">A total / per part</th><th scope="col">B total / per part</th><th scope="col">Lower cost</th></tr></thead><tbody>
+<tr><th scope="row">60</th><td>$600 / $10.00</td><td>$900 / $15.00</td><td>A</td></tr>
+<tr><th scope="row">120</th><td>$1,080 / $9.00</td><td>$1,080 / $9.00</td><td>Equal</td></tr>
+<tr><th scope="row">240</th><td>$2,040 / $8.50</td><td>$1,440 / $6.00</td><td>B</td></tr>
+</tbody></table>
+<p><strong>Between whole parts:</strong> let A = $90 + $6Q and B = $245 + $2Q. Q* = 155/4 = 38.75 parts. At 38 parts A totals $318 and B $321; at 39 parts A totals $324 and B $323. No whole-part quantity ties.</p>
+<p><strong>Try the other cases:</strong> A = $60 + $4Q and B = $210 + $4Q never cross because their slopes match; A stays $150 lower. If both F and v match, costs tie at every positive quantity. With A = $80 + $2Q and B = $200 + $5Q, A is lower for every positive Q. With A = $100 + $2.50Q and B = $900 + $2Q, the positive crossing is at 1,600 parts, beyond the live graph's 0–300 interval.</p>
+<p>The editable explorer accepts fixed cost $0–$100,000, variable cost $0–$1,000/part and whole demand 1–10,000. Dollar entries have at most two decimal places; exact cent totals determine equality. Displayed average unit costs are approximate. A graph ending before a crossing does not prove there is no crossing. Zero on a total-cost graph shows fixed cost; unit cost at zero parts is undefined.</p>
+</div>
+</div>
 <p>Static comparison: at 60 parts A is $10.00/part and B is $15.00/part; at 240 parts A is $8.50/part and B is $6.00/part. Use <a class="xref-page" href="#p-dimensional-analysis">Dimensional Analysis</a> to check units and <a class="xref-page" href="#p-make-or-buy">Make or Buy</a> to consider more than cost.</p>
     </div>
   </details>
@@ -15048,6 +15231,28 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 <p><strong>Kerf</strong> is the width removed by a cut. An <strong>offcut</strong> is leftover stock; a usable offcut may be saved. Include trim cuts and holding allowances before promising a part count.</p>
 <p>Illustrative layout: a 1,000 mm bar supplies 98 mm blanks. Each blank requires one 2 mm separating cut, including the last blank, with no end trim. Ten blanks consume 10 × (98 + 2) = 1,000 mm. A different last-cut arrangement would need a different cut count.</p>
 <p><a class="button" data-practice-add="economics-kerf" href="../practice.html#economics-kerf">Practice kerf allowance</a></p>
+    </div>
+  </details>
+  <details class="xcard deck-slide is-interactive" id="material-utilization-and-cost--test-the-next-blank-threshold" data-card="material-utilization-and-cost--test-the-next-blank-threshold" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Test the next-blank threshold<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Test the next-blank threshold</h2>
+<div data-interactive="stock-yield">
+<div class="sy-fallback">
+<p><strong>Predict first:</strong> can the same 1,000 mm stock still supply ten 98 mm blanks if separating kerf increases from 2 to 3 mm? What happens to stock cost per blank when the stock price stays $48?</p>
+<p>This one-dimensional lab reserves a <strong>full separating kerf after every blank, including the last</strong>. Left and right excluded trim lengths already include their own cut losses. The layout does not use the far stock edge as a finished blank edge; it is a count under this policy, not a claim of globally maximum yield.</p>
+<p><code>Usable interval U = stock length L − left excluded trim − right excluded trim</code><br><code>Blank count n = floor[U / (blank length b + separating kerf k)]</code>. Round down to a whole number. There are <code>n</code> separating cuts, plus any preparation already accounted for in excluded trim.</p>
+<div class="sy-scroll" tabindex="0" role="region" aria-label="Page example stock layout; scroll horizontally to inspect the full bar">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 110" width="1000" height="110" role="img" aria-label="10 blanks and 10 full separating kerfs in 1,000 mm stock; excluded trim 0 mm; offcut 0 mm. Left to right in placement order."><text x="20" y="20">0 mm</text><text x="980" y="20" text-anchor="end">1,000 mm</text><rect class="sy-trim" x="20" y="32" width="0" height="42" data-sy-excluded-interval="left"/><rect class="sy-blank" x="20" y="32" width="94.08" height="42" data-sy-blank="1"/><rect class="sy-kerf" x="114.08" y="32" width="1.92" height="42" data-sy-cut="1"/><rect class="sy-blank" x="116" y="32" width="94.08" height="42" data-sy-blank="2"/><rect class="sy-kerf" x="210.08" y="32" width="1.92" height="42" data-sy-cut="2"/><rect class="sy-blank" x="212" y="32" width="94.08" height="42" data-sy-blank="3"/><rect class="sy-kerf" x="306.08" y="32" width="1.92" height="42" data-sy-cut="3"/><rect class="sy-blank" x="308" y="32" width="94.08" height="42" data-sy-blank="4"/><rect class="sy-kerf" x="402.08" y="32" width="1.92" height="42" data-sy-cut="4"/><rect class="sy-blank" x="404" y="32" width="94.08" height="42" data-sy-blank="5"/><rect class="sy-kerf" x="498.08" y="32" width="1.92" height="42" data-sy-cut="5"/><rect class="sy-blank" x="500" y="32" width="94.08" height="42" data-sy-blank="6"/><rect class="sy-kerf" x="594.08" y="32" width="1.92" height="42" data-sy-cut="6"/><rect class="sy-blank" x="596" y="32" width="94.08" height="42" data-sy-blank="7"/><rect class="sy-kerf" x="690.08" y="32" width="1.92" height="42" data-sy-cut="7"/><rect class="sy-blank" x="692" y="32" width="94.08" height="42" data-sy-blank="8"/><rect class="sy-kerf" x="786.08" y="32" width="1.92" height="42" data-sy-cut="8"/><rect class="sy-blank" x="788" y="32" width="94.08" height="42" data-sy-blank="9"/><rect class="sy-kerf" x="882.08" y="32" width="1.92" height="42" data-sy-cut="9"/><rect class="sy-blank" x="884" y="32" width="94.08" height="42" data-sy-blank="10"/><rect class="sy-kerf" x="978.08" y="32" width="1.92" height="42" data-sy-cut="10"/><rect class="sy-offcut" x="980" y="32" width="0" height="42" data-sy-offcut-interval/><rect class="sy-trim" x="980" y="32" width="0" height="42" data-sy-excluded-interval="right"/><rect class="sy-outline" x="20" y="32" width="960" height="42"/><text x="20" y="99">Prepared interval: 0 to 1,000 mm</text></svg>
+</div>
+<p>Each outlined block is an actual 98 mm blank; the narrow filled band after each is its full 2 mm kerf. Ten blanks plus ten kerfs fill this stock exactly. On narrow screens, scroll sideways to inspect the full bar.</p>
+<p class="sy-equation"><strong>Material balance:</strong> 1,000 mm = 0 excluded trim + 980 acceptable blanks + 20 separating kerfs + 0 offcut. Utilization = 980 / 1,000 × 100 = <strong>98.0%</strong>.</p>
+<p><strong>Change the kerf to 3 mm:</strong> ten blanks would need 10 × (98 + 3) = 1,010 mm, so only nine fit. The new balance is 1,000 = 0 + 882 + 27 + 91 mm. The 91 mm offcut is 10 mm short of another 101 mm blank-and-kerf interval.</p>
+<p><strong>Allocate the whole stock charge:</strong> $48 / 10 = <strong>$4.80</strong> per acceptable blank in the original layout; $48 / 9 ≈ <strong>$5.33</strong> after the kerf change. All equal-cross-section blanks are assumed acceptable. No remnant credit or processing cost is included. If zero blanks fit, cost per blank is undefined.</p>
+<p>Another threshold: at 2 mm kerf, 999.99 mm stock fits nine blanks, while 1,000.00 mm fits ten. This lab uses hundredths of a millimeter and currency cents; its bounded illustrative values are not machine settings. It is not a two-dimensional nesting tool.</p>
+</div>
+</div>
+<p><a class="button" data-practice-add="stock-yield-trim-count" href="../practice.html#stock-yield-trim-count">Practice stock layout and balance</a> <a class="button" data-practice-add="stock-yield-threshold" href="../practice.html#stock-yield-threshold">Practice a count threshold</a></p>
     </div>
   </details>
   <details class="xcard deck-slide" id="material-utilization-and-cost--use-a-consistent-physical-basis-for-utilization" data-card="material-utilization-and-cost--use-a-consistent-physical-basis-for-utilization">
@@ -19217,6 +19422,27 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>For a blind hole, distinguish the depth reached by the <strong>tip</strong> from the depth that has the <strong>full drill diameter</strong>. The conical point extends beyond the full-diameter portion. A tapped blind hole also needs space for the tap's lead-in and chip clearance. For a through hole, account for breakthrough and the drill point below the work.</p>
   <p>If chip shape, sound, thrust or finish changes unexpectedly, stop and inspect the setup before resuming; use <a class="xref-page" href="#p-metal-chips">Metal Chips and Swarf</a> for chip handling.</p>
   <p class="deeper-ref" id="deeper-ref-226">Supporting detail: <a href="#deeper-addendum-226"><strong>Addendum 226</strong></a> &mdash; Why changes in the cut matter.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="drilling-operations--compare-advance-retracing-and-withdrawal-paths" data-card="drilling-operations--compare-advance-retracing-and-withdrawal-paths">
+    <summary>Compare advance, retracing and withdrawal paths<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compare advance, retracing and withdrawal paths</h2>
+  <p>Open <a class="xref-page" href="#p-gcode-and-toolpaths">G-code and Toolpaths</a>. In the playground's <strong>Program</strong> picker, choose these named examples in order: <strong>Drilling path: continuous advance</strong>, <strong>Drilling path: short in-bore retract</strong>, and <strong>Drilling path: withdrawal above the mouth</strong>. Use <strong>Step</strong> to follow each G0 and G1 move.</p>
+  <table><thead><tr><th>Program</th><th>Motion to watch</th><th>What the model reports</th></tr></thead><tbody>
+    <tr><td>Continuous advance</td><td><code>G1 Z-8</code></td><td>One feed enters new modeled stock to final depth.</td></tr>
+    <tr><td>Short in-bore retract</td><td><code>G0 Z-1</code>, then <code>G1 Z-4</code> and <code>G1 Z-8</code></td><td>The first feed back removes no additional modeled stock; the separate deeper feed does.</td></tr>
+    <tr><td>Withdrawal above the mouth</td><td><code>G0 Z2</code>, then <code>G1 Z-4</code> and <code>G1 Z-8</code></td><td>The first feed back removes no additional modeled stock; the separate deeper feed does.</td></tr>
+  </tbody></table>
+  <ol>
+    <li>Mark where the drill enters material that has not yet been removed. That is new cutting in this geometric model.</li>
+    <li>Mark where the drill returns through the bore it already made. That travel retraces the prior path and removes no additional modeled stock; the separate deeper feed begins after the point reaches the previous bottom. The model does not show possible wall or chip contact, rubbing, force or heat during the return.</li>
+    <li>Compare the retraction heights with the raw top at Z+1. The short retraction stays inside the bore. The other withdrawal carries the point above the hole mouth, creating a clearer opportunity for chips to leave the hole.</li>
+    <li>Compare the finished holes. The three illustrative programs intentionally reach the same final tip depth and geometry even though their travel paths differ.</li>
+  </ol>
+  <p>The playground shows programmed motion and removed geometry. It does <strong>not</strong> model chip transport or packing, cutting heat or force, coolant delivery, or whether chips actually cleared. A retraction creates an opportunity for chip escape; it is neither proof of chip clearance nor the only way chips can leave. Haas describes its G83 return as a chip-clearing motion and places the R plane above the cut so chips can get out, but these G0/G1 illustrations are not G73, G83 or Q implementations.</p>
+  <p>The coordinates, spindle speed and feed in these three examples are comparison values for the simulator, not operating recommendations. Select any real drilling cycle, retract amount, speed and feed from the drill maker's guidance, the machine/control manual and the approved shop procedure. Continue to follow the machine instructions and <a class="xref-page" href="#p-metal-chips">Metal Chips</a> for observation and chip handling.</p>
+  <p class="aside"><strong>Primary source:</strong> <a href="https://legacy-aem.haascnc.com/content/haascnc/en/service/codes-settings.type%3Dgcode.machine%3Dmill.value%3DG83.html">Haas Automation, G83 Normal Peck Drilling Canned Cycle</a> (R-plane return and chip-clearing motion). Controller details differ; use the manual for the machine in front of you.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="drilling-operations--check-the-hole-before-calling-it-finished" data-card="drilling-operations--check-the-hole-before-calling-it-finished" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
@@ -23823,7 +24049,10 @@ void loop() {
     <div class="body">
       <h2>Explore the steps and check the units</h2>
   <p>The two-way ADC controls in the <a class="xref-page" href="#p-pulse-width-modulation">PWM and ADC explorer</a> let you enter a voltage or a code. Try nearby voltages within one bin, then cross its boundary. In reverse, code 1023 gives 4.9951171875 V as its lower edge, not proof that the input equals that value.</p>
+  <p>The same explorer also separates <strong>when a voltage is sampled</strong> from how its code is calculated. It shows instantaneous raw PWM or settled RC values, the finite mean of the selected point samples, and the mean of their reconstructed lower-edge voltages. Those are different from the waveform's complete-cycle time mean. A held code is the latest point result, not a window average.</p>
+  <p class="deeper-ref" id="deeper-ref-334">Supporting detail: <a href="#deeper-addendum-334"><strong>Addendum 334</strong></a> &mdash; Quantize first or average first?.</p>
   <p><a class="button" data-practice-add="micro-adc-volts" href="../practice.html#micro-adc-volts">Practice converting a reading to volts</a></p>
+  <p><a class="button" data-practice-add="pwm-sample-phase-high" href="../practice.html#pwm-sample-phase-high">Practice sampling phase</a></p>
     </div>
   </details>
 </div>
@@ -23854,7 +24083,7 @@ void loop() {
       <h2>The stock Uno R3 uses six PWM pins</h2>
   <p>Use digital pins <strong>3, 5, 6, 9, 10 and 11</strong>. Default PWM is approximately <strong>490 Hz on 3, 9, 10 and 11</strong>, and <strong>980 Hz on 5 and 6</strong>. These correspond to periods of about 2.04 ms and 1.02 ms.</p>
   <p><code>analogWrite(pin, value)</code> requests duty using values from 0 (always off) to 255 (always on). A useful nominal mapping is <code>value = round(255 × D)</code>: 25% gives 64. Hardware timer modes introduce small differences in the exact duty, particularly near the ends of the range.</p>
-  <p class="deeper-ref" id="deeper-ref-334">Supporting detail: <a href="#deeper-addendum-334"><strong>Addendum 334</strong></a> &mdash; Official frequency table and timer limitations.</p>
+  <p class="deeper-ref" id="deeper-ref-335">Supporting detail: <a href="#deeper-addendum-335"><strong>Addendum 335</strong></a> &mdash; Official frequency table and timer limitations.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="pulse-width-modulation--change-duty-and-frequency-then-compare-an-adc-reading" data-card="pulse-width-modulation--change-duty-and-frequency-then-compare-an-adc-reading" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -23863,10 +24092,20 @@ void loop() {
       <h2>Change duty and frequency, then compare an ADC reading</h2>
   <div data-interactive="pwm-and-adc">
     <div class="pa-live" hidden></div>
-    <div class="pa-static"><p><strong>Print / static example:</strong> 25% duty at 500 Hz gives a 2 ms period, 0.5 ms on-time and 1.25 V average for a 0–5 V waveform. An unloaded RC filter with R = 10 kΩ and C = 1 µF has a 10 ms time constant; after settling, its output ripples around 1.25 V. With a 5.000 V ADC reference, 3.000 V gives code 614 in the ideal bin model; code 800 gives a lower-edge estimate of 3.90625 V.</p></div>
+    <div class="pa-static">
+      <p><strong>Print / static comparison:</strong> 25% duty at 500 Hz gives a 2 ms period, 0.5 ms HIGH time and a 1.25 V complete-cycle time mean for an ideal 0–5 V waveform. A point sample is one instant, not that average.</p>
+      <div class="unit-table-wrap"><table class="unit-table"><caption>The same PWM waveform sampled at different phases</caption><thead><tr><th>Finite sample set</th><th>Each raw sample</th><th>Selected-sample mean</th><th>ADC code / lower edge</th></tr></thead><tbody>
+        <tr><th>500 samples/s, phase 10%</th><td>5 V</td><td>5 V</td><td>1023 / 4.995117 V</td></tr>
+        <tr><th>500 samples/s, phase 60%</th><td>0 V</td><td>0 V</td><td>0 / 0 V</td></tr>
+        <tr><th>2000 samples/s, phases 1%, 26%, 51%, 76%</th><td>5, 0, 0, 0 V</td><td>1.25 V</td><td>Mean lower edge 1.248779 V</td></tr>
+      </tbody></table></div>
+      <p>An unloaded 10 kΩ / 1 µF RC filter has a 10 ms time constant. In the settled repeating response its 25%, 500 Hz ripple runs from about 1.1579 V to 1.3453 V while its cycle mean remains 1.25 V. Changing a control recomputes that settled response; this model does not show startup.</p>
+      <p>With a separate 5.000 V ADC input, 3.000 V gives code 614; code 800 has lower edge 3.90625 V.</p>
+    </div>
     <noscript><p>The controls require JavaScript. The equations, duty-cycle figure and worked example remain available.</p></noscript>
   </div>
-  <p>The explorer is a model, not a board connection. Its frequency control does not configure an Uno. ADC controls use the ideal bin convention on <a class="xref-page" href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a>; 5.000 V is assumed exact.</p>
+  <p>The explorer is a model, not a board connection. Its frequency and sampling controls do not configure an Uno or claim a board throughput. A raw sample uses normalized phase with HIGH on <code>[0, D)</code> and LOW on <code>[D, 1)</code>; the stated finite sample count defines the reported sample mean. ADC controls use the ideal bin convention on <a class="xref-page" href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a>; 5.000 V is assumed exact.</p>
+  <p class="deeper-ref" id="deeper-ref-336">Supporting detail: <a href="#deeper-addendum-336"><strong>Addendum 336</strong></a> &mdash; Why more samples can still give the wrong mean.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="pulse-width-modulation--an-rc-filter-smooths-pwm-but-leaves-ripple" data-card="pulse-width-modulation--an-rc-filter-smooths-pwm-but-leaves-ripple">
@@ -23875,7 +24114,8 @@ void loop() {
       <h2>An RC filter smooths PWM but leaves ripple</h2>
   <p>Put a resistor in series with the PWM signal and a capacitor from the output node to ground; measure the voltage across the capacitor. This <strong>RC low-pass filter</strong> slows voltage changes. The capacitor charges while PWM is HIGH and discharges while it is LOW.</p>
   <p>The time constant is <code>τ = R × C</code>. A longer time constant relative to the PWM period reduces ripple but makes the output respond more slowly when duty changes. The explorer shows the settled waveform with τ = 10 ms, assuming an ideal source and no load. A load changes the result; the filter is not a motor power supply.</p>
-  <p class="deeper-ref" id="deeper-ref-335">Supporting detail: <a href="#deeper-addendum-335"><strong>Addendum 335</strong></a> &mdash; What the smoothed trace calculates.</p>
+  <p>Microchip's <a href="https://onlinedocs.microchip.com/oxy/GUID-15F56EF1-EBFF-405A-9412-E41CC95BAACF-en-US-2/GUID-34AC5DDB-B9AE-4272-842B-E2A1CEE69B6B.html">AVR131 PWM filtering note</a> explains the tradeoff: the low-pass filter must reject PWM base-frequency ripple without removing the slower signal of interest, and a low-impedance load can discharge the capacitor unless buffered. This explorer deliberately assumes no load.</p>
+  <p class="deeper-ref" id="deeper-ref-337">Supporting detail: <a href="#deeper-addendum-337"><strong>Addendum 337</strong></a> &mdash; What the smoothed trace calculates.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="pulse-width-modulation--pwm-changes-led-brightness-and-motor-drive" data-card="pulse-width-modulation--pwm-changes-led-brightness-and-motor-drive">
@@ -23906,7 +24146,7 @@ void loop() {
   <p class="lede">A generator does not create energy. It takes mechanical work at a shaft and delivers electrical energy to a circuit, with some energy becoming heat along the way.</p>
   <p>A turbine is a rotating machine driven by a moving fluid. Steam, flowing water, wind, or hot combustion gases can turn its blades. The turbine turns the generator; the generator supplies electricity. An engine can also drive a generator without a turbine.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjU1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5Ij4KPHRpdGxlPlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5PC90aXRsZT48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjI1NSIgZmlsbD0iI2ZmZmZmZiIvPgo8ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgcmVmWD0iNyIgcmVmWT0iMyIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwwLDYgTDcsMyBaIiBmaWxsPSIjMTgzMjRiIi8+PC9tYXJrZXI+PC9kZWZzPgo8c3R5bGU+dGV4dHtmb250OjIwcHggc2Fucy1zZXJpZjtmaWxsOiMxODMyNGJ9IC5ib3h7ZmlsbDojZWRmNGY4O3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDoyfSAuZmxvd3tmaWxsOm5vbmU7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjM7bWFya2VyLWVuZDp1cmwoI2Fycm93KX0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDozfTwvc3R5bGU+Cgo8dGV4dCB4PSIzMCIgeT0iMzUiPlN0ZWFtIHJvdXRlOiBoZWF0IOKGkiBmbHVpZCBtb3Rpb24g4oaSIHNoYWZ0IHdvcmsg4oaSIGVsZWN0cmljaXR5PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSIyNSIgeT0iNzAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNzAiLz48dGV4dCB4PSI0NSIgeT0iMTAwIj5IZWF0IHNvdXJjZTwvdGV4dD48dGV4dCB4PSI0NSIgeT0iMTI2Ij4rIGJvaWxlcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik0xNjUgMTA1IEgyMjAiLz48dGV4dCB4PSIxNzAiIHk9IjY1Ij5TdGVhbTwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMjMwIiB5PSI3MCIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjI1NSIgeT0iMTEyIj5UdXJiaW5lPC90ZXh0Pgo8cGF0aCBjbGFzcz0iZmxvdyIgZD0iTTM2MCAxMDUgSDQyNSIvPjx0ZXh0IHg9IjM2NiIgeT0iNjUiPlNoYWZ0PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSI0MzUiIHk9IjcwIiB3aWR0aD0iMTQ1IiBoZWlnaHQ9IjcwIi8+PHRleHQgeD0iNDUwIiB5PSIxMTIiPkdlbmVyYXRvcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik01ODAgMTA1IEg2NDAiLz4KPHJlY3QgY2xhc3M9ImJveCIgeD0iNjUwIiB5PSI3MCIgd2lkdGg9IjEyNSIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjY2MyIgeT0iMTEyIj5FbGVjdHJpY2l0eTwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjE5MCI+V2F0ZXIsIHdpbmQgb3IgY29tYnVzdGlvbiBnYXNlcyBjYW4gZHJpdmUgYSB0dXJiaW5lIGRpcmVjdGx5LjwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjIyNSI+UFYgdGFrZXMgYSBkaWZmZXJlbnQgcm91dGU6IGxpZ2h0IOKGkiBwaG90b3ZvbHRhaWMgY2VsbCDihpIgREMgZWxlY3RyaWNpdHkuPC90ZXh0Pgo8L3N2Zz4=" alt="Heat makes steam; steam turns a turbine; the turbine turns a generator; the generator supplies electricity. Water, wind and combustion gases can drive turbines too." data-natural-width="800" data-natural-height="255"></p>
-  <p class="deeper-ref" id="deeper-ref-336">Supporting detail: <a href="#deeper-addendum-336"><strong>Addendum 336</strong></a> &mdash; How rotation produces electricity.</p>
+  <p class="deeper-ref" id="deeper-ref-338">Supporting detail: <a href="#deeper-addendum-338"><strong>Addendum 338</strong></a> &mdash; How rotation produces electricity.</p>
   <p>See <a class="xref-page" href="#p-power-and-efficiency">Power and Efficiency</a> for losses and <a class="xref-page" href="#p-ac-and-dc">AC and DC</a> for the electrical output forms.</p>
     </div>
   </details>
@@ -24022,7 +24262,7 @@ void loop() {
     <tr><th scope="row">NiMH</th><td>Rechargeable consumer cells and hybrid-vehicle packs; generally more capacity than comparable NiCd cells and no cadmium.</td><td>Conventional cells can self-discharge noticeably; low-self-discharge versions improve charge retention. Voltage depression can occur, but memory concerns are generally less pronounced than with NiCd.</td></tr>
   </tbody></table></div>
   <p>Use a charger designed for the chemistry and cell. Fast charging is appropriate only when the cell and charger support it. Do not deliberately drive a pack to zero volts to prevent memory effect: a weaker cell can be forced into reverse polarity by the others.</p>
-  <p class="deeper-ref" id="deeper-ref-337">Supporting detail: <a href="#deeper-addendum-337"><strong>Addendum 337</strong></a> &mdash; Why a remote-control recommendation needs more than a chemistry name.</p>
+  <p class="deeper-ref" id="deeper-ref-339">Supporting detail: <a href="#deeper-addendum-339"><strong>Addendum 339</strong></a> &mdash; Why a remote-control recommendation needs more than a chemistry name.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="battery-chemistries--lead-acid-trades-low-mass-efficiency-for-useful-power-and-cost" data-card="battery-chemistries--lead-acid-trades-low-mass-efficiency-for-useful-power-and-cost">
@@ -24056,7 +24296,7 @@ void loop() {
     <li><strong>Lewis Urry, 1950s:</strong> work on the modern alkaline cell improved portable primary batteries.</li>
     <li><strong>Lithium-ion, 1990s:</strong> commercialization enabled rechargeable products with high energy per unit mass, building on earlier work by several researchers.</li>
   </ul>
-  <p class="deeper-ref" id="deeper-ref-338">Supporting detail: <a href="#deeper-addendum-338"><strong>Addendum 338</strong></a> &mdash; Scope of this short chronology.</p>
+  <p class="deeper-ref" id="deeper-ref-340">Supporting detail: <a href="#deeper-addendum-340"><strong>Addendum 340</strong></a> &mdash; Scope of this short chronology.</p>
     </div>
   </details>
 </div>
@@ -24078,7 +24318,7 @@ void loop() {
   <p class="lede">A 2 Ah cell and a 2 Ah battery can store very different amounts of energy if their voltages differ. Ah tells you charge. To estimate energy, you also need voltage.</p>
   <p><code>Energy (Wh) ≈ capacity (Ah) × nominal voltage (V)</code><br><code>Energy (J) = energy (Wh) × 3600</code></p>
   <p>For an ideal 2.4 Ah, 3.6 V cell: <code>2.4 × 3.6 = 8.64 Wh</code>, or <code>8.64 × 3600 = 31,104 J</code>. Convert mAh to Ah by dividing by 1000 before multiplying by voltage.</p>
-  <p class="deeper-ref" id="deeper-ref-339">Supporting detail: <a href="#deeper-addendum-339"><strong>Addendum 339</strong></a> &mdash; Why the battery estimate uses an approximate sign.</p>
+  <p class="deeper-ref" id="deeper-ref-341">Supporting detail: <a href="#deeper-addendum-341"><strong>Addendum 341</strong></a> &mdash; Why the battery estimate uses an approximate sign.</p>
   <p>See <a class="xref-page" href="#p-work-and-energy">Work and Energy</a> for energy units and <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> for voltage and charge.</p>
   <a class="button" data-practice-add="battery-energy-wh" href="../practice.html#battery-energy-wh">Practise battery energy</a>
     </div>
@@ -24145,7 +24385,7 @@ void loop() {
       <h2>Choose the tip for contact, not just access</h2>
   <p>A temperature-controlled station regulates the iron's tip temperature. A basic iron may have no temperature control; a cordless iron changes how it is powered, not how a joint is made. Check the tool's instructions and choose settings suitable for the solder and components.</p>
   <p>Tip shape and size matter. A fine point reaches small spaces, but a chisel's broad face often transfers heat more effectively. Use the largest tinned contact face that fits the joint without touching neighboring connections. Interchangeable tips let one iron handle different work; change them according to the tool's instructions.</p>
-  <p class="deeper-ref" id="deeper-ref-340">Supporting detail: <a href="#deeper-addendum-340"><strong>Addendum 340</strong></a> &mdash; What the iron's “sweet spot” means.</p>
+  <p class="deeper-ref" id="deeper-ref-342">Supporting detail: <a href="#deeper-addendum-342"><strong>Addendum 342</strong></a> &mdash; What the iron's “sweet spot” means.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-equipment--match-the-solder-and-flux-to-electrical-work" data-card="soldering-equipment--match-the-solder-and-flux-to-electrical-work">
@@ -24169,9 +24409,9 @@ void loop() {
   <p>Helping hands or a PCB vise hold the parts still while your hands hold the iron and solder. Keep a proper stand or cradle within reach. Use a damp soldering sponge or brass wool for tip cleaning, and have solder wick (copper braid) or a desoldering pump available for removing excess solder.</p>
   <p><strong>It gets hot. Really hot.</strong> Park the iron in its stand, and allow the work to cool before touching it. Use ventilation or fume extraction that keeps the plume away from your face and other people; most visible fume comes from flux. Wash your hands after handling leaded solder, and do not eat or drink at the bench.</p>
   <p><strong>SHOP RULE: NEVER SOLDER BATTERIES.</strong></p>
-  <p class="deeper-ref" id="deeper-ref-341">Supporting detail: <a href="#deeper-addendum-341"><strong>Addendum 341</strong></a> &mdash; Why the battery rule stays absolute.</p>
+  <p class="deeper-ref" id="deeper-ref-343">Supporting detail: <a href="#deeper-addendum-343"><strong>Addendum 343</strong></a> &mdash; Why the battery rule stays absolute.</p>
   <p>Work on disconnected circuits. Follow <a class="xref-page" href="#p-electrical-safety">Electrical Safety</a> and <a class="xref-page" href="#p-ppe">Personal Protective Equipment</a>; flux and fume handling belongs with <a class="xref-page" href="#p-chemicals-and-sds">Chemicals and Safety Data Sheets</a>.</p>
-  <p class="deeper-ref" id="deeper-ref-342">Supporting detail: <a href="#deeper-addendum-342"><strong>Addendum 342</strong></a> &mdash; Further reading on flux fume.</p>
+  <p class="deeper-ref" id="deeper-ref-344">Supporting detail: <a href="#deeper-addendum-344"><strong>Addendum 344</strong></a> &mdash; Further reading on flux fume.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-equipment--clean-tin-and-keep-the-working-face-coated" data-card="soldering-equipment--clean-tin-and-keep-the-working-face-coated">
@@ -24180,7 +24420,7 @@ void loop() {
       <h2>Clean, tin, and keep the working face coated</h2>
   <p>With the iron at working temperature, briefly clean the tip on brass wool or a damp soldering sponge. Apply fresh solder to coat its working face, then remove the excess on the cleaner. Leave a thin coating; do not wipe it bare and let it sit hot. Re-tin as needed and before storage as directed by the tool manufacturer.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkNsZWFuLCBjb2F0LCBhbmQgcmV0YWluIGEgdGhpbiBsYXllciBvZiBzb2xkZXI8L3RpdGxlPjxyZWN0IHdpZHRoPSIzNjAiIGhlaWdodD0iODQwIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MThweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0ZH0gLmhlYWR7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MjJweH0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojOWE1MTE5O3N0cm9rZS13aWR0aDo5O3N0cm9rZS1saW5lY2FwOnJvdW5kfSAubGVhZHtmaWxsOiNjY2M7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5zb2xkZXJ7ZmlsbDojYjhkOWVhO3N0cm9rZTojMTcyYjRkO3N0cm9rZS13aWR0aDoyfSAucGFke2ZpbGw6I2I4NzMzMztzdHJva2U6IzE3MmI0ZH0gLmJvYXJke2ZpbGw6I2UyZWRkZjtzdHJva2U6IzE3MmI0ZH08L3N0eWxlPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjEuIENsZWFuIGJyaWVmbHk8L3RleHQ+PHBhdGggZD0iTTgwIDE5NUgyODBWMjIwSDgwWiIgZmlsbD0iI2VjYWMwMCIgc3Ryb2tlPSIjMTcyYjRkIi8+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjUwIj5EYW1wIHNwb25nZSBvciBicmFzcyB3b29sLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj4yLiBBcHBseSBmcmVzaCBzb2xkZXI8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48cGF0aCBkPSJNMzAwIDkwTDIxMCAxODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyNmI4MyIgc3Ryb2tlLXdpZHRoPSI3Ii8+PHRleHQgeD0iMjAiIHk9IjI1MCI+Q29hdCB0aGUgaG90IHdvcmtpbmcgZmFjZS48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gTGVhdmUgYSB0aGluIGNvYXRpbmc8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5SZW1vdmUgZXhjZXNzIG9uIHRoZSBjbGVhbmVyLjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjcwIj5EbyBub3QgbGVhdmUgdGhlIGhvdCBmYWNlIGJhcmUuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Three stages: clean the working face, melt fresh solder onto it, and leave a thin solder coating after removing excess." data-natural-width="360" data-natural-height="840"></p>
-  <p class="deeper-ref" id="deeper-ref-343">Supporting detail: <a href="#deeper-addendum-343"><strong>Addendum 343</strong></a> &mdash; Why tinning helps heat transfer.</p>
+  <p class="deeper-ref" id="deeper-ref-345">Supporting detail: <a href="#deeper-addendum-345"><strong>Addendum 345</strong></a> &mdash; Why tinning helps heat transfer.</p>
     </div>
   </details>
 </div>
@@ -24201,7 +24441,7 @@ void loop() {
       <h2>Heat both parts, then feed solder into the joint</h2>
   <p>Prepare the iron and bench using <a class="xref-page" href="#p-soldering-equipment">Soldering Equipment and Setup</a>. The iron heats the parts; the heated parts melt the solder. Touch the tinned working face to both wires, or to both the pad and the component lead. Feed solder into the joint, away from the iron's contact point when access allows.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkhlYXQgcGFkIGFuZCBsZWFkLCBmZWVkIHNvbGRlciwgdGhlbiB3aXRoZHJhdyBhbmQgY29vbDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+MS4gSGVhdCBib3RoIHBhcnRzPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNNTUgOTBMODAgNzBMMTc1IDE2NVYxODBIMTUzWiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Jcm9uIGZhY2UgdG91Y2hlcyBwYWQgYW5kIGxlYWQuPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDI4MCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjIuIEZlZWQgaW50byB0aGUgam9pbnQ8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik01NSA5MEw4MCA3MEwxNzUgMTY1VjE4MEgxNTNaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik0zMDAgODBMMjEwIDE2NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTI2YjgzIiBzdHJva2Utd2lkdGg9IjciLz48cGF0aCBkPSJNMTkwIDE0MFEyMDAgMTczIDI1MCAxODBIMTkwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjI0MCIgeT0iNjIiPlNvbGRlcjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5LZWVwIGhlYXRpbmcgYXMgc29sZGVyIHdldHMgYm90aC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gV2l0aGRyYXcgYW5kIGNvb2w8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik05NSAxODBRMTcwIDE3NCAxNzUgMTEwVjE4MFogTTE5MCAxMTBRMjAwIDE3NCAyNjUgMTgwSDE5MFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Tb2xkZXIgYXdheSwgdGhlbiBpcm9uLiBIb2xkIHN0aWxsLjwvdGV4dD48L2c+PC9zdmc+" alt="First the iron contacts both pad and lead. Then solder wire approaches the heated joint from the other side while the iron stays in contact. Finally remove solder, remove iron, and hold still." data-natural-width="360" data-natural-height="840"></p>
-  <p class="deeper-ref" id="deeper-ref-344">Supporting detail: <a href="#deeper-addendum-344"><strong>Addendum 344</strong></a> &mdash; A one-second count is a rhythm, not a temperature test.</p>
+  <p class="deeper-ref" id="deeper-ref-346">Supporting detail: <a href="#deeper-addendum-346"><strong>Addendum 346</strong></a> &mdash; A one-second count is a rhythm, not a temperature test.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="soldering-joints--work-through-the-joint-in-this-order" data-card="soldering-joints--work-through-the-joint-in-this-order" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
@@ -24226,7 +24466,7 @@ void loop() {
     <div class="body">
       <h2>Look for wetting and shape; shine alone is not a verdict</h2>
   <p>A good joint flows onto both surfaces. On a typical through-hole pad, look for a smooth transition from pad to lead, often a concave fillet (an inward-curving slope). Tin-lead joints are often shiny. A sound lead-free joint may be dull; dullness alone does not diagnose a cold joint.</p>
-  <p class="deeper-ref" id="deeper-ref-345">Supporting detail: <a href="#deeper-addendum-345"><strong>Addendum 345</strong></a> &mdash; Why lead-free solder may look different.</p>
+  <p class="deeper-ref" id="deeper-ref-347">Supporting detail: <a href="#deeper-addendum-347"><strong>Addendum 347</strong></a> &mdash; Why lead-free solder may look different.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkpvaW50IGluc3BlY3Rpb246IHNjaGVtYXRpYyBjcm9zcy1zZWN0aW9uczwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+R29vZDogd2V0dGVkPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNOTUgMTgwUTE3MCAxNzQgMTc1IDExMFYxODBaIE0xOTAgMTEwUTIwMCAxNzQgMjY1IDE4MEgxOTBaIiBjbGFzcz0ic29sZGVyIi8+PHRleHQgeD0iMjAiIHk9IjI0NSI+U29sZGVyIHNsb3BlcyBmcm9tIHBhZCB0byBsZWFkLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj5Db2xkIC8gcG9vcmx5IHdldHRlZDwvdGV4dD48cGF0aCBkPSJNNDAgMTkwSDMyMFYyMTVINDBaIiBjbGFzcz0iYm9hcmQiLz48cGF0aCBkPSJNODUgMTgwSDI3NVYxOTBIODVaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTE3NSA2NUgxOTBWMjE1SDE3NVoiIGNsYXNzPSJsZWFkIi8+PGVsbGlwc2UgY3g9IjEzMCIgY3k9IjE1NSIgcng9IjM3IiByeT0iMjQiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5CZWFkIGZhaWxzIHRvIHdldCB0aGUgbGVhZC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+QnJpZGdlOiB1bndhbnRlZCBwYXRoPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik02NSAxODBIMTUwVjE5MEg2NVogTTIxMCAxODBIMjk1VjE5MEgyMTBaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTEwNSA2NUgxMjBWMjE1SDEwNVogTTI0MCA2NUgyNTVWMjE1SDI0MFoiIGNsYXNzPSJsZWFkIi8+PHBhdGggZD0iTTc1IDE4MFExMDAgMTY1IDEwNSAxMzBWMTYwUTE4MCAxNDAgMjQwIDE2MFYxMzBRMjcwIDE3MCAyODUgMTgwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjIwIiB5PSIyNDUiPlNvbGRlciBqb2lucyBzZXBhcmF0ZSBwYWRzLjwvdGV4dD48L2c+PC9zdmc+" alt="Conceptual cross-sections: wetted solder slopes from pad to lead; a cold poorly wetted bead sits on the pad; a solder bridge connects two pads that should be separate." data-natural-width="360" data-natural-height="840"></p>
   <dl class="dims">
     <div><dt>Cold or poorly wetted</dt><dd>Solder balls up or fails to bond to one surface, often because the parts were not heated adequately. A rough or dull appearance can be a clue, but inspect the contact and shape too.</dd></div>
@@ -24280,7 +24520,7 @@ void loop() {
       <h2>Put heat-shrink on before closing the splice</h2>
   <p>Slide suitable heat-shrink tubing onto a wire before joining it, and keep it away from the soldering heat. After soldering, allow the joint to cool and inspect it. Move the tubing over all exposed conductor, overlapping intact insulation at both ends of an inline splice, then shrink it with the appropriate heat source according to its instructions.</p>
   <p>Choose tubing whose unshrunk size passes over the splice and whose recovered size fits the wire. Avoid sharp wire ends that could puncture it. Ordinary heat-shrink provides insulation; do not assume it makes a waterproof connection or replaces strain relief.</p>
-  <p class="deeper-ref" id="deeper-ref-346">Supporting detail: <a href="#deeper-addendum-346"><strong>Addendum 346</strong></a> &mdash; When pre-tinning helps.</p>
+  <p class="deeper-ref" id="deeper-ref-348">Supporting detail: <a href="#deeper-addendum-348"><strong>Addendum 348</strong></a> &mdash; When pre-tinning helps.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together" data-card="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together">
@@ -27581,107 +27821,123 @@ void loop() {
     </li>
     <li class="deeper-addendum" id="deeper-addendum-334" value="334">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 334.</span> Official frequency table and timer limitations</h2>
-        <p>The Uno R3 row of Arduino's <a href="https://github.com/arduino/reference-en/blob/master/Language/Functions/Analog%20IO/analogWrite.adoc">analogWrite reference source</a> states “490 Hz (pins 5 and 6: 980 Hz)”. See also the <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/">published analogWrite reference</a>. A frequency near 31 kHz requires changing timer configuration; it is not the stock setting. <code>analogWrite</code> sets duty, not frequency. Arduino's <a href="https://docs.arduino.cc/tutorials/generic/secrets-of-arduino-pwm/">Secrets of Arduino PWM</a> explains prescalers and timer modes. Changing timers can also affect other functions and libraries.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 334.</span> Quantize first or average first?</h2>
+        <p>ADC conversion floors each individual ideal sample into a bin. Averaging the reconstructed lower edges therefore need not equal converting the analog sample mean. For a 25% raw 0–5 V sequence with one HIGH and three LOW samples, the analog sample mean is 1.25 V; the lower-edge reconstructions average 4.9951171875/4 = 1.248779296875 V. Neither operation recovers information between sample instants.</p>
         <p class="deeper-back"><a href="#deeper-ref-334">Back to reference 334</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-335" value="335">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 335.</span> What the smoothed trace calculates</h2>
-        <p>During each constant input interval, <code>V(t) = V<sub>target</sub> + (V<sub>start</sub> − V<sub>target</sub>)e<sup>−t/τ</sup></code>. The model solves for a repeating steady state, then draws the charging and discharging curves. It omits startup, output resistance, component tolerances and loading. At 0% or 100%, the settled output is simply 0 V or 5 V.</p>
+        <h2><span class="deeper-addendum-number">Addendum 335.</span> Official frequency table and timer limitations</h2>
+        <p>The Uno R3 row of Arduino's <a href="https://github.com/arduino/reference-en/blob/master/Language/Functions/Analog%20IO/analogWrite.adoc">analogWrite reference source</a> states “490 Hz (pins 5 and 6: 980 Hz)”. See also the <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/">published analogWrite reference</a>. A frequency near 31 kHz requires changing timer configuration; it is not the stock setting. <code>analogWrite</code> sets duty, not frequency. Arduino's <a href="https://docs.arduino.cc/tutorials/generic/secrets-of-arduino-pwm/">Secrets of Arduino PWM</a> explains prescalers and timer modes. Changing timers can also affect other functions and libraries.</p>
         <p class="deeper-back"><a href="#deeper-ref-335">Back to reference 335</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-336" value="336">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electrical-generation">Electrical Generation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 336.</span> How rotation produces electricity</h2>
-        <p>Relative motion between a magnetic field and conductors induces a voltage. With a closed circuit, current flows and the shaft must supply work against the electrical load. Motor action and generator action reverse the direction of energy conversion; see <a class="xref-page" href="#p-electric-motor-principles">Electric Motor Principles</a>. Actual machines and controls determine how they can operate in either direction.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 336.</span> Why more samples can still give the wrong mean</h2>
+        <p>If the sample clock repeatedly lands at the same PWM phase, every point can read HIGH or every point can read LOW even though the full-cycle time mean is 1.25 V. A sample-and-hold output keeps the most recent point value between samples; holding is not averaging. A carefully spaced finite set can match the cycle mean, but a higher rate or larger count alone does not guarantee an unbiased result. This bounded comparison does not claim reconstruction of an unbandlimited switching edge from a Nyquist test.</p>
         <p class="deeper-back"><a href="#deeper-ref-336">Back to reference 336</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-337" value="337">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-chemistries">Battery Chemistries</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 337.</span> Why a remote-control recommendation needs more than a chemistry name</h2>
-        <p>A low average load makes charge retention important, but it does not by itself select NiCd over NiMH. Compare the actual cells' self-discharge, usable capacity, voltage and charging requirements. A low-self-discharge NiMH cell behaves differently from an older conventional NiMH cell.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 337.</span> What the smoothed trace calculates</h2>
+        <p>During each constant input interval, <code>V(t) = V<sub>target</sub> + (V<sub>start</sub> − V<sub>target</sub>)e<sup>−t/τ</sup></code>. The model solves for a repeating steady state, then draws the charging and discharging curves. It omits startup, output resistance, component tolerances and loading. At 0% or 100%, the settled output is simply 0 V or 5 V.</p>
         <p class="deeper-back"><a href="#deeper-ref-337">Back to reference 337</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-338" value="338">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-chemistries">Battery Chemistries</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 338.</span> Scope of this short chronology</h2>
-        <p>This overview uses the historical sequence in the course generation-and-storage notes, with dates rounded to eras. Invention, patent and market introduction are different milestones; the dates are not intended as a priority claim. The development of lithium-ion was a multi-researcher effort, not solely the work of the company that first sold it.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electrical-generation">Electrical Generation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 338.</span> How rotation produces electricity</h2>
+        <p>Relative motion between a magnetic field and conductors induces a voltage. With a closed circuit, current flows and the shaft must supply work against the electrical load. Motor action and generator action reverse the direction of energy conversion; see <a class="xref-page" href="#p-electric-motor-principles">Electric Motor Principles</a>. Actual machines and controls determine how they can operate in either direction.</p>
         <p class="deeper-back"><a href="#deeper-ref-338">Back to reference 338</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-339" value="339">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-capacity-and-packs">Battery Capacity and Packs</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 339.</span> Why the battery estimate uses an approximate sign</h2>
-        <p>Wh = Ah × V is exact for constant voltage. A real cell's voltage changes during discharge, so nominal voltage gives an energy estimate. Usable charge also changes with load, temperature, age and the cutoff voltage. These calculations assume the stated capacity is available.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-chemistries">Battery Chemistries</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 339.</span> Why a remote-control recommendation needs more than a chemistry name</h2>
+        <p>A low average load makes charge retention important, but it does not by itself select NiCd over NiMH. Compare the actual cells' self-discharge, usable capacity, voltage and charging requirements. A low-self-discharge NiMH cell behaves differently from an older conventional NiMH cell.</p>
         <p class="deeper-back"><a href="#deeper-ref-339">Back to reference 339</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-340" value="340">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 340.</span> What the iron's “sweet spot” means</h2>
-        <p>Use the broad, clean, solder-coated working face of the tip against both parts. Do not interpret “side of the iron” as the barrel or an uncoated surface. The useful contact area, not the sharpest point or the highest temperature setting, delivers heat into the joint. A tiny point can be hot and still transfer heat poorly.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-chemistries">Battery Chemistries</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 340.</span> Scope of this short chronology</h2>
+        <p>This overview uses the historical sequence in the course generation-and-storage notes, with dates rounded to eras. Invention, patent and market introduction are different milestones; the dates are not intended as a priority claim. The development of lithium-ion was a multi-researcher effort, not solely the work of the company that first sold it.</p>
         <p class="deeper-back"><a href="#deeper-ref-340">Back to reference 340</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-341" value="341">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 341.</span> Why the battery rule stays absolute</h2>
-        <p>Heat applied to a cell can damage its seals and internal parts. Lithium cells in particular can fail dangerously if damaged. Use the intended battery holder or connector instead of applying a soldering iron to a battery.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-capacity-and-packs">Battery Capacity and Packs</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 341.</span> Why the battery estimate uses an approximate sign</h2>
+        <p>Wh = Ah × V is exact for constant voltage. A real cell's voltage changes during discharge, so nominal voltage gives an energy estimate. Usable charge also changes with load, temperature, age and the cutoff voltage. These calculations assume the stated capacity is available.</p>
         <p class="deeper-back"><a href="#deeper-ref-341">Back to reference 341</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-342" value="342">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 342.</span> Further reading on flux fume</h2>
-        <p>The UK Health and Safety Executive's <a href="https://www.hse.gov.uk/asthma/solderers.htm">guidance for solderers</a> describes rosin-based flux fume and recommends extraction and keeping your head out of the plume.</p>
+        <h2><span class="deeper-addendum-number">Addendum 342.</span> What the iron's “sweet spot” means</h2>
+        <p>Use the broad, clean, solder-coated working face of the tip against both parts. Do not interpret “side of the iron” as the barrel or an uncoated surface. The useful contact area, not the sharpest point or the highest temperature setting, delivers heat into the joint. A tiny point can be hot and still transfer heat poorly.</p>
         <p class="deeper-back"><a href="#deeper-ref-342">Back to reference 342</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-343" value="343">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 343.</span> Why tinning helps heat transfer</h2>
-        <p>A hot tip oxidizes. Oxide interferes with wetting, while a solder coating protects the working face and helps make thermal contact with the joint. Tinning the tip is the time to feed solder onto the tip. Making a joint is different: feed solder into the heated joint.</p>
-    <p>See HAKKO's <a href="https://www.hakko.com/english/support/maintenance/detail.php?seq=163">tip-life guidance</a> for the construction of plated tips and the effects of oxidation.</p>
+        <h2><span class="deeper-addendum-number">Addendum 343.</span> Why the battery rule stays absolute</h2>
+        <p>Heat applied to a cell can damage its seals and internal parts. Lithium cells in particular can fail dangerously if damaged. Use the intended battery holder or connector instead of applying a soldering iron to a battery.</p>
         <p class="deeper-back"><a href="#deeper-ref-343">Back to reference 343</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-344" value="344">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 344.</span> A one-second count is a rhythm, not a temperature test</h2>
-        <p>“Apply iron, one-second count, apply solder” reminds you to heat before feeding. The actual time depends on the joint, tip, alloy, and component limits. Look for solder flowing onto both surfaces. If it will not flow, stop and check cleanliness, flux, contact, and tool settings rather than holding the iron there indefinitely.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 344.</span> Further reading on flux fume</h2>
+        <p>The UK Health and Safety Executive's <a href="https://www.hse.gov.uk/asthma/solderers.htm">guidance for solderers</a> describes rosin-based flux fume and recommends extraction and keeping your head out of the plume.</p>
         <p class="deeper-back"><a href="#deeper-ref-344">Back to reference 344</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-345" value="345">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 345.</span> Why lead-free solder may look different</h2>
-        <p>Kester's <a href="https://www.kester.com/knowledge-base/faq">soldering FAQ</a>, under lead-free joint appearance, explains that tin-silver-copper joints can have a dull surface without being poor joints. Judge the connection, not shine alone.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 345.</span> Why tinning helps heat transfer</h2>
+        <p>A hot tip oxidizes. Oxide interferes with wetting, while a solder coating protects the working face and helps make thermal contact with the joint. Tinning the tip is the time to feed solder onto the tip. Making a joint is different: feed solder into the heated joint.</p>
+    <p>See HAKKO's <a href="https://www.hakko.com/english/support/maintenance/detail.php?seq=163">tip-life guidance</a> for the construction of plated tips and the effects of oxidation.</p>
         <p class="deeper-back"><a href="#deeper-ref-345">Back to reference 345</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-346" value="346">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-wires-and-pcbs">Soldering Wire Splices and Through-Hole PCBs</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 346.</span> When pre-tinning helps</h2>
-        <p>Some wires and terminals are pre-tinned: a small amount of solder wets the surface before final assembly. This can help the final joint flow, but too much solder makes a wire end stiff and bulky. Follow the connection's assembly method and still heat both parts when making the final bond.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 346.</span> A one-second count is a rhythm, not a temperature test</h2>
+        <p>“Apply iron, one-second count, apply solder” reminds you to heat before feeding. The actual time depends on the joint, tip, alloy, and component limits. Look for solder flowing onto both surfaces. If it will not flow, stop and check cleanliness, flux, contact, and tool settings rather than holding the iron there indefinitely.</p>
         <p class="deeper-back"><a href="#deeper-ref-346">Back to reference 346</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-347" value="347">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 347.</span> Why lead-free solder may look different</h2>
+        <p>Kester's <a href="https://www.kester.com/knowledge-base/faq">soldering FAQ</a>, under lead-free joint appearance, explains that tin-silver-copper joints can have a dull surface without being poor joints. Judge the connection, not shine alone.</p>
+        <p class="deeper-back"><a href="#deeper-ref-347">Back to reference 347</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-348" value="348">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-wires-and-pcbs">Soldering Wire Splices and Through-Hole PCBs</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 348.</span> When pre-tinning helps</h2>
+        <p>Some wires and terminals are pre-tinned: a small amount of solder wets the surface before final assembly. This can help the final joint flow, but too much solder makes a wire end stiff and bulky. Follow the connection's assembly method and still heat both parts when making the final bond.</p>
+        <p class="deeper-back"><a href="#deeper-ref-348">Back to reference 348</a></p>
       </article>
     </li>
   </ol>
@@ -30489,31 +30745,567 @@ void loop() {
   else boot();
 })();
 
+(function (root, factory) {
+  'use strict';
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiResinBatch = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  function positive(value, name) {
+    if (!Number.isFinite(value) || value <= 0) throw new RangeError(name + ' must be finite and greater than zero.');
+    return value;
+  }
+  function nonnegative(value, name) {
+    if (!Number.isFinite(value) || value < 0) throw new RangeError(name + ' must be finite and zero or greater.');
+    return value;
+  }
+  // Internal units: grams and millilitres. No rounded result feeds another calculation.
+  // A volume specification becomes mass weights a*rhoA : b*rhoB.
+  function batch(s) {
+    if (!s) throw new RangeError('Batch inputs are required.');
+    positive(s.ratioA, 'A ratio parts'); positive(s.ratioB, 'B ratio parts');
+    positive(s.densityA, 'A density'); positive(s.densityB, 'B density');
+    positive(s.amountG, 'Given mass'); nonnegative(s.tareG, 'Container tare');
+    if (s.basis !== 'mass' && s.basis !== 'volume') throw new RangeError('Choose mass or volume as the ratio basis.');
+    if (s.mode !== 'total' && s.mode !== 'given-a') throw new RangeError('Choose target total mass or given A mass.');
+    var weightA = s.ratioA * (s.basis === 'volume' ? s.densityA : 1);
+    var weightB = s.ratioB * (s.basis === 'volume' ? s.densityB : 1);
+    positive(weightA, 'A mass weight'); positive(weightB, 'B mass weight');
+    // Normalize before summing to avoid needless overflow in a+b.
+    var scale = Math.max(weightA, weightB), a = weightA / scale, b = weightB / scale;
+    var massA = s.mode === 'total' ? s.amountG * (a / (a + b)) : s.amountG;
+    var massB = s.mode === 'total' ? s.amountG * (b / (a + b)) : s.amountG * (b / a);
+    var totalG = massA + massB, volumeA = massA / s.densityA, volumeB = massB / s.densityB;
+    var afterAGrossG = s.tareG + massA, finalGrossG = s.tareG + totalG;
+    [massA, massB, totalG, volumeA, volumeB, afterAGrossG, finalGrossG].forEach(function (value) {
+      positive(value, 'Calculated quantity (use less extreme inputs)');
+    });
+    return { massAG: massA, massBG: massB, totalG: totalG, volumeAMl: volumeA, volumeBMl: volumeB,
+      massRatioAtoB: positive(massA / massB, 'Calculated mass ratio'),
+      volumeRatioAtoB: positive(volumeA / volumeB, 'Calculated volume ratio'),
+      emptyGrossG: s.tareG, afterAGrossG: afterAGrossG, finalGrossG: finalGrossG,
+      afterATaredG: massA, finalTaredG: totalG };
+  }
+  function convertMass(value, from, to) {
+    nonnegative(value, 'Mass');
+    if (![from, to].every(function (unit) { return unit === 'g' || unit === 'kg'; })) throw new RangeError('Unknown mass unit.');
+    var result = from === to ? value : from === 'g' ? value / 1000 : value * 1000;
+    nonnegative(result, 'Converted mass');
+    if (value > 0 && result === 0) throw new RangeError('Converted mass is too small.');
+    return result;
+  }
+  return { batch: batch, convertMass: convertMass };
+});
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiResinBatch);
+  if (node) module.exports = api;
+  else if (typeof document !== 'undefined') document.querySelectorAll('[data-interactive="resin-batch"]').forEach(api.init);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  var sequence = 0;
+  function init(root) {
+    if (root.dataset.rbReady || !M) return;
+    var id; do { id = 'rb-' + (++sequence); } while (document.getElementById(id + '-amount'));
+    var unit = 'g';
+    var lab = document.createElement('div'); lab.className = 'rb-lab';
+    function number(key, label, value, minimum) {
+      return '<label for="' + id + '-' + key + '">' + label + '<input id="' + id + '-' + key + '" data-rb-input="' + key + '" type="number" inputmode="decimal" step="any" min="' + minimum + '" value="' + value + '"></label>';
+    }
+    lab.innerHTML = '<p><strong>Two components, two meanings of “220 g”.</strong> These invented A/B values teach arithmetic. They are not a product recipe.</p>' +
+      '<fieldset class="rb-predict"><legend>Predict the mass balance</legend><p>For an illustrative 10:1 A:B ratio <strong>by mass</strong>, compare a 220 g target total with starting from 220 g of A alone. Which gives more total material after adding B?</p>' +
+      ['total|The 220 g target total', 'given-a|Starting from 220 g of A', 'same|Both give the same total'].map(function (option) { var p = option.split('|'); return '<label><input type="radio" name="' + id + '-prediction" value="' + p[0] + '"> ' + p[1] + '</label>'; }).join('') +
+      '<button type="button" data-rb="reveal" disabled aria-controls="' + id + '-experiment">Reveal and explore</button><p data-rb="feedback" role="status">Choose a prediction first.</p></fieldset>' +
+      '<div id="' + id + '-experiment" data-rb="experiment" hidden>' +
+      '<div class="rb-presets" aria-label="Change illustrative specification"><span>Change illustrative specification:</span><button type="button" data-rb-preset="initial">10:1 by mass · 220 g</button><button type="button" data-rb-preset="mass">2:1 by mass · 300 g</button><button type="button" data-rb-preset="volume">2:1 by volume · 300 g</button></div>' +
+      '<div class="rb-controls">' +
+      '<label for="' + id + '-mode">What does the given mass mean?<select id="' + id + '-mode" data-rb="mode"><option value="total">Target total material mass</option><option value="given-a">Given component A mass</option></select></label>' +
+      '<label for="' + id + '-unit">Mass unit (same physical batch)<select id="' + id + '-unit" data-rb="unit"><option value="g">g</option><option value="kg">kg</option></select></label>' +
+      number('amount', 'Given mass (<span data-rb="unit-label">g</span>)', 220, 0) +
+      number('tare', 'Empty container mass / tare (<span data-rb="unit-label">g</span>)', 35, 0) +
+      '<label for="' + id + '-basis">Ratio basis (changes specification)<select id="' + id + '-basis" data-rb="basis"><option value="mass">A:B by mass</option><option value="volume">A:B by volume</option></select></label>' +
+      number('ratio-a', 'A ratio parts', 10, 0) + number('ratio-b', 'B ratio parts', 1, 0) +
+      number('density-a', 'A density (g/mL)', 1.2, 0) + number('density-b', 'B density (g/mL)', 0.8, 0) + '</div>' +
+      '<p class="rb-basis-note">Changing g ↔ kg converts the given mass and tare together. Changing ratio parts or mass ↔ volume changes the illustrative specification; it is not a unit conversion or an instruction to change a product ratio.</p>' +
+      '<p class="rb-error" data-rb="error" role="status"></p><div data-rb="results" aria-live="polite"></div>' +
+      '<p>Displayed numbers round to at most four decimal places; very small or large numbers use scientific notation. All calculations use unrounded values. Ideal readings assume no material loss or scale error; displayed precision is not physical accuracy.</p></div>' +
+      '<p>Use the actual product’s TDS/SDS for its ratio basis and processing/handling instructions. This model predicts no cure, exotherm, working time, compatibility or mixed/cured volume.</p>';
+    root.insertBefore(lab, root.firstChild);
+    var q = function (selector) { return lab.querySelector(selector); };
+    function numeric(key) { var input = q('[data-rb-input="' + key + '"]'); return input.value === '' ? NaN : Number(input.value); }
+    function value(key) { return q('[data-rb="' + key + '"]').value; }
+    function state(mode, basis) {
+      return { ratioA: numeric('ratio-a'), ratioB: numeric('ratio-b'), densityA: numeric('density-a'), densityB: numeric('density-b'),
+        amountG: M.convertMass(numeric('amount'), unit, 'g'), tareG: M.convertMass(numeric('tare'), unit, 'g'), mode: mode || value('mode'), basis: basis || value('basis') };
+    }
+    function f(number) {
+      if (number === 0) return '0';
+      if (Math.abs(number) < 0.0001 || Math.abs(number) >= 1e7) return number.toExponential(4);
+      return number.toLocaleString('en-US', { maximumFractionDigits: 4, useGrouping: false });
+    }
+    function mass(grams) { return f(M.convertMass(grams, 'g', unit)) + ' ' + unit; }
+    function balance(result, mode, max) {
+      var selected = value('mode') === mode;
+      return '<article data-rb-compare="' + mode + '" data-selected="' + selected + '"><h3>' + (mode === 'total' ? 'Given mass = target total' : 'Given mass = A alone') + '</h3>' +
+        '<p class="rb-balance"><span class="rb-a">A ' + mass(result.massAG) + '</span> + <span class="rb-b">B ' + mass(result.massBG) + '</span> = <strong>' + mass(result.totalG) + ' material</strong></p>' +
+        '<div class="rb-bar" aria-hidden="true"><span class="rb-bar-a" style="width:' + (100 * result.massAG / max) + '%"></span><span class="rb-bar-b" style="width:' + (100 * result.massBG / max) + '%"></span></div>' +
+        '<p>' + (selected ? 'Selected for component volumes and scale readings below.' : 'Comparison: same entered number, different meaning.') + '</p></article>';
+    }
+    function render() {
+      q('[data-rb="results"]').innerHTML = ''; // Invalid inputs must clear numbers AND bars.
+      q('[data-rb="error"]').textContent = '';
+      try {
+        var s = state(), total = M.batch(Object.assign({}, s, { mode: 'total' })), given = M.batch(Object.assign({}, s, { mode: 'given-a' }));
+        var r = s.mode === 'total' ? total : given;
+        var byMass = M.batch(Object.assign({}, s, { basis: 'mass' })), byVolume = M.batch(Object.assign({}, s, { basis: 'volume' }));
+        var working = s.basis === 'mass' ?
+          '<p>For a target total, divide by <strong>a + b</strong>, the total number of ratio parts: A = ' + mass(s.amountG) + ' × ' + f(s.ratioA) + '/(' + f(s.ratioA) + ' + ' + f(s.ratioB) + ') = ' + mass(total.massAG) + '; B = ' + mass(s.amountG) + ' × ' + f(s.ratioB) + '/(' + f(s.ratioA) + ' + ' + f(s.ratioB) + ') = ' + mass(total.massBG) + '. For A alone, divide by <strong>a</strong>: B = ' + mass(s.amountG) + ' × ' + f(s.ratioB) + '/' + f(s.ratioA) + ' = ' + mass(given.massBG) + '.</p>' :
+          '<p>First convert volume parts into mass weights: aρ<sub>A</sub>:bρ<sub>B</sub> = (' + f(s.ratioA) + ' × ' + f(s.densityA) + '):(' + f(s.ratioB) + ' × ' + f(s.densityB) + ') = <strong>' + f(s.ratioA * s.densityA) + ':' + f(s.ratioB * s.densityB) + '</strong>. Split the target total in these mass weights: m<sub>A</sub> = M aρ<sub>A</sub>/(aρ<sub>A</sub> + bρ<sub>B</sub>) and m<sub>B</sub> = M bρ<sub>B</sub>/(aρ<sub>A</sub> + bρ<sub>B</sub>).</p><p>For A alone, find V<sub>A</sub> = m<sub>A</sub>/ρ<sub>A</sub>, then V<sub>B</sub> = V<sub>A</sub> b/a and m<sub>B</sub> = V<sub>B</sub>ρ<sub>B</sub>. Here ' + f(given.massAG) + ' g ÷ ' + f(s.densityA) + ' g/mL = ' + f(given.volumeAMl) + ' mL of A; B needs ' + f(given.volumeBMl) + ' mL × ' + f(s.densityB) + ' g/mL = ' + mass(given.massBG) + '.</p>';
+        q('[data-rb="results"]').innerHTML = '<h3>Follow the material mass</h3><p>Specification: <strong>' + f(s.ratioA) + ':' + f(s.ratioB) + ' A:B by ' + s.basis + '</strong>. The same entered ' + mass(s.amountG) + ' is interpreted two ways below.</p>' +
+          '<div class="rb-comparisons">' + balance(total, 'total', Math.max(total.totalG, given.totalG)) + balance(given, 'given-a', Math.max(total.totalG, given.totalG)) + '</div>' +
+          '<p>Bars share one mass scale: the full track represents ' + mass(Math.max(total.totalG, given.totalG)) + '. <span class="rb-a">A is solid</span>; <span class="rb-b">B is striped</span>. They show component mass, not container fill or cavity volume.</p>' +
+          '<div class="rb-working"><h3>Why the denominator changes</h3>' + working + '</div>' +
+          '<h3>Selected batch: each component’s own volume</h3><div class="rb-components"><article><h4>Component A</h4><strong>' + mass(r.massAG) + '</strong><p>' + f(r.massAG) + ' g ÷ ' + f(s.densityA) + ' g/mL = <strong>' + f(r.volumeAMl) + ' mL</strong></p></article>' +
+          '<article><h4>Component B</h4><strong>' + mass(r.massBG) + '</strong><p>' + f(r.massBG) + ' g ÷ ' + f(s.densityB) + ' g/mL = <strong>' + f(r.volumeBMl) + ' mL</strong></p></article></div>' +
+          '<p data-rb="equivalent">This same batch has A:B mass ratio <strong>' + f(r.massRatioAtoB) + ':1</strong> and individual component volume ratio <strong>' + f(r.volumeRatioAtoB) + ':1</strong>. These are two descriptions of the same quantities. The component volumes do not establish mixed/cured volume or cavity fill.</p>' +
+          '<div class="rb-spec-compare"><h3>Keep the numbers, change the basis</h3><p>For the selected meaning of ' + mass(s.amountG) + ', specifying ' + f(s.ratioA) + ':' + f(s.ratioB) + ' <strong>by mass</strong> gives A ' + mass(byMass.massAG) + ' and B ' + mass(byMass.massBG) + '; specifying those same parts <strong>by volume</strong> gives A ' + mass(byVolume.massAG) + ' and B ' + mass(byVolume.massBG) + '.</p><p>' +
+          (s.densityA === s.densityB ? 'The densities are equal, so the two numerical ratios happen to give the same batch.' : 'The densities differ: equal volume parts need not have equal mass. Keeping the numerical parts while switching basis changes the batch.') + '</p></div>' +
+          '<h3>Selected batch: ideal cumulative scale readings</h3><p>Keep one container on the scale. Compare <strong>no tare</strong> (container + material) with <strong>tare once at empty</strong> (material only). Do not re-tare after A in this comparison.</p>' +
+          '<ol class="rb-scale"><li><h4>Empty container</h4><p>No tare: <strong>' + mass(r.emptyGrossG) + '</strong><br>Tare once at empty: <strong>0 ' + unit + '</strong></p></li>' +
+          '<li><h4>After adding A</h4><p>No tare: <strong>' + mass(r.afterAGrossG) + '</strong><br>Tare once at empty: <strong>' + mass(r.afterATaredG) + '</strong></p></li>' +
+          '<li><h4>After adding B</h4><p>No tare: <strong>' + mass(r.finalGrossG) + '</strong><br>Tare once at empty: <strong>' + mass(r.finalTaredG) + '</strong></p><p>B added = ' + mass(r.massBG) + '; the final reading includes A too.</p></li></ol>';
+      } catch (error) { q('[data-rb="error"]').textContent = 'No batch shown. ' + error.message; }
+    }
+    q('.rb-predict').addEventListener('change', function () { q('[data-rb="reveal"]').disabled = !q('input[type="radio"]:checked'); });
+    q('[data-rb="reveal"]').addEventListener('click', function () {
+      var guess = q('input[type="radio"]:checked'); if (!guess) return;
+      q('[data-rb="feedback"]').textContent = (guess.value === 'given-a' ? 'Prediction confirmed. ' : 'Compare what 220 g includes. ') + 'A 220 g target is 200 g A + 20 g B. Starting from 220 g A needs 22 g B, giving 242 g total. The ratio stays 10:1; the given mass means something different.';
+      q('[data-rb="experiment"]').hidden = false; render();
+    });
+    lab.addEventListener('input', function (event) { if (event.target.matches('[data-rb-input]')) render(); });
+    ['mode', 'basis'].forEach(function (key) { q('[data-rb="' + key + '"]').addEventListener('change', render); });
+    q('[data-rb="unit"]').addEventListener('change', function () {
+      var next = value('unit');
+      ['amount', 'tare'].forEach(function (key) {
+        var input = q('[data-rb-input="' + key + '"]');
+        // Retain invalid/blank inputs for correction rather than silently replacing them.
+        if (input.value !== '' && Number.isFinite(numeric(key)) && numeric(key) >= 0) {
+          try { input.value = M.convertMass(numeric(key), unit, next); } catch (error) { input.value = ''; }
+        }
+      });
+      unit = next; lab.querySelectorAll('[data-rb="unit-label"]').forEach(function (label) { label.textContent = unit; }); render();
+    });
+    lab.querySelectorAll('[data-rb-preset]').forEach(function (button) { button.addEventListener('click', function () {
+      var initial = button.dataset.rbPreset === 'initial';
+      unit = 'g'; q('[data-rb="unit"]').value = 'g'; q('[data-rb="mode"]').value = 'total';
+      q('[data-rb="basis"]').value = button.dataset.rbPreset === 'volume' ? 'volume' : 'mass';
+      var values = { 'amount': initial ? 220 : 300, 'tare': 35, 'ratio-a': initial ? 10 : 2, 'ratio-b': 1, 'density-a': 1.2, 'density-b': 0.8 };
+      Object.keys(values).forEach(function (key) { q('[data-rb-input="' + key + '"]').value = values[key]; });
+      lab.querySelectorAll('[data-rb="unit-label"]').forEach(function (label) { label.textContent = unit; }); render();
+    }); });
+    root.dataset.rbReady = 'true';
+  }
+  return { init: init };
+});
+
 (function (root) {
   'use strict';
+  const limits = Object.freeze({ fixed: 100000, variable: 1000, quantity: 10000, chartQuantity: 300 });
+  // The operation is shared by the legacy dollar API and the bounded cent model.
+  function totalCost(fixed, variable, quantity) { return fixed + variable * quantity; }
   function compare(q) {
     if (!Number.isInteger(q) || q < 1) throw new RangeError('Quantity must be a positive whole number.');
-    const a = 120 + 8 * q, b = 720 + 3 * q;
+    const a = totalCost(120, 8, q), b = totalCost(720, 3, q);
     return { quantity: q, a, b, unitA: a / q, unitB: b / q, cheaper: a === b ? 'tie' : a < b ? 'A' : 'B' };
   }
-  const api = Object.freeze({ compare });
+  function moneyCents(value, maximum) {
+    if (typeof value !== 'number' && typeof value !== 'string') return null;
+    const text = String(value).trim();
+    if (!/^(?:\d+|\d*\.\d{1,2})$/.test(text)) return null;
+    const parts = text.split('.');
+    const cents = Number(parts[0] || 0) * 100 + Number((parts[1] || '').padEnd(2, '0'));
+    return Number.isSafeInteger(cents) && cents <= maximum * 100 ? cents : null;
+  }
+  function validate(input) {
+    input = input || {};
+    const fields = { fixedA: limits.fixed, variableA: limits.variable, fixedB: limits.fixed, variableB: limits.variable };
+    const values = {}, errors = {};
+    Object.keys(fields).forEach(key => {
+      values[key] = moneyCents(input[key], fields[key]);
+      if (values[key] === null) errors[key] = 'Enter $0 to $' + fields[key].toLocaleString('en-US') + ' with at most two decimal places.';
+    });
+    const raw = input.quantity;
+    const q = (typeof raw === 'number' || typeof raw === 'string') && /^\d+$/.test(String(raw).trim()) ? Number(raw) : NaN;
+    if (!Number.isInteger(q) || q < 1 || q > limits.quantity) errors.quantity = 'Enter a whole demanded quantity from 1 to 10,000 parts.';
+    values.quantity = q;
+    return { valid: Object.keys(errors).length === 0, values, errors };
+  }
+  function atQuantity(values, q) {
+    const aCents = totalCost(values.fixedA, values.variableA, q);
+    const bCents = totalCost(values.fixedB, values.variableB, q);
+    return { quantity: q, aCents, bCents, unitACents: q === 0 ? null : aCents / q, unitBCents: q === 0 ? null : bCents / q,
+      differenceCents: aCents - bCents, cheaper: aCents === bCents ? 'tie' : aCents < bCents ? 'A' : 'B' };
+  }
+  function crossing(values) {
+    const numerator = values.fixedB - values.fixedA;
+    const denominator = values.variableA - values.variableB;
+    if (denominator === 0) return { kind: numerator === 0 ? 'all' : 'parallel', quantity: null, neighbors: [] };
+    const q = numerator / denominator;
+    if (q <= 0) return { kind: 'nonpositive', quantity: q, neighbors: [] };
+    const whole = numerator % denominator === 0;
+    const qs = whole ? [q - 1, q, q + 1] : [Math.floor(q), Math.ceil(q)];
+    return { kind: 'positive', quantity: q, whole, numerator, denominator,
+      inChart: q <= limits.chartQuantity,
+      neighbors: qs.filter(n => n >= 1).map(n => atQuantity(values, n)) };
+  }
+  // Invalid UI input is data, not an exception; callers clear any previous result.
+  function evaluate(input) {
+    const checked = validate(input);
+    if (!checked.valid) return { valid: false, errors: checked.errors };
+    const values = checked.values;
+    return { valid: true, values, result: atQuantity(values, values.quantity), crossing: crossing(values),
+      chart: [atQuantity(values, 0), atQuantity(values, limits.chartQuantity)] };
+  }
+  const scenarios = Object.freeze([
+    { id: 'original', title: 'Original comparison', fixedA: '120', variableA: '8', fixedB: '720', variableB: '3', quantity: '120' },
+    { id: 'fractional', title: 'Between whole parts', fixedA: '90', variableA: '6', fixedB: '245', variableB: '2', quantity: '39' },
+    { id: 'parallel', title: 'Same variable cost', fixedA: '60', variableA: '4', fixedB: '210', variableB: '4', quantity: '60' },
+    { id: 'dominated', title: 'Lower setup and variable cost', fixedA: '80', variableA: '2', fixedB: '200', variableB: '5', quantity: '60' },
+    { id: 'tie', title: 'Same costs throughout', fixedA: '150', variableA: '3.50', fixedB: '150', variableB: '3.50', quantity: '60' },
+    { id: 'beyond', title: 'Crossing beyond the chart', fixedA: '100', variableA: '2.50', fixedB: '900', variableB: '2', quantity: '300' }
+  ].map(row => Object.freeze(row)));
+  const api = Object.freeze({ compare, evaluate, validate, limits, scenarios });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.CourseWikiProcessBreakEven = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 
 (function () {
   'use strict';
+  const M = globalThis.CourseWikiProcessBreakEven;
+  if (!M) return;
+  const money = cents => '$' + (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const average = cents => '$' + (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+  const count = q => q.toLocaleString('en-US');
+  const winner = value => value === 'tie' ? 'equal total costs' : 'Process ' + value + ' costs less';
   document.querySelectorAll('[data-interactive="process-break-even"]').forEach(function (root) {
     if (root.dataset.initialized) return;
     root.dataset.initialized = 'true';
-    const input = root.querySelector('[data-volume]'), output = root.querySelector('[data-result]');
-    function update() {
-      const r = globalThis.CourseWikiProcessBreakEven.compare(Number(input.value));
-      output.textContent = 'At ' + r.quantity + ' parts: A costs $' + r.a.toFixed(2) + ' total ($' + r.unitA.toFixed(2) + '/part); B costs $' + r.b.toFixed(2) + ' total ($' + r.unitB.toFixed(2) + '/part). ' + (r.cheaper === 'tie' ? 'Costs are equal.' : 'Process ' + r.cheaper + ' costs less.');
+    const ui = document.createElement('div');
+    ui.className = 'pb-live';
+    ui.innerHTML = `
+      <p class="pb-goal"><strong>Which process costs less for the parts you need?</strong> Change a cost or quantity, predict, then compare. Assume equivalent acceptable output, the same included costs, and constant rates.</p>
+      <form novalidate>
+        <label class="pb-scenario">Try a case <select data-pb="scenario"><option value="">Custom costs</option></select></label>
+        <div class="pb-costs">
+          <fieldset><legend>Process A — solid line</legend>
+            <label>Fixed batch cost ($)<input data-pb="fixedA" type="number" min="0" max="100000" step="0.01" inputmode="decimal" value="120"></label>
+            <label>Variable cost ($/part)<input data-pb="variableA" type="number" min="0" max="1000" step="0.01" inputmode="decimal" value="8"></label>
+          </fieldset>
+          <fieldset><legend>Process B — dashed line</legend>
+            <label>Fixed batch cost ($)<input data-pb="fixedB" type="number" min="0" max="100000" step="0.01" inputmode="decimal" value="720"></label>
+            <label>Variable cost ($/part)<input data-pb="variableB" type="number" min="0" max="1000" step="0.01" inputmode="decimal" value="3"></label>
+          </fieldset>
+        </div>
+        <div class="pb-demand">
+          <label>Demanded acceptable parts<input data-pb="quantity" data-volume type="number" min="1" max="10000" step="1" inputmode="numeric" value="120"></label>
+          <label>Move quantity (1–300 on this slider)<input data-pb="slider" type="range" min="1" max="300" step="1" value="120"></label>
+        </div>
+        <p class="pb-note">Illustrative bounds: fixed $0–$100,000; variable $0–$1,000/part; whole demand 1–10,000. Enter dollars to at most two decimal places.</p>
+        <div class="pb-predict">
+          <label>Your prediction at this quantity<select data-pb="prediction"><option value="">Choose a prediction</option><option value="A">A costs less</option><option value="B">B costs less</option><option value="tie">Equal total costs</option></select></label>
+          <button type="submit" data-pb-compare>Compare costs</button>
+        </div>
+      </form>
+      <p class="pb-feedback" data-pb-feedback role="status" aria-live="polite">Choose a prediction, then compare. Changing an input clears the previous comparison.</p>
+      <div data-pb-results hidden>
+        <p class="pb-verdict" data-result></p><div class="pb-totals" data-pb-totals></div>
+        <p class="pb-note">Total costs are exact cents. Average unit costs are approximate, rounded to four decimal places; rounded averages do not decide a tie.</p>
+        <figure class="pb-figure"><div data-pb-chart tabindex="0" role="region" aria-label="Total-cost graph, scroll horizontally if needed"></div><figcaption data-pb-caption></figcaption></figure>
+        <p data-pb-crossing></p><div data-pb-neighbors></div>
+      </div>
+      <details class="pb-assumptions"><summary>What this comparison assumes</summary>
+        <p>Both routes supply equivalent acceptable parts at the same demanded quantity in one batch. Enter costs covering the same items and period, counting each charge once. Fixed cost and variable rate stay constant within the assumed range.</p>
+        <p>This compares the entered process costs. It does not establish equivalent quality, capacity or demand, recommend a purchase, or predict sales profit. Do not produce unwanted parts just to lower an average.</p>
+      </details>`;
+    root.prepend(ui);
+    root.classList.add('pb-ready');
+    const field = key => ui.querySelector('[data-pb="' + key + '"]');
+    const feedback = ui.querySelector('[data-pb-feedback]'), results = ui.querySelector('[data-pb-results]');
+    const keys = ['fixedA', 'variableA', 'fixedB', 'variableB', 'quantity'];
+    M.scenarios.forEach(s => { const option = document.createElement('option'); option.value = s.id; option.textContent = s.title; field('scenario').append(option); });
+    field('scenario').value = 'original';
+    function read() { return Object.fromEntries(keys.map(key => [key, field(key).value])); }
+    function clear(message) {
+      results.hidden = true;
+      ui.querySelector('[data-result]').textContent = '';
+      ['totals', 'chart', 'caption', 'crossing', 'neighbors'].forEach(key => { ui.querySelector('[data-pb-' + key + ']').replaceChildren(); });
+      feedback.textContent = message;
     }
-    input.addEventListener('input', update);
-    update();
+    function check() {
+      const evaluation = M.evaluate(read());
+      keys.forEach(key => { if (evaluation.errors && evaluation.errors[key]) field(key).setAttribute('aria-invalid', 'true'); else field(key).removeAttribute('aria-invalid'); });
+      return evaluation;
+    }
+    function invalidate() {
+      field('prediction').value = '';
+      const checked = check();
+      clear(checked.valid ? 'Inputs changed. Predict at the new quantity, then compare.' : 'No comparison. ' + Object.values(checked.errors).join(' '));
+    }
+    keys.forEach(key => field(key).addEventListener('input', function () {
+      field('scenario').value = '';
+      if (key === 'quantity') {
+        const q = Number(field(key).value);
+        field('slider').disabled = !Number.isInteger(q) || q < 1 || q > M.limits.chartQuantity;
+        if (!field('slider').disabled) field('slider').value = String(q);
+      }
+      invalidate();
+    }));
+    field('slider').addEventListener('input', function () { field('quantity').value = this.value; field('scenario').value = ''; invalidate(); });
+    field('scenario').addEventListener('change', function () {
+      const scenario = M.scenarios.find(s => s.id === this.value);
+      if (!scenario) return;
+      keys.forEach(key => { field(key).value = scenario[key]; });
+      field('slider').disabled = false;
+      field('slider').value = scenario.quantity;
+      invalidate();
+    });
+    field('prediction').addEventListener('change', function () {
+      if (!results.hidden) clear('Prediction changed. Compare again to check it.');
+    });
+    function draw(evaluation) {
+      const left = 76, top = 26, width = 488, height = 220, end = M.limits.chartQuantity;
+      const endpoints = evaluation.chart, r = evaluation.result, cross = evaluation.crossing;
+      const maximum = Math.max(1, endpoints[1].aCents, endpoints[1].bCents);
+      const x = q => left + q / end * width, y = cents => top + height - cents / maximum * height;
+      const line = key => 'M' + x(0) + ',' + y(endpoints[0][key]) + ' L' + x(end) + ',' + y(endpoints[1][key]);
+      const demand = r.quantity <= end ? '<line class="pb-demand-line" x1="'+x(r.quantity)+'" y1="'+top+'" x2="'+x(r.quantity)+'" y2="'+(top+height)+'"/><circle class="pb-a-point" cx="'+x(r.quantity)+'" cy="'+y(r.aCents)+'" r="5"/><circle class="pb-b-point" cx="'+x(r.quantity)+'" cy="'+y(r.bCents)+'" r="5"/>' : '';
+      // Endpoints are canonical model values. Interpolation here only maps a straight line to the screen.
+      const crossY = cross.kind === 'positive' && cross.inChart ? y(endpoints[0].aCents + (endpoints[1].aCents-endpoints[0].aCents)*cross.quantity/end) : 0;
+      const marker = cross.kind === 'positive' && cross.inChart ? '<path class="pb-cross-mark" d="M'+(x(cross.quantity)-5)+','+(crossY-5)+' l10,10 m-10,0 l10,-10"/>' : '';
+      ui.querySelector('[data-pb-chart]').innerHTML = '<svg viewBox="0 0 600 306" role="img" aria-label="Total process costs from zero to 300 parts. A is solid; B is dashed. Exact totals and crossing are given in the text.">'+
+        '<path class="pb-axis" d="M'+left+','+top+' V'+(top+height)+' H'+(left+width)+'"/>'+
+        '<text x="8" y="17">Total cost ($)</text><text x="8" y="'+(top+8)+'">'+count(maximum/100)+'</text><text x="48" y="'+(top+height+5)+'">0</text>'+
+        '<text x="'+left+'" y="270">0</text><text x="'+x(150)+'" y="270" text-anchor="middle">150</text><text x="'+x(300)+'" y="270" text-anchor="end">300 parts</text>'+
+        '<path class="pb-line-a" d="'+line('aCents')+'"/><path class="pb-line-b" d="'+line('bCents')+'"/>'+demand+marker+
+        '<text x="'+left+'" y="296">A — solid</text><text x="'+(left+185)+'" y="296">B — dashed</text></svg>';
+      ui.querySelector('[data-pb-caption]').textContent = 'Total-cost graph, Q = 0–300; zero shows the fixed-cost intercept, not a unit cost. ' + (r.quantity <= end ? 'Dots mark demanded Q = ' + count(r.quantity) + '.' : 'Demanded Q = ' + count(r.quantity) + ' is outside this chart; the comparison above still uses it.') + (cross.kind === 'positive' && cross.inChart ? ' The × marks the crossing.' : '') + ' Scroll the graph horizontally if it does not fit.';
+    }
+    function showCrossing(evaluation) {
+      const cross = evaluation.crossing, r = evaluation.result;
+      let text;
+      if (cross.kind === 'all') text = 'All-Q tie: fixed costs and variable rates match. The routes have equal costs at every positive quantity; the lines overlap.';
+      else if (cross.kind === 'parallel') text = 'Equal variable rates: the lines are parallel. ' + winner(r.cheaper) + ' at every positive quantity because its fixed batch cost is lower. There is no crossing.';
+      else if (cross.kind === 'nonpositive') text = 'No positive crossing. Equality would be at Q* = ' + cross.quantity.toLocaleString('en-US', { maximumSignificantDigits: 6 }) + ', outside positive demand. ' + winner(r.cheaper) + ' for every positive Q under these rates.';
+      else {
+        const rational = Math.abs(cross.numerator) + '/' + Math.abs(cross.denominator);
+        text = 'Positive crossing: Q* = ' + rational + (cross.whole ? ' = ' + count(cross.quantity) : ' ≈ ' + cross.quantity.toLocaleString('en-US', { maximumSignificantDigits: 6 })) + ' parts. ';
+        text += cross.whole ? 'A whole demanded quantity can tie here. ' : 'There is no whole-part tie; compare the neighboring whole quantities below. ';
+        text += cross.inChart ? 'This crossing is inside the displayed 0–300 interval.' : 'This crossing is beyond the displayed 0–300 interval; an absent crossing on the graph does not mean none exists.';
+        if (cross.quantity > M.limits.quantity) text += ' It is also beyond this explorer’s editable demand bound; this is a mathematical extension of the entered rates.';
+      }
+      ui.querySelector('[data-pb-crossing]').textContent = text;
+      if (cross.neighbors.length) {
+        const table = document.createElement('table');
+        table.innerHTML = '<caption>Whole quantities around the crossing' + (cross.neighbors.some(n=>n.quantity>M.limits.quantity) ? ' (mathematical extension beyond the editable range)' : '') + '</caption><thead><tr><th scope="col">Parts</th><th scope="col">A total</th><th scope="col">B total</th><th scope="col">Lower cost</th></tr></thead><tbody>' + cross.neighbors.map(n=>'<tr><th scope="row">'+count(n.quantity)+'</th><td>'+money(n.aCents)+'</td><td>'+money(n.bCents)+'</td><td>'+(n.cheaper==='tie'?'Equal':n.cheaper)+'</td></tr>').join('') + '</tbody>';
+        const scroll = document.createElement('div'); scroll.className = 'pb-table-scroll'; scroll.tabIndex = 0; scroll.setAttribute('role','region'); scroll.setAttribute('aria-label','Whole-quantity cost comparison, scroll horizontally if needed'); scroll.append(table);
+        ui.querySelector('[data-pb-neighbors]').append(scroll);
+      }
+    }
+    ui.querySelector('form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const evaluation = check();
+      if (!evaluation.valid) { clear('No comparison. ' + Object.values(evaluation.errors).join(' ')); field(Object.keys(evaluation.errors)[0]).focus(); return; }
+      const prediction = field('prediction').value;
+      if (!prediction) { clear('Choose a prediction before comparing.'); field('prediction').focus(); return; }
+      clear('');
+      const r = evaluation.result, v = evaluation.values;
+      feedback.textContent = (prediction === r.cheaper ? 'Prediction matches. ' : 'Prediction differs. ') + (r.cheaper === 'tie' ? 'The exact total costs are equal.' : 'Process ' + r.cheaper + ' has the lower total by ' + money(Math.abs(r.differenceCents)) + '.');
+      ui.querySelector('[data-result]').textContent = 'At ' + count(r.quantity) + ' demanded parts: ' + winner(r.cheaper) + '.';
+      ui.querySelector('[data-pb-totals]').innerHTML = ['A','B'].map(letter => {
+        const total = r[letter.toLowerCase()+'Cents'], fixed = v['fixed'+letter], variable = v['variable'+letter];
+        return '<div class="pb-total"><strong>Process '+letter+'</strong><p>'+money(fixed)+' fixed + '+money(variable)+'/part × '+count(r.quantity)+' parts = <b>'+money(total)+' total</b></p><p>Average per part ≈ <b>'+average(r['unit'+letter+'Cents'])+'</b><br>('+money(fixed)+' ÷ '+count(r.quantity)+') + '+money(variable)+'/part</p></div>';
+      }).join('');
+      draw(evaluation); showCrossing(evaluation); results.hidden = false;
+    });
   });
+})();
+
+(function (root) {
+  'use strict';
+  // Lengths are integer hundredths of a millimeter; prices are integer cents.
+  // At most 120000 length ticks and 60 blanks: all arithmetic below is exact.
+  const limits = Object.freeze({
+    length: Object.freeze([50, 1200]), blank: Object.freeze([20, 400]),
+    kerf: Object.freeze([0, 6]), left: Object.freeze([0, 150]),
+    right: Object.freeze([0, 150]), price: Object.freeze([0, 500])
+  });
+  const defaults = Object.freeze({ length: '1000', blank: '98', kerf: '2', left: '0', right: '0', price: '48' });
+  const labels = Object.freeze({ length: 'Stock length', blank: 'Blank length', kerf: 'Kerf', left: 'Left excluded trim', right: 'Right excluded trim', price: 'Stock price' });
+  function parse(value, key) {
+    if (!Object.hasOwn(limits, key)) throw new RangeError('Unknown input.');
+    if (!['number', 'string'].includes(typeof value)) throw new RangeError(`${labels[key]}: enter a decimal with at most two decimal places.`);
+    const s = String(value).trim();
+    const m = /^(\d+)(?:\.(\d{1,2}))?$/.exec(s);
+    if (!m) throw new RangeError(`${labels[key]}: enter a decimal with at most two decimal places.`);
+    const ticks = Number(m[1]) * 100 + Number((m[2] || '').padEnd(2, '0'));
+    const [min, max] = limits[key];
+    if (!Number.isSafeInteger(ticks) || ticks < min * 100 || ticks > max * 100) {
+      throw new RangeError(`${labels[key]}: use ${min} to ${max}${key === 'price' ? ' dollars' : ' mm'}.`);
+    }
+    return ticks;
+  }
+  function calculate(input) {
+    if (!input || typeof input !== 'object') throw new RangeError('Complete the stock layout inputs.');
+    const v = Object.fromEntries(Object.keys(limits).map(key => [key, parse(input[key], key)]));
+    const trim = v.left + v.right;
+    if (trim > v.length) throw new RangeError('The excluded trims together must not exceed stock length.');
+    const usable = v.length - trim;
+    const pitch = v.blank + v.kerf;
+    const count = Math.floor(usable / pitch);
+    const parts = count * v.blank;
+    const kerfLoss = count * v.kerf;
+    const offcut = usable - parts - kerfLoss;
+    // Every rectangle has an actual interval, including zero-width ideal kerfs.
+    const blanks = Array.from({ length: count }, (_, i) => {
+      const start = v.left + i * pitch;
+      return Object.freeze({ number: i + 1, start, end: start + v.blank, cutStart: start + v.blank, cutEnd: start + pitch });
+    });
+    return Object.freeze({
+      ticks: Object.freeze(v), trim, usable, pitch, count, cuts: count, parts, kerfLoss, offcut,
+      offcutStart: v.left + count * pitch, blanks: Object.freeze(blanks),
+      utilization: parts / v.length * 100,
+      costPerBlank: count ? v.price / (count * 100) : null,
+      // Round a nonnegative rational number of cents half-up, using integers.
+      costRoundedCents: count ? Math.floor((2 * v.price + count) / (2 * count)) : null,
+      nextStockLength: trim + (count + 1) * pitch,
+      additionalForNext: pitch - offcut
+    });
+  }
+  const api = Object.freeze({ limits, defaults, parse, calculate });
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.CourseWikiStockYield = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+(function (root) {
+  'use strict';
+  const mm = ticks => (ticks / 100).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  const money = cents => '$' + (cents / 100).toFixed(2);
+  function diagram(r) {
+    const x = tick => +(20 + 960 * tick / r.ticks.length).toFixed(6);
+    const width = ticks => +(960 * ticks / r.ticks.length).toFixed(6);
+    const rect = (start, size, type, attr = '') => `<rect class="sy-${type}" x="${x(start)}" y="32" width="${width(size)}" height="42" ${attr}/>`;
+    const pieces = [rect(0, r.ticks.left, 'trim', 'data-sy-excluded-interval="left"')];
+    for (const b of r.blanks) {
+      pieces.push(rect(b.start, r.ticks.blank, 'blank', `data-sy-blank="${b.number}"`));
+      pieces.push(rect(b.cutStart, r.ticks.kerf, 'kerf', `data-sy-cut="${b.number}"`));
+    }
+    pieces.push(rect(r.offcutStart, r.offcut, 'offcut', 'data-sy-offcut-interval'));
+    pieces.push(rect(r.ticks.length - r.ticks.right, r.ticks.right, 'trim', 'data-sy-excluded-interval="right"'));
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 110" width="1000" height="110" role="img" aria-label="${r.count} blanks and ${r.cuts} full separating kerfs in ${mm(r.ticks.length)} mm stock; excluded trim ${mm(r.trim)} mm; offcut ${mm(r.offcut)} mm. Left to right in placement order."><text x="20" y="20">0 mm</text><text x="980" y="20" text-anchor="end">${mm(r.ticks.length)} mm</text>${pieces.join('')}<rect class="sy-outline" x="20" y="32" width="960" height="42"/><text x="20" y="99">Prepared interval: ${mm(r.ticks.left)} to ${mm(r.ticks.length - r.ticks.right)} mm</text></svg>`;
+  }
+  const api = Object.freeze({ mm, money, diagram });
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.CourseWikiStockYieldRender = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+(function () {
+  'use strict';
+  function init(root) {
+    if (root.dataset.syReady) return;
+    const model = globalThis.CourseWikiStockYield, render = globalThis.CourseWikiStockYieldRender;
+    if (!model || !render) return;
+    const live = document.createElement('div');
+    live.className = 'sy-live';
+    const fields = [
+      ['length', 'Stock length (mm)', '50–1,200 mm'], ['blank', 'Blank length (mm)', '20–400 mm'],
+      ['kerf', 'Separating kerf (mm)', '0–6 mm; zero is an ideal comparison'],
+      ['left', 'Left excluded trim (mm)', '0–150 mm, including its cut loss'],
+      ['right', 'Right excluded trim (mm)', '0–150 mm, including its cut loss'],
+      ['price', 'Whole stock price ($)', '$0–500; no remnant credit']
+    ];
+    live.innerHTML = `<p><strong>Predict:</strong> 3 mm kerf instead of 2 — still ten blanks?</p>
+      <div class="sy-exercise"><div class="sy-actions"><label>Predicted blank count<select data-sy-predict><option value="">Choose before testing</option><option value="10">10 blanks</option><option value="9">9 blanks</option><option value="8">8 blanks</option></select></label><button type="button" data-sy-test>Test 3 mm kerf</button></div><p data-sy-prediction role="status">Page example; $48 stock.</p></div>
+      <p><strong>Cut policy:</strong> one full separating kerf per blank, including last; excluded trims include their own cut losses.</p>
+      <div class="sy-result" data-sy-result hidden>
+        <p class="sy-headline" data-sy-headline role="status" aria-live="polite"></p>
+        <div class="sy-scroll" data-sy-diagram tabindex="0" role="region" aria-label="Actual stock layout; scroll horizontally to inspect the full bar"></div>
+        <p class="sy-scroll-hint">Scroll sideways, or focus the bar and use arrow keys. Exact positions are below.</p>
+        <div class="sy-legend"><span><i class="sy-swatch sy-blank"></i>Acceptable blanks</span><span><i class="sy-swatch sy-kerf"></i>Separating kerfs</span><span><i class="sy-swatch sy-trim"></i>Excluded trims</span><span><i class="sy-swatch sy-offcut"></i>Remaining offcut</span></div>
+      </div>
+      <details class="sy-settings"><summary>Change stock, blank, kerf, trim and price</summary>
+        <div class="sy-controls">${fields.map(([key, label, hint]) => `<label>${label}<small>${hint}</small><input data-sy-input="${key}" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" maxlength="12" value="${model.defaults[key]}"></label>`).join('')}</div>
+        <p>Use up to two decimal places. These bounds keep every blank drawable; they are illustrative values, not machine settings.</p>
+        <div class="sy-actions"><button type="button" data-sy-reset>Reset page example</button><button type="button" data-sy-short>Try 999.99 mm stock</button></div>
+      </details>
+      <p class="sy-error" data-sy-error role="status" hidden></p>
+      <div class="sy-account" data-sy-account hidden>
+        <dl class="sy-balance"><div><dt>Acceptable blanks</dt><dd data-sy-parts></dd></div><div><dt>Separating kerf loss</dt><dd data-sy-kerf></dd></div><div><dt>Excluded trims</dt><dd data-sy-trim></dd></div><div><dt>Offcut</dt><dd data-sy-offcut></dd></div></dl>
+        <p class="sy-equation" data-sy-equation></p><p data-sy-threshold></p><p data-sy-cost></p>
+        <details class="sy-explanation"><summary>Read the assumptions and current dimensions</summary><p data-sy-settings></p><p>This layout does not use the far stock edge as a finished blank edge. One-dimensional placement under this cut policy is not a global maximum or a two-dimensional nest. All blanks have equal cross-section and are assumed acceptable. Utilization compares lengths at that cross-section. The whole stock price is allocated equally to the acceptable blanks with no remnant credit; processing and other costs are excluded.</p></details>
+        <details class="sy-position-details"><summary>Read each blank and cut position</summary><p>Positions are measured from the purchased stock's left end. Adjacent endpoints share a boundary; each interval's length is end minus start.</p><ol class="sy-position-list" data-sy-positions></ol><p data-sy-end-positions></p></details>
+      </div>`;
+    root.append(live);
+    root.dataset.syReady = 'true';
+    const query = selector => live.querySelector(selector);
+    const put = (selector, value) => { query(selector).textContent = value; };
+    const field = key => query(`[data-sy-input="${key}"]`);
+    const mm = render.mm, money = render.money;
+    function update() {
+      const error = query('[data-sy-error]'), result = query('[data-sy-result]'), account = query('[data-sy-account]');
+      try {
+        const input = Object.fromEntries(fields.map(([key]) => [key, field(key).value]));
+        const r = model.calculate(input);
+        error.hidden = true; error.textContent = '';
+        result.hidden = false; account.hidden = false;
+        put('[data-sy-headline]', `${r.count} acceptable blank${r.count === 1 ? '' : 's'} · ${r.cuts} separating cut${r.cuts === 1 ? '' : 's'} · ${r.utilization.toFixed(1)}% utilization`);
+        put('[data-sy-settings]', `${mm(r.ticks.length)} mm stock; ${mm(r.ticks.blank)} mm blanks; ${mm(r.ticks.kerf)} mm per separating kerf; ${mm(r.ticks.left)} mm left and ${mm(r.ticks.right)} mm right excluded trim; ${money(r.ticks.price)} stock price. Cuts for trim preparation are already included in the excluded lengths, not in the separating-cut count.`);
+        query('[data-sy-diagram]').innerHTML = render.diagram(r);
+        put('[data-sy-parts]', `${mm(r.parts)} mm`); put('[data-sy-kerf]', `${mm(r.kerfLoss)} mm (${r.cuts} kerfs)`);
+        put('[data-sy-trim]', `${mm(r.trim)} mm`); put('[data-sy-offcut]', `${mm(r.offcut)} mm`);
+        put('[data-sy-equation]', `${mm(r.ticks.length)} = ${mm(r.trim)} excluded trim + ${mm(r.parts)} acceptable blanks + ${mm(r.kerfLoss)} separating kerfs + ${mm(r.offcut)} offcut (all mm).`);
+        put('[data-sy-threshold]', `${r.count ? 'One more blank' : 'The first blank'} needs ${mm(r.pitch)} mm of usable interval: ${mm(r.ticks.blank)} + ${mm(r.ticks.kerf)}. The ${mm(r.offcut)} mm offcut is ${mm(r.additionalForNext)} mm short. At unchanged blank, kerf and trim sizes, ${r.count + 1} blanks need stock length of at least ${mm(r.nextStockLength)} mm${r.nextStockLength > model.limits.length[1] * 100 ? ' (beyond this lab\'s input range)' : ''}.`);
+        put('[data-sy-cost]', r.count ? `Stock-only cost per acceptable blank = ${money(r.ticks.price)} ÷ ${r.count} = ${money(r.costRoundedCents)} (rounded to the nearest cent). The offcut receives no credit.` : 'No blanks fit under this cut policy. Stock cost per acceptable blank is undefined; there is no per-blank quotient. The purchased stock still has its entered price.');
+        query('[data-sy-positions]').innerHTML = r.blanks.map(b => `<li>Blank ${b.number}: ${mm(b.start)}–${mm(b.end)} mm; full separating kerf ${mm(b.cutStart)}–${mm(b.cutEnd)} mm${r.ticks.kerf === 0 ? ' (zero-width ideal)' : ''}.</li>`).join('');
+        put('[data-sy-end-positions]', `Left excluded trim: 0–${mm(r.ticks.left)} mm. Offcut: ${mm(r.offcutStart)}–${mm(r.ticks.length - r.ticks.right)} mm. Right excluded trim: ${mm(r.ticks.length - r.ticks.right)}–${mm(r.ticks.length)} mm.`);
+      } catch (e) {
+        error.textContent = e.message; error.hidden = false; result.hidden = true; account.hidden = true;
+        // Clear stale data as well as hiding it, including every previously drawn blank.
+        query('[data-sy-diagram]').replaceChildren(); query('[data-sy-positions]').replaceChildren();
+        live.querySelectorAll('[data-sy-result] p,[data-sy-account] p,[data-sy-account] dd').forEach(node => {
+          if (node.hasAttribute('data-sy-headline') || [...node.attributes].some(a => a.name.startsWith('data-sy-'))) node.textContent = '';
+        });
+      }
+    }
+    function set(values) {
+      for (const [key, value] of Object.entries(values)) field(key).value = value;
+      update();
+    }
+    live.addEventListener('input', event => {
+      if (!event.target.matches('[data-sy-input]')) return;
+      put('[data-sy-prediction]', 'Inputs changed. The prediction test below uses the page example with 3 mm kerf.');
+      update();
+    });
+    query('[data-sy-test]').addEventListener('click', () => {
+      const prediction = query('[data-sy-predict]').value;
+      set({ ...model.defaults, kerf: '3' });
+      put('[data-sy-prediction]', prediction === '' ? 'Observed: 9 blanks. Ten would need 1,010 mm, so the $48 stock charge is now shared by nine blanks.' : `${prediction === '9' ? 'Your prediction matches.' : `You predicted ${prediction}; the layout fits 9.`} Ten would need 1,010 mm, so the $48 stock charge is now shared by nine blanks.`);
+    });
+    query('[data-sy-reset]').addEventListener('click', () => {
+      set(model.defaults); query('[data-sy-predict]').value = '';
+      put('[data-sy-prediction]', 'Page example restored: predict the 2 to 3 mm kerf change, then test it.');
+    });
+    query('[data-sy-short]').addEventListener('click', () => {
+      set({ ...model.defaults, length: '999.99' });
+      put('[data-sy-prediction]', 'The stock is just 0.01 mm shorter than the page example. Explain why the whole blank count changes.');
+    });
+    update();
+  }
+  function boot() { document.querySelectorAll('[data-interactive="stock-yield"]').forEach(init); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
 
 (function (root, factory) {
@@ -41721,7 +42513,31 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
         'Add a Feed move down to Z−2 with F100, then one across to X80 with F300.',
         'Finish with a Rapid move up to Z20 and a Spindle off before the end.'
       ],
-      text: ['(My program)', 'G21 G90 G17', 'T1 M6', 'S2500 M3', 'M5', 'M30'] }
+      text: ['(My program)', 'G21 G90 G17', 'T1 M6', 'S2500 M3', 'M5', 'M30'] },
+    { id: 'drill-continuous', title: 'Drilling path: continuous advance',
+      brief: 'Follow one illustrative Ø6 drill path at X50 Y30. After the approach, one G1 move advances from above the raw top, Z+1, to the same final tip depth used in the two retraction examples.',
+      tries: [
+        'Play the program and identify the one move that cuts new material all the way to Z−8.',
+        'Compare the finished hole with “Drilling path: short in-bore retract.” What geometry changed?',
+        'The numbers make the paths easy to compare in this simulator. Where would you get operating values for a real drill, material and machine?'
+      ],
+      text: ['(Illustrative path: continuous drilling advance)', 'G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-8 F120', 'G0 Z20', 'M5', 'M30'] },
+    { id: 'drill-short-retract', title: 'Drilling path: short in-bore retract',
+      brief: 'Follow the same illustrative Ø6 hole to Z−8, but pause at Z−4, retract only to Z−1 inside the bore, feed back to the old bottom, then use a separate feed to cut deeper.',
+      tries: [
+        'Step through the second G1 move. Which part retraces the existing bore, and where does new cutting begin?',
+        'Compare its finished hole with “Drilling path: continuous advance.” Did the added travel create a different final geometry?',
+        'This path creates a short interruption inside the bore. What can the geometric simulation not tell you about the chips?'
+      ],
+      text: ['(Illustrative path: short retract inside the bore)', 'G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-4 F120', 'G0 Z-1', 'G1 Z-4 F120', 'G1 Z-8 F120', 'G0 Z20', 'M5', 'M30'] },
+    { id: 'drill-clear-retract', title: 'Drilling path: withdrawal above the mouth',
+      brief: 'Follow the same illustrative Ø6 hole to Z−8, but pause at Z−4, withdraw to Z+2 above the hole mouth, feed back to the old bottom, then use a separate feed to cut deeper.',
+      tries: [
+        'Step through the withdrawal and return. Which travel is through air, which retraces the bore, and which cuts new material?',
+        'Compare all three drilling-path examples. Which path carries the drill above the hole mouth and creates the clearest opportunity for chips to leave?',
+        'A withdrawal creates an opportunity; it does not prove that chips cleared. What evidence and instructions would you need at the machine?'
+      ],
+      text: ['(Illustrative path: withdraw above the hole mouth)', 'G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-4 F120', 'G0 Z2', 'G1 Z-4 F120', 'G1 Z-8 F120', 'G0 Z20', 'M5', 'M30'] }
   ];
   function example(id) {
     for (var k = 0; k < EXAMPLES.length; k++) if (EXAMPLES[k].id === id) return EXAMPLES[k];
@@ -54869,7 +55685,30 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
     const bottom = top * b, t = phase * p.period;
     return phase <= p.duty ? 5 + (bottom - 5) * Math.exp(-t / tau) : top * Math.exp(-(t - p.onTime) / tau);
   }
-  const api = Object.freeze({ adc, voltage, pwm, filtered });
+  function sampleSet({ percent, pwmFrequency, sampleFrequency, startPhase, count, signal = 'raw', tau = 0.01 }) {
+    const p = pwm(percent, pwmFrequency);
+    range(sampleFrequency, 1, 100000);
+    if (!Number.isFinite(startPhase) || startPhase < 0 || startPhase >= 1) throw new RangeError('Use a normalized starting phase from 0 up to, but not including, 1.');
+    if (!Number.isInteger(count) || count < 1 || count > 1000) throw new RangeError('Use 1–1000 whole samples.');
+    if (signal !== 'raw' && signal !== 'filtered') throw new RangeError('Choose raw or filtered samples.');
+    const samples = Array.from({ length: count }, (_, index) => {
+      const relativeCycles = index * pwmFrequency / sampleFrequency;
+      const cycles = startPhase + relativeCycles;
+      // Reduce the relative advance before adding phase. Adding a large whole-cycle
+      // count first can round a valid phase just below 1 up to the next cycle.
+      const relative = relativeCycles % 1, gap = 1 - startPhase;
+      const phase = relative >= gap ? relative - gap : startPhase + relative;
+      // The ideal raw waveform is HIGH on [0, duty) and LOW on [duty, 1).
+      const input = signal === 'raw' ? (phase < p.duty ? 5 : 0) : filtered(percent, pwmFrequency, phase, tau);
+      const code = adc(input);
+      return Object.freeze({ index, cycles, time: startPhase / pwmFrequency + index / sampleFrequency,
+        phase, input, code, reconstructed: voltage(code) });
+    });
+    const mean = key => samples.reduce((sum, sample) => sum + sample[key], 0) / samples.length;
+    return Object.freeze({ signal, count, samplePeriod: 1 / sampleFrequency, timeMean: p.average,
+      sampleMean: mean('input'), reconstructedMean: mean('reconstructed'), samples: Object.freeze(samples) });
+  }
+  const api = Object.freeze({ adc, voltage, pwm, filtered, sampleSet });
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.CourseWikiPwmAdc = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
@@ -54877,62 +55716,88 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
 (function () {
   'use strict';
   const model = globalThis.CourseWikiPwmAdc;
-  document.querySelectorAll('[data-interactive="pwm-and-adc"]').forEach(root => {
-    if (root.dataset.paReady) return;
+  let sequence = 0;
+  function nextPredictionName() {
+    let name;
+    do { name = `pa-${++sequence}-prediction`; } while (document.querySelector(`input[name="${name}"]`));
+    return name;
+  }
+  function init(root) {
+    if (root.dataset.paReady || !model) return;
+    const predictionName = nextPredictionName();
     root.dataset.paReady = 'true';
     const live = root.querySelector('.pa-live');
     live.innerHTML = `<fieldset><legend>PWM · ideal 0–5 V output</legend>
       <div class="pa-controls"><label>Duty cycle (%) <input data-duty type="range" min="0" max="100" step="1" value="25"></label>
       <label>Frequency (Hz) <input data-frequency type="number" min="10" max="2000" step="1" value="500"></label>
-      <label><input data-smooth type="checkbox" checked> Show RC-smoothed trace (τ = 10 ms)</label></div>
+      <label><input data-smooth type="checkbox" checked> Show settled RC trace (τ = 10 ms)</label></div>
       <p data-pwm-output aria-live="polite"></p>
-      <svg viewBox="0 0 660 240" role="img" aria-label="PWM square wave and optional settled RC trace over four cycles">
+      <div class="pa-plot-scroll" tabindex="0" role="region" aria-label="PWM waveform, sample instants and held readings; scroll horizontally">
+      <svg viewBox="0 0 660 250" role="img" aria-label="Four PWM cycles with optional settled RC trace, point samples and sample-and-hold steps">
       <path class="pa-axis" d="M50 25V195H640"/><text x="4" y="35">5 V</text><text x="4" y="195">0 V</text>
-      <path data-square class="pa-square"/><path data-filter class="pa-filter"/>
-      <text x="50" y="225">0</text><text data-end x="620" y="225" text-anchor="end"></text></svg>
-      <p>Solid line: PWM. Dashed line: settled RC output. The horizontal axis always shows four periods; read its changing time label.</p></fieldset>
+      <path data-square class="pa-square"/><path data-filter class="pa-filter"/><path data-hold class="pa-hold"/><g data-samples class="pa-samples"></g>
+      <text x="50" y="230">0</text><text data-end x="620" y="230" text-anchor="end"></text></svg></div>
+      <p>Solid: raw PWM. Dashed: settled RC output. Gold dots are counted samples; gold steps show the latest value being held. After the final counted dot, a step may continue across the plot only to show held state—it adds no sample to the finite mean. The axis shows four PWM cycles.</p></fieldset>
+      <fieldset><legend>Sampling · point readings, not window averages</legend><div class="pa-controls">
+      <label>Input to sample <select data-signal><option value="raw">Raw PWM</option><option value="filtered">Settled RC output</option></select></label>
+      <label>Sample rate (samples/s) <input data-sample-frequency type="number" min="1" max="100000" step="1" value="500"></label>
+      <label>Starting phase (% of PWM cycle) <input data-phase type="number" min="0" max="99.9" step="0.1" value="10"></label>
+      <label>Finite sample count <input data-count type="number" min="1" max="1000" step="1" value="12"></label></div>
+      <div class="pa-quick"><button type="button" data-phase-preset="10">Try phase 10%</button><button type="button" data-phase-preset="60">Try phase 60%</button></div>
+      <p data-sample-window></p>
+      <fieldset class="pa-predict"><legend>Predict the selected-sample mean versus the full-cycle time mean</legend>
+      <div class="pa-choice-row"><label><input type="radio" name="${predictionName}" value="higher"> Higher</label>
+      <label><input type="radio" name="${predictionName}" value="same"> Same</label>
+      <label><input type="radio" name="${predictionName}" value="lower"> Lower</label></div>
+      <button type="button" data-reveal disabled>Reveal sample results</button></fieldset>
+      <p data-sample-output role="status" aria-live="polite">Choose a prediction, then reveal the finite sample-set results.</p>
+      <p class="pa-limit">Each marker is one ideal point sample. The held value is not an average. Sampling starts at the stated normalized phase and uses half-open PWM cycles; controls recompute a settled periodic RC response rather than startup.</p></fieldset>
       <fieldset><legend>ADC · 10 bits, 5.000 V reference</legend><div class="pa-controls">
       <label>Input voltage (V) <input data-voltage type="number" min="0" max="5" step="any" value="3"></label>
       <label>ADC code (integer) <input data-code type="number" min="0" max="1023" step="1" value="614"></label></div>
       <p data-adc-output aria-live="polite"></p><p>Editing voltage finds its bin. Editing code sets voltage to that bin's lower edge. These are model values, not exact hardware thresholds.</p></fieldset>`;
     const get = selector => live.querySelector(selector);
-    const duty = get('[data-duty]'), frequency = get('[data-frequency]'), smooth = get('[data-smooth]');
-    function draw() {
-      if (!frequency.checkValidity() || frequency.value === '') {
-        get('[data-pwm-output]').textContent = 'Enter a whole-number frequency from 10 to 2000 Hz.'; return;
-      }
-      const d = Number(duty.value), f = Number(frequency.value), p = model.pwm(d, f);
-      get('[data-pwm-output]').textContent = `${d}% duty · period ${(p.period * 1000).toFixed(4)} ms · on-time ${(p.onTime * 1e6).toFixed(2)} µs · average ${p.average.toFixed(3)} V · nominal analogWrite ${p.writeValue}`;
-      const y = v => 195 - 32 * v;
-      let square = `M50 ${y(d === 0 ? 0 : 5)}`;
-      for (let cycle = 0; cycle < 4; cycle++) {
-        const start = 50 + cycle * 145, end = start + 145;
-        if (d === 0 || d === 100) square += ` H${end}`;
-        else square += ` H${start + 145 * p.duty} V195 H${end}${cycle < 3 ? ' V35' : ''}`;
-      }
-      get('[data-square]').setAttribute('d', square);
-      const trace = Array.from({ length: 801 }, (_, i) => {
-        const phase = (i / 200) % 1;
-        return `${i ? 'L' : 'M'}${50 + i * 580 / 800} ${y(model.filtered(d, f, phase))}`;
-      }).join(' ');
-      get('[data-filter]').setAttribute('d', smooth.checked ? trace : '');
-      get('[data-end]').textContent = `${(4 * p.period * 1000).toFixed(3)} ms`;
+    const duty=get('[data-duty]'),frequency=get('[data-frequency]'),smooth=get('[data-smooth]');
+    const signal=get('[data-signal]'),sampleFrequency=get('[data-sample-frequency]');
+    const phase=get('[data-phase]'),count=get('[data-count]'),reveal=get('[data-reveal]');
+    const prediction=()=>live.querySelector(`input[name="${predictionName}"]:checked`);
+    let current=null;
+    const y=value=>195-32*value;
+    const valid=input=>input.value!==''&&input.checkValidity();
+    function resetPrediction(message){live.querySelectorAll(`input[name="${predictionName}"]`).forEach(input=>{input.checked=false;});reveal.disabled=true;get('[data-sample-output]').textContent=message||'Inputs changed. Choose a new prediction, then reveal.';}
+    function clearPlot(){get('[data-square]').setAttribute('d','');get('[data-filter]').setAttribute('d','');get('[data-hold]').setAttribute('d','');get('[data-samples]').replaceChildren();get('[data-end]').textContent='';}
+    function draw(){
+      if(![frequency,sampleFrequency,phase,count].every(valid)){get('[data-pwm-output]').textContent='Enter values inside every stated range.';get('[data-sample-window]').textContent='Sample results unavailable until the inputs are valid.';current=null;reveal.disabled=true;clearPlot();return;}
+      try{
+        const d=Number(duty.value),f=Number(frequency.value),p=model.pwm(d,f);
+        current=model.sampleSet({percent:d,pwmFrequency:f,sampleFrequency:Number(sampleFrequency.value),startPhase:Number(phase.value)/100,count:Number(count.value),signal:signal.value});
+        get('[data-pwm-output]').textContent=`${d}% duty · period ${(p.period*1000).toFixed(4)} ms · HIGH time ${(p.onTime*1e6).toFixed(2)} µs · full-cycle time mean ${p.average.toFixed(3)} V · nominal analogWrite ${p.writeValue}`;
+        let square=`M50 ${y(d===0?0:5)}`;
+        for(let cycle=0;cycle<4;cycle++){const start=50+cycle*145,end=start+145;if(d===0||d===100)square+=` H${end}`;else square+=` H${start+145*p.duty} V195 H${end}${cycle<3?' V35':''}`;}
+        get('[data-square]').setAttribute('d',square);
+        get('[data-filter]').setAttribute('d',smooth.checked?Array.from({length:801},(_,i)=>{const pointPhase=(i/200)%1;return`${i?'L':'M'}${50+i*580/800} ${y(model.filtered(d,f,pointPhase))}`;}).join(' '):'');
+        const visible=current.samples.filter(sample=>sample.cycles<4);
+        get('[data-samples]').innerHTML=visible.map(sample=>`<circle cx="${50+sample.cycles*145}" cy="${y(sample.input)}" r="5"><title>Sample ${sample.index+1}: ${sample.input.toFixed(4)} V at phase ${(sample.phase*100).toFixed(2)}%</title></circle>`).join('');
+        let hold='';visible.forEach((sample,index)=>{const x=50+sample.cycles*145,next=index+1<visible.length?50+visible[index+1].cycles*145:630;hold+=`${index?'L':'M'}${x} ${y(sample.input)} H${Math.min(next,630)}`;});get('[data-hold]').setAttribute('d',hold);
+        get('[data-end]').textContent=`${(4*p.period*1000).toFixed(3)} ms`;
+        const first=current.samples[0],last=current.samples.at(-1);
+        get('[data-sample-window]').textContent=`Exactly ${current.count} point samples, from ${(first.time*1000).toFixed(4)} ms through ${(last.time*1000).toFixed(4)} ms; sample period ${(current.samplePeriod*1000).toFixed(4)} ms. The plot shows only samples within its four displayed PWM cycles.`;
+      }catch(error){current=null;get('[data-sample-window]').textContent=error.message;reveal.disabled=true;clearPlot();}
     }
-    const volts = get('[data-voltage]'), code = get('[data-code]');
-    function convert(fromCode) {
-      const input = fromCode ? code : volts;
-      if (input.value === '' || !input.checkValidity()) {
-        get('[data-adc-output]').textContent = 'Use 0–5 V or an integer code from 0 to 1023.'; return;
-      }
-      if (fromCode) volts.value = model.voltage(Number(code.value));
-      else code.value = model.adc(Number(volts.value));
-      const n = Number(code.value), low = model.voltage(n), high = (n + 1) * 5 / 1024;
-      get('[data-adc-output]').textContent = `Code ${n} · lower edge ${low.toFixed(7)} V · bin ${low.toFixed(7)} to ${high.toFixed(7)} V (${n === 1023 ? 'includes 5 V at the model limit' : 'upper edge excluded'}) · step 4.8828125 mV`;
-    }
-    duty.addEventListener('input', draw); frequency.addEventListener('input', draw); smooth.addEventListener('change', draw);
-    volts.addEventListener('input', () => convert(false)); code.addEventListener('input', () => convert(true));
-    draw(); convert(false); live.hidden = false; root.classList.add('pa-ready');
-  });
+    function update(){resetPrediction();draw();}
+    [duty,frequency,sampleFrequency,phase,count].forEach(input=>input.addEventListener('input',update));
+    smooth.addEventListener('change',update);
+    signal.addEventListener('change',()=>{if(signal.value==='filtered'){smooth.checked=true;smooth.disabled=true;}else smooth.disabled=false;update();});
+    live.querySelectorAll('[data-phase-preset]').forEach(button=>button.addEventListener('click',()=>{phase.value=button.dataset.phasePreset;update();phase.focus();}));
+    live.querySelector('.pa-predict').addEventListener('change',()=>{reveal.disabled=!prediction()||!current;});
+    reveal.addEventListener('click',()=>{if(!current||!prediction())return;const delta=current.sampleMean-current.timeMean,relation=Math.abs(delta)<1e-9?'same':delta>0?'higher':'lower',last=current.samples.at(-1);get('[data-sample-output]').textContent=`${prediction().value===relation?'Prediction confirmed.':'Compare the timing markers with the HIGH interval.'} Selected-sample mean ${current.sampleMean.toFixed(4)} V is ${relation} than full-cycle time mean ${current.timeMean.toFixed(4)} V. Mean of ADC lower-edge reconstructions: ${current.reconstructedMean.toFixed(4)} V. Last held point: ${last.input.toFixed(4)} V, code ${last.code}, lower edge ${last.reconstructed.toFixed(4)} V. Faster or more samples alone do not guarantee an unbiased finite mean.`;});
+    const volts=get('[data-voltage]'),code=get('[data-code]');
+    function convert(fromCode){const input=fromCode?code:volts;if(!valid(input)){get('[data-adc-output]').textContent='Use 0–5 V or an integer code from 0 to 1023.';return;}if(fromCode)volts.value=model.voltage(Number(code.value));else code.value=model.adc(Number(volts.value));const n=Number(code.value),low=model.voltage(n),high=(n+1)*5/1024;get('[data-adc-output]').textContent=`Code ${n} · lower edge ${low.toFixed(7)} V · bin ${low.toFixed(7)} to ${high.toFixed(7)} V (${n===1023?'includes 5 V at the model limit':'upper edge excluded'}) · step 4.8828125 mV`;}
+    volts.addEventListener('input',()=>convert(false));code.addEventListener('input',()=>convert(true));
+    draw();convert(false);live.hidden=false;root.classList.add('pa-ready');
+  }
+  function initAll(){document.querySelectorAll('[data-interactive="pwm-and-adc"]').forEach(init);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAll,{once:true});else initAll();
 })();
 
 (function (root) {

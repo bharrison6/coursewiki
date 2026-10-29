@@ -3003,16 +3003,26 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 [data-interactive="pwm-and-adc"] .pa-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
 [data-interactive="pwm-and-adc"] label { display: block; flex: 1 1 12rem; }
 [data-interactive="pwm-and-adc"] input { max-width: 100%; accent-color: var(--accent); }
-[data-interactive="pwm-and-adc"] input[type="number"] { display: block; width: 10rem; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: .5rem; }
-[data-interactive="pwm-and-adc"] svg { display: block; width: 100%; height: auto; color: var(--ink); }
+[data-interactive="pwm-and-adc"] :is(input[type="number"],select,button) { min-height: 44px; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .5rem; font: inherit; }
+[data-interactive="pwm-and-adc"] input[type="number"] { display: block; width: 10rem; }
+[data-interactive="pwm-and-adc"] :is(input,select,button,.pa-plot-scroll):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+[data-interactive="pwm-and-adc"] .pa-plot-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+[data-interactive="pwm-and-adc"] svg { display: block; width: 660px; max-width: none; height: 250px; color: var(--ink); }
 [data-interactive="pwm-and-adc"] svg text { fill: currentColor; font: 16px sans-serif; }
 [data-interactive="pwm-and-adc"] .pa-axis { fill: none; stroke: currentColor; }
 [data-interactive="pwm-and-adc"] .pa-square { fill: none; stroke: var(--accent); stroke-width: 2.5; }
 [data-interactive="pwm-and-adc"] .pa-filter { fill: none; stroke: currentColor; stroke-width: 3; stroke-dasharray: 7 4; }
+[data-interactive="pwm-and-adc"] .pa-hold { fill: none; stroke: var(--flag); stroke-width: 2.5; }
+[data-interactive="pwm-and-adc"] .pa-samples circle { fill: var(--flag); stroke: var(--ink); stroke-width: 1.5; }
+[data-interactive="pwm-and-adc"] .pa-quick,.pa-choice-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: .65rem; }
+[data-interactive="pwm-and-adc"] .pa-choice-row label { display: inline-flex; align-items: center; flex: 0 1 auto; min-height: 44px; gap: .3rem; }
+[data-interactive="pwm-and-adc"] .pa-predict { margin-block: .75rem; }
+[data-interactive="pwm-and-adc"] .pa-limit { color: var(--ink-soft); }
 [data-interactive="pwm-and-adc"].pa-ready .pa-static { display: none; }
 @media print {
   [data-interactive="pwm-and-adc"] .pa-live { display: none !important; }
   [data-interactive="pwm-and-adc"] .pa-static { display: block !important; }
+  [data-interactive="pwm-and-adc"] .pa-static table { break-inside: avoid; }
 }
 
 </style>
@@ -3192,7 +3202,10 @@ void loop() {
     <div class="body">
       <h2>Explore the steps and check the units</h2>
   <p>The two-way ADC controls in the <a class="xref-page" href="#p-pulse-width-modulation">PWM and ADC explorer</a> let you enter a voltage or a code. Try nearby voltages within one bin, then cross its boundary. In reverse, code 1023 gives 4.9951171875 V as its lower edge, not proof that the input equals that value.</p>
+  <p>The same explorer also separates <strong>when a voltage is sampled</strong> from how its code is calculated. It shows instantaneous raw PWM or settled RC values, the finite mean of the selected point samples, and the mean of their reconstructed lower-edge voltages. Those are different from the waveform's complete-cycle time mean. A held code is the latest point result, not a window average.</p>
+  <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Quantize first or average first?.</p>
   <p><a class="button" data-practice-add="micro-adc-volts" href="../practice.html#micro-adc-volts">Practice converting a reading to volts</a></p>
+  <p><a class="button" data-practice-add="pwm-sample-phase-high" href="../practice.html#pwm-sample-phase-high">Practice sampling phase</a></p>
     </div>
   </details>
 </div>
@@ -3223,7 +3236,7 @@ void loop() {
       <h2>The stock Uno R3 uses six PWM pins</h2>
   <p>Use digital pins <strong>3, 5, 6, 9, 10 and 11</strong>. Default PWM is approximately <strong>490 Hz on 3, 9, 10 and 11</strong>, and <strong>980 Hz on 5 and 6</strong>. These correspond to periods of about 2.04 ms and 1.02 ms.</p>
   <p><code>analogWrite(pin, value)</code> requests duty using values from 0 (always off) to 255 (always on). A useful nominal mapping is <code>value = round(255 × D)</code>: 25% gives 64. Hardware timer modes introduce small differences in the exact duty, particularly near the ends of the range.</p>
-  <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Official frequency table and timer limitations.</p>
+  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; Official frequency table and timer limitations.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="pulse-width-modulation--change-duty-and-frequency-then-compare-an-adc-reading" data-card="pulse-width-modulation--change-duty-and-frequency-then-compare-an-adc-reading" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -3232,10 +3245,20 @@ void loop() {
       <h2>Change duty and frequency, then compare an ADC reading</h2>
   <div data-interactive="pwm-and-adc">
     <div class="pa-live" hidden></div>
-    <div class="pa-static"><p><strong>Print / static example:</strong> 25% duty at 500 Hz gives a 2 ms period, 0.5 ms on-time and 1.25 V average for a 0–5 V waveform. An unloaded RC filter with R = 10 kΩ and C = 1 µF has a 10 ms time constant; after settling, its output ripples around 1.25 V. With a 5.000 V ADC reference, 3.000 V gives code 614 in the ideal bin model; code 800 gives a lower-edge estimate of 3.90625 V.</p></div>
+    <div class="pa-static">
+      <p><strong>Print / static comparison:</strong> 25% duty at 500 Hz gives a 2 ms period, 0.5 ms HIGH time and a 1.25 V complete-cycle time mean for an ideal 0–5 V waveform. A point sample is one instant, not that average.</p>
+      <div class="unit-table-wrap"><table class="unit-table"><caption>The same PWM waveform sampled at different phases</caption><thead><tr><th>Finite sample set</th><th>Each raw sample</th><th>Selected-sample mean</th><th>ADC code / lower edge</th></tr></thead><tbody>
+        <tr><th>500 samples/s, phase 10%</th><td>5 V</td><td>5 V</td><td>1023 / 4.995117 V</td></tr>
+        <tr><th>500 samples/s, phase 60%</th><td>0 V</td><td>0 V</td><td>0 / 0 V</td></tr>
+        <tr><th>2000 samples/s, phases 1%, 26%, 51%, 76%</th><td>5, 0, 0, 0 V</td><td>1.25 V</td><td>Mean lower edge 1.248779 V</td></tr>
+      </tbody></table></div>
+      <p>An unloaded 10 kΩ / 1 µF RC filter has a 10 ms time constant. In the settled repeating response its 25%, 500 Hz ripple runs from about 1.1579 V to 1.3453 V while its cycle mean remains 1.25 V. Changing a control recomputes that settled response; this model does not show startup.</p>
+      <p>With a separate 5.000 V ADC input, 3.000 V gives code 614; code 800 has lower edge 3.90625 V.</p>
+    </div>
     <noscript><p>The controls require JavaScript. The equations, duty-cycle figure and worked example remain available.</p></noscript>
   </div>
-  <p>The explorer is a model, not a board connection. Its frequency control does not configure an Uno. ADC controls use the ideal bin convention on <a class="xref-page" href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a>; 5.000 V is assumed exact.</p>
+  <p>The explorer is a model, not a board connection. Its frequency and sampling controls do not configure an Uno or claim a board throughput. A raw sample uses normalized phase with HIGH on <code>[0, D)</code> and LOW on <code>[D, 1)</code>; the stated finite sample count defines the reported sample mean. ADC controls use the ideal bin convention on <a class="xref-page" href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a>; 5.000 V is assumed exact.</p>
+  <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; Why more samples can still give the wrong mean.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="pulse-width-modulation--an-rc-filter-smooths-pwm-but-leaves-ripple" data-card="pulse-width-modulation--an-rc-filter-smooths-pwm-but-leaves-ripple">
@@ -3244,7 +3267,8 @@ void loop() {
       <h2>An RC filter smooths PWM but leaves ripple</h2>
   <p>Put a resistor in series with the PWM signal and a capacitor from the output node to ground; measure the voltage across the capacitor. This <strong>RC low-pass filter</strong> slows voltage changes. The capacitor charges while PWM is HIGH and discharges while it is LOW.</p>
   <p>The time constant is <code>τ = R × C</code>. A longer time constant relative to the PWM period reduces ripple but makes the output respond more slowly when duty changes. The explorer shows the settled waveform with τ = 10 ms, assuming an ideal source and no load. A load changes the result; the filter is not a motor power supply.</p>
-  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; What the smoothed trace calculates.</p>
+  <p>Microchip's <a href="https://onlinedocs.microchip.com/oxy/GUID-15F56EF1-EBFF-405A-9412-E41CC95BAACF-en-US-2/GUID-34AC5DDB-B9AE-4272-842B-E2A1CEE69B6B.html">AVR131 PWM filtering note</a> explains the tradeoff: the low-pass filter must reject PWM base-frequency ripple without removing the slower signal of interest, and a low-impedance load can discharge the capacitor unless buffered. This explorer deliberately assumes no load.</p>
+  <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; What the smoothed trace calculates.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="pulse-width-modulation--pwm-changes-led-brightness-and-motor-drive" data-card="pulse-width-modulation--pwm-changes-led-brightness-and-motor-drive">
@@ -3308,18 +3332,34 @@ void loop() {
     </li>
     <li class="deeper-addendum" id="deeper-addendum-6" value="6">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 6.</span> Official frequency table and timer limitations</h2>
-        <p>The Uno R3 row of Arduino's <a href="https://github.com/arduino/reference-en/blob/master/Language/Functions/Analog%20IO/analogWrite.adoc">analogWrite reference source</a> states “490 Hz (pins 5 and 6: 980 Hz)”. See also the <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/">published analogWrite reference</a>. A frequency near 31 kHz requires changing timer configuration; it is not the stock setting. <code>analogWrite</code> sets duty, not frequency. Arduino's <a href="https://docs.arduino.cc/tutorials/generic/secrets-of-arduino-pwm/">Secrets of Arduino PWM</a> explains prescalers and timer modes. Changing timers can also affect other functions and libraries.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 6.</span> Quantize first or average first?</h2>
+        <p>ADC conversion floors each individual ideal sample into a bin. Averaging the reconstructed lower edges therefore need not equal converting the analog sample mean. For a 25% raw 0–5 V sequence with one HIGH and three LOW samples, the analog sample mean is 1.25 V; the lower-edge reconstructions average 4.9951171875/4 = 1.248779296875 V. Neither operation recovers information between sample instants.</p>
         <p class="deeper-back"><a href="#deeper-ref-6">Back to reference 6</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-7" value="7">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 7.</span> What the smoothed trace calculates</h2>
-        <p>During each constant input interval, <code>V(t) = V<sub>target</sub> + (V<sub>start</sub> − V<sub>target</sub>)e<sup>−t/τ</sup></code>. The model solves for a repeating steady state, then draws the charging and discharging curves. It omits startup, output resistance, component tolerances and loading. At 0% or 100%, the settled output is simply 0 V or 5 V.</p>
+        <h2><span class="deeper-addendum-number">Addendum 7.</span> Official frequency table and timer limitations</h2>
+        <p>The Uno R3 row of Arduino's <a href="https://github.com/arduino/reference-en/blob/master/Language/Functions/Analog%20IO/analogWrite.adoc">analogWrite reference source</a> states “490 Hz (pins 5 and 6: 980 Hz)”. See also the <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/">published analogWrite reference</a>. A frequency near 31 kHz requires changing timer configuration; it is not the stock setting. <code>analogWrite</code> sets duty, not frequency. Arduino's <a href="https://docs.arduino.cc/tutorials/generic/secrets-of-arduino-pwm/">Secrets of Arduino PWM</a> explains prescalers and timer modes. Changing timers can also affect other functions and libraries.</p>
         <p class="deeper-back"><a href="#deeper-ref-7">Back to reference 7</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-8" value="8">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 8.</span> Why more samples can still give the wrong mean</h2>
+        <p>If the sample clock repeatedly lands at the same PWM phase, every point can read HIGH or every point can read LOW even though the full-cycle time mean is 1.25 V. A sample-and-hold output keeps the most recent point value between samples; holding is not averaging. A carefully spaced finite set can match the cycle mean, but a higher rate or larger count alone does not guarantee an unbiased result. This bounded comparison does not claim reconstruction of an unbandlimited switching edge from a Nyquist test.</p>
+        <p class="deeper-back"><a href="#deeper-ref-8">Back to reference 8</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-9" value="9">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 9.</span> What the smoothed trace calculates</h2>
+        <p>During each constant input interval, <code>V(t) = V<sub>target</sub> + (V<sub>start</sub> − V<sub>target</sub>)e<sup>−t/τ</sup></code>. The model solves for a repeating steady state, then draws the charging and discharging curves. It omits startup, output resistance, component tolerances and loading. At 0% or 100%, the settled output is simply 0 V or 5 V.</p>
+        <p class="deeper-back"><a href="#deeper-ref-9">Back to reference 9</a></p>
       </article>
     </li>
   </ol>
@@ -5166,7 +5206,30 @@ void loop() {
     const bottom = top * b, t = phase * p.period;
     return phase <= p.duty ? 5 + (bottom - 5) * Math.exp(-t / tau) : top * Math.exp(-(t - p.onTime) / tau);
   }
-  const api = Object.freeze({ adc, voltage, pwm, filtered });
+  function sampleSet({ percent, pwmFrequency, sampleFrequency, startPhase, count, signal = 'raw', tau = 0.01 }) {
+    const p = pwm(percent, pwmFrequency);
+    range(sampleFrequency, 1, 100000);
+    if (!Number.isFinite(startPhase) || startPhase < 0 || startPhase >= 1) throw new RangeError('Use a normalized starting phase from 0 up to, but not including, 1.');
+    if (!Number.isInteger(count) || count < 1 || count > 1000) throw new RangeError('Use 1–1000 whole samples.');
+    if (signal !== 'raw' && signal !== 'filtered') throw new RangeError('Choose raw or filtered samples.');
+    const samples = Array.from({ length: count }, (_, index) => {
+      const relativeCycles = index * pwmFrequency / sampleFrequency;
+      const cycles = startPhase + relativeCycles;
+      // Reduce the relative advance before adding phase. Adding a large whole-cycle
+      // count first can round a valid phase just below 1 up to the next cycle.
+      const relative = relativeCycles % 1, gap = 1 - startPhase;
+      const phase = relative >= gap ? relative - gap : startPhase + relative;
+      // The ideal raw waveform is HIGH on [0, duty) and LOW on [duty, 1).
+      const input = signal === 'raw' ? (phase < p.duty ? 5 : 0) : filtered(percent, pwmFrequency, phase, tau);
+      const code = adc(input);
+      return Object.freeze({ index, cycles, time: startPhase / pwmFrequency + index / sampleFrequency,
+        phase, input, code, reconstructed: voltage(code) });
+    });
+    const mean = key => samples.reduce((sum, sample) => sum + sample[key], 0) / samples.length;
+    return Object.freeze({ signal, count, samplePeriod: 1 / sampleFrequency, timeMean: p.average,
+      sampleMean: mean('input'), reconstructedMean: mean('reconstructed'), samples: Object.freeze(samples) });
+  }
+  const api = Object.freeze({ adc, voltage, pwm, filtered, sampleSet });
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.CourseWikiPwmAdc = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
@@ -5174,62 +5237,88 @@ void loop() {
 (function () {
   'use strict';
   const model = globalThis.CourseWikiPwmAdc;
-  document.querySelectorAll('[data-interactive="pwm-and-adc"]').forEach(root => {
-    if (root.dataset.paReady) return;
+  let sequence = 0;
+  function nextPredictionName() {
+    let name;
+    do { name = `pa-${++sequence}-prediction`; } while (document.querySelector(`input[name="${name}"]`));
+    return name;
+  }
+  function init(root) {
+    if (root.dataset.paReady || !model) return;
+    const predictionName = nextPredictionName();
     root.dataset.paReady = 'true';
     const live = root.querySelector('.pa-live');
     live.innerHTML = `<fieldset><legend>PWM · ideal 0–5 V output</legend>
       <div class="pa-controls"><label>Duty cycle (%) <input data-duty type="range" min="0" max="100" step="1" value="25"></label>
       <label>Frequency (Hz) <input data-frequency type="number" min="10" max="2000" step="1" value="500"></label>
-      <label><input data-smooth type="checkbox" checked> Show RC-smoothed trace (τ = 10 ms)</label></div>
+      <label><input data-smooth type="checkbox" checked> Show settled RC trace (τ = 10 ms)</label></div>
       <p data-pwm-output aria-live="polite"></p>
-      <svg viewBox="0 0 660 240" role="img" aria-label="PWM square wave and optional settled RC trace over four cycles">
+      <div class="pa-plot-scroll" tabindex="0" role="region" aria-label="PWM waveform, sample instants and held readings; scroll horizontally">
+      <svg viewBox="0 0 660 250" role="img" aria-label="Four PWM cycles with optional settled RC trace, point samples and sample-and-hold steps">
       <path class="pa-axis" d="M50 25V195H640"/><text x="4" y="35">5 V</text><text x="4" y="195">0 V</text>
-      <path data-square class="pa-square"/><path data-filter class="pa-filter"/>
-      <text x="50" y="225">0</text><text data-end x="620" y="225" text-anchor="end"></text></svg>
-      <p>Solid line: PWM. Dashed line: settled RC output. The horizontal axis always shows four periods; read its changing time label.</p></fieldset>
+      <path data-square class="pa-square"/><path data-filter class="pa-filter"/><path data-hold class="pa-hold"/><g data-samples class="pa-samples"></g>
+      <text x="50" y="230">0</text><text data-end x="620" y="230" text-anchor="end"></text></svg></div>
+      <p>Solid: raw PWM. Dashed: settled RC output. Gold dots are counted samples; gold steps show the latest value being held. After the final counted dot, a step may continue across the plot only to show held state—it adds no sample to the finite mean. The axis shows four PWM cycles.</p></fieldset>
+      <fieldset><legend>Sampling · point readings, not window averages</legend><div class="pa-controls">
+      <label>Input to sample <select data-signal><option value="raw">Raw PWM</option><option value="filtered">Settled RC output</option></select></label>
+      <label>Sample rate (samples/s) <input data-sample-frequency type="number" min="1" max="100000" step="1" value="500"></label>
+      <label>Starting phase (% of PWM cycle) <input data-phase type="number" min="0" max="99.9" step="0.1" value="10"></label>
+      <label>Finite sample count <input data-count type="number" min="1" max="1000" step="1" value="12"></label></div>
+      <div class="pa-quick"><button type="button" data-phase-preset="10">Try phase 10%</button><button type="button" data-phase-preset="60">Try phase 60%</button></div>
+      <p data-sample-window></p>
+      <fieldset class="pa-predict"><legend>Predict the selected-sample mean versus the full-cycle time mean</legend>
+      <div class="pa-choice-row"><label><input type="radio" name="${predictionName}" value="higher"> Higher</label>
+      <label><input type="radio" name="${predictionName}" value="same"> Same</label>
+      <label><input type="radio" name="${predictionName}" value="lower"> Lower</label></div>
+      <button type="button" data-reveal disabled>Reveal sample results</button></fieldset>
+      <p data-sample-output role="status" aria-live="polite">Choose a prediction, then reveal the finite sample-set results.</p>
+      <p class="pa-limit">Each marker is one ideal point sample. The held value is not an average. Sampling starts at the stated normalized phase and uses half-open PWM cycles; controls recompute a settled periodic RC response rather than startup.</p></fieldset>
       <fieldset><legend>ADC · 10 bits, 5.000 V reference</legend><div class="pa-controls">
       <label>Input voltage (V) <input data-voltage type="number" min="0" max="5" step="any" value="3"></label>
       <label>ADC code (integer) <input data-code type="number" min="0" max="1023" step="1" value="614"></label></div>
       <p data-adc-output aria-live="polite"></p><p>Editing voltage finds its bin. Editing code sets voltage to that bin's lower edge. These are model values, not exact hardware thresholds.</p></fieldset>`;
     const get = selector => live.querySelector(selector);
-    const duty = get('[data-duty]'), frequency = get('[data-frequency]'), smooth = get('[data-smooth]');
-    function draw() {
-      if (!frequency.checkValidity() || frequency.value === '') {
-        get('[data-pwm-output]').textContent = 'Enter a whole-number frequency from 10 to 2000 Hz.'; return;
-      }
-      const d = Number(duty.value), f = Number(frequency.value), p = model.pwm(d, f);
-      get('[data-pwm-output]').textContent = `${d}% duty · period ${(p.period * 1000).toFixed(4)} ms · on-time ${(p.onTime * 1e6).toFixed(2)} µs · average ${p.average.toFixed(3)} V · nominal analogWrite ${p.writeValue}`;
-      const y = v => 195 - 32 * v;
-      let square = `M50 ${y(d === 0 ? 0 : 5)}`;
-      for (let cycle = 0; cycle < 4; cycle++) {
-        const start = 50 + cycle * 145, end = start + 145;
-        if (d === 0 || d === 100) square += ` H${end}`;
-        else square += ` H${start + 145 * p.duty} V195 H${end}${cycle < 3 ? ' V35' : ''}`;
-      }
-      get('[data-square]').setAttribute('d', square);
-      const trace = Array.from({ length: 801 }, (_, i) => {
-        const phase = (i / 200) % 1;
-        return `${i ? 'L' : 'M'}${50 + i * 580 / 800} ${y(model.filtered(d, f, phase))}`;
-      }).join(' ');
-      get('[data-filter]').setAttribute('d', smooth.checked ? trace : '');
-      get('[data-end]').textContent = `${(4 * p.period * 1000).toFixed(3)} ms`;
+    const duty=get('[data-duty]'),frequency=get('[data-frequency]'),smooth=get('[data-smooth]');
+    const signal=get('[data-signal]'),sampleFrequency=get('[data-sample-frequency]');
+    const phase=get('[data-phase]'),count=get('[data-count]'),reveal=get('[data-reveal]');
+    const prediction=()=>live.querySelector(`input[name="${predictionName}"]:checked`);
+    let current=null;
+    const y=value=>195-32*value;
+    const valid=input=>input.value!==''&&input.checkValidity();
+    function resetPrediction(message){live.querySelectorAll(`input[name="${predictionName}"]`).forEach(input=>{input.checked=false;});reveal.disabled=true;get('[data-sample-output]').textContent=message||'Inputs changed. Choose a new prediction, then reveal.';}
+    function clearPlot(){get('[data-square]').setAttribute('d','');get('[data-filter]').setAttribute('d','');get('[data-hold]').setAttribute('d','');get('[data-samples]').replaceChildren();get('[data-end]').textContent='';}
+    function draw(){
+      if(![frequency,sampleFrequency,phase,count].every(valid)){get('[data-pwm-output]').textContent='Enter values inside every stated range.';get('[data-sample-window]').textContent='Sample results unavailable until the inputs are valid.';current=null;reveal.disabled=true;clearPlot();return;}
+      try{
+        const d=Number(duty.value),f=Number(frequency.value),p=model.pwm(d,f);
+        current=model.sampleSet({percent:d,pwmFrequency:f,sampleFrequency:Number(sampleFrequency.value),startPhase:Number(phase.value)/100,count:Number(count.value),signal:signal.value});
+        get('[data-pwm-output]').textContent=`${d}% duty · period ${(p.period*1000).toFixed(4)} ms · HIGH time ${(p.onTime*1e6).toFixed(2)} µs · full-cycle time mean ${p.average.toFixed(3)} V · nominal analogWrite ${p.writeValue}`;
+        let square=`M50 ${y(d===0?0:5)}`;
+        for(let cycle=0;cycle<4;cycle++){const start=50+cycle*145,end=start+145;if(d===0||d===100)square+=` H${end}`;else square+=` H${start+145*p.duty} V195 H${end}${cycle<3?' V35':''}`;}
+        get('[data-square]').setAttribute('d',square);
+        get('[data-filter]').setAttribute('d',smooth.checked?Array.from({length:801},(_,i)=>{const pointPhase=(i/200)%1;return`${i?'L':'M'}${50+i*580/800} ${y(model.filtered(d,f,pointPhase))}`;}).join(' '):'');
+        const visible=current.samples.filter(sample=>sample.cycles<4);
+        get('[data-samples]').innerHTML=visible.map(sample=>`<circle cx="${50+sample.cycles*145}" cy="${y(sample.input)}" r="5"><title>Sample ${sample.index+1}: ${sample.input.toFixed(4)} V at phase ${(sample.phase*100).toFixed(2)}%</title></circle>`).join('');
+        let hold='';visible.forEach((sample,index)=>{const x=50+sample.cycles*145,next=index+1<visible.length?50+visible[index+1].cycles*145:630;hold+=`${index?'L':'M'}${x} ${y(sample.input)} H${Math.min(next,630)}`;});get('[data-hold]').setAttribute('d',hold);
+        get('[data-end]').textContent=`${(4*p.period*1000).toFixed(3)} ms`;
+        const first=current.samples[0],last=current.samples.at(-1);
+        get('[data-sample-window]').textContent=`Exactly ${current.count} point samples, from ${(first.time*1000).toFixed(4)} ms through ${(last.time*1000).toFixed(4)} ms; sample period ${(current.samplePeriod*1000).toFixed(4)} ms. The plot shows only samples within its four displayed PWM cycles.`;
+      }catch(error){current=null;get('[data-sample-window]').textContent=error.message;reveal.disabled=true;clearPlot();}
     }
-    const volts = get('[data-voltage]'), code = get('[data-code]');
-    function convert(fromCode) {
-      const input = fromCode ? code : volts;
-      if (input.value === '' || !input.checkValidity()) {
-        get('[data-adc-output]').textContent = 'Use 0–5 V or an integer code from 0 to 1023.'; return;
-      }
-      if (fromCode) volts.value = model.voltage(Number(code.value));
-      else code.value = model.adc(Number(volts.value));
-      const n = Number(code.value), low = model.voltage(n), high = (n + 1) * 5 / 1024;
-      get('[data-adc-output]').textContent = `Code ${n} · lower edge ${low.toFixed(7)} V · bin ${low.toFixed(7)} to ${high.toFixed(7)} V (${n === 1023 ? 'includes 5 V at the model limit' : 'upper edge excluded'}) · step 4.8828125 mV`;
-    }
-    duty.addEventListener('input', draw); frequency.addEventListener('input', draw); smooth.addEventListener('change', draw);
-    volts.addEventListener('input', () => convert(false)); code.addEventListener('input', () => convert(true));
-    draw(); convert(false); live.hidden = false; root.classList.add('pa-ready');
-  });
+    function update(){resetPrediction();draw();}
+    [duty,frequency,sampleFrequency,phase,count].forEach(input=>input.addEventListener('input',update));
+    smooth.addEventListener('change',update);
+    signal.addEventListener('change',()=>{if(signal.value==='filtered'){smooth.checked=true;smooth.disabled=true;}else smooth.disabled=false;update();});
+    live.querySelectorAll('[data-phase-preset]').forEach(button=>button.addEventListener('click',()=>{phase.value=button.dataset.phasePreset;update();phase.focus();}));
+    live.querySelector('.pa-predict').addEventListener('change',()=>{reveal.disabled=!prediction()||!current;});
+    reveal.addEventListener('click',()=>{if(!current||!prediction())return;const delta=current.sampleMean-current.timeMean,relation=Math.abs(delta)<1e-9?'same':delta>0?'higher':'lower',last=current.samples.at(-1);get('[data-sample-output]').textContent=`${prediction().value===relation?'Prediction confirmed.':'Compare the timing markers with the HIGH interval.'} Selected-sample mean ${current.sampleMean.toFixed(4)} V is ${relation} than full-cycle time mean ${current.timeMean.toFixed(4)} V. Mean of ADC lower-edge reconstructions: ${current.reconstructedMean.toFixed(4)} V. Last held point: ${last.input.toFixed(4)} V, code ${last.code}, lower edge ${last.reconstructed.toFixed(4)} V. Faster or more samples alone do not guarantee an unbiased finite mean.`;});
+    const volts=get('[data-voltage]'),code=get('[data-code]');
+    function convert(fromCode){const input=fromCode?code:volts;if(!valid(input)){get('[data-adc-output]').textContent='Use 0–5 V or an integer code from 0 to 1023.';return;}if(fromCode)volts.value=model.voltage(Number(code.value));else code.value=model.adc(Number(volts.value));const n=Number(code.value),low=model.voltage(n),high=(n+1)*5/1024;get('[data-adc-output]').textContent=`Code ${n} · lower edge ${low.toFixed(7)} V · bin ${low.toFixed(7)} to ${high.toFixed(7)} V (${n===1023?'includes 5 V at the model limit':'upper edge excluded'}) · step 4.8828125 mV`;}
+    volts.addEventListener('input',()=>convert(false));code.addEventListener('input',()=>convert(true));
+    draw();convert(false);live.hidden=false;root.classList.add('pa-ready');
+  }
+  function initAll(){document.querySelectorAll('[data-interactive="pwm-and-adc"]').forEach(init);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAll,{once:true});else initAll();
 })();
 
 </script>

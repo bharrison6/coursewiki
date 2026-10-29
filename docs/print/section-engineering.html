@@ -3431,16 +3431,26 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 [data-interactive="pwm-and-adc"] .pa-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
 [data-interactive="pwm-and-adc"] label { display: block; flex: 1 1 12rem; }
 [data-interactive="pwm-and-adc"] input { max-width: 100%; accent-color: var(--accent); }
-[data-interactive="pwm-and-adc"] input[type="number"] { display: block; width: 10rem; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: .5rem; }
-[data-interactive="pwm-and-adc"] svg { display: block; width: 100%; height: auto; color: var(--ink); }
+[data-interactive="pwm-and-adc"] :is(input[type="number"],select,button) { min-height: 44px; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .5rem; font: inherit; }
+[data-interactive="pwm-and-adc"] input[type="number"] { display: block; width: 10rem; }
+[data-interactive="pwm-and-adc"] :is(input,select,button,.pa-plot-scroll):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+[data-interactive="pwm-and-adc"] .pa-plot-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+[data-interactive="pwm-and-adc"] svg { display: block; width: 660px; max-width: none; height: 250px; color: var(--ink); }
 [data-interactive="pwm-and-adc"] svg text { fill: currentColor; font: 16px sans-serif; }
 [data-interactive="pwm-and-adc"] .pa-axis { fill: none; stroke: currentColor; }
 [data-interactive="pwm-and-adc"] .pa-square { fill: none; stroke: var(--accent); stroke-width: 2.5; }
 [data-interactive="pwm-and-adc"] .pa-filter { fill: none; stroke: currentColor; stroke-width: 3; stroke-dasharray: 7 4; }
+[data-interactive="pwm-and-adc"] .pa-hold { fill: none; stroke: var(--flag); stroke-width: 2.5; }
+[data-interactive="pwm-and-adc"] .pa-samples circle { fill: var(--flag); stroke: var(--ink); stroke-width: 1.5; }
+[data-interactive="pwm-and-adc"] .pa-quick,.pa-choice-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: .65rem; }
+[data-interactive="pwm-and-adc"] .pa-choice-row label { display: inline-flex; align-items: center; flex: 0 1 auto; min-height: 44px; gap: .3rem; }
+[data-interactive="pwm-and-adc"] .pa-predict { margin-block: .75rem; }
+[data-interactive="pwm-and-adc"] .pa-limit { color: var(--ink-soft); }
 [data-interactive="pwm-and-adc"].pa-ready .pa-static { display: none; }
 @media print {
   [data-interactive="pwm-and-adc"] .pa-live { display: none !important; }
   [data-interactive="pwm-and-adc"] .pa-static { display: block !important; }
+  [data-interactive="pwm-and-adc"] .pa-static table { break-inside: avoid; }
 }
 
 [data-interactive="wire-voltage-drop"] { min-width: 0; font-size: 16px; overflow-wrap: anywhere; }
@@ -5990,7 +6000,10 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Explore the steps and check the units</h2>
   <p>The two-way ADC controls in the <a class="xref-page" href="#p-pulse-width-modulation">PWM and ADC explorer</a> let you enter a voltage or a code. Try nearby voltages within one bin, then cross its boundary. In reverse, code 1023 gives 4.9951171875 V as its lower edge, not proof that the input equals that value.</p>
+  <p>The same explorer also separates <strong>when a voltage is sampled</strong> from how its code is calculated. It shows instantaneous raw PWM or settled RC values, the finite mean of the selected point samples, and the mean of their reconstructed lower-edge voltages. Those are different from the waveform's complete-cycle time mean. A held code is the latest point result, not a window average.</p>
+  <p class="deeper-ref" id="deeper-ref-53">Supporting detail: <a href="#deeper-addendum-53"><strong>Addendum 53</strong></a> &mdash; Quantize first or average first?.</p>
   <p><a class="button" data-practice-add="micro-adc-volts" href="../practice.html#micro-adc-volts">Practice converting a reading to volts</a></p>
+  <p><a class="button" data-practice-add="pwm-sample-phase-high" href="../practice.html#pwm-sample-phase-high">Practice sampling phase</a></p>
     </div>
   </details>
 </div>
@@ -6012,7 +6025,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="lede">A 2 Ah cell and a 2 Ah battery can store very different amounts of energy if their voltages differ. Ah tells you charge. To estimate energy, you also need voltage.</p>
   <p><code>Energy (Wh) ≈ capacity (Ah) × nominal voltage (V)</code><br><code>Energy (J) = energy (Wh) × 3600</code></p>
   <p>For an ideal 2.4 Ah, 3.6 V cell: <code>2.4 × 3.6 = 8.64 Wh</code>, or <code>8.64 × 3600 = 31,104 J</code>. Convert mAh to Ah by dividing by 1000 before multiplying by voltage.</p>
-  <p class="deeper-ref" id="deeper-ref-53">Supporting detail: <a href="#deeper-addendum-53"><strong>Addendum 53</strong></a> &mdash; Why the battery estimate uses an approximate sign.</p>
+  <p class="deeper-ref" id="deeper-ref-54">Supporting detail: <a href="#deeper-addendum-54"><strong>Addendum 54</strong></a> &mdash; Why the battery estimate uses an approximate sign.</p>
   <p>See <a class="xref-page" href="#p-work-and-energy">Work and Energy</a> for energy units and <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> for voltage and charge.</p>
   <a class="button" data-practice-add="battery-energy-wh" href="../practice.html#battery-energy-wh">Practise battery energy</a>
     </div>
@@ -6091,7 +6104,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <tr><th scope="row">NiMH</th><td>Rechargeable consumer cells and hybrid-vehicle packs; generally more capacity than comparable NiCd cells and no cadmium.</td><td>Conventional cells can self-discharge noticeably; low-self-discharge versions improve charge retention. Voltage depression can occur, but memory concerns are generally less pronounced than with NiCd.</td></tr>
   </tbody></table></div>
   <p>Use a charger designed for the chemistry and cell. Fast charging is appropriate only when the cell and charger support it. Do not deliberately drive a pack to zero volts to prevent memory effect: a weaker cell can be forced into reverse polarity by the others.</p>
-  <p class="deeper-ref" id="deeper-ref-54">Supporting detail: <a href="#deeper-addendum-54"><strong>Addendum 54</strong></a> &mdash; Why a remote-control recommendation needs more than a chemistry name.</p>
+  <p class="deeper-ref" id="deeper-ref-55">Supporting detail: <a href="#deeper-addendum-55"><strong>Addendum 55</strong></a> &mdash; Why a remote-control recommendation needs more than a chemistry name.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="battery-chemistries--lead-acid-trades-low-mass-efficiency-for-useful-power-and-cost" data-card="battery-chemistries--lead-acid-trades-low-mass-efficiency-for-useful-power-and-cost">
@@ -6125,7 +6138,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li><strong>Lewis Urry, 1950s:</strong> work on the modern alkaline cell improved portable primary batteries.</li>
     <li><strong>Lithium-ion, 1990s:</strong> commercialization enabled rechargeable products with high energy per unit mass, building on earlier work by several researchers.</li>
   </ul>
-  <p class="deeper-ref" id="deeper-ref-55">Supporting detail: <a href="#deeper-addendum-55"><strong>Addendum 55</strong></a> &mdash; Scope of this short chronology.</p>
+  <p class="deeper-ref" id="deeper-ref-56">Supporting detail: <a href="#deeper-addendum-56"><strong>Addendum 56</strong></a> &mdash; Scope of this short chronology.</p>
     </div>
   </details>
 </div>
@@ -6148,7 +6161,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Let <code>T<sub>s</sub></code> be stall torque, <code>n<sub>0</sub></code> no-load speed, and <code>T</code> the constant resisting load torque. The steady operating point is where motor torque equals load torque:</p>
   <p><code>n = n<sub>0</sub>(1 − T/T<sub>s</sub>)</code>.</p>
   <p>This is an assumed linear approximation, not a measured motor rating. It omits acceleration, current limiting, temperature changes, and supply voltage drop. At stall it predicts zero shaft power, not zero electrical input. A stall rating is not a continuous operating rating.</p>
-  <p class="deeper-ref" id="deeper-ref-56">Supporting detail: <a href="#deeper-addendum-56"><strong>Addendum 56</strong></a> &mdash; Manufacturer basis for the straight line.</p>
+  <p class="deeper-ref" id="deeper-ref-57">Supporting detail: <a href="#deeper-addendum-57"><strong>Addendum 57</strong></a> &mdash; Manufacturer basis for the straight line.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="dc-motor-curves--explore-the-load-point-and-the-peak-power-point" data-card="dc-motor-curves--explore-the-load-point-and-the-peak-power-point" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -6180,8 +6193,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Peak power is halfway, not at either endpoint</h2>
   <p>Use <code>P = Tω</code>, with torque in N·m and angular speed in rad/s. Convert rpm using <code>ω = 2πn/60</code>. The definitions and units are on <a class="xref-page" href="#p-power-and-efficiency">Power and Efficiency</a> and <a class="xref-page" href="#p-angular-motion">Angular Motion</a>.</p>
   <p>At stall there is torque but no speed. At no load there is speed but no external load torque. Both endpoints therefore have zero shaft output power. Between them, torque times speed reaches a maximum.</p>
-  <p class="deeper-ref" id="deeper-ref-57">Supporting detail: <a href="#deeper-addendum-57"><strong>Addendum 57</strong></a> &mdash; Derive the halfway result from the straight line.</p>
-  <p class="deeper-ref" id="deeper-ref-58">Supporting detail: <a href="#deeper-addendum-58"><strong>Addendum 58</strong></a> &mdash; Manufacturer check on peak power.</p>
+  <p class="deeper-ref" id="deeper-ref-58">Supporting detail: <a href="#deeper-addendum-58"><strong>Addendum 58</strong></a> &mdash; Derive the halfway result from the straight line.</p>
+  <p class="deeper-ref" id="deeper-ref-59">Supporting detail: <a href="#deeper-addendum-59"><strong>Addendum 59</strong></a> &mdash; Manufacturer check on peak power.</p>
   <p><a class="button" data-practice-add="motor-load-speed" href="../practice.html#motor-load-speed">Practice operating speed</a> <a class="button" data-practice-add="motor-load-power" href="../practice.html#motor-load-power">Practice output power</a></p>
     </div>
   </details>
@@ -6191,7 +6204,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Peak efficiency needs electrical input as well as shaft output</h2>
   <p>Efficiency is output power divided by input power. Peak output power and peak efficiency answer different questions. The torque-speed line alone does not give electrical input or losses, so this explorer deliberately does not calculate efficiency.</p>
   <p>For the brushed coreless DC motors described by Portescap, peak efficiency occurs at a lighter load and higher speed than peak output power. Its exact position needs loss or current data. No external load means no useful shaft output, even though a real motor draws current to overcome its internal losses. Consult the actual motor's efficiency and continuous-operation data before selecting a load point.</p>
-  <p class="deeper-ref" id="deeper-ref-59">Supporting detail: <a href="#deeper-addendum-59"><strong>Addendum 59</strong></a> &mdash; Manufacturer basis for the efficiency comparison.</p>
+  <p class="deeper-ref" id="deeper-ref-60">Supporting detail: <a href="#deeper-addendum-60"><strong>Addendum 60</strong></a> &mdash; Manufacturer basis for the efficiency comparison.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="dc-motor-curves--match-the-motor-reduction-and-the-same-output-load" data-card="dc-motor-curves--match-the-motor-reduction-and-the-same-output-load" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -6212,7 +6225,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </div>
   <p>This is a fixed-voltage steady-running comparison with a constant resisting torque. It does not establish starting ability, acceleration, thermal or continuous rating, back-driving, electrical input, or gear strength. At stall, speed and shaft output power are zero; if required motor torque exceeds stall torque, the model reports no forward steady operating point instead of assigning a fictitious speed.</p>
-  <p class="deeper-ref" id="deeper-ref-60">Supporting detail: <a href="#deeper-addendum-60"><strong>Addendum 60</strong></a> &mdash; Source and the standstill boundary.</p>
+  <p class="deeper-ref" id="deeper-ref-61">Supporting detail: <a href="#deeper-addendum-61"><strong>Addendum 61</strong></a> &mdash; Source and the standstill boundary.</p>
   <p>Real loads may demand different torque at different speeds. Their operating point is an intersection of a load curve and a motor curve. <a class="button" data-practice-add="motor-match-reflected-torque" href="../practice.html#motor-match-reflected-torque">Practice reflected load</a> <a class="button" data-practice-add="motor-match-output-power" href="../practice.html#motor-match-output-power">Practice output power</a></p>
     </div>
   </details>
@@ -6251,8 +6264,8 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <tr><td>Pressure or proximity sensor</td><td>Depends on the model: analog voltage, switching output, or digital data. Read its documentation.</td></tr>
   </tbody></table></div>
   <p>A bare resistive sensor does not generate a usable voltage by itself: its surrounding circuit matters. A module may offer both analog and thresholded digital outputs.</p>
-  <p class="deeper-ref" id="deeper-ref-61">Supporting detail: <a href="#deeper-addendum-61"><strong>Addendum 61</strong></a> &mdash; Phototransistor circuits can measure light or switch at a threshold.</p>
-  <p class="deeper-ref" id="deeper-ref-62">Supporting detail: <a href="#deeper-addendum-62"><strong>Addendum 62</strong></a> &mdash; Why an ultrasonic measurement can be digital.</p>
+  <p class="deeper-ref" id="deeper-ref-62">Supporting detail: <a href="#deeper-addendum-62"><strong>Addendum 62</strong></a> &mdash; Phototransistor circuits can measure light or switch at a threshold.</p>
+  <p class="deeper-ref" id="deeper-ref-63">Supporting detail: <a href="#deeper-addendum-63"><strong>Addendum 63</strong></a> &mdash; Why an ultrasonic measurement can be digital.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="digital-and-analog-signals--the-adc-reads-voltage-pwm-controls-time" data-card="digital-and-analog-signals--the-adc-reads-voltage-pwm-controls-time">
@@ -6290,7 +6303,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Keep the magnetic target moving: carrot on a stick</h2>
   <p>Picture the rotor turning to align its magnetic field with the stator's field. If the fields simply settled into alignment, that turning effect would disappear. To keep turning, the motor switches a field or keeps the stator field rotating. Think <strong>carrot on a stick</strong>: keep moving the target ahead.</p>
   <p><strong>Commutation</strong> means switching current between windings at the right time. Brushes and a commutator can do it mechanically, or a drive can do it electronically. A winding is a coil of wire that creates a magnetic field when current flows through it.</p>
-  <p class="deeper-ref" id="deeper-ref-63">Supporting detail: <a href="#deeper-addendum-63"><strong>Addendum 63</strong></a> &mdash; Where the alignment picture needs care.</p>
+  <p class="deeper-ref" id="deeper-ref-64">Supporting detail: <a href="#deeper-addendum-64"><strong>Addendum 64</strong></a> &mdash; Where the alignment picture needs care.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="electric-motor-principles--separate-turning-effort-speed-and-power" data-card="electric-motor-principles--separate-turning-effort-speed-and-power">
@@ -6330,7 +6343,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Stator windings arranged around the motor produce a rotating magnetic field. In a three-phase motor, the currents reach their peaks at different times, moving the combined field around the stator. That moving field induces current in conducting rotor bars. The rotor current and stator field interact to produce torque.</p>
   <p><strong>The rotor runs slightly slower than the field during normal motoring.</strong> The difference is called <strong>slip</strong>. If the rotor caught the field exactly, there would be no relative motion to induce the rotor current needed for torque. For example, a field at 1,800 rpm and a rotor at 1,740 rpm differ by 60 rpm, or 3.33% of field speed.</p>
   <p><strong>Strength:</strong> a squirrel-cage induction rotor needs neither brushes nor permanent magnets, making it useful for pumps, fans, and conveyors. <strong>Weak points:</strong> speed changes with load and slip; a variable-frequency drive is normally used when adjustable speed is needed.</p>
-  <p class="deeper-ref" id="deeper-ref-64">Supporting detail: <a href="#deeper-addendum-64"><strong>Addendum 64</strong></a> &mdash; Why alternating current alone is not the full explanation.</p>
+  <p class="deeper-ref" id="deeper-ref-65">Supporting detail: <a href="#deeper-addendum-65"><strong>Addendum 65</strong></a> &mdash; Why alternating current alone is not the full explanation.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="electric-motor-types--brushless-permanent-magnet-motors-switch-the-stator-current" data-card="electric-motor-types--brushless-permanent-magnet-motors-switch-the-stator-current">
@@ -6445,7 +6458,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="lede">A generator does not create energy. It takes mechanical work at a shaft and delivers electrical energy to a circuit, with some energy becoming heat along the way.</p>
   <p>A turbine is a rotating machine driven by a moving fluid. Steam, flowing water, wind, or hot combustion gases can turn its blades. The turbine turns the generator; the generator supplies electricity. An engine can also drive a generator without a turbine.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjU1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5Ij4KPHRpdGxlPlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5PC90aXRsZT48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjI1NSIgZmlsbD0iI2ZmZmZmZiIvPgo8ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgcmVmWD0iNyIgcmVmWT0iMyIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwwLDYgTDcsMyBaIiBmaWxsPSIjMTgzMjRiIi8+PC9tYXJrZXI+PC9kZWZzPgo8c3R5bGU+dGV4dHtmb250OjIwcHggc2Fucy1zZXJpZjtmaWxsOiMxODMyNGJ9IC5ib3h7ZmlsbDojZWRmNGY4O3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDoyfSAuZmxvd3tmaWxsOm5vbmU7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjM7bWFya2VyLWVuZDp1cmwoI2Fycm93KX0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDozfTwvc3R5bGU+Cgo8dGV4dCB4PSIzMCIgeT0iMzUiPlN0ZWFtIHJvdXRlOiBoZWF0IOKGkiBmbHVpZCBtb3Rpb24g4oaSIHNoYWZ0IHdvcmsg4oaSIGVsZWN0cmljaXR5PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSIyNSIgeT0iNzAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNzAiLz48dGV4dCB4PSI0NSIgeT0iMTAwIj5IZWF0IHNvdXJjZTwvdGV4dD48dGV4dCB4PSI0NSIgeT0iMTI2Ij4rIGJvaWxlcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik0xNjUgMTA1IEgyMjAiLz48dGV4dCB4PSIxNzAiIHk9IjY1Ij5TdGVhbTwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMjMwIiB5PSI3MCIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjI1NSIgeT0iMTEyIj5UdXJiaW5lPC90ZXh0Pgo8cGF0aCBjbGFzcz0iZmxvdyIgZD0iTTM2MCAxMDUgSDQyNSIvPjx0ZXh0IHg9IjM2NiIgeT0iNjUiPlNoYWZ0PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSI0MzUiIHk9IjcwIiB3aWR0aD0iMTQ1IiBoZWlnaHQ9IjcwIi8+PHRleHQgeD0iNDUwIiB5PSIxMTIiPkdlbmVyYXRvcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik01ODAgMTA1IEg2NDAiLz4KPHJlY3QgY2xhc3M9ImJveCIgeD0iNjUwIiB5PSI3MCIgd2lkdGg9IjEyNSIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjY2MyIgeT0iMTEyIj5FbGVjdHJpY2l0eTwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjE5MCI+V2F0ZXIsIHdpbmQgb3IgY29tYnVzdGlvbiBnYXNlcyBjYW4gZHJpdmUgYSB0dXJiaW5lIGRpcmVjdGx5LjwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjIyNSI+UFYgdGFrZXMgYSBkaWZmZXJlbnQgcm91dGU6IGxpZ2h0IOKGkiBwaG90b3ZvbHRhaWMgY2VsbCDihpIgREMgZWxlY3RyaWNpdHkuPC90ZXh0Pgo8L3N2Zz4=" alt="Heat makes steam; steam turns a turbine; the turbine turns a generator; the generator supplies electricity. Water, wind and combustion gases can drive turbines too." data-natural-width="800" data-natural-height="255"></p>
-  <p class="deeper-ref" id="deeper-ref-65">Supporting detail: <a href="#deeper-addendum-65"><strong>Addendum 65</strong></a> &mdash; How rotation produces electricity.</p>
+  <p class="deeper-ref" id="deeper-ref-66">Supporting detail: <a href="#deeper-addendum-66"><strong>Addendum 66</strong></a> &mdash; How rotation produces electricity.</p>
   <p>See <a class="xref-page" href="#p-power-and-efficiency">Power and Efficiency</a> for losses and <a class="xref-page" href="#p-ac-and-dc">AC and DC</a> for the electrical output forms.</p>
     </div>
   </details>
@@ -6540,7 +6553,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Heat both parts, then feed solder into the joint</h2>
   <p>Prepare the iron and bench using <a class="xref-page" href="#p-soldering-equipment">Soldering Equipment and Setup</a>. The iron heats the parts; the heated parts melt the solder. Touch the tinned working face to both wires, or to both the pad and the component lead. Feed solder into the joint, away from the iron's contact point when access allows.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkhlYXQgcGFkIGFuZCBsZWFkLCBmZWVkIHNvbGRlciwgdGhlbiB3aXRoZHJhdyBhbmQgY29vbDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+MS4gSGVhdCBib3RoIHBhcnRzPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNNTUgOTBMODAgNzBMMTc1IDE2NVYxODBIMTUzWiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Jcm9uIGZhY2UgdG91Y2hlcyBwYWQgYW5kIGxlYWQuPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDI4MCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjIuIEZlZWQgaW50byB0aGUgam9pbnQ8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik01NSA5MEw4MCA3MEwxNzUgMTY1VjE4MEgxNTNaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik0zMDAgODBMMjEwIDE2NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTI2YjgzIiBzdHJva2Utd2lkdGg9IjciLz48cGF0aCBkPSJNMTkwIDE0MFEyMDAgMTczIDI1MCAxODBIMTkwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjI0MCIgeT0iNjIiPlNvbGRlcjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5LZWVwIGhlYXRpbmcgYXMgc29sZGVyIHdldHMgYm90aC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gV2l0aGRyYXcgYW5kIGNvb2w8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik05NSAxODBRMTcwIDE3NCAxNzUgMTEwVjE4MFogTTE5MCAxMTBRMjAwIDE3NCAyNjUgMTgwSDE5MFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Tb2xkZXIgYXdheSwgdGhlbiBpcm9uLiBIb2xkIHN0aWxsLjwvdGV4dD48L2c+PC9zdmc+" alt="First the iron contacts both pad and lead. Then solder wire approaches the heated joint from the other side while the iron stays in contact. Finally remove solder, remove iron, and hold still." data-natural-width="360" data-natural-height="840"></p>
-  <p class="deeper-ref" id="deeper-ref-66">Supporting detail: <a href="#deeper-addendum-66"><strong>Addendum 66</strong></a> &mdash; A one-second count is a rhythm, not a temperature test.</p>
+  <p class="deeper-ref" id="deeper-ref-67">Supporting detail: <a href="#deeper-addendum-67"><strong>Addendum 67</strong></a> &mdash; A one-second count is a rhythm, not a temperature test.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="soldering-joints--work-through-the-joint-in-this-order" data-card="soldering-joints--work-through-the-joint-in-this-order" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
@@ -6565,7 +6578,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Look for wetting and shape; shine alone is not a verdict</h2>
   <p>A good joint flows onto both surfaces. On a typical through-hole pad, look for a smooth transition from pad to lead, often a concave fillet (an inward-curving slope). Tin-lead joints are often shiny. A sound lead-free joint may be dull; dullness alone does not diagnose a cold joint.</p>
-  <p class="deeper-ref" id="deeper-ref-67">Supporting detail: <a href="#deeper-addendum-67"><strong>Addendum 67</strong></a> &mdash; Why lead-free solder may look different.</p>
+  <p class="deeper-ref" id="deeper-ref-68">Supporting detail: <a href="#deeper-addendum-68"><strong>Addendum 68</strong></a> &mdash; Why lead-free solder may look different.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkpvaW50IGluc3BlY3Rpb246IHNjaGVtYXRpYyBjcm9zcy1zZWN0aW9uczwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+R29vZDogd2V0dGVkPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNOTUgMTgwUTE3MCAxNzQgMTc1IDExMFYxODBaIE0xOTAgMTEwUTIwMCAxNzQgMjY1IDE4MEgxOTBaIiBjbGFzcz0ic29sZGVyIi8+PHRleHQgeD0iMjAiIHk9IjI0NSI+U29sZGVyIHNsb3BlcyBmcm9tIHBhZCB0byBsZWFkLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj5Db2xkIC8gcG9vcmx5IHdldHRlZDwvdGV4dD48cGF0aCBkPSJNNDAgMTkwSDMyMFYyMTVINDBaIiBjbGFzcz0iYm9hcmQiLz48cGF0aCBkPSJNODUgMTgwSDI3NVYxOTBIODVaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTE3NSA2NUgxOTBWMjE1SDE3NVoiIGNsYXNzPSJsZWFkIi8+PGVsbGlwc2UgY3g9IjEzMCIgY3k9IjE1NSIgcng9IjM3IiByeT0iMjQiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5CZWFkIGZhaWxzIHRvIHdldCB0aGUgbGVhZC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+QnJpZGdlOiB1bndhbnRlZCBwYXRoPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik02NSAxODBIMTUwVjE5MEg2NVogTTIxMCAxODBIMjk1VjE5MEgyMTBaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTEwNSA2NUgxMjBWMjE1SDEwNVogTTI0MCA2NUgyNTVWMjE1SDI0MFoiIGNsYXNzPSJsZWFkIi8+PHBhdGggZD0iTTc1IDE4MFExMDAgMTY1IDEwNSAxMzBWMTYwUTE4MCAxNDAgMjQwIDE2MFYxMzBRMjcwIDE3MCAyODUgMTgwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjIwIiB5PSIyNDUiPlNvbGRlciBqb2lucyBzZXBhcmF0ZSBwYWRzLjwvdGV4dD48L2c+PC9zdmc+" alt="Conceptual cross-sections: wetted solder slopes from pad to lead; a cold poorly wetted bead sits on the pad; a solder bridge connects two pads that should be separate." data-natural-width="360" data-natural-height="840"></p>
   <dl class="dims">
     <div><dt>Cold or poorly wetted</dt><dd>Solder balls up or fails to bond to one surface, often because the parts were not heated adequately. A rough or dull appearance can be a clue, but inspect the contact and shape too.</dd></div>
@@ -6605,7 +6618,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>A <strong>voltmeter</strong> measures the potential difference between two points. Connect it across the component, in parallel. A <strong>series ammeter</strong> becomes part of the current path: open the path and insert it in series with the element whose current you want.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkFtbWV0ZXIgaW4gc2VyaWVzIGFuZCB2b2x0bWV0ZXIgaW4gcGFyYWxsZWwiPjx0aXRsZT5BbW1ldGVyIGluIHNlcmllcyBhbmQgdm9sdG1ldGVyIGluIHBhcmFsbGVsPC90aXRsZT48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MTdweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0NX0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojMTcyYjQ1O3N0cm9rZS13aWR0aDozfTwvc3R5bGU+PHBhdGggY2xhc3M9IndpcmUiIGQ9Ik04MCA4MEgyMzUgTTI4NSA4MEg0MTAgTTQ5MCA4MEg2NjBWMjgwSDgwVjIwMCBNODAgMTUwVjgwIE0zNjUgODBWMTgwSDQyNSBNNDc1IDE4MEg1NTBWODAiLz48Y2lyY2xlIGNsYXNzPSJ3aXJlIiBjeD0iODAiIGN5PSIxNzUiIHI9IjI1Ii8+PHRleHQgeD0iNjgiIHk9IjE4MiI+REM8L3RleHQ+PGNpcmNsZSBjbGFzcz0id2lyZSIgY3g9IjI2MCIgY3k9IjgwIiByPSIyNSIvPjx0ZXh0IHg9IjI1NCIgeT0iODciPkE8L3RleHQ+PHJlY3QgY2xhc3M9IndpcmUiIHg9IjQxMCIgeT0iNjgiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNCIvPjx0ZXh0IHg9IjQxMCIgeT0iNTMiPlJlc2lzdG9yPC90ZXh0PjxjaXJjbGUgY2xhc3M9IndpcmUiIGN4PSI0NTAiIGN5PSIxODAiIHI9IjI1Ii8+PHRleHQgeD0iNDQ0IiB5PSIxODciPlY8L3RleHQ+PGNpcmNsZSBjeD0iMzY1IiBjeT0iODAiIHI9IjQiLz48Y2lyY2xlIGN4PSI1NTAiIGN5PSI4MCIgcj0iNCIvPjx0ZXh0IHg9IjE3NSIgeT0iMTMwIj5DdXJyZW50IGZsb3dzIHRocm91Z2ggQTwvdGV4dD48dGV4dCB4PSIzMzAiIHk9IjIzNSI+ViBtZWFzdXJlcyBiZXR3ZWVuIHRoZXNlIHR3byBub2RlczwvdGV4dD48dGV4dCB4PSIxODAiIHk9IjMyNSI+SWRlYWwgbWV0ZXJzOiBBIGhhcyB6ZXJvIHJlc2lzdGFuY2U7IFYgZHJhd3Mgbm8gY3VycmVudDwvdGV4dD48L3N2Zz4=" alt="A DC source supplies an ammeter and resistor in series. A voltmeter connects across the resistor, on two separate parallel leads." data-natural-width="760" data-natural-height="360"></p>
   <p>A meter set for current has a low-resistance input; connecting that input across a source makes a short circuit. Read <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a> before making physical measurements. The diagrams here explain connections, not a procedure for working on mains wiring.</p>
-  <p class="deeper-ref" id="deeper-ref-68">Supporting detail: <a href="#deeper-addendum-68"><strong>Addendum 68</strong></a> &mdash; Real meters change the circuit a little.</p>
+  <p class="deeper-ref" id="deeper-ref-69">Supporting detail: <a href="#deeper-addendum-69"><strong>Addendum 69</strong></a> &mdash; Real meters change the circuit a little.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="measuring-electric-circuits--place-both-voltage-probes-predict-the-sign-then-reveal" data-card="measuring-electric-circuits--place-both-voltage-probes-predict-the-sign-then-reveal" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -6717,7 +6730,7 @@ void loop() {
   digitalWrite(LED_BUILTIN, pressed ? HIGH : LOW);
 }</code></pre>
   <p>The pull-up supplies a small current through the closed switch to ground. The switch sinks that current. A physical switch can bounce between states briefly; counting presses reliably needs debouncing beyond this simple state display.</p>
-  <p class="deeper-ref" id="deeper-ref-69">Supporting detail: <a href="#deeper-addendum-69"><strong>Addendum 69</strong></a> &mdash; Pull-up resistance and current.</p>
+  <p class="deeper-ref" id="deeper-ref-70">Supporting detail: <a href="#deeper-addendum-70"><strong>Addendum 70</strong></a> &mdash; Pull-up resistance and current.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="microcontroller-basics--use-the-official-ide-and-function-reference" data-card="microcontroller-basics--use-the-official-ide-and-function-reference" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
@@ -6758,7 +6771,7 @@ void loop() {
       <h2>The stock Uno R3 uses six PWM pins</h2>
   <p>Use digital pins <strong>3, 5, 6, 9, 10 and 11</strong>. Default PWM is approximately <strong>490 Hz on 3, 9, 10 and 11</strong>, and <strong>980 Hz on 5 and 6</strong>. These correspond to periods of about 2.04 ms and 1.02 ms.</p>
   <p><code>analogWrite(pin, value)</code> requests duty using values from 0 (always off) to 255 (always on). A useful nominal mapping is <code>value = round(255 × D)</code>: 25% gives 64. Hardware timer modes introduce small differences in the exact duty, particularly near the ends of the range.</p>
-  <p class="deeper-ref" id="deeper-ref-70">Supporting detail: <a href="#deeper-addendum-70"><strong>Addendum 70</strong></a> &mdash; Official frequency table and timer limitations.</p>
+  <p class="deeper-ref" id="deeper-ref-71">Supporting detail: <a href="#deeper-addendum-71"><strong>Addendum 71</strong></a> &mdash; Official frequency table and timer limitations.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="pulse-width-modulation--change-duty-and-frequency-then-compare-an-adc-reading" data-card="pulse-width-modulation--change-duty-and-frequency-then-compare-an-adc-reading" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -6767,10 +6780,20 @@ void loop() {
       <h2>Change duty and frequency, then compare an ADC reading</h2>
   <div data-interactive="pwm-and-adc">
     <div class="pa-live" hidden></div>
-    <div class="pa-static"><p><strong>Print / static example:</strong> 25% duty at 500 Hz gives a 2 ms period, 0.5 ms on-time and 1.25 V average for a 0–5 V waveform. An unloaded RC filter with R = 10 kΩ and C = 1 µF has a 10 ms time constant; after settling, its output ripples around 1.25 V. With a 5.000 V ADC reference, 3.000 V gives code 614 in the ideal bin model; code 800 gives a lower-edge estimate of 3.90625 V.</p></div>
+    <div class="pa-static">
+      <p><strong>Print / static comparison:</strong> 25% duty at 500 Hz gives a 2 ms period, 0.5 ms HIGH time and a 1.25 V complete-cycle time mean for an ideal 0–5 V waveform. A point sample is one instant, not that average.</p>
+      <div class="unit-table-wrap"><table class="unit-table"><caption>The same PWM waveform sampled at different phases</caption><thead><tr><th>Finite sample set</th><th>Each raw sample</th><th>Selected-sample mean</th><th>ADC code / lower edge</th></tr></thead><tbody>
+        <tr><th>500 samples/s, phase 10%</th><td>5 V</td><td>5 V</td><td>1023 / 4.995117 V</td></tr>
+        <tr><th>500 samples/s, phase 60%</th><td>0 V</td><td>0 V</td><td>0 / 0 V</td></tr>
+        <tr><th>2000 samples/s, phases 1%, 26%, 51%, 76%</th><td>5, 0, 0, 0 V</td><td>1.25 V</td><td>Mean lower edge 1.248779 V</td></tr>
+      </tbody></table></div>
+      <p>An unloaded 10 kΩ / 1 µF RC filter has a 10 ms time constant. In the settled repeating response its 25%, 500 Hz ripple runs from about 1.1579 V to 1.3453 V while its cycle mean remains 1.25 V. Changing a control recomputes that settled response; this model does not show startup.</p>
+      <p>With a separate 5.000 V ADC input, 3.000 V gives code 614; code 800 has lower edge 3.90625 V.</p>
+    </div>
     <noscript><p>The controls require JavaScript. The equations, duty-cycle figure and worked example remain available.</p></noscript>
   </div>
-  <p>The explorer is a model, not a board connection. Its frequency control does not configure an Uno. ADC controls use the ideal bin convention on <a class="xref-page" href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a>; 5.000 V is assumed exact.</p>
+  <p>The explorer is a model, not a board connection. Its frequency and sampling controls do not configure an Uno or claim a board throughput. A raw sample uses normalized phase with HIGH on <code>[0, D)</code> and LOW on <code>[D, 1)</code>; the stated finite sample count defines the reported sample mean. ADC controls use the ideal bin convention on <a class="xref-page" href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a>; 5.000 V is assumed exact.</p>
+  <p class="deeper-ref" id="deeper-ref-72">Supporting detail: <a href="#deeper-addendum-72"><strong>Addendum 72</strong></a> &mdash; Why more samples can still give the wrong mean.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="pulse-width-modulation--an-rc-filter-smooths-pwm-but-leaves-ripple" data-card="pulse-width-modulation--an-rc-filter-smooths-pwm-but-leaves-ripple">
@@ -6779,7 +6802,8 @@ void loop() {
       <h2>An RC filter smooths PWM but leaves ripple</h2>
   <p>Put a resistor in series with the PWM signal and a capacitor from the output node to ground; measure the voltage across the capacitor. This <strong>RC low-pass filter</strong> slows voltage changes. The capacitor charges while PWM is HIGH and discharges while it is LOW.</p>
   <p>The time constant is <code>τ = R × C</code>. A longer time constant relative to the PWM period reduces ripple but makes the output respond more slowly when duty changes. The explorer shows the settled waveform with τ = 10 ms, assuming an ideal source and no load. A load changes the result; the filter is not a motor power supply.</p>
-  <p class="deeper-ref" id="deeper-ref-71">Supporting detail: <a href="#deeper-addendum-71"><strong>Addendum 71</strong></a> &mdash; What the smoothed trace calculates.</p>
+  <p>Microchip's <a href="https://onlinedocs.microchip.com/oxy/GUID-15F56EF1-EBFF-405A-9412-E41CC95BAACF-en-US-2/GUID-34AC5DDB-B9AE-4272-842B-E2A1CEE69B6B.html">AVR131 PWM filtering note</a> explains the tradeoff: the low-pass filter must reject PWM base-frequency ripple without removing the slower signal of interest, and a low-impedance load can discharge the capacitor unless buffered. This explorer deliberately assumes no load.</p>
+  <p class="deeper-ref" id="deeper-ref-73">Supporting detail: <a href="#deeper-addendum-73"><strong>Addendum 73</strong></a> &mdash; What the smoothed trace calculates.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="pulse-width-modulation--pwm-changes-led-brightness-and-motor-drive" data-card="pulse-width-modulation--pwm-changes-led-brightness-and-motor-drive">
@@ -6843,7 +6867,7 @@ void loop() {
       <h2>Count four nodes with the switch open, three with it closed</h2>
 <p>Trace this small component schematic with S1 open. Stop at each component terminal; do not count through the battery, resistor, or LED.</p>
 <figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlNjaGVtYXRpYzogQjEgcG9zaXRpdmUgdG8gb3BlbiBTMSwgdGhlbiBSMSwgRDEgYW5vZGUsIEQxIGNhdGhvZGUgYW5kIEIxIG5lZ2F0aXZlIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3MmI0ZCIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNMjAgNjBINjggTTkyIDYwSDIxNSBNMjY1IDYwSDMwMFYyMDBIMjcwIE0yMTAgMjAwSDEwNSBNNTUgMjAwSDIwVjYwIi8+PGcgZGF0YS1jb21wb25lbnQ9ImJhdHRlcnkiPjxwYXRoIGQ9Ik02OCA0NVY3NSBNNzYgMzVWODUgTTg0IDQ1Vjc1IE05MiAzNVY4NSIvPjx0ZXh0IHg9IjEwNiIgeT0iNDIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPis8L3RleHQ+PHRleHQgeD0iODAiIHk9IjExNCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+QjEgYmF0dGVyeTwvdGV4dD48L2c+PGcgZGF0YS1jb21wb25lbnQ9InN3aXRjaCI+PGNpcmNsZSBjeD0iMjE1IiBjeT0iNjAiIHI9IjMiLz48Y2lyY2xlIGN4PSIyNjUiIGN5PSI2MCIgcj0iMyIvPjxwYXRoIGQ9Ik0yMTggNThMMjU5IDM1Ii8+PHRleHQgeD0iMjQwIiB5PSIxMTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlMxIG9wZW48L3RleHQ+PC9nPjxnIGRhdGEtY29tcG9uZW50PSJyZXNpc3RvciI+PHBhdGggZD0iTTIxMCAyMDBsNS0xMCAxMCAyMCAxMC0yMCAxMCAyMCAxMC0yMCAxMCAyMCA1LTEwIi8+PHRleHQgeD0iMjQwIiB5PSIyNTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlIxIHJlc2lzdG9yPC90ZXh0PjwvZz48ZyBkYXRhLWNvbXBvbmVudD0ibGVkIj48cGF0aCBkPSJNMTA1IDIwMEg5NSBNOTUgMTgzVjIxN0w2NSAyMDBaIE02NSAxODNWMjE3IE02NSAyMDBINTUgTTgzIDE3NmwtMTUtMThtMCA4di04aDggTTEwMCAxNzZsLTE1LTE4bTAgOHYtOGg4Ii8+PHRleHQgeD0iODAiIHk9IjI1NCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+RDEgTEVEPC90ZXh0PjwvZz48L2c+PC9zdmc+Cg==" alt="Battery B1, open switch S1, resistor R1 and LED D1 form a loop." data-natural-width="320" data-natural-height="290"></p><figcaption>The same generic circuit as the drawing comparison. No off-page connections are implied.</figcaption></figure>
-<p class="deeper-ref" id="deeper-ref-72">Supporting detail: <a href="#deeper-addendum-72"><strong>Addendum 72</strong></a> &mdash; Check the node count terminal by terminal.</p>
+<p class="deeper-ref" id="deeper-ref-74">Supporting detail: <a href="#deeper-addendum-74"><strong>Addendum 74</strong></a> &mdash; Check the node count terminal by terminal.</p>
 <p><a class="button" data-practice-add="diagram-component-nodes" href="../practice.html#diagram-component-nodes">Practice counting schematic nodes</a></p>
     </div>
   </details>
@@ -6880,7 +6904,7 @@ void loop() {
     <li>Two parallel resistors: <code>R<sub>eq</sub> = R<sub>1</sub>R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>)</code>.</li>
   </ul>
   <p>Check the result: series resistance is greater than any one positive resistor; parallel resistance is smaller than the smallest connected resistor when two or more branches are connected. An open circuit has no conducting path and is represented by infinite equivalent resistance.</p>
-  <p class="deeper-ref" id="deeper-ref-73">Supporting detail: <a href="#deeper-addendum-73"><strong>Addendum 73</strong></a> &mdash; Why the parallel formula uses reciprocals.</p>
+  <p class="deeper-ref" id="deeper-ref-75">Supporting detail: <a href="#deeper-addendum-75"><strong>Addendum 75</strong></a> &mdash; Why the parallel formula uses reciprocals.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="series-and-parallel-circuits--change-a-resistor-or-open-a-switch-and-predict-what-changes" data-card="series-and-parallel-circuits--change-a-resistor-or-open-a-switch-and-predict-what-changes" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -6940,7 +6964,7 @@ void loop() {
       <h2>Choose the tip for contact, not just access</h2>
   <p>A temperature-controlled station regulates the iron's tip temperature. A basic iron may have no temperature control; a cordless iron changes how it is powered, not how a joint is made. Check the tool's instructions and choose settings suitable for the solder and components.</p>
   <p>Tip shape and size matter. A fine point reaches small spaces, but a chisel's broad face often transfers heat more effectively. Use the largest tinned contact face that fits the joint without touching neighboring connections. Interchangeable tips let one iron handle different work; change them according to the tool's instructions.</p>
-  <p class="deeper-ref" id="deeper-ref-74">Supporting detail: <a href="#deeper-addendum-74"><strong>Addendum 74</strong></a> &mdash; What the iron's “sweet spot” means.</p>
+  <p class="deeper-ref" id="deeper-ref-76">Supporting detail: <a href="#deeper-addendum-76"><strong>Addendum 76</strong></a> &mdash; What the iron's “sweet spot” means.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-equipment--match-the-solder-and-flux-to-electrical-work" data-card="soldering-equipment--match-the-solder-and-flux-to-electrical-work">
@@ -6964,9 +6988,9 @@ void loop() {
   <p>Helping hands or a PCB vise hold the parts still while your hands hold the iron and solder. Keep a proper stand or cradle within reach. Use a damp soldering sponge or brass wool for tip cleaning, and have solder wick (copper braid) or a desoldering pump available for removing excess solder.</p>
   <p><strong>It gets hot. Really hot.</strong> Park the iron in its stand, and allow the work to cool before touching it. Use ventilation or fume extraction that keeps the plume away from your face and other people; most visible fume comes from flux. Wash your hands after handling leaded solder, and do not eat or drink at the bench.</p>
   <p><strong>SHOP RULE: NEVER SOLDER BATTERIES.</strong></p>
-  <p class="deeper-ref" id="deeper-ref-75">Supporting detail: <a href="#deeper-addendum-75"><strong>Addendum 75</strong></a> &mdash; Why the battery rule stays absolute.</p>
+  <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; Why the battery rule stays absolute.</p>
   <p>Work on disconnected circuits. Follow <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a>; flux and fume handling belongs with <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a>.</p>
-  <p class="deeper-ref" id="deeper-ref-76">Supporting detail: <a href="#deeper-addendum-76"><strong>Addendum 76</strong></a> &mdash; Further reading on flux fume.</p>
+  <p class="deeper-ref" id="deeper-ref-78">Supporting detail: <a href="#deeper-addendum-78"><strong>Addendum 78</strong></a> &mdash; Further reading on flux fume.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-equipment--clean-tin-and-keep-the-working-face-coated" data-card="soldering-equipment--clean-tin-and-keep-the-working-face-coated">
@@ -6975,7 +6999,7 @@ void loop() {
       <h2>Clean, tin, and keep the working face coated</h2>
   <p>With the iron at working temperature, briefly clean the tip on brass wool or a damp soldering sponge. Apply fresh solder to coat its working face, then remove the excess on the cleaner. Leave a thin coating; do not wipe it bare and let it sit hot. Re-tin as needed and before storage as directed by the tool manufacturer.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkNsZWFuLCBjb2F0LCBhbmQgcmV0YWluIGEgdGhpbiBsYXllciBvZiBzb2xkZXI8L3RpdGxlPjxyZWN0IHdpZHRoPSIzNjAiIGhlaWdodD0iODQwIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MThweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0ZH0gLmhlYWR7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MjJweH0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojOWE1MTE5O3N0cm9rZS13aWR0aDo5O3N0cm9rZS1saW5lY2FwOnJvdW5kfSAubGVhZHtmaWxsOiNjY2M7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5zb2xkZXJ7ZmlsbDojYjhkOWVhO3N0cm9rZTojMTcyYjRkO3N0cm9rZS13aWR0aDoyfSAucGFke2ZpbGw6I2I4NzMzMztzdHJva2U6IzE3MmI0ZH0gLmJvYXJke2ZpbGw6I2UyZWRkZjtzdHJva2U6IzE3MmI0ZH08L3N0eWxlPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjEuIENsZWFuIGJyaWVmbHk8L3RleHQ+PHBhdGggZD0iTTgwIDE5NUgyODBWMjIwSDgwWiIgZmlsbD0iI2VjYWMwMCIgc3Ryb2tlPSIjMTcyYjRkIi8+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjUwIj5EYW1wIHNwb25nZSBvciBicmFzcyB3b29sLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj4yLiBBcHBseSBmcmVzaCBzb2xkZXI8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48cGF0aCBkPSJNMzAwIDkwTDIxMCAxODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyNmI4MyIgc3Ryb2tlLXdpZHRoPSI3Ii8+PHRleHQgeD0iMjAiIHk9IjI1MCI+Q29hdCB0aGUgaG90IHdvcmtpbmcgZmFjZS48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gTGVhdmUgYSB0aGluIGNvYXRpbmc8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5SZW1vdmUgZXhjZXNzIG9uIHRoZSBjbGVhbmVyLjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjcwIj5EbyBub3QgbGVhdmUgdGhlIGhvdCBmYWNlIGJhcmUuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Three stages: clean the working face, melt fresh solder onto it, and leave a thin solder coating after removing excess." data-natural-width="360" data-natural-height="840"></p>
-  <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; Why tinning helps heat transfer.</p>
+  <p class="deeper-ref" id="deeper-ref-79">Supporting detail: <a href="#deeper-addendum-79"><strong>Addendum 79</strong></a> &mdash; Why tinning helps heat transfer.</p>
     </div>
   </details>
 </div>
@@ -7011,7 +7035,7 @@ void loop() {
       <h2>Put heat-shrink on before closing the splice</h2>
   <p>Slide suitable heat-shrink tubing onto a wire before joining it, and keep it away from the soldering heat. After soldering, allow the joint to cool and inspect it. Move the tubing over all exposed conductor, overlapping intact insulation at both ends of an inline splice, then shrink it with the appropriate heat source according to its instructions.</p>
   <p>Choose tubing whose unshrunk size passes over the splice and whose recovered size fits the wire. Avoid sharp wire ends that could puncture it. Ordinary heat-shrink provides insulation; do not assume it makes a waterproof connection or replaces strain relief.</p>
-  <p class="deeper-ref" id="deeper-ref-78">Supporting detail: <a href="#deeper-addendum-78"><strong>Addendum 78</strong></a> &mdash; When pre-tinning helps.</p>
+  <p class="deeper-ref" id="deeper-ref-80">Supporting detail: <a href="#deeper-addendum-80"><strong>Addendum 80</strong></a> &mdash; When pre-tinning helps.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together" data-card="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together">
@@ -7051,7 +7075,7 @@ void loop() {
       <h2>A smaller AWG number means a thicker conductor</h2>
   <p><strong>American Wire Gauge (AWG)</strong> uses smaller numbers for larger conductor cross sections. For the same material, length and temperature, a thicker conductor has less resistance. See <a href="https://learn.adafruit.com/wires-and-connections/wire-gauges">Adafruit’s wire-gauge explanation</a>. Under comparable installation and temperature conditions, it can carry more current without exceeding its temperature limit.</p>
   <p><strong>Ampacity</strong> means the allowable current under specified conditions. Gauge alone is not an ampacity rating: material, insulation temperature rating, ambient temperature, bundling and installation all matter. Use the applicable manufacturer data and installation requirements for a real selection; this page is not a wire-sizing table. <a href="https://www.iewc.com/resources/technical-guide/suggested-ampacities">IEWC explains these ampacity factors</a>. Choosing a wire involves voltage drop as well as allowable current.</p>
-  <p class="deeper-ref" id="deeper-ref-79">Supporting detail: <a href="#deeper-addendum-79"><strong>Addendum 79</strong></a> &mdash; Why a long wire can matter even below its current limit.</p>
+  <p class="deeper-ref" id="deeper-ref-81">Supporting detail: <a href="#deeper-addendum-81"><strong>Addendum 81</strong></a> &mdash; Why a long wire can matter even below its current limit.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="wire-and-wire-gauge--count-the-return-wire-explore-voltage-drop-and-heating" data-card="wire-and-wire-gauge--count-the-return-wire-explore-voltage-drop-and-heating" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -7068,7 +7092,7 @@ void loop() {
     <noscript><p>The worked table and comparison above work without JavaScript. Enable JavaScript to vary the inputs.</p></noscript>
   </div>
   <p>This model assumes solid copper at 20 °C, equal outgoing and return wires, and DC/resistive behavior. Current is an input, not a prediction of how a particular load responds. Heating loss is not a temperature prediction; copper resistance rises with temperature (approx. 0.393%/°C near 20 °C). Connections and AC reactance are omitted.</p>
-  <p class="deeper-ref" id="deeper-ref-80">Supporting detail: <a href="#deeper-addendum-80"><strong>Addendum 80</strong></a> &mdash; Definitions used to calculate every result.</p>
+  <p class="deeper-ref" id="deeper-ref-82">Supporting detail: <a href="#deeper-addendum-82"><strong>Addendum 82</strong></a> &mdash; Definitions used to calculate every result.</p>
   <p>Practice:
     <a data-practice-add="wire-loop-resistance" href="../practice.html#wire-loop-resistance">Loop resistance</a> ·
     <a data-practice-add="wire-run-drop" href="../practice.html#wire-run-drop">Voltage drop</a> ·
@@ -7681,228 +7705,244 @@ void loop() {
     </li>
     <li class="deeper-addendum" id="deeper-addendum-53" value="53">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-capacity-and-packs">Battery Capacity and Packs</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 53.</span> Why the battery estimate uses an approximate sign</h2>
-        <p>Wh = Ah × V is exact for constant voltage. A real cell's voltage changes during discharge, so nominal voltage gives an energy estimate. Usable charge also changes with load, temperature, age and the cutoff voltage. These calculations assume the stated capacity is available.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 53.</span> Quantize first or average first?</h2>
+        <p>ADC conversion floors each individual ideal sample into a bin. Averaging the reconstructed lower edges therefore need not equal converting the analog sample mean. For a 25% raw 0–5 V sequence with one HIGH and three LOW samples, the analog sample mean is 1.25 V; the lower-edge reconstructions average 4.9951171875/4 = 1.248779296875 V. Neither operation recovers information between sample instants.</p>
         <p class="deeper-back"><a href="#deeper-ref-53">Back to reference 53</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-54" value="54">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-chemistries">Battery Chemistries</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 54.</span> Why a remote-control recommendation needs more than a chemistry name</h2>
-        <p>A low average load makes charge retention important, but it does not by itself select NiCd over NiMH. Compare the actual cells' self-discharge, usable capacity, voltage and charging requirements. A low-self-discharge NiMH cell behaves differently from an older conventional NiMH cell.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-capacity-and-packs">Battery Capacity and Packs</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 54.</span> Why the battery estimate uses an approximate sign</h2>
+        <p>Wh = Ah × V is exact for constant voltage. A real cell's voltage changes during discharge, so nominal voltage gives an energy estimate. Usable charge also changes with load, temperature, age and the cutoff voltage. These calculations assume the stated capacity is available.</p>
         <p class="deeper-back"><a href="#deeper-ref-54">Back to reference 54</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-55" value="55">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-chemistries">Battery Chemistries</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 55.</span> Scope of this short chronology</h2>
-        <p>This overview uses the historical sequence in the course generation-and-storage notes, with dates rounded to eras. Invention, patent and market introduction are different milestones; the dates are not intended as a priority claim. The development of lithium-ion was a multi-researcher effort, not solely the work of the company that first sold it.</p>
+        <h2><span class="deeper-addendum-number">Addendum 55.</span> Why a remote-control recommendation needs more than a chemistry name</h2>
+        <p>A low average load makes charge retention important, but it does not by itself select NiCd over NiMH. Compare the actual cells' self-discharge, usable capacity, voltage and charging requirements. A low-self-discharge NiMH cell behaves differently from an older conventional NiMH cell.</p>
         <p class="deeper-back"><a href="#deeper-ref-55">Back to reference 55</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-56" value="56">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-dc-motor-curves">DC Motor Torque, Speed, and Power</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 56.</span> Manufacturer basis for the straight line</h2>
-        <p>maxon's <a href="https://www.maxongroup.com.tw/medias/sys_master/8798985748510.pdf?attachment=true#page=10">Motor Data and Operating Ranges, p. 10</a>, states: <q>Enhancing the load torque leads to a linear reduction of the speed.</q> It identifies no-load speed and stall torque as the endpoints and specifies fixed applied voltage.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-battery-chemistries">Battery Chemistries</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 56.</span> Scope of this short chronology</h2>
+        <p>This overview uses the historical sequence in the course generation-and-storage notes, with dates rounded to eras. Invention, patent and market introduction are different milestones; the dates are not intended as a priority claim. The development of lithium-ion was a multi-researcher effort, not solely the work of the company that first sold it.</p>
         <p class="deeper-back"><a href="#deeper-ref-56">Back to reference 56</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-57" value="57">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-dc-motor-curves">DC Motor Torque, Speed, and Power</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 57.</span> Derive the halfway result from the straight line</h2>
-        <p>Put x = n/n<sub>0</sub>. Then T = T<sub>s</sub>(1 − x), so P = T<sub>s</sub>ω<sub>0</sub>x(1 − x). Since x(1 − x) = 1/4 − (x − 1/2)<sup>2</sup>, the largest value is 1/4 at x = 1/2. Thus peak power = T<sub>s</sub>ω<sub>0</sub>/4, at half no-load speed and half stall torque. The two endpoint maxima cannot occur at the same time.</p>
+        <h2><span class="deeper-addendum-number">Addendum 57.</span> Manufacturer basis for the straight line</h2>
+        <p>maxon's <a href="https://www.maxongroup.com.tw/medias/sys_master/8798985748510.pdf?attachment=true#page=10">Motor Data and Operating Ranges, p. 10</a>, states: <q>Enhancing the load torque leads to a linear reduction of the speed.</q> It identifies no-load speed and stall torque as the endpoints and specifies fixed applied voltage.</p>
         <p class="deeper-back"><a href="#deeper-ref-57">Back to reference 57</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-58" value="58">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-dc-motor-curves">DC Motor Torque, Speed, and Power</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 58.</span> Manufacturer check on peak power</h2>
-        <p>Portescap's <a href="https://www.portescap.com/-/media/project/automation-specialty/portescap/portescap/pdf/whitepapers/ed_wp_brush_dc_motor_basics.pdf#page=1">Brush DC Motor Basics, p. 1, point 4</a>, places maximum mechanical power at <q>half the stall torque</q>. On the linear curve, this also means half no-load speed, as derived above.</p>
+        <h2><span class="deeper-addendum-number">Addendum 58.</span> Derive the halfway result from the straight line</h2>
+        <p>Put x = n/n<sub>0</sub>. Then T = T<sub>s</sub>(1 − x), so P = T<sub>s</sub>ω<sub>0</sub>x(1 − x). Since x(1 − x) = 1/4 − (x − 1/2)<sup>2</sup>, the largest value is 1/4 at x = 1/2. Thus peak power = T<sub>s</sub>ω<sub>0</sub>/4, at half no-load speed and half stall torque. The two endpoint maxima cannot occur at the same time.</p>
         <p class="deeper-back"><a href="#deeper-ref-58">Back to reference 58</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-59" value="59">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-dc-motor-curves">DC Motor Torque, Speed, and Power</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 59.</span> Manufacturer basis for the efficiency comparison</h2>
-        <p>Portescap's <a href="https://www.portescap.com/-/media/project/automation-specialty/portescap/portescap/pdf/whitepapers/ed_wp_brush_dc_motor_basics.pdf#page=1">Brush DC Motor Basics, p. 1, point 3</a>, states: <q>The maximum efficiency is obtained at high speed.</q> Its accompanying torque plot places the efficiency peak below the torque of peak power; the descending speed line therefore puts it at higher speed.</p>
+        <h2><span class="deeper-addendum-number">Addendum 59.</span> Manufacturer check on peak power</h2>
+        <p>Portescap's <a href="https://www.portescap.com/-/media/project/automation-specialty/portescap/portescap/pdf/whitepapers/ed_wp_brush_dc_motor_basics.pdf#page=1">Brush DC Motor Basics, p. 1, point 4</a>, places maximum mechanical power at <q>half the stall torque</q>. On the linear curve, this also means half no-load speed, as derived above.</p>
         <p class="deeper-back"><a href="#deeper-ref-59">Back to reference 59</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-60" value="60">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-dc-motor-curves">DC Motor Torque, Speed, and Power</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 60.</span> Source and the standstill boundary</h2>
-        <p>The running conversion follows maxon's <a href="https://www.maxongroup.com/medias/sys_master/root/8815461728286/gear-Technology-short-and-to-the-point-14-EN-36-37.pdf#page=1">gear conversion note</a>: motor speed equals reduction multiplied by load speed, while motor torque equals load torque divided by reduction and gear efficiency. The note also requires checking actual gear torque and speed limits. A separate <a href="https://support.maxongroup.com/hc/en-us/articles/360006034594-Gearhead-efficiency-at-blocked-state">maxon standstill note</a> explains that power efficiency is undefined when both input and output power are zero. This lesson therefore treats stall as a boundary; it does not calculate blocked-state efficiency or a permissible output torque.</p>
+        <h2><span class="deeper-addendum-number">Addendum 60.</span> Manufacturer basis for the efficiency comparison</h2>
+        <p>Portescap's <a href="https://www.portescap.com/-/media/project/automation-specialty/portescap/portescap/pdf/whitepapers/ed_wp_brush_dc_motor_basics.pdf#page=1">Brush DC Motor Basics, p. 1, point 3</a>, states: <q>The maximum efficiency is obtained at high speed.</q> Its accompanying torque plot places the efficiency peak below the torque of peak power; the descending speed line therefore puts it at higher speed.</p>
         <p class="deeper-back"><a href="#deeper-ref-60">Back to reference 60</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-61" value="61">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-digital-and-analog-signals">Digital and Analog Signals</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 61.</span> Phototransistor circuits can measure light or switch at a threshold</h2>
-        <p>Vishay's <a href="https://www.vishay.com/docs/84154/appnotesensors.pdf">Ambient Light Sensors — Circuit and Window Design</a> shows both light-meter circuits and light-switch circuits. The phototransistor current changes with illumination; the surrounding circuit determines whether the output preserves a range or switches between logic states.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-dc-motor-curves">DC Motor Torque, Speed, and Power</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 61.</span> Source and the standstill boundary</h2>
+        <p>The running conversion follows maxon's <a href="https://www.maxongroup.com/medias/sys_master/root/8815461728286/gear-Technology-short-and-to-the-point-14-EN-36-37.pdf#page=1">gear conversion note</a>: motor speed equals reduction multiplied by load speed, while motor torque equals load torque divided by reduction and gear efficiency. The note also requires checking actual gear torque and speed limits. A separate <a href="https://support.maxongroup.com/hc/en-us/articles/360006034594-Gearhead-efficiency-at-blocked-state">maxon standstill note</a> explains that power efficiency is undefined when both input and output power are zero. This lesson therefore treats stall as a boundary; it does not calculate blocked-state efficiency or a permissible output torque.</p>
         <p class="deeper-back"><a href="#deeper-ref-61">Back to reference 61</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-62" value="62">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-digital-and-analog-signals">Digital and Analog Signals</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 62.</span> Why an ultrasonic measurement can be digital</h2>
-        <p>The <a href="https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf">HC-SR04 manufacturer datasheet, hosted by SparkFun</a> describes an Echo pulse whose width represents the range. Digital describes the two voltage states; the information can be carried by their timing. A single <code>digitalRead</code> tells you the current state, not the pulse duration.</p>
+        <h2><span class="deeper-addendum-number">Addendum 62.</span> Phototransistor circuits can measure light or switch at a threshold</h2>
+        <p>Vishay's <a href="https://www.vishay.com/docs/84154/appnotesensors.pdf">Ambient Light Sensors — Circuit and Window Design</a> shows both light-meter circuits and light-switch circuits. The phototransistor current changes with illumination; the surrounding circuit determines whether the output preserves a range or switches between logic states.</p>
         <p class="deeper-back"><a href="#deeper-ref-62">Back to reference 62</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-63" value="63">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electric-motor-principles">Electric Motor Principles</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 63.</span> Where the alignment picture needs care</h2>
-        <p>This is a first picture, not a description of every motor's internal timing. A synchronous motor can rotate at the same speed as the stator field while keeping an angular offset that produces torque. An induction rotor runs slower than the field during normal motoring; that relative motion induces rotor current. A stepper can deliberately stop and hold a commanded position.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-digital-and-analog-signals">Digital and Analog Signals</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 63.</span> Why an ultrasonic measurement can be digital</h2>
+        <p>The <a href="https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf">HC-SR04 manufacturer datasheet, hosted by SparkFun</a> describes an Echo pulse whose width represents the range. Digital describes the two voltage states; the information can be carried by their timing. A single <code>digitalRead</code> tells you the current state, not the pulse duration.</p>
         <p class="deeper-back"><a href="#deeper-ref-63">Back to reference 63</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-64" value="64">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electric-motor-types">Electric Motor Types</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 64.</span> Why alternating current alone is not the full explanation</h2>
-        <p>A single winding supplied by single-phase AC makes a field that pulses back and forth; that alone does not establish a starting direction. Single-phase induction motors use an additional starting arrangement. The rotating field, rotor current, and relative speed explain rotation more clearly than saying the rotor field simply opposes the stator field.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electric-motor-principles">Electric Motor Principles</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 64.</span> Where the alignment picture needs care</h2>
+        <p>This is a first picture, not a description of every motor's internal timing. A synchronous motor can rotate at the same speed as the stator field while keeping an angular offset that produces torque. An induction rotor runs slower than the field during normal motoring; that relative motion induces rotor current. A stepper can deliberately stop and hold a commanded position.</p>
         <p class="deeper-back"><a href="#deeper-ref-64">Back to reference 64</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-65" value="65">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electrical-generation">Electrical Generation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 65.</span> How rotation produces electricity</h2>
-        <p>Relative motion between a magnetic field and conductors induces a voltage. With a closed circuit, current flows and the shaft must supply work against the electrical load. Motor action and generator action reverse the direction of energy conversion; see <a class="xref-page" href="#p-electric-motor-principles">Electric Motor Principles</a>. Actual machines and controls determine how they can operate in either direction.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electric-motor-types">Electric Motor Types</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 65.</span> Why alternating current alone is not the full explanation</h2>
+        <p>A single winding supplied by single-phase AC makes a field that pulses back and forth; that alone does not establish a starting direction. Single-phase induction motors use an additional starting arrangement. The rotating field, rotor current, and relative speed explain rotation more clearly than saying the rotor field simply opposes the stator field.</p>
         <p class="deeper-back"><a href="#deeper-ref-65">Back to reference 65</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-66" value="66">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 66.</span> A one-second count is a rhythm, not a temperature test</h2>
-        <p>“Apply iron, one-second count, apply solder” reminds you to heat before feeding. The actual time depends on the joint, tip, alloy, and component limits. Look for solder flowing onto both surfaces. If it will not flow, stop and check cleanliness, flux, contact, and tool settings rather than holding the iron there indefinitely.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electrical-generation">Electrical Generation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 66.</span> How rotation produces electricity</h2>
+        <p>Relative motion between a magnetic field and conductors induces a voltage. With a closed circuit, current flows and the shaft must supply work against the electrical load. Motor action and generator action reverse the direction of energy conversion; see <a class="xref-page" href="#p-electric-motor-principles">Electric Motor Principles</a>. Actual machines and controls determine how they can operate in either direction.</p>
         <p class="deeper-back"><a href="#deeper-ref-66">Back to reference 66</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-67" value="67">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 67.</span> Why lead-free solder may look different</h2>
-        <p>Kester's <a href="https://www.kester.com/knowledge-base/faq">soldering FAQ</a>, under lead-free joint appearance, explains that tin-silver-copper joints can have a dull surface without being poor joints. Judge the connection, not shine alone.</p>
+        <h2><span class="deeper-addendum-number">Addendum 67.</span> A one-second count is a rhythm, not a temperature test</h2>
+        <p>“Apply iron, one-second count, apply solder” reminds you to heat before feeding. The actual time depends on the joint, tip, alloy, and component limits. Look for solder flowing onto both surfaces. If it will not flow, stop and check cleanliness, flux, contact, and tool settings rather than holding the iron there indefinitely.</p>
         <p class="deeper-back"><a href="#deeper-ref-67">Back to reference 67</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-68" value="68">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-measuring-electric-circuits">Measuring Electric Circuits</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 68.</span> Real meters change the circuit a little</h2>
-        <p>An ideal voltmeter draws no current. A real one has high but finite input resistance. An ideal ammeter drops no voltage. A real one has some resistance and a voltage drop, sometimes called burden voltage. The practice problems use ideal meters unless stated otherwise.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 68.</span> Why lead-free solder may look different</h2>
+        <p>Kester's <a href="https://www.kester.com/knowledge-base/faq">soldering FAQ</a>, under lead-free joint appearance, explains that tin-silver-copper joints can have a dull surface without being poor joints. Judge the connection, not shine alone.</p>
         <p class="deeper-back"><a href="#deeper-ref-68">Back to reference 68</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-69" value="69">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-microcontroller-basics">Microcontroller Basics</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 69.</span> Pull-up resistance and current</h2>
-        <p>The Uno's internal pull-up is approximately <strong>20–50 kΩ</strong>, not a fixed 10 kΩ. Arduino's <a href="https://docs.arduino.cc/retired/boards/arduino-uno-rev3-with-long-pins/">Uno R3 documentation</a> specifies “20-50k ohm.” At nominal 5 V, a closed switch carries about 0.10–0.25 mA through that resistor, using <code>I = V/R</code>. See <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a>.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-measuring-electric-circuits">Measuring Electric Circuits</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 69.</span> Real meters change the circuit a little</h2>
+        <p>An ideal voltmeter draws no current. A real one has high but finite input resistance. An ideal ammeter drops no voltage. A real one has some resistance and a voltage drop, sometimes called burden voltage. The practice problems use ideal meters unless stated otherwise.</p>
         <p class="deeper-back"><a href="#deeper-ref-69">Back to reference 69</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-70" value="70">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 70.</span> Official frequency table and timer limitations</h2>
-        <p>The Uno R3 row of Arduino's <a href="https://github.com/arduino/reference-en/blob/master/Language/Functions/Analog%20IO/analogWrite.adoc">analogWrite reference source</a> states “490 Hz (pins 5 and 6: 980 Hz)”. See also the <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/">published analogWrite reference</a>. A frequency near 31 kHz requires changing timer configuration; it is not the stock setting. <code>analogWrite</code> sets duty, not frequency. Arduino's <a href="https://docs.arduino.cc/tutorials/generic/secrets-of-arduino-pwm/">Secrets of Arduino PWM</a> explains prescalers and timer modes. Changing timers can also affect other functions and libraries.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-microcontroller-basics">Microcontroller Basics</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 70.</span> Pull-up resistance and current</h2>
+        <p>The Uno's internal pull-up is approximately <strong>20–50 kΩ</strong>, not a fixed 10 kΩ. Arduino's <a href="https://docs.arduino.cc/retired/boards/arduino-uno-rev3-with-long-pins/">Uno R3 documentation</a> specifies “20-50k ohm.” At nominal 5 V, a closed switch carries about 0.10–0.25 mA through that resistor, using <code>I = V/R</code>. See <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a>.</p>
         <p class="deeper-back"><a href="#deeper-ref-70">Back to reference 70</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-71" value="71">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 71.</span> What the smoothed trace calculates</h2>
-        <p>During each constant input interval, <code>V(t) = V<sub>target</sub> + (V<sub>start</sub> − V<sub>target</sub>)e<sup>−t/τ</sup></code>. The model solves for a repeating steady state, then draws the charging and discharging curves. It omits startup, output resistance, component tolerances and loading. At 0% or 100%, the settled output is simply 0 V or 5 V.</p>
+        <h2><span class="deeper-addendum-number">Addendum 71.</span> Official frequency table and timer limitations</h2>
+        <p>The Uno R3 row of Arduino's <a href="https://github.com/arduino/reference-en/blob/master/Language/Functions/Analog%20IO/analogWrite.adoc">analogWrite reference source</a> states “490 Hz (pins 5 and 6: 980 Hz)”. See also the <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/">published analogWrite reference</a>. A frequency near 31 kHz requires changing timer configuration; it is not the stock setting. <code>analogWrite</code> sets duty, not frequency. Arduino's <a href="https://docs.arduino.cc/tutorials/generic/secrets-of-arduino-pwm/">Secrets of Arduino PWM</a> explains prescalers and timer modes. Changing timers can also affect other functions and libraries.</p>
         <p class="deeper-back"><a href="#deeper-ref-71">Back to reference 71</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-72" value="72">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-reading-electrical-connections">Reading Electrical Connections</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 72.</span> Check the node count terminal by terminal</h2>
-        <p>The four separate conductor groups are B1+ to S1; the other side of S1 to R1; the other side of R1 to D1 anode; and D1 cathode to B1−. Closing an ideal S1 merges the first two groups into one, leaving three nodes. None of the component bodies is an extra node.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 72.</span> Why more samples can still give the wrong mean</h2>
+        <p>If the sample clock repeatedly lands at the same PWM phase, every point can read HIGH or every point can read LOW even though the full-cycle time mean is 1.25 V. A sample-and-hold output keeps the most recent point value between samples; holding is not averaging. A carefully spaced finite set can match the cycle mean, but a higher rate or larger count alone does not guarantee an unbiased result. This bounded comparison does not claim reconstruction of an unbandlimited switching edge from a Nyquist test.</p>
         <p class="deeper-back"><a href="#deeper-ref-72">Back to reference 72</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-73" value="73">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 73.</span> Why the parallel formula uses reciprocals</h2>
-        <p>Each branch draws the supply voltage divided by its resistance. Add those branch currents, then divide by the common voltage. The result is a sum of <code>1/R</code> terms. This reciprocal of resistance is called conductance: parallel branches add ways for current to flow.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 73.</span> What the smoothed trace calculates</h2>
+        <p>During each constant input interval, <code>V(t) = V<sub>target</sub> + (V<sub>start</sub> − V<sub>target</sub>)e<sup>−t/τ</sup></code>. The model solves for a repeating steady state, then draws the charging and discharging curves. It omits startup, output resistance, component tolerances and loading. At 0% or 100%, the settled output is simply 0 V or 5 V.</p>
         <p class="deeper-back"><a href="#deeper-ref-73">Back to reference 73</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-74" value="74">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 74.</span> What the iron's “sweet spot” means</h2>
-        <p>Use the broad, clean, solder-coated working face of the tip against both parts. Do not interpret “side of the iron” as the barrel or an uncoated surface. The useful contact area, not the sharpest point or the highest temperature setting, delivers heat into the joint. A tiny point can be hot and still transfer heat poorly.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-reading-electrical-connections">Reading Electrical Connections</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 74.</span> Check the node count terminal by terminal</h2>
+        <p>The four separate conductor groups are B1+ to S1; the other side of S1 to R1; the other side of R1 to D1 anode; and D1 cathode to B1−. Closing an ideal S1 merges the first two groups into one, leaving three nodes. None of the component bodies is an extra node.</p>
         <p class="deeper-back"><a href="#deeper-ref-74">Back to reference 74</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-75" value="75">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 75.</span> Why the battery rule stays absolute</h2>
-        <p>Heat applied to a cell can damage its seals and internal parts. Lithium cells in particular can fail dangerously if damaged. Use the intended battery holder or connector instead of applying a soldering iron to a battery.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 75.</span> Why the parallel formula uses reciprocals</h2>
+        <p>Each branch draws the supply voltage divided by its resistance. Add those branch currents, then divide by the common voltage. The result is a sum of <code>1/R</code> terms. This reciprocal of resistance is called conductance: parallel branches add ways for current to flow.</p>
         <p class="deeper-back"><a href="#deeper-ref-75">Back to reference 75</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-76" value="76">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 76.</span> Further reading on flux fume</h2>
-        <p>The UK Health and Safety Executive's <a href="https://www.hse.gov.uk/asthma/solderers.htm">guidance for solderers</a> describes rosin-based flux fume and recommends extraction and keeping your head out of the plume.</p>
+        <h2><span class="deeper-addendum-number">Addendum 76.</span> What the iron's “sweet spot” means</h2>
+        <p>Use the broad, clean, solder-coated working face of the tip against both parts. Do not interpret “side of the iron” as the barrel or an uncoated surface. The useful contact area, not the sharpest point or the highest temperature setting, delivers heat into the joint. A tiny point can be hot and still transfer heat poorly.</p>
         <p class="deeper-back"><a href="#deeper-ref-76">Back to reference 76</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-77" value="77">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 77.</span> Why tinning helps heat transfer</h2>
-        <p>A hot tip oxidizes. Oxide interferes with wetting, while a solder coating protects the working face and helps make thermal contact with the joint. Tinning the tip is the time to feed solder onto the tip. Making a joint is different: feed solder into the heated joint.</p>
-    <p>See HAKKO's <a href="https://www.hakko.com/english/support/maintenance/detail.php?seq=163">tip-life guidance</a> for the construction of plated tips and the effects of oxidation.</p>
+        <h2><span class="deeper-addendum-number">Addendum 77.</span> Why the battery rule stays absolute</h2>
+        <p>Heat applied to a cell can damage its seals and internal parts. Lithium cells in particular can fail dangerously if damaged. Use the intended battery holder or connector instead of applying a soldering iron to a battery.</p>
         <p class="deeper-back"><a href="#deeper-ref-77">Back to reference 77</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-78" value="78">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-wires-and-pcbs">Soldering Wire Splices and Through-Hole PCBs</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 78.</span> When pre-tinning helps</h2>
-        <p>Some wires and terminals are pre-tinned: a small amount of solder wets the surface before final assembly. This can help the final joint flow, but too much solder makes a wire end stiff and bulky. Follow the connection's assembly method and still heat both parts when making the final bond.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 78.</span> Further reading on flux fume</h2>
+        <p>The UK Health and Safety Executive's <a href="https://www.hse.gov.uk/asthma/solderers.htm">guidance for solderers</a> describes rosin-based flux fume and recommends extraction and keeping your head out of the plume.</p>
         <p class="deeper-back"><a href="#deeper-ref-78">Back to reference 78</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-79" value="79">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 79.</span> Why a long wire can matter even below its current limit</h2>
-        <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> shows the calculation.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 79.</span> Why tinning helps heat transfer</h2>
+        <p>A hot tip oxidizes. Oxide interferes with wetting, while a solder coating protects the working face and helps make thermal contact with the joint. Tinning the tip is the time to feed solder onto the tip. Making a joint is different: feed solder into the heated joint.</p>
+    <p>See HAKKO's <a href="https://www.hakko.com/english/support/maintenance/detail.php?seq=163">tip-life guidance</a> for the construction of plated tips and the effects of oxidation.</p>
         <p class="deeper-back"><a href="#deeper-ref-79">Back to reference 79</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-80" value="80">
       <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-wires-and-pcbs">Soldering Wire Splices and Through-Hole PCBs</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 80.</span> When pre-tinning helps</h2>
+        <p>Some wires and terminals are pre-tinned: a small amount of solder wets the surface before final assembly. This can help the final joint flow, but too much solder makes a wire end stiff and bulky. Follow the connection's assembly method and still heat both parts when making the final bond.</p>
+        <p class="deeper-back"><a href="#deeper-ref-80">Back to reference 80</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-81" value="81">
+      <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 80.</span> Definitions used to calculate every result</h2>
+        <h2><span class="deeper-addendum-number">Addendum 81.</span> Why a long wire can matter even below its current limit</h2>
+        <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> shows the calculation.</p>
+        <p class="deeper-back"><a href="#deeper-ref-81">Back to reference 81</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-82" value="82">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 82.</span> Definitions used to calculate every result</h2>
         <p>For AWG number n, diameter d = 0.127 × 92<sup>(36 − n)/39</sup> mm. Convert d to meters, then A = πd²/4 in m². Using annealed-copper resistivity ρ = 1.724 × 10<sup>−8</sup> Ω·m at 20 °C, R = ρL/A. One foot is exactly 0.3048 m.</p>
     <p>With one-way run ℓ, L = 2ℓ and R<sub>loop</sub> = ρ(2ℓ)/A. V<sub>drop</sub> = IR<sub>loop</sub>; percent drop = 100V<sub>drop</sub>/V<sub>source</sub>; V<sub>load</sub> = V<sub>source</sub> − V<sub>drop</sub>; wire loss P = I²R<sub>loop</sub>. A two-wire single-phase resistive approximation uses the same return path, but this model does not include AC effects.</p>
-        <p class="deeper-back"><a href="#deeper-ref-80">Back to reference 80</a></p>
+        <p class="deeper-back"><a href="#deeper-ref-82">Back to reference 82</a></p>
       </article>
     </li>
   </ol>
@@ -11424,7 +11464,30 @@ void loop() {
     const bottom = top * b, t = phase * p.period;
     return phase <= p.duty ? 5 + (bottom - 5) * Math.exp(-t / tau) : top * Math.exp(-(t - p.onTime) / tau);
   }
-  const api = Object.freeze({ adc, voltage, pwm, filtered });
+  function sampleSet({ percent, pwmFrequency, sampleFrequency, startPhase, count, signal = 'raw', tau = 0.01 }) {
+    const p = pwm(percent, pwmFrequency);
+    range(sampleFrequency, 1, 100000);
+    if (!Number.isFinite(startPhase) || startPhase < 0 || startPhase >= 1) throw new RangeError('Use a normalized starting phase from 0 up to, but not including, 1.');
+    if (!Number.isInteger(count) || count < 1 || count > 1000) throw new RangeError('Use 1–1000 whole samples.');
+    if (signal !== 'raw' && signal !== 'filtered') throw new RangeError('Choose raw or filtered samples.');
+    const samples = Array.from({ length: count }, (_, index) => {
+      const relativeCycles = index * pwmFrequency / sampleFrequency;
+      const cycles = startPhase + relativeCycles;
+      // Reduce the relative advance before adding phase. Adding a large whole-cycle
+      // count first can round a valid phase just below 1 up to the next cycle.
+      const relative = relativeCycles % 1, gap = 1 - startPhase;
+      const phase = relative >= gap ? relative - gap : startPhase + relative;
+      // The ideal raw waveform is HIGH on [0, duty) and LOW on [duty, 1).
+      const input = signal === 'raw' ? (phase < p.duty ? 5 : 0) : filtered(percent, pwmFrequency, phase, tau);
+      const code = adc(input);
+      return Object.freeze({ index, cycles, time: startPhase / pwmFrequency + index / sampleFrequency,
+        phase, input, code, reconstructed: voltage(code) });
+    });
+    const mean = key => samples.reduce((sum, sample) => sum + sample[key], 0) / samples.length;
+    return Object.freeze({ signal, count, samplePeriod: 1 / sampleFrequency, timeMean: p.average,
+      sampleMean: mean('input'), reconstructedMean: mean('reconstructed'), samples: Object.freeze(samples) });
+  }
+  const api = Object.freeze({ adc, voltage, pwm, filtered, sampleSet });
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.CourseWikiPwmAdc = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
@@ -11432,62 +11495,88 @@ void loop() {
 (function () {
   'use strict';
   const model = globalThis.CourseWikiPwmAdc;
-  document.querySelectorAll('[data-interactive="pwm-and-adc"]').forEach(root => {
-    if (root.dataset.paReady) return;
+  let sequence = 0;
+  function nextPredictionName() {
+    let name;
+    do { name = `pa-${++sequence}-prediction`; } while (document.querySelector(`input[name="${name}"]`));
+    return name;
+  }
+  function init(root) {
+    if (root.dataset.paReady || !model) return;
+    const predictionName = nextPredictionName();
     root.dataset.paReady = 'true';
     const live = root.querySelector('.pa-live');
     live.innerHTML = `<fieldset><legend>PWM · ideal 0–5 V output</legend>
       <div class="pa-controls"><label>Duty cycle (%) <input data-duty type="range" min="0" max="100" step="1" value="25"></label>
       <label>Frequency (Hz) <input data-frequency type="number" min="10" max="2000" step="1" value="500"></label>
-      <label><input data-smooth type="checkbox" checked> Show RC-smoothed trace (τ = 10 ms)</label></div>
+      <label><input data-smooth type="checkbox" checked> Show settled RC trace (τ = 10 ms)</label></div>
       <p data-pwm-output aria-live="polite"></p>
-      <svg viewBox="0 0 660 240" role="img" aria-label="PWM square wave and optional settled RC trace over four cycles">
+      <div class="pa-plot-scroll" tabindex="0" role="region" aria-label="PWM waveform, sample instants and held readings; scroll horizontally">
+      <svg viewBox="0 0 660 250" role="img" aria-label="Four PWM cycles with optional settled RC trace, point samples and sample-and-hold steps">
       <path class="pa-axis" d="M50 25V195H640"/><text x="4" y="35">5 V</text><text x="4" y="195">0 V</text>
-      <path data-square class="pa-square"/><path data-filter class="pa-filter"/>
-      <text x="50" y="225">0</text><text data-end x="620" y="225" text-anchor="end"></text></svg>
-      <p>Solid line: PWM. Dashed line: settled RC output. The horizontal axis always shows four periods; read its changing time label.</p></fieldset>
+      <path data-square class="pa-square"/><path data-filter class="pa-filter"/><path data-hold class="pa-hold"/><g data-samples class="pa-samples"></g>
+      <text x="50" y="230">0</text><text data-end x="620" y="230" text-anchor="end"></text></svg></div>
+      <p>Solid: raw PWM. Dashed: settled RC output. Gold dots are counted samples; gold steps show the latest value being held. After the final counted dot, a step may continue across the plot only to show held state—it adds no sample to the finite mean. The axis shows four PWM cycles.</p></fieldset>
+      <fieldset><legend>Sampling · point readings, not window averages</legend><div class="pa-controls">
+      <label>Input to sample <select data-signal><option value="raw">Raw PWM</option><option value="filtered">Settled RC output</option></select></label>
+      <label>Sample rate (samples/s) <input data-sample-frequency type="number" min="1" max="100000" step="1" value="500"></label>
+      <label>Starting phase (% of PWM cycle) <input data-phase type="number" min="0" max="99.9" step="0.1" value="10"></label>
+      <label>Finite sample count <input data-count type="number" min="1" max="1000" step="1" value="12"></label></div>
+      <div class="pa-quick"><button type="button" data-phase-preset="10">Try phase 10%</button><button type="button" data-phase-preset="60">Try phase 60%</button></div>
+      <p data-sample-window></p>
+      <fieldset class="pa-predict"><legend>Predict the selected-sample mean versus the full-cycle time mean</legend>
+      <div class="pa-choice-row"><label><input type="radio" name="${predictionName}" value="higher"> Higher</label>
+      <label><input type="radio" name="${predictionName}" value="same"> Same</label>
+      <label><input type="radio" name="${predictionName}" value="lower"> Lower</label></div>
+      <button type="button" data-reveal disabled>Reveal sample results</button></fieldset>
+      <p data-sample-output role="status" aria-live="polite">Choose a prediction, then reveal the finite sample-set results.</p>
+      <p class="pa-limit">Each marker is one ideal point sample. The held value is not an average. Sampling starts at the stated normalized phase and uses half-open PWM cycles; controls recompute a settled periodic RC response rather than startup.</p></fieldset>
       <fieldset><legend>ADC · 10 bits, 5.000 V reference</legend><div class="pa-controls">
       <label>Input voltage (V) <input data-voltage type="number" min="0" max="5" step="any" value="3"></label>
       <label>ADC code (integer) <input data-code type="number" min="0" max="1023" step="1" value="614"></label></div>
       <p data-adc-output aria-live="polite"></p><p>Editing voltage finds its bin. Editing code sets voltage to that bin's lower edge. These are model values, not exact hardware thresholds.</p></fieldset>`;
     const get = selector => live.querySelector(selector);
-    const duty = get('[data-duty]'), frequency = get('[data-frequency]'), smooth = get('[data-smooth]');
-    function draw() {
-      if (!frequency.checkValidity() || frequency.value === '') {
-        get('[data-pwm-output]').textContent = 'Enter a whole-number frequency from 10 to 2000 Hz.'; return;
-      }
-      const d = Number(duty.value), f = Number(frequency.value), p = model.pwm(d, f);
-      get('[data-pwm-output]').textContent = `${d}% duty · period ${(p.period * 1000).toFixed(4)} ms · on-time ${(p.onTime * 1e6).toFixed(2)} µs · average ${p.average.toFixed(3)} V · nominal analogWrite ${p.writeValue}`;
-      const y = v => 195 - 32 * v;
-      let square = `M50 ${y(d === 0 ? 0 : 5)}`;
-      for (let cycle = 0; cycle < 4; cycle++) {
-        const start = 50 + cycle * 145, end = start + 145;
-        if (d === 0 || d === 100) square += ` H${end}`;
-        else square += ` H${start + 145 * p.duty} V195 H${end}${cycle < 3 ? ' V35' : ''}`;
-      }
-      get('[data-square]').setAttribute('d', square);
-      const trace = Array.from({ length: 801 }, (_, i) => {
-        const phase = (i / 200) % 1;
-        return `${i ? 'L' : 'M'}${50 + i * 580 / 800} ${y(model.filtered(d, f, phase))}`;
-      }).join(' ');
-      get('[data-filter]').setAttribute('d', smooth.checked ? trace : '');
-      get('[data-end]').textContent = `${(4 * p.period * 1000).toFixed(3)} ms`;
+    const duty=get('[data-duty]'),frequency=get('[data-frequency]'),smooth=get('[data-smooth]');
+    const signal=get('[data-signal]'),sampleFrequency=get('[data-sample-frequency]');
+    const phase=get('[data-phase]'),count=get('[data-count]'),reveal=get('[data-reveal]');
+    const prediction=()=>live.querySelector(`input[name="${predictionName}"]:checked`);
+    let current=null;
+    const y=value=>195-32*value;
+    const valid=input=>input.value!==''&&input.checkValidity();
+    function resetPrediction(message){live.querySelectorAll(`input[name="${predictionName}"]`).forEach(input=>{input.checked=false;});reveal.disabled=true;get('[data-sample-output]').textContent=message||'Inputs changed. Choose a new prediction, then reveal.';}
+    function clearPlot(){get('[data-square]').setAttribute('d','');get('[data-filter]').setAttribute('d','');get('[data-hold]').setAttribute('d','');get('[data-samples]').replaceChildren();get('[data-end]').textContent='';}
+    function draw(){
+      if(![frequency,sampleFrequency,phase,count].every(valid)){get('[data-pwm-output]').textContent='Enter values inside every stated range.';get('[data-sample-window]').textContent='Sample results unavailable until the inputs are valid.';current=null;reveal.disabled=true;clearPlot();return;}
+      try{
+        const d=Number(duty.value),f=Number(frequency.value),p=model.pwm(d,f);
+        current=model.sampleSet({percent:d,pwmFrequency:f,sampleFrequency:Number(sampleFrequency.value),startPhase:Number(phase.value)/100,count:Number(count.value),signal:signal.value});
+        get('[data-pwm-output]').textContent=`${d}% duty · period ${(p.period*1000).toFixed(4)} ms · HIGH time ${(p.onTime*1e6).toFixed(2)} µs · full-cycle time mean ${p.average.toFixed(3)} V · nominal analogWrite ${p.writeValue}`;
+        let square=`M50 ${y(d===0?0:5)}`;
+        for(let cycle=0;cycle<4;cycle++){const start=50+cycle*145,end=start+145;if(d===0||d===100)square+=` H${end}`;else square+=` H${start+145*p.duty} V195 H${end}${cycle<3?' V35':''}`;}
+        get('[data-square]').setAttribute('d',square);
+        get('[data-filter]').setAttribute('d',smooth.checked?Array.from({length:801},(_,i)=>{const pointPhase=(i/200)%1;return`${i?'L':'M'}${50+i*580/800} ${y(model.filtered(d,f,pointPhase))}`;}).join(' '):'');
+        const visible=current.samples.filter(sample=>sample.cycles<4);
+        get('[data-samples]').innerHTML=visible.map(sample=>`<circle cx="${50+sample.cycles*145}" cy="${y(sample.input)}" r="5"><title>Sample ${sample.index+1}: ${sample.input.toFixed(4)} V at phase ${(sample.phase*100).toFixed(2)}%</title></circle>`).join('');
+        let hold='';visible.forEach((sample,index)=>{const x=50+sample.cycles*145,next=index+1<visible.length?50+visible[index+1].cycles*145:630;hold+=`${index?'L':'M'}${x} ${y(sample.input)} H${Math.min(next,630)}`;});get('[data-hold]').setAttribute('d',hold);
+        get('[data-end]').textContent=`${(4*p.period*1000).toFixed(3)} ms`;
+        const first=current.samples[0],last=current.samples.at(-1);
+        get('[data-sample-window]').textContent=`Exactly ${current.count} point samples, from ${(first.time*1000).toFixed(4)} ms through ${(last.time*1000).toFixed(4)} ms; sample period ${(current.samplePeriod*1000).toFixed(4)} ms. The plot shows only samples within its four displayed PWM cycles.`;
+      }catch(error){current=null;get('[data-sample-window]').textContent=error.message;reveal.disabled=true;clearPlot();}
     }
-    const volts = get('[data-voltage]'), code = get('[data-code]');
-    function convert(fromCode) {
-      const input = fromCode ? code : volts;
-      if (input.value === '' || !input.checkValidity()) {
-        get('[data-adc-output]').textContent = 'Use 0–5 V or an integer code from 0 to 1023.'; return;
-      }
-      if (fromCode) volts.value = model.voltage(Number(code.value));
-      else code.value = model.adc(Number(volts.value));
-      const n = Number(code.value), low = model.voltage(n), high = (n + 1) * 5 / 1024;
-      get('[data-adc-output]').textContent = `Code ${n} · lower edge ${low.toFixed(7)} V · bin ${low.toFixed(7)} to ${high.toFixed(7)} V (${n === 1023 ? 'includes 5 V at the model limit' : 'upper edge excluded'}) · step 4.8828125 mV`;
-    }
-    duty.addEventListener('input', draw); frequency.addEventListener('input', draw); smooth.addEventListener('change', draw);
-    volts.addEventListener('input', () => convert(false)); code.addEventListener('input', () => convert(true));
-    draw(); convert(false); live.hidden = false; root.classList.add('pa-ready');
-  });
+    function update(){resetPrediction();draw();}
+    [duty,frequency,sampleFrequency,phase,count].forEach(input=>input.addEventListener('input',update));
+    smooth.addEventListener('change',update);
+    signal.addEventListener('change',()=>{if(signal.value==='filtered'){smooth.checked=true;smooth.disabled=true;}else smooth.disabled=false;update();});
+    live.querySelectorAll('[data-phase-preset]').forEach(button=>button.addEventListener('click',()=>{phase.value=button.dataset.phasePreset;update();phase.focus();}));
+    live.querySelector('.pa-predict').addEventListener('change',()=>{reveal.disabled=!prediction()||!current;});
+    reveal.addEventListener('click',()=>{if(!current||!prediction())return;const delta=current.sampleMean-current.timeMean,relation=Math.abs(delta)<1e-9?'same':delta>0?'higher':'lower',last=current.samples.at(-1);get('[data-sample-output]').textContent=`${prediction().value===relation?'Prediction confirmed.':'Compare the timing markers with the HIGH interval.'} Selected-sample mean ${current.sampleMean.toFixed(4)} V is ${relation} than full-cycle time mean ${current.timeMean.toFixed(4)} V. Mean of ADC lower-edge reconstructions: ${current.reconstructedMean.toFixed(4)} V. Last held point: ${last.input.toFixed(4)} V, code ${last.code}, lower edge ${last.reconstructed.toFixed(4)} V. Faster or more samples alone do not guarantee an unbiased finite mean.`;});
+    const volts=get('[data-voltage]'),code=get('[data-code]');
+    function convert(fromCode){const input=fromCode?code:volts;if(!valid(input)){get('[data-adc-output]').textContent='Use 0–5 V or an integer code from 0 to 1023.';return;}if(fromCode)volts.value=model.voltage(Number(code.value));else code.value=model.adc(Number(volts.value));const n=Number(code.value),low=model.voltage(n),high=(n+1)*5/1024;get('[data-adc-output]').textContent=`Code ${n} · lower edge ${low.toFixed(7)} V · bin ${low.toFixed(7)} to ${high.toFixed(7)} V (${n===1023?'includes 5 V at the model limit':'upper edge excluded'}) · step 4.8828125 mV`;}
+    volts.addEventListener('input',()=>convert(false));code.addEventListener('input',()=>convert(true));
+    draw();convert(false);live.hidden=false;root.classList.add('pa-ready');
+  }
+  function initAll(){document.querySelectorAll('[data-interactive="pwm-and-adc"]').forEach(init);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAll,{once:true});else initAll();
 })();
 
 (function (root, factory) {

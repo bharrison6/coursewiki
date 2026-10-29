@@ -12445,6 +12445,27 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-73">Supporting detail: <a href="#deeper-addendum-73"><strong>Addendum 73</strong></a> &mdash; Why changes in the cut matter.</p>
     </div>
   </details>
+  <details class="xcard deck-slide" id="drilling-operations--compare-advance-retracing-and-withdrawal-paths" data-card="drilling-operations--compare-advance-retracing-and-withdrawal-paths">
+    <summary>Compare advance, retracing and withdrawal paths<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Compare advance, retracing and withdrawal paths</h2>
+  <p>Open <a class="xref-page" href="#p-gcode-and-toolpaths">G-code and Toolpaths</a>. In the playground's <strong>Program</strong> picker, choose these named examples in order: <strong>Drilling path: continuous advance</strong>, <strong>Drilling path: short in-bore retract</strong>, and <strong>Drilling path: withdrawal above the mouth</strong>. Use <strong>Step</strong> to follow each G0 and G1 move.</p>
+  <table><thead><tr><th>Program</th><th>Motion to watch</th><th>What the model reports</th></tr></thead><tbody>
+    <tr><td>Continuous advance</td><td><code>G1 Z-8</code></td><td>One feed enters new modeled stock to final depth.</td></tr>
+    <tr><td>Short in-bore retract</td><td><code>G0 Z-1</code>, then <code>G1 Z-4</code> and <code>G1 Z-8</code></td><td>The first feed back removes no additional modeled stock; the separate deeper feed does.</td></tr>
+    <tr><td>Withdrawal above the mouth</td><td><code>G0 Z2</code>, then <code>G1 Z-4</code> and <code>G1 Z-8</code></td><td>The first feed back removes no additional modeled stock; the separate deeper feed does.</td></tr>
+  </tbody></table>
+  <ol>
+    <li>Mark where the drill enters material that has not yet been removed. That is new cutting in this geometric model.</li>
+    <li>Mark where the drill returns through the bore it already made. That travel retraces the prior path and removes no additional modeled stock; the separate deeper feed begins after the point reaches the previous bottom. The model does not show possible wall or chip contact, rubbing, force or heat during the return.</li>
+    <li>Compare the retraction heights with the raw top at Z+1. The short retraction stays inside the bore. The other withdrawal carries the point above the hole mouth, creating a clearer opportunity for chips to leave the hole.</li>
+    <li>Compare the finished holes. The three illustrative programs intentionally reach the same final tip depth and geometry even though their travel paths differ.</li>
+  </ol>
+  <p>The playground shows programmed motion and removed geometry. It does <strong>not</strong> model chip transport or packing, cutting heat or force, coolant delivery, or whether chips actually cleared. A retraction creates an opportunity for chip escape; it is neither proof of chip clearance nor the only way chips can leave. Haas describes its G83 return as a chip-clearing motion and places the R plane above the cut so chips can get out, but these G0/G1 illustrations are not G73, G83 or Q implementations.</p>
+  <p>The coordinates, spindle speed and feed in these three examples are comparison values for the simulator, not operating recommendations. Select any real drilling cycle, retract amount, speed and feed from the drill maker's guidance, the machine/control manual and the approved shop procedure. Continue to follow the machine instructions and <a class="xref-page" href="#p-metal-chips">Metal Chips</a> for observation and chip handling.</p>
+  <p class="aside"><strong>Primary source:</strong> <a href="https://legacy-aem.haascnc.com/content/haascnc/en/service/codes-settings.type%3Dgcode.machine%3Dmill.value%3DG83.html">Haas Automation, G83 Normal Peck Drilling Canned Cycle</a> (R-plane return and chip-clearing motion). Controller details differ; use the manual for the machine in front of you.</p>
+    </div>
+  </details>
   <details class="xcard deck-slide is-checklist" id="drilling-operations--check-the-hole-before-calling-it-finished" data-card="drilling-operations--check-the-hole-before-calling-it-finished" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
     <summary>Check the hole before calling it finished<span class="card-tags"><span class="card-tag" data-marker="checklist" style="--card-marker:var(--mark-checklist)"><span class="marker-separator">; </span>Checklist</span></span><span class="chev"></span></summary>
     <div class="body">
@@ -28836,7 +28857,31 @@ var CourseWikiMillingWorkerSource="(()=>{var ke=(j,U)=>()=>{try{return U||j((U={
         'Add a Feed move down to Z−2 with F100, then one across to X80 with F300.',
         'Finish with a Rapid move up to Z20 and a Spindle off before the end.'
       ],
-      text: ['(My program)', 'G21 G90 G17', 'T1 M6', 'S2500 M3', 'M5', 'M30'] }
+      text: ['(My program)', 'G21 G90 G17', 'T1 M6', 'S2500 M3', 'M5', 'M30'] },
+    { id: 'drill-continuous', title: 'Drilling path: continuous advance',
+      brief: 'Follow one illustrative Ø6 drill path at X50 Y30. After the approach, one G1 move advances from above the raw top, Z+1, to the same final tip depth used in the two retraction examples.',
+      tries: [
+        'Play the program and identify the one move that cuts new material all the way to Z−8.',
+        'Compare the finished hole with “Drilling path: short in-bore retract.” What geometry changed?',
+        'The numbers make the paths easy to compare in this simulator. Where would you get operating values for a real drill, material and machine?'
+      ],
+      text: ['(Illustrative path: continuous drilling advance)', 'G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-8 F120', 'G0 Z20', 'M5', 'M30'] },
+    { id: 'drill-short-retract', title: 'Drilling path: short in-bore retract',
+      brief: 'Follow the same illustrative Ø6 hole to Z−8, but pause at Z−4, retract only to Z−1 inside the bore, feed back to the old bottom, then use a separate feed to cut deeper.',
+      tries: [
+        'Step through the second G1 move. Which part retraces the existing bore, and where does new cutting begin?',
+        'Compare its finished hole with “Drilling path: continuous advance.” Did the added travel create a different final geometry?',
+        'This path creates a short interruption inside the bore. What can the geometric simulation not tell you about the chips?'
+      ],
+      text: ['(Illustrative path: short retract inside the bore)', 'G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-4 F120', 'G0 Z-1', 'G1 Z-4 F120', 'G1 Z-8 F120', 'G0 Z20', 'M5', 'M30'] },
+    { id: 'drill-clear-retract', title: 'Drilling path: withdrawal above the mouth',
+      brief: 'Follow the same illustrative Ø6 hole to Z−8, but pause at Z−4, withdraw to Z+2 above the hole mouth, feed back to the old bottom, then use a separate feed to cut deeper.',
+      tries: [
+        'Step through the withdrawal and return. Which travel is through air, which retraces the bore, and which cuts new material?',
+        'Compare all three drilling-path examples. Which path carries the drill above the hole mouth and creates the clearest opportunity for chips to leave?',
+        'A withdrawal creates an opportunity; it does not prove that chips cleared. What evidence and instructions would you need at the machine?'
+      ],
+      text: ['(Illustrative path: withdraw above the hole mouth)', 'G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-4 F120', 'G0 Z2', 'G1 Z-4 F120', 'G1 Z-8 F120', 'G0 Z20', 'M5', 'M30'] }
   ];
   function example(id) {
     for (var k = 0; k < EXAMPLES.length; k++) if (EXAMPLES[k].id === id) return EXAMPLES[k];

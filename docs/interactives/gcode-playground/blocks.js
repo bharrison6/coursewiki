@@ -206,7 +206,31 @@
         'Add a Feed move down to Z−2 with F100, then one across to X80 with F300.',
         'Finish with a Rapid move up to Z20 and a Spindle off before the end.'
       ],
-      text: ['(My program)', 'G21 G90 G17', 'T1 M6', 'S2500 M3', 'M5', 'M30'] }
+      text: ['(My program)', 'G21 G90 G17', 'T1 M6', 'S2500 M3', 'M5', 'M30'] },
+    { id: 'drill-continuous', title: 'Drilling path: continuous advance',
+      brief: 'Follow one illustrative Ø6 drill path at X50 Y30. After the approach, one G1 move advances from above the raw top, Z+1, to the same final tip depth used in the two retraction examples.',
+      tries: [
+        'Play the program and identify the one move that cuts new material all the way to Z−8.',
+        'Compare the finished hole with “Drilling path: short in-bore retract.” What geometry changed?',
+        'The numbers make the paths easy to compare in this simulator. Where would you get operating values for a real drill, material and machine?'
+      ],
+      text: ['(Illustrative path: continuous drilling advance)', 'G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-8 F120', 'G0 Z20', 'M5', 'M30'] },
+    { id: 'drill-short-retract', title: 'Drilling path: short in-bore retract',
+      brief: 'Follow the same illustrative Ø6 hole to Z−8, but pause at Z−4, retract only to Z−1 inside the bore, feed back to the old bottom, then use a separate feed to cut deeper.',
+      tries: [
+        'Step through the second G1 move. Which part retraces the existing bore, and where does new cutting begin?',
+        'Compare its finished hole with “Drilling path: continuous advance.” Did the added travel create a different final geometry?',
+        'This path creates a short interruption inside the bore. What can the geometric simulation not tell you about the chips?'
+      ],
+      text: ['(Illustrative path: short retract inside the bore)', 'G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-4 F120', 'G0 Z-1', 'G1 Z-4 F120', 'G1 Z-8 F120', 'G0 Z20', 'M5', 'M30'] },
+    { id: 'drill-clear-retract', title: 'Drilling path: withdrawal above the mouth',
+      brief: 'Follow the same illustrative Ø6 hole to Z−8, but pause at Z−4, withdraw to Z+2 above the hole mouth, feed back to the old bottom, then use a separate feed to cut deeper.',
+      tries: [
+        'Step through the withdrawal and return. Which travel is through air, which retraces the bore, and which cuts new material?',
+        'Compare all three drilling-path examples. Which path carries the drill above the hole mouth and creates the clearest opportunity for chips to leave?',
+        'A withdrawal creates an opportunity; it does not prove that chips cleared. What evidence and instructions would you need at the machine?'
+      ],
+      text: ['(Illustrative path: withdraw above the hole mouth)', 'G21 G90 G17', 'T3 M6', 'S1500 M3', 'G0 X50 Y30', 'G0 Z2', 'G1 Z-4 F120', 'G0 Z2', 'G1 Z-4 F120', 'G1 Z-8 F120', 'G0 Z20', 'M5', 'M30'] }
   ];
   function example(id) {
     for (var k = 0; k < EXAMPLES.length; k++) if (EXAMPLES[k].id === id) return EXAMPLES[k];
