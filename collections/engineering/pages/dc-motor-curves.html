@@ -52,7 +52,21 @@
 </section>
 
 <section>
-  <h2>A gearbox changes the load seen by the motor</h2>
-  <p>A gearbox can move the operating point by changing the torque demanded at the motor shaft for the same output load. Reduction trades output speed for output torque; it does not add power. Use [[gear-ratios]] for the ratio calculation, then bring the resulting motor-shaft torque back to this curve.</p>
-  <p>Real loads may demand different torque at different speeds. Their operating point is an intersection of a load curve and a motor curve. This explorer uses a constant load so that the first calculation stays visible.</p>
+  <h2>Match the motor, reduction, and the same output load</h2>
+  <p>A gearbox changes the torque demanded at the motor shaft for the same output load. That can move the motor to a different point on its torque–speed curve. Predict both operating points before revealing them.</p>
+  <div data-interactive="motor-load-matching">
+    <div class="mlm-static">
+      <p><strong>Static example:</strong> a motor has 0.8 N·m stall torque and 120 rpm no-load speed. The output load resists with 0.6 N·m. Compare direct drive with a 20-tooth driver, 40-tooth driven gear, and a stated 90% running mesh efficiency.</p>
+      <div class="unit-table-wrap mlm-table-scroll" tabindex="0" role="region" aria-label="Motor and load comparison table; scroll horizontally to see every column">
+      <table class="unit-table"><caption>The same motor and output load, two connections</caption><thead><tr><th>Connection</th><th>Torque required at motor</th><th>Motor speed</th><th>Output speed</th><th>Motor shaft power</th><th>Modeled output power</th></tr></thead><tbody>
+        <tr><th>Direct</th><td>0.600 N·m</td><td>30.0 rpm</td><td>30.0 rpm</td><td>1.885 W</td><td>1.885 W</td></tr>
+        <tr><th>2:1 reduction, 90%</th><td>0.3333 N·m</td><td>70.0 rpm</td><td>35.0 rpm</td><td>2.443 W</td><td>2.199 W</td></tr>
+      </tbody></table>
+      </div>
+      <p><strong>Result:</strong> the reduction runs the output faster under this load, even though it divides motor speed. It reflects less load torque to the motor, so the motor reaches a higher speed. The gearbox did not create power: motor shaft power changed before the 10% modeled mesh loss.</p>
+    </div>
+  </div>
+  <p>This is a fixed-voltage steady-running comparison with a constant resisting torque. It does not establish starting ability, acceleration, thermal or continuous rating, back-driving, electrical input, or gear strength. At stall, speed and shaft output power are zero; if required motor torque exceeds stall torque, the model reports no forward steady operating point instead of assigning a fictitious speed.</p>
+  <details class="deeper"><summary>Source and the standstill boundary</summary><p>The running conversion follows maxon's <a href="https://www.maxongroup.com/medias/sys_master/root/8815461728286/gear-Technology-short-and-to-the-point-14-EN-36-37.pdf#page=1">gear conversion note</a>: motor speed equals reduction multiplied by load speed, while motor torque equals load torque divided by reduction and gear efficiency. The note also requires checking actual gear torque and speed limits. A separate <a href="https://support.maxongroup.com/hc/en-us/articles/360006034594-Gearhead-efficiency-at-blocked-state">maxon standstill note</a> explains that power efficiency is undefined when both input and output power are zero. This lesson therefore treats stall as a boundary; it does not calculate blocked-state efficiency or a permissible output torque.</p></details>
+  <p>Real loads may demand different torque at different speeds. Their operating point is an intersection of a load curve and a motor curve. <a class="button" data-practice-add="motor-match-reflected-torque" href="../practice.html#motor-match-reflected-torque">Practice reflected load</a> <a class="button" data-practice-add="motor-match-output-power" href="../practice.html#motor-match-output-power">Practice output power</a></p>
 </section>

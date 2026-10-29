@@ -1,0 +1,49 @@
+@@ID: motor-load-matching
+@@TITLE: Motor, Gearbox, and Load Matching
+@@SUMMARY: Reflect an output load through a reduction and compare ideal DC motor operating points.
+@@END
+
+<section>
+<h2>Reflect the load torque to the motor</h2>
+<div class="panel" id="motor-match-reflected-torque" data-practice data-practice-id="motor-match-reflected-torque" data-practice-title="Reflect load through a reduction" data-practice-source="dc-motor-curves" data-answer="0.3333333333333333" data-tolerance="0.002" data-unit="N·m">
+<p><strong>Reflect load through a reduction:</strong> A 20-tooth motor gear drives a 40-tooth output gear through one mesh modeled at 90% efficiency. The output load torque is 0.600 N·m. What motor torque is required at a steady running point? Give four significant figures.</p>
+<label for="motor-match-reflected-torque-answer">Answer in N·m</label><input id="motor-match-reflected-torque-answer" data-practice-input type="number" step="any" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p>The reduction is <code>i = 40/20 = 2</code>. With stated running mesh efficiency η = 0.90, <code>T<sub>motor</sub> = T<sub>load</sub>/(iη) = 0.600/(2 × 0.90) = <strong>0.3333 N·m</strong></code>. Using 0.300 N·m ignores the modeled loss.</p></details>
+</div>
+</section>
+
+<section>
+<h2>Find the motor and output speeds</h2>
+<div class="panel" id="motor-match-output-speed" data-practice data-practice-id="motor-match-output-speed" data-practice-title="Find geared output speed under load" data-practice-source="dc-motor-curves" data-answer="35" data-tolerance="0.1" data-unit="rpm">
+<p><strong>Find geared output speed:</strong> The motor has 0.800 N·m stall torque and 120 rpm no-load speed. It supplies the 0.3333 N·m reflected torque from the previous problem. Using the ideal linear motor curve and the 2:1 reduction, what is output speed?</p>
+<label for="motor-match-output-speed-answer">Answer in rpm</label><input id="motor-match-output-speed-answer" data-practice-input type="number" step="any" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p><code>n<sub>motor</sub> = 120(1 − 0.3333/0.800) = 70.0 rpm</code>. The 2:1 reduction gives <code>n<sub>output</sub> = 70.0/2 = <strong>35.0 rpm</strong></code>. Dividing the 120 rpm no-load endpoint by two would ignore the loaded motor curve.</p></details>
+</div>
+</section>
+
+<section>
+<h2>Find modeled output power</h2>
+<div class="panel" id="motor-match-output-power" data-practice data-practice-id="motor-match-output-power" data-practice-title="Find gearbox output power" data-practice-source="dc-motor-curves" data-answer="2.199114857512855" data-tolerance="0.01" data-unit="W">
+<p><strong>Find gearbox output power:</strong> The motor operates at 0.3333 N·m and 70.0 rpm. Find motor shaft power, then apply the stated 90% running mesh efficiency. Give output power in watts. You may use π = 3.14 and four-significant-figure intermediate values.</p>
+<label for="motor-match-output-power-answer">Answer in W</label><input id="motor-match-output-power-answer" data-practice-input type="number" step="any" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p><code>P<sub>motor</sub> = Tω = 0.3333 × 70.0 × 2π/60 = 2.443 W</code>. Then <code>P<sub>output</sub> = 0.90 × 2.443 = <strong>2.199 W</strong></code>. Multiplying torque by rpm without converting to rad/s gives the wrong units and value.</p></details>
+</div>
+</section>
+
+<section>
+<h2>Explain why output power changed</h2>
+<div class="panel" id="motor-match-power-explanation" data-practice data-practice-id="motor-match-power-explanation" data-practice-title="Explain the changed output power" data-practice-source="dc-motor-curves" data-answer="3" data-tolerance="0" data-unit="choice">
+<p><strong>Explain the comparison:</strong> In the lesson example, direct output power is 1.885 W while geared output power is 2.199 W. Which explanation matches the model? 1 = the gearbox created power; 2 = both cases had equal motor shaft power; 3 = reflected torque moved the motor to a different speed and shaft-power point before mesh loss; 4 = the mesh was more than 100% efficient.</p>
+<label for="motor-match-power-explanation-answer">Choice number</label><input id="motor-match-power-explanation-answer" data-practice-input type="number" step="1" min="1" max="4" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p><strong>3.</strong> The reduction changes the motor torque required by the same output load. The motor therefore settles at a different speed and produces different shaft power. The stated mesh loss is then applied. This is not free power and does not claim equal electrical input.</p></details>
+</div>
+</section>
+
+<section>
+<h2>Recognize a missing operating point</h2>
+<div class="panel" id="motor-match-direct-overload" data-practice data-practice-id="motor-match-direct-overload" data-practice-title="Compare direct overload with geared running" data-practice-source="dc-motor-curves" data-answer="22.5" data-tolerance="0.1" data-unit="rpm">
+<p><strong>Compare direct overload with geared running:</strong> Keep the 0.800 N·m, 120 rpm motor and the 2:1, 90% reduction, but raise output load torque to 0.900 N·m. Direct drive has no forward steady operating point in this model. What geared output speed does the model give?</p>
+<label for="motor-match-direct-overload-answer">Answer in rpm</label><input id="motor-match-direct-overload-answer" data-practice-input type="number" step="any" inputmode="decimal"><button type="button" data-practice-check>Check answer</button><output data-practice-feedback aria-live="polite">Enter a number, then check it.</output>
+<details class="solution"><summary>Show worked solution</summary><p>The reflected motor torque is <code>0.900/(2 × 0.90) = 0.500 N·m</code>. The motor curve gives <code>120(1 − 0.500/0.800) = 45.0 rpm</code>. After the 2:1 reduction, output speed is <strong>22.5 rpm</strong>. This steady-running point does not prove the system starts or runs continuously.</p></details>
+</div>
+</section>
