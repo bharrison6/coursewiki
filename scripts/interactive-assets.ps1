@@ -45,7 +45,7 @@ function Initialize-InteractiveAssets([string]$sourceRoot) {
         $script:interactiveStampParts += [IO.File]::ReadAllText((Join-Path $dir.FullName $name))
       }
     }
-    if (-not $assets.CSS.Count -or -not $assets.JS.Count) { throw "interactive $id needs @@CSS and @@JS assets" }
+    if (-not $assets.JS.Count) { throw "interactive $id needs @@JS assets" }
     $requires = @()
     foreach ($dependency in ([string]$manifest.Meta.REQUIRES -split ',')) {
       $dependency = $dependency.Trim()

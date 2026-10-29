@@ -99,7 +99,9 @@ Each module declares its assets in `interactive.conf`:
 @@END
 ```
 
-The folder and ID must match exactly. Assets are module-relative filenames; JavaScript
+The folder and ID must match exactly. Every module requires at least one `@@JS` asset;
+`@@CSS` may be omitted or empty when the module needs no styling. A declared stylesheet
+must still exist with matching case. Assets are module-relative filenames; JavaScript
 order is significant. The generator loads each module once per page, copies declared
 assets into `docs/interactives/`, includes their content in the cache stamp, and inlines
 the same assets in standalone print aggregates. Modules initialize every matching root

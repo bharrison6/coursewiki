@@ -46,6 +46,23 @@ Assert (Refuses { Initialize-InteractiveAssets $fixture } 'duplicate') 'duplicat
 [IO.File]::WriteAllText($manifestPath, $manifest.Replace('@@ID: probe', '@@ID: other'))
 Assert (Refuses { Initialize-InteractiveAssets $fixture } 'match exactly') 'manifest identity matches its folder'
 
+# CSS is optional for any JavaScript-bearing module, including shared dependencies.
+$jsOnlyManifest = "@@ID: probe`n@@JS: model.js, demo.js`n@@END`n"
+[IO.File]::WriteAllText($manifestPath, $jsOnlyManifest)
+Initialize-InteractiveAssets $fixture
+Assert (@(Get-InteractiveWebAssets $html '../' 'CSS').Count -eq 0) 'a JavaScript-only module emits no web stylesheet'
+Assert (@(Get-InteractiveInlineAssets $html 'CSS').Count -eq 0) 'a JavaScript-only module emits no inline stylesheet'
+Assert (@(Get-InteractiveWebAssets $html '../' 'JS').Count -eq 2) 'a JavaScript-only module keeps its ordered scripts'
+[IO.File]::WriteAllText($manifestPath, "@@ID: probe`n@@CSS: `n@@JS: model.js, demo.js`n@@END`n")
+Initialize-InteractiveAssets $fixture
+Assert (@(Get-InteractiveIds $html).Count -eq 1) 'an explicitly empty CSS declaration is also optional'
+[IO.File]::WriteAllText($manifestPath, "@@ID: probe`n@@CSS: demo.css`n@@END`n")
+Assert (Refuses { Initialize-InteractiveAssets $fixture } 'needs @@JS') 'a CSS-only module is refused'
+[IO.File]::WriteAllText($manifestPath, "@@ID: probe`n@@END`n")
+Assert (Refuses { Initialize-InteractiveAssets $fixture } 'needs @@JS') 'a module with no scripts is refused even without CSS'
+[IO.File]::WriteAllText($manifestPath, $manifest.Replace('demo.css', 'missing.css'))
+Assert (Refuses { Initialize-InteractiveAssets $fixture } 'missing or wrong-case') 'declared CSS must still exist'
+
 # Two consumers share one dependency, which itself has a dependency.
 function New-ProbeModule([string]$id, [string]$requires = '') {
   $dir = Join-Path $fixture "interactives/$id"
@@ -58,6 +75,8 @@ function New-ProbeModule([string]$id, [string]$requires = '') {
 }
 New-ProbeModule 'core'
 New-ProbeModule 'shared' 'core'
+$sharedManifestPath = Join-Path $fixture 'interactives/shared/interactive.conf'
+[IO.File]::WriteAllText($sharedManifestPath, "@@ID: shared`n@@JS: model.js, demo.js`n@@REQUIRES: core`n@@END`n")
 New-ProbeModule 'probe' 'shared'
 New-ProbeModule 'sibling' 'shared'
 Initialize-InteractiveAssets $fixture
@@ -68,6 +87,7 @@ $web = @(Get-InteractiveWebAssets $both '../' 'JS')
 Assert ($web.Count -eq 8 -and $web[0] -match '/core/model.js' -and $web[2] -match '/shared/model.js' -and $web[4] -match '/probe/model.js') 'web dependencies load before both consumers'
 $inline = @(Get-InteractiveInlineAssets $both 'JS') -join "`n"
 Assert ([regex]::Matches($inline, 'window.sharedReady').Count -eq 1) 'aggregate inlines a shared dependency once'
+Assert (@(Get-InteractiveWebAssets $both '../' 'CSS').Count -eq 3) 'two consumers share a JavaScript-only dependency without a dummy stylesheet'
 $dependencyStamp = $script:interactiveStampParts -join "`n"
 New-ProbeModule 'probe' 'shared,core'
 Initialize-InteractiveAssets $fixture
