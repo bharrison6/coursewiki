@@ -19,6 +19,33 @@
   <p>A <strong>version</strong> captures the design state of the workspace, including its tabs, at a named point. That captured design state is read-only. Use a meaningful milestone name and description so a reviewer knows which state you mean.</p>
   <p>A <strong>branch</strong> starts from a version and provides a separate workspace for further edits. Use it to explore an alternative while preserving the starting version. Compare changes before merging; merging needs review, not just a button click.</p>
   <details class="deeper"><summary>Viewing history, restoring, and branching serve different purposes</summary><p>Viewing an earlier state is inspection. Restoring changes a workspace back to an earlier state. Branching gives you a separate place to continue editing. Check the active workspace before any restore or merge. See <a href="https://cad.onshape.com/help/Content/Document/versions_and_history.htm">Onshape Versions and History</a> and <a href="https://cad.onshape.com/help/Content/Document/document_management.htm">Document Management</a>.</p></details>
+  <div data-interactive="cad-state-history">
+    <div class="csh-static" data-csh-static-scenario="bracket-milestones">
+      <h3>Worked symbolic timeline: feature order stays put while edits accumulate</h3>
+      <p><strong>What:</strong> the feature list remains Mounting sketch → Base extrude → Edge fillet. <strong>Why:</strong> editing the first feature later should add a new history event, not move that feature to the end of the regeneration sequence.</p>
+      <ol>
+        <li>Start Main workspace: sketch width 60 mm, extrude depth 12 mm, fillet radius 2 mm.</li>
+        <li>Edit the early Mounting sketch now: width 60 → 72 mm. It remains feature 1.</li>
+        <li>Create the fixed <strong>Design review</strong> snapshot: 72 / 12 / 2 mm.</li>
+        <li>Edit Main again: sketch width 72 → 84 mm. The snapshot still reads 72 / 12 / 2 mm.</li>
+        <li>Create <strong>Lightweight branch</strong> from Design review, then edit only its extrude depth 12 → 8 mm.</li>
+      </ol>
+      <ol aria-label="Canonical feature order">
+        <li data-csh-static-feature="mount-sketch" data-csh-static-value="60"><strong>1 · Mounting sketch</strong> — width starts at 60 mm.</li>
+        <li data-csh-static-feature="base-extrude" data-csh-static-value="12"><strong>2 · Base extrude</strong> — depth starts at 12 mm.</li>
+        <li data-csh-static-feature="edge-fillet" data-csh-static-value="2"><strong>3 · Edge fillet</strong> — radius starts at 2 mm.</li>
+      </ol>
+      <table class="csh-static-table">
+        <thead><tr><th>State after the worked actions</th><th>Sketch width</th><th>Extrude depth</th><th>Fillet radius</th></tr></thead>
+        <tbody>
+          <tr data-csh-static-state="main"><th>Main workspace · editable</th><td>84 mm</td><td>12 mm</td><td>2 mm</td></tr>
+          <tr data-csh-static-state="design-review"><th>Design review · fixed snapshot</th><td>72 mm</td><td>12 mm</td><td>2 mm</td></tr>
+          <tr data-csh-static-state="lightweight"><th>Lightweight branch · editable</th><td>72 mm</td><td>8 mm</td><td>2 mm</td></tr>
+        </tbody>
+      </table>
+      <p>This is a symbolic in-memory model, not Onshape or SOLIDWORKS. It performs no rollback, restore, merge, save, file operation, or permission change.</p>
+    </div>
+  </div>
 </section>
 
 <section>
