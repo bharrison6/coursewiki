@@ -136,7 +136,7 @@ $script:written = [System.Collections.Generic.HashSet[string]]::new([StringCompa
 function Write-OutBytes([string]$path, [byte[]]$bytes) {
   [void]$script:written.Add($path)
   $dir = Split-Path $path -Parent
-  $name = $path.Substring($root.Length).TrimStart('\')
+  $name = $path.Substring($root.Length).TrimStart('\', '/')
   if ($WhatIf) {
     $same = (Test-Path -LiteralPath $path) -and
             ([System.IO.File]::ReadAllBytes($path).Length -eq $bytes.Length) -and
@@ -154,7 +154,7 @@ function Write-OutBytes([string]$path, [byte[]]$bytes) {
 function Write-Out([string]$path, [string]$text) {
   [void]$script:written.Add($path)
   $dir = Split-Path $path -Parent
-  $name = $path.Substring($root.Length).TrimStart('\')
+  $name = $path.Substring($root.Length).TrimStart('\', '/')
   $text = $text.Replace("`r`n", "`n")
   if ($WhatIf) {
     $state = if (-not (Test-Path -LiteralPath $path)) { 'would CREATE' }
@@ -182,7 +182,7 @@ function Copy-StaticTree([string]$srcDir, [string]$destDir, [string]$label, [str
   if (-not (Test-Path -LiteralPath $srcDir)) { return }
   foreach ($f in (Get-ChildItem -LiteralPath $srcDir -Recurse -File | Sort-Object FullName)) {
     if ($onlyExt.Count -and ($onlyExt -notcontains $f.Extension.ToLowerInvariant())) { continue }
-    $rel  = $f.FullName.Substring($srcDir.Length).TrimStart('\')
+    $rel  = $f.FullName.Substring($srcDir.Length).TrimStart('\', '/')
     $dest = Join-Path $destDir $rel
     [void]$script:written.Add($dest)
     $same = (Test-Path -LiteralPath $dest) -and
@@ -705,7 +705,8 @@ $script:mediaSkipped = @()
 $mediaStampParts = @()
 if (Test-Path -LiteralPath $mediaDir) {
   foreach ($f in (Get-ChildItem -LiteralPath $mediaDir -Recurse -File | Sort-Object FullName)) {
-    $rel  = $f.FullName.Substring($mediaDir.Length).TrimStart('\').Replace('\', '/')
+    # Trim either separator: on Linux the remainder starts with '/', and a key that kept it would match no [[img:...]].
+    $rel  = $f.FullName.Substring($mediaDir.Length).TrimStart('\', '/').Replace('\', '/')
     $mime = Get-MediaMime $f.FullName
     if (-not $mime) {
       if ($f.Name -ne 'README.md') { $script:mediaSkipped += $rel }
@@ -2182,7 +2183,7 @@ if (Test-Path -LiteralPath $docsDir) {
 if ($orphans.Count) {
   Write-Host ''
   Write-Host ("stale files in docs\ - not produced by this build ({0}):" -f $orphans.Count)
-  foreach ($o in $orphans) { Write-Host ("  {0}" -f $o.Substring($root.Length).TrimStart('\')) }
+  foreach ($o in $orphans) { Write-Host ("  {0}" -f $o.Substring($root.Length).TrimStart('\', '/')) }
   if ($Prune -and -not $WhatIf) {
     foreach ($o in $orphans) { Remove-Item -LiteralPath $o -Force }
     Write-Host ("  removed {0}" -f $orphans.Count)
