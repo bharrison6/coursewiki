@@ -13,7 +13,7 @@ test('end-mill anatomy web, phone, fallback and independent roots',{skip},async(
   const out=fs.mkdtempSync(path.join(os.tmpdir(),'coursewiki-end-mill-anatomy-')),browser=await launch();
   try{
     const page=await browser.newPage({viewport:{width:1200,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
-    const url=browserURL.replace(/\/$/,'')+'/machining/milling-cutter-selection.html';
+    const url=browserURL.replace(/\/$/,'')+'/machining/milling-cutter-selection.html?p=det-330';
     await page.goto(url,{waitUntil:'networkidle'});await page.locator('details').evaluateAll(ns=>ns.forEach(n=>n.open=true));
     await page.waitForFunction(()=>document.querySelector('[data-interactive="end-mill-anatomy"]')?.dataset.emaReady==='true');
     const root=page.locator('[data-interactive="end-mill-anatomy"]');
@@ -23,7 +23,7 @@ test('end-mill anatomy web, phone, fallback and independent roots',{skip},async(
     assert.match(before,/OAL 76 mm/);assert.match(after,/OAL 76 mm/);assert.match(before,/Holder projection 50 mm/);assert.match(after,/Holder projection 60 mm/);
     await root.locator('[data-ema-view="reset"]').click();await root.locator('canvas').focus();await page.waitForTimeout(50);await root.locator('canvas').evaluate(n=>n.blur());const baseline=await root.locator('canvas').screenshot();
     await root.locator('[data-ema-view="side"]').click();assert.equal(await root.locator('[data-ema-scene]').getAttribute('data-camera-view'),'side');
-    await root.locator('canvas').focus();await page.keyboard.press('ArrowRight');await page.waitForTimeout(50);const changed=await root.locator('canvas').screenshot();assert.equal(baseline.equals(changed),false,'keyboard orbit changes rendered pixels');
+    const beforeOrbitURL=page.url();await root.locator('canvas').focus();await page.keyboard.press('ArrowRight');assert.equal(page.url(),beforeOrbitURL,'canvas orbit does not trigger playlist navigation');await page.waitForTimeout(50);const changed=await root.locator('canvas').screenshot();assert.equal(baseline.equals(changed),false,'keyboard orbit changes rendered pixels');
     await root.locator('[data-ema-view="end"]').click();assert.equal(await root.locator('[data-ema-scene]').getAttribute('data-camera-view'),'end');
     await root.locator('[data-ema-view="reset"]').click();await root.locator('canvas').focus();await page.waitForTimeout(50);assert.equal(await root.locator('[data-ema-scene]').getAttribute('data-camera-view'),'orbit');await root.locator('canvas').evaluate(n=>n.blur());const restored=await root.locator('canvas').screenshot();assert.equal(baseline.equals(restored),true,'Reset 3D restores the exact saved view');
     await root.locator('canvas').focus();await page.keyboard.press('ArrowLeft');await page.waitForTimeout(50);await page.keyboard.press('Home');await page.waitForTimeout(50);await root.locator('canvas').evaluate(n=>n.blur());const homeRestored=await root.locator('canvas').screenshot();assert.equal(baseline.equals(homeRestored),true,'Home restores the same exact saved view as Reset 3D');
