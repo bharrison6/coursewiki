@@ -16,8 +16,10 @@ test('side and static lessons carry dimensions limits and attribution',()=>{
   assert.doesNotMatch(lesson,/\sid=/,'reusable static markup remains intrinsically ID-free');
   for(const text of ['LOC 20 mm','LBS 70 mm','OAL 100 mm','holder-face projection 75 mm'])assert.match(side,new RegExp(text));
   assert.match(lesson,/not a grip recommendation/);assert.match(lesson,/LBS includes LOC plus any relieved neck/);
-  assert.match(lesson,/do not establish center-cutting end-face geometry/);
-  assert.match(lesson,/not watertight manufacturing CAD/);
+  assert.match(lesson,/end gashes and relief/);
+  assert.match(lesson,/Separate catalog comparison/);
+  assert.match(lesson,/Approved fixed model/);
+  assert.match(lesson,/not manufacturing CAD/);
   assert.match(D.side(M.SPECS.longFlute,75,'long-'),/no reduced-neck interval/);
   assert.doesNotMatch(D.side(M.SPECS.longFlute,75,'long-'),/a reduced neck extends/);
   const narrow=A.catalog({...M.SPECS.reduced,neckDiameter:8});
@@ -40,7 +42,7 @@ test('module manifest uses shared runtime and shared cutter geometry',()=>{
 });
 test('3D scene is event driven and does not copy a vendor bundle',()=>{
   const source=fs.readFileSync(path.join(__dirname,'scene3d.js'),'utf8');
-  assert.match(source,/CourseWikiThree/);assert.match(source,/CourseWikiCutterAxial/);
+  assert.match(source,/CourseWikiThree/);assert.match(source,/CourseWikiApprovedEndMill/);assert.match(source,/GLTFLoader/);
   assert.doesNotMatch(source,/setAnimationLoop|three-bundle|milling-simulator/);
   assert.match(source,/requestAnimationFrame\(render\)/);
 });

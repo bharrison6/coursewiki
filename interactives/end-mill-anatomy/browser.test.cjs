@@ -15,11 +15,12 @@ test('end-mill anatomy web, phone, fallback and independent roots',{skip},async(
     const page=await browser.newPage({viewport:{width:1200,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
     const url=browserURL.replace(/\/$/,'')+'/machining/milling-cutter-selection.html';
     await page.goto(url,{waitUntil:'networkidle'});await page.locator('details').evaluateAll(ns=>ns.forEach(n=>n.open=true));
+    await page.waitForFunction(()=>document.querySelector('[data-interactive="end-mill-anatomy"]')?.dataset.emaReady==='true');
     const root=page.locator('[data-interactive="end-mill-anatomy"]');
     assert.equal(await root.getAttribute('data-ema-ready'),'true');assert.equal(await root.locator('canvas.ema-webgl').count(),1);
-    const before=await root.locator('[data-ema-readout]').textContent();
-    await root.locator('[data-ema="projection"]').selectOption('85');const after=await root.locator('[data-ema-readout]').textContent();
-    assert.match(before,/OAL 100 mm/);assert.match(after,/OAL 100 mm/);assert.match(before,/Holder projection 75 mm/);assert.match(after,/Holder projection 85 mm/);
+    const before=await root.locator('.ema-status').textContent();
+    await root.locator('[data-ema="projection"]').selectOption('60');const after=await root.locator('.ema-status').textContent();
+    assert.match(before,/OAL 76 mm/);assert.match(after,/OAL 76 mm/);assert.match(before,/Holder projection 50 mm/);assert.match(after,/Holder projection 60 mm/);
     await root.locator('[data-ema-view="reset"]').click();await root.locator('canvas').focus();await page.waitForTimeout(50);await root.locator('canvas').evaluate(n=>n.blur());const baseline=await root.locator('canvas').screenshot();
     await root.locator('[data-ema-view="side"]').click();assert.equal(await root.locator('[data-ema-scene]').getAttribute('data-camera-view'),'side');
     await root.locator('canvas').focus();await page.keyboard.press('ArrowRight');await page.waitForTimeout(50);const changed=await root.locator('canvas').screenshot();assert.equal(baseline.equals(changed),false,'keyboard orbit changes rendered pixels');
@@ -38,9 +39,10 @@ test('end-mill anatomy web, phone, fallback and independent roots',{skip},async(
     assert.equal(fixture.origin,emitted.origin);assert.equal(fixture.pathname,emitted.pathname);const preserved=new URL(fixture);preserved.searchParams.delete('two-roots');assert.deepEqual([...preserved.searchParams],[...emitted.searchParams]);assert.equal(fixture.searchParams.get('two-roots'),'1');assert.notEqual(fixture.href,emitted.href);
     await multi.evaluate(()=>{const a=document.querySelector('[data-interactive="end-mill-anatomy"]');a.after(a.cloneNode(true));});await multi.unroute('**/end-mill-anatomy/demo.js*');
     const mounts=await multi.evaluate(src=>{const s=document.createElement('script');s.src=src;document.body.append(s);return new Promise(r=>setTimeout(()=>r(document.querySelectorAll('[data-ema-ready]').length),250));},fixtureURL);
+    await multi.waitForFunction(()=>document.querySelectorAll('[data-ema-ready="true"]').length===2);
     assert.equal(mounts,2);assert.equal(await multi.locator('canvas.ema-webgl').count(),2);
-    const roots=multi.locator('[data-interactive="end-mill-anatomy"]');await roots.nth(1).locator('[data-ema="projection"]').selectOption('85');
-    assert.match(await roots.nth(0).locator('[data-ema-readout]').textContent(),/Holder projection 75 mm/);assert.match(await roots.nth(1).locator('[data-ema-readout]').textContent(),/Holder projection 85 mm/);
+    const roots=multi.locator('[data-interactive="end-mill-anatomy"]');await roots.nth(1).locator('[data-ema="projection"]').selectOption('60');
+    assert.match(await roots.nth(0).locator('.ema-status').textContent(),/Holder projection 50 mm/);assert.match(await roots.nth(1).locator('.ema-status').textContent(),/Holder projection 60 mm/);
     assert.deepEqual(await multi.locator('[data-interactive="end-mill-anatomy"] [id]').evaluateAll(nodes=>{const seen=new Set();return nodes.map(n=>n.id).filter(id=>seen.has(id)||!seen.add(id));}),[],'two roots initialized by one loader share no static or live ids');await multi.close();
     const noJs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:900}}),np=await noJs.newPage();await np.goto(url,{waitUntil:'networkidle'});await np.locator('details').evaluateAll(ns=>ns.forEach(n=>n.open=true));
     assert.equal(await np.locator('[data-interactive="end-mill-anatomy"] .ema-static').isVisible(),true);assert.match(await np.locator('[data-interactive="end-mill-anatomy"]').textContent(),/LBS includes LOC plus any relieved neck/);await noJs.close();

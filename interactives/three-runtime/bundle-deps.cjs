@@ -11,7 +11,7 @@ async function main() {
     fs.readFileSync(path.join(dir, 'LICENSE'), 'utf8');
   fs.writeFileSync(path.join(__dirname, 'dependency-licenses.txt'), notices);
   await esbuild.build({
-    stdin: { contents: 'export * from "three"; export { OrbitControls } from "three/addons/controls/OrbitControls.js";',
+    stdin: { contents: 'export * from "three"; export { OrbitControls } from "three/addons/controls/OrbitControls.js"; export { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";',
       resolveDir: __dirname, sourcefile: 'module-dependencies.js' },
     outfile: path.join(__dirname, 'three-bundle.js'), bundle: true, minify: true,
     format: 'iife', globalName: 'CourseWikiThree', target: 'es2020',
