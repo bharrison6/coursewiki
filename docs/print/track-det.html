@@ -16155,12 +16155,16 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </div>
   </details>
   <details class="xcard deck-slide" id="reliable-shop-measurement--temperature-and-surface-condition-can-move-the-result" data-card="reliable-shop-measurement--temperature-and-surface-condition-can-move-the-result">
-    <summary>Temperature and surface condition can move the result<span class="chev"></span></summary>
+    <summary>Temperature and surface condition can move the result<span class="card-tags"><span class="card-tag" data-marker="practice"><span class="marker-separator">; </span>Practice</span></span><span class="chev"></span></summary>
     <div class="body">
       <h2>Temperature and surface condition can move the result</h2>
   <p>Parts and instruments change size with temperature. Let them approach the same stable measuring conditions; follow the reference temperature and corrections required by the inspection procedure. Avoid direct sun, drafts, and prolonged hand contact with precision tools.</p>
   <p>Clean contact faces matter because the instrument measures what touches them. A chip can enlarge an apparent outside size; a raised edge can hold a depth-micrometer base above its reference. Surface peaks can affect contact too. See <a class="xref-page" href="#p-surface-texture">Surface Texture and Finish</a> for surface condition rather than treating every last-digit change as a size change.</p>
   <p>Measure at several positions when taper or out-of-roundness matters. Keep the individual values. An average can hide an oversize region and does not prove the whole feature meets its limits.</p>
+  <p>In this invented classroom example, each value is a local diameter reading in a 20&nbsp;mm-deep bore. Near, middle, and far name axial stations 2, 10, and 18&nbsp;mm from the entry face. X and Y are two marked perpendicular diametral directions at each station.</p>
+  <table><caption>Invented classroom local-diameter readings; treat the stated values as exact</caption><thead><tr><th scope="col">Axial station from entry face</th><th scope="col">Diametral direction</th><th scope="col">Local diameter (mm)</th></tr></thead><tbody><tr><th scope="row">Near &mdash; 2&nbsp;mm</th><td>X</td><td>20.000</td></tr><tr><th scope="row">Near &mdash; 2&nbsp;mm</th><td>Y</td><td>20.002</td></tr><tr><th scope="row">Middle &mdash; 10&nbsp;mm</th><td>X</td><td>20.001</td></tr><tr><th scope="row">Middle &mdash; 10&nbsp;mm</th><td>Y</td><td>20.003</td></tr><tr><th scope="row">Far &mdash; 18&nbsp;mm</th><td>X</td><td>20.004</td></tr><tr><th scope="row">Far &mdash; 18&nbsp;mm</th><td>Y</td><td>20.026</td></tr></tbody></table>
+  <p>For stated limits of 19.980 to 20.020&nbsp;mm, the six-reading mean is <code>120.036 / 6 = 20.006&nbsp;mm</code>, inside the limits. The far-depth Y reading is 20.026&nbsp;mm, above the stated upper limit. Keep that location with the value: the in-limit average does not make the sampled high reading disappear. These six local readings do not establish the size or form of the unsampled bore.</p>
+  <p><a class="button" data-practice-add="measurement-bore-mean" href="../practice.html#measurement-bore-mean">Practice interpreting bore readings</a></p>
   <p>For the operating rules around machines, use <a class="xref-page" href="#p-equipment-operating-procedure">Equipment Operating Procedure</a> and <a class="xref-page" href="#p-machine-hazards">Machine Hazards and Housekeeping</a>. For the numerical limits themselves, use <a class="xref-page" href="#p-tolerances-and-fits">Tolerances and Fits</a>.</p>
     </div>
   </details>
@@ -24784,11 +24788,35 @@ void loop() {
     <div class="body">
       <h2>Explore a pack by changing one input at a time</h2>
   <p>First double the series count: voltage and energy double, but Ah and runtime at the same pack current do not. Reset it, then double the parallel count: Ah, energy, rated current and ideal runtime double. The load current below is measured at the pack terminals.</p>
+  <div class="panel">
+    <h3>Predict first: same current or same ideal power?</h3>
+    <p>Before checking the results, predict whether ideal runtime will stay the same or double in each comparison, and explain what must happen to current. Start with 3.6 V, 2.4 Ah cells in a 3s2p pack at 1.2 A, then try two different meanings of “the same load”:</p>
+    <ol>
+      <li><strong>Same pack current:</strong> change only the series count from 3 to 6 and leave the load-current input at 1.2 A.</li>
+      <li><strong>Same ideal nominal pack power:</strong> keep 6s2p, calculate <code>I = P ÷ V = 12.96 W ÷ 21.6 V = 0.6 A</code>, then enter <strong>0.6 A</strong> in the existing load-current input.</li>
+    </ol>
+  </div>
   <div data-interactive="battery-pack">
     <div class="battery-static"><p><strong>Paper example:</strong> 3.6 V, 2.4 Ah cells; 3s2p; continuous discharge rating 3C; load 1.2 A.</p><p><code>V = 3 × 3.6 = 10.8 V; Ah = 2 × 2.4 = 4.8 Ah; Wh = 10.8 × 4.8 = 51.84 Wh; Imax = 3 × 4.8 = 14.4 A; t = 4.8 ÷ 1.2 = 4 h.</code></p><p>With no JavaScript, use these equations to explore other packs. This example remains in the print view.</p></div>
     <div data-battery-live></div>
   </div>
-  <p>The model excludes discharge curves, conversion losses, reserve capacity and aging. It reports when the requested current exceeds the entered rating; a result below that rating is not a safety certification.</p>
+  <details class="solution">
+    <summary>Check the fixed-current and fixed-power comparison</summary>
+    <div class="unit-table-wrap" tabindex="0" role="region" aria-label="Fixed-current and fixed-power battery comparison; scroll horizontally for all columns">
+      <table class="unit-table">
+        <caption>Same cells and parallel count, with two different load bases</caption>
+        <thead><tr><th>Case</th><th>Nominal voltage</th><th>Capacity</th><th>Nominal energy</th><th>Pack current</th><th>Nominal load power</th><th>Ideal runtime</th></tr></thead>
+        <tbody>
+          <tr><th>3s2p starting case</th><td>10.8 V</td><td>4.8 Ah</td><td>51.84 Wh</td><td>1.2 A</td><td>12.96 W</td><td>4 h</td></tr>
+          <tr><th>6s2p, same current</th><td>21.6 V</td><td>4.8 Ah</td><td>103.68 Wh</td><td>1.2 A</td><td>25.92 W</td><td>4 h</td></tr>
+          <tr><th>6s2p, same ideal power</th><td>21.6 V</td><td>4.8 Ah</td><td>103.68 Wh</td><td>0.6 A</td><td>12.96 W</td><td>8 h</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Check:</strong> at the same current, both packs still have 4.8 Ah, so <code>t = Ah ÷ I</code> stays at 4 h while the 6s2p pack supplies twice the nominal power. At the same ideal power, twice the nominal voltage needs half the current, so the ideal runtime becomes 8 h.</p>
+    <p>The 6s2p case uses twelve cells instead of six and stores twice the nominal energy. The longer fixed-power runtime is not a free benefit.</p>
+  </details>
+  <p>This comparison assumes matched cells, constant nominal voltage, the stated Ah is available and the entered load is ideal. It does not predict changing discharge voltage, load or converter losses, reserve capacity, aging, cutoff or protection behavior. The model reports when the requested current exceeds the entered rating; a result below that rating is not a safety certification.</p>
   <a class="button" data-practice-add="battery-pack-voltage" href="../practice.html#battery-pack-voltage">Practise series and parallel packs</a>
     </div>
   </details>

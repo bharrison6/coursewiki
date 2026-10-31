@@ -6139,11 +6139,35 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Explore a pack by changing one input at a time</h2>
   <p>First double the series count: voltage and energy double, but Ah and runtime at the same pack current do not. Reset it, then double the parallel count: Ah, energy, rated current and ideal runtime double. The load current below is measured at the pack terminals.</p>
+  <div class="panel">
+    <h3>Predict first: same current or same ideal power?</h3>
+    <p>Before checking the results, predict whether ideal runtime will stay the same or double in each comparison, and explain what must happen to current. Start with 3.6 V, 2.4 Ah cells in a 3s2p pack at 1.2 A, then try two different meanings of “the same load”:</p>
+    <ol>
+      <li><strong>Same pack current:</strong> change only the series count from 3 to 6 and leave the load-current input at 1.2 A.</li>
+      <li><strong>Same ideal nominal pack power:</strong> keep 6s2p, calculate <code>I = P ÷ V = 12.96 W ÷ 21.6 V = 0.6 A</code>, then enter <strong>0.6 A</strong> in the existing load-current input.</li>
+    </ol>
+  </div>
   <div data-interactive="battery-pack">
     <div class="battery-static"><p><strong>Paper example:</strong> 3.6 V, 2.4 Ah cells; 3s2p; continuous discharge rating 3C; load 1.2 A.</p><p><code>V = 3 × 3.6 = 10.8 V; Ah = 2 × 2.4 = 4.8 Ah; Wh = 10.8 × 4.8 = 51.84 Wh; Imax = 3 × 4.8 = 14.4 A; t = 4.8 ÷ 1.2 = 4 h.</code></p><p>With no JavaScript, use these equations to explore other packs. This example remains in the print view.</p></div>
     <div data-battery-live></div>
   </div>
-  <p>The model excludes discharge curves, conversion losses, reserve capacity and aging. It reports when the requested current exceeds the entered rating; a result below that rating is not a safety certification.</p>
+  <details class="solution">
+    <summary>Check the fixed-current and fixed-power comparison</summary>
+    <div class="unit-table-wrap" tabindex="0" role="region" aria-label="Fixed-current and fixed-power battery comparison; scroll horizontally for all columns">
+      <table class="unit-table">
+        <caption>Same cells and parallel count, with two different load bases</caption>
+        <thead><tr><th>Case</th><th>Nominal voltage</th><th>Capacity</th><th>Nominal energy</th><th>Pack current</th><th>Nominal load power</th><th>Ideal runtime</th></tr></thead>
+        <tbody>
+          <tr><th>3s2p starting case</th><td>10.8 V</td><td>4.8 Ah</td><td>51.84 Wh</td><td>1.2 A</td><td>12.96 W</td><td>4 h</td></tr>
+          <tr><th>6s2p, same current</th><td>21.6 V</td><td>4.8 Ah</td><td>103.68 Wh</td><td>1.2 A</td><td>25.92 W</td><td>4 h</td></tr>
+          <tr><th>6s2p, same ideal power</th><td>21.6 V</td><td>4.8 Ah</td><td>103.68 Wh</td><td>0.6 A</td><td>12.96 W</td><td>8 h</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Check:</strong> at the same current, both packs still have 4.8 Ah, so <code>t = Ah ÷ I</code> stays at 4 h while the 6s2p pack supplies twice the nominal power. At the same ideal power, twice the nominal voltage needs half the current, so the ideal runtime becomes 8 h.</p>
+    <p>The 6s2p case uses twelve cells instead of six and stores twice the nominal energy. The longer fixed-power runtime is not a free benefit.</p>
+  </details>
+  <p>This comparison assumes matched cells, constant nominal voltage, the stated Ah is available and the entered load is ideal. It does not predict changing discharge voltage, load or converter losses, reserve capacity, aging, cutoff or protection behavior. The model reports when the requested current exceeds the entered rating; a result below that rating is not a safety certification.</p>
   <a class="button" data-practice-add="battery-pack-voltage" href="../practice.html#battery-pack-voltage">Practise series and parallel packs</a>
     </div>
   </details>
