@@ -27,6 +27,19 @@
       <tr><td>Mid-plane</td><td>A total depth split equally about the sketch plane.</td><td>The part must stay centered. In SOLIDWORKS, a 14 mm Mid Plane depth extends 7 mm each way.</td></tr>
     </tbody>
   </table>
+  <div data-interactive="cad-end-conditions">
+    <div class="cec-static">
+      <p><strong>Worked thickness edit.</strong> One rectangular cut starts on the top face of one flat plate, travels downward normal to that face, and removes material from that selected body only. Compare a distance-controlled blind cut with a through-all cut before and after the plate becomes thicker.</p>
+      <p>All three sections use the same vertical scale: 8 drawing units per millimeter.</p>
+      <div class="cec-static-grid">
+        <figure><svg viewBox="0 0 240 205" role="img" aria-label="A 12 millimeter blind rectangular cut crosses a 10 millimeter plate."><path class="cec-material" d="M20 35H85V115H20Z M155 35H220V115H155Z"/><path class="cec-cut" d="M85 35H155V115H85Z"/><text class="cec-title" x="120" y="20" text-anchor="middle">BLIND 12 · PLATE 10</text><text class="cec-result-label" x="120" y="192" text-anchor="middle">Open · floor 0 mm</text></svg><figcaption>The requested blind distance reaches beyond this plate; actual removal stops at the body boundary.</figcaption></figure>
+        <figure><svg viewBox="0 0 240 205" role="img" aria-label="The same 12 millimeter blind rectangular cut leaves a 4 millimeter floor in a 16 millimeter plate."><path class="cec-material" d="M20 35H85V131H155V35H220V163H20Z"/><path class="cec-cut" d="M85 35H155V131H85Z"/><text class="cec-title" x="120" y="20" text-anchor="middle">BLIND 12 · PLATE 16</text><text class="cec-result-label" x="120" y="192" text-anchor="middle">Closed · floor 4 mm</text></svg><figcaption>The blind distance stays 12 mm, so the later thickness edit leaves a floor.</figcaption></figure>
+        <figure><svg viewBox="0 0 240 205" role="img" aria-label="A through-all rectangular cut crosses a 16 millimeter plate."><path class="cec-material" d="M20 35H85V163H20Z M155 35H220V163H155Z"/><path class="cec-cut" d="M85 35H155V163H85Z"/><text class="cec-title" x="120" y="20" text-anchor="middle">THROUGH ALL · PLATE 16</text><text class="cec-result-label" x="120" y="192" text-anchor="middle">Open · floor 0 mm</text></svg><figcaption>Through all follows this selected plate in the stated direction.</figcaption></figure>
+      </div>
+      <table><thead><tr><th>Design goal</th><th>Choice that survives the edit</th><th>Why</th></tr></thead><tbody><tr><td>Opening must stay through</td><td>Through all</td><td>The termination follows the selected plate thickness.</td></tr><tr><td>Pocket must retain a floor</td><td>Blind, with a depth smaller than the final thickness</td><td>The fixed distance intentionally stops before the far face.</td></tr></tbody></table>
+      <p>This teaching model does not cover up-to-face, up-to-next, multiple bodies, opposite directions or revolved cuts. Check the selected sketch region, direction and body scope in the CAD preview.</p>
+    </div>
+  </div>
   <p>Do not substitute an oversized blind cut for a through-all requirement. It may work today and leave a thin floor after a later edit. Conversely, through all is wrong for a pocket that must retain its floor.</p>
   <p>Onshape uses a <strong>Symmetric</strong> option for supported end types. Dialog names and available conditions depend on the selected operation; inspect the preview and measured result rather than transferring every setting by name.</p>
   <p><a class="button" data-practice-add="part-features-end-condition" href="../practice.html#part-features-end-condition">Practice end conditions</a> <a class="button" data-practice-add="part-features-midplane" href="../practice.html#part-features-midplane">Practice symmetric depth</a></p>
