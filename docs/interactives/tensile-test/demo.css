@@ -1,0 +1,175 @@
+[data-interactive="tensile-test"] { min-width: 0; margin-block: 1rem; overflow-wrap: anywhere; }
+.tt-ready > .tt-static { display: none; }
+/* Series colours come from theme tokens; each series also has its own dash pattern and a letter label. */
+[data-interactive="tensile-test"] { --tt-a: var(--accent); --tt-b: var(--msu-redorange); --tt-c: var(--ink); --tt-d: var(--ink-soft); }
+.tt-lab, .tt-static { font: .97rem/1.45 var(--f-display); }
+.tt-lab p { margin-block: .55rem; }
+.tt-challenge { padding: .6rem .8rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+.tt-challenge strong { display: block; font-size: 1.08rem; }
+.tt-toolbar { display: flex; flex-wrap: wrap; gap: .5rem; align-items: end; margin-block: .7rem; }
+.tt-toolbar label { display: grid; gap: .2rem; font-weight: 700; flex: 1 1 15rem; min-width: 0; }
+.tt-lab :is(select, input[type="number"], button) { box-sizing: border-box; min-height: 44px; min-width: 0; max-width: 100%; font: inherit; padding: .4rem .65rem; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); }
+.tt-lab :is(button, select, summary) { cursor: pointer; }
+.tt-lab button:disabled { opacity: .5; cursor: default; }
+.tt-lab button.tt-primary { border: 2px solid var(--accent); font-weight: 700; }
+.tt-lab :is(input, select, button, summary):focus-visible, .tt-tablewrap:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.tt-lab input { accent-color: var(--accent); }
+.tt-stage { position: relative; touch-action: pan-y; border: 1px solid var(--rule); background: var(--paper); cursor: ew-resize; }
+.tt-specimen, .tt-plot { display: block; width: 100%; height: auto; }
+.tt-stage .tt-specimen { max-height: 15rem; }
+.tt-crosshead-control { display: grid; gap: .15rem; margin-block: .5rem .2rem; font-weight: 700; }
+.tt-crosshead-control input[type="range"] { width: 100%; min-height: 44px; margin: 0; }
+.tt-hint, .tt-speccap { color: var(--ink-soft); font-size: .9rem; }
+.tt-speccap { margin: .3rem 0 0; }
+.tt-readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin: .5rem 0; padding: 0; list-style: none; font-variant-numeric: tabular-nums; }
+.tt-readouts li { min-width: 0; padding: .4rem .5rem; border: 1px solid var(--rule); background: var(--surface); }
+.tt-readouts span { display: block; color: var(--ink-soft); font-size: .82rem; }
+.tt-readouts strong { font-size: 1.05rem; }
+/* Reserve two lines for changing stage names so the panel below does not shift while the result animates. */
+.tt-readouts strong[data-r="stage"] { display: block; min-height: 2.9em; }
+.tt-status { min-height: 2.9em; padding: .5rem .7rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+.tt-lab, .tt-static { container-type: inline-size; }
+.tt-plots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+.tt-plots > svg { border: 1px solid var(--rule); background: var(--paper); }
+.tt-plots > svg:only-child { grid-column: 1 / -1; max-width: 32rem; }
+.tt-pointer { min-height: 1.5em; color: var(--ink-soft); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.tt-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: .5rem; }
+.tt-actions button { flex: 1 1 10rem; }
+.tt-predict { margin-block: .7rem; padding: .7rem .8rem; border: 1px solid var(--rule); border-left: 4px solid var(--accent); }
+.tt-predict[hidden] { display: none; }
+.tt-predict summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; }
+.tt-predict label { display: grid; gap: .2rem; font-weight: 700; max-width: 20rem; }
+.tt-feedback { padding: .5rem .7rem; background: var(--surface-2); }
+/* Paired result view inside the prediction panel: specimen, readings and unloading line stay beside the answer. */
+.tt-uv { display: grid; gap: .3rem; justify-items: center; margin-block: .4rem; }
+.tt-uv-spec { width: 100%; background: var(--paper); border: 1px solid var(--rule); }
+.tt-uv-spec .tt-specimen { max-height: 4.2rem; }
+.tt-uv-spec .tt-slabel { display: none; }
+.tt-uv .tt-plot { max-width: 22rem; border: 1px solid var(--rule); background: var(--paper); }
+.tt-uv-read { margin: 0; font-size: .88rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; text-align: center; }
+.tt-predict .tt-feedback { min-height: 4.4em; margin-block: .4rem; font-size: .93rem; }
+.tt-answer { display: flex; flex-wrap: wrap; gap: .5rem; align-items: end; }
+.tt-answer label { flex: 1 1 9rem; max-width: none; }
+.tt-answer button { flex: 0 0 auto; }
+.tt-predict > p[data-tt-context] { margin-top: 0; font-size: .93rem; }
+@container (max-width: 30rem) { .tt-uv-spec .tt-specimen { max-height: 3.2rem; } .tt-uv-read { font-size: .8rem; } }
+/* Wide columns: plot beside the specimen, readings, result and answer, so the whole check fits one screen. */
+@container (min-width: 36rem) {
+  .tt-predict:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); column-gap: .8rem; align-items: start;
+    grid-template-areas: "ctx ctx" "plot spec" "plot read" "plot fb" "plot ans" "plot act" "score score" "hint hint"; }
+  .tt-predict .tt-uv { display: contents; }
+  .tt-predict > p[data-tt-context] { grid-area: ctx; }
+  .tt-predict .tt-uv-spec { grid-area: spec; }
+  .tt-predict .tt-uv-read { grid-area: read; }
+  .tt-predict .tt-uv .tt-plot { grid-area: plot; max-width: none; }
+  .tt-predict .tt-feedback { grid-area: fb; }
+  .tt-predict .tt-answer { grid-area: ans; }
+  .tt-predict > .tt-actions { grid-area: act; }
+  .tt-predict > [data-tt-score] { grid-area: score; }
+  .tt-predict > details { grid-area: hint; }
+}
+.tt-feedback[data-result="match"], .tt-feedback[data-result="match-ratio"] { border-left: 4px solid var(--accent); }
+.tt-feedback[data-result="miss"], .tt-feedback[data-result="close"] { border-left: 4px dashed var(--ink-soft); }
+.tt-found { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .4rem; margin: .5rem 0; padding: 0; list-style: none; }
+.tt-found li { padding: .4rem .55rem; border: 1px dashed var(--rule); color: var(--ink-soft); }
+.tt-found li.is-found { border-style: solid; color: var(--ink); background: var(--surface); }
+.tt-found strong { display: block; }
+.tt-section-title { margin: 1.2rem 0 .3rem; font-size: 1.1rem; font-weight: 700; }
+.tt-compare-toggles { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin: 0; padding: 0; border: 0; }
+.tt-compare-toggles legend { font-weight: 700; padding: 0; margin-bottom: .2rem; }
+.tt-compare-toggles label { display: flex; align-items: center; gap: .45rem; min-height: 44px; }
+.tt-compare-toggles input { width: 1.25rem; height: 1.25rem; }
+.tt-legend { display: flex; flex-wrap: wrap; gap: .2rem 1.2rem; margin: .4rem 0; padding: 0; list-style: none; font-size: .92rem; }
+.tt-legend svg { width: 2.5rem; height: .8rem; vertical-align: middle; }
+.tt-quiz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem .8rem; margin-block: .5rem; }
+.tt-quiz label { display: grid; gap: .2rem; min-width: 0; }
+.tt-quiz-result { margin: .3rem 0; padding: 0 0 0 1.2rem; }
+.tt-ranks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem 1rem; }
+.tt-rank { margin: 0; min-width: 0; break-inside: avoid; }
+.tt-rank figcaption { font-weight: 700; margin-bottom: .2rem; }
+.tt-rank ol { list-style: none; margin: 0; padding: 0; }
+.tt-rank li { display: grid; grid-template-columns: 1.4rem minmax(0, 1fr) 4.2rem; gap: .4rem; align-items: center; min-height: 1.6rem; font-variant-numeric: tabular-nums; }
+.tt-bar { height: .8rem; background: var(--surface-2); border: 1px solid var(--rule); }
+.tt-bar-fill { display: block; height: 100%; background: currentColor; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.tt-rank-val { text-align: right; }
+.tt-tablewrap { overflow-x: auto; max-width: 100%; }
+.tt-table :is(th, td) { overflow-wrap: normal; word-break: normal; }
+.tt-legend li, .tt-readouts li, .tt-found li, .tt-quiz-result li { padding-left: 0; }
+.tt-legend li::before, .tt-readouts li::before, .tt-found li::before, .tt-quiz-result li::before { content: none; }
+.tt-quiz-result { list-style: disc; padding-left: 1.2rem; }
+.tt-quiz-result li { display: list-item; }
+.tt-table { border-collapse: collapse; font-size: .9rem; min-width: 32rem; }
+.tt-table :is(th, td) { padding: .35rem .5rem; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+.tt-table td { font-variant-numeric: tabular-nums; }
+.tt-limits { margin-top: .8rem; border-top: 1px solid var(--rule); }
+.tt-limits > summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; }
+.tt-readlist li { margin-block: .25rem; }
+.tt-figure { margin: .8rem 0; break-inside: avoid; }
+.tt-figure > figcaption { font-size: .92rem; color: var(--ink-soft); margin-bottom: .3rem; }
+.tt-shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.tt-shot { border: 1px solid var(--rule); background: var(--paper); min-width: 0; }
+.tt-shotcap { margin: .3rem .5rem 0; font-size: .88rem; }
+
+/* SVG drawing: theme tokens only, readable in both themes and on paper. */
+.tt-plot text, .tt-specimen text { fill: var(--ink); font-family: var(--f-display); }
+.tt-tick { font-size: 21px; fill: var(--ink-soft) !important; }
+.tt-label { font-size: 21px; }
+.tt-ptitle { font-size: 21px; font-weight: 700; }
+.tt-marklabel { font-size: 20px; font-weight: 600; paint-order: stroke; stroke: var(--paper); stroke-width: 5px; stroke-linejoin: round; }
+.tt-endlabel { font-size: 23px; font-weight: 700; paint-order: stroke; stroke: var(--paper); stroke-width: 5px; }
+.tt-grid { stroke: var(--rule); stroke-width: 1; }
+.tt-axis { stroke: var(--ink-soft); stroke-width: 1.5; }
+.tt-curve { fill: none; stroke-width: 3.2; stroke-linejoin: round; stroke-linecap: round; }
+.tt-s-a { color: var(--tt-a); stroke: var(--tt-a); }
+.tt-s-b { color: var(--tt-b); stroke: var(--tt-b); stroke-dasharray: 12 5; }
+.tt-s-c { color: var(--tt-c); stroke: var(--tt-c); stroke-dasharray: 3 4; }
+.tt-s-d { color: var(--tt-d); stroke: var(--tt-d); stroke-dasharray: 10 4 2 4; }
+.tt-curve.tt-main { stroke: var(--accent); stroke-width: 3.6; }
+.tt-endlabel.tt-s-a, .tt-endlabel.tt-s-b, .tt-endlabel.tt-s-c, .tt-endlabel.tt-s-d { fill: currentColor; stroke: var(--paper); stroke-dasharray: none; }
+.tt-fracture { fill: none; stroke-width: 2.5; stroke-dasharray: none !important; }
+.tt-area { fill: var(--accent); fill-opacity: .16; stroke: none; }
+.tt-offset { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 7 5; }
+.tt-offset-base { fill: none; stroke: var(--ink); stroke-width: 2; }
+.tt-unload { fill: none; stroke: var(--msu-redorange); stroke-width: 3; stroke-dasharray: 9 5; }
+.tt-set { fill: var(--msu-redorange); stroke: var(--paper); stroke-width: 1.5; }
+.tt-pred { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+.tt-point { fill: var(--paper); stroke: var(--accent); stroke-width: 3.5; }
+.tt-mark-yield { fill: var(--paper); stroke: var(--ink); stroke-width: 3; }
+.tt-mark-uts { fill: var(--ink); stroke: var(--paper); stroke-width: 1.5; }
+.tt-mark-fracture { fill: none; stroke: var(--ink); stroke-width: 3; }
+.tt-slabel { font-size: 21px; fill: var(--ink-soft) !important; }
+.tt-grip { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 2; }
+.tt-crosshead { fill: var(--surface-2); stroke: var(--accent); stroke-width: 3; }
+.tt-spec { fill: var(--rule); stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; }
+.tt-neckmark, .tt-gauge { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+
+/* Narrow containers (phones, narrow columns): stack, and let HTML captions carry the specimen labels. */
+@container (max-width: 30rem) {
+  .tt-plots, .tt-shots, .tt-ranks, .tt-quiz { grid-template-columns: minmax(0, 1fr); }
+  .tt-readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Reserve the four-line plateau message through unloading, keeping the prediction panel still. */
+  .tt-status { min-height: calc(5.8em + 1rem); }
+  /* Keep the paired result and its answer together without shrinking the specimen or plot. */
+  .tt-predict { padding-block: .5rem; }
+  .tt-uv { margin-block: .2rem; gap: .2rem; }
+  .tt-predict .tt-feedback { margin-block: .2rem; min-height: 3.8em; }
+  .tt-slabel { display: none; }
+}
+@media (max-width: 34rem) {
+  .xcard:has([data-interactive="tensile-test"]) .body { padding-inline: .6rem; }
+  .tt-actions button { flex-basis: 8rem; }
+}
+@media (prefers-reduced-motion: reduce) { [data-interactive="tensile-test"] * { animation: none !important; transition: none !important; } }
+@media print {
+  /* The fallback is taller than a page: let it flow instead of jumping whole to the next page. */
+  [data-interactive="tensile-test"][data-interactive] { break-inside: auto; }
+  .tt-lab { display: none !important; }
+  .tt-ready > .tt-static { display: block !important; }
+  .tt-static .tt-plots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tt-static .tt-shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tt-figure, .tt-shot, .tt-plots > svg, .tt-table, .tt-readlist li { break-inside: avoid; }
+  .tt-limits > :not(summary) { display: block !important; }
+  .tt-plot, .tt-specimen, .tt-area { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .tt-tablewrap { overflow: visible; }
+  .tt-table { min-width: 0; width: 100%; }
+}

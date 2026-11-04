@@ -3050,6 +3050,162 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="belt-geometry"] :is(table, svg) { break-inside: avoid; }
 }
 
+/* Chain chordal action: scoped lab, drawings and print fallback. */
+[data-interactive="chain-chordal-action"] { min-width: 0; }
+.article:has([data-interactive="chain-chordal-action"]) { max-width: 76rem; }
+[data-interactive="chain-chordal-action"].cc-live > .cc-static { display: none; }
+/* Only the outer drawings scale; the nested drive viewport keeps its own width and height. */
+[data-interactive="chain-chordal-action"] :is(.cc-scene, .cc-trace-svg) { display: block; width: 100%; height: auto; }
+
+/* ---- shared drawing styles (live and static) -------------------------------------------- */
+.cc-text { fill: var(--ink); font-family: var(--f-display); font-size: 15px; }
+.cc-small { font-size: 13px; }
+.cc-compact .cc-text { font-size: 17px; }
+.cc-compact .cc-small { font-size: 16px; }
+.cc-strong { font-weight: 700; }
+.cc-scene .cc-text { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.cc-sprocket { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 1.5; stroke-linejoin: round; }
+.cc-hub { fill: var(--surface); stroke: var(--ink-soft); stroke-width: 1.5; }
+.cc-bore { fill: var(--paper); stroke: var(--ink-soft); stroke-width: 1.5; }
+.cc-mark { fill: var(--ink-soft); }
+.cc-plate { stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+.cc-inner { fill: var(--surface); }
+.cc-outer { fill: var(--rule); }
+.cc-plate.cc-span { stroke: var(--accent); stroke-width: 2.2; }
+.cc-outer.cc-span { fill: var(--cat1-soft); }
+.cc-inner.cc-span { fill: var(--flag-soft); }
+.cc-pin { fill: var(--ink); }
+.cc-pin-leave { fill: var(--flag); stroke: var(--accent); stroke-width: 2.5; }
+.cc-radius { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.cc-height { fill: none; stroke: var(--cat3); stroke-width: 2.5; stroke-dasharray: 6 4; }
+.cc-hub-dot { fill: var(--ink); }
+.cc-ghost { fill: none; stroke: var(--ink-soft); stroke-width: 1.6; stroke-dasharray: 2 5; stroke-linecap: round; }
+.cc-turn { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cc-gauge-box { fill: var(--surface); stroke: var(--rule); stroke-width: 1.2; }
+.cc-gauge-ref { stroke: var(--ink-soft); stroke-width: 2; }
+.cc-gauge-track { stroke: var(--rule); stroke-width: 3; }
+.cc-gauge-dot { fill: var(--flag); stroke: var(--accent); stroke-width: 2.5; }
+.cc-plot-bg { fill: var(--surface); stroke: var(--rule); }
+.cc-grid { stroke: var(--rule); stroke-width: 1; }
+.cc-grid-tooth { stroke-dasharray: 3 4; }
+.cc-tick { fill: var(--ink-soft); font-size: 13px; }
+.cc-axis { fill: var(--ink); font-size: 13px; font-weight: 600; }
+.cc-trace { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linejoin: round; }
+.cc-trace-dot { fill: var(--flag); stroke: var(--accent); stroke-width: 2.5; }
+.cc-trace-mean { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 1 4; stroke-linecap: round; }
+.cc-trace-ghost { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 8 5; }
+.cc-trace-compare { fill: none; stroke-width: 2.4; stroke-linejoin: round; }
+.cc-trace-a { stroke: var(--cat3); stroke-dasharray: 7 3; }
+.cc-trace-b { stroke: var(--ink); stroke-dasharray: 2 3; }
+
+/* ---- live lab ---------------------------------------------------------------------------- */
+/* No scroll anchoring inside the lab: swapping the prediction for its result must not make the
+   browser shift the page and carry the result out of view. */
+.cc-lab { font: .95rem/1.45 var(--f-display); container: cclab / inline-size; overflow-anchor: none; }
+.cc-lab p { margin: 0; }
+.cc-lab [hidden] { display: none !important; }
+.cc-lab :is(button, select, input, summary):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.cc-lab button, .cc-lab select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); min-height: 44px; padding: .4rem .7rem; cursor: pointer; }
+.cc-lab button:hover { border-color: var(--accent); }
+.cc-lab button:disabled { cursor: default; opacity: .55; }
+.cc-lab .cc-primary { background: var(--accent); border-color: var(--accent); color: var(--paper); font-weight: 600; }
+.cc-challenge { border-left: 4px solid var(--cat1); background: var(--cat1-soft); padding: .7rem .85rem; border-radius: var(--radius-xs); margin-bottom: .8rem; }
+.cc-challenge > p:first-child { font-weight: 700; font-size: 1.02rem; margin-bottom: .55rem; }
+/* Reserve about the result's height so swapping in the result does not push the button row down. */
+.cc-questions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; min-height: 11.5rem; align-content: start; }
+.cc-questions fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.cc-questions legend { font-weight: 600; margin-bottom: .35rem; font-size: .9rem; }
+.cc-choices { display: flex; flex-wrap: wrap; gap: .35rem; }
+.cc-choices label { display: flex; align-items: center; gap: .45rem; min-height: 44px; padding: .35rem .65rem; border: 1px solid var(--rule); border-radius: var(--radius-xs); background: var(--surface); cursor: pointer; font-size: .9rem; }
+.cc-choices input { margin: 0; width: 18px; height: 18px; accent-color: var(--accent); }
+.cc-choices label:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.cc-check-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .8rem; margin-top: .65rem; }
+.cc-feedback { font-size: .9rem; }
+.cc-feedback strong { color: var(--ink); }
+.cc-workbench { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 1fr); gap: .9rem; align-items: start; }
+.cc-observe { min-width: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; }
+.cc-observe .cc-scene { background: var(--surface); max-width: 36rem; margin-inline: auto; }
+.cc-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .3rem 1rem; padding: .5rem .7rem .4rem; border-top: 1px solid var(--rule); }
+.cc-quick { font-size: .8rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cc-result { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(13rem, 1fr); gap: .6rem .9rem; align-items: center; }
+.cc-score { grid-column: 1 / -1; font-weight: 700; }
+.cc-lines { margin: 0; padding: 0; list-style: none; display: grid; gap: .2rem; }
+.cc-preview { min-width: 0; border: 1px solid var(--rule); border-radius: var(--radius-xs); background: var(--surface); }
+.cc-result-text { font-size: .9rem; display: grid; gap: .35rem; }
+.cc-jump { font-weight: 600; color: var(--accent); }
+.cc-motion { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; padding: .45rem .5rem; border-top: 1px solid var(--rule); }
+.cc-motion .cc-run { min-width: 6rem; }
+.cc-anim-note { text-align: center; font-size: .78rem; color: var(--ink-soft); padding: 0 .6rem .55rem; }
+.cc-trace-wrap { border-top: 1px solid var(--rule); padding: .35rem .3rem 0; }
+.cc-controls { min-width: 0; display: grid; gap: .7rem; }
+.cc-control { display: grid; gap: .2rem; min-width: 0; }
+.cc-control > label, .cc-control > .cc-control-label { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; font-weight: 600; font-size: .9rem; }
+.cc-control output { color: var(--accent); font: 600 1rem var(--f-mono); white-space: nowrap; }
+.cc-stepper { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: .4rem; align-items: center; }
+.cc-stepper button { padding: 0; font-size: 1.25rem; font-weight: 700; }
+.cc-control input[type="range"] { width: 100%; min-height: 44px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.cc-control select { width: 100%; }
+.cc-toggle { display: flex; align-items: center; gap: .55rem; min-height: 44px; font-weight: 600; font-size: .9rem; cursor: pointer; }
+.cc-toggle input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+.cc-results { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.cc-results > div { padding: .5rem .6rem; border: 1px solid var(--rule); border-top: 3px solid var(--flag); border-radius: var(--radius-xs); background: var(--flag-soft); display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.cc-results span { font-size: .75rem; color: var(--ink-soft); }
+.cc-results strong { font-size: clamp(1.1rem, 1.7vw, 1.45rem); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.cc-results small { font-size: .75rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cc-equation { font-size: .85rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cc-equation b { color: var(--ink); font-weight: 600; }
+.cc-insight { margin-top: .8rem !important; border-left: 3px solid var(--cat1); padding: .5rem .7rem; background: var(--cat1-soft); }
+.cc-limit { color: var(--ink-soft); font-size: .8rem; margin-top: .5rem !important; }
+.cc-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* ---- static fallback ---------------------------------------------------------------------- */
+.cc-static { display: grid; gap: 1rem; }
+.cc-static p { margin: 0; }
+.cc-static-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.cc-static-figure { margin: 0; break-inside: avoid; }
+.cc-static-figure > svg { border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--surface); }
+.cc-static-trace > svg { max-width: 40rem; margin-inline: auto; }
+.cc-static-figure figcaption { font-size: .9rem; margin-top: .35rem; }
+.cc-law { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; }
+.cc-law > div { border: 1px solid var(--rule); border-top: 3px solid var(--cat1); border-radius: var(--radius-sm); padding: .6rem .7rem; font-family: var(--f-mono); font-size: .85rem; }
+.cc-law strong { display: block; font-family: var(--f-display); margin-bottom: .2rem; }
+.cc-table .cc-row-mark { background: var(--flag-soft); }
+
+/* ---- presentation, tablet, phone ------------------------------------------------------- */
+.presenting .xcard:has(.cc-lab) { padding-block: .8rem; justify-content: flex-start; }
+.presenting .cc-lab { max-width: 74rem; margin-inline: auto; width: 100%; }
+/* The lab sizes itself from its own width (a reading column, a projector panel or a phone). */
+@container cclab (max-width: 54rem) {
+  .cc-workbench { grid-template-columns: 1fr; }
+  .cc-controls { grid-template-columns: 1fr 1fr; align-items: start; column-gap: 1rem; }
+  .cc-results, .cc-equation, .cc-reset-row { grid-column: 1 / -1; }
+  .cc-results { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@container cclab (max-width: 36rem) {
+  .cc-questions, .cc-controls, .cc-pair, .cc-result { grid-template-columns: 1fr; }
+  .cc-questions { min-height: 0; }
+  .cc-pair { padding-inline: .5rem; }
+  .cc-results { grid-template-columns: 1fr 1fr; }
+  .cc-motion button { flex: 1 1 auto; }
+}
+@media (max-width: 60rem) { .cc-law { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 34rem) {
+  .xcard:has([data-interactive="chain-chordal-action"]) .body { padding: .7rem .5rem; }
+  .cc-static-pair, .cc-law { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .cc-lab * { transition: none !important; } }
+@media print {
+  .xcard:has([data-interactive="chain-chordal-action"]) { break-inside: auto; }
+  [data-interactive="chain-chordal-action"] .cc-lab { display: none !important; }
+  [data-interactive="chain-chordal-action"] > .cc-static { display: grid !important; }
+  .cc-static-figure > svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .cc-static-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cc-static-figure figcaption { font-size: 10pt; }
+  .cc-law { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cc-static-trace > svg { max-width: 34rem; }
+}
+.cc-divider { stroke: var(--rule); stroke-width: 1.5; }
+
 /* Gear experiment: scoped controls, drawings and print fallback. */
 [data-interactive="gear-ratios"] { min-width: 0; }
 .article:has([data-interactive="gear-ratios"]) { max-width: 76rem; }
@@ -3458,6 +3614,23 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-6">Supporting detail: <a href="#deeper-addendum-6"><strong>Addendum 6</strong></a> &mdash; Chain selection and maintenance reference.</p>
     </div>
   </details>
+  <details class="xcard deck-slide is-interactive" id="chain-drives--few-sprocket-teeth-make-the-chain-surge-and-bob" data-card="chain-drives--few-sprocket-teeth-make-the-chain-surge-and-bob" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Few sprocket teeth make the chain surge and bob<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Few sprocket teeth make the chain surge and bob</h2>
+  <p class="lede">A chain can bend only at its pins, so it wraps a sprocket as a polygon with one side per tooth. Even at a perfectly steady sprocket speed, the chain leaving that polygon speeds up and slows down once per tooth, and the span rises and falls with it. Predict how much, then turn the sprocket and watch.</p>
+  <div data-interactive="chain-chordal-action">
+    <div class="cc-static">
+      <!-- CHAIN-CHORDAL-STATIC -->
+      <div class="cc-static-pair"><figure class="cc-static-figure"><svg class="cc-scene cc-compact" viewBox="0 0 420 344" role="img" aria-label="Side view of a 9-tooth sprocket turning clockwise with roller chain wrapped around its left side. The leaving pin sits 0 degrees from the top, so the leaving span is 0 mm below the pitch radius and moving at 100 percent of omega R." data-cc-scene><svg x="0" y="0" width="322" height="344" viewBox="0 0 322 344" overflow="hidden"><g><g data-cc-sprocket transform="translate(120 168) rotate(0)"><path class="cc-sprocket" d="M-26.28 -107.72L-19.15 -85.78A20.14 20.14 0 0 0 19.15 -85.78L26.28 -107.72A110.88 110.88 0 0 1 49.11 -99.41L49.11 -99.41L40.46 -78.02A20.14 20.14 0 0 0 69.81 -53.4L89.37 -65.62A110.88 110.88 0 0 1 101.52 -44.59L101.52 -44.59L81.15 -33.76A20.14 20.14 0 0 0 87.8 3.97L110.65 7.18A110.88 110.88 0 0 1 106.43 31.1L106.43 31.1L83.86 26.3A20.14 20.14 0 0 0 64.71 59.48L80.15 76.62A110.88 110.88 0 0 1 61.54 92.23L61.54 92.23L47.33 74.05A20.14 20.14 0 0 0 11.34 87.15L12.15 110.21A110.88 110.88 0 0 1 -12.15 110.21L-12.15 110.21L-11.34 87.15A20.14 20.14 0 0 0 -47.33 74.05L-61.54 92.23A110.88 110.88 0 0 1 -80.15 76.62L-80.15 76.62L-64.71 59.48A20.14 20.14 0 0 0 -83.86 26.3L-106.43 31.1A110.88 110.88 0 0 1 -110.65 7.18L-110.65 7.18L-87.8 3.97A20.14 20.14 0 0 0 -81.15 -33.76L-101.52 -44.59A110.88 110.88 0 0 1 -89.37 -65.62L-89.37 -65.62L-69.81 -53.4A20.14 20.14 0 0 0 -40.46 -78.02L-49.11 -99.41A110.88 110.88 0 0 1 -26.28 -107.72Z"/><circle class="cc-hub" r="31.28"/><circle class="cc-bore" r="14.08"/><circle class="cc-mark" cx="19.66" cy="-54.02" r="7.36"/></g><g data-cc-chain><path class="cc-plate cc-inner" d="M515.5 238.72Q497.59 241.55 479.68 238.72A20.77 20.77 0 1 0 479.68 270.18Q497.59 267.35 515.5 270.18A20.77 20.77 0 1 0 515.5 238.72Z"/><path class="cc-plate cc-inner" d="M389.64 238.72Q371.73 241.55 353.82 238.72A20.77 20.77 0 1 0 353.82 270.18Q371.73 267.35 389.64 270.18A20.77 20.77 0 1 0 389.64 238.72Z"/><path class="cc-plate cc-inner" d="M263.77 238.72Q245.86 241.55 227.95 238.72A20.77 20.77 0 1 0 227.95 270.18Q245.86 267.35 263.77 270.18A20.77 20.77 0 1 0 263.77 238.72Z"/><path class="cc-plate cc-inner" d="M137.91 238.72Q120 241.55 102.09 238.72A20.77 20.77 0 1 0 102.09 270.18Q120 267.35 137.91 270.18A20.77 20.77 0 1 0 137.91 238.72Z"/><path class="cc-plate cc-inner" d="M53.47 197.92Q47.57 180.77 47.25 162.64A20.77 20.77 0 1 0 16.26 168.11Q22.16 185.25 22.48 203.38A20.77 20.77 0 1 0 53.47 197.92Z"/><path class="cc-plate cc-inner" d="M78.98 107.67Q94.84 98.88 112.64 95.42A20.77 20.77 0 1 0 101.88 65.85Q86.02 74.64 68.22 78.1A20.77 20.77 0 1 0 78.98 107.67Z"/><path class="cc-plate cc-inner cc-span" d="M196.49 91.73Q214.4 88.9 232.31 91.73A20.77 20.77 0 1 0 232.31 60.27Q214.4 63.1 196.49 60.27A20.77 20.77 0 1 0 196.49 91.73Z"/><path class="cc-plate cc-inner cc-span" d="M322.35 91.73Q340.26 88.9 358.17 91.73A20.77 20.77 0 1 0 358.17 60.27Q340.26 63.1 322.35 60.27A20.77 20.77 0 1 0 322.35 91.73Z"/><path class="cc-plate cc-inner cc-span" d="M448.21 91.73Q466.12 88.9 484.03 91.73A20.77 20.77 0 1 0 484.03 60.27Q466.12 63.1 448.21 60.27A20.77 20.77 0 1 0 448.21 91.73Z"/><path class="cc-plate cc-outer" d="M450.2 237.46Q434.66 240.52 419.11 237.46A23.28 23.28 0 1 0 419.11 271.44Q434.66 268.38 450.2 271.44A23.28 23.28 0 1 0 450.2 237.46Z"/><path class="cc-plate cc-outer" d="M324.34 237.46Q308.8 240.52 293.25 237.46A23.28 23.28 0 1 0 293.25 271.44Q308.8 268.38 324.34 271.44A23.28 23.28 0 1 0 324.34 237.46Z"/><path class="cc-plate cc-outer" d="M198.48 237.46Q182.93 240.52 167.39 237.46A23.28 23.28 0 1 0 167.39 271.44Q182.93 268.38 198.48 271.44A23.28 23.28 0 1 0 198.48 237.46Z"/><path class="cc-plate cc-outer" d="M87.26 231.2Q73.39 223.55 63.44 211.22A23.28 23.28 0 1 0 41.6 237.25Q55.47 244.9 65.42 257.23A23.28 23.28 0 1 0 87.26 231.2Z"/><path class="cc-plate cc-outer" d="M52.07 146.73Q57.2 131.74 67.62 119.81A23.28 23.28 0 1 0 38.19 102.82Q33.06 117.81 22.64 129.74A23.28 23.28 0 1 0 52.07 146.73Z"/><path class="cc-plate cc-outer cc-span" d="M135.92 92.99Q151.47 89.93 167.01 92.99A23.28 23.28 0 1 0 167.01 59.01Q151.47 62.07 135.92 59.01A23.28 23.28 0 1 0 135.92 92.99Z"/><path class="cc-plate cc-outer cc-span" d="M261.78 92.99Q277.33 89.93 292.87 92.99A23.28 23.28 0 1 0 292.87 59.01Q277.33 62.07 261.78 59.01A23.28 23.28 0 1 0 261.78 92.99Z"/><path class="cc-plate cc-outer cc-span" d="M387.65 92.99Q403.19 89.93 418.74 92.99A23.28 23.28 0 1 0 418.74 59.01Q403.19 62.07 387.65 59.01A23.28 23.28 0 1 0 387.65 92.99Z"/><circle class="cc-pin" cx="529.06" cy="254.45" r="9.44"/><circle class="cc-pin" cx="466.12" cy="254.45" r="9.44"/><circle class="cc-pin" cx="403.19" cy="254.45" r="9.44"/><circle class="cc-pin" cx="340.26" cy="254.45" r="9.44"/><circle class="cc-pin" cx="277.33" cy="254.45" r="9.44"/><circle class="cc-pin" cx="214.4" cy="254.45" r="9.44"/><circle class="cc-pin" cx="151.47" cy="254.45" r="9.44"/><circle class="cc-pin" cx="88.53" cy="254.45" r="9.44"/><circle class="cc-pin" cx="40.33" cy="214" r="9.44"/><circle class="cc-pin" cx="29.4" cy="152.02" r="9.44"/><circle class="cc-pin" cx="60.86" cy="97.52" r="9.44"/><circle class="cc-pin cc-pin-leave" cx="120" cy="76" r="12.59"/><circle class="cc-pin" cx="182.93" cy="76" r="9.44"/><circle class="cc-pin" cx="245.86" cy="76" r="9.44"/><circle class="cc-pin" cx="308.8" cy="76" r="9.44"/><circle class="cc-pin" cx="371.73" cy="76" r="9.44"/><circle class="cc-pin" cx="434.66" cy="76" r="9.44"/><circle class="cc-pin" cx="497.59" cy="76" r="9.44"/></g></g></svg><g data-cc-overlay><path class="cc-height" d="M120 168V76"/><path class="cc-radius" d="M120 168L120 76"/><circle class="cc-hub-dot" cx="120" cy="168" r="3"/><g class="cc-gauge"><rect class="cc-gauge-box" x="326" y="30" width="90" height="286" rx="6"/><path class="cc-gauge-ref" d="M336 110H372M336 228H372"/><path class="cc-gauge-track" d="M354 110V228"/><circle class="cc-gauge-dot" cx="354" cy="110" r="7"/><text class="cc-text cc-small cc-strong" x="334" y="50">Span</text><text class="cc-text cc-small cc-strong" x="334" y="68">height</text><text class="cc-text cc-small" x="334" y="88">×21</text><text class="cc-text cc-small" x="377" y="115">R</text><text class="cc-text cc-small" x="334" y="250">R cos</text><text class="cc-text cc-small" x="334" y="268">(20°)</text><text class="cc-text cc-small" x="334" y="288">drop</text><text class="cc-text cc-small" x="334" y="307">0 mm</text></g></g><g data-cc-labels><text class="cc-text cc-strong" x="12" y="20">9 teeth · #40 chain, p = 12.7 mm</text><text class="cc-text cc-small cc-span-label" x="238" y="124.83">leaving →</text><text class="cc-text cc-small" x="238" y="222.17">← arriving</text><path class="cc-turn" d="M91.32 151.44A33.12 33.12 0 0 1 145.37 146.71M153.07 151.36L145.37 146.71L139.57 152.65"/><text class="cc-text cc-small" x="12" y="334">R = 18.57 mm · ω constant · to fit</text><path class="cc-divider" d="M322 0V344"/></g></svg><figcaption><strong>Pin at the top:</strong> the leaving span sits at the full pitch radius R and moves at ωR, its fastest.</figcaption></figure><figure class="cc-static-figure"><svg class="cc-scene cc-compact" viewBox="0 0 420 344" role="img" aria-label="Side view of a 9-tooth sprocket turning clockwise with roller chain wrapped around its left side. The leaving pin sits 20 degrees from the top, so the leaving span is 1.12 mm below the pitch radius and moving at 93.97 percent of omega R." data-cc-scene><svg x="0" y="0" width="322" height="344" viewBox="0 0 322 344" overflow="hidden"><g><g data-cc-sprocket transform="translate(120 168) rotate(20)"><path class="cc-sprocket" d="M-26.28 -107.72L-19.15 -85.78A20.14 20.14 0 0 0 19.15 -85.78L26.28 -107.72A110.88 110.88 0 0 1 49.11 -99.41L49.11 -99.41L40.46 -78.02A20.14 20.14 0 0 0 69.81 -53.4L89.37 -65.62A110.88 110.88 0 0 1 101.52 -44.59L101.52 -44.59L81.15 -33.76A20.14 20.14 0 0 0 87.8 3.97L110.65 7.18A110.88 110.88 0 0 1 106.43 31.1L106.43 31.1L83.86 26.3A20.14 20.14 0 0 0 64.71 59.48L80.15 76.62A110.88 110.88 0 0 1 61.54 92.23L61.54 92.23L47.33 74.05A20.14 20.14 0 0 0 11.34 87.15L12.15 110.21A110.88 110.88 0 0 1 -12.15 110.21L-12.15 110.21L-11.34 87.15A20.14 20.14 0 0 0 -47.33 74.05L-61.54 92.23A110.88 110.88 0 0 1 -80.15 76.62L-80.15 76.62L-64.71 59.48A20.14 20.14 0 0 0 -83.86 26.3L-106.43 31.1A110.88 110.88 0 0 1 -110.65 7.18L-110.65 7.18L-87.8 3.97A20.14 20.14 0 0 0 -81.15 -33.76L-101.52 -44.59A110.88 110.88 0 0 1 -89.37 -65.62L-89.37 -65.62L-69.81 -53.4A20.14 20.14 0 0 0 -40.46 -78.02L-49.11 -99.41A110.88 110.88 0 0 1 -26.28 -107.72Z"/><circle class="cc-hub" r="31.28"/><circle class="cc-bore" r="14.08"/><circle class="cc-mark" cx="19.66" cy="-54.02" r="7.36"/></g><g data-cc-chain><path class="cc-plate cc-inner" d="M484.03 244.27Q466.12 247.1 448.21 244.27A20.77 20.77 0 1 0 448.21 275.73Q466.12 272.9 484.03 275.73A20.77 20.77 0 1 0 484.03 244.27Z"/><path class="cc-plate cc-inner" d="M358.17 244.27Q340.26 247.1 322.35 244.27A20.77 20.77 0 1 0 322.35 275.73Q340.26 272.9 358.17 275.73A20.77 20.77 0 1 0 358.17 244.27Z"/><path class="cc-plate cc-inner" d="M232.31 244.27Q214.4 247.1 196.49 244.27A20.77 20.77 0 1 0 196.49 275.73Q214.4 272.9 232.31 275.73A20.77 20.77 0 1 0 232.31 244.27Z"/><path class="cc-plate cc-inner" d="M112.64 240.58Q94.84 237.12 78.98 228.33A20.77 20.77 0 1 0 68.22 257.9Q86.02 261.36 101.88 270.15A20.77 20.77 0 1 0 112.64 240.58Z"/><path class="cc-plate cc-inner" d="M47.25 173.36Q47.57 155.23 53.47 138.08A20.77 20.77 0 1 0 22.48 132.62Q22.16 150.75 16.26 167.89A20.77 20.77 0 1 0 47.25 173.36Z"/><path class="cc-plate cc-inner cc-span" d="M102.09 97.28Q120 94.45 137.91 97.28A20.77 20.77 0 1 0 137.91 65.82Q120 68.65 102.09 65.82A20.77 20.77 0 1 0 102.09 97.28Z"/><path class="cc-plate cc-inner cc-span" d="M227.95 97.28Q245.86 94.45 263.77 97.28A20.77 20.77 0 1 0 263.77 65.82Q245.86 68.65 227.95 65.82A20.77 20.77 0 1 0 227.95 97.28Z"/><path class="cc-plate cc-inner cc-span" d="M353.82 97.28Q371.73 94.45 389.64 97.28A20.77 20.77 0 1 0 389.64 65.82Q371.73 68.65 353.82 65.82A20.77 20.77 0 1 0 353.82 97.28Z"/><path class="cc-plate cc-outer" d="M418.74 243.01Q403.19 246.07 387.65 243.01A23.28 23.28 0 1 0 387.65 276.99Q403.19 273.93 418.74 276.99A23.28 23.28 0 1 0 418.74 243.01Z"/><path class="cc-plate cc-outer" d="M292.87 243.01Q277.33 246.07 261.78 243.01A23.28 23.28 0 1 0 261.78 276.99Q277.33 273.93 292.87 276.99A23.28 23.28 0 1 0 292.87 243.01Z"/><path class="cc-plate cc-outer" d="M167.01 243.01Q151.47 246.07 135.92 243.01A23.28 23.28 0 1 0 135.92 276.99Q151.47 273.93 167.01 276.99A23.28 23.28 0 1 0 167.01 243.01Z"/><path class="cc-plate cc-outer" d="M67.62 216.19Q57.2 204.26 52.07 189.27A23.28 23.28 0 1 0 22.64 206.26Q33.06 218.19 38.19 233.18A23.28 23.28 0 1 0 67.62 216.19Z"/><path class="cc-plate cc-outer" d="M63.44 124.78Q73.39 112.45 87.26 104.8A23.28 23.28 0 1 0 65.42 78.77Q55.47 91.1 41.6 98.75A23.28 23.28 0 1 0 63.44 124.78Z"/><path class="cc-plate cc-outer cc-span" d="M167.39 98.54Q182.93 95.48 198.48 98.54A23.28 23.28 0 1 0 198.48 64.56Q182.93 67.62 167.39 64.56A23.28 23.28 0 1 0 167.39 98.54Z"/><path class="cc-plate cc-outer cc-span" d="M293.25 98.54Q308.8 95.48 324.34 98.54A23.28 23.28 0 1 0 324.34 64.56Q308.8 67.62 293.25 64.56A23.28 23.28 0 1 0 293.25 98.54Z"/><path class="cc-plate cc-outer cc-span" d="M419.11 98.54Q434.66 95.48 450.2 98.54A23.28 23.28 0 1 0 450.2 64.56Q434.66 67.62 419.11 64.56A23.28 23.28 0 1 0 419.11 98.54Z"/><circle class="cc-pin" cx="497.59" cy="260" r="9.44"/><circle class="cc-pin" cx="434.66" cy="260" r="9.44"/><circle class="cc-pin" cx="371.73" cy="260" r="9.44"/><circle class="cc-pin" cx="308.8" cy="260" r="9.44"/><circle class="cc-pin" cx="245.86" cy="260" r="9.44"/><circle class="cc-pin" cx="182.93" cy="260" r="9.44"/><circle class="cc-pin" cx="120" cy="260" r="9.44"/><circle class="cc-pin" cx="60.86" cy="238.48" r="9.44"/><circle class="cc-pin" cx="29.4" cy="183.98" r="9.44"/><circle class="cc-pin" cx="40.33" cy="122" r="9.44"/><circle class="cc-pin cc-pin-leave" cx="88.53" cy="81.55" r="12.59"/><circle class="cc-pin" cx="151.47" cy="81.55" r="9.44"/><circle class="cc-pin" cx="214.4" cy="81.55" r="9.44"/><circle class="cc-pin" cx="277.33" cy="81.55" r="9.44"/><circle class="cc-pin" cx="340.26" cy="81.55" r="9.44"/><circle class="cc-pin" cx="403.19" cy="81.55" r="9.44"/><circle class="cc-pin" cx="466.12" cy="81.55" r="9.44"/></g></g></svg><g data-cc-overlay><path class="cc-height" d="M120 168V81.55"/><path class="cc-radius" d="M120 168L88.53 81.55"/><circle class="cc-hub-dot" cx="120" cy="168" r="3"/><g class="cc-gauge"><rect class="cc-gauge-box" x="326" y="30" width="90" height="286" rx="6"/><path class="cc-gauge-ref" d="M336 110H372M336 228H372"/><path class="cc-gauge-track" d="M354 110V228"/><circle class="cc-gauge-dot" cx="354" cy="228" r="7"/><text class="cc-text cc-small cc-strong" x="334" y="50">Span</text><text class="cc-text cc-small cc-strong" x="334" y="68">height</text><text class="cc-text cc-small" x="334" y="88">×21</text><text class="cc-text cc-small" x="377" y="115">R</text><text class="cc-text cc-small" x="334" y="250">R cos</text><text class="cc-text cc-small" x="334" y="268">(20°)</text><text class="cc-text cc-small" x="334" y="288">drop</text><text class="cc-text cc-small" x="334" y="307">1.12 mm</text></g></g><g data-cc-labels><text class="cc-text cc-strong" x="12" y="20">9 teeth · #40 chain, p = 12.7 mm</text><text class="cc-text cc-small cc-span-label" x="238" y="124.83">leaving →</text><text class="cc-text cc-small" x="238" y="222.17">← arriving</text><path class="cc-turn" d="M91.32 151.44A33.12 33.12 0 0 1 145.37 146.71M153.07 151.36L145.37 146.71L139.57 152.65"/><text class="cc-text cc-small" x="12" y="334">R = 18.57 mm · ω constant · to fit</text><path class="cc-divider" d="M322 0V344"/></g></svg><figcaption><strong>Two pins straddle the top:</strong> the span leaves from a flat of the polygon at R cos(180°/N) and moves at ωR cos(180°/N), its slowest.</figcaption></figure></div><div class="cc-law"><div><strong>Pitch radius</strong>R = p / (2 sin(180°/N))</div><div><strong>Speed range</strong>ωR cos(180°/N) ≤ v ≤ ωR</div><div><strong>Ripple</strong>(v<sub>max</sub> − v<sub>min</sub>) / v<sub>max</sub> = 1 − cos(180°/N)</div><div><strong>Span rise</strong>R (1 − cos(180°/N))</div></div><p><strong>Worked example:</strong> #40 chain (p = 12.7 mm) on a 9-tooth sprocket at 120 r/min. R = 12.7 / (2 sin 20°) = 18.57 mm. ω = 120 × 2π / 60 = 12.57 rad/s, so v<sub>max</sub> = ωR = 0.233 m/s and v<sub>min</sub> = ωR cos 20° = 0.219 m/s. Ripple = 1 − cos 20° = 6.03 %; the span rises and falls 1.12 mm, once per tooth: 18 times a second. With 21 teeth the same chain and speed give 1.12 % and 0.476 mm.</p><figure class="cc-static-figure cc-static-trace"><svg class="cc-trace-svg" viewBox="0 0 640 230" role="img" aria-label="Chain speed trace over 3 teeth of rotation. Compared: 9 teeth dips to 93.97 percent; 21 teeth dips to 98.88 percent."><rect class="cc-plot-bg" x="58" y="30" width="530" height="136"/><path class="cc-grid" d="M58 166H588"/><text class="cc-text cc-tick" style="font-size:13px" x="52" y="170" text-anchor="end">85</text><text class="cc-text cc-tick" style="font-size:13px" x="594" y="170">85</text><path class="cc-grid" d="M58 120.67H588"/><text class="cc-text cc-tick" style="font-size:13px" x="52" y="124.67" text-anchor="end">90</text><text class="cc-text cc-tick" style="font-size:13px" x="594" y="124.67">90</text><path class="cc-grid" d="M58 75.33H588"/><text class="cc-text cc-tick" style="font-size:13px" x="52" y="79.33" text-anchor="end">95</text><text class="cc-text cc-tick" style="font-size:13px" x="594" y="79.33">95</text><path class="cc-grid" d="M58 30H588"/><text class="cc-text cc-tick" style="font-size:13px" x="52" y="34" text-anchor="end">100</text><text class="cc-text cc-tick" style="font-size:13px" x="594" y="34">100</text><path class="cc-grid cc-grid-tooth" d="M58 30V166"/><path class="cc-grid cc-grid-tooth" d="M234.67 30V166"/><path class="cc-grid cc-grid-tooth" d="M411.33 30V166"/><path class="cc-grid cc-grid-tooth" d="M588 30V166"/><path class="cc-trace-compare cc-trace-a" d="M58 30L60.76 30.05L63.52 30.22L66.28 30.49L69.04 30.86L71.8 31.35L74.56 31.94L77.32 32.64L80.08 33.45L82.84 34.37L85.6 35.39L88.36 36.52L91.13 37.76L93.89 39.1L96.65 40.55L99.41 42.11L102.17 43.77L104.93 45.54L107.69 47.42L110.45 49.4L113.21 51.49L115.97 53.68L118.73 55.98L121.49 58.39L124.25 60.89L127.01 63.51L129.77 66.22L132.53 69.04L135.29 71.96L138.05 74.99L140.81 78.12L143.57 81.35L146.33 84.68L146.33 84.68L149.09 81.35L151.85 78.12L154.61 74.99L157.38 71.96L160.14 69.04L162.9 66.22L165.66 63.51L168.42 60.89L171.18 58.39L173.94 55.98L176.7 53.68L179.46 51.49L182.22 49.4L184.98 47.42L187.74 45.54L190.5 43.77L193.26 42.11L196.02 40.55L198.78 39.1L201.54 37.76L204.3 36.52L207.06 35.39L209.82 34.37L212.58 33.45L215.34 32.64L218.1 31.94L220.86 31.35L223.63 30.86L226.39 30.49L229.15 30.22L231.91 30.05L234.67 30L237.43 30.05L240.19 30.22L242.95 30.49L245.71 30.86L248.47 31.35L251.23 31.94L253.99 32.64L256.75 33.45L259.51 34.37L262.27 35.39L265.03 36.52L267.79 37.76L270.55 39.1L273.31 40.55L276.07 42.11L278.83 43.77L281.59 45.54L284.35 47.42L287.11 49.4L289.88 51.49L292.64 53.68L295.4 55.98L298.16 58.39L300.92 60.89L303.68 63.51L306.44 66.22L309.2 69.04L311.96 71.96L314.72 74.99L317.48 78.12L320.24 81.35L323 84.68L323 84.68L325.76 81.35L328.52 78.12L331.28 74.99L334.04 71.96L336.8 69.04L339.56 66.22L342.32 63.51L345.08 60.89L347.84 58.39L350.6 55.98L353.36 53.68L356.13 51.49L358.89 49.4L361.65 47.42L364.41 45.54L367.17 43.77L369.93 42.11L372.69 40.55L375.45 39.1L378.21 37.76L380.97 36.52L383.73 35.39L386.49 34.37L389.25 33.45L392.01 32.64L394.77 31.94L397.53 31.35L400.29 30.86L403.05 30.49L405.81 30.22L408.57 30.05L411.33 30L414.09 30.05L416.85 30.22L419.61 30.49L422.38 30.86L425.14 31.35L427.9 31.94L430.66 32.64L433.42 33.45L436.18 34.37L438.94 35.39L441.7 36.52L444.46 37.76L447.22 39.1L449.98 40.55L452.74 42.11L455.5 43.77L458.26 45.54L461.02 47.42L463.78 49.4L466.54 51.49L469.3 53.68L472.06 55.98L474.82 58.39L477.58 60.89L480.34 63.51L483.1 66.22L485.86 69.04L488.63 71.96L491.39 74.99L494.15 78.12L496.91 81.35L499.67 84.68L499.67 84.68L502.43 81.35L505.19 78.12L507.95 74.99L510.71 71.96L513.47 69.04L516.23 66.22L518.99 63.51L521.75 60.89L524.51 58.39L527.27 55.98L530.03 53.68L532.79 51.49L535.55 49.4L538.31 47.42L541.07 45.54L543.83 43.77L546.59 42.11L549.35 40.55L552.11 39.1L554.88 37.76L557.64 36.52L560.4 35.39L563.16 34.37L565.92 33.45L568.68 32.64L571.44 31.94L574.2 31.35L576.96 30.86L579.72 30.49L582.48 30.22L585.24 30.05L588 30"/><path class="cc-trace-compare cc-trace-b" d="M58 30L60.76 30.01L63.52 30.04L66.28 30.09L69.04 30.16L71.8 30.25L74.56 30.36L77.32 30.49L80.08 30.63L82.84 30.8L85.6 30.99L88.36 31.2L91.13 31.43L93.89 31.67L96.65 31.94L99.41 32.23L102.17 32.54L104.93 32.86L107.69 33.21L110.45 33.57L113.21 33.96L115.97 34.37L118.73 34.79L121.49 35.24L124.25 35.7L127.01 36.19L129.77 36.69L132.53 37.21L135.29 37.76L138.05 38.32L140.81 38.9L143.57 39.5L146.33 40.13L146.33 40.13L149.09 39.5L151.85 38.9L154.61 38.32L157.38 37.76L160.14 37.21L162.9 36.69L165.66 36.19L168.42 35.7L171.18 35.24L173.94 34.79L176.7 34.37L179.46 33.96L182.22 33.57L184.98 33.21L187.74 32.86L190.5 32.54L193.26 32.23L196.02 31.94L198.78 31.67L201.54 31.43L204.3 31.2L207.06 30.99L209.82 30.8L212.58 30.63L215.34 30.49L218.1 30.36L220.86 30.25L223.63 30.16L226.39 30.09L229.15 30.04L231.91 30.01L234.67 30L237.43 30.01L240.19 30.04L242.95 30.09L245.71 30.16L248.47 30.25L251.23 30.36L253.99 30.49L256.75 30.63L259.51 30.8L262.27 30.99L265.03 31.2L267.79 31.43L270.55 31.67L273.31 31.94L276.07 32.23L278.83 32.54L281.59 32.86L284.35 33.21L287.11 33.57L289.88 33.96L292.64 34.37L295.4 34.79L298.16 35.24L300.92 35.7L303.68 36.19L306.44 36.69L309.2 37.21L311.96 37.76L314.72 38.32L317.48 38.9L320.24 39.5L323 40.13L323 40.13L325.76 39.5L328.52 38.9L331.28 38.32L334.04 37.76L336.8 37.21L339.56 36.69L342.32 36.19L345.08 35.7L347.84 35.24L350.6 34.79L353.36 34.37L356.13 33.96L358.89 33.57L361.65 33.21L364.41 32.86L367.17 32.54L369.93 32.23L372.69 31.94L375.45 31.67L378.21 31.43L380.97 31.2L383.73 30.99L386.49 30.8L389.25 30.63L392.01 30.49L394.77 30.36L397.53 30.25L400.29 30.16L403.05 30.09L405.81 30.04L408.57 30.01L411.33 30L414.09 30.01L416.85 30.04L419.61 30.09L422.38 30.16L425.14 30.25L427.9 30.36L430.66 30.49L433.42 30.63L436.18 30.8L438.94 30.99L441.7 31.2L444.46 31.43L447.22 31.67L449.98 31.94L452.74 32.23L455.5 32.54L458.26 32.86L461.02 33.21L463.78 33.57L466.54 33.96L469.3 34.37L472.06 34.79L474.82 35.24L477.58 35.7L480.34 36.19L483.1 36.69L485.86 37.21L488.63 37.76L491.39 38.32L494.15 38.9L496.91 39.5L499.67 40.13L499.67 40.13L502.43 39.5L505.19 38.9L507.95 38.32L510.71 37.76L513.47 37.21L516.23 36.69L518.99 36.19L521.75 35.7L524.51 35.24L527.27 34.79L530.03 34.37L532.79 33.96L535.55 33.57L538.31 33.21L541.07 32.86L543.83 32.54L546.59 32.23L549.35 31.94L552.11 31.67L554.88 31.43L557.64 31.2L560.4 30.99L563.16 30.8L565.92 30.63L568.68 30.49L571.44 30.36L574.2 30.25L576.96 30.16L579.72 30.09L582.48 30.04L585.24 30.01L588 30"/><text class="cc-text cc-axis" style="font-size:13px" x="58" y="20">chain speed, % of ωR</text><text class="cc-text cc-axis" style="font-size:13px" x="588" y="20" text-anchor="end">= span height, % of R</text><text class="cc-text cc-axis" style="font-size:13px" x="323" y="185" text-anchor="middle">sprocket rotation → one grid division = one tooth</text><path class="cc-trace-compare cc-trace-a cc-legend" d="M58 208h22"/><text class="cc-text cc-tick" style="font-size:13px" x="85" y="212">9 teeth: 6.03 %</text><path class="cc-trace-compare cc-trace-b cc-legend" d="M323 208h22"/><text class="cc-text cc-tick" style="font-size:13px" x="350" y="212">21 teeth: 1.12 %</text></svg><figcaption>Three teeth of rotation. Each pulse is one tooth: the speed peaks when a pin passes the top and dips at the hand-over between pins. More teeth make a shallower, more frequent pulse.</figcaption></figure><div class="unit-table-wrap"><table class="unit-table cc-table"><caption>Chordal speed variation by tooth count. Rise is for p = 12.7 mm (#40); ripple percentages do not depend on pitch or speed.</caption><thead><tr><th scope="col">Teeth N</th><th scope="col">R / p</th><th scope="col">Ripple (v<sub>max</sub> − v<sub>min</sub>) / v<sub>max</sub></th><th scope="col">Same spread ÷ average speed</th><th scope="col">Span rise (mm)</th></tr></thead><tbody><tr><th scope="row">6</th><td>1</td><td>13.40 %</td><td>14.03 %</td><td>1.7</td></tr><tr><th scope="row">8</th><td>1.307</td><td>7.61 %</td><td>7.81 %</td><td>1.26</td></tr><tr class="cc-row-mark"><th scope="row">9</th><td>1.462</td><td>6.03 %</td><td>6.15 %</td><td>1.12</td></tr><tr><th scope="row">10</th><td>1.618</td><td>4.89 %</td><td>4.98 %</td><td>1.01</td></tr><tr><th scope="row">12</th><td>1.932</td><td>3.41 %</td><td>3.45 %</td><td>0.836</td></tr><tr><th scope="row">15</th><td>2.405</td><td>2.19 %</td><td>2.20 %</td><td>0.667</td></tr><tr><th scope="row">17</th><td>2.721</td><td>1.70 %</td><td>1.71 %</td><td>0.588</td></tr><tr><th scope="row">19</th><td>3.038</td><td>1.36 %</td><td>1.37 %</td><td>0.526</td></tr><tr class="cc-row-mark"><th scope="row">21</th><td>3.355</td><td>1.12 %</td><td>1.12 %</td><td>0.476</td></tr><tr><th scope="row">25</th><td>3.989</td><td>0.79 %</td><td>0.79 %</td><td>0.4</td></tr><tr><th scope="row">30</th><td>4.783</td><td>0.55 %</td><td>0.55 %</td><td>0.333</td></tr></tbody></table></div>
+      <!-- /CHAIN-CHORDAL-STATIC -->
+    </div>
+    <noscript><p>The figures, formulas, worked example and table above work without JavaScript. Enable JavaScript to change the tooth count, turn the sprocket and test a prediction.</p></noscript>
+  </div>
+  <p><strong>Read the trace:</strong> the speed peaks each time a pin passes the top of the sprocket and dips at the hand-over between pins. Chain speed as a fraction of ωR and span height as a fraction of R follow the same curve, cos θ, where θ is the leaving pin's angle from the top. The ripple percentage depends only on the tooth count. Speed and pitch change the size of the numbers, not the percentage.</p>
+  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; Where the formulas come from, and what this model leaves out.</p>
+    </div>
+  </details>
 </div>
 
 </article>
@@ -3496,7 +3669,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div><dt>Addendum / dedendum</dt><dd>Radial tooth height from pitch circle to tip / radial depth from pitch circle to root. Neither is a diameter difference by itself.</dd></div>
     <div><dt>Backlash</dt><dd>Clearance between mating tooth flanks. It allows clearance in the mesh but creates lost motion when the load reverses.</dd></div>
   </dl>
-  <p class="deeper-ref" id="deeper-ref-7">Supporting detail: <a href="#deeper-addendum-7"><strong>Addendum 7</strong></a> &mdash; Check the size definitions with one gear.</p>
+  <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; Check the size definitions with one gear.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-drives--matching-pitch-is-necessary-but-not-sufficient" data-card="gear-drives--matching-pitch-is-necessary-but-not-sufficient">
@@ -3505,9 +3678,9 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Matching pitch is necessary, but not sufficient</h2>
   <p><strong>Ordinary spur gears intended to mesh must share module or diametral pitch and pressure angle.</strong> Matching outside diameter or tooth count does not establish compatibility. Check the tooth system, center distance, clearance and manufacturer's mating information too.</p>
   <p>For external helical gears on parallel shafts, match tooth size, pressure angle and helix angle. Use one right-hand and one left-hand gear (teeth slanting in opposite directions), and confirm the manufacturer's mating specification. Equal tooth counts are not required.</p>
-  <p class="deeper-ref" id="deeper-ref-8">Supporting detail: <a href="#deeper-addendum-8"><strong>Addendum 8</strong></a> &mdash; Normal and transverse measurements use different planes.</p>
+  <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Normal and transverse measurements use different planes.</p>
   <p>A larger tooth size can support more load when other conditions are comparable, but pitch alone cannot determine capacity, backlash or achievable reduction. Material, face width, heat treatment, alignment and speed remain part of the design.</p>
-  <p class="deeper-ref" id="deeper-ref-9">Supporting detail: <a href="#deeper-addendum-9"><strong>Addendum 9</strong></a> &mdash; Primary references for the geometry and helical mesh.</p>
+  <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Primary references for the geometry and helical mesh.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-drives--gear-damage-tells-you-where-the-load-went" data-card="gear-drives--gear-damage-tells-you-where-the-load-went">
@@ -3569,7 +3742,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>This lesson uses <strong>reduction ratio i = input speed ÷ output speed</strong>, with speed magnitudes. A 2:1 reduction means two input turns for one output turn. Ratios above 1 reduce speed; ratios below 1 increase it. At zero speed, use tooth counts to find the ratio; do not divide 0 by 0.</p>
   <p class="aside"><strong>Notation map:</strong> this page's original equations use N for teeth and n for speed. The course uses n for teeth, ω for angular velocity and τ for torque. Thus page N = course n; page speed n is written ω in the additions below. GR and i name the same reduction ratio.</p>
   <p>In course notation, using magnitudes: <code>GR = n<sub>out</sub>/n<sub>in</sub> = d<sub>out</sub>/d<sub>in</sub> = ω<sub>in</sub>/ω<sub>out</sub> = τ<sub>out</sub>/τ<sub>in</sub></code> for an <strong>ideal single pair</strong>. Here d is pitch diameter; the torque equality assumes no losses. For a compound train, multiply the stage ratios; the first and last tooth counts alone do not give the overall ratio.</p>
-  <p class="deeper-ref" id="deeper-ref-10">Supporting detail: <a href="#deeper-addendum-10"><strong>Addendum 10</strong></a> &mdash; Why tooth counts work, and what the dashed circles mean.</p>
+  <p class="deeper-ref" id="deeper-ref-11">Supporting detail: <a href="#deeper-addendum-11"><strong>Addendum 11</strong></a> &mdash; Why tooth counts work, and what the dashed circles mean.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-ratios--an-idler-and-a-compound-shaft-do-different-jobs" data-card="gear-ratios--an-idler-and-a-compound-shaft-do-different-jobs">
@@ -3593,7 +3766,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><strong>Torque is turning effort.</strong> In this ideal, lossless train at steady load, output torque magnitude = input torque magnitude × reduction ratio. A 2:1 reduction changes 120 rpm and 2 N·m into 60 rpm and 4 N·m. The 4:1 compound example gives 30 rpm and 8 N·m.</p>
   <p>Rotational power is torque × angular speed: <strong>P = T × 2πn/60</strong> when T is in N·m and n is in rpm. Both sides of either example carry 25.13 W ideally. Real friction and other losses leave less output power. Tooth strength, bearings, shafts, lubrication and the motor all limit usable torque.</p>
   <p>At zero speed, mechanical power is zero. A loaded, stationary gear train can still carry torque. The lab shows ideal static torque balance in that case; it does not model motor stall behavior or promise a safe load.</p>
-  <p class="deeper-ref" id="deeper-ref-11">Supporting detail: <a href="#deeper-addendum-11"><strong>Addendum 11</strong></a> &mdash; Primary references and model boundaries.</p>
+  <p class="deeper-ref" id="deeper-ref-12">Supporting detail: <a href="#deeper-addendum-12"><strong>Addendum 12</strong></a> &mdash; Primary references and model boundaries.</p>
   <p>Connect the gears to <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/angular-motion.html" target="_blank" rel="noopener">Angular Motion</a>, <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/rotation-and-linear-speed.html" target="_blank" rel="noopener">Rotation and Linear Speed</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/torque.html" target="_blank" rel="noopener">Torque</a>.</p>
     </div>
   </details>
@@ -3624,7 +3797,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <figcaption>Power-flow schematic, with gear pairs shown by pitch circles. The stages are separated for clarity; each connecting shaft turns its attached gears together.</figcaption>
   </figure>
   <p>At 98% per stage, three stages give <code>0.98³ = 0.941192</code>: about <strong>5.88% total loss</strong>, not 6%. Fewer, higher-quality stages often beat many cheap stages for efficiency, provided they can meet the ratio and load requirements.</p>
-  <p class="deeper-ref" id="deeper-ref-12">Supporting detail: <a href="#deeper-addendum-12"><strong>Addendum 12</strong></a> &mdash; Why adding losses is only an approximation.</p>
+  <p class="deeper-ref" id="deeper-ref-13">Supporting detail: <a href="#deeper-addendum-13"><strong>Addendum 13</strong></a> &mdash; Why adding losses is only an approximation.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-ratios--positive-drives-keep-the-speed-ratio-losses-reduce-torque" data-card="gear-ratios--positive-drives-keep-the-speed-ratio-losses-reduce-torque">
@@ -3634,7 +3807,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>A <strong>positive drive</strong> keeps input and output linked in a fixed ratio without slipping. Gears, chains and timing belts are positive drives. A slipping flat belt or V-belt is not. Follow <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/rotation-and-linear-speed.html" target="_blank" rel="noopener">Rotation and Linear Speed</a> for the connection from rotation to belt travel.</p>
   <div class="panel"><p>At a stated steady input speed and load, use magnitudes:</p><p><strong>ω<sub>out</sub> = ω<sub>in</sub>/i</strong><br><strong>τ<sub>out</sub> = τ<sub>in</sub> × i × η<sub>total</sub></strong><br><strong>P<sub>out</sub> = η<sub>total</sub> × P<sub>in</sub></strong></p></div>
   <p>The teeth still set the speed exactly in this model. Efficiency reduces output torque from its ideal value. It does not reduce output rpm as well. Use matching torque units on both sides: lbf·ft or N·m. The course conversion is <strong>1 rpm ≈ 0.1047 rad/s</strong> when angular speed in rad/s is needed.</p>
-  <p class="deeper-ref" id="deeper-ref-13">Supporting detail: <a href="#deeper-addendum-13"><strong>Addendum 13</strong></a> &mdash; Follow both stages of one loaded train.</p>
+  <p class="deeper-ref" id="deeper-ref-14">Supporting detail: <a href="#deeper-addendum-14"><strong>Addendum 14</strong></a> &mdash; Follow both stages of one loaded train.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="gear-ratios--count-stages-for-ratio-meshes-for-direction-and-stated-losses" data-card="gear-ratios--count-stages-for-ratio-meshes-for-direction-and-stated-losses">
@@ -3657,7 +3830,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li>Calculate output speed and torque, keeping full precision for both limit checks. Check direction by counting external meshes. An added idler may require recalculating losses.</li>
   </ul>
   <p>To choose the faster of feasible designs at the same input speed, compare their actual overall ratios: the smaller one is faster. A feasible design is not automatically the fastest possible design.</p>
-  <p class="deeper-ref" id="deeper-ref-14">Supporting detail: <a href="#deeper-addendum-14"><strong>Addendum 14</strong></a> &mdash; Worked design: a winch with a speed ceiling and torque floor.</p>
+  <p class="deeper-ref" id="deeper-ref-15">Supporting detail: <a href="#deeper-addendum-15"><strong>Addendum 15</strong></a> &mdash; Worked design: a winch with a speed ceiling and torque floor.</p>
   <p><a class="button" data-practice-add="gear-three-stage-efficiency" href="../practice.html#gear-three-stage-efficiency">Practice multiplying efficiencies</a> <a class="button" data-practice-add="gear-winch-stage-count" href="../practice.html#gear-winch-stage-count">Practice designing to limits</a></p>
     </div>
   </details>
@@ -3725,72 +3898,83 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </li>
     <li class="deeper-addendum" id="deeper-addendum-7" value="7">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-gear-drives">Gear Drives and Tooth Geometry</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 7.</span> Check the size definitions with one gear</h2>
-        <p>A spur gear with 30 teeth and 60 mm reference diameter has m = 60/30 = 2 mm. The diameter is 60/25.4 in, so its equivalent diametral pitch is 30/(60/25.4) = 12.7 teeth/in. In general, m = 25.4/P<sub>d</sub>. Two gears can have different diameters and tooth counts while sharing the same tooth size.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-chain-drives">Chain Drives</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 7.</span> Where the formulas come from, and what this model leaves out</h2>
+        <p><strong>Geometry.</strong> The pin centres sit on a circle of radius R = p / (2 sin(180°/N)). The leaving pin turns at ω, so its horizontal speed is ωR cos θ and its height above the sprocket centre is R cos θ. The pin hands over to the next one when θ reaches ±180°/N, so v runs from ωR cos(180°/N) to ωR. One pitch leaves per tooth, so the average chain speed is N·p·n. Shigley's text derives the same maximum and minimum exit speeds: Budynas and Nisbett, <cite>Shigley's Mechanical Engineering Design</cite>, 8th ed., section 17-5, Eqs. 17-30 and 17-31.</p>
+    <p><strong>Two ways to state the same spread.</strong> Tsubaki's <a href="https://catalog.ustsubaki.com/view/303981549">Complete Guide to Chain</a>, section 2.2.1 (printed page 15), divides by the fastest speed: <q>(Vmax − Vmin) / Vmax = 1 − cos (180°/N)</q>. Shigley's Eq. 17-31 divides the same spread by the average speed. For 9 teeth that gives 6.03 % and 6.15 %. The table shows both columns, and the prediction bands accept either.</p>
+    <p><strong>Design guidance.</strong> Shigley's text adds: <q>For smooth operation at moderate and high speeds it is considered good practice to use a driving sprocket with at least 17 teeth</q>. Follow the chain maker's selection procedure for a real drive.</p>
+    <p><strong>Left out on purpose.</strong> This model has one sprocket with rigid links, pins seated exactly on the pitch polygon, and a taut span kept level. In a real drive the span's far end rides on a second sprocket, so the span also tilts. Tsubaki notes that the centre distance relative to the chain pitch, plus manufacturing and alignment errors, changes how much chordal action you get. The model does not include chain stretch, joint clearance, wear, lubrication, vibration or resonance. The tooth form is drawn schematically, not to a standard tooth profile. Pitch follows the pin-to-pin definition in the first card; the governing standard for these chains is ASME B29.1, linked there.</p>
         <p class="deeper-back"><a href="#deeper-ref-7">Back to reference 7</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-8" value="8">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-gear-drives">Gear Drives and Tooth Geometry</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 8.</span> Normal and transverse measurements use different planes</h2>
-        <p>The normal plane cuts across a tooth at right angles to its slant; the transverse plane cuts across the gear at right angles to its shaft. Module (tooth size) and pressure angle can be specified in either plane, so compare values measured in the same plane. For this helical pair, match normal module, normal pressure angle and helix-angle magnitude, with opposite helix hands.</p>
+        <h2><span class="deeper-addendum-number">Addendum 8.</span> Check the size definitions with one gear</h2>
+        <p>A spur gear with 30 teeth and 60 mm reference diameter has m = 60/30 = 2 mm. The diameter is 60/25.4 in, so its equivalent diametral pitch is 30/(60/25.4) = 12.7 teeth/in. In general, m = 25.4/P<sub>d</sub>. Two gears can have different diameters and tooth counts while sharing the same tooth size.</p>
         <p class="deeper-back"><a href="#deeper-ref-8">Back to reference 8</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-9" value="9">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-gear-drives">Gear Drives and Tooth Geometry</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 9.</span> Primary references for the geometry and helical mesh</h2>
-        <p><a href="https://khkgears.net/new/gear_knowledge/gear_technical_reference/calculation_gear_dimensions.html">KHK, Calculation of Gear Dimensions</a>, sections 4.1 and 4.3, distinguishes reference geometry, profile shifts, and normal/transverse helical dimensions. <a href="https://khkgears.us/media/fqrlut1m/abcs-of-gearing-b.pdf">KHK, ABCs of Gearing, B</a>, develops tooth terminology and spur/helical calculations. <a href="https://khkgears.net/pdf/2023/helical-gears.pdf">KHK's helical-gear catalog</a> gives mating-series and bearing-thrust cautions. Use the mating table for the exact product.</p>
+        <h2><span class="deeper-addendum-number">Addendum 9.</span> Normal and transverse measurements use different planes</h2>
+        <p>The normal plane cuts across a tooth at right angles to its slant; the transverse plane cuts across the gear at right angles to its shaft. Module (tooth size) and pressure angle can be specified in either plane, so compare values measured in the same plane. For this helical pair, match normal module, normal pressure angle and helix-angle magnitude, with opposite helix hands.</p>
         <p class="deeper-back"><a href="#deeper-ref-9">Back to reference 9</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-10" value="10">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 10.</span> Why tooth counts work, and what the dashed circles mean</h2>
-        <p>The gears here share one tooth size, called module, and a 20° pressure angle. Their pitch diameters are proportional to tooth count. The dashed pitch circles roll together at equal tangential speed, so n<sub>A</sub> × N<sub>A</sub> = −n<sub>B</sub> × N<sub>B</sub> when clockwise is positive on both shafts. Here n is signed rotational speed and N is tooth count.</p>
-    <p>Tooth flanks are involute curves. Actual tooth surfaces can slide during contact even though the pitch circles roll. The drawing samples those curves, simplifies the tooth roots and adds a small visual clearance. It is a motion model, not a manufacturing drawing.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Power Transmission</span><span class="sep">/</span><a href="#p-gear-drives">Gear Drives and Tooth Geometry</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 10.</span> Primary references for the geometry and helical mesh</h2>
+        <p><a href="https://khkgears.net/new/gear_knowledge/gear_technical_reference/calculation_gear_dimensions.html">KHK, Calculation of Gear Dimensions</a>, sections 4.1 and 4.3, distinguishes reference geometry, profile shifts, and normal/transverse helical dimensions. <a href="https://khkgears.us/media/fqrlut1m/abcs-of-gearing-b.pdf">KHK, ABCs of Gearing, B</a>, develops tooth terminology and spur/helical calculations. <a href="https://khkgears.net/pdf/2023/helical-gears.pdf">KHK's helical-gear catalog</a> gives mating-series and bearing-thrust cautions. Use the mating table for the exact product.</p>
         <p class="deeper-back"><a href="#deeper-ref-10">Back to reference 10</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-11" value="11">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 11.</span> Primary references and model boundaries</h2>
-        <ul>
-      <li><a href="https://khkgears.net/new/gear_knowledge/gear-nomenclature/idler-gear.html">KHK: Idler gear</a>. The intermediate tooth count cancels from the overall speed ratio.</li>
-      <li><a href="https://khkgears.net/new/gear_knowledge/gear_technical_reference/calculation_gear_dimensions.html">KHK: Calculation of Gear Dimensions</a>, section 4.1 and Table 4.1. Standard spur-gear pitch, base, tip and root dimensions and center spacing.</li>
-      <li><a href="https://ocw.mit.edu/courses/res-tll-004-stem-concept-videos-fall-2013/resources/gear-trains/">MIT OpenCourseWare: Gear Trains</a>. Gear bodies, shared shafts, and force and torque balance.</li>
-    </ul>
-    <p>The lab assumes rigid external spur gears, fixed shaft centers, matched tooth size and steady transmitted load. It starts lossless; its efficiency control applies the same specified loss to every actual mesh, including both meshes around an idler. Acceleration, elasticity, backlash dynamics, detailed friction, noise and tooth strength are omitted. Changing tooth counts moves the centers to maintain the correct mesh; it does not represent swapping a gear into a fixed gearbox housing.</p>
+        <h2><span class="deeper-addendum-number">Addendum 11.</span> Why tooth counts work, and what the dashed circles mean</h2>
+        <p>The gears here share one tooth size, called module, and a 20° pressure angle. Their pitch diameters are proportional to tooth count. The dashed pitch circles roll together at equal tangential speed, so n<sub>A</sub> × N<sub>A</sub> = −n<sub>B</sub> × N<sub>B</sub> when clockwise is positive on both shafts. Here n is signed rotational speed and N is tooth count.</p>
+    <p>Tooth flanks are involute curves. Actual tooth surfaces can slide during contact even though the pitch circles roll. The drawing samples those curves, simplifies the tooth roots and adds a small visual clearance. It is a motion model, not a manufacturing drawing.</p>
         <p class="deeper-back"><a href="#deeper-ref-11">Back to reference 11</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-12" value="12">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 12.</span> Why adding losses is only an approximation</h2>
-        <p>For a 1000 W input and three 96% stages, the losses are 40 W, 38.4 W and 36.864 W. Each 4% applies to a smaller incoming power. Adding 4% + 4% + 4% incorrectly takes every loss from the original 1000 W.</p>
+        <h2><span class="deeper-addendum-number">Addendum 12.</span> Primary references and model boundaries</h2>
+        <ul>
+      <li><a href="https://khkgears.net/new/gear_knowledge/gear-nomenclature/idler-gear.html">KHK: Idler gear</a>. The intermediate tooth count cancels from the overall speed ratio.</li>
+      <li><a href="https://khkgears.net/new/gear_knowledge/gear_technical_reference/calculation_gear_dimensions.html">KHK: Calculation of Gear Dimensions</a>, section 4.1 and Table 4.1. Standard spur-gear pitch, base, tip and root dimensions and center spacing.</li>
+      <li><a href="https://ocw.mit.edu/courses/res-tll-004-stem-concept-videos-fall-2013/resources/gear-trains/">MIT OpenCourseWare: Gear Trains</a>. Gear bodies, shared shafts, and force and torque balance.</li>
+    </ul>
+    <p>The lab assumes rigid external spur gears, fixed shaft centers, matched tooth size and steady transmitted load. It starts lossless; its efficiency control applies the same specified loss to every actual mesh, including both meshes around an idler. Acceleration, elasticity, backlash dynamics, detailed friction, noise and tooth strength are omitted. Changing tooth counts moves the centers to maintain the correct mesh; it does not represent swapping a gear into a fixed gearbox housing.</p>
         <p class="deeper-back"><a href="#deeper-ref-12">Back to reference 12</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-13" value="13">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 13.</span> Follow both stages of one loaded train</h2>
-        <p>A 24-tooth driver at 1440 rpm and 4 lbf·ft drives 48 teeth. That shaft also carries a 15-tooth driver for a 45-tooth output. Both stages are 96% efficient, with no other losses. After stage 1: 720 rpm and <code>4 × 2 × 0.96 = 7.68 lbf·ft</code>. The shared shaft carries that same 720 rpm into stage 2. Final output: <code>1440/(2 × 3) = 240 rpm</code> and <code>7.68 × 3 × 0.96 = 22.1184 lbf·ft</code>, versus 24 lbf·ft ideally. Overall efficiency is 0.9216.</p>
+        <h2><span class="deeper-addendum-number">Addendum 13.</span> Why adding losses is only an approximation</h2>
+        <p>For a 1000 W input and three 96% stages, the losses are 40 W, 38.4 W and 36.864 W. Each 4% applies to a smaller incoming power. Adding 4% + 4% + 4% incorrectly takes every loss from the original 1000 W.</p>
         <p class="deeper-back"><a href="#deeper-ref-13">Back to reference 13</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-14" value="14">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 14.</span> Worked design: a winch with a speed ceiling and torque floor</h2>
-        <p>A motor supplies 1680 rpm and 24 lbf·ft. The output must be at most 40 rpm and at least 950 lbf·ft. Available gears have 10–60 teeth, with unlimited copies; each reduction stage is at most 6:1 and 97% efficient. There are no idlers or other losses.</p><ol><li>Speed requires <code>i ≥ 1680/40 = 42</code>. Two stages give at most <code>6² = 36</code>, so try three.</li><li>Three stages give <code>η<sub>total</sub> = 0.97³ = 0.912673</code>. Torque requires <code>i ≥ 950/(24 × 0.912673) ≈ 43.3708</code>. Torque controls.</li><li>Choose 12 → 48, 15 → 45, and 16 → 60 teeth: <code>i = 4 × 3 × 3.75 = 45</code>. Every tooth count and stage ratio meets its limit.</li><li><code>ω<sub>out</sub> = 1680/45 ≈ 37.33 rpm ≤ 40 rpm</code>. <code>τ<sub>out</sub> = 24 × 45 × 0.912673 = 985.68684 lbf·ft ≥ 950 lbf·ft</code>. Both pass. Three external meshes make the output opposite to the input.</li></ol><p>This is one feasible train, not a claim of an optimum or a complete winch specification. For load force at a drum, continue to <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/torque.html" target="_blank" rel="noopener">Torque</a>; for travel speed, use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/rotation-and-linear-speed.html" target="_blank" rel="noopener">Rotation and Linear Speed</a>.</p>
+        <h2><span class="deeper-addendum-number">Addendum 14.</span> Follow both stages of one loaded train</h2>
+        <p>A 24-tooth driver at 1440 rpm and 4 lbf·ft drives 48 teeth. That shaft also carries a 15-tooth driver for a 45-tooth output. Both stages are 96% efficient, with no other losses. After stage 1: 720 rpm and <code>4 × 2 × 0.96 = 7.68 lbf·ft</code>. The shared shaft carries that same 720 rpm into stage 2. Final output: <code>1440/(2 × 3) = 240 rpm</code> and <code>7.68 × 3 × 0.96 = 22.1184 lbf·ft</code>, versus 24 lbf·ft ideally. Overall efficiency is 0.9216.</p>
         <p class="deeper-back"><a href="#deeper-ref-14">Back to reference 14</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-15" value="15">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Motion and Rotation</span><span class="sep">/</span><a href="#p-gear-ratios">Gear Ratios</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 15.</span> Worked design: a winch with a speed ceiling and torque floor</h2>
+        <p>A motor supplies 1680 rpm and 24 lbf·ft. The output must be at most 40 rpm and at least 950 lbf·ft. Available gears have 10–60 teeth, with unlimited copies; each reduction stage is at most 6:1 and 97% efficient. There are no idlers or other losses.</p><ol><li>Speed requires <code>i ≥ 1680/40 = 42</code>. Two stages give at most <code>6² = 36</code>, so try three.</li><li>Three stages give <code>η<sub>total</sub> = 0.97³ = 0.912673</code>. Torque requires <code>i ≥ 950/(24 × 0.912673) ≈ 43.3708</code>. Torque controls.</li><li>Choose 12 → 48, 15 → 45, and 16 → 60 teeth: <code>i = 4 × 3 × 3.75 = 45</code>. Every tooth count and stage ratio meets its limit.</li><li><code>ω<sub>out</sub> = 1680/45 ≈ 37.33 rpm ≤ 40 rpm</code>. <code>τ<sub>out</sub> = 24 × 45 × 0.912673 = 985.68684 lbf·ft ≥ 950 lbf·ft</code>. Both pass. Three external meshes make the output opposite to the input.</li></ol><p>This is one feasible train, not a claim of an optimum or a complete winch specification. For load force at a drum, continue to <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/torque.html" target="_blank" rel="noopener">Torque</a>; for travel speed, use <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/rotation-and-linear-speed.html" target="_blank" rel="noopener">Rotation and Linear Speed</a>.</p>
+        <p class="deeper-back"><a href="#deeper-ref-15">Back to reference 15</a></p>
       </article>
     </li>
   </ol>
@@ -5898,6 +6082,705 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     sync(); update(); root.dataset.bgReady = 'true';
   }
   return { init };
+});
+
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiChainChordal = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  // Kinematics of one sprocket driving a roller chain, treated as a rigid pitch polygon.
+  // Assumptions: rigid links of exactly one pitch, pins seated on the pitch polygon, a taut
+  // straight span that stays parallel to its mean line, and constant sprocket speed.
+  // Units: pitch and lengths in mm, speed in r/min, chain speed in m/s.
+  // Angles are measured clockwise from the top of the sprocket; the sprocket turns clockwise,
+  // so the top span leaves to the right and the bottom span arrives from the right.
+
+  // Pitches already tabulated on the chain-drives page (ANSI base numbers; 1/8 in per step).
+  const PITCHES = Object.freeze([
+    Object.freeze({ id: '25', label: '#25', p: 6.35 }),
+    Object.freeze({ id: '35', label: '#35', p: 9.525 }),
+    Object.freeze({ id: '40', label: '#40', p: 12.7 }),
+    Object.freeze({ id: '100', label: '#100', p: 31.75 })
+  ]);
+  const LIMITS = Object.freeze({ teethMin: 6, teethMax: 30, rpmMin: 30, rpmMax: 600, rpmStep: 30 });
+  const DEFAULT = Object.freeze({ teeth: 9, chain: '40', rpm: 120 });
+
+  function teethOk(N) {
+    if (!Number.isInteger(N) || N < 3) throw new RangeError('Tooth count must be a whole number of at least 3.');
+    return N;
+  }
+  function positive(v, name) {
+    if (!Number.isFinite(v) || v <= 0) throw new RangeError(name + ' must be finite and positive.');
+    return v;
+  }
+  function speedOk(n) {
+    if (!Number.isFinite(n) || n < 0) throw new RangeError('Sprocket speed must be finite and not negative.');
+    return n;
+  }
+  function phaseOk(phase) {
+    if (!Number.isFinite(phase)) throw new RangeError('Sprocket position must be finite.');
+    return phase;
+  }
+  function pitchOf(id) {
+    const found = PITCHES.find(c => c.id === String(id));
+    if (!found) throw new RangeError('Unknown chain size.');
+    return found.p;
+  }
+
+  const halfAngle = N => Math.PI / teethOk(N);                       // 180°/N in radians
+  const pitchRadius = (N, p) => positive(p, 'Pitch') / (2 * Math.sin(halfAngle(N)));
+  // (vmax − vmin) / vmax: the form in Tsubaki's Complete Guide to Chain, section 2.2.1.
+  const ripple = N => 1 - Math.cos(halfAngle(N));
+  // (vmax − vmin) / mean speed: the form in Shigley's text, Eq. 17-31 (8th ed.).
+  const rippleOfMean = N => { const h = halfAngle(N); return (Math.PI / N) * (1 / Math.sin(h) - 1 / Math.tan(h)); };
+  const rise = (N, p) => pitchRadius(N, p) * ripple(N);
+  // Mean chain speed / maximum speed. The mean is N·p·n, exactly one pitch per tooth passed.
+  const meanFactor = N => { const h = halfAngle(N); return Math.sin(h) / h; };
+
+  // Position of the leaving pin, measured from top dead centre, for a sprocket position given in
+  // teeth (phase = 0 puts a pin exactly at the top). The result lies in [−180°/N, +180°/N).
+  function leavingAngle(N, phase) {
+    phaseOk(phase);
+    const u = phase + 0.5 - Math.floor(phase + 0.5) - 0.5;
+    return u * 2 * halfAngle(N);
+  }
+
+  function summary(N, p, rpm) {
+    teethOk(N); positive(p, 'Pitch'); speedOk(rpm);
+    const R = pitchRadius(N, p), omega = rpm * 2 * Math.PI / 60;
+    const vmax = omega * R / 1000;
+    return {
+      teeth: N, pitch: p, rpm, R, halfAngleDeg: 180 / N,
+      ripple: ripple(N), rippleOfMean: rippleOfMean(N), rise: rise(N, p),
+      lowRadius: R * Math.cos(halfAngle(N)),
+      vmax, vmin: vmax * Math.cos(halfAngle(N)), vmean: N * p * rpm / 60000,
+      pulseHz: N * rpm / 60, toothPeriod: rpm > 0 ? 60 / (N * rpm) : Infinity
+    };
+  }
+
+  // Instantaneous state of the leaving span at sprocket position `phase` (teeth).
+  function instant(N, p, rpm, phase) {
+    const s = summary(N, p, rpm), a = leavingAngle(N, phase), c = Math.cos(a);
+    return {
+      angle: a, angleDeg: a * 180 / Math.PI, speedRatio: c, heightRatio: c,
+      speed: s.vmax * c, verticalSpeed: -s.vmax * Math.sin(a),
+      height: s.R * c, drop: s.R - s.R * c
+    };
+  }
+
+  // Pin centres for drawing: wrapped pins on the pitch polygon, plus straight top and bottom
+  // spans. Each pin keeps an absolute index j so link plates alternate consistently as the chain
+  // moves. Coordinates in mm, origin at the sprocket centre, y upward.
+  function pose(N, p, phase, spanLength) {
+    teethOk(N); positive(p, 'Pitch'); phaseOk(phase);
+    const span = spanLength === undefined ? 6 * p : positive(spanLength, 'Span length');
+    const R = pitchRadius(N, p), step = 2 * halfAngle(N);
+    const at = j => { const a = (phase - j) * step; return { j, x: R * Math.sin(a), y: R * Math.cos(a), angle: a }; };
+    const jL = Math.floor(phase + 0.5);            // pin leaving at the top
+    const jE = Math.floor(phase + N / 2 + 0.5);    // pin engaging at the bottom
+    const wrap = [];
+    for (let j = jL; j <= jE; j++) wrap.push(at(j));
+    const leave = wrap[0], engage = wrap[wrap.length - 1];
+    const count = Math.max(1, Math.ceil(span / p));
+    const top = [], bottom = [];
+    for (let k = 1; k <= count; k++) {
+      top.push({ j: jL - k, x: leave.x + k * p, y: leave.y });
+      bottom.push({ j: jE + k, x: engage.x + k * p, y: engage.y });
+    }
+    return { R, pitch: p, teeth: N, sprocketTurn: phase * step, leaving: jL, engaging: jE, wrap, top, bottom };
+  }
+
+  // Normalized speed (= normalized span height) sampled over a window of sprocket positions.
+  function trace(N, fromPhase, toPhase, perTooth) {
+    teethOk(N); phaseOk(fromPhase); phaseOk(toPhase);
+    if (!(toPhase > fromPhase)) throw new RangeError('Trace window must have positive length.');
+    const samples = Math.max(2, Math.ceil((toPhase - fromPhase) * (perTooth || 48)));
+    const out = [];
+    for (let i = 0; i <= samples; i++) {
+      const t = fromPhase + (toPhase - fromPhase) * i / samples;
+      out.push([t, Math.cos(leavingAngle(N, t))]);
+    }
+    // Add the exact cusps (pin hand-over at half-integer positions) so minima are not sampled away.
+    for (let k = Math.ceil(fromPhase - 0.5); k + 0.5 <= toPhase; k++) {
+      const t = k + 0.5;
+      if (t >= fromPhase) out.push([t, Math.cos(halfAngle(N))]);
+    }
+    return out.sort((m, n) => m[0] - n[0]);
+  }
+
+  function format(v, digits) {
+    if (!Number.isFinite(v)) return '—';
+    return Number(v.toPrecision(digits || 4)).toString();
+  }
+  const percent = (v, places) => (v * 100).toFixed(places === undefined ? 2 : places) + ' %';
+
+  return { PITCHES, LIMITS, DEFAULT, pitchOf, halfAngle, pitchRadius, ripple, rippleOfMean, rise, meanFactor,
+    leavingAngle, summary, instant, pose, trace, format, percent };
+});
+
+(function (root, factory) {
+  'use strict';
+  const node = typeof module === 'object' && module.exports;
+  const api = factory(node ? require('./model.js') : root.CourseWikiChainChordal);
+  if (node) module.exports = api; else root.CourseWikiChainChordalDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  // Pure SVG markup shared by the live lab and the static (print / no-JS) fallback.
+  const n = v => (Math.round(v * 100) / 100).toString();
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const deg = r => r * 180 / Math.PI;
+
+  // Layout of the drive drawing for a given viewBox width (640 wide, or 420 compact).
+  function layout(W) {
+    const wide = W >= 560;
+    // The gauge is a column right of the drive in both layouts, so the moving span, its gauge and
+    // the controls under the drawing stay close together on a phone.
+    return wide
+      ? { W, H: 372, cx: 172, cy: 178, Rpx: 120, wide, driveW: W - 168, driveH: 372, gauge: { x: W - 154, y: 56, w: 146, h: 290 } }
+      : { W, H: 344, cx: 120, cy: 168, Rpx: 92, wide, driveW: W - 98, driveH: 344, gauge: { x: W - 94, y: 30, w: 90, h: 286 } };
+  }
+
+  // Schematic sprocket outline, seats centred on the pitch polygon vertices, drawn about (0,0)
+  // in screen units (y down) with seat k at k·360°/N clockwise from the top. Tooth form is
+  // illustrative: a seat arc slightly larger than the roller, straight flanks and a tip arc.
+  function sprocketPath(N, Rpx, ppx) {
+    const step = 2 * Math.PI / N, rs = 0.32 * ppx, g = 18 * Math.PI / 180;
+    let Rt = Rpx + 0.3 * ppx;
+    const pt = (th, r) => [r * Math.sin(th), -r * Math.cos(th)];
+    function gap(k, tip) {
+      const th = k * step, u = [Math.sin(th), -Math.cos(th)], w = [Math.cos(th), Math.sin(th)];
+      const c = pt(th, Rpx);
+      const side = s => {
+        const T = [c[0] + rs * (-Math.sin(g) * u[0] + s * Math.cos(g) * w[0]), c[1] + rs * (-Math.sin(g) * u[1] + s * Math.cos(g) * w[1])];
+        const d = [Math.cos(g) * u[0] + s * Math.sin(g) * w[0], Math.cos(g) * u[1] + s * Math.sin(g) * w[1]];
+        const b = T[0] * d[0] + T[1] * d[1], cc = T[0] * T[0] + T[1] * T[1] - tip * tip;
+        const t = -b + Math.sqrt(Math.max(0, b * b - cc));
+        return { T, F: [T[0] + t * d[0], T[1] + t * d[1]] };
+      };
+      return { minus: side(-1), plus: side(1) };
+    }
+    // Keep a visible tooth land even on few-tooth sprockets.
+    for (let i = 0; i < 20; i++) {
+      const a = gap(0, Rt).plus.F, b = gap(1, Rt).minus.F;
+      const span = Math.atan2(b[0], -b[1]) - Math.atan2(a[0], -a[1]);
+      if (span > 0.18 * step) break;
+      Rt -= 0.02 * ppx;
+    }
+    let d = '';
+    for (let k = 0; k < N; k++) {
+      const q = gap(k, Rt);
+      d += (k === 0 ? 'M' : 'L') + n(q.minus.F[0]) + ' ' + n(q.minus.F[1]) +
+        'L' + n(q.minus.T[0]) + ' ' + n(q.minus.T[1]) +
+        'A' + n(rs) + ' ' + n(rs) + ' 0 0 0 ' + n(q.plus.T[0]) + ' ' + n(q.plus.T[1]) +
+        'L' + n(q.plus.F[0]) + ' ' + n(q.plus.F[1]);
+      const next = gap(k + 1, Rt).minus.F;
+      d += 'A' + n(Rt) + ' ' + n(Rt) + ' 0 0 1 ' + n(next[0]) + ' ' + n(next[1]);
+    }
+    return { d: d + 'Z', tip: Rt };
+  }
+
+  // One link plate between two pin centres (screen units): a waisted, figure-eight outline.
+  function plate(a, b, rc, waist) {
+    const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+    const u = [dx / L, dy / L], w = [-u[1], u[0]], e = Math.sqrt(Math.max(0, rc * rc - waist * waist));
+    const P = (o, s, t) => n(o[0] + s * u[0] + t * w[0]) + ' ' + n(o[1] + s * u[1] + t * w[1]);
+    const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], pinch = waist * 0.82;
+    return 'M' + P(a, e, waist) + 'Q' + P(mid, 0, pinch) + ' ' + P(b, -e, waist) +
+      'A' + n(rc) + ' ' + n(rc) + ' 0 1 0 ' + P(b, -e, -waist) +
+      'Q' + P(mid, 0, -pinch) + ' ' + P(a, e, -waist) +
+      'A' + n(rc) + ' ' + n(rc) + ' 0 1 0 ' + P(a, e, waist) + 'Z';
+  }
+
+  function frame(state, W) {
+    const L = layout(W || 640), p = M.pitchOf(state.chain), N = state.teeth;
+    const R = M.pitchRadius(N, p), s = L.Rpx / R;
+    return { L, p, N, R, s, ppx: p * s };
+  }
+
+  // Moving chain: pins from the model's pose, mapped to screen. Inner plates first, then outer
+  // plates (nearer the viewer), then pins. The leaving span and leaving pin are highlighted.
+  function chainLayer(state, phase, W) {
+    const F = frame(state, W), L = F.L;
+    const spanMm = (L.driveW - L.cx + 2 * F.ppx) / F.s;
+    const pose = M.pose(F.N, F.p, phase, spanMm);
+    const scr = q => [L.cx + q.x * F.s, L.cy - q.y * F.s];
+    const pins = pose.bottom.slice().reverse().concat(pose.wrap.slice().reverse(), pose.top);
+    // pins now ordered by decreasing j: bottom span (largest j) → wrap → top span.
+    let inner = '', outer = '', joints = '';
+    const topSet = new Set(pose.top.map(q => q.j).concat([pose.leaving]));
+    for (let i = 0; i + 1 < pins.length; i++) {
+      const a = pins[i], b = pins[i + 1], lo = Math.min(a.j, b.j);
+      const span = topSet.has(a.j) && topSet.has(b.j) ? ' cc-span' : '';
+      const isInner = ((lo % 2) + 2) % 2 === 0;
+      const d = isInner ? plate(scr(a), scr(b), 0.33 * F.ppx, 0.25 * F.ppx) : plate(scr(a), scr(b), 0.37 * F.ppx, 0.27 * F.ppx);
+      if (isInner) inner += '<path class="cc-plate cc-inner' + span + '" d="' + d + '"/>';
+      else outer += '<path class="cc-plate cc-outer' + span + '" d="' + d + '"/>';
+    }
+    pins.forEach(q => {
+      const c = scr(q), lead = q.j === pose.leaving;
+      joints += '<circle class="cc-pin' + (lead ? ' cc-pin-leave' : '') + '" cx="' + n(c[0]) + '" cy="' + n(c[1]) + '" r="' + n((lead ? 0.2 : 0.15) * F.ppx) + '"/>';
+    });
+    return inner + outer + joints;
+  }
+
+  // Geometry overlays: the radius to the leaving pin, the span height and the magnified gauge.
+  function overlayLayer(state, phase, W, ghost) {
+    const F = frame(state, W), L = F.L, I = M.instant(F.N, F.p, state.rpm, phase);
+    const lx = L.cx + F.R * Math.sin(I.angle) * F.s, ly = L.cy - I.height * F.s;
+    let out = '';
+    if (ghost) {
+      out += '<circle class="cc-ghost" cx="' + L.cx + '" cy="' + L.cy + '" r="' + L.Rpx + '"/>' +
+        '<path class="cc-ghost" d="M' + L.cx + ' ' + n(L.cy - L.Rpx) + 'H' + L.driveW + '"/>';
+    }
+    out += '<path class="cc-height" d="M' + L.cx + ' ' + L.cy + 'V' + n(ly) + '"/>' +
+      '<path class="cc-radius" d="M' + L.cx + ' ' + L.cy + 'L' + n(lx) + ' ' + n(ly) + '"/>' +
+      '<circle class="cc-hub-dot" cx="' + L.cx + '" cy="' + L.cy + '" r="3"/>';
+    // Gauge: span height between R (top) and R·cos(180°/N) (bottom), magnified by k.
+    const G = L.gauge, risePx = F.R * M.ripple(F.N) * F.s, sm = 'cc-text cc-small', angle = n(180 / F.N) + '°';
+    const top = G.y + (L.wide ? 62 : 80), bot = G.y + G.h - (L.wide ? 42 : 88);
+    const k = (bot - top) / risePx, kText = k >= 100 ? Math.round(k / 10) * 10 : k >= 10 ? Math.round(k) : Math.round(k * 10) / 10;
+    const y = top + (I.drop / (F.R * M.ripple(F.N))) * (bot - top);
+    const x0 = G.x + (L.wide ? 12 : 10), x1 = G.x + (L.wide ? 44 : 46), xc = (x0 + x1) / 2, drop = M.format(I.drop, 3) + ' mm';
+    out += '<g class="cc-gauge"><rect class="cc-gauge-box" x="' + G.x + '" y="' + G.y + '" width="' + G.w + '" height="' + G.h + '" rx="6"/>' +
+      '<path class="cc-gauge-ref" d="M' + x0 + ' ' + n(top) + 'H' + x1 + 'M' + x0 + ' ' + n(bot) + 'H' + x1 + '"/>' +
+      '<path class="cc-gauge-track" d="M' + xc + ' ' + n(top) + 'V' + n(bot) + '"/>' +
+      '<circle class="cc-gauge-dot" cx="' + xc + '" cy="' + n(y) + '" r="7"/>';
+    if (L.wide) out += '<text class="' + sm + ' cc-strong" x="' + (G.x + 10) + '" y="' + (G.y + 20) + '">Leaving-span height</text>' +
+      '<text class="' + sm + '" x="' + (G.x + 10) + '" y="' + (G.y + 36) + '">scale magnified ×' + kText + '</text>' +
+      '<text class="' + sm + '" x="' + (x1 + 6) + '" y="' + n(top + 5) + '">R</text>' +
+      '<text class="' + sm + '" x="' + (x1 + 6) + '" y="' + n(bot + 5) + '">R cos(' + angle + ')</text>' +
+      '<text class="' + sm + '" x="' + (G.x + 10) + '" y="' + (G.y + G.h - 12) + '">drop: ' + drop + '</text></g>';
+    else out += '<text class="' + sm + ' cc-strong" x="' + (G.x + 8) + '" y="' + (G.y + 20) + '">Span</text>' +
+      '<text class="' + sm + ' cc-strong" x="' + (G.x + 8) + '" y="' + (G.y + 38) + '">height</text>' +
+      '<text class="' + sm + '" x="' + (G.x + 8) + '" y="' + (G.y + 58) + '">×' + kText + '</text>' +
+      '<text class="' + sm + '" x="' + (x1 + 5) + '" y="' + n(top + 5) + '">R</text>' +
+      '<text class="' + sm + '" x="' + (G.x + 8) + '" y="' + n(bot + 22) + '">R cos</text>' +
+      '<text class="' + sm + '" x="' + (G.x + 8) + '" y="' + n(bot + 40) + '">(' + angle + ')</text>' +
+      '<text class="' + sm + '" x="' + (G.x + 8) + '" y="' + (G.y + G.h - 28) + '">drop</text>' +
+      '<text class="' + sm + '" x="' + (G.x + 8) + '" y="' + (G.y + G.h - 9) + '">' + drop + '</text></g>';
+    return out;
+  }
+
+  function labelLayer(state, W) {
+    const F = frame(state, W), L = F.L, chain = M.PITCHES.find(c => c.id === String(state.chain));
+    const plateHalf = 0.37 * F.ppx, low = F.R * Math.cos(M.halfAngle(F.N)) * F.s;
+    const wide = L.wide, xLab = L.driveW - (wide ? 112 : 84), sm = 'cc-text cc-small';
+    // Title sits above the gauge column, leaving the top of the drive free for few-tooth chains.
+    let out = (wide
+      ? '<text class="cc-text cc-strong" x="' + (L.gauge.x + 2) + '" y="20">' + F.N + ' teeth · ' + esc(chain.label) + '</text>' +
+        '<text class="cc-text cc-small" x="' + (L.gauge.x + 2) + '" y="40">p = ' + M.format(F.p, 4) + ' mm</text>'
+      : '<text class="cc-text cc-strong" x="12" y="20">' + F.N + ' teeth · ' + esc(chain.label) + ' chain, p = ' + M.format(F.p, 4) + ' mm</text>') +
+      '<text class="' + sm + ' cc-span-label" x="' + xLab + '" y="' + n(L.cy - low + plateHalf + 20) + '">' + (wide ? 'leaving span →' : 'leaving →') + '</text>' +
+      '<text class="' + sm + '" x="' + xLab + '" y="' + n(L.cy + low - plateHalf - 9) + '">' + (wide ? '← arriving span' : '← arriving') + '</text>' +
+      '<path class="cc-turn" d="' + turnArrow(L) + '"/>';
+    if (wide) out += '<text class="' + sm + '" x="12" y="' + (L.H - 12) + '">R = ' + M.format(F.R, 4) + ' mm · constant ω, clockwise · scaled to fit</text>' +
+      '<path class="cc-divider" d="M' + L.driveW + ' 0V' + L.H + '"/>';
+    else out += '<text class="' + sm + '" x="12" y="' + (L.H - 10) + '">R = ' + M.format(F.R, 4) + ' mm · ω constant · to fit</text>' +
+      '<path class="cc-divider" d="M' + L.driveW + ' 0V' + L.H + '"/>';
+    return out;
+  }
+  function turnArrow(L) {
+    const r = L.Rpx * 0.36, a0 = -150 * Math.PI / 180, a1 = -40 * Math.PI / 180;
+    const P = a => [L.cx + r * Math.cos(a), L.cy + r * Math.sin(a)], s = P(a0), e = P(a1);
+    const h = [e[0] - 7 * Math.cos(a1 - 0.6) , e[1] - 7 * Math.sin(a1 - 0.6)];
+    return 'M' + n(s[0]) + ' ' + n(s[1]) + 'A' + n(r) + ' ' + n(r) + ' 0 0 1 ' + n(e[0]) + ' ' + n(e[1]) +
+      'M' + n(e[0] - 9 * Math.cos(a1 - 1.9)) + ' ' + n(e[1] - 9 * Math.sin(a1 - 1.9)) + 'L' + n(e[0]) + ' ' + n(e[1]) + 'L' + n(h[0] - 4 * Math.cos(a1 + 0.9)) + ' ' + n(h[1] - 4 * Math.sin(a1 + 0.9));
+  }
+
+  function sprocketLayer(state, W) {
+    const F = frame(state, W), L = F.L, sp = sprocketPath(F.N, L.Rpx, F.ppx);
+    const hub = Math.max(L.Rpx * 0.34, 18), bore = hub * 0.45, markR = (L.Rpx - 0.32 * F.ppx) * 0.8;
+    const mark = 0.5 * 2 * Math.PI / F.N;
+    return '<path class="cc-sprocket" d="' + sp.d + '"/>' +
+      '<circle class="cc-hub" r="' + n(hub) + '"/><circle class="cc-bore" r="' + n(bore) + '"/>' +
+      '<circle class="cc-mark" cx="' + n(markR * Math.sin(mark)) + '" cy="' + n(-markR * Math.cos(mark)) + '" r="' + n(Math.max(3, 0.08 * L.Rpx)) + '"/>';
+  }
+  const sprocketTransform = (state, phase, W) => {
+    const L = layout(W || 640), turns = phase / state.teeth;
+    return 'translate(' + L.cx + ' ' + L.cy + ') rotate(' + n(((turns % 1) + 1) % 1 * 360) + ')';
+  };
+
+  function sceneLabel(state, phase) {
+    const p = M.pitchOf(state.chain), I = M.instant(state.teeth, p, state.rpm, phase);
+    return 'Side view of a ' + state.teeth + '-tooth sprocket turning clockwise with roller chain wrapped around its left side. ' +
+      'The leaving pin sits ' + M.format(Math.abs(I.angleDeg), 3) + ' degrees from the top, so the leaving span is ' +
+      M.format(I.drop, 3) + ' mm below the pitch radius and moving at ' + M.format(I.speedRatio * 100, 4) + ' percent of omega R.';
+  }
+
+  // Whole drive drawing. The live lab updates the three dynamic groups in place each frame.
+  function scene(state, phase, opts) {
+    const o = opts || {}, W = o.width || 640, L = layout(W);
+    return '<svg class="cc-scene' + (L.W < 560 ? ' cc-compact' : '') + '" viewBox="0 0 ' + L.W + ' ' + L.H + '" role="img" aria-label="' + esc(sceneLabel(state, phase)) + '" data-cc-scene>' +
+      // A nested viewport clips the drive area without document ids, so copies never collide.
+      '<svg x="0" y="0" width="' + L.driveW + '" height="' + L.driveH + '" viewBox="0 0 ' + L.driveW + ' ' + L.driveH + '" overflow="hidden"><g>' +
+      '<g data-cc-sprocket transform="' + sprocketTransform(state, phase, W) + '">' + sprocketLayer(state, W) + '</g>' +
+      '<g data-cc-chain>' + chainLayer(state, phase, W) + '</g></g></svg>' +
+      '<g data-cc-overlay>' + overlayLayer(state, phase, W, !!o.ghost) + '</g>' +
+      '<g data-cc-labels>' + labelLayer(state, W) + '</g></svg>';
+  }
+
+  // Speed trace: chain speed as a fraction of ωR (identical to span height as a fraction of R),
+  // against sprocket rotation counted in teeth. Window ends at `phase`.
+  function traceChart(spec) {
+    // spec.mini: a short comparison chart for the prediction result.
+    const W = spec.width || 640, compact = W < 560, H = spec.mini ? (compact ? 204 : 190) : compact ? 284 : 230;
+    const x0 = compact ? 50 : 58, x1 = W - (compact ? 40 : 52), y0 = 30, y1 = H - (spec.mini ? (compact ? 86 : 56) : compact ? 100 : 64);
+    const lo = 0.85, hi = 1.0, from = spec.from, to = spec.to;
+    const X = t => x0 + (t - from) / (to - from) * (x1 - x0), Y = v => y1 - (v - lo) / (hi - lo) * (y1 - y0);
+    const line = N => M.trace(N, from, to, 64).map((q, i) => (i ? 'L' : 'M') + n(X(q[0])) + ' ' + n(Y(q[1]))).join('');
+    const fs = compact ? 16 : 13;
+    let g = '<rect class="cc-plot-bg" x="' + x0 + '" y="' + y0 + '" width="' + (x1 - x0) + '" height="' + (y1 - y0) + '"/>';
+    [0.85, 0.9, 0.95, 1].forEach(v => {
+      g += '<path class="cc-grid" d="M' + x0 + ' ' + n(Y(v)) + 'H' + x1 + '"/>' +
+        '<text class="cc-text cc-tick" style="font-size:' + fs + 'px" x="' + (x0 - 6) + '" y="' + n(Y(v) + 4) + '" text-anchor="end">' + Math.round(v * 100) + '</text>' +
+        '<text class="cc-text cc-tick" style="font-size:' + fs + 'px" x="' + (x1 + 6) + '" y="' + n(Y(v) + 4) + '">' + Math.round(v * 100) + '</text>';
+    });
+    for (let k = Math.ceil(from); k <= to; k++) g += '<path class="cc-grid cc-grid-tooth" d="M' + n(X(k)) + ' ' + y0 + 'V' + y1 + '"/>';
+    const ghostOn = !!spec.ghost;
+    if (ghostOn) g += '<path class="cc-trace-ghost" d="M' + x0 + ' ' + n(Y(1)) + 'H' + x1 + '"/>';
+    if (spec.teeth) g += '<path class="cc-trace-mean" d="M' + x0 + ' ' + n(Y(M.meanFactor(spec.teeth))) + 'H' + x1 + '"/>';
+    const styles = ['cc-trace-a', 'cc-trace-b'];
+    (spec.compare || []).forEach((N, i) => { g += '<path class="cc-trace-compare ' + styles[i % 2] + '" d="' + line(N) + '"/>'; });
+    if (spec.teeth) {
+      g += '<path class="cc-trace" d="' + line(spec.teeth) + '"/>';
+      if (spec.cursor) {
+        const v = Math.cos(M.leavingAngle(spec.teeth, to));
+        g += '<circle class="cc-trace-dot" cx="' + n(X(to)) + '" cy="' + n(Y(v)) + '" r="5.5"/>';
+      }
+    }
+    g += '<text class="cc-text cc-axis" style="font-size:' + fs + 'px" x="' + x0 + '" y="' + (y0 - 10) + '">' + (compact ? 'speed, % of ωR' : 'chain speed, % of ωR') + '</text>' +
+      '<text class="cc-text cc-axis" style="font-size:' + fs + 'px" x="' + x1 + '" y="' + (y0 - 10) + '" text-anchor="end">' + (compact ? '= height, % of R' : '= span height, % of R') + '</text>' +
+      '<text class="cc-text cc-axis" style="font-size:' + fs + 'px" x="' + ((x0 + x1) / 2) + '" y="' + (y1 + fs + 6) + '" text-anchor="middle">' + (compact ? 'rotation → one division = one tooth' : 'sprocket rotation → one grid division = one tooth') + '</text>';
+    // Legend, drawn into the SVG so print and no-JS readers get it too.
+    const items = [];
+    if (spec.teeth) items.push(['cc-trace', spec.teeth + ' teeth' + (spec.compare && spec.compare.length ? ' (now)' : '')]);
+    (spec.compare || []).forEach((N, i) => items.push(['cc-trace-compare ' + styles[i % 2], N + ' teeth: ' + M.percent(M.ripple(N), 2)]));
+    if (spec.teeth) items.push(['cc-trace-mean', 'average = N·p·n']);
+    if (ghostOn) items.push(['cc-trace-ghost', 'belt on pitch circle']);
+    let lx = x0, ly = H - (compact ? 34 : 18);
+    const per = compact ? Math.ceil(items.length / 2) : items.length, colW = compact ? (x1 - x0) / 2 : (x1 - x0) / Math.max(items.length, 1);
+    items.forEach((it, i) => {
+      if (compact) { lx = x0 + (i >= per ? colW : 0); ly = H - (spec.mini ? 14 : 42) + (i % per) * 22; } else lx = x0 + i * colW;
+      g += '<path class="' + it[0] + ' cc-legend" d="M' + n(lx) + ' ' + n(ly - 4) + 'h22"/><text class="cc-text cc-tick" style="font-size:' + fs + 'px" x="' + n(lx + 27) + '" y="' + n(ly) + '">' + esc(it[1]) + '</text>';
+    });
+    const label = 'Chain speed trace over ' + M.format(to - from, 3) + ' teeth of rotation' +
+      (spec.teeth ? ' for ' + spec.teeth + ' teeth: it peaks at 100 percent of omega R once per tooth and dips to ' + M.format(Math.cos(M.halfAngle(spec.teeth)) * 100, 4) + ' percent' : '') +
+      ((spec.compare || []).length ? '. Compared: ' + spec.compare.map(N => N + ' teeth dips to ' + M.format(Math.cos(M.halfAngle(N)) * 100, 4) + ' percent').join('; ') : '') + '.';
+    return '<svg class="cc-trace-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(label) + '">' + g + '</svg>';
+  }
+
+  const TABLE_TEETH = Object.freeze([6, 8, 9, 10, 12, 15, 17, 19, 21, 25, 30]);
+  function rippleTable(p) {
+    const rows = TABLE_TEETH.map(N => '<tr' + (N === 9 || N === 21 ? ' class="cc-row-mark"' : '') + '><th scope="row">' + N + '</th><td>' + M.format(M.pitchRadius(N, p) / p, 4) + '</td><td>' +
+      M.percent(M.ripple(N), 2) + '</td><td>' + M.percent(M.rippleOfMean(N), 2) + '</td><td>' + M.format(M.rise(N, p), 3) + '</td></tr>').join('');
+    return '<div class="unit-table-wrap"><table class="unit-table cc-table"><caption>Chordal speed variation by tooth count. Rise is for p = ' + M.format(p, 4) + ' mm (#40); ripple percentages do not depend on pitch or speed.</caption>' +
+      '<thead><tr><th scope="col">Teeth N</th><th scope="col">R / p</th><th scope="col">Ripple (v<sub>max</sub> − v<sub>min</sub>) / v<sub>max</sub></th><th scope="col">Same spread ÷ average speed</th><th scope="col">Span rise (mm)</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  function staticLesson() {
+    const state = { teeth: 9, chain: '40', rpm: 120 }, s = M.summary(9, 12.7, 120), t = M.summary(21, 12.7, 120);
+    return '<div class="cc-static-pair">' +
+      '<figure class="cc-static-figure">' + scene(state, 0, { width: 420, uid: 'cc-static-a' }) + '<figcaption><strong>Pin at the top:</strong> the leaving span sits at the full pitch radius R and moves at ωR, its fastest.</figcaption></figure>' +
+      '<figure class="cc-static-figure">' + scene(state, 0.5, { width: 420, uid: 'cc-static-b' }) + '<figcaption><strong>Two pins straddle the top:</strong> the span leaves from a flat of the polygon at R cos(180°/N) and moves at ωR cos(180°/N), its slowest.</figcaption></figure></div>' +
+      '<div class="cc-law"><div><strong>Pitch radius</strong>R = p / (2 sin(180°/N))</div>' +
+      '<div><strong>Speed range</strong>ωR cos(180°/N) ≤ v ≤ ωR</div>' +
+      '<div><strong>Ripple</strong>(v<sub>max</sub> − v<sub>min</sub>) / v<sub>max</sub> = 1 − cos(180°/N)</div>' +
+      '<div><strong>Span rise</strong>R (1 − cos(180°/N))</div></div>' +
+      '<p><strong>Worked example:</strong> #40 chain (p = 12.7 mm) on a 9-tooth sprocket at 120 r/min. R = 12.7 / (2 sin 20°) = ' + M.format(s.R, 4) + ' mm. ' +
+      'ω = 120 × 2π / 60 = 12.57 rad/s, so v<sub>max</sub> = ωR = ' + M.format(s.vmax, 3) + ' m/s and v<sub>min</sub> = ωR cos 20° = ' + M.format(s.vmin, 3) + ' m/s. ' +
+      'Ripple = 1 − cos 20° = ' + M.percent(s.ripple, 2) + '; the span rises and falls ' + M.format(s.rise, 3) + ' mm, once per tooth: ' + M.format(s.pulseHz, 3) + ' times a second. ' +
+      'With 21 teeth the same chain and speed give ' + M.percent(t.ripple, 2) + ' and ' + M.format(t.rise, 3) + ' mm.</p>' +
+      '<figure class="cc-static-figure cc-static-trace">' + traceChart({ width: 640, from: 0, to: 3, compare: [9, 21] }) +
+      '<figcaption>Three teeth of rotation. Each pulse is one tooth: the speed peaks when a pin passes the top and dips at the hand-over between pins. More teeth make a shallower, more frequent pulse.</figcaption></figure>' +
+      rippleTable(12.7);
+  }
+
+  return { layout, sprocketPath, plate, chainLayer, overlayLayer, labelLayer, sprocketLayer, sprocketTransform, sceneLabel, scene, traceChart, rippleTable, staticLesson, TABLE_TEETH };
+});
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiChainChordal,
+    node ? require('./render.js') : root.CourseWikiChainChordalDraw);
+  if (node) module.exports = api;
+  else if (typeof document !== 'undefined') document.querySelectorAll('[data-interactive="chain-chordal-action"]').forEach(api.init);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M, D) {
+  'use strict';
+  var sequence = 0;
+  var DISPLAY_RPM = 5;            // animation speed: one sprocket turn every 12 s
+  var TRACE_TEETH = 3;            // trace window, in teeth of rotation
+  var BANDS = [['under2', 'under 2 %'], ['2to10', '2 to 10 %'], ['over10', 'over 10 %']];
+  // Band containing a ripple fraction. Bands are wide on purpose: both common normalizations
+  // (÷ v_max and ÷ average speed) land in the same band for 9 and 21 teeth.
+  function band(r) { return r < 0.02 ? 'under2' : r <= 0.10 ? '2to10' : 'over10'; }
+  function scorePrediction(answers) {
+    var expected = { 9: band(M.ripple(9)), 21: band(M.ripple(21)) };
+    return { expected: expected, correct: (answers[9] === expected[9] ? 1 : 0) + (answers[21] === expected[21] ? 1 : 0) };
+  }
+
+  function init(root) {
+    if (root.dataset.ccReady || !M || !D) return;
+    root.dataset.ccReady = 'true';
+    var id = 'cc-' + (++sequence);
+    while (document.getElementById(id + '-teeth')) id = 'cc-' + (++sequence);
+    var state = Object.assign({}, M.DEFAULT), phase = 0, ghost = false, compare = [];
+    var running = false, frame = 0, previous = null, visible = true, width = 640;
+    var reduced = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false, addEventListener: function () {} };
+    var answers = { 9: null, 21: null };
+
+    function choices(N) {
+      return BANDS.map(function (b) {
+        return '<label><input type="radio" name="' + id + '-p' + N + '" value="' + b[0] + '" data-cc-guess="' + N + '"><span>' + b[1] + '</span></label>';
+      }).join('');
+    }
+    var lab = document.createElement('div'); lab.className = 'cc-lab';
+    lab.innerHTML =
+      '<div class="cc-challenge"><p>Challenge: the same chain runs on a 9-tooth and a 21-tooth sprocket at the same speed. How much does the chain speed ripple on each?</p>' +
+      '<div class="cc-questions" data-cc-questions><fieldset><legend>9-tooth sprocket: speed ripple is…</legend><div class="cc-choices">' + choices(9) + '</div></fieldset>' +
+      '<fieldset><legend>21-tooth sprocket: speed ripple is…</legend><div class="cc-choices">' + choices(21) + '</div></fieldset></div>' +
+      // The result takes the questions' place, so it appears where the learner was just looking.
+      '<div class="cc-result" data-cc-result hidden><p class="cc-score" data-cc-score></p><div class="cc-preview" data-cc-preview></div>' +
+      '<div class="cc-result-text"><ul class="cc-lines" data-cc-lines></ul><p><span data-cc-detail></span> <a class="cc-jump" href="#' + id + '-observe">Watch it on the sprocket</a>.</p></div></div>' +
+      '<div class="cc-check-row"><button type="button" class="cc-primary" data-cc-check disabled>Test my prediction</button>' +
+      '<button type="button" data-cc-again hidden>Change my answers</button>' +
+      '<p class="cc-feedback" data-cc-feedback role="status">Predict first: pick one answer for each sprocket. Ripple = (fastest − slowest) ÷ fastest chain speed.</p></div></div>' +
+      '<div class="cc-workbench"><div class="cc-observe" id="' + id + '-observe"><div data-cc-figure></div>' +
+      // Tooth count and hand position sit directly under the drawing they change.
+      '<div class="cc-pair">' +
+      '<div class="cc-control"><label for="' + id + '-teeth"><span>Sprocket teeth N</span><output for="' + id + '-teeth" data-cc-out="teeth"></output></label>' +
+      '<p class="cc-quick" data-cc-quick></p><div class="cc-stepper"><button type="button" data-cc-dec aria-label="One tooth fewer">−</button>' +
+      '<input type="range" id="' + id + '-teeth" min="' + M.LIMITS.teethMin + '" max="' + M.LIMITS.teethMax + '" step="1" data-cc-teeth>' +
+      '<button type="button" data-cc-inc aria-label="One tooth more">+</button></div></div>' +
+      '<div class="cc-control"><label for="' + id + '-hand"><span>Turn by hand</span><output for="' + id + '-hand" data-cc-out="hand"></output></label>' +
+      '<input type="range" id="' + id + '-hand" min="-50" max="50" step="1" value="0" data-cc-hand></div></div>' +
+      '<div class="cc-motion"><button type="button" class="cc-primary cc-run" data-cc-run aria-pressed="false">Run</button>' +
+      '<button type="button" data-cc-step>Step ⅛ tooth</button></div>' +
+      '<p class="cc-anim-note" data-cc-anim></p><div class="cc-trace-wrap" data-cc-trace></div></div>' +
+      '<div class="cc-controls">' +
+      '<div class="cc-control"><label for="' + id + '-chain"><span>Chain size</span></label><select id="' + id + '-chain" data-cc-pitch>' +
+      M.PITCHES.map(function (c) { return '<option value="' + c.id + '">' + c.label + ' · p = ' + M.format(c.p, 4) + ' mm</option>'; }).join('') + '</select></div>' +
+      '<div class="cc-control"><label for="' + id + '-rpm"><span>Sprocket speed</span><output for="' + id + '-rpm" data-cc-out="rpm"></output></label>' +
+      '<input type="range" id="' + id + '-rpm" min="' + M.LIMITS.rpmMin + '" max="' + M.LIMITS.rpmMax + '" step="' + M.LIMITS.rpmStep + '" data-cc-rpm></div>' +
+      '<label class="cc-toggle"><input type="checkbox" data-cc-ghost>Show smooth pitch circle (belt-like)</label>' +
+      '<div class="cc-results">' +
+      '<div><span>Speed ripple</span><strong data-cc-r="ripple"></strong><small data-cc-r="rippleNote"></small></div>' +
+      '<div><span>Span rise and fall</span><strong data-cc-r="rise"></strong><small data-cc-r="riseNote"></small></div>' +
+      '<div><span>Chain speed now</span><strong data-cc-r="speed"></strong><small data-cc-r="range"></small></div>' +
+      '<div><span>Pulses</span><strong data-cc-r="pulse"></strong><small data-cc-r="mean"></small></div></div>' +
+      '<p class="cc-equation" data-cc-equation></p>' +
+      '<div class="cc-check-row cc-reset-row"><button type="button" data-cc-clear hidden>Clear comparison</button><button type="button" data-cc-reset>Reset lab</button></div>' +
+      '</div></div>' +
+      '<p class="cc-insight" data-cc-insight></p>' +
+      '<p class="cc-limit">Model: rigid links of exactly one pitch, pins seated on the pitch polygon, a taut straight span kept level, and a constant sprocket speed. One sprocket only; no stretch, wear, clearance or vibration response.</p>' +
+      '<span class="cc-sr" data-cc-status role="status"></span>';
+    root.insertBefore(lab, root.firstChild);
+    var q = function (s) { return lab.querySelector(s); };
+    var figure = q('[data-cc-figure]'), traceBox = q('[data-cc-trace]');
+    var parts = {};
+
+    function pitch() { return M.pitchOf(state.chain); }
+    function pickWidth() { return (figure.clientWidth || root.clientWidth || 640) < 520 ? 420 : 640; }
+    function drawScene() {
+      width = pickWidth();
+      figure.innerHTML = D.scene(state, phase, { width: width, ghost: ghost, uid: id });
+      parts = { svg: figure.querySelector('svg'), sprocket: figure.querySelector('[data-cc-sprocket]'),
+        chain: figure.querySelector('[data-cc-chain]'), overlay: figure.querySelector('[data-cc-overlay]') };
+    }
+    function drawTrace() {
+      traceBox.innerHTML = D.traceChart({ width: width, teeth: state.teeth, from: phase - TRACE_TEETH, to: phase,
+        cursor: true, ghost: ghost, compare: compare });
+    }
+    function paintMotion() {
+      parts.sprocket.setAttribute('transform', D.sprocketTransform(state, phase, width));
+      parts.chain.innerHTML = D.chainLayer(state, phase, width);
+      parts.overlay.innerHTML = D.overlayLayer(state, phase, width, ghost);
+      drawTrace();
+      var I = M.instant(state.teeth, pitch(), state.rpm, phase);
+      var hand = Math.round(I.angle / (2 * M.halfAngle(state.teeth)) * 100);
+      q('[data-cc-hand]').value = String(hand);
+      var a = I.angleDeg, text = Math.abs(a) < 0.05 ? 'at top' : M.format(Math.abs(a), 3) + '° ' + (a > 0 ? 'past top' : 'before top');
+      q('[data-cc-out="hand"]').textContent = 'pin ' + text;
+      q('[data-cc-hand]').setAttribute('aria-valuetext', 'Leaving pin ' + text + ', span ' + M.format(I.drop, 3) + ' millimetres below R');
+      q('[data-cc-r="speed"]').textContent = M.format(I.speed, 4) + ' m/s';
+      root.dataset.ccPhase = phase.toFixed(6);
+      root.dataset.ccSpeedRatio = I.speedRatio.toFixed(8);
+    }
+    function describe() {
+      var I = M.instant(state.teeth, pitch(), state.rpm, phase);
+      parts.svg.setAttribute('aria-label', D.sceneLabel(state, phase));
+      return state.teeth + ' teeth: ripple ' + M.percent(M.ripple(state.teeth), 2) + ', span rises and falls ' + M.format(M.rise(state.teeth, pitch()), 3) +
+        ' millimetres. Chain speed now ' + M.format(I.speedRatio * 100, 4) + ' percent of the maximum.';
+    }
+    function announce(extra) { q('[data-cc-status]').textContent = (extra ? extra + ' ' : '') + describe(); }
+
+    function update() {
+      var s = M.summary(state.teeth, pitch(), state.rpm), half = M.format(180 / state.teeth, 4) + '°';
+      q('[data-cc-teeth]').value = String(state.teeth);
+      q('[data-cc-teeth]').setAttribute('aria-valuetext', state.teeth + ' teeth');
+      q('[data-cc-out="teeth"]').textContent = state.teeth + ' teeth';
+      q('[data-cc-dec]').disabled = state.teeth <= M.LIMITS.teethMin;
+      q('[data-cc-inc]').disabled = state.teeth >= M.LIMITS.teethMax;
+      q('[data-cc-pitch]').value = state.chain;
+      q('[data-cc-rpm]').value = String(state.rpm);
+      q('[data-cc-out="rpm"]').textContent = state.rpm + ' r/min';
+      q('[data-cc-rpm]').setAttribute('aria-valuetext', state.rpm + ' revolutions per minute');
+      q('[data-cc-ghost]').checked = ghost;
+      q('[data-cc-quick]').textContent = 'Ripple ' + M.percent(s.ripple, 2) + ' · span rises ' + M.format(s.rise, 3) + ' mm';
+      q('[data-cc-r="ripple"]').textContent = M.percent(s.ripple, 2);
+      q('[data-cc-r="rippleNote"]').textContent = '1 − cos(' + half + ')';
+      q('[data-cc-r="rise"]').textContent = M.format(s.rise, 3) + ' mm';
+      q('[data-cc-r="riseNote"]').textContent = 'R (1 − cos ' + half + ')';
+      q('[data-cc-r="range"]').textContent = M.format(s.vmin, 4) + ' to ' + M.format(s.vmax, 4) + ' m/s';
+      q('[data-cc-r="pulse"]').textContent = M.format(s.pulseHz, 3) + ' per second';
+      q('[data-cc-r="mean"]').textContent = 'one per tooth · average ' + M.format(s.vmean, 4) + ' m/s';
+      q('[data-cc-equation]').innerHTML = 'R = p / (2 sin(180°/N)) = ' + M.format(s.pitch, 4) + ' / (2 sin ' + half + ') = <b>' + M.format(s.R, 4) + ' mm</b>. ' +
+        'v<sub>max</sub> = ωR; v<sub>min</sub> = ωR cos ' + half + '.';
+      q('[data-cc-insight]').textContent = insight(s);
+      q('[data-cc-clear]').hidden = compare.length === 0;
+      motionNote();
+      drawScene(); paintMotion(); drawPreview();
+      root.dataset.ccN = String(state.teeth);
+    }
+    function insight(s) {
+      var twice = Math.min(state.teeth * 2, 60);
+      return 'The chain can bend only at its pins, so on ' + s.teeth + ' teeth it wraps a ' + s.teeth + '-sided polygon, not a circle. ' +
+        'Each time a pin passes the top the leaving span rides up to R and speeds up to ωR; between pins it drops ' + M.format(s.rise, 3) +
+        ' mm and slows by ' + M.percent(s.ripple, 2) + '. That pulse repeats once per tooth. Doubling to ' + twice + ' teeth would cut the ripple to ' +
+        M.percent(M.ripple(twice), 2) + ', about a quarter, because it shrinks roughly with 1/N².';
+    }
+    function motionNote() {
+      var run = q('[data-cc-run]');
+      if (reduced.matches) {
+        pause(); run.hidden = true;
+        q('[data-cc-anim]').textContent = 'Reduced motion is on: use Step ⅛ tooth or Turn by hand. Readouts use ' + state.rpm + ' r/min.';
+      } else {
+        run.hidden = false;
+        q('[data-cc-anim]').textContent = 'Animation slowed to ' + DISPLAY_RPM + ' r/min (1/' + M.format(state.rpm / DISPLAY_RPM, 3) +
+          ' of ' + state.rpm + ' r/min). Readouts and the trace use the real ' + state.rpm + ' r/min.';
+      }
+    }
+
+    function tick(now) {
+      frame = 0;
+      if (!running || !visible || document.hidden || !root.isConnected) { previous = null; return; }
+      var dt = previous === null ? 0 : Math.min((now - previous) / 1000, 0.1);
+      previous = now; phase += dt * DISPLAY_RPM / 60 * state.teeth;
+      paintMotion();
+      frame = requestAnimationFrame(tick);
+    }
+    function schedule() { if (running && visible && !document.hidden && !frame) frame = requestAnimationFrame(tick); }
+    function pause() {
+      running = false; previous = null;
+      if (frame) cancelAnimationFrame(frame); frame = 0;
+      var run = q('[data-cc-run]'); run.textContent = 'Run'; run.setAttribute('aria-pressed', 'false');
+    }
+    function play() {
+      if (reduced.matches) return;
+      running = true; previous = null;
+      var run = q('[data-cc-run]'); run.textContent = 'Pause'; run.setAttribute('aria-pressed', 'true');
+      schedule();
+    }
+    function setTeeth(N) {
+      N = Math.max(M.LIMITS.teethMin, Math.min(M.LIMITS.teethMax, Math.round(N)));
+      if (N === state.teeth) return;
+      // Keep the leaving pin's position within its tooth while the tooth count changes.
+      var frac = phase - Math.floor(phase + 0.5);
+      state.teeth = N; phase = frac; update();
+    }
+
+    lab.addEventListener('keydown', function (e) { if (e.target.closest('input, select, button, summary')) e.stopPropagation(); });
+    q('[data-cc-teeth]').addEventListener('input', function (e) { setTeeth(Number(e.target.value)); });
+    q('[data-cc-teeth]').addEventListener('change', function () { announce(); });
+    q('[data-cc-dec]').addEventListener('click', function () { setTeeth(state.teeth - 1); announce(); });
+    q('[data-cc-inc]').addEventListener('click', function () { setTeeth(state.teeth + 1); announce(); });
+    q('[data-cc-hand]').addEventListener('input', function (e) {
+      pause(); phase = Math.floor(phase + 0.5) + Number(e.target.value) / 100; paintMotion();
+    });
+    q('[data-cc-hand]').addEventListener('change', function () { announce(); });
+    q('[data-cc-pitch]').addEventListener('change', function (e) { state.chain = e.target.value; update(); announce(); });
+    q('[data-cc-rpm]').addEventListener('input', function (e) { state.rpm = Number(e.target.value); update(); });
+    q('[data-cc-rpm]').addEventListener('change', function () { announce('Ripple percentage does not depend on speed; pulses per second do.'); });
+    q('[data-cc-ghost]').addEventListener('change', function (e) {
+      ghost = e.target.checked; drawScene(); paintMotion();
+      announce(ghost ? 'Smooth pitch circle shown: a belt on it would leave steadily at height R and speed ωR.' : 'Smooth pitch circle hidden.');
+    });
+    q('[data-cc-run]').addEventListener('click', function () { if (running) pause(); else play(); });
+    q('[data-cc-step]').addEventListener('click', function () { pause(); phase += 0.125; paintMotion(); announce(); });
+    q('[data-cc-reset]').addEventListener('click', function () {
+      pause(); state = Object.assign({}, M.DEFAULT); phase = 0; ghost = false; compare = [];
+      answers = { 9: null, 21: null };
+      lab.querySelectorAll('[data-cc-guess]').forEach(function (r) { r.checked = false; });
+      q('[data-cc-check]').disabled = true; showQuestions(false);
+      q('[data-cc-feedback]').textContent = 'Predict first: pick one answer for each sprocket. Ripple = (fastest − slowest) ÷ fastest chain speed.';
+      update(); announce('Lab reset.');
+    });
+    q('[data-cc-clear]').addEventListener('click', function () { compare = []; update(); announce('Comparison cleared.'); });
+    lab.querySelectorAll('[data-cc-guess]').forEach(function (r) {
+      r.addEventListener('change', function () {
+        answers[r.dataset.ccGuess] = r.value;
+        q('[data-cc-check]').disabled = !(answers[9] && answers[21]);
+      });
+    });
+    function showQuestions(focus) {
+      q('[data-cc-questions]').hidden = false; q('[data-cc-result]').hidden = true; q('[data-cc-feedback]').hidden = false;
+      q('[data-cc-check]').hidden = false; q('[data-cc-again]').hidden = true;
+      if (focus) q('[data-cc-check]').focus({ preventScroll: true });
+    }
+    var previewWidth = 0;
+    function drawPreview() {
+      if (q('[data-cc-result]').hidden) return;
+      // Size the comparison chart from its own column so its labels stay readable.
+      previewWidth = (q('[data-cc-preview]').clientWidth || 640) < 520 ? 420 : 640;
+      q('[data-cc-preview]').innerHTML = D.traceChart({ width: previewWidth, from: 0, to: 3, compare: [9, 21], mini: true });
+    }
+    q('[data-cc-again]').addEventListener('click', function () {
+      showQuestions(true);
+      q('[data-cc-feedback]').textContent = 'Change either answer, then test again.';
+    });
+    q('[data-cc-check]').addEventListener('click', function () {
+      if (!(answers[9] && answers[21])) return;
+      var result = scorePrediction(answers), label = function (k) { return BANDS.find(function (b) { return b[0] === k; })[1]; };
+      var r9 = M.ripple(9), r21 = M.ripple(21);
+      var line = function (N, r) {
+        var ok = answers[N] === result.expected[N];
+        return '<li><strong>' + N + ' teeth: ' + M.percent(r, 2) + '</strong> · ' +
+          (ok ? 'you: ' + label(answers[N]) + ' ✓' : 'you: ' + label(answers[N]) + ', not ' + label(result.expected[N])) + '</li>';
+      };
+      q('[data-cc-score]').textContent = result.correct + ' of 2 in the right band.';
+      q('[data-cc-lines]').innerHTML = line(9, r9) + line(21, r21);
+      q('[data-cc-feedback]').hidden = true;
+      q('[data-cc-detail]').textContent = 'Ripple = 1 − cos(180°/N), so 2.3 times the teeth leaves about 1/' + M.format(r9 / r21, 2) + ' of it (roughly 1/N²).';
+      // Swap the questions for the result in the same place, at least as tall, so the button row does
+      // not move up under the learner; focus moves to the new button without scrolling.
+      var questions = q('[data-cc-questions]'), panel = q('[data-cc-result]');
+      if (!questions.hidden) panel.style.minHeight = questions.offsetHeight + 'px';
+      questions.hidden = true; panel.hidden = false;
+      q('[data-cc-check]').hidden = true; q('[data-cc-again]').hidden = false;
+      q('[data-cc-again]').focus({ preventScroll: true });
+      compare = [9, 21]; pause(); phase = 0; state.teeth = 9; update(); play();
+      announce('Prediction checked: ' + result.correct + ' of 2.');
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+        if (!visible) { if (frame) cancelAnimationFrame(frame); frame = 0; previous = null; } else schedule();
+      }).observe(figure);
+    }
+    if ('ResizeObserver' in window) new ResizeObserver(function () { if (pickWidth() !== width) { drawScene(); paintMotion(); drawPreview(); } }).observe(figure);
+    if ('ResizeObserver' in window) new ResizeObserver(function () {
+      var box = q('[data-cc-preview]'); if (previewWidth && (box.clientWidth < 520 ? 420 : 640) !== previewWidth) drawPreview();
+    }).observe(q('[data-cc-preview]'));
+    document.addEventListener('visibilitychange', function () { previous = null; schedule(); });
+    if (reduced.addEventListener) reduced.addEventListener('change', function () { motionNote(); if (reduced.matches) announce('Motion paused for your reduced-motion preference.'); });
+    root.classList.add('cc-live');
+    update();
+  }
+  return { init: init, band: band, scorePrediction: scorePrediction, BANDS: BANDS };
 });
 
 (function (root, factory) {

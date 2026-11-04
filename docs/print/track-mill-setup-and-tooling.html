@@ -3051,6 +3051,156 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
 }
 
 
+[data-interactive="edge-finder-zero"] { min-width: 0; margin-block: 1rem; }
+.efz-live > .efz-static { display: none; }
+.efz-lab { font: .95rem/1.45 var(--f-display); min-width: 0; }
+.efz-lab p { margin-block: .5rem; }
+.efz-challenge { padding: .6rem .8rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+.efz-convention, .efz-hint { font-size: .88rem; color: var(--ink-soft); }
+.efz-setup { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; align-items: end; }
+.efz-group { min-width: 0; border: 0; margin: 0; padding: 0; }
+.efz-group > legend, .efz-group > label, .efz-set > label, .efz-tool-row label, .efz-mistakes > legend { display: block; font-weight: 700; margin-bottom: .2rem; }
+.efz-segs { display: flex; flex-wrap: wrap; gap: .35rem; }
+.efz-seg { position: relative; display: inline-flex; }
+.efz-seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.efz-seg span { display: inline-flex; align-items: center; min-height: 44px; padding: .3rem .75rem; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); border-radius: var(--radius-xs); }
+.efz-seg input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--surface); font-weight: 700; }
+.efz-seg input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 3px; }
+.efz-lab select, .efz-lab input[type="text"], .efz-lab button { min-height: 44px; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .4rem .7rem; max-width: 100%; }
+.efz-lab input[type="text"] { width: 100%; font-variant-numeric: tabular-nums; }
+.efz-lab button { cursor: pointer; }
+.efz-lab button:disabled, .efz-lab input:disabled { opacity: .55; cursor: default; }
+.efz-lab :is(button, select, input):focus-visible, .efz-close-wrap:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.efz-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: .5rem; }
+.efz-actions button { flex: 1 1 9rem; }
+.efz-lab { container: efz / inline-size; }
+.efz-bench { display: grid; grid-template-columns: minmax(0, 1fr); gap: .8rem; margin-block: .8rem; }
+.efz-view, .efz-controls, .efz-drawing, .efz-length-wrap, .efz-pair { min-width: 0; }
+.efz-pair { display: grid; gap: .8rem; }
+.efz-view { display: contents; }   /* lets the close-up stick within the whole pair */
+/* Single-column flow: keep the changing contact view pinned under the site bar while the
+   jog controls below it are on screen. Its range ends with the controls (.efz-pair). */
+/* The card's overflow:hidden would make it a scroll container and defeat sticky; clip keeps the same
+   clipping without one. Scoped to cards that hold this lab. */
+.xcard:has(.efz-lab) { overflow: clip; }
+.presenting .xcard:has(.efz-lab) .body { overflow-y: visible; }   /* unbounded panel body; same reason */
+@media (min-height: 34rem) {
+  .efz-close-wrap { position: sticky; top: calc(var(--appbar-h, 3.5rem) + .25rem); z-index: 3; background: var(--paper); }
+  .efz-controls :is(button, input, select) { scroll-margin-top: calc(var(--appbar-h, 3.5rem) + min(58vw, 22rem) + 1rem); }
+}
+.efz-controls { display: grid; gap: .6rem; align-content: start; }
+.efz-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+.efz-jogbox { display: grid; gap: .5rem; align-content: start; }
+.efz-view-actions button { flex: 1 1 8rem; }
+.efz-close { max-width: min(100%, 96vh); margin-inline: auto; }
+.efz-jog { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.efz-jog button { min-height: 52px; font-weight: 700; }
+.efz-set { display: grid; gap: .3rem; }
+.efz-set-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+.efz-ruler-cap { margin: .6rem 0 .2rem; font-size: .88rem; color: var(--ink-soft); }
+.efz-lab-length .efz-controls { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .8rem; }
+.efz-lab-length .efz-controls > .efz-actions { grid-column: 1 / -1; }
+@container efz (min-width: 30rem) {
+  .efz-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; }
+  .efz-set-row { grid-template-columns: minmax(8rem, 1fr) auto auto; }
+}
+/* Wide containers (presentation mode, wide screens): views left, controls right. */
+@container efz (min-width: 62rem) {
+  .efz-bench { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); grid-template-areas: "view controls" "actions controls" "draw controls"; align-items: start; }
+  .efz-pair { display: contents; }
+  .efz-close-wrap { position: static; grid-area: view; } .efz-view-actions { grid-area: actions; margin: 0; }
+  .efz-controls { grid-area: controls; } .efz-drawing { grid-area: draw; }
+  .efz-row { grid-template-columns: minmax(0, 1fr); }
+}
+/* Readout */
+.efz-dro { padding: .55rem .7rem; background: var(--surface-2); border: 1px solid var(--rule); }
+.efz-dro-row { display: grid; grid-template-columns: 1.6rem 1fr auto; align-items: baseline; gap: .4rem; color: var(--ink-soft); }
+.efz-dro-row.is-active { color: var(--ink); }
+.efz-dro-axis { font-weight: 700; }
+.efz-dro-value { font: 700 1.55rem/1.2 var(--f-mono); text-align: right; font-variant-numeric: tabular-nums; }
+.efz-dro-row:not(.is-active) .efz-dro-value { font-size: 1.15rem; font-weight: 400; }
+.efz-phase { margin: .35rem 0 0; padding: .3rem .5rem; border-left: 4px solid var(--ink-soft); background: var(--surface); font-size: .9rem; }
+.efz-phase[data-efz-phase="centring"] { border-left-color: var(--accent); }
+.efz-phase[data-efz-phase="kick"] { border-left-color: var(--flag); background: var(--flag-soft); }
+/* Drawings */
+.efz-svg { display: block; width: 100%; height: auto; background: var(--paper); border: 1px solid var(--rule); }
+.efz-svg text { fill: var(--ink); font: 20px var(--f-display); }
+.efz-svg .efz-small { font-size: 23px; fill: var(--ink-soft); }
+.efz-svg .efz-gap, .efz-svg .efz-label { font-size: 25px; font-weight: 700; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.efz-svg .efz-datum-label { font-size: 23px; font-weight: 700; fill: var(--accent); }
+.efz-svg .efz-halo { paint-order: stroke; stroke: var(--surface-2); stroke-width: 7px; stroke-linejoin: round; }
+.efz-top { max-width: 38rem; margin-inline: auto; }
+.efz-part { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 1.5; }
+.efz-hatch { stroke: var(--rule); stroke-width: 2; }
+.efz-face { stroke: var(--ink); stroke-width: 3; fill: none; }
+.efz-divider { stroke: var(--rule); stroke-width: 1.5; }
+.efz-ref { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.efz-axis { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+.efz-centerline { stroke-dasharray: 10 4 2 4; stroke: var(--ink-soft); }
+.efz-tip { fill: color-mix(in srgb, var(--accent) 22%, transparent); stroke: var(--accent); stroke-width: 3; }
+.efz-tip-dot { fill: var(--accent); }
+.efz-tip-true { fill: color-mix(in srgb, var(--accent) 18%, transparent); stroke: var(--accent); stroke-width: 2; }
+.efz-kickmark { stroke: var(--flag); stroke-width: 4; stroke-linecap: round; fill: none; }
+.efz-close-wrap.is-kicked .efz-svg { border-color: var(--flag); box-shadow: 0 0 0 2px var(--flag); }
+.efz-datum { stroke: var(--accent); stroke-width: 6; stroke-linecap: square; fill: none; }
+.efz-dim { stroke: var(--ink-soft); stroke-width: 1.5; fill: none; }
+.efz-intended { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.efz-intended-cross { stroke: var(--ink-soft); stroke-width: 1.5; }
+.efz-hole, .efz-hole-ok { fill: var(--accent); stroke: var(--paper); stroke-width: 1.5; }
+.efz-hole-forgot { fill: var(--paper); stroke: var(--cat3); stroke-width: 3; stroke-dasharray: 4 2; }
+.efz-hole-sign { fill: none; stroke: var(--cat3); stroke-width: 3; }
+.efz-lane { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 2 3; }
+.efz-target { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 6 4; }
+.efz-axes { stroke: var(--ink-soft); stroke-width: 2; fill: none; }
+.efz-spindle-nose { fill: var(--surface-2); stroke: var(--ink); stroke-width: 2; }
+.efz-gauge-line { stroke: var(--flag); stroke-width: 3; stroke-dasharray: 8 4; }
+.efz-tool, .efz-drill-point { fill: color-mix(in srgb, var(--accent) 22%, transparent); stroke: var(--accent); stroke-width: 2; }
+.efz-block { fill: var(--flag-soft); stroke: var(--flag); stroke-width: 2; }
+/* Results */
+.efz-feedback { min-height: 3em; padding: .6rem .7rem; background: var(--surface-2); border-left: 4px solid var(--accent); }
+.efz-rule { padding: .5rem .7rem; border: 1px solid var(--rule); font-weight: 700; }
+.efz-table-wrap { max-width: 100%; overflow-x: auto; }
+.efz-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .9rem; }
+.efz-table caption { text-align: left; font-weight: 700; padding-bottom: .3rem; }
+.efz-table :is(th, td) { padding: .35rem .45rem; border: 1px solid var(--rule); text-align: left; vertical-align: top; }
+.efz-key { display: inline-block; width: .85em; height: .85em; margin-right: .35em; border-radius: 50%; vertical-align: -.05em; }
+.efz-key-yours, .efz-key-correct { background: var(--accent); }
+.efz-key-forgot { border: 2px dashed var(--cat3); }
+.efz-key-sign { border: 2px solid var(--cat3); box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--cat3); }
+.efz-mistakes { border: 1px solid var(--rule); border-left: 4px solid var(--cat3); padding: .6rem .8rem; margin-block: .8rem; min-width: 0; }
+.efz-tool-row { padding-bottom: .6rem; border-bottom: 1px solid var(--rule); display: grid; gap: .3rem; }
+.efz-tool-row p { margin: 0; }
+.efz-empty { color: var(--ink-soft); }
+/* Static lesson */
+.efz-static-grid { display: grid; gap: 1rem; }
+.efz-fig { margin: 0; padding: .6rem; border: 1px solid var(--rule); min-width: 0; }
+.efz-fig h3 { margin-top: 0; }
+.efz-fig h4 { margin: .2rem 0; font-size: .95rem; }
+.efz-seq { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; }
+.efz-source { font-size: .88rem; }
+@media (max-width: 40rem) { .efz-seq { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 34rem) {
+  .xcard:has([data-interactive="edge-finder-zero"]) .body { padding-inline: .5rem; }
+  .efz-dro-value { font-size: 1.35rem; }
+}
+@keyframes efz-flash { from { box-shadow: 0 0 0 8px var(--flag); } to { box-shadow: 0 0 0 2px var(--flag); } }
+.efz-close-wrap.is-kicked .efz-svg { animation: efz-flash .45s ease-out; }
+@media (prefers-reduced-motion: reduce) { [data-interactive="edge-finder-zero"] * { animation: none !important; transition: none !important; } }
+@media print {
+  .efz-lab { display: none !important; }
+  .efz-live > .efz-static { display: block !important; }
+  /* The lesson is taller than a page: let it flow, keep each drawing and table whole. */
+  main [data-interactive="edge-finder-zero"], main [data-interactive="edge-finder-zero"] .efz-fig { break-inside: auto; }
+  .efz-static-grid { display: block; }
+  .efz-fig { margin-bottom: 1rem; }
+  .efz-fig h3, .efz-fig h4, .efz-ruler-cap { break-after: avoid; }
+  .efz-seq { display: grid; grid-template-columns: minmax(0, 1fr); gap: .4rem; }
+  .efz-seq > div { break-inside: avoid; }
+  .efz-seq .efz-svg, .efz-top { max-width: 4.6in; margin-inline: auto; }
+  .efz-svg, .efz-table, .efz-table-wrap { break-inside: avoid; }
+  .efz-svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+
 /* ============================================================================
    cutter-geometry / cutter.css
 
@@ -3273,6 +3423,21 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-5">Supporting detail: <a href="#deeper-addendum-5"><strong>Addendum 5</strong></a> &mdash; Check both repeatability and the offset sign.</p>
     </div>
   </details>
+  <details class="xcard deck-slide is-interactive" id="mill-indicating-and-zero--find-an-edge-choose-the-sign-and-check-where-the-hole-lands" data-card="mill-indicating-and-zero--find-an-edge-choose-the-sign-and-check-where-the-hole-lands" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Find an edge, choose the sign, and check where the hole lands<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Find an edge, choose the sign, and check where the hole lands</h2>
+  <p>Jog a mechanical edge finder toward any of the four edges, watch the tip wobble, centre and kick, then decide what the readout should read at that position. A check hole shows where your zero really is. The radius used is half the <strong>contact</strong> diameter, which can differ from the body diameter. Re-approach from the same direction each time; reversing a feed screw adds <a class="xref-out" href="https://bharrison6.github.io/coursewiki/engineering/screw-threads.html" target="_blank" rel="noopener">backlash</a>, which this model does not include.</p>
+  <div data-interactive="edge-finder-zero">
+    <div class="efz-static">
+      <!-- EDGE-FINDER-ZERO-STATIC -->
+      <div class="efz-static-grid"><figure class="efz-fig"><h3>Wobble, centre, kick</h3><div class="efz-seq"><div><h4>Free: off-centre wobble</h4><svg class="efz-svg efz-close" viewBox="0 0 640 360" role="img" aria-label="Magnified close-up of the left edge. Wobbling: tip runs off-centre, not touching. Gap to the trigger point 7.370 mm." focusable="false" data-phase="free"><rect class="efz-part" x="320" y="40" width="320" height="176"/><path class="efz-face" d="M320 40V216"/><text class="efz-small" x="630" y="70" text-anchor="end">part</text><text class="efz-small" x="630" y="28" text-anchor="end">Top view, magnified</text><text class="efz-small efz-orient" x="630" y="206" text-anchor="end">→ +X   ↑ +Y</text><circle class="efz-ref" cx="146.82" cy="128" r="70"/><path class="efz-axis" d="M136.82 128H156.82M146.82 118V138"/><g class="efz-tip-top" transform="translate(7 0)"><circle class="efz-tip" cx="146.82" cy="128" r="70"/><circle class="efz-tip-dot" cx="146.82" cy="128" r="3"/></g><path class="efz-divider" d="M0 226H640"/><text class="efz-small" x="630" y="254" text-anchor="end">Side view from the front</text><rect class="efz-part" x="320" y="268" width="320" height="92"/><path class="efz-hatch" d="M320 282L334 268M320 296L348 268M320 310L362 268M320 324L376 268M320 338L390 268M320 352L404 268M326 360L418 268M340 360L432 268M354 360L446 268M368 360L460 268M382 360L474 268M396 360L488 268M410 360L502 268M424 360L516 268M438 360L530 268M452 360L544 268M466 360L558 268M480 360L572 268M494 360L586 268M508 360L600 268M522 360L614 268M536 360L628 268M550 360L640 270M564 360L640 284M578 360L640 298M592 360L640 312M606 360L640 326M620 360L640 340M634 360L640 354"/><path class="efz-face" d="M320 268V360M320 268h320"/><path class="efz-axis efz-centerline" d="M146.82 232V352"/><g class="efz-tip-side" transform="translate(7 0)"><rect class="efz-tip" x="76.82" y="232" width="140" height="92"/></g><text class="efz-gap" x="630" y="304" text-anchor="end">To trigger: 7.370 mm</text></svg></div><div><h4>0.200 mm before the trigger: nearly concentric</h4><svg class="efz-svg efz-close" viewBox="0 0 640 360" role="img" aria-label="Magnified close-up of the left edge. Centring: tip touches and runs nearly concentric. Gap to the trigger point 0.200 mm." focusable="false" data-phase="centring"><rect class="efz-part" x="320" y="40" width="320" height="176"/><path class="efz-face" d="M320 40V216"/><text class="efz-small" x="630" y="70" text-anchor="end">part</text><text class="efz-small" x="630" y="28" text-anchor="end">Top view, magnified</text><text class="efz-small efz-orient" x="630" y="206" text-anchor="end">→ +X   ↑ +Y</text><circle class="efz-ref" cx="247.20" cy="128" r="70"/><path class="efz-axis" d="M237.20 128H257.20M247.20 118V138"/><g class="efz-tip-top" transform="translate(2.80 0)"><circle class="efz-tip" cx="247.20" cy="128" r="70"/><circle class="efz-tip-dot" cx="247.20" cy="128" r="3"/></g><path class="efz-divider" d="M0 226H640"/><text class="efz-small" x="630" y="254" text-anchor="end">Side view from the front</text><rect class="efz-part" x="320" y="268" width="320" height="92"/><path class="efz-hatch" d="M320 282L334 268M320 296L348 268M320 310L362 268M320 324L376 268M320 338L390 268M320 352L404 268M326 360L418 268M340 360L432 268M354 360L446 268M368 360L460 268M382 360L474 268M396 360L488 268M410 360L502 268M424 360L516 268M438 360L530 268M452 360L544 268M466 360L558 268M480 360L572 268M494 360L586 268M508 360L600 268M522 360L614 268M536 360L628 268M550 360L640 270M564 360L640 284M578 360L640 298M592 360L640 312M606 360L640 326M620 360L640 340M634 360L640 354"/><path class="efz-face" d="M320 268V360M320 268h320"/><path class="efz-axis efz-centerline" d="M247.20 232V352"/><g class="efz-tip-side" transform="translate(2.80 0)"><rect class="efz-tip" x="177.20" y="232" width="140" height="92"/></g><text class="efz-gap" x="630" y="304" text-anchor="end">To trigger: 0.200 mm</text></svg></div><div><h4>At the trigger: the tip kicks sideways</h4><svg class="efz-svg efz-close" viewBox="0 0 640 360" role="img" aria-label="Magnified close-up of the left edge. Kick: trigger reached. Spindle centre has reached or passed the trigger point." focusable="false" data-phase="kick"><rect class="efz-part" x="320" y="40" width="320" height="176"/><path class="efz-face" d="M320 40V216"/><text class="efz-small" x="630" y="70" text-anchor="end">part</text><text class="efz-small" x="630" y="28" text-anchor="end">Top view, magnified</text><text class="efz-small efz-orient" x="630" y="206" text-anchor="end">→ +X   ↑ +Y</text><circle class="efz-ref" cx="250" cy="128" r="70"/><path class="efz-axis" d="M240 128H260M250 118V138"/><g class="efz-tip-top" transform="translate(-4.20 -11.20)"><circle class="efz-tip" cx="250" cy="128" r="70"/><circle class="efz-tip-dot" cx="250" cy="128" r="3"/></g><path class="efz-kickmark" d="M234 38l-7 -14M250 36v-16M266 38l7 -14"/><path class="efz-divider" d="M0 226H640"/><text class="efz-small" x="630" y="254" text-anchor="end">Side view from the front</text><rect class="efz-part" x="320" y="268" width="320" height="92"/><path class="efz-hatch" d="M320 282L334 268M320 296L348 268M320 310L362 268M320 324L376 268M320 338L390 268M320 352L404 268M326 360L418 268M340 360L432 268M354 360L446 268M368 360L460 268M382 360L474 268M396 360L488 268M410 360L502 268M424 360L516 268M438 360L530 268M452 360L544 268M466 360L558 268M480 360L572 268M494 360L586 268M508 360L600 268M522 360L614 268M536 360L628 268M550 360L640 270M564 360L640 284M578 360L640 298M592 360L640 312M606 360L640 326M620 360L640 340M634 360L640 354"/><path class="efz-face" d="M320 268V360M320 268h320"/><path class="efz-axis efz-centerline" d="M250 232V352"/><g class="efz-tip-side" transform="translate(-4.20 0)"><rect class="efz-tip" x="180" y="232" width="140" height="92"/></g><text class="efz-gap" x="630" y="304" text-anchor="end">Kick: trigger reached</text></svg></div></div><figcaption>The offset tip orbits while free, is pushed concentric by the edge, then kicks when the spindle centre is one contact radius from the edge. The wobble and kick are drawn for illustration, not as contact mechanics.</figcaption></figure><figure class="efz-fig"><h3>Where the check hole lands</h3><svg class="efz-svg efz-top" viewBox="0 0 640 470" role="img" aria-label="Top view of the 100 by 60 mm part, true scale. Datum: the left edge, X 0 after setting. Drawn check hole 20 mm inside it. Your hole 20.000 mm from the edge; Radius forgotten 15.000 mm from the edge; Wrong sign 10.000 mm from the edge." focusable="false"><text class="efz-small" x="18" y="28">Top view, true scale</text><rect class="efz-part" x="140" y="142" width="360" height="216"/><path class="efz-datum" d="M140 142V358"/><text class="efz-datum-label" x="140" y="130" text-anchor="middle">datum X 0</text><path class="efz-dim" d="M140 286H212M212 260V292"/><text class="efz-small" x="176" y="310" text-anchor="middle">20</text><circle class="efz-intended" cx="212" cy="250" r="10.20"/><path class="efz-intended-cross" d="M198 250H226M212 236V264"/><g data-hole="yours" data-cx="212" data-cy="250"><circle class="efz-hole" cx="212" cy="250" r="7.20"/></g><g data-hole="forgot" data-cx="194" data-cy="250"><circle class="efz-hole-forgot" cx="194" cy="250" r="7.20"/></g><g data-hole="sign" data-cx="176" data-cy="250"><circle class="efz-hole-sign" cx="176" cy="250" r="7.20"/><circle class="efz-hole-sign" cx="176" cy="250" r="11.20"/></g><g class="efz-spindle" data-sx="122" data-sy="250"><circle class="efz-tip-true" cx="122" cy="250" r="18"/><path class="efz-axis" d="M114 250H130M122 242V258"/></g><path class="efz-axes" d="M30 446H90M82 440L90 446L82 452M30 446V386M24 394L30 386L36 394"/><text class="efz-small" x="96" y="453">+X</text><text class="efz-small" x="40" y="392">+Y (back)</text><text class="efz-small" x="622" y="453" text-anchor="end">front (operator side)</text></svg><p class="efz-ruler-cap">Distance from the datum edge, magnified (mm); the dashed line is the drawing’s 20.000</p><svg class="efz-svg efz-ruler" viewBox="0 0 640 176" role="img" aria-label="Magnified scale of distance from the datum edge, 20 mm drawn at 20.000. Your hole at 20.000 mm; Radius forgotten at 15.000 mm; Wrong sign at 10.000 mm." focusable="false"><rect class="efz-part" x="80" y="44" width="560" height="200"/><path class="efz-datum" d="M80 30V250"/><path class="efz-axes" d="M40 44H620M40 44V37M60 44V37M80 44V30M100 44V37M120 44V37M140 44V37M160 44V37M180 44V30M200 44V37M220 44V37M240 44V37M260 44V37M280 44V30M300 44V37M320 44V37M340 44V37M360 44V37M380 44V30M400 44V37M420 44V37M440 44V37M460 44V37M480 44V30M500 44V37M520 44V37M540 44V37M560 44V37M580 44V30M600 44V37M620 44V37"/><text class="efz-small" x="80" y="24" text-anchor="middle">0</text><text class="efz-small" x="180" y="24" text-anchor="middle">5</text><text class="efz-small" x="280" y="24" text-anchor="middle">10</text><text class="efz-small" x="380" y="24" text-anchor="middle">15</text><text class="efz-small" x="480" y="24" text-anchor="middle">20</text><text class="efz-small" x="580" y="24" text-anchor="middle">25</text><path class="efz-target" d="M480 30V250"/><g data-ruler="yours" data-x="480"><path class="efz-lane" d="M480 44V72"/><circle class="efz-hole" cx="480" cy="80" r="7"/><text class="efz-small efz-halo" x="466" y="88" text-anchor="end">your hole 20.000</text></g><g data-ruler="forgot" data-x="380"><path class="efz-lane" d="M380 44V110"/><circle class="efz-hole-forgot" cx="380" cy="118" r="7"/><text class="efz-small efz-halo" x="366" y="126" text-anchor="end">radius forgotten 15.000</text></g><g data-ruler="sign" data-x="280"><path class="efz-lane" d="M280 44V148"/><circle class="efz-hole-sign" cx="280" cy="156" r="7"/><text class="efz-small efz-halo" x="294" y="164" text-anchor="start">wrong sign 10.000</text></g></svg><figcaption><div class="efz-table-wrap"><table class="efz-table"><caption>Check holes: drawing says 20.000 mm from the left edge</caption><thead><tr><th scope="col">Hole</th><th scope="col">Readout set at kick (mm)</th><th scope="col">Lands from edge (mm)</th><th scope="col">Off by (mm)</th></tr></thead><tbody><tr data-kind="yours"><th scope="row"><span class="efz-key efz-key-yours" aria-hidden="true"></span>Your hole</th><td>−5.000</td><td>20.000</td><td>0.000</td></tr><tr data-kind="forgot"><th scope="row"><span class="efz-key efz-key-forgot" aria-hidden="true"></span>Radius forgotten</th><td>0.000</td><td>15.000</td><td>5.000 toward edge (1 r)</td></tr><tr data-kind="sign"><th scope="row"><span class="efz-key efz-key-sign" aria-hidden="true"></span>Wrong sign</th><td>+5.000</td><td>10.000</td><td>10.000 toward edge (2 r)</td></tr></tbody></table></div></figcaption></figure></div><div class="efz-table-wrap"><table class="efz-table"><caption>The sign depends on the side approached (+X right, +Y toward the back)</caption><thead><tr><th scope="col">Edge</th><th scope="col">Spindle approaches moving</th><th scope="col">Edge position</th><th scope="col">Set readout at the kick (10 mm contact)</th></tr></thead><tbody><tr><th scope="row">Left edge</th><td>+X</td><td>X = reading + r</td><td>−5.000 mm</td></tr><tr><th scope="row">Right edge</th><td>−X</td><td>X = reading − r</td><td>+5.000 mm</td></tr><tr><th scope="row">Front edge</th><td>+Y</td><td>Y = reading + r</td><td>−5.000 mm</td></tr><tr><th scope="row">Back edge</th><td>−Y</td><td>Y = reading − r</td><td>+5.000 mm</td></tr></tbody></table></div><p><strong>Worked example (left edge, 10 mm contact, r = 5 mm):</strong> at the kick the X readout shows +32.460 mm in its old, arbitrary frame. The edge is at reading + r = +32.460 + 5.000 = +37.460 mm. Setting the readout to −5.000 mm at that position makes the edge read 0, and a hole programmed at X 20.000 lands 20.000 mm from the edge. Setting 0 instead (radius forgotten) puts the hole at 15.000 mm: off by r. Setting +5.000 (wrong sign) puts it at 10.000 mm: off by 2r.</p><p><strong>Model:</strong> top view; positions are the spindle centre relative to the part, whichever of them actually moves. The trigger occurs when the spindle centre is exactly one contact radius (half the contact diameter, not the body diameter) from the edge, on the approach side. Lengths are exact to 0.001 mm; jog steps are 1, 0.1 and 0.01 mm. A step that crosses the trigger leaves the readout past it by up to one step. The other axis is assumed already located. Backlash, tip wear, edge condition and speed are not modelled; use the edge finder’s specified speed.</p><p class="efz-source">Sources: <a href="https://ocw.mit.edu/courses/2-670-mechanical-engineering-tools-january-iap-2004/69ddc43986801c51a7fbfa97d6b5b63f_mill.pdf">MIT 2.670, Milling Machine</a>, “Using an Edge Finder”, p. 6; <a href="https://www.starrett.co.uk/products/precision-hand-tools/edge-finders/edge-finders-edge-finders/827mb-edge-finder/">Starrett 827MB</a> and <a href="https://www.starrett.co.uk/products/precision-hand-tools/edge-finders/edge-finders-edge-finders/827a-edge-finder/">827A</a> product pages (how to use; 6 mm and 0.200 in contact diameters). The part, readings and drawings are original illustrations.</p>
+      <!-- /EDGE-FINDER-ZERO-STATIC -->
+      <noscript><p>The jog controls require JavaScript. The figures, table and worked example above carry the same lesson for print and no-JavaScript readers.</p></noscript>
+    </div>
+  </div>
+    </div>
+  </details>
   <details class="xcard deck-slide" id="mill-indicating-and-zero--home-the-machine-locate-the-part-then-account-for-each-tool-s-length" data-card="mill-indicating-and-zero--home-the-machine-locate-the-part-then-account-for-each-tool-s-length">
     <summary>Home the machine, locate the part, then account for each tool's length<span class="chev"></span></summary>
     <div class="body">
@@ -3284,6 +3449,21 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   </ul>
   <p>Choose the origin used by the drawing and program, locate X and Y, and establish Z using the approved touch-off or probing method. Account for any gauge or touch plate thickness. Confirm the active work offset, tool number and tool length before a trial path. Recheck after moving the part or changing how a tool is seated.</p>
   <p>Use <a class="xref-page" href="#p-mill-setup-checklist">Vertical Mill Startup, Setup and Shutdown</a> to check the sequence and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/gcode-and-toolpaths.html" target="_blank" rel="noopener">G-code and Toolpaths</a> to connect coordinates to a program. Tormach's <a href="https://knowledgebase.tormach.com/pcnc-1100/basic-operation-pcnc-1100">basic-operation reference</a> provides links to work/tool offset instructions; select documentation matching the installed control.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide is-interactive" id="mill-indicating-and-zero--two-tools-touch-the-same-surface-at-different-readings" data-card="mill-indicating-and-zero--two-tools-touch-the-same-surface-at-different-readings" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Two tools touch the same surface at different readings<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Two tools touch the same surface at different readings</h2>
+  <p>Once X and Y are located, Z still depends on which tool is in the spindle. Predict the readout for two tools of different lengths touching the same part top, with ideal contact or through a block of stated thickness. <a class="xref-out" href="https://bharrison6.github.io/coursewiki/machining/cnc-axes-and-offsets.html" target="_blank" rel="noopener">CNC Axes and Offsets</a> shows how a control applies a stored length value.</p>
+  <div data-interactive="edge-finder-zero" data-efz-stage="length">
+    <div class="efz-static">
+      <!-- EDGE-FINDER-ZERO-LENGTH-STATIC -->
+      <figure class="efz-fig"><h3>Two tools touched off on the same surface</h3><svg class="efz-svg efz-length" viewBox="0 0 640 420" role="img" aria-label="Side view of two tools touched off on the part top through a 10.000 mm block. T1 length 82.000 mm, T2 length 109.500 mm from the spindle gauge line. T1 reads Z +10.000. T2 reads Z +37.500." focusable="false"><text class="efz-small" x="18" y="28">Side view: tool lengths and diameters to scale</text><g data-station="t1"><rect class="efz-block" x="156" y="345" width="68" height="21"/><rect class="efz-spindle-nose" x="150" y="138.80" width="80" height="34"/><path class="efz-gauge-line" d="M128 172.80H252"/><rect class="efz-tool" data-diameter-px="21" x="179.50" y="172.80" width="21" height="172.20"/><path class="efz-dim" d="M242 172.80V345M236 345H248"/><text class="efz-small" x="250" y="258.90">L 82.000</text><text class="efz-label" x="190" y="128.80" text-anchor="middle">T1 · Z +10.000</text></g><g data-station="t2"><rect class="efz-block" x="416" y="345" width="68" height="21"/><rect class="efz-spindle-nose" x="410" y="81.05" width="80" height="34"/><path class="efz-gauge-line" d="M388 115.05H512"/><path class="efz-drill-point" d="M443.70 341.21L450 345L456.30 341.21Z"/><rect class="efz-tool" data-diameter-px="12.60" x="443.70" y="115.05" width="12.60" height="226.16"/><path class="efz-dim" d="M502 115.05V345M496 345H508"/><text class="efz-small" x="510" y="230.03">L 109.500</text><text class="efz-label" x="450" y="71.05" text-anchor="middle">T2 · Z +37.500</text></g><rect class="efz-part" x="40" y="366" width="560" height="54"/><path class="efz-face" d="M40 366H600"/><text class="efz-small" x="48" y="396">part top, Z 0</text></svg><figcaption><div class="efz-table-wrap"><table class="efz-table"><caption>Touch-off through a 10.000 mm block</caption><thead><tr><th scope="col">Tool</th><th scope="col">Length, gauge line to tip (mm)</th><th scope="col">Z reading at touch-off (mm)</th><th scope="col">Length value vs T1 (mm)</th></tr></thead><tbody><tr><th scope="row">T1 · 10 mm end mill (reference)</th><td>82.000</td><td>+10.000</td><td>0.000</td></tr><tr><th scope="row">T2 · 6 mm drill</th><td>109.500</td><td>+37.500</td><td>+27.500</td></tr></tbody></table></div><div class="efz-table-wrap"><table class="efz-table"><caption>Touch-off with ideal zero-thickness contact</caption><thead><tr><th scope="col">Tool</th><th scope="col">Length, gauge line to tip (mm)</th><th scope="col">Z reading at touch-off (mm)</th><th scope="col">Length value vs T1 (mm)</th></tr></thead><tbody><tr><th scope="row">T1 · 10 mm end mill (reference)</th><td>82.000</td><td>0.000</td><td>0.000</td></tr><tr><th scope="row">T2 · 6 mm drill</th><td>109.500</td><td>+27.500</td><td>+27.500</td></tr></tbody></table></div></figcaption></figure><p><strong>Worked example:</strong> the readout follows the spindle and reads T1’s tip height, with the part top at Z 0. T2 is 27.500 mm longer than T1. Touching T2 onto a 10.000 mm block, the readout shows Z = 0 + 10.000 + (109.500 − 82.000) = +37.500 mm. T2’s length value is that reading minus the block: +27.500 mm. With that value applied, the tip Z is the reading minus 27.500. Without it, a move to Z +2.000 with T2 would put its tip at 2.000 − 27.500 = −25.500 mm: 25.500 mm below the part top.</p><p><strong>Model:</strong> Z reading at touch-off = surface Z + gauge thickness + (L<sub>tool</sub> − L<sub>T1</sub>). Lengths run from the spindle gauge line to the tip and are illustrative. The gauge is either an ideal zero-thickness contact or a stated 10.000 mm block. Controls store and apply tool length in different ways; follow the control’s documentation for the actual offset entry.</p>
+      <!-- /EDGE-FINDER-ZERO-LENGTH-STATIC -->
+      <noscript><p>The touch-off controls require JavaScript. The figure, tables and worked example above carry the same lesson for print and no-JavaScript readers.</p></noscript>
+    </div>
+  </div>
     </div>
   </details>
 </div>
@@ -5973,6 +6153,759 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   return Object.freeze({ init: init, prediction: prediction });
 });
 
+
+(function (root, factory) {
+  'use strict';
+  var api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiEdgeFinderZero = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  // Pure geometric model. Every length is an integer number of micrometres (µm),
+  // so sign and radius checks are exact; the interface formats them as mm.
+  //
+  // Frame: top view, positions are the spindle centre relative to the part.
+  // +X points right, +Y points away from the operator (toward the back).
+  // n is the outward normal of the edge along its axis: the side the spindle
+  // approaches from. The trigger happens when the spindle centre is exactly
+  // r (contact-tip radius) outside the edge, on the approach side:
+  //   d = n · (P − E) = r   →   E = P − n·r
+  // Left/front edges (n = −1, approached moving +): edge = reading + r.
+  // Right/back edges (n = +1, approached moving −): edge = reading − r.
+  var SIDES = Object.freeze({
+    left: Object.freeze({ id: 'left', axis: 'x', n: -1, label: 'Left edge', move: '+X' }),
+    right: Object.freeze({ id: 'right', axis: 'x', n: 1, label: 'Right edge', move: '−X' }),
+    front: Object.freeze({ id: 'front', axis: 'y', n: -1, label: 'Front edge', move: '+Y' }),
+    back: Object.freeze({ id: 'back', axis: 'y', n: 1, label: 'Back edge', move: '−Y' })
+  });
+  // Contact diameters. 10 mm matches the page's worked example; 6 mm and
+  // 0.200 in are published contact diameters of one maker's mechanical edge
+  // finders (Starrett 827MB and 827A product pages). The radius used is half the
+  // CONTACT diameter, not the body diameter.
+  var TIPS = Object.freeze({
+    d10: Object.freeze({ id: 'd10', diameter: 10000, label: '10 mm contact (page example)' }),
+    d6: Object.freeze({ id: 'd6', diameter: 6000, label: '6 mm contact' }),
+    d5080: Object.freeze({ id: 'd5080', diameter: 5080, label: '0.200 in (5.080 mm) contact' })
+  });
+  // Illustrative 100 × 60 mm block, located in the readout's arbitrary starting frame.
+  var PART = Object.freeze({ x0: 37460, x1: 137460, y0: 12840, y1: 72840 });
+  var HOLE_INSET = 20000;      // drawing: check hole 20.000 mm inside the datum edge
+  var START_GAP = 7370;        // first position: 7.370 mm beyond the trigger point
+  var AWAY_LIMIT = 10000;      // may back off up to 10 mm further than the start
+  var ECCENTRIC = 500;         // illustrative free-running tip offset, 0.5 mm
+  var KICK = 1000;             // illustrative sideways throw after the trigger, 1 mm
+  var STEPS = Object.freeze([1000, 100, 10]);
+  var SETTING_LIMIT = 50000;   // the readout entry accepts −50.000 … +50.000 mm
+
+  function int(v, key) {
+    if (typeof v !== 'number' || !Number.isInteger(v)) throw new RangeError(key + ' must be a whole number of micrometres');
+    return v;
+  }
+  function z(v) { return v === 0 ? 0 : v; }   // never report −0
+  function side(id) {
+    if (!Object.prototype.hasOwnProperty.call(SIDES, id)) throw new RangeError('Choose the left, right, front or back edge');
+    return SIDES[id];
+  }
+  function tip(id) {
+    if (!Object.prototype.hasOwnProperty.call(TIPS, id)) throw new RangeError('Choose a listed contact diameter');
+    return TIPS[id];
+  }
+  function radiusOf(r) { int(r, 'Tip radius'); if (r <= 0 || r > 10000) throw new RangeError('Tip radius must be from 1 µm to 10 mm'); return r; }
+  // Edge coordinate in the starting frame. A custom part may be supplied for checks.
+  function edge(sideId, part) {
+    var s = side(sideId), p = part || PART;
+    if (s.axis === 'x') return s.n < 0 ? p.x0 : p.x1;
+    return s.n < 0 ? p.y0 : p.y1;
+  }
+  function middle(axis, part) { var p = part || PART; return axis === 'x' ? (p.x0 + p.x1) / 2 : (p.y0 + p.y1) / 2; }
+  function other(axis) { return axis === 'x' ? 'y' : 'x'; }
+
+  // The rule the learner applies: edge = reading − n·r.
+  function edgeFromReading(sideId, reading, r) { return int(reading, 'Reading') - side(sideId).n * radiusOf(r); }
+  // Readout at the exact trigger in a frame whose zero is the true edge.
+  function triggerReading(sideId, edgeAt, r) { return int(edgeAt, 'Edge') + side(sideId).n * radiusOf(r); }
+  // What to set the readout to at the trigger so the edge itself reads zero.
+  function correctSetting(sideId, r) { return side(sideId).n * radiusOf(r); }
+  // Drawing coordinate of the check hole in the datum frame (inside the part).
+  function holeTarget(sideId) { return -side(sideId).n * HOLE_INSET; }
+
+  function create(sideId, tipId) {
+    var s = side(sideId), t = tip(tipId), r = t.diameter / 2;
+    var pos = { x: middle('x'), y: middle('y') };
+    pos[s.axis] = edge(sideId) + s.n * (r + START_GAP);
+    return Object.freeze({ side: s.id, tip: t.id, r: r, pos: Object.freeze(pos), frame: Object.freeze({ x: 0, y: 0 }), setting: null, holes: Object.freeze([]) });
+  }
+  function validate(st) {
+    if (!st || typeof st !== 'object') throw new RangeError('State is missing');
+    var s = side(st.side), t = tip(st.tip);
+    if (st.r !== t.diameter / 2) throw new RangeError('Tip radius must match the chosen contact');
+    int(st.pos.x, 'Position X'); int(st.pos.y, 'Position Y'); int(st.frame.x, 'Frame X'); int(st.frame.y, 'Frame Y');
+    var d = distance(st, true);
+    if (d > st.r + START_GAP + AWAY_LIMIT) throw new RangeError('Position is outside the modelled approach');
+    if (st.pos[other(s.axis)] !== middle(other(s.axis))) throw new RangeError('This lesson moves along one axis only');
+    return st;
+  }
+  function distance(st, raw) { if (!raw) validate(st); var s = SIDES[st.side]; return s.n * (st.pos[s.axis] - edge(st.side)); }
+  function contact(st) {
+    var d = distance(st), r = st.r, gap = d - r;
+    if (gap <= 0) return Object.freeze({ phase: 'kick', d: d, gap: gap, eccentricity: 0, overshoot: gap === 0 ? 0 : -gap });
+    if (gap < ECCENTRIC) return Object.freeze({ phase: 'centring', d: d, gap: gap, eccentricity: gap, overshoot: 0 });
+    return Object.freeze({ phase: 'free', d: d, gap: gap, eccentricity: ECCENTRIC, overshoot: 0 });
+  }
+  function readings(st) { validate(st); return Object.freeze({ x: st.pos.x + st.frame.x, y: st.pos.y + st.frame.y }); }
+  function with_(st, patch) { return validate(Object.freeze(Object.assign({}, st, patch))); }
+  // direction +1 moves toward the edge, −1 backs away.
+  function jog(st, direction, step) {
+    validate(st);
+    if (direction !== 1 && direction !== -1) throw new RangeError('Jog direction must be toward (+1) or away (−1)');
+    if (STEPS.indexOf(step) < 0) throw new RangeError('Choose a 1, 0.1 or 0.01 mm step');
+    var s = SIDES[st.side], c = contact(st);
+    if (direction === 1 && c.phase === 'kick') throw new RangeError('The tip has already kicked. Feeding further only drags it; back away and re-approach');
+    if (direction === -1 && c.d + step > st.r + START_GAP + AWAY_LIMIT) throw new RangeError('That is far enough away for this approach');
+    var pos = Object.assign({}, st.pos);
+    pos[s.axis] = st.pos[s.axis] - s.n * direction * step;
+    return with_(st, { pos: Object.freeze(pos) });
+  }
+  // Move to a known gap beyond the trigger (used by static figures and checks).
+  function atGap(st, gap) {
+    int(gap, 'Gap'); var s = SIDES[validate(st).side], pos = Object.assign({}, st.pos);
+    pos[s.axis] = edge(st.side) + s.n * (st.r + gap);
+    return with_(st, { pos: Object.freeze(pos) });
+  }
+  function parseMillimetres(text) {
+    var t = String(text == null ? '' : text).trim().replace(/[−–]/g, '-');
+    if (!/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(t)) throw new RangeError('Enter a number in millimetres, such as -5 or 2.54');
+    var um = Math.round(Number(t) * 1000);
+    if (Math.abs(Number(t) * 1000 - um) > 1e-6) throw new RangeError('The readout resolves 0.001 mm; use at most three decimal places');
+    if (Math.abs(um) > SETTING_LIMIT) throw new RangeError('Enter a value from −50.000 to +50.000 mm');
+    return um === 0 ? 0 : um;
+  }
+  // Set the readout on the axis being found so the current position reads `value`.
+  function setReadout(st, value) {
+    validate(st); int(value, 'Setting');
+    if (Math.abs(value) > SETTING_LIMIT) throw new RangeError('Enter a value from −50.000 to +50.000 mm');
+    var c = contact(st);
+    if (c.phase !== 'kick') throw new RangeError('Find the edge first: set the readout only at the kick');
+    var s = SIDES[st.side], frame = Object.assign({}, st.frame);
+    frame[s.axis] = value - st.pos[s.axis];
+    return with_(st, { frame: Object.freeze(frame), setting: Object.freeze({ value: value, at: st.pos[s.axis], overshoot: c.overshoot }) });
+  }
+  // Where the check hole lands when the readout frame offset is `frameAxis`.
+  function holeFor(sideId, frameAxis, target) {
+    var s = side(sideId), E = edge(sideId), H = target === undefined ? holeTarget(sideId) : target;
+    var at = H - frameAxis;                       // machine moves until reading = H
+    var fromEdge = z(-s.n * (at - E));            // inward distance from the datum edge
+    // Where the readout's zero actually lies: the position reading 0 is −frameAxis.
+    // Positive = outside the part on the approach side; negative = inside the part.
+    var zeroOutside = z(s.n * (-frameAxis - E));
+    return Object.freeze({ at: at, fromEdge: fromEdge, error: z(at - (E + H)), inwardError: z(fromEdge - (-s.n * H)), zeroOutside: zeroOutside });
+  }
+  function drill(st, label) {
+    validate(st);
+    if (!st.setting) throw new RangeError('Set the readout before drilling the check hole');
+    var s = SIDES[st.side], h = holeFor(st.side, st.frame[s.axis]);
+    var hole = Object.freeze(Object.assign({ label: label || 'Your hole', setting: st.setting.value, overshoot: st.setting.overshoot, kind: 'yours' }, h));
+    return with_(st, { holes: Object.freeze(st.holes.concat([hole])) });
+  }
+  // A what-if hole: the same trigger position, a different setting. State is unchanged.
+  function whatIf(st, kind) {
+    validate(st);
+    var c = contact(st);
+    if (c.phase !== 'kick') throw new RangeError('Reach the kick first; a mistake needs a trigger reading to act on');
+    var s = SIDES[st.side], right = correctSetting(st.side, st.r);
+    var value = kind === 'forgot' ? 0 : kind === 'sign' ? -right : kind === 'correct' ? right : null;
+    if (value === null) throw new RangeError('Unknown mistake');
+    var h = holeFor(st.side, value - st.pos[s.axis]);
+    return Object.freeze(Object.assign({ label: kind === 'forgot' ? 'Radius forgotten' : kind === 'sign' ? 'Wrong sign' : 'Correct setting', setting: value, overshoot: c.overshoot, kind: kind }, h));
+  }
+  // Illustrative tip motion for drawing. u is toward the part (µm), v along the edge.
+  // The tip never crosses the part face: u + r ≤ d in every phase.
+  function tipOffset(c, theta) {
+    if (!Number.isFinite(theta)) throw new RangeError('Angle must be finite');
+    if (c.phase === 'kick') return { u: c.gap - 150 - 150 * Math.cos(theta), v: KICK * (0.8 + 0.2 * Math.sin(theta)) };
+    return { u: c.eccentricity * Math.cos(theta), v: c.eccentricity * Math.sin(theta) };
+  }
+  function classify(hole, r) {
+    var e = Math.abs(hole.error);
+    if (e === 0) return 'exact';
+    if (e === r) return 'radius';
+    if (e === 2 * r) return 'double';
+    return 'other';
+  }
+
+  // ---- Stage 2: tool length (Z) -----------------------------------------------
+  // Z is positive upward. The part's top surface is Z = 0. The readout follows the
+  // spindle and was set to read the REFERENCE tool's tip height. A tool touched
+  // onto a gauge of thickness g has its tip at Z = g, so
+  //   reading at touch-off = Z_surface + g + (L_tool − L_ref)
+  //   tool length value    = L_tool − L_ref  (relative to the reference tool)
+  // With a value applied, tip Z = reading − value. Lengths are gauge line to tip.
+  var TOOLS = Object.freeze({
+    t1: Object.freeze({ id: 't1', label: 'T1 · 10 mm end mill (reference)', short: 'T1', length: 82000 }),
+    t2: Object.freeze({ id: 't2', label: 'T2 · 6 mm drill', short: 'T2', length: 109500 })
+  });
+  var GAUGES = Object.freeze({ g0: 0, g10: 10000 });
+  function tool(id) { if (!Object.prototype.hasOwnProperty.call(TOOLS, id)) throw new RangeError('Choose T1 or T2'); return TOOLS[id]; }
+  function gauge(g) { int(g, 'Gauge thickness'); if (g !== 0 && g !== 10000) throw new RangeError('Gauge must be ideal contact (0 mm) or the 10.000 mm block'); return g; }
+  function lengthValue(id) { return tool(id).length - TOOLS.t1.length; }
+  function touchReading(id, g, surfaceZ) { var z = surfaceZ === undefined ? 0 : int(surfaceZ, 'Surface Z'); return z + gauge(g) + lengthValue(id); }
+  function tipZ(reading, value) { return int(reading, 'Reading') - int(value, 'Length value'); }
+
+  function mm(um) { var v = um / 1000; return (Math.abs(v) < 0.0005 ? 0 : v).toFixed(3); }
+  function signedMm(um) { return um > 0 ? '+' + mm(um) : um < 0 ? '−' + mm(-um) : mm(0); }
+
+  return Object.freeze({
+    SIDES: SIDES, TIPS: TIPS, PART: PART, HOLE_INSET: HOLE_INSET, START_GAP: START_GAP, ECCENTRIC: ECCENTRIC, KICK: KICK, STEPS: STEPS,
+    TOOLS: TOOLS, GAUGES: GAUGES,
+    side: side, tip: tip, edge: edge, middle: middle, edgeFromReading: edgeFromReading, triggerReading: triggerReading,
+    correctSetting: correctSetting, holeTarget: holeTarget, create: create, validate: validate, distance: distance, contact: contact,
+    readings: readings, jog: jog, atGap: atGap, parseMillimetres: parseMillimetres, setReadout: setReadout, holeFor: holeFor,
+    drill: drill, whatIf: whatIf, tipOffset: tipOffset, classify: classify,
+    lengthValue: lengthValue, touchReading: touchReading, tipZ: tipZ, mm: mm, signedMm: signedMm
+  });
+});
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiEdgeFinderZero);
+  if (node) module.exports = api; else root.CourseWikiEdgeFinderZeroDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  // Pure string renderers shared by the live lab and the static (print/no-JS) lesson.
+  function n2(v) { return (Math.round(v * 100) / 100).toFixed(2).replace(/\.00$/, ''); }
+  function esc(v) { return String(v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  var mm = M.mm, sm = M.signedMm;
+  var PHASE_TEXT = { free: 'Wobbling: tip runs off-centre, not touching', centring: 'Centring: tip touches and runs nearly concentric', kick: 'Kick: trigger reached' };
+  function axisName(st) { return M.SIDES[st.side].axis.toUpperCase(); }
+  function sideWord(st) { return M.SIDES[st.side].label.toLowerCase(); }
+
+  // 45° section hatching clipped to a rectangle, without SVG ids (mounts stay independent).
+  function hatch(x, y, w, h, gap) {
+    var d = '';
+    for (var k = gap; k < w + h; k += gap) {
+      var x1 = x + Math.max(0, k - h), y1 = y + Math.min(k, h), x2 = x + Math.min(k, w), y2 = y + Math.max(0, k - w);
+      d += 'M' + n2(x1) + ' ' + n2(y1) + 'L' + n2(x2) + ' ' + n2(y2);
+    }
+    return d;
+  }
+  // ---- Close-up: magnified top view and matching side view ----------------------
+  var CK = 0.014;                     // px per µm (14 px per mm)
+  var C_EDGE = 320, C_TOP = 128, C_SURF = 268;
+  function closeGeometry(st, theta) {
+    var c = M.contact(st), n = M.SIDES[st.side].n, off = M.tipOffset(c, theta);
+    var axisX = C_EDGE + n * c.d * CK;
+    return { c: c, n: n, axisX: axisX, dx: -n * off.u * CK, dy: -off.v * CK, rr: st.r * CK };
+  }
+  function tipTransforms(st, theta) {
+    var g = closeGeometry(st, theta);
+    return { top: 'translate(' + n2(g.dx) + ' ' + n2(g.dy) + ')', side: 'translate(' + n2(g.dx) + ' 0)' };
+  }
+  function closeup(st, theta, opts) {
+    opts = opts || {};
+    var g = closeGeometry(st, theta === undefined ? 0 : theta), c = g.c, n = g.n, ax = g.axisX, rr = g.rr;
+    var partX = n < 0 ? C_EDGE : 0, partW = n < 0 ? 640 - C_EDGE : C_EDGE;
+    var t = tipTransforms(st, theta === undefined ? 0 : theta);
+    var viewWord = M.SIDES[st.side].axis === 'x' ? 'Side view from the front' : 'Side view from the right';
+    var label = 'Magnified close-up of the ' + sideWord(st) + '. ' + PHASE_TEXT[c.phase] + '. ' +
+      (c.phase === 'kick' ? 'Spindle centre has reached or passed the trigger point.' : 'Gap to the trigger point ' + mm(c.gap) + ' mm.');
+    var gapText = c.phase === 'kick' ? 'Kick: trigger reached' : 'To trigger: ' + mm(c.gap) + ' mm';
+    var off = ax < -rr || ax > 640 + rr;
+    var labelX = n < 0 ? 630 : 10, labelAnchor = n < 0 ? 'end' : 'start';
+    return '<svg class="efz-svg efz-close" viewBox="0 0 640 360" role="img" aria-label="' + esc(label) + '" focusable="false" data-phase="' + c.phase + '">' +
+      '<rect class="efz-part" x="' + partX + '" y="40" width="' + partW + '" height="176"/>' +
+      '<path class="efz-face" d="M' + C_EDGE + ' 40V216"/>' +
+      '<text class="efz-small" x="' + labelX + '" y="70" text-anchor="' + labelAnchor + '">part</text>' +
+      '<text class="efz-small" x="' + labelX + '" y="28" text-anchor="' + labelAnchor + '">Top view, magnified</text>' +
+      '<text class="efz-small efz-orient" x="' + labelX + '" y="206" text-anchor="' + labelAnchor + '">' + (M.SIDES[st.side].axis === 'x' ? '→ +X   ↑ +Y' : 'turned 90°: → +Y   ↓ +X') + '</text>' +
+      // concentric reference ring and spindle axis
+      '<circle class="efz-ref" cx="' + n2(ax) + '" cy="' + C_TOP + '" r="' + n2(rr) + '"/>' +
+      '<path class="efz-axis" d="M' + n2(ax - 10) + ' ' + C_TOP + 'H' + n2(ax + 10) + 'M' + n2(ax) + ' ' + (C_TOP - 10) + 'V' + (C_TOP + 10) + '"/>' +
+      '<g class="efz-tip-top" transform="' + t.top + '"><circle class="efz-tip" cx="' + n2(ax) + '" cy="' + C_TOP + '" r="' + n2(rr) + '"/><circle class="efz-tip-dot" cx="' + n2(ax) + '" cy="' + C_TOP + '" r="3"/></g>' +
+      // Motion marks above the tip: the kick throws it sideways along the edge.
+      (c.phase === 'kick' ? '<path class="efz-kickmark" d="M' + n2(ax - 16) + ' ' + n2(C_TOP - rr - 20) + 'l-7 -14M' + n2(ax) + ' ' + n2(C_TOP - rr - 22) + 'v-16M' + n2(ax + 16) + ' ' + n2(C_TOP - rr - 20) + 'l7 -14"/>' : '') +
+      (off ? '<text class="efz-small" x="' + (n < 0 ? 12 : 628) + '" y="200" text-anchor="' + (n < 0 ? 'start' : 'end') + '">' + (n < 0 ? '← ' : '') + 'edge finder out of frame' + (n < 0 ? '' : ' →') + '</text>' : '') +
+      // side view
+      '<path class="efz-divider" d="M0 226H640"/>' +
+      '<text class="efz-small" x="' + labelX + '" y="254" text-anchor="' + labelAnchor + '">' + viewWord + '</text>' +
+      '<rect class="efz-part" x="' + partX + '" y="' + C_SURF + '" width="' + partW + '" height="' + (360 - C_SURF) + '"/><path class="efz-hatch" d="' + hatch(partX, C_SURF, partW, 360 - C_SURF, 14) + '"/>' +
+      '<path class="efz-face" d="M' + C_EDGE + ' ' + C_SURF + 'V360M' + partX + ' ' + C_SURF + 'h' + partW + '"/>' +
+      '<path class="efz-axis efz-centerline" d="M' + n2(ax) + ' 232V352"/>' +
+      '<g class="efz-tip-side" transform="' + t.side + '"><rect class="efz-tip" x="' + n2(ax - rr) + '" y="232" width="' + n2(2 * rr) + '" height="92"/></g>' +
+      '<text class="efz-gap" x="' + labelX + '" y="' + (C_SURF + 36) + '" text-anchor="' + labelAnchor + '">' + esc(gapText) + '</text>' +
+      '</svg>';
+  }
+
+  // ---- Top view of the part, true scale ------------------------------------------
+  var TS = 0.0036, TCX = 320, TCY = 250;
+  function tx(x) { return TCX + (x - M.middle('x')) * TS; }
+  function ty(y) { return TCY - (y - M.middle('y')) * TS; }
+  function holeScreen(st, hole) {
+    var s = M.SIDES[st.side];
+    return s.axis === 'x' ? { x: tx(hole.at), y: ty(M.middle('y')) } : { x: tx(M.middle('x')), y: ty(hole.at) };
+  }
+  function holeMark(st, hole) {
+    var p = holeScreen(st, hole), r = 2000 * TS;
+    var cls = hole.kind === 'yours' ? 'efz-hole' : hole.kind === 'forgot' ? 'efz-hole-forgot' : hole.kind === 'sign' ? 'efz-hole-sign' : 'efz-hole-ok';
+    var extra = hole.kind === 'sign' ? '<circle class="efz-hole-sign" cx="' + n2(p.x) + '" cy="' + n2(p.y) + '" r="' + n2(r + 4) + '"/>' : '';
+    return '<g data-hole="' + esc(hole.kind) + '" data-cx="' + n2(p.x) + '" data-cy="' + n2(p.y) + '"><circle class="' + cls + '" cx="' + n2(p.x) + '" cy="' + n2(p.y) + '" r="' + n2(r) + '"/>' + extra + '</g>';
+  }
+  function topView(st, opts) {
+    opts = opts || {};
+    var s = M.SIDES[st.side], P = M.PART, holes = (st.holes || []).concat(opts.extra || []);
+    var x0 = tx(P.x0), x1 = tx(P.x1), yb = ty(P.y1), yf = ty(P.y0);
+    var E = M.edge(st.side), H = M.holeTarget(st.side), target = E + H;
+    var ip = s.axis === 'x' ? { x: tx(target), y: ty(M.middle('y')) } : { x: tx(M.middle('x')), y: ty(target) };
+    var datum = s.axis === 'x' ? 'M' + n2(tx(E)) + ' ' + n2(yb) + 'V' + n2(yf) : 'M' + n2(x0) + ' ' + n2(ty(E)) + 'H' + n2(x1);
+    var sp = opts.spindle || st.pos, spx = tx(sp.x), spy = ty(sp.y), rr = st.r * TS;
+    // Dimension from the datum edge to the drawn hole.
+    var dim, dimText;
+    if (s.axis === 'x') {
+      var dy = ty(M.middle('y')) + 36;
+      dim = 'M' + n2(tx(E)) + ' ' + n2(dy) + 'H' + n2(ip.x) + 'M' + n2(ip.x) + ' ' + n2(ip.y + 10) + 'V' + n2(dy + 6);
+      dimText = '<text class="efz-small" x="' + n2((tx(E) + ip.x) / 2) + '" y="' + n2(dy + 24) + '" text-anchor="middle">20</text>';
+    } else {
+      var dx = tx(M.middle('x')) + 40;
+      dim = 'M' + n2(dx) + ' ' + n2(ty(E)) + 'V' + n2(ip.y) + 'M' + n2(ip.x + 10) + ' ' + n2(ip.y) + 'H' + n2(dx + 6);
+      dimText = '<text class="efz-small" x="' + n2(dx + 10) + '" y="' + n2((ty(E) + ip.y) / 2 + 7) + '">20</text>';
+    }
+    var datumLabelPos = s.axis === 'x' ? { x: tx(E), y: yb - 12, a: 'middle' } : { x: x1 + 10, y: ty(E) + 7, a: 'start' };
+    var label = 'Top view of the 100 by 60 mm part, true scale. Datum: the ' + sideWord(st) + ', ' + axisName(st) + ' 0 after setting. Drawn check hole 20 mm inside it.' +
+      (holes.length ? ' ' + holes.map(function (h) { return h.label + ' ' + mm(h.fromEdge) + ' mm from the edge'; }).join('; ') + '.' : ' No hole drilled yet.');
+    return '<svg class="efz-svg efz-top" viewBox="0 0 640 470" role="img" aria-label="' + esc(label) + '" focusable="false">' +
+      '<text class="efz-small" x="18" y="28">Top view, true scale</text>' +
+      '<rect class="efz-part" x="' + n2(x0) + '" y="' + n2(yb) + '" width="' + n2(x1 - x0) + '" height="' + n2(yf - yb) + '"/>' +
+      '<path class="efz-datum" d="' + datum + '"/>' +
+      '<text class="efz-datum-label" x="' + n2(datumLabelPos.x) + '" y="' + n2(datumLabelPos.y) + '" text-anchor="' + datumLabelPos.a + '">datum ' + axisName(st) + ' 0</text>' +
+      '<path class="efz-dim" d="' + dim + '"/>' + dimText +
+      '<circle class="efz-intended" cx="' + n2(ip.x) + '" cy="' + n2(ip.y) + '" r="' + n2(2000 * TS + 3) + '"/>' +
+      '<path class="efz-intended-cross" d="M' + n2(ip.x - 14) + ' ' + n2(ip.y) + 'H' + n2(ip.x + 14) + 'M' + n2(ip.x) + ' ' + n2(ip.y - 14) + 'V' + n2(ip.y + 14) + '"/>' +
+      holes.map(function (h) { return holeMark(st, h); }).join('') +
+      '<g class="efz-spindle" data-sx="' + n2(spx) + '" data-sy="' + n2(spy) + '">' + (opts.spindle ? '' : '<circle class="efz-tip-true" cx="' + n2(spx) + '" cy="' + n2(spy) + '" r="' + n2(rr) + '"/>') + '<path class="efz-axis" d="M' + n2(spx - 8) + ' ' + n2(spy) + 'H' + n2(spx + 8) + 'M' + n2(spx) + ' ' + n2(spy - 8) + 'V' + n2(spy + 8) + '"/></g>' +
+      '<path class="efz-axes" d="M30 446H90M82 440L90 446L82 452M30 446V386M24 394L30 386L36 394"/>' +
+      '<text class="efz-small" x="96" y="453">+X</text><text class="efz-small" x="40" y="392">+Y (back)</text>' +
+      '<text class="efz-small" x="622" y="453" text-anchor="end">front (operator side)</text>' +
+      '</svg>';
+  }
+
+  // ---- Magnified ruler: where each hole lands, measured from the datum edge -----------
+  var RK = 20, RMIN = -2000, RMAX = 27000;          // 20 px per mm over −2 … 27 mm
+  function rulerX(um) { return 40 + (um - RMIN) / 1000 * RK; }
+  function latestByKind(holes) {
+    var out = {}; holes.forEach(function (h) { out[h.kind === 'correct' ? 'yours' : h.kind] = h; });
+    return ['yours', 'forgot', 'sign'].filter(function (k) { return out[k]; }).map(function (k) { return out[k]; });
+  }
+  function holeRuler(st, holes) {
+    var shown = latestByKind(holes || st.holes), ticks = '', nums = '';
+    for (var m = -2; m <= 27; m++) {
+      var x = rulerX(m * 1000), big = m % 5 === 0;
+      ticks += 'M' + n2(x) + ' 44V' + (big ? 30 : 37);
+      if (big) nums += '<text class="efz-small" x="' + n2(x) + '" y="24" text-anchor="middle">' + m + '</text>';
+    }
+    var lanes = shown.map(function (h, i) {
+      var y = 80 + i * 38, clamped = Math.max(RMIN, Math.min(RMAX, h.fromEdge)), x = rulerX(clamped), off = clamped !== h.fromEdge;
+      var word = h.kind === 'yours' || h.kind === 'correct' ? h.label.toLowerCase() : h.kind === 'forgot' ? 'radius forgotten' : 'wrong sign';
+      var text = word + ' ' + (clamped !== h.fromEdge ? '(off scale) ' : '') + mm(h.fromEdge), right = x + 14 + text.length * 12.5 > 632;
+      var cls = h.kind === 'forgot' ? 'efz-hole-forgot' : h.kind === 'sign' ? 'efz-hole-sign' : 'efz-hole';
+      return '<g data-ruler="' + esc(h.kind) + '" data-x="' + n2(x) + '"><path class="efz-lane" d="M' + n2(x) + ' 44V' + (y - 8) + '"/><circle class="' + cls + '" cx="' + n2(x) + '" cy="' + y + '" r="7"/>' +
+        '<text class="efz-small efz-halo" x="' + n2(right ? x - 14 : x + 14) + '" y="' + (y + 8) + '" text-anchor="' + (right ? 'end' : 'start') + '">' + esc(text) + '</text></g>';
+    }).join('');
+    var label = 'Magnified scale of distance from the datum edge, 20 mm drawn at 20.000. ' + (shown.length ? shown.map(function (h) { return h.label + ' at ' + mm(h.fromEdge) + ' mm'; }).join('; ') + '.' : 'No holes yet.');
+    return '<svg class="efz-svg efz-ruler" viewBox="0 0 640 ' + (shown.length ? 62 + shown.length * 38 : 62) + '" role="img" aria-label="' + esc(label) + '" focusable="false">' +
+      '<rect class="efz-part" x="' + n2(rulerX(0)) + '" y="44" width="' + n2(rulerX(RMAX) - rulerX(0) + 20) + '" height="200"/>' +
+      '<path class="efz-datum" d="M' + n2(rulerX(0)) + ' 30V250"/>' +
+      '<path class="efz-axes" d="M' + n2(rulerX(RMIN)) + ' 44H' + n2(rulerX(RMAX)) + ticks + '"/>' + nums +
+      '<path class="efz-target" d="M' + n2(rulerX(20000)) + ' 30V250"/>' + lanes + '</svg>';
+  }
+
+  // ---- Readout, holes and explanations --------------------------------------------
+  function dro(st) {
+    var r = M.readings(st), c = M.contact(st), a = M.SIDES[st.side].axis;
+    function row(k) { return '<div class="efz-dro-row' + (k === a ? ' is-active' : '') + '"><span class="efz-dro-axis">' + k.toUpperCase() + '</span><output class="efz-dro-value" data-efz-dro="' + k + '">' + sm(r[k]) + '</output><span class="efz-dro-unit">mm</span></div>'; }
+    return '<div class="efz-dro" data-phase="' + c.phase + '">' + row('x') + row('y') +
+      '<p class="efz-phase" data-efz-phase="' + c.phase + '"><strong>' + (c.phase === 'kick' ? 'KICK' : c.phase === 'centring' ? 'Centring' : 'Wobbling') + '</strong> ' + esc(PHASE_TEXT[c.phase].split(': ')[1]) + '</p></div>';
+  }
+  function holeRows(st, holes) {
+    return holes.map(function (h) {
+      var cls = M.classify(h, st.r), mult = cls === 'radius' ? ' (1 r)' : cls === 'double' ? ' (2 r)' : '';
+      return '<tr data-kind="' + esc(h.kind) + '"><th scope="row"><span class="efz-key efz-key-' + esc(h.kind) + '" aria-hidden="true"></span>' + esc(h.label) + '</th><td>' + sm(h.setting) + '</td><td>' + mm(h.fromEdge) + '</td><td>' + (h.inwardError === 0 ? '0.000' : (h.inwardError < 0 ? mm(-h.inwardError) + ' toward edge' : mm(h.inwardError) + ' away from edge') + mult) + '</td></tr>';
+    }).join('');
+  }
+  function holeTable(st, holes) {
+    holes = holes || st.holes;
+    if (!holes.length) return '<p class="efz-empty">No check holes yet.</p>';
+    return '<div class="efz-table-wrap"><table class="efz-table"><caption>Check holes: drawing says 20.000 mm from the ' + sideWord(st) + '</caption><thead><tr><th scope="col">Hole</th><th scope="col">Readout set at kick (mm)</th><th scope="col">Lands from edge (mm)</th><th scope="col">Off by (mm)</th></tr></thead><tbody>' + holeRows(st, holes) + '</tbody></table></div>';
+  }
+  function rule(st) {
+    var s = M.SIDES[st.side], plus = s.n < 0;
+    return 'Approaching the ' + sideWord(st) + ' moving ' + s.move + ': edge ' + s.axis.toUpperCase() + ' = reading ' + (plus ? '+' : '−') + ' r. To make the edge read 0, set the readout to ' + sm(M.correctSetting(st.side, st.r)) + ' mm at the kick.';
+  }
+  // Separates the ideal setting contribution (0, r, 2r …) from the signed overshoot,
+  // then states the net shift and where the readout's zero really lies.
+  function explain(st, hole) {
+    var s = M.SIDES[st.side], r = st.r, right = M.correctSetting(st.side, r);
+    var settingPart = s.n * hole.setting - r, over = hole.overshoot, net = hole.inwardError;
+    function dir(v) { return v < 0 ? 'toward the edge' : 'away from the edge'; }
+    var out = [hole.label + ' lands ' + mm(hole.fromEdge) + ' mm from the ' + sideWord(st) + (net === 0 ? ', exactly as drawn.' : ', ' + mm(Math.abs(net)) + ' mm ' + (net < 0 ? 'closer to the edge' : 'further from the edge') + ' than the drawn 20.000 mm.')];
+    if (settingPart === 0) out.push(over ? 'The setting ' + sm(right) + ' mm is correct for this side, so it contributes nothing.' : 'At the kick the spindle centre was one radius (' + mm(r) + ' mm) outside the edge, so the readout had to read ' + sm(right) + ' mm there.');
+    else if (hole.setting === 0) out.push('At the exact trigger, the spindle centre is one radius outside the edge. Setting 0 there puts zero at the spindle centre: the forgotten radius contributes r = ' + mm(r) + ' mm toward the edge.');
+    else if (hole.setting === -right) out.push('At the exact trigger, the spindle centre is one radius outside the edge. The wrong sign moves zero a second radius further out: the wrong sign contributes 2r = ' + mm(2 * r) + ' mm toward the edge.');
+    else out.push('The setting differs from the correct ' + sm(right) + ' mm, contributing ' + mm(Math.abs(settingPart)) + ' mm ' + dir(settingPart) + '.');
+    if (over) out.push('The last jog went past the trigger by ' + mm(over) + ' mm, which moves the hole ' + mm(over) + ' mm away from the edge.');
+    if (over && settingPart) out.push('Net: ' + mm(Math.abs(settingPart)) + ' mm ' + (settingPart < 0 ? 'toward' : 'away') + ' and ' + mm(over) + ' mm away gives ' + (net === 0 ? '0.000 mm.' : mm(Math.abs(net)) + ' mm ' + dir(net) + '.'));
+    out.push(hole.zeroOutside === 0 ? 'Zero is exactly on the edge.' : hole.zeroOutside > 0 ? 'Zero lies ' + mm(hole.zeroOutside) + ' mm outside the edge.' : 'Zero lies ' + mm(-hole.zeroOutside) + ' mm inside the part.');
+    if (over) out.push('Back away and re-approach with finer steps.');
+    return out.join(' ');
+  }
+
+  // ---- Tool length side view --------------------------------------------------------
+  var ZS = 0.0021, ZSURF = 366, ZH = 420, RAISE = 8000;
+  function lengthView(g, shown, opts) {
+    opts = opts || {};
+    // shown: { t1: bool, t2: bool } — touched-off stations; others are drawn raised.
+    var stations = [{ id: 't1', x: 190 }, { id: 't2', x: 450 }];
+    var body = stations.map(function (s) {
+      var T = M.TOOLS[s.id], touched = shown && shown[s.id];
+      var raise = opts.raise && typeof opts.raise[s.id] === 'number' ? opts.raise[s.id] : touched ? 0 : RAISE;
+      var reading = M.touchReading(s.id, g);
+      var gaugeLine = ZSURF - (g + T.length + raise) * ZS, tipY = gaugeLine + T.length * ZS;
+      var w = (s.id === 't1' ? 10000 : 6000) * ZS;                  // diameter, same scale as length
+      var pt = s.id === 't2' ? 6000 / (2 * Math.tan(59 * Math.PI / 180)) * ZS : 0; // 118° point length
+      var block = g ? '<rect class="efz-block" x="' + (s.x - 34) + '" y="' + n2(ZSURF - g * ZS) + '" width="68" height="' + n2(g * ZS) + '"/>' : '';
+      return '<g data-station="' + s.id + '">' + block +
+        '<rect class="efz-spindle-nose" x="' + (s.x - 40) + '" y="' + n2(gaugeLine - 34) + '" width="80" height="34"/>' +
+        '<path class="efz-gauge-line" d="M' + (s.x - 62) + ' ' + n2(gaugeLine) + 'H' + (s.x + 62) + '"/>' +
+        (s.id === 't2' ? '<path class="efz-drill-point" d="M' + n2(s.x - w / 2) + ' ' + n2(tipY - pt) + 'L' + s.x + ' ' + n2(tipY) + 'L' + n2(s.x + w / 2) + ' ' + n2(tipY - pt) + 'Z"/>' : '') +
+        '<rect class="efz-tool" data-diameter-px="' + n2(w) + '" x="' + n2(s.x - w / 2) + '" y="' + n2(gaugeLine) + '" width="' + n2(w) + '" height="' + n2(T.length * ZS - pt) + '"/>' +
+        '<path class="efz-dim" d="M' + (s.x + 52) + ' ' + n2(gaugeLine) + 'V' + n2(tipY) + 'M' + (s.x + 46) + ' ' + n2(tipY) + 'H' + (s.x + 58) + '"/>' +
+        '<text class="efz-small" x="' + (s.x + 60) + '" y="' + n2((gaugeLine + tipY) / 2) + '">L ' + mm(T.length) + '</text>' +
+        '<text class="efz-label" x="' + s.x + '" y="' + n2(gaugeLine - 44) + '" text-anchor="middle">' + T.short + (touched ? ' · Z ' + sm(reading) : raise > 0 ? ' · raised' : '') + '</text>' +
+        '</g>';
+    }).join('');
+    var label = 'Side view of two tools touched off on the part top' + (g ? ' through a ' + mm(g) + ' mm block' : '') + '. T1 length ' + mm(M.TOOLS.t1.length) + ' mm, T2 length ' + mm(M.TOOLS.t2.length) + ' mm from the spindle gauge line. ' +
+      (shown && shown.t1 ? 'T1 reads Z ' + sm(M.touchReading('t1', g)) + '. ' : '') + (shown && shown.t2 ? 'T2 reads Z ' + sm(M.touchReading('t2', g)) + '.' : '');
+    return '<svg class="efz-svg efz-length" viewBox="0 0 640 ' + ZH + '" role="img" aria-label="' + esc(label) + '" focusable="false">' +
+      '<text class="efz-small" x="18" y="28">Side view: tool lengths and diameters to scale</text>' +
+      body +
+      '<rect class="efz-part" x="40" y="' + ZSURF + '" width="560" height="' + (ZH - ZSURF) + '"/>' +
+      '<path class="efz-face" d="M40 ' + ZSURF + 'H600"/>' +
+      '<text class="efz-small" x="48" y="' + (ZSURF + 30) + '">part top, Z 0</text>' +
+      '</svg>';
+  }
+  function lengthTable(g) {
+    return '<div class="efz-table-wrap"><table class="efz-table"><caption>Touch-off ' + (g ? 'through a ' + mm(g) + ' mm block' : 'with ideal zero-thickness contact') + '</caption><thead><tr><th scope="col">Tool</th><th scope="col">Length, gauge line to tip (mm)</th><th scope="col">Z reading at touch-off (mm)</th><th scope="col">Length value vs T1 (mm)</th></tr></thead><tbody>' +
+      ['t1', 't2'].map(function (id) { var T = M.TOOLS[id]; return '<tr><th scope="row">' + esc(T.label) + '</th><td>' + mm(T.length) + '</td><td>' + sm(M.touchReading(id, g)) + '</td><td>' + sm(M.lengthValue(id)) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  }
+
+  // ---- Static lessons (inside the mounts; regenerated by static.cjs) -------------------
+  var SOURCES = '<p class="efz-source">Sources: <a href="https://ocw.mit.edu/courses/2-670-mechanical-engineering-tools-january-iap-2004/69ddc43986801c51a7fbfa97d6b5b63f_mill.pdf">MIT 2.670, Milling Machine</a>, “Using an Edge Finder”, p. 6; <a href="https://www.starrett.co.uk/products/precision-hand-tools/edge-finders/edge-finders-edge-finders/827mb-edge-finder/">Starrett 827MB</a> and <a href="https://www.starrett.co.uk/products/precision-hand-tools/edge-finders/edge-finders-edge-finders/827a-edge-finder/">827A</a> product pages (how to use; 6 mm and 0.200 in contact diameters). The part, readings and drawings are original illustrations.</p>';
+  function sidesTable() {
+    return '<div class="efz-table-wrap"><table class="efz-table"><caption>The sign depends on the side approached (+X right, +Y toward the back)</caption><thead><tr><th scope="col">Edge</th><th scope="col">Spindle approaches moving</th><th scope="col">Edge position</th><th scope="col">Set readout at the kick (10 mm contact)</th></tr></thead><tbody>' +
+      ['left', 'right', 'front', 'back'].map(function (id) { var s = M.SIDES[id]; return '<tr><th scope="row">' + s.label + '</th><td>' + s.move + '</td><td>' + s.axis.toUpperCase() + ' = reading ' + (s.n < 0 ? '+' : '−') + ' r</td><td>' + sm(M.correctSetting(id, 5000)) + ' mm</td></tr>'; }).join('') + '</tbody></table></div>';
+  }
+  function staticLesson() {
+    var base = M.create('left', 'd10');
+    var wob = base, cen = M.atGap(base, 200), kick = M.atGap(base, 0);
+    var done = M.drill(M.setReadout(kick, -5000));
+    var extra = [M.whatIf(done, 'forgot'), M.whatIf(done, 'sign')];
+    var reading = M.readings(kick).x;
+    return '<div class="efz-static-grid">' +
+      '<figure class="efz-fig"><h3>Wobble, centre, kick</h3>' +
+      '<div class="efz-seq"><div><h4>Free: off-centre wobble</h4>' + closeup(wob, 0, { uid: 'sa' }) + '</div><div><h4>0.200 mm before the trigger: nearly concentric</h4>' + closeup(cen, 0, { uid: 'sb' }) + '</div><div><h4>At the trigger: the tip kicks sideways</h4>' + closeup(kick, 0, { uid: 'sc' }) + '</div></div>' +
+      '<figcaption>The offset tip orbits while free, is pushed concentric by the edge, then kicks when the spindle centre is one contact radius from the edge. The wobble and kick are drawn for illustration, not as contact mechanics.</figcaption></figure>' +
+      '<figure class="efz-fig"><h3>Where the check hole lands</h3>' + topView(done, { extra: extra }) + '<p class="efz-ruler-cap">Distance from the datum edge, magnified (mm); the dashed line is the drawing’s 20.000</p>' + holeRuler(done, done.holes.concat(extra)) +
+      '<figcaption>' + holeTable(done, done.holes.concat(extra)) + '</figcaption></figure></div>' +
+      sidesTable() +
+      '<p><strong>Worked example (left edge, 10 mm contact, r = 5 mm):</strong> at the kick the X readout shows ' + sm(reading) + ' mm in its old, arbitrary frame. The edge is at reading + r = ' + sm(reading) + ' + 5.000 = ' + sm(reading + 5000) + ' mm. Setting the readout to −5.000 mm at that position makes the edge read 0, and a hole programmed at X 20.000 lands 20.000 mm from the edge. Setting 0 instead (radius forgotten) puts the hole at 15.000 mm: off by r. Setting +5.000 (wrong sign) puts it at 10.000 mm: off by 2r.</p>' +
+      '<p><strong>Model:</strong> top view; positions are the spindle centre relative to the part, whichever of them actually moves. The trigger occurs when the spindle centre is exactly one contact radius (half the contact diameter, not the body diameter) from the edge, on the approach side. Lengths are exact to 0.001 mm; jog steps are 1, 0.1 and 0.01 mm. A step that crosses the trigger leaves the readout past it by up to one step. The other axis is assumed already located. Backlash, tip wear, edge condition and speed are not modelled; use the edge finder’s specified speed.</p>' + SOURCES;
+  }
+  function staticLength() {
+    var g = 10000;
+    return '<figure class="efz-fig"><h3>Two tools touched off on the same surface</h3>' + lengthView(g, { t1: true, t2: true }) + '<figcaption>' + lengthTable(g) + lengthTable(0) + '</figcaption></figure>' +
+      '<p><strong>Worked example:</strong> the readout follows the spindle and reads T1’s tip height, with the part top at Z 0. T2 is 27.500 mm longer than T1. Touching T2 onto a 10.000 mm block, the readout shows Z = 0 + 10.000 + (109.500 − 82.000) = +37.500 mm. T2’s length value is that reading minus the block: +27.500 mm. With that value applied, the tip Z is the reading minus 27.500. Without it, a move to Z +2.000 with T2 would put its tip at 2.000 − 27.500 = −25.500 mm: 25.500 mm below the part top.</p>' +
+      '<p><strong>Model:</strong> Z reading at touch-off = surface Z + gauge thickness + (L<sub>tool</sub> − L<sub>T1</sub>). Lengths run from the spindle gauge line to the tip and are illustrative. The gauge is either an ideal zero-thickness contact or a stated 10.000 mm block. Controls store and apply tool length in different ways; follow the control’s documentation for the actual offset entry.</p>';
+  }
+  return Object.freeze({ holeRuler: holeRuler, rulerX: rulerX, closeup: closeup, tipTransforms: tipTransforms, topView: topView, holeScreen: holeScreen, dro: dro, holeTable: holeTable, rule: rule, explain: explain,
+    lengthView: lengthView, lengthTable: lengthTable, RAISE: RAISE, staticLesson: staticLesson, staticLength: staticLength, PHASE_TEXT: PHASE_TEXT, TS: TS });
+});
+
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiEdgeFinderZero,
+    node ? require('./render.js') : root.CourseWikiEdgeFinderZeroDraw);
+  if (node) module.exports = api;
+  else if (typeof document !== 'undefined') document.querySelectorAll('[data-interactive="edge-finder-zero"]').forEach(api.init);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M, D) {
+  'use strict';
+  var sequence = 0;
+  function reducedMotion() { return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  function frame(fn) { return typeof requestAnimationFrame === 'function' ? requestAnimationFrame(fn) : setTimeout(function () { fn(Date.now()); }, 16); }
+  // Returns a handle; a cancelled tween never calls step or done again.
+  function tween(ms, step, done) {
+    var handle = { cancelled: false, cancel: function () { handle.cancelled = true; } };
+    if (reducedMotion() || ms <= 0) { step(1); done(); return handle; }
+    var start = null;
+    frame(function tick(now) {
+      if (handle.cancelled) return;
+      if (start === null) start = now;
+      var t = Math.min(1, (now - start) / ms), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      step(e);
+      if (t < 1) frame(tick); else done();
+    });
+    return handle;
+  }
+  function nextId() { var id; do { id = 'efz-' + (++sequence); } while (document.getElementById(id + '-set')); return id; }
+
+  function init(root) {
+    if (root.dataset.efzReady || !M || !D) return;
+    if (root.getAttribute('data-efz-stage') === 'length') initLength(root); else initEdge(root);
+    root.dataset.efzReady = 'true'; root.classList.add('efz-live');
+  }
+
+  // ---------------------------------------------------------------- edge stage
+  function initEdge(root) {
+    var id = nextId();
+    var st = M.create('left', 'd10'), extras = [], spindleAt = null, theta = 0, paused = false, visible = true, busy = false, yours = 0, lastStep = null;
+    var generation = 0, anim = null;   // any setup change invalidates in-flight animations
+    function cancelAnimation() { generation += 1; if (anim) anim.cancel(); anim = null; busy = false; }
+    var lab = document.createElement('div'); lab.className = 'efz-lab';
+    var sideRadios = ['left', 'right', 'front', 'back'].map(function (s) { return '<label class="efz-seg"><input type="radio" name="' + id + '-side" value="' + s + '"' + (s === 'left' ? ' checked' : '') + '><span>' + M.SIDES[s].label + '</span></label>'; }).join('');
+    var stepRadios = M.STEPS.map(function (s, i) { return '<label class="efz-seg"><input type="radio" name="' + id + '-step" value="' + s + '"' + (i === 0 ? ' checked' : '') + '><span>' + (s / 1000) + ' mm</span></label>'; }).join('');
+    var tipOptions = Object.keys(M.TIPS).map(function (k) { return '<option value="' + k + '">' + M.TIPS[k].label + '</option>'; }).join('');
+    lab.innerHTML =
+      '<p class="efz-challenge"><strong>Challenge:</strong> find the <span data-efz-word>left edge</span> with a mechanical edge finder, set the readout so that edge reads <span data-efz-axis>X</span> 0, then drill a check hole that the drawing puts 20.000 mm inside it.</p>' +
+      '<div class="efz-setup"><fieldset class="efz-group"><legend>Edge to find</legend><div class="efz-segs">' + sideRadios + '</div></fieldset>' +
+      '<div class="efz-group"><label for="' + id + '-tip">Contact diameter</label><select id="' + id + '-tip" data-efz-tip>' + tipOptions + '</select></div></div>' +
+      '<p class="efz-convention" data-efz-convention></p>' +
+      '<div class="efz-bench"><div class="efz-pair">' +
+      '<div class="efz-view"><div class="efz-close-wrap" data-efz-close tabindex="0" role="group" aria-label="Edge finder close-up. Arrow keys jog along the approach axis." aria-describedby="' + id + '-keys"></div>' +
+      '<div class="efz-actions efz-view-actions"><button type="button" data-efz-pause aria-pressed="false">Pause spin</button><button type="button" data-efz-reset>Start this edge again</button></div></div>' +
+      '<div class="efz-controls">' +
+      '<div class="efz-row"><div data-efz-dro></div>' +
+      '<div class="efz-jogbox"><fieldset class="efz-group"><legend>Jog step</legend><div class="efz-segs">' + stepRadios + '</div></fieldset>' +
+      '<div class="efz-jog" role="group" aria-label="Jog the spindle"><button type="button" data-efz-move="-1"></button><button type="button" data-efz-move="1"></button></div></div></div>' +
+      '<p class="efz-hint" id="' + id + '-keys">Keyboard: focus the close-up or a jog button, then use the arrow keys along the axis.</p>' +
+      '<p class="efz-feedback" data-efz-feedback role="status" aria-live="polite"></p>' +
+      '<div class="efz-set"><label for="' + id + '-set">Set the <span data-efz-axis>X</span> readout at this position to (mm)</label>' +
+      '<div class="efz-set-row"><input id="' + id + '-set" data-efz-input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="reach the kick first">' +
+      '<button type="button" data-efz-setbtn>Set readout</button><button type="button" data-efz-drill>Drill check hole</button></div></div>' +
+      '</div></div>' +
+      '<div class="efz-drawing"><div data-efz-top></div><p class="efz-ruler-cap">Distance from the datum edge, magnified (mm); the dashed line is the drawing’s 20.000</p><div data-efz-ruler></div></div>' +
+      '</div>' +
+      '<div data-efz-holes></div>' +
+      '<fieldset class="efz-mistakes"><legend>Mistake mode: same kick, different setting</legend>' +
+      '<p>Predict first: compared with the drawing, how far does a <strong>wrong-sign</strong> hole move?</p>' +
+      '<div class="efz-segs">' + ['0', 'r', '2r'].map(function (v) { return '<label class="efz-seg"><input type="radio" name="' + id + '-predict" value="' + v + '"><span>' + v + '</span></label>'; }).join('') + '</div>' +
+      '<div class="efz-actions"><button type="button" data-efz-what="forgot">Forget the radius (set 0)</button><button type="button" data-efz-what="sign">Use the wrong sign</button></div>' +
+      '<p data-efz-what-feedback role="status" aria-live="polite">Reach the kick first; these stamp extra holes without changing your setting.</p></fieldset>' +
+      '<p class="efz-rule" data-efz-rule hidden></p>';
+    root.append(lab);
+    function q(s) { return lab.querySelector(s); }
+    function qa(s) { return Array.prototype.slice.call(lab.querySelectorAll(s)); }
+    var closeWrap = q('[data-efz-close]'), input = q('[data-efz-input]');
+    function say(text) { q('[data-efz-feedback]').textContent = text; }
+    function step() { var c = q('input[name="' + id + '-step"]:checked'); return Number(c ? c.value : 1000); }
+
+    function renderClose() {
+      closeWrap.innerHTML = D.closeup(st, theta, { uid: id });
+      closeWrap.classList.toggle('is-kicked', M.contact(st).phase === 'kick');
+    }
+    function renderTop() { q('[data-efz-top]').innerHTML = D.topView(st, { extra: extras, spindle: spindleAt || undefined }); q('[data-efz-ruler]').innerHTML = D.holeRuler(st, st.holes.concat(extras)); }
+    function update() {
+      var s = M.SIDES[st.side], c = M.contact(st), axis = s.axis.toUpperCase();
+      renderClose(); renderTop();
+      q('[data-efz-dro]').innerHTML = D.dro(st);
+      q('[data-efz-holes]').innerHTML = D.holeTable(st, st.holes.concat(extras));
+      qa('[data-efz-axis]').forEach(function (n) { n.textContent = axis; });
+      q('[data-efz-word]').textContent = s.label.toLowerCase();
+      q('[data-efz-convention]').textContent = 'Convention: +X points right, +Y points toward the back (away from you). Readings are the spindle centre relative to the part. Contact radius r = ' + M.mm(st.r) + ' mm (half the contact diameter).';
+      var neg = q('[data-efz-move="-1"]'), pos = q('[data-efz-move="1"]');
+      var negToward = s.n > 0; // moving in −axis approaches right/back edges
+      var arrows = s.axis === 'x' ? ['←', '→'] : ['↓', '↑'];
+      neg.textContent = arrows[0] + ' ' + (negToward ? 'Toward edge' : 'Away') + ' (−' + axis + ')';
+      pos.textContent = arrows[1] + ' ' + (negToward ? 'Away' : 'Toward edge') + ' (+' + axis + ')';
+      var kicked = c.phase === 'kick';
+      q('[data-efz-setbtn]').disabled = busy || !kicked;
+      input.disabled = busy || !kicked;
+      input.placeholder = kicked ? 'value in mm' : 'reach the kick first';
+      q('[data-efz-drill]').disabled = busy || !st.setting;
+      qa('[data-efz-what]').forEach(function (b) { b.disabled = busy || !kicked; });
+      qa('[data-efz-move]').forEach(function (b) { b.disabled = busy; });
+    }
+    function reset(message) {
+      cancelAnimation();
+      var sideId = q('input[name="' + id + '-side"]:checked').value, tipId = q('[data-efz-tip]').value;
+      st = M.create(sideId, tipId); extras = []; spindleAt = null; yours = 0; lastStep = null; input.value = '';
+      q('[data-efz-rule]').hidden = true; q('[data-efz-what-feedback]').textContent = 'Reach the kick first; these stamp extra holes without changing your setting.';
+      update(); say(message || 'Jog toward the edge. Watch the tip: it wobbles, centres, then kicks.');
+    }
+    function jog(direction) {
+      if (busy) return;
+      var before = M.contact(st).phase, s = step();
+      try { st = M.jog(st, direction, s); } catch (e) { say(e.message + '.'); return; }
+      spindleAt = null; lastStep = s;
+      var c = M.contact(st);
+      update();
+      if (c.phase === 'kick' && before !== 'kick') {
+        say('Kick! It appeared during a ' + (s / 1000) + ' mm step, so the trigger lies within that last step. ' + (s > 10 ? 'For a precise reading, back away and re-approach with a finer step. ' : '') + 'Now decide what the ' + M.SIDES[st.side].axis.toUpperCase() + ' readout should read here.');
+        input.focus({ preventScroll: true });
+      } else if (c.phase === 'centring' && before === 'free') say('Contact: the tip is being pushed toward concentric. Slow down: switch to a finer step.');
+      else if (c.phase === 'kick') say('Backed away ' + (s / 1000) + ' mm, still kicked.');
+      else say((direction > 0 ? 'Toward' : 'Away') + ' ' + (s / 1000) + ' mm. ' + D.PHASE_TEXT[c.phase] + '.');
+    }
+    function setReadout() {
+      if (busy) return;
+      var v;
+      try { v = M.parseMillimetres(input.value); st = M.setReadout(st, v); }
+      catch (e) { say(e.message + '. Nothing was changed.'); return; }
+      update(); say('Readout set: this position now reads ' + M.signedMm(v) + ' mm. Drill the check hole to see where your zero really is.');
+    }
+    function drill() {
+      if (busy || !st.setting) return;
+      var next; try { next = M.drill(st, yours ? 'Your hole ' + (yours + 1) : 'Your hole'); } catch (e) { say(e.message + '.'); return; }
+      var hole = next.holes[next.holes.length - 1], s = M.SIDES[st.side];
+      var target = { x: st.pos.x, y: st.pos.y }; target[s.axis] = hole.at;
+      var from = { x: (spindleAt || st.pos).x, y: (spindleAt || st.pos).y };
+      var token = generation;
+      busy = true; update();
+      anim = tween(700, function (e) {
+        if (token !== generation) return;
+        spindleAt = { x: from.x + (target.x - from.x) * e, y: from.y + (target.y - from.y) * e };
+        q('[data-efz-top]').innerHTML = D.topView(st, { extra: extras, spindle: spindleAt });
+      }, function () {
+        if (token !== generation) return;   // the edge, tip or run changed mid-travel
+        anim = null; busy = false; st = next; yours += 1; spindleAt = target;
+        update(); say(D.explain(st, hole));
+        var rule = q('[data-efz-rule]'); rule.hidden = false; rule.textContent = D.rule(st);
+      });
+    }
+    function whatIf(kind) {
+      var h; try { h = M.whatIf(st, kind); } catch (e) { q('[data-efz-what-feedback]').textContent = e.message + '.'; return; }
+      extras = extras.filter(function (x) { return x.kind !== kind; }).concat([h]);
+      update();
+      var predicted = q('input[name="' + id + '-predict"]:checked'), text = D.explain(st, h);
+      if (kind === 'sign' && predicted) {
+        text = (predicted.value === '2r' ? 'Your prediction, 2r, matches the wrong-sign contribution. ' : 'You predicted ' + predicted.value + '; the wrong sign contributes 2r. ') +
+          (h.overshoot ? 'This kick also carries a ' + M.mm(h.overshoot) + ' mm overshoot, so the net shift is ' + M.mm(Math.abs(h.inwardError)) + ' mm, not exactly 2r. ' : '') + text;
+      }
+      q('[data-efz-what-feedback]').textContent = text;
+      var rule = q('[data-efz-rule]'); rule.hidden = false; rule.textContent = D.rule(st);
+    }
+    // Arrow keys along the approach axis. Owned here so page navigation does not fire.
+    function onKey(event) {
+      var k = event.key; if (!/^Arrow(Left|Right|Up|Down)$/.test(k)) return;
+      if (!(event.target === closeWrap || event.target.hasAttribute('data-efz-move'))) return;
+      event.preventDefault(); event.stopPropagation();
+      var s = M.SIDES[st.side], horizontal = k === 'ArrowLeft' || k === 'ArrowRight';
+      if ((s.axis === 'x') !== horizontal) { say('This approach moves along ' + s.axis.toUpperCase() + ' only; use ' + (s.axis === 'x' ? '← and →' : '↑ and ↓') + '.'); return; }
+      var sign = (k === 'ArrowRight' || k === 'ArrowUp') ? 1 : -1;
+      jog(sign === -s.n ? 1 : -1);
+    }
+    lab.addEventListener('keydown', onKey);
+    lab.addEventListener('keydown', function (event) { if (event.target.matches('input, select')) event.stopPropagation(); });
+    qa('input[name="' + id + '-side"]').forEach(function (r) { r.addEventListener('change', function () { reset('Edge changed. ' + M.SIDES[r.value].label + ': the spindle approaches moving ' + M.SIDES[r.value].move + '.'); }); });
+    q('[data-efz-tip]').addEventListener('change', function () { reset('Contact changed: r = ' + M.mm(M.TIPS[this.value].diameter / 2) + ' mm. Start the approach again.'); });
+    qa('[data-efz-move]').forEach(function (b) {
+      b.addEventListener('click', function () { var sign = Number(b.getAttribute('data-efz-move')); jog(sign === -M.SIDES[st.side].n ? 1 : -1); });
+    });
+    q('[data-efz-setbtn]').addEventListener('click', setReadout);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); setReadout(); } });
+    q('[data-efz-drill]').addEventListener('click', drill);
+    qa('[data-efz-what]').forEach(function (b) { b.addEventListener('click', function () { whatIf(b.getAttribute('data-efz-what')); }); });
+    q('[data-efz-reset]').addEventListener('click', function () { reset(); });
+    var pauseBtn = q('[data-efz-pause]');
+    pauseBtn.addEventListener('click', function () { paused = !paused; pauseBtn.setAttribute('aria-pressed', String(paused)); pauseBtn.textContent = paused ? 'Resume spin' : 'Pause spin'; if (!paused) loop(); });
+
+    // Spin animation: only the tip transforms change per frame.
+    var running = false, last = null;
+    function loop() {
+      if (running) return;
+      running = true; last = null;
+      frame(function tick(now) {
+        if (paused || !visible || reducedMotion() || document.hidden || !root.isConnected) { running = false; return; }
+        if (last !== null) theta = (theta + (now - last) / 1000 * 2 * Math.PI * 0.9) % (2 * Math.PI);
+        last = now;
+        var t = D.tipTransforms(st, theta), top = closeWrap.querySelector('.efz-tip-top'), side = closeWrap.querySelector('.efz-tip-side');
+        if (top) top.setAttribute('transform', t.top);
+        if (side) side.setAttribute('transform', t.side);
+        frame(tick);
+      });
+    }
+    if (typeof IntersectionObserver === 'function') {
+      new IntersectionObserver(function (entries) { visible = entries[0].isIntersecting; if (visible) loop(); }).observe(closeWrap);
+    }
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) loop(); });
+    if (typeof matchMedia === 'function') { var mq = matchMedia('(prefers-reduced-motion: reduce)'); if (mq.addEventListener) mq.addEventListener('change', function () { if (!mq.matches) loop(); }); }
+    reset('Jog toward the edge. Watch the tip: it wobbles, centres, then kicks.');
+    loop();
+  }
+
+  // ---------------------------------------------------------- tool length stage
+  function initLength(root) {
+    var id = nextId(), g = 0, shown = { t1: false, t2: false }, busy = false, generation = 0, anim = null;
+    function cancelAnimation() { generation += 1; if (anim) anim.cancel(); anim = null; busy = false; }
+    var lab = document.createElement('div'); lab.className = 'efz-lab efz-lab-length';
+    lab.innerHTML =
+      '<p class="efz-challenge"><strong>Challenge:</strong> the readout follows the spindle and reads T1’s tip height, with the part top at Z 0. Predict what it reads when each tool touches the part top, then touch off and compare.</p>' +
+      '<fieldset class="efz-group"><legend>Touch-off contact</legend><div class="efz-segs">' +
+      '<label class="efz-seg"><input type="radio" name="' + id + '-gauge" value="0" checked><span>Ideal contact (0 mm)</span></label>' +
+      '<label class="efz-seg"><input type="radio" name="' + id + '-gauge" value="10000"><span>10.000 mm block</span></label></div></fieldset>' +
+      '<div class="efz-bench efz-bench-length"><div class="efz-length-wrap" data-efz-view></div><div class="efz-controls">' +
+      ['t1', 't2'].map(function (t) {
+        var T = M.TOOLS[t];
+        return '<div class="efz-tool-row"><p><strong>' + T.label + '</strong><br>Length, gauge line to tip: ' + M.mm(T.length) + ' mm</p>' +
+          '<label for="' + id + '-' + t + '">Predict ' + T.short + '’s Z reading at touch-off (mm)</label><input id="' + id + '-' + t + '" data-efz-predict="' + t + '" type="text" inputmode="decimal" autocomplete="off" spellcheck="false">' +
+          '<button type="button" data-efz-touch="' + t + '">Touch off ' + T.short + '</button><p class="efz-tool-result" data-efz-result="' + t + '" role="status" aria-live="polite"></p></div>';
+      }).join('') +
+      '<div class="efz-actions"><button type="button" data-efz-missing>Run T2 at Z +2.000 with T1’s value</button><button type="button" data-efz-lreset>Raise both tools</button></div>' +
+      '</div></div><p class="efz-feedback" data-efz-lfeedback role="status" aria-live="polite">Model: reading at touch-off = surface Z + contact thickness + (L<sub>tool</sub> − L<sub>T1</sub>).</p>' +
+      '<div data-efz-ltable></div>';
+    root.append(lab);
+    function q(s) { return lab.querySelector(s); }
+    function view(raise) { q('[data-efz-view]').innerHTML = D.lengthView(g, shown, { raise: raise }); }
+    function update() {
+      view();
+      q('[data-efz-ltable]').innerHTML = shown.t1 && shown.t2 ? D.lengthTable(g) : '';
+      // While a tool is lowering, only 'Raise both tools' and the contact choice stay live; both cancel it.
+      Array.prototype.forEach.call(lab.querySelectorAll('button:not([data-efz-lreset])'), function (b) { b.disabled = busy; });
+    }
+    function feedback(text) { q('[data-efz-lfeedback]').textContent = text; }
+    function touch(t) {
+      if (busy) return;
+      var reading = M.touchReading(t, g), field = q('[data-efz-predict="' + t + '"]'), guess = null, note;
+      if (field.value.trim()) { try { guess = M.parseMillimetres(field.value); } catch (e) { q('[data-efz-result="' + t + '"]').textContent = e.message + '.'; return; } }
+      if (guess === null) note = 'Reading ' + M.signedMm(reading) + ' mm.';
+      else if (guess === reading) note = 'Reading ' + M.signedMm(reading) + ' mm: matches your prediction.';
+      else {
+        var diff = reading - guess, why = Math.abs(diff) === g && g ? ' That difference is the block thickness.' : Math.abs(diff) === Math.abs(M.lengthValue(t)) && M.lengthValue(t) ? ' That difference is the length difference from T1.' : Math.abs(diff) === 2 * Math.abs(M.lengthValue(t)) && M.lengthValue(t) ? ' Check the sign: a longer tool touches with the spindle higher.' : '';
+        note = 'Reading ' + M.signedMm(reading) + ' mm; your prediction differs by ' + M.mm(Math.abs(diff)) + ' mm.' + why;
+      }
+      var token = generation;
+      busy = true; update();
+      var raise = {}; raise[t] = D.RAISE;
+      anim = tween(600, function (e) { if (token !== generation) return; raise[t] = Math.round(D.RAISE * (1 - e)); view(raise); }, function () {
+        if (token !== generation) return;   // the contact or tools changed mid-touch
+        anim = null; busy = false; shown[t] = true; update();
+        q('[data-efz-result="' + t + '"]').textContent = note + ' Length value vs T1: ' + M.signedMm(M.lengthValue(t)) + ' mm.';
+        feedback(t === 't1' ? 'T1 is the reference: its tip sits on the ' + (g ? 'block top' : 'part top') + ', so the readout shows the contact thickness, ' + M.signedMm(g) + ' mm.' :
+          'T2 is ' + M.mm(M.lengthValue('t2')) + ' mm longer, so it touches with the spindle that much higher: ' + M.signedMm(g) + ' + ' + M.mm(M.lengthValue('t2')) + ' = ' + M.signedMm(reading) + ' mm. Its own length value is the reading minus the contact thickness: ' + M.signedMm(M.lengthValue('t2')) + ' mm.');
+      });
+    }
+    Array.prototype.forEach.call(lab.querySelectorAll('input[name="' + id + '-gauge"]'), function (r) {
+      r.addEventListener('change', function () { cancelAnimation(); g = Number(r.value); shown = { t1: false, t2: false }; lab.querySelectorAll('[data-efz-result]').forEach(function (p) { p.textContent = ''; }); update(); feedback('Contact changed to ' + (g ? 'a 10.000 mm block' : 'ideal zero-thickness contact') + '. Both tools raised; predict again.'); });
+    });
+    Array.prototype.forEach.call(lab.querySelectorAll('[data-efz-touch]'), function (b) { b.addEventListener('click', function () { touch(b.getAttribute('data-efz-touch')); }); });
+    q('[data-efz-missing]').addEventListener('click', function () {
+      var tip = M.tipZ(2000, 0) - M.lengthValue('t2');
+      feedback('With T1’s value (0) the control treats T2 like T1. Commanded Z +2.000 puts T2’s tip at 2.000 − ' + M.mm(M.lengthValue('t2')) + ' = ' + M.signedMm(tip) + ' mm: ' + M.mm(-tip) + ' mm below the part top instead of 2 mm above it. Each tool needs its own length value.');
+    });
+    q('[data-efz-lreset]').addEventListener('click', function () { cancelAnimation(); shown = { t1: false, t2: false }; lab.querySelectorAll('[data-efz-result]').forEach(function (p) { p.textContent = ''; }); update(); feedback('Both tools raised.'); });
+    lab.addEventListener('keydown', function (event) { if (event.target.matches('input')) event.stopPropagation(); });
+    update();
+  }
+  return Object.freeze({ init: init });
+});
 
 /* Generated by bundle-deps.cjs from the pinned package-lock.json.
 three@0.186.1

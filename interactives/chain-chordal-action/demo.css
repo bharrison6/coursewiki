@@ -1,0 +1,155 @@
+/* Chain chordal action: scoped lab, drawings and print fallback. */
+[data-interactive="chain-chordal-action"] { min-width: 0; }
+.article:has([data-interactive="chain-chordal-action"]) { max-width: 76rem; }
+[data-interactive="chain-chordal-action"].cc-live > .cc-static { display: none; }
+/* Only the outer drawings scale; the nested drive viewport keeps its own width and height. */
+[data-interactive="chain-chordal-action"] :is(.cc-scene, .cc-trace-svg) { display: block; width: 100%; height: auto; }
+
+/* ---- shared drawing styles (live and static) -------------------------------------------- */
+.cc-text { fill: var(--ink); font-family: var(--f-display); font-size: 15px; }
+.cc-small { font-size: 13px; }
+.cc-compact .cc-text { font-size: 17px; }
+.cc-compact .cc-small { font-size: 16px; }
+.cc-strong { font-weight: 700; }
+.cc-scene .cc-text { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.cc-sprocket { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 1.5; stroke-linejoin: round; }
+.cc-hub { fill: var(--surface); stroke: var(--ink-soft); stroke-width: 1.5; }
+.cc-bore { fill: var(--paper); stroke: var(--ink-soft); stroke-width: 1.5; }
+.cc-mark { fill: var(--ink-soft); }
+.cc-plate { stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+.cc-inner { fill: var(--surface); }
+.cc-outer { fill: var(--rule); }
+.cc-plate.cc-span { stroke: var(--accent); stroke-width: 2.2; }
+.cc-outer.cc-span { fill: var(--cat1-soft); }
+.cc-inner.cc-span { fill: var(--flag-soft); }
+.cc-pin { fill: var(--ink); }
+.cc-pin-leave { fill: var(--flag); stroke: var(--accent); stroke-width: 2.5; }
+.cc-radius { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.cc-height { fill: none; stroke: var(--cat3); stroke-width: 2.5; stroke-dasharray: 6 4; }
+.cc-hub-dot { fill: var(--ink); }
+.cc-ghost { fill: none; stroke: var(--ink-soft); stroke-width: 1.6; stroke-dasharray: 2 5; stroke-linecap: round; }
+.cc-turn { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cc-gauge-box { fill: var(--surface); stroke: var(--rule); stroke-width: 1.2; }
+.cc-gauge-ref { stroke: var(--ink-soft); stroke-width: 2; }
+.cc-gauge-track { stroke: var(--rule); stroke-width: 3; }
+.cc-gauge-dot { fill: var(--flag); stroke: var(--accent); stroke-width: 2.5; }
+.cc-plot-bg { fill: var(--surface); stroke: var(--rule); }
+.cc-grid { stroke: var(--rule); stroke-width: 1; }
+.cc-grid-tooth { stroke-dasharray: 3 4; }
+.cc-tick { fill: var(--ink-soft); font-size: 13px; }
+.cc-axis { fill: var(--ink); font-size: 13px; font-weight: 600; }
+.cc-trace { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linejoin: round; }
+.cc-trace-dot { fill: var(--flag); stroke: var(--accent); stroke-width: 2.5; }
+.cc-trace-mean { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 1 4; stroke-linecap: round; }
+.cc-trace-ghost { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 8 5; }
+.cc-trace-compare { fill: none; stroke-width: 2.4; stroke-linejoin: round; }
+.cc-trace-a { stroke: var(--cat3); stroke-dasharray: 7 3; }
+.cc-trace-b { stroke: var(--ink); stroke-dasharray: 2 3; }
+
+/* ---- live lab ---------------------------------------------------------------------------- */
+/* No scroll anchoring inside the lab: swapping the prediction for its result must not make the
+   browser shift the page and carry the result out of view. */
+.cc-lab { font: .95rem/1.45 var(--f-display); container: cclab / inline-size; overflow-anchor: none; }
+.cc-lab p { margin: 0; }
+.cc-lab [hidden] { display: none !important; }
+.cc-lab :is(button, select, input, summary):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.cc-lab button, .cc-lab select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); min-height: 44px; padding: .4rem .7rem; cursor: pointer; }
+.cc-lab button:hover { border-color: var(--accent); }
+.cc-lab button:disabled { cursor: default; opacity: .55; }
+.cc-lab .cc-primary { background: var(--accent); border-color: var(--accent); color: var(--paper); font-weight: 600; }
+.cc-challenge { border-left: 4px solid var(--cat1); background: var(--cat1-soft); padding: .7rem .85rem; border-radius: var(--radius-xs); margin-bottom: .8rem; }
+.cc-challenge > p:first-child { font-weight: 700; font-size: 1.02rem; margin-bottom: .55rem; }
+/* Reserve about the result's height so swapping in the result does not push the button row down. */
+.cc-questions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; min-height: 11.5rem; align-content: start; }
+.cc-questions fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.cc-questions legend { font-weight: 600; margin-bottom: .35rem; font-size: .9rem; }
+.cc-choices { display: flex; flex-wrap: wrap; gap: .35rem; }
+.cc-choices label { display: flex; align-items: center; gap: .45rem; min-height: 44px; padding: .35rem .65rem; border: 1px solid var(--rule); border-radius: var(--radius-xs); background: var(--surface); cursor: pointer; font-size: .9rem; }
+.cc-choices input { margin: 0; width: 18px; height: 18px; accent-color: var(--accent); }
+.cc-choices label:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.cc-check-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .8rem; margin-top: .65rem; }
+.cc-feedback { font-size: .9rem; }
+.cc-feedback strong { color: var(--ink); }
+.cc-workbench { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 1fr); gap: .9rem; align-items: start; }
+.cc-observe { min-width: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; }
+.cc-observe .cc-scene { background: var(--surface); max-width: 36rem; margin-inline: auto; }
+.cc-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .3rem 1rem; padding: .5rem .7rem .4rem; border-top: 1px solid var(--rule); }
+.cc-quick { font-size: .8rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cc-result { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(13rem, 1fr); gap: .6rem .9rem; align-items: center; }
+.cc-score { grid-column: 1 / -1; font-weight: 700; }
+.cc-lines { margin: 0; padding: 0; list-style: none; display: grid; gap: .2rem; }
+.cc-preview { min-width: 0; border: 1px solid var(--rule); border-radius: var(--radius-xs); background: var(--surface); }
+.cc-result-text { font-size: .9rem; display: grid; gap: .35rem; }
+.cc-jump { font-weight: 600; color: var(--accent); }
+.cc-motion { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; padding: .45rem .5rem; border-top: 1px solid var(--rule); }
+.cc-motion .cc-run { min-width: 6rem; }
+.cc-anim-note { text-align: center; font-size: .78rem; color: var(--ink-soft); padding: 0 .6rem .55rem; }
+.cc-trace-wrap { border-top: 1px solid var(--rule); padding: .35rem .3rem 0; }
+.cc-controls { min-width: 0; display: grid; gap: .7rem; }
+.cc-control { display: grid; gap: .2rem; min-width: 0; }
+.cc-control > label, .cc-control > .cc-control-label { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; font-weight: 600; font-size: .9rem; }
+.cc-control output { color: var(--accent); font: 600 1rem var(--f-mono); white-space: nowrap; }
+.cc-stepper { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: .4rem; align-items: center; }
+.cc-stepper button { padding: 0; font-size: 1.25rem; font-weight: 700; }
+.cc-control input[type="range"] { width: 100%; min-height: 44px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.cc-control select { width: 100%; }
+.cc-toggle { display: flex; align-items: center; gap: .55rem; min-height: 44px; font-weight: 600; font-size: .9rem; cursor: pointer; }
+.cc-toggle input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+.cc-results { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.cc-results > div { padding: .5rem .6rem; border: 1px solid var(--rule); border-top: 3px solid var(--flag); border-radius: var(--radius-xs); background: var(--flag-soft); display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.cc-results span { font-size: .75rem; color: var(--ink-soft); }
+.cc-results strong { font-size: clamp(1.1rem, 1.7vw, 1.45rem); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.cc-results small { font-size: .75rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cc-equation { font-size: .85rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cc-equation b { color: var(--ink); font-weight: 600; }
+.cc-insight { margin-top: .8rem !important; border-left: 3px solid var(--cat1); padding: .5rem .7rem; background: var(--cat1-soft); }
+.cc-limit { color: var(--ink-soft); font-size: .8rem; margin-top: .5rem !important; }
+.cc-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* ---- static fallback ---------------------------------------------------------------------- */
+.cc-static { display: grid; gap: 1rem; }
+.cc-static p { margin: 0; }
+.cc-static-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.cc-static-figure { margin: 0; break-inside: avoid; }
+.cc-static-figure > svg { border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--surface); }
+.cc-static-trace > svg { max-width: 40rem; margin-inline: auto; }
+.cc-static-figure figcaption { font-size: .9rem; margin-top: .35rem; }
+.cc-law { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; }
+.cc-law > div { border: 1px solid var(--rule); border-top: 3px solid var(--cat1); border-radius: var(--radius-sm); padding: .6rem .7rem; font-family: var(--f-mono); font-size: .85rem; }
+.cc-law strong { display: block; font-family: var(--f-display); margin-bottom: .2rem; }
+.cc-table .cc-row-mark { background: var(--flag-soft); }
+
+/* ---- presentation, tablet, phone ------------------------------------------------------- */
+.presenting .xcard:has(.cc-lab) { padding-block: .8rem; justify-content: flex-start; }
+.presenting .cc-lab { max-width: 74rem; margin-inline: auto; width: 100%; }
+/* The lab sizes itself from its own width (a reading column, a projector panel or a phone). */
+@container cclab (max-width: 54rem) {
+  .cc-workbench { grid-template-columns: 1fr; }
+  .cc-controls { grid-template-columns: 1fr 1fr; align-items: start; column-gap: 1rem; }
+  .cc-results, .cc-equation, .cc-reset-row { grid-column: 1 / -1; }
+  .cc-results { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@container cclab (max-width: 36rem) {
+  .cc-questions, .cc-controls, .cc-pair, .cc-result { grid-template-columns: 1fr; }
+  .cc-questions { min-height: 0; }
+  .cc-pair { padding-inline: .5rem; }
+  .cc-results { grid-template-columns: 1fr 1fr; }
+  .cc-motion button { flex: 1 1 auto; }
+}
+@media (max-width: 60rem) { .cc-law { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 34rem) {
+  .xcard:has([data-interactive="chain-chordal-action"]) .body { padding: .7rem .5rem; }
+  .cc-static-pair, .cc-law { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .cc-lab * { transition: none !important; } }
+@media print {
+  .xcard:has([data-interactive="chain-chordal-action"]) { break-inside: auto; }
+  [data-interactive="chain-chordal-action"] .cc-lab { display: none !important; }
+  [data-interactive="chain-chordal-action"] > .cc-static { display: grid !important; }
+  .cc-static-figure > svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .cc-static-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cc-static-figure figcaption { font-size: 10pt; }
+  .cc-law { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cc-static-trace > svg { max-width: 34rem; }
+}
+.cc-divider { stroke: var(--rule); stroke-width: 1.5; }

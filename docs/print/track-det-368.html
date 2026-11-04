@@ -3046,6 +3046,196 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="fiber-orientation"] > .fo-static { display: block !important; }
 }
 
+/* laminate-stacking: topic-scoped styles. Colours come from CourseWiki tokens;
+   the four ply colours use the official palette and swap navy for ink in dark. */
+[data-interactive="laminate-stacking"] {
+  min-width: 0; margin-block: 1rem;
+  --ls-p0: var(--msu-navy); --ls-p0-fiber: #FFFFFF;
+  --ls-p90: var(--msu-gold); --ls-p90-fiber: var(--msu-navy);
+  --ls-p45: var(--msu-redorange); --ls-p45-fiber: #FFFFFF;
+  --ls-m45: var(--msu-liteblue); --ls-m45-fiber: var(--msu-navy);
+  --ls-free: var(--msu-redorange);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-interactive="laminate-stacking"] { --ls-p0: var(--ink); --ls-p0-fiber: var(--msu-navy); }
+}
+:root[data-theme="dark"] [data-interactive="laminate-stacking"] { --ls-p0: var(--ink); --ls-p0-fiber: var(--msu-navy); }
+[data-interactive="laminate-stacking"] * { box-sizing: border-box; }
+
+/* ---- shared SVG drawing (live and static) ---- */
+.ls-svg { display: block; width: 100%; height: auto; }
+.ls-t { font-family: var(--f-display); font-size: 17px; fill: var(--ink); }
+.ls-small { font-size: 18px; fill: var(--ink-soft); }
+.ls-panel .ls-small { font-size: 16px; }
+.ls-rose .ls-small { font-size: 16px; }
+.ls-rose-compact .ls-small { font-size: 20px; }
+.ls-caps { letter-spacing: .08em; font-weight: 700; }
+.ls-head { font-weight: 700; letter-spacing: .06em; font-size: 17px; }
+.ls-plylabel { font-family: var(--f-mono); font-size: 18px; font-weight: 700; }
+.ls-ply { stroke: var(--ink); stroke-width: 1; stroke-opacity: .55; }
+.ls-ply-edge { stroke: var(--ink); stroke-width: .8; stroke-opacity: .45; fill-opacity: .7; }
+.ls-p0 { fill: var(--ls-p0); } .ls-p90 { fill: var(--ls-p90); } .ls-p45 { fill: var(--ls-p45); } .ls-m45 { fill: var(--ls-m45); } .ls-px { fill: var(--surface-2); }
+.ls-fiber { fill: none; stroke-width: 1.6; stroke-linecap: round; opacity: .9; }
+.ls-fiber-p0 { stroke: var(--ls-p0-fiber); } .ls-fiber-p90 { stroke: var(--ls-p90-fiber); }
+.ls-fiber-p45 { stroke: var(--ls-p45-fiber); } .ls-fiber-m45 { stroke: var(--ls-m45-fiber); } .ls-fiber-px { stroke: var(--ink); }
+.ls-leader { fill: none; stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 2 3; }
+.ls-mid { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 8 5; }
+.ls-axis { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+.ls-ring { fill: none; stroke: var(--rule); stroke-width: 1; }
+.ls-ring-outer { stroke: var(--ink-soft); }
+.ls-spoke { fill: none; stroke: var(--rule); stroke-width: 1; }
+.ls-rose .ls-ring-label { font-size: 15px; paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+.ls-curve { fill: none; stroke-linejoin: round; }
+.ls-curve-flat { fill: var(--accent); fill-opacity: .16; stroke: var(--accent); stroke-width: 3; }
+.ls-curve-free { stroke: var(--ls-free); stroke-width: 2.5; stroke-dasharray: 7 5; }
+.ls-curve-ply { stroke: var(--ink-soft); stroke-width: 1.8; stroke-dasharray: 2 4; stroke-linecap: round; }
+.ls-flat { fill: none; stroke: var(--ink-soft); stroke-width: 1.4; stroke-dasharray: 6 5; }
+.ls-flat-front { stroke-opacity: .6; }
+.ls-face { fill: var(--accent); stroke: var(--ink); stroke-opacity: .28; stroke-width: .6; stroke-linejoin: round; }
+.ls-load { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ls-shear { stroke-dasharray: none; }
+
+/* ---- static fallback ---- */
+.ls-static { display: grid; gap: 1rem; }
+.ls-static-figure { margin: 0; }
+.ls-static-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.ls-static-pair > div { min-width: 0; border: 1px solid var(--rule); background: var(--paper); padding: .3rem; }
+.ls-static-figure figcaption { font-size: .92rem; color: var(--ink-soft); margin-top: .45rem; }
+
+/* ---- live lab ---- */
+.ls-live > .ls-static { display: none; }
+.ls-lab { font-family: var(--f-display); font-size: .94rem; line-height: 1.4; display: grid; gap: .9rem; }
+.ls-start { display: flex; align-items: baseline; flex-wrap: wrap; gap: .35rem .7rem; }
+.ls-start strong { font-size: 1.05rem; }
+.ls-start > span:last-child { color: var(--ink-soft); }
+.ls-kicker { font-size: .7rem; font-weight: 700; letter-spacing: .09em; padding: .22rem .45rem; background: var(--flag); color: var(--msu-navy); }
+.ls-bench { display: grid; grid-template-columns: minmax(0, 1fr); gap: .7rem; align-items: start; }
+.ls-bench > * { min-width: 0; }
+.ls-ctrl { display: grid; gap: .5rem; }
+.ls-plylist, .ls-explain { display: grid; gap: .45rem; }
+.ls-feedback.ls-status { margin: 0; min-height: calc(2 * 1.4em + .7rem); line-height: 1.4; padding: .35rem .55rem; border-left: 3px solid var(--accent); background: var(--surface); font-size: .84rem; }
+.ls-rosebox .ls-rose { max-width: 22rem; margin-inline: auto; }
+@media (max-width: 46rem) { .ls-rosebox .ls-rose { max-width: 14rem; } .ls-rosebox .ls-rose .ls-small { font-size: 22px; } .ls-rosebox .ls-rose .ls-ring-label { font-size: 21px; } .ls-lab .ls-ctrl h3 { font-size: .72rem; } }
+.ls-left { display: flex; flex-direction: column; gap: .6rem; min-width: 0; }
+@media (min-width: 46.01rem) {
+  .ls-bench { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "left rose" "left explain"; }
+  .ls-rosebox { grid-area: rose; } .ls-left { grid-area: left; } .ls-explain { grid-area: explain; }
+}
+.ls-box { border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--paper); overflow: hidden; min-width: 0; }
+.ls-box > .ls-svg { padding: .2rem; }
+.ls-lab h3 { margin: 0; font-size: .8rem; }
+.ls-group { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+.ls-lab button, .ls-lab select { font: inherit; font-size: .85rem; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); min-height: 44px; min-width: 44px; padding: .4rem .6rem; cursor: pointer; }
+.ls-lab button:hover:not(:disabled) { background: var(--surface-2); }
+.ls-lab button:disabled { opacity: .45; cursor: default; }
+.ls-lab :is(button, select, input, summary, li):focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ls-palette { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ls-add { font-weight: 700; justify-content: center; display: inline-flex; align-items: center; gap: .35rem; }
+.ls-chip { display: inline-block; width: .95rem; height: .95rem; border: 1px solid var(--ink-soft); flex: none; }
+.ls-chip.ls-p0 { background: var(--ls-p0); } .ls-chip.ls-p90 { background: var(--ls-p90); } .ls-chip.ls-p45 { background: var(--ls-p45); } .ls-chip.ls-m45 { background: var(--ls-m45); }
+.ls-presets { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+.ls-presets label { font-weight: 700; font-size: .82rem; }
+.ls-presets select { flex: 1 1 10rem; max-width: 100%; }
+.ls-plies { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; counter-reset: ply; }
+.ls-plies li { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px; align-items: center; gap: .25rem; border: 1px solid var(--rule); border-radius: var(--radius-xs); background: var(--surface); padding: 0 .15rem 0 0; touch-action: auto; }
+.ls-plies li.ls-dragging { opacity: .85; box-shadow: 0 0 0 2px var(--accent); position: relative; z-index: 1; }
+.ls-plies li.ls-moved { box-shadow: inset 4px 0 0 var(--flag); }
+.ls-handle { cursor: grab; touch-action: none; display: grid; place-items: center; min-height: 44px; color: var(--ink-soft); font-size: 1.1rem; user-select: none; }
+.ls-handle:active { cursor: grabbing; }
+.ls-plyname { display: flex; align-items: center; gap: .45rem; font-family: var(--f-mono); font-size: .85rem; min-width: 0; }
+.ls-plyname small { color: var(--ink-soft); font-family: var(--f-display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ls-plies button { padding: 0; font-size: 1rem; }
+.ls-hint, .ls-note { font-size: .78rem; color: var(--ink-soft); margin: 0; }
+.ls-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 0 .6rem; padding: 0 .4rem; font-size: .76rem; color: var(--ink-soft); }
+.ls-legend span { display: inline-flex; align-items: center; gap: .35rem; }
+.ls-legend span[hidden] { display: inline-flex; visibility: hidden; } /* keep the legend height stable so controls below never shift */
+.ls-legend i { display: inline-block; width: 1.4rem; height: 0; border-top: 3px solid var(--accent); }
+.ls-legend i.ls-k-free { border-top: 3px dashed var(--ls-free); }
+.ls-legend i.ls-k-ply { border-top: 2px dotted var(--ink-soft); }
+.ls-toggle { display: inline-flex; align-items: center; gap: .4rem; min-height: 44px; cursor: pointer; }
+.ls-toggle input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent); }
+.ls-rosebox { display: flex; flex-direction: column; }
+.ls-read { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--rule); order: 3; }
+.ls-rosebox .ls-legend { order: 2; }
+@media (min-width: 46.01rem) { .ls-read { order: 0; border-top: 0; border-bottom: 1px solid var(--rule); } }
+.ls-read > div { padding: .45rem .6rem; display: grid; gap: .1rem; min-width: 0; }
+.ls-read > div + div { border-left: 1px solid var(--rule); }
+.ls-read span { color: var(--ink-soft); font-size: .72rem; }
+.ls-read strong { color: var(--accent); font-size: 1.05rem; overflow-wrap: anywhere; }
+.ls-badges { display: grid; gap: .35rem; }
+.ls-badge { display: grid; grid-template-columns: 6.6rem minmax(0, 1fr); gap: .5rem; align-items: baseline; padding: .4rem .6rem; border: 1px solid var(--rule); border-left: 4px solid var(--rule); border-radius: var(--radius-xs); background: var(--surface); font-size: .82rem; }
+.ls-badge[data-on="true"] { border-left-color: var(--accent); }
+.ls-badge b { font-size: .8rem; }
+.ls-badge b::after { content: " \2014  no"; font-weight: 400; color: var(--ink-soft); }
+.ls-badge[data-on="true"] b::after { content: " \2014  yes"; color: var(--ink); font-weight: 700; }
+.ls-predict { border: 1px solid var(--rule); border-left: 4px solid var(--flag); border-radius: var(--radius-xs); padding: .65rem .8rem; display: grid; gap: .55rem; }
+.ls-predict fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.ls-predict legend { padding: 0; font-weight: 700; margin-bottom: .35rem; }
+.ls-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem; }
+.ls-option { display: flex; align-items: center; gap: .45rem; border: 1px solid var(--rule); border-radius: var(--radius-xs); min-height: 44px; padding: .35rem .55rem; cursor: pointer; font-family: var(--f-mono); font-size: .85rem; background: var(--surface); }
+.ls-option:has(input:checked) { border-color: var(--accent); background: var(--cat1-soft); }
+.ls-option input { width: 1.15rem; height: 1.15rem; accent-color: var(--accent); margin: 0; }
+.ls-option[data-result="right"] { box-shadow: inset 4px 0 0 var(--accent); }
+.ls-option[data-result="wrong"] { box-shadow: inset 4px 0 0 var(--msu-redorange); }
+.ls-option em { font-style: normal; font-family: var(--f-display); font-size: .74rem; color: var(--ink-soft); margin-left: auto; text-align: right; }
+.ls-check { background: var(--band) !important; color: var(--band-ink) !important; border-color: var(--band) !important; font-weight: 700; justify-self: start; }
+.ls-lab .ls-check:disabled { opacity: .72; }
+.ls-feedback { margin: 0; font-size: .86rem; min-height: 1.4em; }
+.ls-multiples { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; }
+.ls-multiples figure { margin: 0; border: 1px solid var(--rule); background: var(--paper); padding: .2rem; min-width: 0; }
+.ls-multiples figcaption { font-family: var(--f-mono); font-size: .74rem; text-align: center; padding-bottom: .2rem; }
+.ls-pull { border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: .7rem .8rem; display: grid; gap: .6rem; }
+.ls-pull > h3 { font-size: .95rem; text-transform: none; letter-spacing: 0; color: var(--ink); }
+.ls-sliders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .3rem .8rem; align-items: end; }
+.ls-slider label { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 .4rem; font-weight: 700; font-size: .9rem; }
+.ls-slider label small { font-weight: 400; color: var(--ink-soft); font-size: .74rem; }
+.ls-slider output { font-family: var(--f-mono); color: var(--accent); white-space: nowrap; }
+.ls-slider input[type="range"] { display: block; width: 100%; min-height: 44px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.ls-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.ls-panelbox { margin: 0; }
+.ls-panelbox figcaption { padding: .4rem .55rem 0; font-size: .82rem; line-height: 1.3; }
+.ls-panelbox figcaption b { text-transform: uppercase; letter-spacing: .06em; font-size: .74rem; }
+.ls-panelbox figcaption span { font-family: var(--f-mono); font-size: .78rem; overflow-wrap: anywhere; }
+.ls-panelbox .ls-sum { display: block; color: var(--accent); font-size: .86rem; line-height: 1.3; padding: 0 .55rem .45rem; min-height: 2.6em; }
+.ls-panels .ls-svg { max-width: 17rem; margin-inline: auto; }
+.ls-readouts { display: grid; gap: .2rem; font-size: .76rem; color: var(--ink-soft); }
+.ls-readouts p { margin: 0; overflow-wrap: anywhere; }
+.ls-readouts b { color: var(--ink); }
+.ls-trybar > span { font-weight: 700; font-size: .84rem; }
+.ls-panels .ls-box p { margin: 0; padding: .3rem .55rem .45rem; font-size: .74rem; color: var(--ink-soft); border-top: 1px solid var(--rule); overflow-wrap: anywhere; }
+.ls-panelcap { font-weight: 700; color: var(--ink); }
+.ls-validity { font-size: .8rem; padding: .5rem .6rem; border-left: 3px solid var(--cat2); background: var(--cat2-soft); margin: 0; }
+.ls-boundary { font-size: .76rem; color: var(--ink-soft); margin: 0; }
+
+/* presentation mode: the card is a full panel; keep controls in normal flow */
+.presenting .xcard:has(.ls-lab) { justify-content: flex-start; }
+.presenting .ls-lab { max-width: 80rem; margin-inline: auto; width: 100%; }
+
+@media (max-width: 46rem) {
+  .ls-multiples { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ls-static-pair { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 30rem) {
+  .xcard:has([data-interactive="laminate-stacking"]) .body { padding-inline: .5rem; }
+  .ls-options { grid-template-columns: minmax(0, 1fr); }
+  .ls-t { font-size: 19px; } .ls-small, .ls-panel .ls-small, .ls-rose .ls-small { font-size: 18px; } .ls-plylabel { font-size: 18px; } .ls-head { font-size: 18px; }
+  .ls-rose-compact .ls-small { font-size: 20px; }
+  .ls-read strong { font-size: .92rem; }
+  .ls-read > div { padding: .4rem .45rem; }
+  .ls-badge { grid-template-columns: minmax(0, 1fr); gap: .1rem; }
+}
+@media (prefers-reduced-motion: reduce) { [data-interactive="laminate-stacking"] * { transition: none !important; animation: none !important; } }
+@media print {
+  /* The mount is taller than a page: let it flow, and keep each figure and the table whole. */
+  [data-interactive="laminate-stacking"] { break-inside: auto !important; }
+  .ls-static .unit-table-wrap { break-inside: avoid; }
+  [data-interactive="laminate-stacking"] .ls-lab { display: none !important; }
+  [data-interactive="laminate-stacking"] > .ls-static { display: grid !important; }
+  .ls-static-figure { break-inside: avoid; }
+  .ls-static-pair > div { break-inside: avoid; }
+  .ls-svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+
 [data-interactive="straight-pull"] { min-width: 0; margin-block: 1rem; }
 [data-interactive="straight-pull"] * { box-sizing: border-box; }
 .sp-lab { font: .96rem/1.5 var(--f-display); }
@@ -5136,6 +5326,44 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p><a class="button" data-practice-add="fiber-axis-strain" href="../practice.html#fiber-axis-strain">Practice axial strain</a> <a class="button" data-practice-add="fiber-angle-symmetry" href="../practice.html#fiber-angle-symmetry">Practice angle symmetry</a> <a class="button" data-practice-add="fiber-stiffness-not-strength" href="../practice.html#fiber-stiffness-not-strength">Practice model limits</a></p>
     </div>
   </details>
+  <details class="xcard deck-slide is-interactive" id="fiber-direction-and-stiffness--stack-plies-into-a-laminate-and-find-one-equally-stiff-in-every-direction" data-card="fiber-direction-and-stiffness--stack-plies-into-a-laminate-and-find-one-equally-stiff-in-every-direction" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Stack plies into a laminate and find one equally stiff in every direction<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Stack plies into a laminate and find one equally stiff in every direction</h2>
+  <p>A real part is rarely one ply. A <strong>laminate</strong> is a stack of bonded plies, each with its own fiber angle. The stacking sequence is written from the top face down: <code>[0/90]</code> is a 0° ply on top of a 90° ply, and a subscript <code>s</code> means the list is mirrored about the midplane, so <code>[0/90]s</code> is <code>[0/90/90/0]</code>. Every ply here is the same illustrative ply as the card above, 0.125 mm thick.</p>
+  <div data-interactive="laminate-stacking">
+    <div class="ls-static">
+      <!-- LAMINATE-STACKING-STATIC -->
+      <p><strong>Challenge:</strong> using only 0°, +45°, −45° and 90° plies, build a laminate that is equally stiff in every in-plane direction. Then find out why an unsymmetric stack curls when it is pulled.</p><figure class="ls-static-figure"><div class="ls-static-pair"><div><svg class="ls-svg ls-stack" viewBox="0 0 446 334" role="img" aria-label="Exploded ply stack [0/90]s, top ply first. ply 1 0°, ply 2 90°, ply 3 90°, ply 4 0°." focusable="false"><polygon class="ls-ply-edge ls-p0" points="96.8,221.2 234.4,275.6 234.4,279.6 96.8,225.2"/><polygon class="ls-ply-edge ls-p0" points="189.6,138 96.8,221.2 96.8,225.2 189.6,142"/><polygon class="ls-ply ls-p0" points="96.8,221.2 234.4,275.6 327.2,192.4 189.6,138" data-ply="4" data-angle="0"/><path class="ls-fiber ls-fiber-p0" d="M96.8 221.2L234.4 275.6M108.4 210.8L246 265.2M120 200.4L257.6 254.8M131.6 190L269.2 244.4M143.2 179.6L280.8 234M154.8 169.2L292.4 223.6M166.4 158.8L304 213.2M178 148.4L315.6 202.8M189.6 138L327.2 192.4"/><path class="ls-leader" d="M286.8 234H342"/><text x="348" y="240" class="ls-t ls-plylabel">4  0°</text><polygon class="ls-ply-edge ls-p90" points="96.8,191.2 234.4,245.6 234.4,249.6 96.8,195.2"/><polygon class="ls-ply-edge ls-p90" points="189.6,108 96.8,191.2 96.8,195.2 189.6,112"/><polygon class="ls-ply ls-p90" points="96.8,191.2 234.4,245.6 327.2,162.4 189.6,108" data-ply="3" data-angle="90"/><path class="ls-fiber ls-fiber-p90" d="M234.4 245.6L327.2 162.4M217.2 238.8L310 155.6M200 232L292.8 148.8M182.8 225.2L275.6 142M165.6 218.4L258.4 135.2M148.4 211.6L241.2 128.4M131.2 204.8L224 121.6M114 198L206.8 114.8M96.8 191.2L189.6 108"/><path class="ls-leader" d="M286.8 204H342"/><text x="348" y="210" class="ls-t ls-plylabel">3  90°</text><polygon class="ls-ply-edge ls-p90" points="96.8,161.2 234.4,215.6 234.4,219.6 96.8,165.2"/><polygon class="ls-ply-edge ls-p90" points="189.6,78 96.8,161.2 96.8,165.2 189.6,82"/><polygon class="ls-ply ls-p90" points="96.8,161.2 234.4,215.6 327.2,132.4 189.6,78" data-ply="2" data-angle="90"/><path class="ls-fiber ls-fiber-p90" d="M234.4 215.6L327.2 132.4M217.2 208.8L310 125.6M200 202L292.8 118.8M182.8 195.2L275.6 112M165.6 188.4L258.4 105.2M148.4 181.6L241.2 98.4M131.2 174.8L224 91.6M114 168L206.8 84.8M96.8 161.2L189.6 78"/><path class="ls-leader" d="M286.8 174H342"/><text x="348" y="180" class="ls-t ls-plylabel">2  90°</text><polygon class="ls-ply-edge ls-p0" points="96.8,131.2 234.4,185.6 234.4,189.6 96.8,135.2"/><polygon class="ls-ply-edge ls-p0" points="189.6,48 96.8,131.2 96.8,135.2 189.6,52"/><polygon class="ls-ply ls-p0" points="96.8,131.2 234.4,185.6 327.2,102.4 189.6,48" data-ply="1" data-angle="0"/><path class="ls-fiber ls-fiber-p0" d="M96.8 131.2L234.4 185.6M108.4 120.8L246 175.2M120 110.4L257.6 164.8M131.6 100L269.2 154.4M143.2 89.6L280.8 144M154.8 79.2L292.4 133.6M166.4 68.8L304 123.2M178 58.4L315.6 112.8M189.6 48L327.2 102.4"/><path class="ls-leader" d="M286.8 144H342"/><text x="348" y="150" class="ls-t ls-plylabel">1  0°</text><path class="ls-mid" d="M84.42 171.3L241.28 233.32"/><text x="80.42" y="175.3" class="ls-t ls-small" text-anchor="end">midplane</text><path class="ls-axis" d="M22 294l37.84 14.96M22 294l25.52 -22.88"/><text x="63.84" y="314.96" class="ls-t ls-small">x  0°</text><text x="51.52" y="269.12" class="ls-t ls-small">y  90°</text><text x="16" y="24" class="ls-t ls-small ls-caps">TOP FACE</text><text x="348" y="24" class="ls-t ls-small">ply  angle</text></svg><svg class="ls-svg ls-rose" viewBox="0 0 380 386" role="img" aria-label="Polar plot for [0/90]s: 25.21 GPa along 0 and 90 degrees, 14.82 GPa at 45 degrees." focusable="false"><circle class="ls-ring" cx="190" cy="196" r="34.5"/><circle class="ls-ring" cx="190" cy="196" r="69"/><circle class="ls-ring" cx="190" cy="196" r="103.5"/><circle class="ls-ring ls-ring-outer" cx="190" cy="196" r="138"/><path class="ls-spoke" d="M52 196L328 196"/><path class="ls-spoke" d="M92.42 293.58L287.58 98.42"/><path class="ls-spoke" d="M190 334L190 58"/><path class="ls-spoke" d="M287.58 293.58L92.42 98.42"/><path class="ls-curve ls-curve-ply" d="M328 196L325.8 188.88L319.63 182.38L310.54 176.91L299.84 172.65L288.67 169.56L277.86 167.45L267.9 166.1L258.98 165.29L251.14 164.85L244.32 164.64L238.41 164.56L233.29 164.55L228.83 164.56L224.92 164.56L221.48 164.52L218.41 164.45L215.65 164.33L213.13 164.16L210.82 163.95L208.65 163.7L206.6 163.42L204.64 163.13L202.74 162.82L200.88 162.53L199.04 162.25L197.23 162L195.42 161.79L193.61 161.63L191.81 161.53L190 161.5L188.19 161.53L186.39 161.63L184.58 161.79L182.77 162L180.96 162.25L179.12 162.53L177.26 162.82L175.36 163.13L173.4 163.42L171.35 163.7L169.18 163.95L166.87 164.16L164.35 164.33L161.59 164.45L158.52 164.52L155.08 164.56L151.17 164.56L146.71 164.55L141.59 164.56L135.68 164.64L128.86 164.85L121.02 165.29L112.1 166.1L102.14 167.45L91.33 169.56L80.16 172.65L69.46 176.91L60.37 182.38L54.2 188.88L52 196L54.2 203.12L60.37 209.62L69.46 215.09L80.16 219.35L91.33 222.44L102.14 224.55L112.1 225.9L121.02 226.71L128.86 227.15L135.68 227.36L141.59 227.44L146.71 227.45L151.17 227.44L155.08 227.44L158.52 227.48L161.59 227.55L164.35 227.67L166.87 227.84L169.18 228.05L171.35 228.3L173.4 228.58L175.36 228.87L177.26 229.18L179.12 229.47L180.96 229.75L182.77 230L184.58 230.21L186.39 230.37L188.19 230.47L190 230.5L191.81 230.47L193.61 230.37L195.42 230.21L197.23 230L199.04 229.75L200.88 229.47L202.74 229.18L204.64 228.87L206.6 228.58L208.65 228.3L210.82 228.05L213.13 227.84L215.65 227.67L218.41 227.55L221.48 227.48L224.92 227.44L228.83 227.44L233.29 227.45L238.41 227.44L244.32 227.36L251.14 227.15L258.98 226.71L267.9 225.9L277.86 224.55L288.67 222.44L299.84 219.35L310.54 215.09L319.63 209.62L325.8 203.12Z"/><path class="ls-curve ls-curve-flat" d="M276.96 196L276.19 191.48L273.95 187.18L270.51 183.25L266.23 179.8L261.49 176.85L256.59 174.36L251.81 172.27L247.29 170.49L243.13 168.93L239.38 167.49L236.03 166.11L233.07 164.71L230.47 163.23L228.18 161.62L226.16 159.84L224.38 157.82L222.77 155.53L221.29 152.93L219.89 149.97L218.51 146.62L217.07 142.87L215.51 138.71L213.73 134.19L211.64 129.41L209.15 124.51L206.2 119.77L202.75 115.49L198.82 112.05L194.52 109.81L190 109.04L185.48 109.81L181.18 112.05L177.25 115.49L173.8 119.77L170.85 124.51L168.36 129.41L166.27 134.19L164.49 138.71L162.93 142.87L161.49 146.62L160.11 149.97L158.71 152.93L157.23 155.53L155.62 157.82L153.84 159.84L151.82 161.62L149.53 163.23L146.93 164.71L143.97 166.11L140.62 167.49L136.87 168.93L132.71 170.49L128.19 172.27L123.41 174.36L118.51 176.85L113.77 179.8L109.49 183.25L106.05 187.18L103.81 191.48L103.04 196L103.81 200.52L106.05 204.82L109.49 208.75L113.77 212.2L118.51 215.15L123.41 217.64L128.19 219.73L132.71 221.51L136.87 223.07L140.62 224.51L143.97 225.89L146.93 227.29L149.53 228.77L151.82 230.38L153.84 232.16L155.62 234.18L157.23 236.47L158.71 239.07L160.11 242.03L161.49 245.38L162.93 249.13L164.49 253.29L166.27 257.81L168.36 262.59L170.85 267.49L173.8 272.23L177.25 276.51L181.18 279.95L185.48 282.19L190 282.96L194.52 282.19L198.82 279.95L202.75 276.51L206.2 272.23L209.15 267.49L211.64 262.59L213.73 257.81L215.51 253.29L217.07 249.13L218.51 245.38L219.89 242.03L221.29 239.07L222.77 236.47L224.38 234.18L226.16 232.16L228.18 230.38L230.47 228.77L233.07 227.29L236.03 225.89L239.38 224.51L243.13 223.07L247.29 221.51L251.81 219.73L256.59 217.64L261.49 215.15L266.23 212.2L270.51 208.75L273.95 204.82L276.19 200.52Z"/><text x="176.8" y="168.13" class="ls-t ls-small ls-ring-label" text-anchor="middle">10</text><text x="163.59" y="136.25" class="ls-t ls-small ls-ring-label" text-anchor="middle">20</text><text x="150.39" y="104.38" class="ls-t ls-small ls-ring-label" text-anchor="middle">30</text><text x="137.19" y="72.5" class="ls-t ls-small ls-ring-label" text-anchor="middle">40 GPa</text><text x="334" y="201" class="ls-t ls-small">0°</text><text x="190" y="50" class="ls-t ls-small" text-anchor="middle">90°</text><text x="293.36" y="92.64" class="ls-t ls-small">45°</text><text x="86.64" y="92.64" class="ls-t ls-small" text-anchor="end">135°</text><text x="46" y="201" class="ls-t ls-small" text-anchor="end">180°</text></svg></div><div><svg class="ls-svg ls-stack" viewBox="0 0 446 454" role="img" aria-label="Exploded ply stack [0/+45/−45/90]s, top ply first. ply 1 0°, ply 2 +45°, ply 3 −45°, ply 4 90°, ply 5 90°, ply 6 −45°, ply 7 +45°, ply 8 0°." focusable="false"><polygon class="ls-ply-edge ls-p0" points="96.8,341.2 234.4,395.6 234.4,399.6 96.8,345.2"/><polygon class="ls-ply-edge ls-p0" points="189.6,258 96.8,341.2 96.8,345.2 189.6,262"/><polygon class="ls-ply ls-p0" points="96.8,341.2 234.4,395.6 327.2,312.4 189.6,258" data-ply="8" data-angle="0"/><path class="ls-fiber ls-fiber-p0" d="M96.8 341.2L234.4 395.6M108.4 330.8L246 385.2M120 320.4L257.6 374.8M131.6 310L269.2 364.4M143.2 299.6L280.8 354M154.8 289.2L292.4 343.6M166.4 278.8L304 333.2M178 268.4L315.6 322.8M189.6 258L327.2 312.4"/><path class="ls-leader" d="M286.8 354H342"/><text x="348" y="360" class="ls-t ls-plylabel">8  0°</text><polygon class="ls-ply-edge ls-p45" points="96.8,311.2 234.4,365.6 234.4,369.6 96.8,315.2"/><polygon class="ls-ply-edge ls-p45" points="189.6,228 96.8,311.2 96.8,315.2 189.6,232"/><polygon class="ls-ply ls-p45" points="96.8,311.2 234.4,365.6 327.2,282.4 189.6,228" data-ply="7" data-angle="45"/><path class="ls-fiber ls-fiber-p45" d="M218.42 359.28L245.18 355.94M194.1 349.67L261.58 341.23M169.77 340.05L277.99 326.52M145.45 330.43L294.39 311.82M121.12 320.82L310.8 297.11M96.8 311.2L327.2 282.4M113.2 296.49L302.88 272.78M129.61 281.78L278.55 263.17M146.01 267.08L254.23 253.55M162.42 252.37L229.9 243.93M178.82 237.66L205.58 234.32"/><path class="ls-leader" d="M286.8 324H342"/><text x="348" y="330" class="ls-t ls-plylabel">7  +45°</text><polygon class="ls-ply-edge ls-m45" points="96.8,281.2 234.4,335.6 234.4,339.6 96.8,285.2"/><polygon class="ls-ply-edge ls-m45" points="189.6,198 96.8,281.2 96.8,285.2 189.6,202"/><polygon class="ls-ply ls-m45" points="96.8,281.2 234.4,335.6 327.2,252.4 189.6,198" data-ply="6" data-angle="-45"/><path class="ls-fiber ls-fiber-m45" d="M107.58 271.54L112.78 287.52M123.98 256.83L137.1 297.13M140.39 242.12L161.43 306.75M156.79 227.42L185.75 316.37M173.2 212.71L210.08 325.98M189.6 198L234.4 335.6M213.92 207.62L250.8 320.89M238.25 217.23L267.21 306.18M262.57 226.85L283.61 291.48M286.9 236.47L300.02 276.77M311.22 246.08L316.42 262.06"/><path class="ls-leader" d="M286.8 294H342"/><text x="348" y="300" class="ls-t ls-plylabel">6  −45°</text><polygon class="ls-ply-edge ls-p90" points="96.8,251.2 234.4,305.6 234.4,309.6 96.8,255.2"/><polygon class="ls-ply-edge ls-p90" points="189.6,168 96.8,251.2 96.8,255.2 189.6,172"/><polygon class="ls-ply ls-p90" points="96.8,251.2 234.4,305.6 327.2,222.4 189.6,168" data-ply="5" data-angle="90"/><path class="ls-fiber ls-fiber-p90" d="M234.4 305.6L327.2 222.4M217.2 298.8L310 215.6M200 292L292.8 208.8M182.8 285.2L275.6 202M165.6 278.4L258.4 195.2M148.4 271.6L241.2 188.4M131.2 264.8L224 181.6M114 258L206.8 174.8M96.8 251.2L189.6 168"/><path class="ls-leader" d="M286.8 264H342"/><text x="348" y="270" class="ls-t ls-plylabel">5  90°</text><polygon class="ls-ply-edge ls-p90" points="96.8,221.2 234.4,275.6 234.4,279.6 96.8,225.2"/><polygon class="ls-ply-edge ls-p90" points="189.6,138 96.8,221.2 96.8,225.2 189.6,142"/><polygon class="ls-ply ls-p90" points="96.8,221.2 234.4,275.6 327.2,192.4 189.6,138" data-ply="4" data-angle="90"/><path class="ls-fiber ls-fiber-p90" d="M234.4 275.6L327.2 192.4M217.2 268.8L310 185.6M200 262L292.8 178.8M182.8 255.2L275.6 172M165.6 248.4L258.4 165.2M148.4 241.6L241.2 158.4M131.2 234.8L224 151.6M114 228L206.8 144.8M96.8 221.2L189.6 138"/><path class="ls-leader" d="M286.8 234H342"/><text x="348" y="240" class="ls-t ls-plylabel">4  90°</text><polygon class="ls-ply-edge ls-m45" points="96.8,191.2 234.4,245.6 234.4,249.6 96.8,195.2"/><polygon class="ls-ply-edge ls-m45" points="189.6,108 96.8,191.2 96.8,195.2 189.6,112"/><polygon class="ls-ply ls-m45" points="96.8,191.2 234.4,245.6 327.2,162.4 189.6,108" data-ply="3" data-angle="-45"/><path class="ls-fiber ls-fiber-m45" d="M107.58 181.54L112.78 197.52M123.98 166.83L137.1 207.13M140.39 152.12L161.43 216.75M156.79 137.42L185.75 226.37M173.2 122.71L210.08 235.98M189.6 108L234.4 245.6M213.92 117.62L250.8 230.89M238.25 127.23L267.21 216.18M262.57 136.85L283.61 201.48M286.9 146.47L300.02 186.77M311.22 156.08L316.42 172.06"/><path class="ls-leader" d="M286.8 204H342"/><text x="348" y="210" class="ls-t ls-plylabel">3  −45°</text><polygon class="ls-ply-edge ls-p45" points="96.8,161.2 234.4,215.6 234.4,219.6 96.8,165.2"/><polygon class="ls-ply-edge ls-p45" points="189.6,78 96.8,161.2 96.8,165.2 189.6,82"/><polygon class="ls-ply ls-p45" points="96.8,161.2 234.4,215.6 327.2,132.4 189.6,78" data-ply="2" data-angle="45"/><path class="ls-fiber ls-fiber-p45" d="M218.42 209.28L245.18 205.94M194.1 199.67L261.58 191.23M169.77 190.05L277.99 176.52M145.45 180.43L294.39 161.82M121.12 170.82L310.8 147.11M96.8 161.2L327.2 132.4M113.2 146.49L302.88 122.78M129.61 131.78L278.55 113.17M146.01 117.08L254.23 103.55M162.42 102.37L229.9 93.93M178.82 87.66L205.58 84.32"/><path class="ls-leader" d="M286.8 174H342"/><text x="348" y="180" class="ls-t ls-plylabel">2  +45°</text><polygon class="ls-ply-edge ls-p0" points="96.8,131.2 234.4,185.6 234.4,189.6 96.8,135.2"/><polygon class="ls-ply-edge ls-p0" points="189.6,48 96.8,131.2 96.8,135.2 189.6,52"/><polygon class="ls-ply ls-p0" points="96.8,131.2 234.4,185.6 327.2,102.4 189.6,48" data-ply="1" data-angle="0"/><path class="ls-fiber ls-fiber-p0" d="M96.8 131.2L234.4 185.6M108.4 120.8L246 175.2M120 110.4L257.6 164.8M131.6 100L269.2 154.4M143.2 89.6L280.8 144M154.8 79.2L292.4 133.6M166.4 68.8L304 123.2M178 58.4L315.6 112.8M189.6 48L327.2 102.4"/><path class="ls-leader" d="M286.8 144H342"/><text x="348" y="150" class="ls-t ls-plylabel">1  0°</text><path class="ls-mid" d="M84.42 231.3L241.28 293.32"/><text x="80.42" y="235.3" class="ls-t ls-small" text-anchor="end">midplane</text><path class="ls-axis" d="M22 414l37.84 14.96M22 414l25.52 -22.88"/><text x="63.84" y="434.96" class="ls-t ls-small">x  0°</text><text x="51.52" y="389.12" class="ls-t ls-small">y  90°</text><text x="16" y="24" class="ls-t ls-small ls-caps">TOP FACE</text><text x="348" y="24" class="ls-t ls-small">ply  angle</text></svg><svg class="ls-svg ls-rose" viewBox="0 0 380 386" role="img" aria-label="Polar plot for [0/+45/−45/90]s: a circle at 20.74 GPa in every direction." focusable="false"><circle class="ls-ring" cx="190" cy="196" r="34.5"/><circle class="ls-ring" cx="190" cy="196" r="69"/><circle class="ls-ring" cx="190" cy="196" r="103.5"/><circle class="ls-ring ls-ring-outer" cx="190" cy="196" r="138"/><path class="ls-spoke" d="M52 196L328 196"/><path class="ls-spoke" d="M92.42 293.58L287.58 98.42"/><path class="ls-spoke" d="M190 334L190 58"/><path class="ls-spoke" d="M287.58 293.58L92.42 98.42"/><path class="ls-curve ls-curve-ply" d="M328 196L325.8 188.88L319.63 182.38L310.54 176.91L299.84 172.65L288.67 169.56L277.86 167.45L267.9 166.1L258.98 165.29L251.14 164.85L244.32 164.64L238.41 164.56L233.29 164.55L228.83 164.56L224.92 164.56L221.48 164.52L218.41 164.45L215.65 164.33L213.13 164.16L210.82 163.95L208.65 163.7L206.6 163.42L204.64 163.13L202.74 162.82L200.88 162.53L199.04 162.25L197.23 162L195.42 161.79L193.61 161.63L191.81 161.53L190 161.5L188.19 161.53L186.39 161.63L184.58 161.79L182.77 162L180.96 162.25L179.12 162.53L177.26 162.82L175.36 163.13L173.4 163.42L171.35 163.7L169.18 163.95L166.87 164.16L164.35 164.33L161.59 164.45L158.52 164.52L155.08 164.56L151.17 164.56L146.71 164.55L141.59 164.56L135.68 164.64L128.86 164.85L121.02 165.29L112.1 166.1L102.14 167.45L91.33 169.56L80.16 172.65L69.46 176.91L60.37 182.38L54.2 188.88L52 196L54.2 203.12L60.37 209.62L69.46 215.09L80.16 219.35L91.33 222.44L102.14 224.55L112.1 225.9L121.02 226.71L128.86 227.15L135.68 227.36L141.59 227.44L146.71 227.45L151.17 227.44L155.08 227.44L158.52 227.48L161.59 227.55L164.35 227.67L166.87 227.84L169.18 228.05L171.35 228.3L173.4 228.58L175.36 228.87L177.26 229.18L179.12 229.47L180.96 229.75L182.77 230L184.58 230.21L186.39 230.37L188.19 230.47L190 230.5L191.81 230.47L193.61 230.37L195.42 230.21L197.23 230L199.04 229.75L200.88 229.47L202.74 229.18L204.64 228.87L206.6 228.58L208.65 228.3L210.82 228.05L213.13 227.84L215.65 227.67L218.41 227.55L221.48 227.48L224.92 227.44L228.83 227.44L233.29 227.45L238.41 227.44L244.32 227.36L251.14 227.15L258.98 226.71L267.9 225.9L277.86 224.55L288.67 222.44L299.84 219.35L310.54 215.09L319.63 209.62L325.8 203.12Z"/><path class="ls-curve ls-curve-flat" d="M261.55 196L261.45 192.26L261.16 188.52L260.67 184.81L259.99 181.12L259.11 177.48L258.05 173.89L256.8 170.36L255.36 166.9L253.75 163.52L251.96 160.23L250.01 157.03L247.88 153.94L245.6 150.97L243.17 148.12L240.59 145.41L237.88 142.83L235.03 140.4L232.06 138.12L228.97 135.99L225.77 134.04L222.48 132.25L219.1 130.64L215.64 129.2L212.11 127.95L208.52 126.89L204.88 126.01L201.19 125.33L197.48 124.84L193.74 124.55L190 124.45L186.26 124.55L182.52 124.84L178.81 125.33L175.12 126.01L171.48 126.89L167.89 127.95L164.36 129.2L160.9 130.64L157.52 132.25L154.23 134.04L151.03 135.99L147.94 138.12L144.97 140.4L142.12 142.83L139.41 145.41L136.83 148.12L134.4 150.97L132.12 153.94L129.99 157.03L128.04 160.23L126.25 163.52L124.64 166.9L123.2 170.36L121.95 173.89L120.89 177.48L120.01 181.12L119.33 184.81L118.84 188.52L118.55 192.26L118.45 196L118.55 199.74L118.84 203.48L119.33 207.19L120.01 210.88L120.89 214.52L121.95 218.11L123.2 221.64L124.64 225.1L126.25 228.48L128.04 231.77L129.99 234.97L132.12 238.06L134.4 241.03L136.83 243.88L139.41 246.59L142.12 249.17L144.97 251.6L147.94 253.88L151.03 256.01L154.23 257.96L157.52 259.75L160.9 261.36L164.36 262.8L167.89 264.05L171.48 265.11L175.12 265.99L178.81 266.67L182.52 267.16L186.26 267.45L190 267.55L193.74 267.45L197.48 267.16L201.19 266.67L204.88 265.99L208.52 265.11L212.11 264.05L215.64 262.8L219.1 261.36L222.48 259.75L225.77 257.96L228.97 256.01L232.06 253.88L235.03 251.6L237.88 249.17L240.59 246.59L243.17 243.88L245.6 241.03L247.88 238.06L250.01 234.97L251.96 231.77L253.75 228.48L255.36 225.1L256.8 221.64L258.05 218.11L259.11 214.52L259.99 210.88L260.67 207.19L261.16 203.48L261.45 199.74Z"/><text x="176.8" y="168.13" class="ls-t ls-small ls-ring-label" text-anchor="middle">10</text><text x="163.59" y="136.25" class="ls-t ls-small ls-ring-label" text-anchor="middle">20</text><text x="150.39" y="104.38" class="ls-t ls-small ls-ring-label" text-anchor="middle">30</text><text x="137.19" y="72.5" class="ls-t ls-small ls-ring-label" text-anchor="middle">40 GPa</text><text x="334" y="201" class="ls-t ls-small">0°</text><text x="190" y="50" class="ls-t ls-small" text-anchor="middle">90°</text><text x="293.36" y="92.64" class="ls-t ls-small">45°</text><text x="86.64" y="92.64" class="ls-t ls-small" text-anchor="end">135°</text><text x="46" y="201" class="ls-t ls-small" text-anchor="end">180°</text></svg></div></div><figcaption><strong>Same ply, two balanced symmetric stacks.</strong> Left, cross-ply [0/90]s: 25.21 GPa along 0° and 90° but only 14.82 GPa at 45°. Right, [0/+45/−45/90]s: 20.74 GPa in every in-plane direction, so the shaded rose is a circle. The dotted outline is one 0° ply on its own (40 GPa along the fibers, 10 GPa across), the same ply as the fiber-orientation lesson above. Radius = modulus; outer ring 40 GPa.</figcaption></figure><div class="unit-table-wrap" tabindex="0" role="region" aria-label="Laminate comparison table; scroll horizontally to see every column"><table class="unit-table"><caption>Same illustrative plies, 0.125 mm each. E<sub>x</sub> is flat-held (curvature held at zero).</caption><thead><tr><th>Stack (top first)</th><th>Symmetric</th><th>Balanced</th><th>Quasi-isotropic</th><th>E<sub>x</sub> at 0° / 45° / 90°, GPa</th><th>Largest |B<sub>ij</sub>|</th></tr></thead><tbody><tr><th>[0]</th><td>yes</td><td>yes</td><td>no</td><td>40.00 / 12.90 / 10.00</td><td>0</td></tr><tr><th>[0/90]</th><td>no</td><td>yes</td><td>no</td><td>25.21 / 14.82 / 25.21</td><td>239.8 N</td></tr><tr><th>[0/90]s</th><td>yes</td><td>yes</td><td>no</td><td>25.21 / 14.82 / 25.21</td><td>0</td></tr><tr><th>[+45/−45]</th><td>no</td><td>yes</td><td>no</td><td>14.82 / 25.21 / 14.82</td><td>119.9 N</td></tr><tr><th>[±45]s</th><td>yes</td><td>yes</td><td>no</td><td>14.82 / 25.21 / 14.82</td><td>0</td></tr><tr><th>[0/+45/−45/90]s</th><td>yes</td><td>yes</td><td>yes</td><td>20.74 / 20.74 / 20.74</td><td>0</td></tr></tbody></table></div><p>A single 0° ply gives 40.00 GPa along x and 10.00 GPa along y, the fiber-orientation result for the same ply.</p><figure class="ls-static-figure"><div class="ls-static-pair"><div><svg class="ls-svg ls-panel" viewBox="0 0 400 402" role="img" aria-label="[0/90] under Nx 0.5 N/mm and zero moment curls about the y axis." focusable="false"><polygon class="ls-flat" points="42,254 214,322 330,218 158,150"/><polygon class="ls-face" points="148.33,129.16 162.67,143.84 172.33,135.18 158,120.49" style="fill-opacity:0.41"/><polygon class="ls-face" points="162.67,143.84 177,156.89 186.67,148.22 172.33,135.18" style="fill-opacity:0.44"/><polygon class="ls-face" points="177,156.89 191.33,168.29 201,159.62 186.67,148.22" style="fill-opacity:0.47"/><polygon class="ls-face" points="138.67,137.83 153,152.51 162.67,143.84 148.33,129.16" style="fill-opacity:0.41"/><polygon class="ls-face" points="191.33,168.29 205.67,178.05 215.33,169.39 201,159.62" style="fill-opacity:0.50"/><polygon class="ls-face" points="153,152.51 167.33,165.55 177,156.89 162.67,143.84" style="fill-opacity:0.44"/><polygon class="ls-face" points="205.67,178.05 220,186.18 229.67,177.51 215.33,169.39" style="fill-opacity:0.53"/><polygon class="ls-face" points="167.33,165.55 181.67,176.96 191.33,168.29 177,156.89" style="fill-opacity:0.47"/><polygon class="ls-face" points="129,146.49 143.33,161.18 153,152.51 138.67,137.83" style="fill-opacity:0.41"/><polygon class="ls-face" points="181.67,176.96 196,186.72 205.67,178.05 191.33,168.29" style="fill-opacity:0.50"/><polygon class="ls-face" points="220,186.18 234.33,192.67 244,184 229.67,177.51" style="fill-opacity:0.56"/><polygon class="ls-face" points="143.33,161.18 157.67,174.22 167.33,165.55 153,152.51" style="fill-opacity:0.44"/><polygon class="ls-face" points="196,186.72 210.33,194.85 220,186.18 205.67,178.05" style="fill-opacity:0.53"/><polygon class="ls-face" points="157.67,174.22 172,185.62 181.67,176.96 167.33,165.55" style="fill-opacity:0.47"/><polygon class="ls-face" points="234.33,192.67 248.67,197.51 258.33,188.85 244,184" style="fill-opacity:0.58"/><polygon class="ls-face" points="119.33,155.16 133.67,169.84 143.33,161.18 129,146.49" style="fill-opacity:0.41"/><polygon class="ls-face" points="172,185.62 186.33,195.39 196,186.72 181.67,176.96" style="fill-opacity:0.50"/><polygon class="ls-face" points="210.33,194.85 224.67,201.33 234.33,192.67 220,186.18" style="fill-opacity:0.56"/><polygon class="ls-face" points="133.67,169.84 148,182.89 157.67,174.22 143.33,161.18" style="fill-opacity:0.44"/><polygon class="ls-face" points="186.33,195.39 200.67,203.51 210.33,194.85 196,186.72" style="fill-opacity:0.53"/><polygon class="ls-face" points="148,182.89 162.33,194.29 172,185.62 157.67,174.22" style="fill-opacity:0.47"/><polygon class="ls-face" points="248.67,197.51 263,200.72 272.67,192.05 258.33,188.85" style="fill-opacity:0.60"/><polygon class="ls-face" points="224.67,201.33 239,206.18 248.67,197.51 234.33,192.67" style="fill-opacity:0.58"/><polygon class="ls-face" points="109.67,163.83 124,178.51 133.67,169.84 119.33,155.16" style="fill-opacity:0.41"/><polygon class="ls-face" points="162.33,194.29 176.67,204.05 186.33,195.39 172,185.62" style="fill-opacity:0.50"/><polygon class="ls-face" points="200.67,203.51 215,210 224.67,201.33 210.33,194.85" style="fill-opacity:0.56"/><polygon class="ls-face" points="124,178.51 138.33,191.55 148,182.89 133.67,169.84" style="fill-opacity:0.44"/><polygon class="ls-face" points="263,200.72 277.33,202.29 287,193.62 272.67,192.05" style="fill-opacity:0.61"/><polygon class="ls-face" points="176.67,204.05 191,212.18 200.67,203.51 186.33,195.39" style="fill-opacity:0.53"/><polygon class="ls-face" points="138.33,191.55 152.67,202.96 162.33,194.29 148,182.89" style="fill-opacity:0.47"/><polygon class="ls-face" points="239,206.18 253.33,209.39 263,200.72 248.67,197.51" style="fill-opacity:0.60"/><polygon class="ls-face" points="215,210 229.33,214.85 239,206.18 224.67,201.33" style="fill-opacity:0.58"/><polygon class="ls-face" points="100,172.49 114.33,187.18 124,178.51 109.67,163.83" style="fill-opacity:0.41"/><polygon class="ls-face" points="152.67,202.96 167,212.72 176.67,204.05 162.33,194.29" style="fill-opacity:0.50"/><polygon class="ls-face" points="191,212.18 205.33,218.67 215,210 200.67,203.51" style="fill-opacity:0.56"/><polygon class="ls-face" points="114.33,187.18 128.67,200.22 138.33,191.55 124,178.51" style="fill-opacity:0.44"/><polygon class="ls-face" points="277.33,202.29 291.67,202.22 301.33,193.55 287,193.62" style="fill-opacity:0.62"/><polygon class="ls-face" points="253.33,209.39 267.67,210.96 277.33,202.29 263,200.72" style="fill-opacity:0.61"/><polygon class="ls-face" points="167,212.72 181.33,220.85 191,212.18 176.67,204.05" style="fill-opacity:0.53"/><polygon class="ls-face" points="128.67,200.22 143,211.62 152.67,202.96 138.33,191.55" style="fill-opacity:0.47"/><polygon class="ls-face" points="229.33,214.85 243.67,218.05 253.33,209.39 239,206.18" style="fill-opacity:0.60"/><polygon class="ls-face" points="205.33,218.67 219.67,223.51 229.33,214.85 215,210" style="fill-opacity:0.58"/><polygon class="ls-face" points="90.33,181.16 104.67,195.84 114.33,187.18 100,172.49" style="fill-opacity:0.41"/><polygon class="ls-face" points="143,211.62 157.33,221.39 167,212.72 152.67,202.96" style="fill-opacity:0.50"/><polygon class="ls-face" points="181.33,220.85 195.67,227.33 205.33,218.67 191,212.18" style="fill-opacity:0.56"/><polygon class="ls-face" points="104.67,195.84 119,208.89 128.67,200.22 114.33,187.18" style="fill-opacity:0.44"/><polygon class="ls-face" points="291.67,202.22 306,200.51 315.67,191.84 301.33,193.55" style="fill-opacity:0.63"/><polygon class="ls-face" points="267.67,210.96 282,210.89 291.67,202.22 277.33,202.29" style="fill-opacity:0.62"/><polygon class="ls-face" points="243.67,218.05 258,219.62 267.67,210.96 253.33,209.39" style="fill-opacity:0.61"/><polygon class="ls-face" points="157.33,221.39 171.67,229.51 181.33,220.85 167,212.72" style="fill-opacity:0.53"/><polygon class="ls-face" points="119,208.89 133.33,220.29 143,211.62 128.67,200.22" style="fill-opacity:0.47"/><polygon class="ls-face" points="219.67,223.51 234,226.72 243.67,218.05 229.33,214.85" style="fill-opacity:0.60"/><polygon class="ls-face" points="195.67,227.33 210,232.18 219.67,223.51 205.33,218.67" style="fill-opacity:0.58"/><polygon class="ls-face" points="80.67,189.83 95,204.51 104.67,195.84 90.33,181.16" style="fill-opacity:0.41"/><polygon class="ls-face" points="133.33,220.29 147.67,230.05 157.33,221.39 143,211.62" style="fill-opacity:0.50"/><polygon class="ls-face" points="171.67,229.51 186,236 195.67,227.33 181.33,220.85" style="fill-opacity:0.56"/><polygon class="ls-face" points="95,204.51 109.33,217.55 119,208.89 104.67,195.84" style="fill-opacity:0.44"/><polygon class="ls-face" points="282,210.89 296.33,209.18 306,200.51 291.67,202.22" style="fill-opacity:0.63"/><polygon class="ls-face" points="258,219.62 272.33,219.55 282,210.89 267.67,210.96" style="fill-opacity:0.62"/><polygon class="ls-face" points="306,200.51 320.33,197.16 330,188.49 315.67,191.84" style="fill-opacity:0.63"/><polygon class="ls-face" points="234,226.72 248.33,228.29 258,219.62 243.67,218.05" style="fill-opacity:0.61"/><polygon class="ls-face" points="147.67,230.05 162,238.18 171.67,229.51 157.33,221.39" style="fill-opacity:0.53"/><polygon class="ls-face" points="109.33,217.55 123.67,228.96 133.33,220.29 119,208.89" style="fill-opacity:0.47"/><polygon class="ls-face" points="210,232.18 224.33,235.39 234,226.72 219.67,223.51" style="fill-opacity:0.60"/><polygon class="ls-face" points="186,236 200.33,240.85 210,232.18 195.67,227.33" style="fill-opacity:0.58"/><polygon class="ls-face" points="71,198.49 85.33,213.18 95,204.51 80.67,189.83" style="fill-opacity:0.41"/><polygon class="ls-face" points="123.67,228.96 138,238.72 147.67,230.05 133.33,220.29" style="fill-opacity:0.50"/><polygon class="ls-face" points="162,238.18 176.33,244.67 186,236 171.67,229.51" style="fill-opacity:0.56"/><polygon class="ls-face" points="85.33,213.18 99.67,226.22 109.33,217.55 95,204.51" style="fill-opacity:0.44"/><polygon class="ls-face" points="272.33,219.55 286.67,217.84 296.33,209.18 282,210.89" style="fill-opacity:0.63"/><polygon class="ls-face" points="248.33,228.29 262.67,228.22 272.33,219.55 258,219.62" style="fill-opacity:0.62"/><polygon class="ls-face" points="296.33,209.18 310.67,205.83 320.33,197.16 306,200.51" style="fill-opacity:0.63"/><polygon class="ls-face" points="224.33,235.39 238.67,236.96 248.33,228.29 234,226.72" style="fill-opacity:0.61"/><polygon class="ls-face" points="138,238.72 152.33,246.85 162,238.18 147.67,230.05" style="fill-opacity:0.53"/><polygon class="ls-face" points="99.67,226.22 114,237.62 123.67,228.96 109.33,217.55" style="fill-opacity:0.47"/><polygon class="ls-face" points="200.33,240.85 214.67,244.05 224.33,235.39 210,232.18" style="fill-opacity:0.60"/><polygon class="ls-face" points="176.33,244.67 190.67,249.51 200.33,240.85 186,236" style="fill-opacity:0.58"/><polygon class="ls-face" points="61.33,207.16 75.67,221.84 85.33,213.18 71,198.49" style="fill-opacity:0.41"/><polygon class="ls-face" points="114,237.62 128.33,247.39 138,238.72 123.67,228.96" style="fill-opacity:0.50"/><polygon class="ls-face" points="152.33,246.85 166.67,253.33 176.33,244.67 162,238.18" style="fill-opacity:0.56"/><polygon class="ls-face" points="75.67,221.84 90,234.89 99.67,226.22 85.33,213.18" style="fill-opacity:0.44"/><polygon class="ls-face" points="262.67,228.22 277,226.51 286.67,217.84 272.33,219.55" style="fill-opacity:0.63"/><polygon class="ls-face" points="238.67,236.96 253,236.89 262.67,228.22 248.33,228.29" style="fill-opacity:0.62"/><polygon class="ls-face" points="286.67,217.84 301,214.49 310.67,205.83 296.33,209.18" style="fill-opacity:0.63"/><polygon class="ls-face" points="214.67,244.05 229,245.62 238.67,236.96 224.33,235.39" style="fill-opacity:0.61"/><polygon class="ls-face" points="128.33,247.39 142.67,255.51 152.33,246.85 138,238.72" style="fill-opacity:0.53"/><polygon class="ls-face" points="90,234.89 104.33,246.29 114,237.62 99.67,226.22" style="fill-opacity:0.47"/><polygon class="ls-face" points="190.67,249.51 205,252.72 214.67,244.05 200.33,240.85" style="fill-opacity:0.60"/><polygon class="ls-face" points="166.67,253.33 181,258.18 190.67,249.51 176.33,244.67" style="fill-opacity:0.58"/><polygon class="ls-face" points="51.67,215.83 66,230.51 75.67,221.84 61.33,207.16" style="fill-opacity:0.41"/><polygon class="ls-face" points="104.33,246.29 118.67,256.05 128.33,247.39 114,237.62" style="fill-opacity:0.50"/><polygon class="ls-face" points="142.67,255.51 157,262 166.67,253.33 152.33,246.85" style="fill-opacity:0.56"/><polygon class="ls-face" points="66,230.51 80.33,243.55 90,234.89 75.67,221.84" style="fill-opacity:0.44"/><polygon class="ls-face" points="253,236.89 267.33,235.18 277,226.51 262.67,228.22" style="fill-opacity:0.63"/><polygon class="ls-face" points="229,245.62 243.33,245.55 253,236.89 238.67,236.96" style="fill-opacity:0.62"/><polygon class="ls-face" points="277,226.51 291.33,223.16 301,214.49 286.67,217.84" style="fill-opacity:0.63"/><polygon class="ls-face" points="205,252.72 219.33,254.29 229,245.62 214.67,244.05" style="fill-opacity:0.61"/><polygon class="ls-face" points="118.67,256.05 133,264.18 142.67,255.51 128.33,247.39" style="fill-opacity:0.53"/><polygon class="ls-face" points="80.33,243.55 94.67,254.96 104.33,246.29 90,234.89" style="fill-opacity:0.47"/><polygon class="ls-face" points="181,258.18 195.33,261.39 205,252.72 190.67,249.51" style="fill-opacity:0.60"/><polygon class="ls-face" points="157,262 171.33,266.85 181,258.18 166.67,253.33" style="fill-opacity:0.58"/><polygon class="ls-face" points="42,224.49 56.33,239.18 66,230.51 51.67,215.83" style="fill-opacity:0.41"/><polygon class="ls-face" points="94.67,254.96 109,264.72 118.67,256.05 104.33,246.29" style="fill-opacity:0.50"/><polygon class="ls-face" points="133,264.18 147.33,270.67 157,262 142.67,255.51" style="fill-opacity:0.56"/><polygon class="ls-face" points="56.33,239.18 70.67,252.22 80.33,243.55 66,230.51" style="fill-opacity:0.44"/><polygon class="ls-face" points="243.33,245.55 257.67,243.84 267.33,235.18 253,236.89" style="fill-opacity:0.63"/><polygon class="ls-face" points="219.33,254.29 233.67,254.22 243.33,245.55 229,245.62" style="fill-opacity:0.62"/><polygon class="ls-face" points="267.33,235.18 281.67,231.83 291.33,223.16 277,226.51" style="fill-opacity:0.63"/><polygon class="ls-face" points="195.33,261.39 209.67,262.96 219.33,254.29 205,252.72" style="fill-opacity:0.61"/><polygon class="ls-face" points="109,264.72 123.33,272.85 133,264.18 118.67,256.05" style="fill-opacity:0.53"/><polygon class="ls-face" points="70.67,252.22 85,263.62 94.67,254.96 80.33,243.55" style="fill-opacity:0.47"/><polygon class="ls-face" points="171.33,266.85 185.67,270.05 195.33,261.39 181,258.18" style="fill-opacity:0.60"/><polygon class="ls-face" points="147.33,270.67 161.67,275.51 171.33,266.85 157,262" style="fill-opacity:0.58"/><polygon class="ls-face" points="85,263.62 99.33,273.39 109,264.72 94.67,254.96" style="fill-opacity:0.50"/><polygon class="ls-face" points="123.33,272.85 137.67,279.33 147.33,270.67 133,264.18" style="fill-opacity:0.56"/><polygon class="ls-face" points="233.67,254.22 248,252.51 257.67,243.84 243.33,245.55" style="fill-opacity:0.63"/><polygon class="ls-face" points="209.67,262.96 224,262.89 233.67,254.22 219.33,254.29" style="fill-opacity:0.62"/><polygon class="ls-face" points="257.67,243.84 272,240.49 281.67,231.83 267.33,235.18" style="fill-opacity:0.63"/><polygon class="ls-face" points="185.67,270.05 200,271.62 209.67,262.96 195.33,261.39" style="fill-opacity:0.61"/><polygon class="ls-face" points="99.33,273.39 113.67,281.51 123.33,272.85 109,264.72" style="fill-opacity:0.53"/><polygon class="ls-face" points="161.67,275.51 176,278.72 185.67,270.05 171.33,266.85" style="fill-opacity:0.60"/><polygon class="ls-face" points="137.67,279.33 152,284.18 161.67,275.51 147.33,270.67" style="fill-opacity:0.58"/><polygon class="ls-face" points="113.67,281.51 128,288 137.67,279.33 123.33,272.85" style="fill-opacity:0.56"/><polygon class="ls-face" points="224,262.89 238.33,261.18 248,252.51 233.67,254.22" style="fill-opacity:0.63"/><polygon class="ls-face" points="200,271.62 214.33,271.55 224,262.89 209.67,262.96" style="fill-opacity:0.62"/><polygon class="ls-face" points="248,252.51 262.33,249.16 272,240.49 257.67,243.84" style="fill-opacity:0.63"/><polygon class="ls-face" points="176,278.72 190.33,280.29 200,271.62 185.67,270.05" style="fill-opacity:0.61"/><polygon class="ls-face" points="152,284.18 166.33,287.39 176,278.72 161.67,275.51" style="fill-opacity:0.60"/><polygon class="ls-face" points="128,288 142.33,292.85 152,284.18 137.67,279.33" style="fill-opacity:0.58"/><polygon class="ls-face" points="214.33,271.55 228.67,269.84 238.33,261.18 224,262.89" style="fill-opacity:0.63"/><polygon class="ls-face" points="190.33,280.29 204.67,280.22 214.33,271.55 200,271.62" style="fill-opacity:0.62"/><polygon class="ls-face" points="238.33,261.18 252.67,257.83 262.33,249.16 248,252.51" style="fill-opacity:0.63"/><polygon class="ls-face" points="166.33,287.39 180.67,288.96 190.33,280.29 176,278.72" style="fill-opacity:0.61"/><polygon class="ls-face" points="142.33,292.85 156.67,296.05 166.33,287.39 152,284.18" style="fill-opacity:0.60"/><polygon class="ls-face" points="204.67,280.22 219,278.51 228.67,269.84 214.33,271.55" style="fill-opacity:0.63"/><polygon class="ls-face" points="180.67,288.96 195,288.89 204.67,280.22 190.33,280.29" style="fill-opacity:0.62"/><polygon class="ls-face" points="228.67,269.84 243,266.49 252.67,257.83 238.33,261.18" style="fill-opacity:0.63"/><polygon class="ls-face" points="156.67,296.05 171,297.62 180.67,288.96 166.33,287.39" style="fill-opacity:0.61"/><polygon class="ls-face" points="195,288.89 209.33,287.18 219,278.51 204.67,280.22" style="fill-opacity:0.63"/><polygon class="ls-face" points="171,297.62 185.33,297.55 195,288.89 180.67,288.96" style="fill-opacity:0.62"/><polygon class="ls-face" points="219,278.51 233.33,275.16 243,266.49 228.67,269.84" style="fill-opacity:0.63"/><polygon class="ls-face" points="185.33,297.55 199.67,295.84 209.33,287.18 195,288.89" style="fill-opacity:0.63"/><polygon class="ls-face" points="209.33,287.18 223.67,283.83 233.33,275.16 219,278.51" style="fill-opacity:0.63"/><polygon class="ls-face" points="199.67,295.84 214,292.49 223.67,283.83 209.33,287.18" style="fill-opacity:0.63"/><polygon class="ls-flat ls-flat-front" points="42,254 214,322 330,218 158,150"/><path class="ls-load " d="M240.64 270.65L269.88 282.21M262.9 282.72L269.88 282.21L265.14 277.06"/><path class="ls-load " d="M61.76 199.93L32.52 188.37M39.5 187.85L32.52 188.37L37.26 193.52"/><path class="ls-load " d="M275.44 239.45L304.68 251.01M297.7 251.52L304.68 251.01L299.94 245.86"/><path class="ls-load " d="M96.56 168.73L67.32 157.17M74.3 156.65L67.32 157.17L72.06 162.32"/><path class="ls-load " d="M310.24 208.25L339.48 219.81M332.5 220.32L339.48 219.81L334.74 214.66"/><path class="ls-load " d="M131.36 137.53L102.12 125.97M109.1 125.45L102.12 125.97L106.86 131.12"/><text x="14" y="24" class="ls-t ls-head">UNSYMMETRIC</text><text x="388" y="24" class="ls-t ls-small" text-anchor="end">height ×30</text><text x="14" y="46" class="ls-t ls-small">[0/90], 0° ply on top</text><text x="14" y="68" class="ls-t ls-small">Nx 0.50 N/mm, M = 0</text></svg></div><div><svg class="ls-svg ls-panel" viewBox="0 0 400 402" role="img" aria-label="[0/90]s under the same load stays flat." focusable="false"><polygon class="ls-flat" points="42,254 214,322 330,218 158,150"/><polygon class="ls-face" points="148.33,158.67 162.67,164.33 172.33,155.67 158,150" style="fill-opacity:0.57"/><polygon class="ls-face" points="162.67,164.33 177,170 186.67,161.33 172.33,155.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="138.67,167.33 153,173 162.67,164.33 148.33,158.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="177,170 191.33,175.67 201,167 186.67,161.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="153,173 167.33,178.67 177,170 162.67,164.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="129,176 143.33,181.67 153,173 138.67,167.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="191.33,175.67 205.67,181.33 215.33,172.67 201,167" style="fill-opacity:0.57"/><polygon class="ls-face" points="167.33,178.67 181.67,184.33 191.33,175.67 177,170" style="fill-opacity:0.57"/><polygon class="ls-face" points="143.33,181.67 157.67,187.33 167.33,178.67 153,173" style="fill-opacity:0.57"/><polygon class="ls-face" points="205.67,181.33 220,187 229.67,178.33 215.33,172.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="119.33,184.67 133.67,190.33 143.33,181.67 129,176" style="fill-opacity:0.57"/><polygon class="ls-face" points="181.67,184.33 196,190 205.67,181.33 191.33,175.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="157.67,187.33 172,193 181.67,184.33 167.33,178.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="220,187 234.33,192.67 244,184 229.67,178.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="133.67,190.33 148,196 157.67,187.33 143.33,181.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="196,190 210.33,195.67 220,187 205.67,181.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="109.67,193.33 124,199 133.67,190.33 119.33,184.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="172,193 186.33,198.67 196,190 181.67,184.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="234.33,192.67 248.67,198.33 258.33,189.67 244,184" style="fill-opacity:0.57"/><polygon class="ls-face" points="148,196 162.33,201.67 172,193 157.67,187.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="210.33,195.67 224.67,201.33 234.33,192.67 220,187" style="fill-opacity:0.57"/><polygon class="ls-face" points="124,199 138.33,204.67 148,196 133.67,190.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="186.33,198.67 200.67,204.33 210.33,195.67 196,190" style="fill-opacity:0.57"/><polygon class="ls-face" points="248.67,198.33 263,204 272.67,195.33 258.33,189.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="100,202 114.33,207.67 124,199 109.67,193.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="162.33,201.67 176.67,207.33 186.33,198.67 172,193" style="fill-opacity:0.57"/><polygon class="ls-face" points="224.67,201.33 239,207 248.67,198.33 234.33,192.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="138.33,204.67 152.67,210.33 162.33,201.67 148,196" style="fill-opacity:0.57"/><polygon class="ls-face" points="200.67,204.33 215,210 224.67,201.33 210.33,195.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="263,204 277.33,209.67 287,201 272.67,195.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="114.33,207.67 128.67,213.33 138.33,204.67 124,199" style="fill-opacity:0.57"/><polygon class="ls-face" points="176.67,207.33 191,213 200.67,204.33 186.33,198.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="239,207 253.33,212.67 263,204 248.67,198.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="90.33,210.67 104.67,216.33 114.33,207.67 100,202" style="fill-opacity:0.57"/><polygon class="ls-face" points="152.67,210.33 167,216 176.67,207.33 162.33,201.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="215,210 229.33,215.67 239,207 224.67,201.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="277.33,209.67 291.67,215.33 301.33,206.67 287,201" style="fill-opacity:0.57"/><polygon class="ls-face" points="128.67,213.33 143,219 152.67,210.33 138.33,204.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="191,213 205.33,218.67 215,210 200.67,204.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="253.33,212.67 267.67,218.33 277.33,209.67 263,204" style="fill-opacity:0.57"/><polygon class="ls-face" points="104.67,216.33 119,222 128.67,213.33 114.33,207.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="167,216 181.33,221.67 191,213 176.67,207.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="229.33,215.67 243.67,221.33 253.33,212.67 239,207" style="fill-opacity:0.57"/><polygon class="ls-face" points="291.67,215.33 306,221 315.67,212.33 301.33,206.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="80.67,219.33 95,225 104.67,216.33 90.33,210.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="143,219 157.33,224.67 167,216 152.67,210.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="205.33,218.67 219.67,224.33 229.33,215.67 215,210" style="fill-opacity:0.57"/><polygon class="ls-face" points="267.67,218.33 282,224 291.67,215.33 277.33,209.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="119,222 133.33,227.67 143,219 128.67,213.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="181.33,221.67 195.67,227.33 205.33,218.67 191,213" style="fill-opacity:0.57"/><polygon class="ls-face" points="243.67,221.33 258,227 267.67,218.33 253.33,212.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="306,221 320.33,226.67 330,218 315.67,212.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="95,225 109.33,230.67 119,222 104.67,216.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="157.33,224.67 171.67,230.33 181.33,221.67 167,216" style="fill-opacity:0.57"/><polygon class="ls-face" points="219.67,224.33 234,230 243.67,221.33 229.33,215.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="282,224 296.33,229.67 306,221 291.67,215.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="71,228 85.33,233.67 95,225 80.67,219.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="133.33,227.67 147.67,233.33 157.33,224.67 143,219" style="fill-opacity:0.57"/><polygon class="ls-face" points="195.67,227.33 210,233 219.67,224.33 205.33,218.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="258,227 272.33,232.67 282,224 267.67,218.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="109.33,230.67 123.67,236.33 133.33,227.67 119,222" style="fill-opacity:0.57"/><polygon class="ls-face" points="171.67,230.33 186,236 195.67,227.33 181.33,221.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="234,230 248.33,235.67 258,227 243.67,221.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="296.33,229.67 310.67,235.33 320.33,226.67 306,221" style="fill-opacity:0.57"/><polygon class="ls-face" points="85.33,233.67 99.67,239.33 109.33,230.67 95,225" style="fill-opacity:0.57"/><polygon class="ls-face" points="147.67,233.33 162,239 171.67,230.33 157.33,224.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="210,233 224.33,238.67 234,230 219.67,224.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="272.33,232.67 286.67,238.33 296.33,229.67 282,224" style="fill-opacity:0.57"/><polygon class="ls-face" points="61.33,236.67 75.67,242.33 85.33,233.67 71,228" style="fill-opacity:0.57"/><polygon class="ls-face" points="123.67,236.33 138,242 147.67,233.33 133.33,227.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="186,236 200.33,241.67 210,233 195.67,227.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="248.33,235.67 262.67,241.33 272.33,232.67 258,227" style="fill-opacity:0.57"/><polygon class="ls-face" points="99.67,239.33 114,245 123.67,236.33 109.33,230.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="162,239 176.33,244.67 186,236 171.67,230.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="224.33,238.67 238.67,244.33 248.33,235.67 234,230" style="fill-opacity:0.57"/><polygon class="ls-face" points="286.67,238.33 301,244 310.67,235.33 296.33,229.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="75.67,242.33 90,248 99.67,239.33 85.33,233.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="138,242 152.33,247.67 162,239 147.67,233.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="200.33,241.67 214.67,247.33 224.33,238.67 210,233" style="fill-opacity:0.57"/><polygon class="ls-face" points="262.67,241.33 277,247 286.67,238.33 272.33,232.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="51.67,245.33 66,251 75.67,242.33 61.33,236.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="114,245 128.33,250.67 138,242 123.67,236.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="176.33,244.67 190.67,250.33 200.33,241.67 186,236" style="fill-opacity:0.57"/><polygon class="ls-face" points="238.67,244.33 253,250 262.67,241.33 248.33,235.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="90,248 104.33,253.67 114,245 99.67,239.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="152.33,247.67 166.67,253.33 176.33,244.67 162,239" style="fill-opacity:0.57"/><polygon class="ls-face" points="214.67,247.33 229,253 238.67,244.33 224.33,238.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="277,247 291.33,252.67 301,244 286.67,238.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="66,251 80.33,256.67 90,248 75.67,242.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="128.33,250.67 142.67,256.33 152.33,247.67 138,242" style="fill-opacity:0.57"/><polygon class="ls-face" points="190.67,250.33 205,256 214.67,247.33 200.33,241.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="253,250 267.33,255.67 277,247 262.67,241.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="42,254 56.33,259.67 66,251 51.67,245.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="104.33,253.67 118.67,259.33 128.33,250.67 114,245" style="fill-opacity:0.57"/><polygon class="ls-face" points="166.67,253.33 181,259 190.67,250.33 176.33,244.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="229,253 243.33,258.67 253,250 238.67,244.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="80.33,256.67 94.67,262.33 104.33,253.67 90,248" style="fill-opacity:0.57"/><polygon class="ls-face" points="142.67,256.33 157,262 166.67,253.33 152.33,247.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="205,256 219.33,261.67 229,253 214.67,247.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="267.33,255.67 281.67,261.33 291.33,252.67 277,247" style="fill-opacity:0.57"/><polygon class="ls-face" points="56.33,259.67 70.67,265.33 80.33,256.67 66,251" style="fill-opacity:0.57"/><polygon class="ls-face" points="118.67,259.33 133,265 142.67,256.33 128.33,250.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="181,259 195.33,264.67 205,256 190.67,250.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="243.33,258.67 257.67,264.33 267.33,255.67 253,250" style="fill-opacity:0.57"/><polygon class="ls-face" points="94.67,262.33 109,268 118.67,259.33 104.33,253.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="157,262 171.33,267.67 181,259 166.67,253.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="219.33,261.67 233.67,267.33 243.33,258.67 229,253" style="fill-opacity:0.57"/><polygon class="ls-face" points="70.67,265.33 85,271 94.67,262.33 80.33,256.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="133,265 147.33,270.67 157,262 142.67,256.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="195.33,264.67 209.67,270.33 219.33,261.67 205,256" style="fill-opacity:0.57"/><polygon class="ls-face" points="257.67,264.33 272,270 281.67,261.33 267.33,255.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="109,268 123.33,273.67 133,265 118.67,259.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="171.33,267.67 185.67,273.33 195.33,264.67 181,259" style="fill-opacity:0.57"/><polygon class="ls-face" points="233.67,267.33 248,273 257.67,264.33 243.33,258.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="85,271 99.33,276.67 109,268 94.67,262.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="147.33,270.67 161.67,276.33 171.33,267.67 157,262" style="fill-opacity:0.57"/><polygon class="ls-face" points="209.67,270.33 224,276 233.67,267.33 219.33,261.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="123.33,273.67 137.67,279.33 147.33,270.67 133,265" style="fill-opacity:0.57"/><polygon class="ls-face" points="185.67,273.33 200,279 209.67,270.33 195.33,264.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="248,273 262.33,278.67 272,270 257.67,264.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="99.33,276.67 113.67,282.33 123.33,273.67 109,268" style="fill-opacity:0.57"/><polygon class="ls-face" points="161.67,276.33 176,282 185.67,273.33 171.33,267.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="224,276 238.33,281.67 248,273 233.67,267.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="137.67,279.33 152,285 161.67,276.33 147.33,270.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="200,279 214.33,284.67 224,276 209.67,270.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="113.67,282.33 128,288 137.67,279.33 123.33,273.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="176,282 190.33,287.67 200,279 185.67,273.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="238.33,281.67 252.67,287.33 262.33,278.67 248,273" style="fill-opacity:0.57"/><polygon class="ls-face" points="152,285 166.33,290.67 176,282 161.67,276.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="214.33,284.67 228.67,290.33 238.33,281.67 224,276" style="fill-opacity:0.57"/><polygon class="ls-face" points="128,288 142.33,293.67 152,285 137.67,279.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="190.33,287.67 204.67,293.33 214.33,284.67 200,279" style="fill-opacity:0.57"/><polygon class="ls-face" points="166.33,290.67 180.67,296.33 190.33,287.67 176,282" style="fill-opacity:0.57"/><polygon class="ls-face" points="228.67,290.33 243,296 252.67,287.33 238.33,281.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="142.33,293.67 156.67,299.33 166.33,290.67 152,285" style="fill-opacity:0.57"/><polygon class="ls-face" points="204.67,293.33 219,299 228.67,290.33 214.33,284.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="180.67,296.33 195,302 204.67,293.33 190.33,287.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="156.67,299.33 171,305 180.67,296.33 166.33,290.67" style="fill-opacity:0.57"/><polygon class="ls-face" points="219,299 233.33,304.67 243,296 228.67,290.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="195,302 209.33,307.67 219,299 204.67,293.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="171,305 185.33,310.67 195,302 180.67,296.33" style="fill-opacity:0.57"/><polygon class="ls-face" points="209.33,307.67 223.67,313.33 233.33,304.67 219,299" style="fill-opacity:0.57"/><polygon class="ls-face" points="185.33,310.67 199.67,316.33 209.33,307.67 195,302" style="fill-opacity:0.57"/><polygon class="ls-face" points="199.67,316.33 214,322 223.67,313.33 209.33,307.67" style="fill-opacity:0.57"/><polygon class="ls-flat ls-flat-front" points="42,254 214,322 330,218 158,150"/><path class="ls-load " d="M240.64 302.56L269.88 314.12M262.9 314.63L269.88 314.12L265.14 308.97"/><path class="ls-load " d="M61.76 231.84L32.52 220.28M39.5 219.77L32.52 220.28L37.26 225.43"/><path class="ls-load " d="M275.44 271.36L304.68 282.92M297.7 283.43L304.68 282.92L299.94 277.77"/><path class="ls-load " d="M96.56 200.64L67.32 189.08M74.3 188.57L67.32 189.08L72.06 194.23"/><path class="ls-load " d="M310.24 240.16L339.48 251.72M332.5 252.23L339.48 251.72L334.74 246.57"/><path class="ls-load " d="M131.36 169.44L102.12 157.88M109.1 157.37L102.12 157.88L106.86 163.03"/><text x="14" y="24" class="ls-t ls-head">SYMMETRIC</text><text x="388" y="24" class="ls-t ls-small" text-anchor="end">height ×30</text><text x="14" y="46" class="ls-t ls-small">[0/90]s</text><text x="14" y="68" class="ls-t ls-small">Nx 0.50 N/mm, M = 0</text></svg></div></div><figcaption><strong>Same pull, Nx = 0.5 N/mm, no applied moment.</strong> [0/90] curls: κx −7.87×10⁻⁴ mm⁻¹ · κy 0 mm⁻¹ · κxy 0 mm⁻¹ (principal radius about 1271 mm). [0/90]s stays flat: all curvatures are zero because B = 0. Height exaggerated ×30 in both drawings of a 50 mm square patch; the dashed outline is the unloaded patch and in-plane stretch is not drawn. With no load, both are flat.</figcaption></figure>
+      <!-- /LAMINATE-STACKING-STATIC -->
+    </div>
+  </div>
+  <p>The polar plot is a <strong>stiffness rose</strong>. Its radius in each direction is the laminate's effective in-plane modulus E<sub>x</sub>(θ) for a pull in that direction, computed with the laminate held flat. A circle means the same in-plane stiffness every way.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="fiber-direction-and-stiffness--symmetric-balanced-and-quasi-isotropic-are-three-different-properties" data-card="fiber-direction-and-stiffness--symmetric-balanced-and-quasi-isotropic-are-three-different-properties">
+    <summary>Symmetric, balanced and quasi-isotropic are three different properties<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Symmetric, balanced and quasi-isotropic are three different properties</h2>
+  <ul>
+    <li><strong>Symmetric:</strong> the plies above the midplane are a mirror image of the plies below it. Then the coupling matrix <code>B</code> is zero, so in-plane loads and bending stay separate. <code>[0/90]s</code> is symmetric; <code>[0/90]</code> is not.</li>
+    <li><strong>Balanced:</strong> every +θ ply has a −θ ply of the same thickness somewhere in the stack (0° and 90° plies need no partner). Then <code>A<sub>16</sub> = A<sub>26</sub> = 0</code>: there is no extension–shear coupling in the flat-held in-plane response, so a pull along x or y held flat does not shear the laminate in its plane. A balanced <em>and</em> symmetric stack also has <code>B = 0</code>, so it does not shear when free either; a balanced unsymmetric stack such as <code>[0/+45/−45/90]</code> can still shear and twist when free to curve.</li>
+    <li><strong>Quasi-isotropic:</strong> the in-plane stiffness matrix <code>A</code> is the same in every direction, so the rose is a circle. Equal numbers of 0°, +45°, −45° and 90° plies do this, and because <code>A</code> ignores the order of the plies, <code>[0/+45/−45/90]s</code> and <code>[+45/0/−45/90]s</code> both qualify. It describes in-plane stiffness only; bending stiffness <code>D</code> still depends on order and direction.</li>
+  </ul>
+  <p>An unsymmetric laminate does <strong>not</strong> bend just because <code>B</code> is not zero. With no applied force and no applied moment, this model predicts no deformation at all. <code>B</code> only links a load to a response: pull an unsymmetric panel in its plane and it also curls or twists, even though no moment is applied. A symmetric panel under the same pull stays flat: it stretches (and, if unbalanced, also shears in its plane) but does not curl or twist.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide" id="fiber-direction-and-stiffness--flat-held-and-free-stiffness-differ-for-unsymmetric-laminates" data-card="fiber-direction-and-stiffness--flat-held-and-free-stiffness-differ-for-unsymmetric-laminates">
+    <summary>Flat-held and free stiffness differ for unsymmetric laminates<span class="chev"></span></summary>
+    <div class="body">
+      <h2>Flat-held and free stiffness differ for unsymmetric laminates</h2>
+  <p>The two stiffness numbers for an unsymmetric laminate answer different questions. <strong>Flat-held</strong> (curvature-constrained) stiffness uses <code>A</code> alone and assumes something stops the panel from curving. <strong>Free</strong> stiffness lets it curve with zero applied moment and solves the full relation including <code>B</code> and <code>D</code>; it is never higher, and in most directions lower, because the panel can curl as well as stretch. For a symmetric laminate the two are identical.</p>
+  <p>Real unsymmetric panels can also warp as they cool after curing, because each ply shrinks differently in different directions. That temperature effect is <strong>not</strong> modeled here, and the curled panel in the interactive is not a picture of it: every curl drawn above is the response to the stated in-plane load.</p>
+  <p class="deeper-ref" id="deeper-ref-16">Supporting detail: <a href="#deeper-addendum-16"><strong>Addendum 16</strong></a> &mdash; How the laminate stiffness and the free-panel response are calculated.</p>
+  <p>This is linear, small-deflection classical laminate theory with perfectly bonded plies. It does not predict strength, first-ply failure, delamination, buckling, temperature or moisture effects, or how a real panel behaves once its deflection is comparable to its thickness.</p>
+  <p class="deeper-ref" id="deeper-ref-17">Supporting detail: <a href="#deeper-addendum-17"><strong>Addendum 17</strong></a> &mdash; Primary mechanics source and model boundary.</p>
+    </div>
+  </details>
 </div>
 
 </article>
@@ -5189,7 +5417,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <li>Complete a small compatibility trial and inspect its cure before the full pour.</li>
   </ul>
   <p><strong>Working time</strong> is the available time to mix and place the material under stated conditions. It is not the demolding time. Cure instructions may distinguish demolding from full properties or further treatment. Record the actual temperature and times; do not substitute a universal overnight wait.</p>
-  <p class="deeper-ref" id="deeper-ref-16">Supporting detail: <a href="#deeper-addendum-16"><strong>Addendum 16</strong></a> &mdash; Where to find product-specific instructions.</p>
+  <p class="deeper-ref" id="deeper-ref-18">Supporting detail: <a href="#deeper-addendum-18"><strong>Addendum 18</strong></a> &mdash; Where to find product-specific instructions.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume" data-card="making-silicone-molds-from-a-printed-pattern--a-ratio-by-weight-is-not-automatically-a-ratio-by-volume" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -5688,10 +5916,30 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </li>
     <li class="deeper-addendum" id="deeper-addendum-16" value="16">
       <article>
-        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-making-silicone-molds-from-a-printed-pattern">Making Silicone Molds from a Printed Pattern</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 16.</span> Where to find product-specific instructions</h2>
-        <p>Start with the manufacturer's product documentation, such as <a href="https://www.smooth-on.com/documents/?doc=all">Smooth-On's technical bulletin and SDS directory</a>. Its <a href="https://www.smooth-on.com/support/faq/210/">printed-pattern compatibility FAQ</a> is a further-reading lead when investigating an uncured surface against a resin print. Check the complete instructions for the particular materials before selecting a treatment.</p>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Composites</span><span class="sep">/</span><a href="#p-fiber-direction-and-stiffness">Fiber Direction and Elastic Stiffness</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 16.</span> How the laminate stiffness and the free-panel response are calculated</h2>
+        <p>Each ply's reduced stiffness <code>Q</code> (MPa) comes from E<sub>1</sub>, E<sub>2</sub>, G<sub>12</sub> and ν<sub>12</sub>, and is rotated to the ply angle to give <code>Q̄</code>, using engineering shear strain γ<sub>xy</sub>. With z measured up from the midplane and each ply running from z<sub>bottom</sub> to z<sub>top</sub> (mm):</p>
+    <p><code>A = Σ Q̄ (z<sub>top</sub> − z<sub>bottom</sub>)</code> in N/mm; <code>B = Σ Q̄ (z<sub>top</sub>² − z<sub>bottom</sub>²)/2</code> in N; <code>D = Σ Q̄ (z<sub>top</sub>³ − z<sub>bottom</sub>³)/3</code> in N·mm.</p>
+    <p>The force resultants N (N/mm) and moment resultants M (N·mm per mm) relate to midplane strain ε⁰ and curvature κ (1/mm) by <code>N = A ε⁰ + B κ</code> and <code>M = B ε⁰ + D κ</code>. The interactive applies N with <code>M = 0</code> and solves all six equations together. The drawn surface is <code>w = −(κ<sub>x</sub>x² + κ<sub>y</sub>y² + κ<sub>xy</sub>xy)/2</code>, exaggerated by the stated factor.</p>
+    <p>For the rose, a pull N<sub>θ</sub> along direction θ has components <code>(cos²θ, sin²θ, sinθ cosθ) N<sub>θ</sub></code>. Flat-held: <code>E<sub>x</sub>(θ) = 1/(h · vᵀA⁻¹v)</code> with <code>v = (cos²θ, sin²θ, sinθ cosθ)</code> and laminate thickness h. Free: the same, with the in-plane block of the inverted six-by-six A-B-D matrix in place of A⁻¹.</p>
+    <p>Reversing the ply order (the bottom ply listed first) leaves <code>A</code> and <code>D</code> unchanged and reverses the sign of every <code>B</code> term, so the same pull makes the opposite curl. A single ply is symmetric about its own midplane, so it reproduces the one-ply result above: 40 GPa along the fibers and 10 GPa across.</p>
         <p class="deeper-back"><a href="#deeper-ref-16">Back to reference 16</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-17" value="17">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Composites</span><span class="sep">/</span><a href="#p-fiber-direction-and-stiffness">Fiber Direction and Elastic Stiffness</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 17.</span> Primary mechanics source and model boundary</h2>
+        <p><a href="https://ntrs.nasa.gov/citations/19950009349">NASA Reference Publication 1351, <em>Basic Mechanics of Laminated Composite Plates</em></a> (A. T. Nettles, 1994) defines balanced and symmetric laminates, derives the A, B and D matrices and the laminate constitutive equations, shows that a symmetric laminate has B = 0, and works an unsymmetric laminate example in which a tensile load alone bends the plate. It also notes that unsymmetric laminates can warp from processing temperature changes, which this lesson excludes. The ply constants, ply thickness, loads and panel size here are original illustrative teaching inputs, not values from that report and not design data.</p>
+        <p class="deeper-back"><a href="#deeper-ref-17">Back to reference 17</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-18" value="18">
+      <article>
+        <div class="crumb"><span>Materials and Manufacturing Processes</span><span class="sep">/</span><span>Manufacturing Documentation</span><span class="sep">/</span><a href="#p-making-silicone-molds-from-a-printed-pattern">Making Silicone Molds from a Printed Pattern</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 18.</span> Where to find product-specific instructions</h2>
+        <p>Start with the manufacturer's product documentation, such as <a href="https://www.smooth-on.com/documents/?doc=all">Smooth-On's technical bulletin and SDS directory</a>. Its <a href="https://www.smooth-on.com/support/faq/210/">printed-pattern compatibility FAQ</a> is a further-reading lead when investigating an uncured surface against a resin print. Check the complete instructions for the particular materials before selecting a treatment.</p>
+        <p class="deeper-back"><a href="#deeper-ref-18">Back to reference 18</a></p>
       </article>
     </li>
   </ol>
@@ -7710,6 +7958,886 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll, { once: true });
   else initAll();
 })();
+
+/* Bounded classical laminate theory for a stack of thin, perfectly bonded,
+   linear-elastic orthotropic plies in plane stress (Kirchhoff plate kinematics,
+   small deflection). Units throughout: MPa, mm, N/mm (force resultant N),
+   N (moment resultant per unit width M), 1/mm (curvature kappa).
+
+   Geometry: z is measured UP from the geometric midplane. Plies are listed
+   from the TOP face (z = +h/2) to the BOTTOM face (z = -h/2), which is how a
+   stacking sequence is written. Fiber angle theta is measured from the global
+   x axis toward y, counterclockwise seen from +z. Shear strains are
+   ENGINEERING shear strains (gamma_xy = 2 eps_xy); curvatures follow
+   kappa_x = -d2w/dx2, kappa_y = -d2w/dy2, kappa_xy = -2 d2w/dxdy, so the
+   midplane deflection is w = -(kappa_x x^2 + kappa_y y^2 + kappa_xy x y)/2.
+
+   The ply material comes from the fiber-orientation module's illustrative
+   defaults and is validated by that module's own validator. This is NOT a
+   strength, failure, buckling, thermal, moisture or cure-warp model. */
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('../fiber-orientation/model.js') : root.FiberOrientationModel);
+  if (node) module.exports = api; else root.CourseWikiLaminate = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (FO) {
+  'use strict';
+  if (!FO) throw new Error('laminate-stacking requires the fiber-orientation model.');
+
+  var PLY_MM = 0.125;          // chosen illustrative ply thickness, not measured data
+  var MAX_PLIES = 16;
+  var ANGLES = Object.freeze([0, 45, -45, 90]);
+  var MATERIAL = Object.freeze({ E1GPa: FO.defaults.E1GPa, E2GPa: FO.defaults.E2GPa,
+    G12GPa: FO.defaults.G12GPa, nu12: FO.defaults.nu12 });
+  var REL_ZERO = 1e-9;
+
+  function finite(v, name) { if (!Number.isFinite(v)) throw new RangeError(name + ' must be a finite number.'); }
+
+  function material(input) {
+    var m = input || MATERIAL;
+    // Reuse the single-ply module's validation rather than copying it.
+    FO.validate({ E1GPa: m.E1GPa, E2GPa: m.E2GPa, G12GPa: m.G12GPa, nu12: m.nu12, angleDeg: 0, sigmaXMPa: 0 });
+    return m;
+  }
+
+  /* Reduced stiffness Q of one ply in its own axes, MPa. */
+  function reducedStiffness(input) {
+    var m = material(input);
+    var E1 = m.E1GPa * 1000, E2 = m.E2GPa * 1000, G12 = m.G12GPa * 1000;
+    var nu21 = m.nu12 * E2 / E1, d = 1 - m.nu12 * nu21;
+    return { Q11: E1 / d, Q22: E2 / d, Q12: m.nu12 * E2 / d, Q66: G12 };
+  }
+
+  /* Transformed reduced stiffness Qbar (3x3, MPa) for engineering shear strain. */
+  function qbar(angleDeg, input) {
+    finite(angleDeg, 'Ply angle');
+    var q = reducedStiffness(input), t = angleDeg * Math.PI / 180;
+    var m = Math.cos(t), n = Math.sin(t), m2 = m * m, n2 = n * n;
+    var Q11 = q.Q11, Q22 = q.Q22, Q12 = q.Q12, Q66 = q.Q66;
+    var b11 = Q11 * m2 * m2 + 2 * (Q12 + 2 * Q66) * m2 * n2 + Q22 * n2 * n2;
+    var b22 = Q11 * n2 * n2 + 2 * (Q12 + 2 * Q66) * m2 * n2 + Q22 * m2 * m2;
+    var b12 = (Q11 + Q22 - 4 * Q66) * m2 * n2 + Q12 * (m2 * m2 + n2 * n2);
+    var b16 = (Q11 - Q12 - 2 * Q66) * m2 * m * n + (Q12 - Q22 + 2 * Q66) * m * n2 * n;
+    var b26 = (Q11 - Q12 - 2 * Q66) * m * n2 * n + (Q12 - Q22 + 2 * Q66) * m2 * m * n;
+    var b66 = (Q11 + Q22 - 2 * Q12 - 2 * Q66) * m2 * n2 + Q66 * (m2 * m2 + n2 * n2);
+    return [[b11, b12, b16], [b12, b22, b26], [b16, b26, b66]];
+  }
+
+  function zeros(r, c) { var out = []; for (var i = 0; i < r; i++) { out.push([]); for (var j = 0; j < c; j++) out[i].push(0); } return out; }
+
+  function normalizePlies(plies) {
+    if (!Array.isArray(plies) || plies.length < 1) throw new RangeError('A laminate needs at least one ply.');
+    if (plies.length > 64) throw new RangeError('At most 64 plies are supported.');
+    return plies.map(function (p, i) {
+      var angle = typeof p === 'number' ? p : p && p.angle;
+      var t = typeof p === 'number' ? PLY_MM : (p && p.t != null ? p.t : PLY_MM);
+      finite(angle, 'Ply ' + (i + 1) + ' angle');
+      finite(t, 'Ply ' + (i + 1) + ' thickness');
+      if (t <= 0) throw new RangeError('Ply ' + (i + 1) + ' thickness must be greater than zero.');
+      return { angle: angle, t: t };
+    });
+  }
+
+  /* A (N/mm), B (N), D (N mm). Plies listed top (z=+h/2) to bottom. */
+  function abd(plies, input) {
+    var list = normalizePlies(plies);
+    var h = list.reduce(function (s, p) { return s + p.t; }, 0);
+    var A = zeros(3, 3), B = zeros(3, 3), D = zeros(3, 3), zTop = h / 2, layers = [];
+    list.forEach(function (p) {
+      var zBot = zTop - p.t, Q = qbar(p.angle, input);
+      for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) {
+        A[i][j] += Q[i][j] * (zTop - zBot);
+        B[i][j] += Q[i][j] * (zTop * zTop - zBot * zBot) / 2;
+        D[i][j] += Q[i][j] * (zTop * zTop * zTop - zBot * zBot * zBot) / 3;
+      }
+      layers.push({ angle: p.angle, t: p.t, zTop: zTop, zBottom: zBot });
+      zTop = zBot;
+    });
+    return { A: A, B: B, D: D, h: h, layers: layers };
+  }
+
+  function full(L) {
+    var K = zeros(6, 6);
+    for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) {
+      K[i][j] = L.A[i][j]; K[i][j + 3] = L.B[i][j]; K[i + 3][j] = L.B[i][j]; K[i + 3][j + 3] = L.D[i][j];
+    }
+    return K;
+  }
+
+  /* Gauss-Jordan inverse with partial pivoting; refuses singular input. */
+  function invert(M) {
+    var n = M.length, a = M.map(function (row, i) {
+      var r = row.slice(); for (var j = 0; j < n; j++) r.push(i === j ? 1 : 0); return r;
+    });
+    var scale = 0; M.forEach(function (row) { row.forEach(function (v) { scale = Math.max(scale, Math.abs(v)); }); });
+    for (var c = 0; c < n; c++) {
+      var p = c;
+      for (var r = c + 1; r < n; r++) if (Math.abs(a[r][c]) > Math.abs(a[p][c])) p = r;
+      if (!(Math.abs(a[p][c]) > scale * 1e-14)) throw new RangeError('Stiffness matrix is singular.');
+      var tmp = a[c]; a[c] = a[p]; a[p] = tmp;
+      var piv = a[c][c];
+      for (var k = 0; k < 2 * n; k++) a[c][k] /= piv;
+      for (r = 0; r < n; r++) if (r !== c) {
+        var f = a[r][c];
+        if (f) for (k = 0; k < 2 * n; k++) a[r][k] -= f * a[c][k];
+      }
+    }
+    return a.map(function (row) { return row.slice(n); });
+  }
+  function mulVec(M, v) { return M.map(function (row) { return row.reduce(function (s, x, j) { return s + x * v[j]; }, 0); }); }
+  function upperLeft(M) { return [M[0].slice(0, 3), M[1].slice(0, 3), M[2].slice(0, 3)]; }
+  function maxAbs(M) { var m = 0; M.forEach(function (row) { row.forEach(function (v) { m = Math.max(m, Math.abs(v)); }); }); return m; }
+
+  function laminate(plies, input) {
+    var L = abd(plies, input);
+    L.a = invert(L.A);                       // flat-held (curvature-constrained) compliance, mm/N
+    L.inverseABD = invert(full(L));
+    L.aFree = upperLeft(L.inverseABD);       // free in-plane compliance with M = 0, mm/N
+    return L;
+  }
+
+  /* Directional in-plane modulus (GPa) for a uniaxial resultant along theta.
+     mode 'flat': curvature held at zero, uses A only.
+     mode 'free': plate free to curve with zero applied moment, uses full ABD. */
+  function directionalModulus(L, thetaDeg, mode) {
+    finite(thetaDeg, 'Direction');
+    var t = thetaDeg * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
+    var v = [c * c, s * s, c * s];
+    var a = mode === 'free' ? L.aFree : L.a;
+    var compliance = mulVec(a, v).reduce(function (sum, x, i) { return sum + x * v[i]; }, 0);
+    return 1 / (L.h * compliance) / 1000;
+  }
+
+  function polar(L, mode, step) {
+    var out = [], d = step || 2;
+    for (var th = 0; th < 360; th += d) out.push({ theta: th, E: directionalModulus(L, th, mode) });
+    return out;
+  }
+
+  /* Solve the full 6x6 relation for midplane strain and curvature.
+     N in N/mm; M in N (per unit width). Zero load returns exact zeros. */
+  function respond(L, N, M) {
+    var n = N || {}, m = M || {};
+    var load = [n.Nx || 0, n.Ny || 0, n.Nxy || 0, m.Mx || 0, m.My || 0, m.Mxy || 0];
+    load.forEach(function (v, i) { finite(v, ['Nx', 'Ny', 'Nxy', 'Mx', 'My', 'Mxy'][i]); });
+    var x = mulVec(L.inverseABD, load);
+    // Rounding leaves ~1e-20 residues where the exact answer is zero (for example
+    // curvature of a symmetric stack). Snap components that are below 1e-9 of the
+    // largest strain in the laminate (membrane or bending surface strain) to 0.
+    var scale = Math.max(Math.abs(x[0]), Math.abs(x[1]), Math.abs(x[2]),
+      (Math.abs(x[3]) + Math.abs(x[4]) + Math.abs(x[5])) * L.h / 2);
+    x = x.map(function (v, i) { var s = i < 3 ? Math.abs(v) : Math.abs(v) * L.h / 2; return s <= 1e-9 * scale ? 0 : v; });
+    return {
+      load: { Nx: load[0], Ny: load[1], Nxy: load[2], Mx: load[3], My: load[4], Mxy: load[5] },
+      strain: { ex: x[0], ey: x[1], gxy: x[2] },
+      curvature: { kx: x[3], ky: x[4], kxy: x[5] }
+    };
+  }
+
+  /* Midplane deflection (mm, positive up) at (x, y) mm, from a solved curvature. */
+  function deflection(curvature, x, y) {
+    return -(curvature.kx * x * x + curvature.ky * y * y + curvature.kxy * x * y) / 2;
+  }
+
+  function mirrored(angles) {
+    var a = angles.map(function (p) { return typeof p === 'number' ? p : p.angle; });
+    for (var i = 0, j = a.length - 1; i < j; i++, j--) if (a[i] !== a[j]) return false;
+    return true;
+  }
+
+  function classify(L, angles) {
+    var Amax = maxAbs(L.A), Bmax = maxAbs(L.B);
+    var A = L.A, list = angles.map(function (p) { return typeof p === 'number' ? p : p.angle; });
+    var bZero = Bmax <= REL_ZERO * Amax * L.h;
+    var balancedMatrix = Math.abs(A[0][2]) <= REL_ZERO * Amax && Math.abs(A[1][2]) <= REL_ZERO * Amax;
+    var qi = Math.abs(A[0][0] - A[1][1]) <= REL_ZERO * Amax && balancedMatrix &&
+      Math.abs(A[2][2] - (A[0][0] - A[0][1]) / 2) <= REL_ZERO * Amax;
+    var flat = polar(L, 'flat', 1).map(function (p) { return p.E; });
+    var free = polar(L, 'free', 1).map(function (p) { return p.E; });
+    function range(xs) { var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs); return { min: lo, max: hi }; }
+    var plus = list.filter(function (a) { return a === 45; }).length, minus = list.filter(function (a) { return a === -45; }).length;
+    return {
+      symmetric: mirrored(list),
+      couplingZero: bZero,
+      balanced: balancedMatrix,
+      balancedCount: { plus45: plus, minus45: minus },
+      quasiIsotropic: qi,
+      flat: range(flat),
+      free: range(free),
+      Bmax: Bmax
+    };
+  }
+
+  /* Principal curvatures of the midplane surface. kappa_xy is the ENGINEERING
+     twist (-2 d2w/dxdy), so the curvature tensor is [[kx, kxy/2], [kxy/2, ky]]. */
+  function principalCurvatures(k) {
+    finite(k.kx, 'kappa_x'); finite(k.ky, 'kappa_y'); finite(k.kxy, 'kappa_xy');
+    var mean = (k.kx + k.ky) / 2, r = Math.hypot((k.kx - k.ky) / 2, k.kxy / 2);
+    var k1 = mean + r, k2 = mean - r, big = Math.max(Math.abs(k1), Math.abs(k2));
+    return { k1: k1, k2: k2, maxAbs: big, radiusMm: big > 0 ? 1 / big : Infinity };
+  }
+
+  /* Exact height range of the quadratic surface w(x, y) over the square
+     |x|, |y| <= a. Extrema of a quadratic on a square lie at the corners, at
+     stationary points along the four edges, or at the interior stationary
+     point (the origin, where w = 0). The linear model assumes the true range
+     is small compared with the laminate thickness h. */
+  function surfaceRange(curvature, a) {
+    var k = curvature, pts = [[a, a], [a, -a], [-a, a], [-a, -a], [0, 0]];
+    [-a, a].forEach(function (e) {
+      if (k.ky !== 0) { var y = -k.kxy * e / (2 * k.ky); if (Math.abs(y) <= a) pts.push([e, y]); }
+      if (k.kx !== 0) { var x = -k.kxy * e / (2 * k.kx); if (Math.abs(x) <= a) pts.push([x, e]); }
+    });
+    var hi = -Infinity, lo = Infinity, at = { hi: null, lo: null };
+    pts.forEach(function (p) {
+      var w = deflection(k, p[0], p[1]);
+      if (w > hi) { hi = w; at.hi = p; }
+      if (w < lo) { lo = w; at.lo = p; }
+    });
+    return { max: hi, min: lo, maxAt: at.hi, minAt: at.lo };
+  }
+  function smallDeflection(curvature, halfSpanMm, h) {
+    if (!(halfSpanMm > 0) || !(h > 0)) throw new RangeError('Patch half-span and thickness must be greater than zero.');
+    var r = surfaceRange(curvature, halfSpanMm), span = r.max - r.min;
+    return { reliefMm: span, ratioToThickness: span / h, withinLinearRange: span <= h, maxAt: r.maxAt, minAt: r.minAt };
+  }
+
+  function mirror(angles) { return angles.concat(angles.slice().reverse()); }
+
+  function label(angles) {
+    var a = angles.map(function (p) { return typeof p === 'number' ? p : p.angle; });
+    if (a.length > 1 && a.length % 2 === 0 && mirrored(a)) return '[' + a.slice(0, a.length / 2).map(text).join('/') + ']s';
+    return '[' + a.map(text).join('/') + ']';
+    function text(x) { return x > 0 && x !== 90 ? '+' + x : x < 0 ? '\u2212' + Math.abs(x) : String(x); }
+  }
+
+  function format(v, digits) {
+    var d = digits == null ? 2 : digits, s = Number(v).toFixed(d);
+    if (Number(s) === 0) s = Number(0).toFixed(d);
+    return s.replace('-', '\u2212');
+  }
+
+  return Object.freeze({
+    PLY_MM: PLY_MM, MAX_PLIES: MAX_PLIES, ANGLES: ANGLES, MATERIAL: MATERIAL,
+    reducedStiffness: reducedStiffness, qbar: qbar, abd: abd, laminate: laminate,
+    directionalModulus: directionalModulus, polar: polar, respond: respond, deflection: deflection,
+    classify: classify, smallDeflection: smallDeflection, surfaceRange: surfaceRange, principalCurvatures: principalCurvatures, mirror: mirror, mirrored: mirrored,
+    label: label, format: format, invert: invert
+  });
+});
+
+/* Pure SVG renderer for laminate-stacking. The live lesson and the static
+   no-JS / print fallback both call these functions, so they cannot disagree.
+   No element ids are emitted, so several mounts can share one page. */
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiLaminate);
+  if (node) module.exports = api; else root.CourseWikiLaminateDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  var PATCH_MM = 50;            // side of the drawn square patch
+  var BASE_MAGNIFICATION = 50;  // out-of-plane exaggeration before any common reduction
+  var LOAD_LIMIT = 0.5;         // N/mm, largest resultant offered by the controls
+  var ROSE_MAX_GPA = 40;        // fixed radial scale: the ply's fiber-direction modulus
+
+  function n(v) { var s = (Math.round(v * 100) / 100).toFixed(2); return s.replace(/\.?0+$/, '') || '0'; }
+  function esc(v) { return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function txt(x, y, value, cls, anchor) {
+    return '<text x="' + n(x) + '" y="' + n(y) + '" class="ls-t ' + (cls || '') + '"' +
+      (anchor ? ' text-anchor="' + anchor + '"' : '') + '>' + esc(value) + '</text>';
+  }
+  function angleClass(a) { return a === 0 ? 'p0' : a === 90 ? 'p90' : a === 45 ? 'p45' : a === -45 ? 'm45' : 'px'; }
+  function angleText(a) { return (a > 0 && a !== 90 ? '+' : a < 0 ? '\u2212' : '') + Math.abs(a) + '\u00b0'; }
+
+  /* Oblique view shared by the ply stack and the loaded patch: x to the right
+     (the load axis), y away from the viewer, z up. */
+  function projector(cx, cy, R) {
+    return function (x, y, z) { return [cx + (x * 0.86 + y * 0.58) * R, cy + (x * 0.34 - y * 0.52) * R - z]; };
+  }
+  // Distance along the viewing direction (larger = farther), z in units of R.
+  function depth(x, y, z) { return -0.6744 * x + y - 0.7493 * z; }
+  function poly(points, cls, attrs) {
+    return '<polygon class="' + cls + '" points="' + points.map(function (p) { return n(p[0]) + ',' + n(p[1]); }).join(' ') + '"' + (attrs || '') + '/>';
+  }
+  /* Segments of the lines {p : p . normal = c} inside the square [-1,1]^2. */
+  function clipLine(dx, dy, c) {
+    var nx = -dy, ny = dx, pts = [];
+    [[-1, null], [1, null], [null, -1], [null, 1]].forEach(function (edge) {
+      if (edge[0] !== null && Math.abs(ny) > 1e-9) {
+        var y = (c - nx * edge[0]) / ny; if (y >= -1 - 1e-9 && y <= 1 + 1e-9) pts.push([edge[0], y]);
+      } else if (edge[1] !== null && Math.abs(nx) > 1e-9) {
+        var x = (c - ny * edge[1]) / nx; if (x >= -1 - 1e-9 && x <= 1 + 1e-9) pts.push([x, edge[1]]);
+      }
+    });
+    if (pts.length < 2) return null;
+    pts.sort(function (a, b) { return (a[0] * dx + a[1] * dy) - (b[0] * dx + b[1] * dy); });
+    return [pts[0], pts[pts.length - 1]];
+  }
+
+  /* Exploded ply stack. angles listed top to bottom. */
+  function stack(angles, opts) {
+    var o = opts || {}, count = angles.length, R = 80, W = 446;
+    var gap = Math.max(12, Math.min(30, 250 / Math.max(count, 1)));
+    var top = 48, H = Math.round(top + 0.86 * R + (count - 1) * gap + 0.86 * R + 58);
+    var P = projector(212, top + 0.86 * R, R), out = [];
+    var label = o.label || ('Exploded ply stack ' + M.label(angles) + ', top ply first. ' +
+      angles.map(function (a, i) { return 'ply ' + (i + 1) + ' ' + angleText(a); }).join(', ') + '.');
+    out.push('<svg class="ls-svg ls-stack" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(label) + '" focusable="false">');
+    for (var i = count - 1; i >= 0; i--) {
+      var a = angles[i], z = -i * gap, cls = angleClass(a);
+      var c = [P(-1, -1, z), P(1, -1, z), P(1, 1, z), P(-1, 1, z)];
+      var lip = 4;
+      out.push(poly([c[0], c[1], [c[1][0], c[1][1] + lip], [c[0][0], c[0][1] + lip]], 'ls-ply-edge ls-' + cls));
+      out.push(poly([c[3], c[0], [c[0][0], c[0][1] + lip], [c[3][0], c[3][1] + lip]], 'ls-ply-edge ls-' + cls));
+      out.push(poly(c, 'ls-ply ls-' + cls, ' data-ply="' + (i + 1) + '" data-angle="' + a + '"'));
+      var t = a * Math.PI / 180, dx = Math.cos(t), dy = Math.sin(t), d = [];
+      for (var k = -7; k <= 7; k++) {
+        var seg = clipLine(dx, dy, k * 0.25);
+        if (!seg) continue;
+        var p1 = P(seg[0][0], seg[0][1], z), p2 = P(seg[1][0], seg[1][1], z);
+        d.push('M' + n(p1[0]) + ' ' + n(p1[1]) + 'L' + n(p2[0]) + ' ' + n(p2[1]));
+      }
+      out.push('<path class="ls-fiber ls-fiber-' + cls + '" d="' + d.join('') + '"/>');
+      var right = P(1, 1, z), lead = P(1, 0, z);
+      out.push('<path class="ls-leader" d="M' + n(lead[0] + 6) + ' ' + n(lead[1]) + 'H' + n(W - 104) + '"/>');
+      out.push(txt(W - 98, lead[1] + 6, (i + 1) + '  ' + angleText(a), 'ls-plylabel'));
+      void right;
+    }
+    if (count > 1) {
+      var midZ = -(count - 1) * gap / 2, m1 = P(-1.18, -1, midZ), m2 = P(1.1, -1, midZ);
+      out.push('<path class="ls-mid" d="M' + n(m1[0]) + ' ' + n(m1[1]) + 'L' + n(m2[0]) + ' ' + n(m2[1]) + '"/>');
+      out.push(txt(m1[0] - 4, m1[1] + 4, 'midplane', 'ls-small', 'end'));
+    }
+    var ax = [22, H - 40];
+    out.push('<path class="ls-axis" d="M' + n(ax[0]) + ' ' + n(ax[1]) + 'l' + n(0.86 * 44) + ' ' + n(0.34 * 44) +
+      'M' + n(ax[0]) + ' ' + n(ax[1]) + 'l' + n(0.58 * 44) + ' ' + n(-0.52 * 44) + '"/>');
+    out.push(txt(ax[0] + 0.86 * 44 + 4, ax[1] + 0.34 * 44 + 6, 'x  0\u00b0', 'ls-small'));
+    out.push(txt(ax[0] + 0.58 * 44 + 4, ax[1] - 0.52 * 44 - 2, 'y  90\u00b0', 'ls-small'));
+    out.push(txt(16, 24, 'TOP FACE', 'ls-small ls-caps'));
+    out.push(txt(W - 98, 24, 'ply  angle', 'ls-small'));
+    out.push('</svg>');
+    return out.join('');
+  }
+
+  function rosePath(points, cx, cy, R) {
+    return points.map(function (p, i) {
+      var r = p.E / ROSE_MAX_GPA * R, t = p.theta * Math.PI / 180;
+      return (i ? 'L' : 'M') + n(cx + r * Math.cos(t)) + ' ' + n(cy - r * Math.sin(t));
+    }).join('') + 'Z';
+  }
+
+  /* Polar plot of directional in-plane modulus. curves: [{points, kind}] */
+  function rose(curves, opts) {
+    var o = opts || {}, compact = !!o.compact, S = compact ? 220 : 380, cx = S / 2, cy = S / 2 + (compact ? 6 : 6);
+    var R = compact ? 86 : 138, out = [];
+    out.push('<svg class="ls-svg ls-rose' + (compact ? ' ls-rose-compact' : '') + '" viewBox="0 0 ' + S + ' ' + (S + (compact ? 0 : 6)) + '" role="img" aria-label="' + esc(o.label || 'Polar plot of in-plane modulus') + '" focusable="false">');
+    [10, 20, 30, 40].forEach(function (g) {
+      out.push('<circle class="ls-ring' + (g === 40 ? ' ls-ring-outer' : '') + '" cx="' + n(cx) + '" cy="' + n(cy) + '" r="' + n(g / ROSE_MAX_GPA * R) + '"/>');
+    });
+    [0, 45, 90, 135].forEach(function (a) {
+      var t = a * Math.PI / 180;
+      out.push('<path class="ls-spoke" d="M' + n(cx - R * Math.cos(t)) + ' ' + n(cy + R * Math.sin(t)) + 'L' + n(cx + R * Math.cos(t)) + ' ' + n(cy - R * Math.sin(t)) + '"/>');
+    });
+    curves.forEach(function (c) {
+      out.push('<path class="ls-curve ls-curve-' + c.kind + '" d="' + rosePath(c.points, cx, cy, R) + '"/>');
+    });
+    if (!compact) {
+      [10, 20, 30, 40].forEach(function (g) {
+        var r = g / ROSE_MAX_GPA * R, t = 112.5 * Math.PI / 180;
+        out.push(txt(cx + r * Math.cos(t), cy - r * Math.sin(t) + 4, g + (g === 40 ? ' GPa' : ''), 'ls-small ls-ring-label', 'middle'));
+      });
+      out.push(txt(cx + R + 6, cy + 5, '0\u00b0', 'ls-small'));
+      out.push(txt(cx, cy - R - 8, '90\u00b0', 'ls-small', 'middle'));
+      out.push(txt(cx + R * 0.72 + 4, cy - R * 0.72 - 4, '45\u00b0', 'ls-small'));
+      out.push(txt(cx - R * 0.72 - 4, cy - R * 0.72 - 4, '135\u00b0', 'ls-small', 'end'));
+      out.push(txt(cx - R - 6, cy + 5, '180\u00b0', 'ls-small', 'end'));
+    } else {
+      out.push(txt(cx + R + 3, cy + 5, '0\u00b0', 'ls-small'));
+      out.push(txt(cx, cy - R - 5, '90\u00b0', 'ls-small', 'middle'));
+    }
+    out.push('</svg>');
+    return out.join('');
+  }
+
+  function roseCurves(L, showPly, cls) {
+    var curves = [];
+    if (showPly) curves.push({ kind: 'ply', points: M.polar(M.laminate([0]), 'flat', 3) });
+    curves.push({ kind: 'flat', points: M.polar(L, 'flat', 3) });
+    if (!(cls || M.classify(L, L.layers)).couplingZero) curves.push({ kind: 'free', points: M.polar(L, 'free', 3) });
+    return curves;
+  }
+
+  /* One common out-of-plane magnification for the given laminates, chosen from
+     the largest response any offered load could produce, so the drawn shape
+     scales linearly while a slider moves. */
+  function commonMagnification(lams) {
+    // The height range of the surface is a maximum of linear functions of the
+    // curvature, and curvature is linear in (Nx, Ny, Nxy), so the range is
+    // convex in the load. Its largest value over the slider box is therefore
+    // at one of the eight corners (+-LIMIT each), evaluated exactly.
+    var worst = 0, half = PATCH_MM / 2;
+    lams.forEach(function (L) {
+      [-1, 1].forEach(function (sx) { [-1, 1].forEach(function (sy) { [-1, 1].forEach(function (sxy) {
+        var k = M.respond(L, { Nx: sx * LOAD_LIMIT, Ny: sy * LOAD_LIMIT, Nxy: sxy * LOAD_LIMIT }).curvature;
+        worst = Math.max(worst, M.smallDeflection(k, half, L.h).reliefMm);
+      }); }); });
+    });
+    var allowed = 0.3 * PATCH_MM;   // keeps the drawn surface clear of the panel labels
+    if (worst === 0) return BASE_MAGNIFICATION;
+    var mag = Math.min(BASE_MAGNIFICATION, allowed / worst);
+    return mag >= 10 ? Math.floor(mag) : Math.max(1, Math.floor(mag * 10) / 10);
+  }
+
+  /* Loaded square patch drawn from the solved curvature. */
+  function panel(L, response, magnification, opts) {
+    var o = opts || {}, W = 400, H = 402, R = 100, P = projector(186, 236, R), half = PATCH_MM / 2;
+    var pxPerMm = R / half, G = 12, out = [], faces = [];
+    function w(u, v) { return M.deflection(response.curvature, u * half, v * half) * magnification * pxPerMm; }
+    for (var i = 0; i < G; i++) for (var j = 0; j < G; j++) {
+      var u0 = -1 + 2 * i / G, u1 = -1 + 2 * (i + 1) / G, v0 = -1 + 2 * j / G, v1 = -1 + 2 * (j + 1) / G;
+      var q = [[u0, v0], [u1, v0], [u1, v1], [u0, v1]].map(function (p) { return [p[0], p[1], w(p[0], p[1])]; });
+      var cxm = (u0 + u1) / 2, cym = (v0 + v1) / 2, czm = (q[0][2] + q[1][2] + q[2][2] + q[3][2]) / 4;
+      // Surface normal from the two diagonals, in projected-pixel units.
+      var ax = (q[2][0] - q[0][0]) * R, ay = (q[2][1] - q[0][1]) * R, az = q[2][2] - q[0][2];
+      var bx = (q[3][0] - q[1][0]) * R, by = (q[3][1] - q[1][1]) * R, bz = q[3][2] - q[1][2];
+      var nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx, len = Math.hypot(nx, ny, nz) || 1;
+      var shade = Math.max(0, (nx * -0.45 + ny * -0.35 + nz * 0.82) / len);
+      faces.push({ d: depth(cxm, cym, czm / R), pts: q.map(function (p) { return P(p[0], p[1], p[2]); }), shade: shade });
+    }
+    faces.sort(function (a, b) { return b.d - a.d; });
+    var title = o.title || 'Panel';
+    var lbl = o.label || (title + ': square patch under in-plane load with zero applied moment.');
+    var labelled = o.labels !== false;
+    // Without in-figure labels (the live lab puts them in HTML) the view crops to the drawing area.
+    var box = labelled ? '0 0 ' + W + ' ' + H : '18 70 350 334';
+    out.push('<svg class="ls-svg ls-panel" viewBox="' + box + '" role="img" aria-label="' + esc(lbl) + '" focusable="false">');
+    out.push(poly([P(-1, -1, 0), P(1, -1, 0), P(1, 1, 0), P(-1, 1, 0)], 'ls-flat'));
+    faces.forEach(function (f) {
+      out.push(poly(f.pts, 'ls-face', ' style="fill-opacity:' + (0.16 + 0.5 * f.shade).toFixed(2) + '"'));
+    });
+    out.push(poly([P(-1, -1, 0), P(1, -1, 0), P(1, 1, 0), P(-1, 1, 0)], 'ls-flat ls-flat-front'));
+    var N = response.load;
+    function arrow(x0, y0, dx, dy, cls) {
+      var a = P(x0, y0, w(x0, y0)), b = P(x0 + dx, y0 + dy, w(x0, y0));
+      var ang = Math.atan2(b[1] - a[1], b[0] - a[0]), hs = 7;
+      return '<path class="ls-load ' + (cls || '') + '" d="M' + n(a[0]) + ' ' + n(a[1]) + 'L' + n(b[0]) + ' ' + n(b[1]) +
+        'M' + n(b[0] - hs * Math.cos(ang - 0.45)) + ' ' + n(b[1] - hs * Math.sin(ang - 0.45)) + 'L' + n(b[0]) + ' ' + n(b[1]) +
+        'L' + n(b[0] - hs * Math.cos(ang + 0.45)) + ' ' + n(b[1] - hs * Math.sin(ang + 0.45)) + '"/>';
+    }
+    var len = 0.34;
+    [-0.6, 0, 0.6].forEach(function (s) {
+      if (N.Nx) { var sx = N.Nx > 0 ? 1 : -1; out.push(arrow(1.04 + (sx < 0 ? len : 0), s, sx * len, 0)); out.push(arrow(-1.04 - (sx < 0 ? len : 0), s, -sx * len, 0)); }
+      if (N.Ny) { var sy = N.Ny > 0 ? 1 : -1; out.push(arrow(s, 1.04 + (sy < 0 ? len : 0), 0, sy * len)); out.push(arrow(s, -1.04 - (sy < 0 ? len : 0), 0, -sy * len)); }
+    });
+    if (N.Nxy) {
+      var ss = N.Nxy > 0 ? 1 : -1;
+      out.push(arrow(1.08, -0.3 * ss, 0, 0.6 * ss, 'ls-shear')); out.push(arrow(-1.08, 0.3 * ss, 0, -0.6 * ss, 'ls-shear'));
+      out.push(arrow(-0.3 * ss, 1.08, 0.6 * ss, 0, 'ls-shear')); out.push(arrow(0.3 * ss, -1.08, -0.6 * ss, 0, 'ls-shear'));
+    }
+    if (!labelled) { out.push('</svg>'); return out.join(''); }
+    var stackText = o.stackLabel || '';
+    if (stackText.length > 36) stackText = stackText.slice(0, 35) + '\u2026';
+    out.push(txt(14, 24, title, 'ls-head'));
+    out.push(txt(W - 12, 24, 'height \u00d7' + magnification, 'ls-small', 'end'));
+    out.push(txt(14, 46, stackText, 'ls-small'));
+    var loadText = ['Nx', 'Ny', 'Nxy'].filter(function (k) { return N[k]; }).map(function (k) { return k + ' ' + M.format(N[k], 2); }).join(' \u00b7 ');
+    out.push(txt(14, 68, loadText ? loadText + ' N/mm, M = 0' : 'no load, M = 0', 'ls-small'));
+    out.push('</svg>');
+    return out.join('');
+  }
+
+  function curvatureText(k) {
+    var parts = [['\u03bax', k.kx], ['\u03bay', k.ky], ['\u03baxy', k.kxy]].map(function (p) {
+      return p[0] + ' ' + sci(p[1]) + ' mm\u207b\u00b9';
+    });
+    return parts.join(' \u00b7 ');
+  }
+  function sci(v) {
+    if (Math.abs(v) < 1e-12) return '0';
+    var e = Math.floor(Math.log10(Math.abs(v))), m = v / Math.pow(10, e);
+    var sup = String(e).replace('-', '\u207b').replace(/[0-9]/g, function (d) { return '\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079'[d]; });
+    return M.format(m, 2) + '\u00d710' + sup;
+  }
+
+  /* Complete static lesson used inside the mount for no-JS, search and print. */
+  function staticLesson() {
+    var cross = [0, 90, 90, 0], qi = [0, 45, -45, 90, 90, -45, 45, 0], unsym = [0, 90];
+    var Lc = M.laminate(cross), Lq = M.laminate(qi), Lu = M.laminate(unsym), Lp = M.laminate([0]);
+    var Ec0 = M.directionalModulus(Lc, 0), Ec45 = M.directionalModulus(Lc, 45), Eq = M.directionalModulus(Lq, 0);
+    var load = { Nx: 0.5 }, ru = M.respond(Lu, load), rc = M.respond(Lc, load);
+    var mag = commonMagnification([Lu, Lc]);
+    var fig1 = '<figure class="ls-static-figure"><div class="ls-static-pair">' +
+      '<div>' + stack(cross) + rose(roseCurves(Lc, true), { label: 'Polar plot for [0/90]s: ' + M.format(Ec0) + ' GPa along 0 and 90 degrees, ' + M.format(Ec45) + ' GPa at 45 degrees.' }) + '</div>' +
+      '<div>' + stack(qi) + rose(roseCurves(Lq, true), { label: 'Polar plot for [0/+45/\u221245/90]s: a circle at ' + M.format(Eq) + ' GPa in every direction.' }) + '</div>' +
+      '</div><figcaption><strong>Same ply, two balanced symmetric stacks.</strong> Left, cross-ply [0/90]s: ' + M.format(Ec0) +
+      ' GPa along 0\u00b0 and 90\u00b0 but only ' + M.format(Ec45) + ' GPa at 45\u00b0. Right, [0/+45/\u221245/90]s: ' + M.format(Eq) +
+      ' GPa in every in-plane direction, so the shaded rose is a circle. The dotted outline is one 0\u00b0 ply on its own (40 GPa along the fibers, 10 GPa across), the same ply as the fiber-orientation lesson above. Radius = modulus; outer ring 40 GPa.</figcaption></figure>';
+    var fig2 = '<figure class="ls-static-figure"><div class="ls-static-pair">' +
+      '<div>' + panel(Lu, ru, mag, { title: 'UNSYMMETRIC', stackLabel: '[0/90], 0\u00b0 ply on top', label: '[0/90] under Nx 0.5 N/mm and zero moment curls about the y axis.' }) + '</div>' +
+      '<div>' + panel(Lc, rc, mag, { title: 'SYMMETRIC', stackLabel: '[0/90]s', label: '[0/90]s under the same load stays flat.' }) + '</div>' +
+      '</div><figcaption><strong>Same pull, Nx = 0.5 N/mm, no applied moment.</strong> [0/90] curls: ' + curvatureText(ru.curvature) +
+      ' (principal radius about ' + Math.round(M.principalCurvatures(ru.curvature).radiusMm) + ' mm). [0/90]s stays flat: all curvatures are zero because B = 0. Height exaggerated \u00d7' + mag +
+      ' in both drawings of a ' + PATCH_MM + ' mm square patch; the dashed outline is the unloaded patch and in-plane stretch is not drawn. With no load, both are flat.</figcaption></figure>';
+    var rows = [
+      ['[0]', [0]], ['[0/90]', unsym], ['[0/90]s', cross], ['[+45/\u221245]', [45, -45]], ['[\u00b145]s', [45, -45, -45, 45]], ['[0/+45/\u221245/90]s', qi]
+    ].map(function (r) {
+      var L = M.laminate(r[1]), c = M.classify(L, r[1]);
+      return '<tr><th>' + r[0] + '</th><td>' + (c.symmetric ? 'yes' : 'no') + '</td><td>' + (c.balanced ? 'yes' : 'no') + '</td><td>' + (c.quasiIsotropic ? 'yes' : 'no') +
+        '</td><td>' + M.format(M.directionalModulus(L, 0)) + ' / ' + M.format(M.directionalModulus(L, 45)) + ' / ' + M.format(M.directionalModulus(L, 90)) +
+        '</td><td>' + (c.couplingZero ? '0' : M.format(c.Bmax, 1) + ' N') + '</td></tr>';
+    }).join('');
+    return '<p><strong>Challenge:</strong> using only 0\u00b0, +45\u00b0, \u221245\u00b0 and 90\u00b0 plies, build a laminate that is equally stiff in every in-plane direction. Then find out why an unsymmetric stack curls when it is pulled.</p>' +
+      fig1 +
+      '<div class="unit-table-wrap" tabindex="0" role="region" aria-label="Laminate comparison table; scroll horizontally to see every column"><table class="unit-table"><caption>Same illustrative plies, 0.125 mm each. E<sub>x</sub> is flat-held (curvature held at zero).</caption><thead><tr><th>Stack (top first)</th><th>Symmetric</th><th>Balanced</th><th>Quasi-isotropic</th><th>E<sub>x</sub> at 0\u00b0 / 45\u00b0 / 90\u00b0, GPa</th><th>Largest |B<sub>ij</sub>|</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p>A single 0\u00b0 ply gives ' + M.format(M.directionalModulus(Lp, 0)) + ' GPa along x and ' + M.format(M.directionalModulus(Lp, 90)) + ' GPa along y, the fiber-orientation result for the same ply.</p>' +
+      fig2;
+  }
+
+  return { stack: stack, rose: rose, roseCurves: roseCurves, panel: panel, commonMagnification: commonMagnification,
+    curvatureText: curvatureText, sci: sci, staticLesson: staticLesson, angleText: angleText, angleClass: angleClass,
+    PATCH_MM: PATCH_MM, LOAD_LIMIT: LOAD_LIMIT, BASE_MAGNIFICATION: BASE_MAGNIFICATION, ROSE_MAX_GPA: ROSE_MAX_GPA };
+});
+
+/* laminate-stacking browser behaviour. Every mount is independent; all numbers
+   come from model.js and every drawing from render.js. */
+(function (root, factory) {
+  'use strict';
+  var node = typeof module === 'object' && module.exports;
+  var api = factory(node ? require('./model.js') : root.CourseWikiLaminate,
+    node ? require('./render.js') : root.CourseWikiLaminateDraw);
+  if (node) module.exports = api;
+  else if (typeof document !== 'undefined') {
+    var start = function () { document.querySelectorAll('[data-interactive="laminate-stacking"]').forEach(api.init); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true }); else start();
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M, D) {
+  'use strict';
+  var sequence = 0;
+  var PRESETS = [
+    ['single', 'One 0\u00b0 ply', [0]],
+    ['cross-unsym', '[0/90] unsymmetric', [0, 90]],
+    ['cross-sym', '[0/90]s cross-ply', [0, 90, 90, 0]],
+    ['angle-unsym', '[+45/\u221245] unsymmetric', [45, -45]],
+    ['angle-sym', '[\u00b145]s angle-ply', [45, -45, -45, 45]],
+    ['unbalanced', '[0/+45]s unbalanced', [0, 45, 45, 0]],
+    ['qi-unsym', '[0/+45/\u221245/90] unsymmetric', [0, 45, -45, 90]]
+  ];
+  // Quiz: in-plane quasi-isotropy depends only on how many plies of each angle
+  // there are, so BOTH orderings of the 0/+45/-45/90 set are correct.
+  var QUIZ = [
+    { key: 'a', stack: [0, 90, 90, 0] },
+    { key: 'b', stack: [45, -45, -45, 45] },
+    { key: 'c', stack: [0, 45, -45, 90, 90, -45, 45, 0] },
+    { key: 'd', stack: [45, 0, -45, 90, 90, -45, 0, 45] }
+  ];
+  function quizAnswer(stack) { return M.classify(M.laminate(stack), stack).quasiIsotropic; }
+  /* Score a multi-select answer. Every option is judged on its own. */
+  function scoreQuiz(selectedKeys) {
+    var picked = {}; (selectedKeys || []).forEach(function (k) { picked[k] = true; });
+    var results = QUIZ.map(function (q) {
+      var truth = quizAnswer(q.stack);
+      return { key: q.key, stack: q.stack, truth: truth, picked: !!picked[q.key], right: truth === !!picked[q.key] };
+    });
+    return { results: results, correct: results.filter(function (r) { return r.right; }).length, total: results.length };
+  }
+  function moved(list, from, to) {
+    var out = list.slice(), item = out.splice(from, 1)[0]; out.splice(to, 0, item); return out;
+  }
+  function esc(v) { return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  function micro(v) { return M.format(v * 1e6, 1) + ' \u00b5\u03b5'; }
+
+  function init(root) {
+    if (root.dataset.lsReady || !M || !D) return;
+    root.dataset.lsReady = 'true';
+    var id = 'ls-' + (++sequence);
+    var angles = [0], showPly = true, load = { Nx: 0, Ny: 0, Nxy: 0 }, quizChecked = false;
+    var lab = document.createElement('div'); lab.className = 'ls-lab';
+    lab.innerHTML =
+      '<div class="ls-start"><span class="ls-kicker">TRY IT</span><strong>Stack plies, then make a laminate that is equally stiff in every direction.</strong><span>Start from one 0\u00b0 ply. Add plies and watch the stiffness rose change shape.</span></div>' +
+      '<div class="ls-bench">' +
+        '<div class="ls-box ls-rosebox">' +
+          '<div class="ls-read"><div><span>E<sub>x</sub> at 0\u00b0</span><strong data-ls-e0></strong></div><div><span>at 45\u00b0</span><strong data-ls-e45></strong></div><div><span>at 90\u00b0</span><strong data-ls-e90></strong></div></div>' +
+          '<div data-ls-rose></div>' +
+          '<div class="ls-legend"><span><i></i>Flat-held</span><span data-ls-free-key hidden><i class="ls-k-free"></i>Free, M = 0</span>' +
+            '<label class="ls-toggle"><input type="checkbox" data-ls-showply checked aria-label="Show the single 0 degree ply from the fiber-orientation lesson"><i class="ls-k-ply"></i>One 0\u00b0 ply</label></div>' +
+        '</div>' +
+        '<div class="ls-left">' +
+          '<div class="ls-ctrl">' +
+            '<h3>Add a ply to the bottom</h3><div class="ls-group ls-palette" role="group" aria-label="Add a ply to the bottom of the stack">' +
+              M.ANGLES.map(function (a) { return '<button type="button" class="ls-add" data-ls-add="' + a + '" aria-label="Add a ' + D.angleText(a) + ' ply"><i class="ls-chip ls-' + D.angleClass(a) + '"></i>' + D.angleText(a) + '</button>'; }).join('') +
+            '</div>' +
+            '<div class="ls-presets"><label for="' + id + '-preset">Stack</label><select id="' + id + '-preset" data-ls-preset><option value="" data-ls-custom>Custom</option>' +
+              PRESETS.map(function (p) { return '<option value="' + p[0] + '">' + esc(p[1]) + '</option>'; }).join('') + '</select></div>' +
+          '</div>' +
+          '<div class="ls-box ls-stackbox" data-ls-stack></div>' +
+          '<p class="ls-feedback ls-status" data-ls-status role="status" aria-live="polite"></p>' +
+          '<div class="ls-plylist">' +
+            '<div class="ls-group ls-transforms"><button type="button" data-ls-mirror aria-label="Mirror to make the stack symmetric">Mirror</button><button type="button" data-ls-reverse aria-label="Reverse the ply order, top to bottom">Reverse ply order</button><button type="button" data-ls-reset aria-label="Reset to one 0 degree ply">Reset</button></div>' +
+            '<ol class="ls-plies" data-ls-plies aria-label="Ply stack, top face first"></ol>' +
+            '<p class="ls-hint">Top face first. Drag \u2630 to reorder, or focus it and press \u2191/\u2193. Up to ' + M.MAX_PLIES + ' plies of 0.125 mm.</p></div>' +
+        '</div>' +
+        '<div class="ls-explain"><p class="ls-note" data-ls-rose-note></p><div class="ls-badges" data-ls-badges></div></div>' +
+      '</div>' +
+      '<div class="ls-predict"><fieldset><legend>Predict: which stacks have the same in-plane stiffness in every direction (quasi-isotropic)? Select every one that does.</legend><div class="ls-options">' +
+        QUIZ.map(function (q) { return '<label class="ls-option" data-ls-option="' + q.key + '"><input type="checkbox" value="' + q.key + '"> ' + esc(M.label(q.stack)) + '<em></em></label>'; }).join('') +
+      '</div></fieldset><button type="button" class="ls-check" data-ls-check disabled>Check with the polar plots</button>' +
+      '<p class="ls-feedback" data-ls-quiz-feedback role="status" aria-live="polite">Choose at least one stack.</p><div class="ls-multiples" data-ls-multiples hidden></div></div>' +
+      '<div class="ls-pull"><h3>Pull on it: does the free panel stay flat?</h3>' +
+        '<p class="ls-note">An in-plane force per unit edge length N (N/mm) with zero applied moment. Left: your stack. Right: its mirrored, symmetric version under the same load.</p>' +
+        '<div class="ls-panels">' + panelBox('a') + panelBox('b') + '</div>' +
+        '<p class="ls-note ls-panelcap" data-ls-panel-cap></p>' +
+        '<div class="ls-group ls-trybar"><span>Try</span><button type="button" data-ls-try="cross-unsym" aria-label="Try [0/90] with Nx 0.5 newtons per millimetre">[0/90]</button><button type="button" data-ls-try="angle-unsym" aria-label="Try [+45/-45] with Nx 0.5 newtons per millimetre">[+45/\u221245]</button><button type="button" data-ls-pullx aria-label="Set Nx to 0.5 and the other loads to zero">Nx 0.5</button><button type="button" data-ls-zero aria-label="Zero the load">Zero</button></div>' +
+        '<div class="ls-sliders">' + slider('Nx', 'N<sub>x</sub>', 'pull along x') + slider('Ny', 'N<sub>y</sub>', 'pull along y') + slider('Nxy', 'N<sub>xy</sub>', 'in-plane shear') + '</div>' +
+        '<p class="ls-validity" data-ls-validity hidden></p>' +
+        '<div class="ls-readouts"><p><b>Your stack:</b> <span data-ls-read-a></span></p><p><b>Mirrored:</b> <span data-ls-read-b></span></p></div>' +
+        '<p class="ls-note" data-ls-scale></p>' +
+      '</div>' +
+      '<p class="ls-boundary">Model: classical laminate theory with thin, perfectly bonded, linear-elastic plies (E<sub>1</sub> 40, E<sub>2</sub> 10, G<sub>12</sub> 5 GPa, \u03bd<sub>12</sub> 0.30; illustrative, not a named material). Small deflections only. No strength, failure, buckling, temperature, moisture or cure warping.</p>';
+    root.insertBefore(lab, root.firstChild);
+    root.classList.add('ls-live');
+
+    function slider(key, sym, title) {
+      var sid = id + '-' + key;
+      return '<div class="ls-slider"><label for="' + sid + '"><span>' + sym + ' <small>' + title + '</small></span><output for="' + sid + '" data-ls-out="' + key + '">0.00</output></label>' +
+        '<input id="' + sid + '" type="range" min="' + (-D.LOAD_LIMIT) + '" max="' + D.LOAD_LIMIT + '" step="0.05" value="0" data-ls-load="' + key + '" aria-label="' + key + ' ' + title + ', newtons per millimetre"></div>';
+    }
+    function panelBox(k) {
+      return '<figure class="ls-box ls-panelbox"><figcaption><b data-ls-title-' + k + '></b> <span data-ls-label-' + k + '></span></figcaption>' +
+        '<div data-ls-panel-' + k + '></div><strong class="ls-sum" data-ls-sum-' + k + ' aria-live="polite"></strong></figure>';
+    }
+    function q(s) { return lab.querySelector(s); }
+    function status(text) { q('[data-ls-status]').textContent = text; }
+
+    function plyRows() {
+      var list = q('[data-ls-plies]');
+      list.innerHTML = angles.map(function (a, i) {
+        var n = i + 1, last = angles.length;
+        return '<li data-index="' + i + '">' +
+          '<button type="button" class="ls-handle" data-ls-handle aria-label="Ply ' + n + ', ' + D.angleText(a) + '. Drag, or press up or down arrow to move">\u2630</button>' +
+          '<span class="ls-plyname"><i class="ls-chip ls-' + D.angleClass(a) + '"></i><b>' + n + '</b> ' + D.angleText(a) + (n === 1 ? ' <small>top</small>' : n === last && last > 1 ? ' <small>bottom</small>' : '') + '</span>' +
+          '<button type="button" data-ls-up aria-label="Move ply ' + n + ' up"' + (i === 0 ? ' disabled' : '') + '>\u2191</button>' +
+          '<button type="button" data-ls-down aria-label="Move ply ' + n + ' down"' + (i === last - 1 ? ' disabled' : '') + '>\u2193</button>' +
+          '<button type="button" data-ls-remove aria-label="Remove ply ' + n + '"' + (last === 1 ? ' disabled' : '') + '>\u2715</button></li>';
+      }).join('');
+    }
+    function balancedText(c, plus, minus) {
+      var pair = plus + minus === 0 ? 'No \u00b145\u00b0 plies to pair' : c.balanced ? 'Every +45\u00b0 ply has a \u221245\u00b0 partner (' + plus + ' and ' + minus + ')' : 'Unequal +45\u00b0 and \u221245\u00b0 plies (' + plus + ' and ' + minus + ')';
+      if (!c.balanced) return pair + ', so A\u2081\u2086 = A\u2082\u2086 \u2260 0: even held flat, a pull along x also shears the laminate in its plane.';
+      if (c.couplingZero) return pair + ', so A\u2081\u2086 = A\u2082\u2086 = 0, and B = 0 as well: a pull along x or y does not shear it, held flat or free.';
+      return pair + ', so A\u2081\u2086 = A\u2082\u2086 = 0: held flat, a pull along x or y does not shear it. This stack is unsymmetric, so when free to curve, B can still couple the pull to in-plane shear and twist.';
+    }
+    function badge(on, name, text) {
+      return '<div class="ls-badge" data-on="' + on + '"><b>' + name + '</b><span>' + text + '</span></div>';
+    }
+    function render() {
+      var L = M.laminate(angles), c = M.classify(L, angles);
+      plyRows(); syncPreset();
+      q('[data-ls-stack]').innerHTML = D.stack(angles);
+      q('[data-ls-rose]').innerHTML = D.rose(D.roseCurves(L, showPly, c), {
+        label: 'Polar plot of flat-held in-plane modulus for ' + M.label(angles) + ': ' + M.format(c.flat.min) + ' to ' + M.format(c.flat.max) + ' GPa.' +
+          (c.couplingZero ? '' : ' Dashed: free to curve, ' + M.format(c.free.min) + ' to ' + M.format(c.free.max) + ' GPa.') });
+      q('[data-ls-free-key]').hidden = c.couplingZero;
+      q('[data-ls-e0]').textContent = M.format(M.directionalModulus(L, 0)) + ' GPa';
+      q('[data-ls-e45]').textContent = M.format(M.directionalModulus(L, 45)) + ' GPa';
+      q('[data-ls-e90]').textContent = M.format(M.directionalModulus(L, 90)) + ' GPa';
+      q('[data-ls-rose-note]').textContent = c.couplingZero ?
+        'Radius = modulus for a pull in that direction. B = 0 here, so holding the laminate flat changes nothing.' :
+        'Solid: flat-held (curvature-constrained), from A only. Dashed: the same laminate free to curve with zero moment, from the full A-B-D relation: ' + M.format(c.free.min) + '\u2013' + M.format(c.free.max) + ' GPa. A free laminate is never stiffer than a flat-held one.';
+      var plus = c.balancedCount.plus45, minus = c.balancedCount.minus45;
+      q('[data-ls-badges]').innerHTML =
+        badge(c.symmetric, 'Symmetric', c.symmetric ? 'The sequence mirrors about the midplane, so B = 0.' : 'Not a mirror image about the midplane.') +
+        badge(c.balanced, 'Balanced', balancedText(c, plus, minus)) +
+        badge(c.quasiIsotropic, 'Quasi-isotropic', c.quasiIsotropic ? 'A is the same in every in-plane direction: the rose is a circle at ' + M.format(c.flat.min) + ' GPa.' : 'In-plane stiffness changes with direction: ' + M.format(c.flat.min) + '\u2013' + M.format(c.flat.max) + ' GPa.') +
+        badge(!c.couplingZero, 'Coupling B \u2260 0', c.couplingZero ? 'No stretching\u2013bending coupling.' : 'Largest |B| ' + M.format(c.Bmax, 1) + ' N. A pull can bend or twist a free panel.');
+      q('[data-ls-add="0"]').parentNode.querySelectorAll('button').forEach(function (b) { b.disabled = angles.length >= M.MAX_PLIES; });
+      q('[data-ls-mirror]').disabled = angles.length * 2 > M.MAX_PLIES;
+      renderPull(L);
+    }
+    function shapeWord(r) {
+      var p = M.principalCurvatures(r.curvature);
+      if (p.maxAbs === 0) return 'flat';
+      var k = r.curvature;
+      if (p.k1 * p.k2 < 0) return Math.abs(k.kx) + Math.abs(k.ky) < 1e-12 ? 'twists' : 'saddle';
+      return 'curls';
+    }
+    function summary(r) {
+      var p = M.principalCurvatures(r.curvature);
+      return p.maxAbs === 0 ? 'flat' : shapeWord(r) + ', tightest radius \u2248 ' + Math.round(p.radiusMm) + ' mm';
+    }
+    function renderPull(L) {
+      var mirroredStack = M.mirror(angles), Lm = M.laminate(mirroredStack);
+      var mag = D.commonMagnification([L, Lm]);
+      var ra = M.respond(L, load), rb = M.respond(Lm, load);
+      q('[data-ls-panel-a]').innerHTML = D.panel(L, ra, mag, { labels: false,
+        label: 'Your stack ' + M.label(angles) + ' under the applied load with zero moment: ' + summary(ra) + '. ' + D.curvatureText(ra.curvature) });
+      q('[data-ls-panel-b]').innerHTML = D.panel(Lm, rb, mag, { labels: false,
+        label: 'Mirrored symmetric stack ' + M.label(mirroredStack) + ' under the same load: ' + summary(rb) + '. ' + D.curvatureText(rb.curvature) });
+      q('[data-ls-title-a]').textContent = 'Your stack'; q('[data-ls-title-b]').textContent = 'Mirrored';
+      q('[data-ls-label-a]').textContent = M.label(angles); q('[data-ls-label-b]').textContent = M.label(mirroredStack);
+      q('[data-ls-sum-a]').textContent = summary(ra); q('[data-ls-sum-b]').textContent = summary(rb);
+      q('[data-ls-read-a]').textContent = readText(ra, L);
+      q('[data-ls-read-b]').textContent = readText(rb, Lm);
+      var zero = !load.Nx && !load.Ny && !load.Nxy;
+      var loadText = ['Nx', 'Ny', 'Nxy'].filter(function (k) { return load[k]; }).map(function (k) { return k + ' ' + M.format(load[k], 2); }).join(' \u00b7 ');
+      q('[data-ls-panel-cap]').textContent = (zero ? 'No load (N = 0, M = 0): both panels are flat, whatever B is.' : loadText + ' N/mm, M = 0.') + ' Height \u00d7' + mag + ' in both.';
+      q('[data-ls-scale]').textContent = 'Height exaggeration \u00d7' + mag + ' is shared by both panels and fixed for these two stacks over the whole slider range, so the drawn shape grows in proportion to the load. In-plane stretch is too small to draw. ' + D.PATCH_MM + ' mm square patch; dashed outline = unloaded. Radius is the smallest principal radius of curvature.';
+      var check = M.smallDeflection(ra.curvature, D.PATCH_MM / 2, L.h);
+      var v = q('[data-ls-validity]');
+      v.hidden = check.withinLinearRange;
+      v.textContent = check.withinLinearRange ? '' : 'True height range across your patch is ' + M.format(check.reliefMm, 2) + ' mm, ' + M.format(check.ratioToThickness, 1) + '\u00d7 the ' + M.format(L.h, 3) + ' mm thickness. Linear small-deflection theory is losing accuracy here; treat the shape as a trend.';
+    }
+    function readText(r, L) {
+      var p = M.principalCurvatures(r.curvature);
+      return 'h ' + M.format(L.h, 3) + ' mm \u00b7 \u03b5x ' + micro(r.strain.ex) + ' \u00b7 \u03b3xy ' + micro(r.strain.gxy) + ' \u00b7 ' + D.curvatureText(r.curvature) +
+        (p.maxAbs > 0 ? ' \u00b7 principal \u03ba\u2081 ' + D.sci(p.k1) + ', \u03ba\u2082 ' + D.sci(p.k2) + ' mm\u207b\u00b9' : '');
+    }
+    function presetFor(list) {
+      var hit = PRESETS.filter(function (p) { return p[2].length === list.length && p[2].every(function (a, i) { return a === list[i]; }); })[0];
+      return hit ? hit[0] : '';
+    }
+    function syncPreset() {
+      var sel = q('[data-ls-preset]'), key = presetFor(angles);
+      sel.querySelector('[data-ls-custom]').textContent = key ? 'Custom' : 'Custom: ' + M.label(angles);
+      sel.value = key;
+    }
+    function setStack(next, message) {
+      angles = next.slice(0, M.MAX_PLIES); render(); if (message) status(message);
+    }
+
+    /* Keep the control the learner just used where it was on screen. Results
+       above it can change height (a longer stack, a wrapped status line), and
+       the browser's own scroll anchoring cannot always pick a stable anchor
+       when re-rendered markup is above the viewport top. This compensates by
+       the measured shift only; it never scrolls to bring something else in. */
+    function keepInPlace(anchor, action) {
+      var before = anchor.getBoundingClientRect().top;
+      action();
+      if (!anchor.isConnected) return;
+      var shift = anchor.getBoundingClientRect().top - before;
+      if (Math.abs(shift) > 1) window.scrollBy({ top: shift, left: 0, behavior: 'instant' });
+      // Focus follows a moved ply after compensation; scroll by the minimum only if that row is off screen.
+      if (pendingFocus) { var f = pendingFocus; pendingFocus = null; f(); }
+    }
+    var pendingFocus = null;
+    lab.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || b.disabled) return;
+      keepInPlace(b.closest('[data-ls-plies]') || b.closest('[data-ls-multiples]') || b, function () { onClick(b); });
+    });
+    function onClick(b) {
+      var li = b.closest('li'), i = li ? Number(li.dataset.index) : -1;
+      if (b.hasAttribute('data-ls-add')) {
+        var a = Number(b.getAttribute('data-ls-add'));
+        setStack(angles.concat([a]), D.angleText(a) + ' ply added at the bottom. ' + M.label(angles.concat([a])) + '.');
+      } else if (b.hasAttribute('data-ls-up') && i > 0) { setStack(moved(angles, i, i - 1), 'Ply moved up. A is unchanged by order; B and D change.'); focusRow(i - 1, 'data-ls-up'); }
+      else if (b.hasAttribute('data-ls-down') && i < angles.length - 1) { setStack(moved(angles, i, i + 1), 'Ply moved down. A is unchanged by order; B and D change.'); focusRow(i + 1, 'data-ls-down'); }
+      else if (b.hasAttribute('data-ls-remove') && angles.length > 1) { var copy = angles.slice(); copy.splice(i, 1); setStack(copy, 'Ply removed. ' + M.label(copy) + '.'); focusRow(Math.min(i, copy.length - 1), 'data-ls-handle'); }
+      else if (b.hasAttribute('data-ls-mirror')) setStack(M.mirror(angles), 'Mirrored: ' + M.label(M.mirror(angles)) + ' is symmetric, so B = 0.');
+      else if (b.hasAttribute('data-ls-reverse')) setStack(angles.slice().reverse(), 'Ply order reversed: A and D unchanged, B changes sign, so a curl under load reverses.');
+      else if (b.hasAttribute('data-ls-reset')) { load = { Nx: 0, Ny: 0, Nxy: 0 }; syncLoad(); setStack([0], 'Reset to one 0\u00b0 ply, no load.'); }
+      else if (b.hasAttribute('data-ls-try')) { var p = PRESETS.filter(function (x) { return x[0] === b.getAttribute('data-ls-try'); })[0]; load = { Nx: 0.5, Ny: 0, Nxy: 0 }; syncLoad(); setStack(p[2], p[1] + ' loaded with Nx = 0.50 N/mm and zero moment.'); }
+      else if (b.hasAttribute('data-ls-zero')) { load = { Nx: 0, Ny: 0, Nxy: 0 }; syncLoad(); render(); status('No load: zero force and moment give zero deformation, even when B \u2260 0.'); }
+      else if (b.hasAttribute('data-ls-pullx')) { load = { Nx: 0.5, Ny: 0, Nxy: 0 }; syncLoad(); render(); status('Nx = 0.50 N/mm, zero moment.'); }
+      else if (b.hasAttribute('data-ls-check')) checkQuiz();
+      else if (b.hasAttribute('data-ls-load-stack')) { var s = QUIZ.filter(function (x) { return x.key === b.getAttribute('data-ls-load-stack'); })[0]; setStack(s.stack, M.label(s.stack) + ' loaded into the builder.'); q('[data-ls-quiz-feedback]').textContent = M.label(s.stack) + ' is now in the stack builder above; its rose is the one beside this button.'; }
+    }
+    function focusRow(index, attr) {
+      var row = q('[data-ls-plies] li[data-index="' + index + '"]'); if (!row) return;
+      var target = row.querySelector('[' + attr + ']:not(:disabled)') || row.querySelector('[data-ls-handle]');
+      row.classList.add('ls-moved');
+      pendingFocus = function () {
+        target.focus({ preventScroll: true });
+        var r = target.getBoundingClientRect();
+        if (r.top < 0 || r.bottom > window.innerHeight) target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+      };
+    }
+    q('[data-ls-preset]').addEventListener('change', function (e) {
+      var p = PRESETS.filter(function (x) { return x[0] === e.target.value; })[0];
+      if (p) keepInPlace(e.target, function () { setStack(p[2], p[1] + ' loaded.'); });
+    });
+    q('[data-ls-showply]').addEventListener('change', function (e) { keepInPlace(e.target, function () { showPly = e.target.checked; render(); }); });
+    function syncLoad() {
+      lab.querySelectorAll('[data-ls-load]').forEach(function (input) {
+        var k = input.getAttribute('data-ls-load'); input.value = load[k];
+        var t = M.format(load[k], 2) + ' N/mm'; q('[data-ls-out="' + k + '"]').textContent = M.format(load[k], 2); input.setAttribute('aria-valuetext', t);
+      });
+    }
+    lab.querySelectorAll('[data-ls-load]').forEach(function (input) {
+      input.addEventListener('input', function () {
+        var v = Math.round(Number(input.value) * 100) / 100;
+        load[input.getAttribute('data-ls-load')] = Number.isFinite(v) ? v : 0;
+        keepInPlace(input, function () { syncLoad(); renderPull(M.laminate(angles)); });
+      });
+    });
+    // Keyboard reorder on the handle, and keep page-level arrow navigation out of controls.
+    lab.addEventListener('keydown', function (e) {
+      if (e.target.matches('input, select, button, summary')) e.stopPropagation();
+      if (!e.target.hasAttribute('data-ls-handle')) return;
+      var i = Number(e.target.closest('li').dataset.index);
+      var list = q('[data-ls-plies]');
+      if (e.key === 'ArrowUp' && i > 0) { e.preventDefault(); keepInPlace(list, function () { setStack(moved(angles, i, i - 1), 'Ply ' + (i + 1) + ' moved up to position ' + i + '.'); focusRow(i - 1, 'data-ls-handle'); }); }
+      if (e.key === 'ArrowDown' && i < angles.length - 1) { e.preventDefault(); keepInPlace(list, function () { setStack(moved(angles, i, i + 1), 'Ply ' + (i + 1) + ' moved down to position ' + (i + 2) + '.'); focusRow(i + 1, 'data-ls-handle'); }); }
+    });
+    // Pointer drag reorder: the row follows the pointer; the drop commits once.
+    var drag = null;
+    q('[data-ls-plies]').addEventListener('pointerdown', function (e) {
+      var h = e.target.closest('[data-ls-handle]'); if (!h || e.button > 0) return;
+      var li = h.closest('li'), rows = Array.prototype.slice.call(q('[data-ls-plies]').children);
+      drag = { from: Number(li.dataset.index), li: li, y0: e.clientY, mids: rows.map(function (r) { var b = r.getBoundingClientRect(); return b.top + b.height / 2; }), to: Number(li.dataset.index), id: e.pointerId };
+      h.setPointerCapture(e.pointerId); li.classList.add('ls-dragging'); e.preventDefault();
+    });
+    q('[data-ls-plies]').addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dy = e.clientY - drag.y0, center = drag.mids[drag.from] + dy, to = 0;
+      drag.mids.forEach(function (m, k) { if (center > m) to = k; });
+      if (center < drag.mids[0]) to = 0;
+      drag.to = Math.max(0, Math.min(angles.length - 1, to));
+      drag.li.style.transform = 'translateY(' + dy + 'px)';
+    });
+    function endDrag(e) {
+      if (!drag || (e && e.pointerId !== drag.id)) return;
+      var d = drag; drag = null; d.li.style.transform = ''; d.li.classList.remove('ls-dragging');
+      if (d.to !== d.from) keepInPlace(q('[data-ls-plies]'), function () { setStack(moved(angles, d.from, d.to), 'Ply ' + (d.from + 1) + ' moved to position ' + (d.to + 1) + '. ' + M.label(moved(angles, d.from, d.to)) + '.'); focusRow(d.to, 'data-ls-handle'); });
+    }
+    q('[data-ls-plies]').addEventListener('pointerup', endDrag);
+    q('[data-ls-plies]').addEventListener('pointercancel', endDrag);
+
+    // Prediction
+    q('.ls-options').addEventListener('change', function () {
+      var any = lab.querySelectorAll('.ls-options input:checked').length > 0;
+      q('[data-ls-check]').disabled = !any;
+      if (quizChecked) { quizChecked = false; clearQuiz(); }
+      q('[data-ls-quiz-feedback]').textContent = any ? 'Ready to check.' : 'Choose at least one stack.';
+    });
+    function clearQuiz() {
+      lab.querySelectorAll('[data-ls-option]').forEach(function (o) { o.removeAttribute('data-result'); o.querySelector('em').textContent = ''; });
+      q('[data-ls-multiples]').hidden = true;
+    }
+    function checkQuiz() {
+      var keys = Array.prototype.map.call(lab.querySelectorAll('.ls-options input:checked'), function (i) { return i.value; });
+      var s = scoreQuiz(keys); quizChecked = true;
+      s.results.forEach(function (r) {
+        var o = q('[data-ls-option="' + r.key + '"]');
+        o.setAttribute('data-result', r.right ? 'right' : 'wrong');
+        o.querySelector('em').textContent = (r.right ? '\u2713 ' : '\u2717 ') + (r.truth ? 'quasi-isotropic' : 'directional');
+      });
+      q('[data-ls-multiples]').innerHTML = s.results.map(function (r) {
+        var L = M.laminate(r.stack), c = M.classify(L, r.stack);
+        return '<figure>' + D.rose(D.roseCurves(L, false, c), { compact: true, label: M.label(r.stack) + ': ' + M.format(c.flat.min) + ' to ' + M.format(c.flat.max) + ' GPa' }) +
+          '<figcaption>' + esc(M.label(r.stack)) + '<br>' + (c.quasiIsotropic ? 'circle, ' + M.format(c.flat.min) + ' GPa' : M.format(c.flat.min) + '\u2013' + M.format(c.flat.max) + ' GPa') +
+          '<br><button type="button" data-ls-load-stack="' + r.key + '">Build this</button></figcaption></figure>';
+      }).join('');
+      q('[data-ls-multiples]').hidden = false;
+      var both = s.results.filter(function (r) { return r.truth; }).map(function (r) { return M.label(r.stack); }).join(' and ');
+      q('[data-ls-quiz-feedback]').textContent = (s.correct === s.total ? 'All four judged correctly. ' : s.correct + ' of ' + s.total + ' judged correctly. ') +
+        both + ' are both quasi-isotropic: equal numbers of 0\u00b0, +45\u00b0, \u221245\u00b0 and 90\u00b0 plies make A the same in every direction, and A does not depend on the order. Cross-ply and \u00b145\u00b0 stacks are stiff in some directions and soft in others.';
+    }
+
+    syncLoad(); render();
+    status('One 0\u00b0 ply: 40 GPa along the fibers, 10 GPa across, as in the fiber-orientation lesson.');
+  }
+  return { init: init, scoreQuiz: scoreQuiz, QUIZ: QUIZ, PRESETS: PRESETS, moved: moved };
+});
 
 (function (root, factory) {
   'use strict';

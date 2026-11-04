@@ -1,0 +1,106 @@
+[data-interactive="section-view-explorer"] {
+  --sve-cut: #135b88; --sve-right: #2e7d32; --sve-wrong: #b3261e;
+  min-width: 0; margin-block: 1rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-interactive="section-view-explorer"] { --sve-cut: #45b0ea; --sve-right: #7bcf7f; --sve-wrong: #ff8a80; }
+}
+:root[data-theme="dark"] [data-interactive="section-view-explorer"] { --sve-cut: #45b0ea; --sve-right: #7bcf7f; --sve-wrong: #ff8a80; }
+
+/* Drawing sheet, shared by the live view and the static lesson. */
+.sve-svg { display: block; width: 100%; height: auto; background: var(--surface); border: 1px solid var(--rule); }
+.sve-svg text { fill: var(--ink); font-family: var(--f-display); }
+.sve-svg .sve-edge { stroke: var(--ink); }
+.sve-svg .sve-center { stroke: var(--ink-soft); }
+.sve-svg :is(.sve-cutline, .sve-cutline-solid) { stroke: var(--sve-cut); }
+.sve-svg .sve-arrowhead { fill: var(--sve-cut); }
+.sve-svg .sve-letter { fill: var(--sve-cut); }
+.sve-svg .sve-face { fill: transparent; stroke: none; }
+.sve-svg .sve-face.is-hatched { fill: var(--flag-soft); }
+.sve-svg .sve-hatch { stroke: var(--ink-soft); }
+.sve-svg .sve-face[tabindex] { cursor: pointer; outline: none; }
+.sve-svg .sve-face[tabindex]:hover { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; }
+.sve-svg .sve-face[tabindex]:focus-visible, .sve-svg .sve-face.is-focus { stroke: var(--accent); stroke-width: 4; stroke-dasharray: none; }
+.sve-svg .sve-face.is-wrong { stroke: var(--sve-wrong); stroke-width: 4; stroke-dasharray: 9 5; }
+.sve-svg .sve-badge rect { fill: var(--surface); stroke: var(--ink); }
+.sve-svg .sve-badge.is-right rect { stroke: var(--sve-right); stroke-width: 2.5; }
+.sve-svg .sve-badge.is-wrong rect { stroke: var(--sve-wrong); stroke-width: 2.5; }
+
+/* Live explorer. Controls stay in ordinary page flow with 44px targets. */
+.sve-live { font: 1rem/1.45 var(--f-body); }
+.sve-challenge { padding: .7rem .85rem; border-left: 4px solid var(--sve-cut); background: var(--surface-2); }
+.sve-controls { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; margin-block: .7rem; }
+.sve-mode-note { flex: 1 1 100%; }
+.sve-choice { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; padding: 0; border: 0; min-width: 0; }
+.sve-choice legend { width: 100%; margin-bottom: .3rem; font: 700 .95rem var(--f-display); }
+.sve-choice label { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; padding: .4rem .8rem; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; font-family: var(--f-display); }
+.sve-choice label:has(input:checked) { border-color: var(--sve-cut); box-shadow: inset 0 0 0 2px var(--sve-cut); font-weight: 700; }
+.sve-choice label:has(input:disabled) { opacity: .55; cursor: not-allowed; }
+.sve-choice input { width: 1.1rem; height: 1.1rem; margin: 0; accent-color: var(--sve-cut); }
+.sve-mode-note:empty { display: none; }
+.sve-mode-note { margin: 0; color: var(--ink-soft); font-size: .95rem; }
+.sve-slider[hidden] { display: none; }
+.sve-slider label { display: flex; justify-content: space-between; gap: 1rem; font: 700 .95rem var(--f-display); }
+.sve-slider output { font-weight: 400; font-variant-numeric: tabular-nums; }
+.sve-slider input[type="range"] { width: 100%; min-height: 44px; margin: 0; accent-color: var(--sve-cut); }
+.sve-actions, .sve-view-actions { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
+.sve-live button { min-height: 44px; padding: .45rem .85rem; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); font: 600 .95rem var(--f-display); cursor: pointer; }
+.sve-live button[data-sve-act="predict"] { border: 2px solid var(--sve-cut); }
+.sve-live button[hidden] { display: none; }
+.sve-live button:disabled { opacity: .5; cursor: not-allowed; }
+.sve-live :is(button, input):focus-visible, .sve-webgl:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sve-view-actions label { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; font-family: var(--f-display); }
+.sve-view-actions input { width: 1.1rem; height: 1.1rem; }
+.sve-work { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "stage panel"; gap: 1rem; align-items: start; }
+.sve-panel { grid-area: panel; display: grid; gap: .55rem; min-width: 0; }
+.sve-stage { grid-area: stage; min-width: 0; }
+.sve-sheet { min-width: 0; }
+.sve-panel .sve-status { margin: 0; }
+.sve-canvas { height: 30rem; max-height: 66vh; background: var(--surface-2); border: 1px solid var(--rule); overflow: hidden; }
+.sve-webgl { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.sve-webgl.is-dragging { cursor: grabbing; }
+.sve-no3d { padding: 1rem; }
+.sve-status { min-height: 3em; margin: .7rem 0 .4rem; padding: .55rem .75rem; border-left: 4px solid var(--accent); background: var(--surface); }
+.sve-readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin: .4rem 0; padding: 0; list-style: none; }
+.sve-readout li { padding: .5rem; border: 1px solid var(--rule); background: var(--surface); }
+.sve-results { margin: .6rem 0; padding-left: 0; list-style: none; display: grid; gap: .35rem; }
+.sve-results li { padding: .5rem .7rem; border-left: 4px solid var(--rule); background: var(--surface); }
+.sve-results li.is-right { border-left-color: var(--sve-right); }
+.sve-results li.is-wrong { border-left-color: var(--sve-wrong); }
+[data-interactive="section-view-explorer"].sve-ready > .sve-static { display: none; }
+
+/* Static lesson inside the mount: the no-JavaScript, search and print copy. */
+.sve-static-figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.sve-static-figs figure { margin: 0; min-width: 0; }
+.sve-static-figs figcaption { margin-top: .4rem; font-size: .95rem; }
+.sve-static ol { padding-left: 1.3rem; }
+
+@media (max-width: 40rem) {
+  .sve-work { grid-template-columns: minmax(0, 1fr); grid-template-areas: "panel" "stage"; }
+  .sve-canvas { height: 20rem; }
+}
+@media (max-width: 34rem) {
+  .sve-readout { grid-template-columns: 1fr; }
+  .sve-static-figs { grid-template-columns: 1fr; }
+  .sve-canvas { height: 19rem; }
+  .sve-choice label { flex: 1 1 auto; }
+}
+.sve-sheet .sve-svg { width: auto; max-width: 100%; max-height: min(58vh, 36rem); margin-inline: auto; }
+.presenting .sve-canvas { height: 62vh; }
+.presenting .sve-sheet .sve-svg { max-height: 52vh; }
+@media (prefers-reduced-motion: reduce) {
+  [data-interactive="section-view-explorer"] * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media print {
+  /* The static lesson is longer than a page: let it break between figures, not as one block. */
+  .xcard:has([data-interactive="section-view-explorer"]), [data-interactive="section-view-explorer"] { break-inside: auto !important; }
+  .xcard:has([data-interactive="section-view-explorer"]) { break-before: page; }
+  [data-interactive="section-view-explorer"] { --sve-cut: #135b88 !important; --sve-right: #2e7d32 !important; --sve-wrong: #b3261e !important; }
+  .sve-live { display: none !important; }
+  [data-interactive="section-view-explorer"].sve-ready > .sve-static { display: block !important; }
+  .sve-static-figs { display: block; }
+  .sve-static-figs figure { break-inside: avoid; page-break-inside: avoid; margin-bottom: .8rem; }
+  .sve-static-figs .sve-svg { width: 3.7in; max-width: 100%; height: auto; max-height: 7.6in; margin-inline: auto; }
+  .sve-static-figs figcaption { break-before: avoid; }
+  .sve-static > p:first-child { break-after: avoid; }
+}

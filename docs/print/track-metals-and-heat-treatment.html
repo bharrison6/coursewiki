@@ -2996,6 +2996,182 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   .deeper-addendum h2, .deeper-addendum .crumb { break-after: avoid; }
   .deeper-back { display: none; }
 }
+[data-interactive="tensile-test"] { min-width: 0; margin-block: 1rem; overflow-wrap: anywhere; }
+.tt-ready > .tt-static { display: none; }
+/* Series colours come from theme tokens; each series also has its own dash pattern and a letter label. */
+[data-interactive="tensile-test"] { --tt-a: var(--accent); --tt-b: var(--msu-redorange); --tt-c: var(--ink); --tt-d: var(--ink-soft); }
+.tt-lab, .tt-static { font: .97rem/1.45 var(--f-display); }
+.tt-lab p { margin-block: .55rem; }
+.tt-challenge { padding: .6rem .8rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+.tt-challenge strong { display: block; font-size: 1.08rem; }
+.tt-toolbar { display: flex; flex-wrap: wrap; gap: .5rem; align-items: end; margin-block: .7rem; }
+.tt-toolbar label { display: grid; gap: .2rem; font-weight: 700; flex: 1 1 15rem; min-width: 0; }
+.tt-lab :is(select, input[type="number"], button) { box-sizing: border-box; min-height: 44px; min-width: 0; max-width: 100%; font: inherit; padding: .4rem .65rem; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); }
+.tt-lab :is(button, select, summary) { cursor: pointer; }
+.tt-lab button:disabled { opacity: .5; cursor: default; }
+.tt-lab button.tt-primary { border: 2px solid var(--accent); font-weight: 700; }
+.tt-lab :is(input, select, button, summary):focus-visible, .tt-tablewrap:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.tt-lab input { accent-color: var(--accent); }
+.tt-stage { position: relative; touch-action: pan-y; border: 1px solid var(--rule); background: var(--paper); cursor: ew-resize; }
+.tt-specimen, .tt-plot { display: block; width: 100%; height: auto; }
+.tt-stage .tt-specimen { max-height: 15rem; }
+.tt-crosshead-control { display: grid; gap: .15rem; margin-block: .5rem .2rem; font-weight: 700; }
+.tt-crosshead-control input[type="range"] { width: 100%; min-height: 44px; margin: 0; }
+.tt-hint, .tt-speccap { color: var(--ink-soft); font-size: .9rem; }
+.tt-speccap { margin: .3rem 0 0; }
+.tt-readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin: .5rem 0; padding: 0; list-style: none; font-variant-numeric: tabular-nums; }
+.tt-readouts li { min-width: 0; padding: .4rem .5rem; border: 1px solid var(--rule); background: var(--surface); }
+.tt-readouts span { display: block; color: var(--ink-soft); font-size: .82rem; }
+.tt-readouts strong { font-size: 1.05rem; }
+/* Reserve two lines for changing stage names so the panel below does not shift while the result animates. */
+.tt-readouts strong[data-r="stage"] { display: block; min-height: 2.9em; }
+.tt-status { min-height: 2.9em; padding: .5rem .7rem; border-left: 4px solid var(--accent); background: var(--surface-2); }
+.tt-lab, .tt-static { container-type: inline-size; }
+.tt-plots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+.tt-plots > svg { border: 1px solid var(--rule); background: var(--paper); }
+.tt-plots > svg:only-child { grid-column: 1 / -1; max-width: 32rem; }
+.tt-pointer { min-height: 1.5em; color: var(--ink-soft); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.tt-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: .5rem; }
+.tt-actions button { flex: 1 1 10rem; }
+.tt-predict { margin-block: .7rem; padding: .7rem .8rem; border: 1px solid var(--rule); border-left: 4px solid var(--accent); }
+.tt-predict[hidden] { display: none; }
+.tt-predict summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; }
+.tt-predict label { display: grid; gap: .2rem; font-weight: 700; max-width: 20rem; }
+.tt-feedback { padding: .5rem .7rem; background: var(--surface-2); }
+/* Paired result view inside the prediction panel: specimen, readings and unloading line stay beside the answer. */
+.tt-uv { display: grid; gap: .3rem; justify-items: center; margin-block: .4rem; }
+.tt-uv-spec { width: 100%; background: var(--paper); border: 1px solid var(--rule); }
+.tt-uv-spec .tt-specimen { max-height: 4.2rem; }
+.tt-uv-spec .tt-slabel { display: none; }
+.tt-uv .tt-plot { max-width: 22rem; border: 1px solid var(--rule); background: var(--paper); }
+.tt-uv-read { margin: 0; font-size: .88rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; text-align: center; }
+.tt-predict .tt-feedback { min-height: 4.4em; margin-block: .4rem; font-size: .93rem; }
+.tt-answer { display: flex; flex-wrap: wrap; gap: .5rem; align-items: end; }
+.tt-answer label { flex: 1 1 9rem; max-width: none; }
+.tt-answer button { flex: 0 0 auto; }
+.tt-predict > p[data-tt-context] { margin-top: 0; font-size: .93rem; }
+@container (max-width: 30rem) { .tt-uv-spec .tt-specimen { max-height: 3.2rem; } .tt-uv-read { font-size: .8rem; } }
+/* Wide columns: plot beside the specimen, readings, result and answer, so the whole check fits one screen. */
+@container (min-width: 36rem) {
+  .tt-predict:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); column-gap: .8rem; align-items: start;
+    grid-template-areas: "ctx ctx" "plot spec" "plot read" "plot fb" "plot ans" "plot act" "score score" "hint hint"; }
+  .tt-predict .tt-uv { display: contents; }
+  .tt-predict > p[data-tt-context] { grid-area: ctx; }
+  .tt-predict .tt-uv-spec { grid-area: spec; }
+  .tt-predict .tt-uv-read { grid-area: read; }
+  .tt-predict .tt-uv .tt-plot { grid-area: plot; max-width: none; }
+  .tt-predict .tt-feedback { grid-area: fb; }
+  .tt-predict .tt-answer { grid-area: ans; }
+  .tt-predict > .tt-actions { grid-area: act; }
+  .tt-predict > [data-tt-score] { grid-area: score; }
+  .tt-predict > details { grid-area: hint; }
+}
+.tt-feedback[data-result="match"], .tt-feedback[data-result="match-ratio"] { border-left: 4px solid var(--accent); }
+.tt-feedback[data-result="miss"], .tt-feedback[data-result="close"] { border-left: 4px dashed var(--ink-soft); }
+.tt-found { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .4rem; margin: .5rem 0; padding: 0; list-style: none; }
+.tt-found li { padding: .4rem .55rem; border: 1px dashed var(--rule); color: var(--ink-soft); }
+.tt-found li.is-found { border-style: solid; color: var(--ink); background: var(--surface); }
+.tt-found strong { display: block; }
+.tt-section-title { margin: 1.2rem 0 .3rem; font-size: 1.1rem; font-weight: 700; }
+.tt-compare-toggles { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin: 0; padding: 0; border: 0; }
+.tt-compare-toggles legend { font-weight: 700; padding: 0; margin-bottom: .2rem; }
+.tt-compare-toggles label { display: flex; align-items: center; gap: .45rem; min-height: 44px; }
+.tt-compare-toggles input { width: 1.25rem; height: 1.25rem; }
+.tt-legend { display: flex; flex-wrap: wrap; gap: .2rem 1.2rem; margin: .4rem 0; padding: 0; list-style: none; font-size: .92rem; }
+.tt-legend svg { width: 2.5rem; height: .8rem; vertical-align: middle; }
+.tt-quiz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem .8rem; margin-block: .5rem; }
+.tt-quiz label { display: grid; gap: .2rem; min-width: 0; }
+.tt-quiz-result { margin: .3rem 0; padding: 0 0 0 1.2rem; }
+.tt-ranks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem 1rem; }
+.tt-rank { margin: 0; min-width: 0; break-inside: avoid; }
+.tt-rank figcaption { font-weight: 700; margin-bottom: .2rem; }
+.tt-rank ol { list-style: none; margin: 0; padding: 0; }
+.tt-rank li { display: grid; grid-template-columns: 1.4rem minmax(0, 1fr) 4.2rem; gap: .4rem; align-items: center; min-height: 1.6rem; font-variant-numeric: tabular-nums; }
+.tt-bar { height: .8rem; background: var(--surface-2); border: 1px solid var(--rule); }
+.tt-bar-fill { display: block; height: 100%; background: currentColor; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.tt-rank-val { text-align: right; }
+.tt-tablewrap { overflow-x: auto; max-width: 100%; }
+.tt-table :is(th, td) { overflow-wrap: normal; word-break: normal; }
+.tt-legend li, .tt-readouts li, .tt-found li, .tt-quiz-result li { padding-left: 0; }
+.tt-legend li::before, .tt-readouts li::before, .tt-found li::before, .tt-quiz-result li::before { content: none; }
+.tt-quiz-result { list-style: disc; padding-left: 1.2rem; }
+.tt-quiz-result li { display: list-item; }
+.tt-table { border-collapse: collapse; font-size: .9rem; min-width: 32rem; }
+.tt-table :is(th, td) { padding: .35rem .5rem; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+.tt-table td { font-variant-numeric: tabular-nums; }
+.tt-limits { margin-top: .8rem; border-top: 1px solid var(--rule); }
+.tt-limits > summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; }
+.tt-readlist li { margin-block: .25rem; }
+.tt-figure { margin: .8rem 0; break-inside: avoid; }
+.tt-figure > figcaption { font-size: .92rem; color: var(--ink-soft); margin-bottom: .3rem; }
+.tt-shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.tt-shot { border: 1px solid var(--rule); background: var(--paper); min-width: 0; }
+.tt-shotcap { margin: .3rem .5rem 0; font-size: .88rem; }
+
+/* SVG drawing: theme tokens only, readable in both themes and on paper. */
+.tt-plot text, .tt-specimen text { fill: var(--ink); font-family: var(--f-display); }
+.tt-tick { font-size: 21px; fill: var(--ink-soft) !important; }
+.tt-label { font-size: 21px; }
+.tt-ptitle { font-size: 21px; font-weight: 700; }
+.tt-marklabel { font-size: 20px; font-weight: 600; paint-order: stroke; stroke: var(--paper); stroke-width: 5px; stroke-linejoin: round; }
+.tt-endlabel { font-size: 23px; font-weight: 700; paint-order: stroke; stroke: var(--paper); stroke-width: 5px; }
+.tt-grid { stroke: var(--rule); stroke-width: 1; }
+.tt-axis { stroke: var(--ink-soft); stroke-width: 1.5; }
+.tt-curve { fill: none; stroke-width: 3.2; stroke-linejoin: round; stroke-linecap: round; }
+.tt-s-a { color: var(--tt-a); stroke: var(--tt-a); }
+.tt-s-b { color: var(--tt-b); stroke: var(--tt-b); stroke-dasharray: 12 5; }
+.tt-s-c { color: var(--tt-c); stroke: var(--tt-c); stroke-dasharray: 3 4; }
+.tt-s-d { color: var(--tt-d); stroke: var(--tt-d); stroke-dasharray: 10 4 2 4; }
+.tt-curve.tt-main { stroke: var(--accent); stroke-width: 3.6; }
+.tt-endlabel.tt-s-a, .tt-endlabel.tt-s-b, .tt-endlabel.tt-s-c, .tt-endlabel.tt-s-d { fill: currentColor; stroke: var(--paper); stroke-dasharray: none; }
+.tt-fracture { fill: none; stroke-width: 2.5; stroke-dasharray: none !important; }
+.tt-area { fill: var(--accent); fill-opacity: .16; stroke: none; }
+.tt-offset { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 7 5; }
+.tt-offset-base { fill: none; stroke: var(--ink); stroke-width: 2; }
+.tt-unload { fill: none; stroke: var(--msu-redorange); stroke-width: 3; stroke-dasharray: 9 5; }
+.tt-set { fill: var(--msu-redorange); stroke: var(--paper); stroke-width: 1.5; }
+.tt-pred { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+.tt-point { fill: var(--paper); stroke: var(--accent); stroke-width: 3.5; }
+.tt-mark-yield { fill: var(--paper); stroke: var(--ink); stroke-width: 3; }
+.tt-mark-uts { fill: var(--ink); stroke: var(--paper); stroke-width: 1.5; }
+.tt-mark-fracture { fill: none; stroke: var(--ink); stroke-width: 3; }
+.tt-slabel { font-size: 21px; fill: var(--ink-soft) !important; }
+.tt-grip { fill: var(--surface-2); stroke: var(--ink-soft); stroke-width: 2; }
+.tt-crosshead { fill: var(--surface-2); stroke: var(--accent); stroke-width: 3; }
+.tt-spec { fill: var(--rule); stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; }
+.tt-neckmark, .tt-gauge { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+
+/* Narrow containers (phones, narrow columns): stack, and let HTML captions carry the specimen labels. */
+@container (max-width: 30rem) {
+  .tt-plots, .tt-shots, .tt-ranks, .tt-quiz { grid-template-columns: minmax(0, 1fr); }
+  .tt-readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Reserve the four-line plateau message through unloading, keeping the prediction panel still. */
+  .tt-status { min-height: calc(5.8em + 1rem); }
+  /* Keep the paired result and its answer together without shrinking the specimen or plot. */
+  .tt-predict { padding-block: .5rem; }
+  .tt-uv { margin-block: .2rem; gap: .2rem; }
+  .tt-predict .tt-feedback { margin-block: .2rem; min-height: 3.8em; }
+  .tt-slabel { display: none; }
+}
+@media (max-width: 34rem) {
+  .xcard:has([data-interactive="tensile-test"]) .body { padding-inline: .6rem; }
+  .tt-actions button { flex-basis: 8rem; }
+}
+@media (prefers-reduced-motion: reduce) { [data-interactive="tensile-test"] * { animation: none !important; transition: none !important; } }
+@media print {
+  /* The fallback is taller than a page: let it flow instead of jumping whole to the next page. */
+  [data-interactive="tensile-test"][data-interactive] { break-inside: auto; }
+  .tt-lab { display: none !important; }
+  .tt-ready > .tt-static { display: block !important; }
+  .tt-static .tt-plots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tt-static .tt-shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tt-figure, .tt-shot, .tt-plots > svg, .tt-table, .tt-readlist li { break-inside: avoid; }
+  .tt-limits > :not(summary) { display: block !important; }
+  .tt-plot, .tt-specimen, .tt-area { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .tt-tablewrap { overflow: visible; }
+  .tt-table { min-width: 0; width: 100%; }
+}
+
 </style>
 </head>
 <body class="app skin-app aggregate" data-page="agg-track-metals-and-heat-treatment" data-base="">
@@ -3055,6 +3231,19 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     </tbody>
   </table>
   <p><strong>Strong does not mean stiff.</strong> Stiffness describes elastic deflection. Hardening a steel can raise its strength substantially without a comparable change in its elastic stiffness. Geometry also affects how far a part bends.</p>
+    </div>
+  </details>
+  <details class="xcard deck-slide is-interactive" id="metals-and-their-properties--pull-a-tensile-specimen-strength-stiffness-ductility-and-toughness-on-one-curve" data-card="metals-and-their-properties--pull-a-tensile-specimen-strength-stiffness-ductility-and-toughness-on-one-curve" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Pull a tensile specimen: strength, stiffness, ductility and toughness on one curve<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Pull a tensile specimen: strength, stiffness, ductility and toughness on one curve</h2>
+  <p>A tension test pulls a specimen of known size until it breaks and records force against stretch. Dividing by the original area and gauge length turns that record into an engineering stress–strain curve, and one curve answers four different questions: how stiff, how strong, how far it stretches and how much energy it absorbs.</p>
+  <p>The curves below are synthetic teaching curves, shaped to resemble common behaviour. Read the method from them, not the numbers for any real alloy.</p>
+  <div data-interactive="tensile-test">
+    <!-- TENSILE-TEST-STATIC -->
+    <div class="tt-static"><p><strong>Tensile test: one curve, four different properties.</strong> This fallback shows the same synthetic curves and calculations as the live lab.</p><p>A round specimen with a chosen gauge length <em>L</em><sub>0</sub> = 50 mm and diameter 12.5 mm (original area <em>A</em><sub>0</sub> = 122.7 mm²) is pulled by a moving crosshead. Engineering stress σ = <em>F</em>/<em>A</em><sub>0</sub> (N/mm² = MPa). Engineering strain ε = Δ<em>L</em>/<em>L</em><sub>0</sub> (mm/mm, shown here in %). Both use the <em>original</em> dimensions, so engineering stress falls after the neck forms even though the force is concentrated on a shrinking section.</p><figure class="tt-figure"><figcaption>Synthetic specimen A (ductile, low-carbon-steel-like; illustrative, not a grade). Shaded: area under the curve to fracture. Dashed red line: unloading from 10% strain.</figcaption><div class="tt-plots"><svg class="tt-plot" viewBox="0 0 520 380" role="img" aria-label="Engineering stress against strain for specimen A to 30.0% strain, to fracture." data-xmax="0.324" data-ymax="500"><defs><clipPath id="tt-static-full-clip"><rect x="80" y="40" width="424" height="270"/></clipPath></defs><path class="tt-grid" d="M80.0 44V310"/><text class="tt-tick" x="80.0" y="332" text-anchor="middle">0</text><path class="tt-grid" d="M209.6 44V310"/><text class="tt-tick" x="209.6" y="332" text-anchor="middle">10</text><path class="tt-grid" d="M339.3 44V310"/><text class="tt-tick" x="339.3" y="332" text-anchor="middle">20</text><path class="tt-grid" d="M468.9 44V310"/><text class="tt-tick" x="468.9" y="332" text-anchor="middle">30</text><path class="tt-grid" d="M80 310.0H500"/><text class="tt-tick" x="72" y="316" text-anchor="end">0</text><path class="tt-grid" d="M80 256.8H500"/><text class="tt-tick" x="72" y="262.8" text-anchor="end">100</text><path class="tt-grid" d="M80 203.6H500"/><text class="tt-tick" x="72" y="209.6" text-anchor="end">200</text><path class="tt-grid" d="M80 150.4H500"/><text class="tt-tick" x="72" y="156.4" text-anchor="end">300</text><path class="tt-grid" d="M80 97.2H500"/><text class="tt-tick" x="72" y="103.2" text-anchor="end">400</text><path class="tt-grid" d="M80 44.0H500"/><text class="tt-tick" x="72" y="50" text-anchor="end">500</text><path class="tt-axis" d="M80 44V310H500" fill="none" stroke="currentColor"/><text class="tt-label" x="290" y="368" text-anchor="middle">Engineering strain (%)</text><text class="tt-label" transform="translate(22 177) rotate(-90)" text-anchor="middle">Engineering stress (MPa)</text><text class="tt-ptitle" x="80" y="28">Whole test</text><g clip-path="url(#tt-static-full-clip)"><path class="tt-area" d="M80.00 310.00L80.00 310.00L81.50 187.23L81.62 177.00L82.99 177.00L84.49 177.00L85.98 177.00L87.48 177.00L88.97 177.00L90.47 177.00L91.97 177.00L93.46 177.00L94.96 177.00L96.45 177.00L97.95 177.00L99.44 177.00L99.44 177.00L100.94 175.66L102.44 174.33L103.93 173.02L105.43 171.72L106.92 170.43L108.42 169.17L109.91 167.91L111.41 166.67L112.91 165.45L114.40 164.23L115.90 163.04L117.39 161.86L118.89 160.69L120.38 159.53L121.88 158.39L123.38 157.26L124.87 156.15L126.37 155.05L127.86 153.97L129.36 152.89L130.85 151.83L132.35 150.79L133.85 149.76L135.34 148.74L136.84 147.73L138.33 146.74L139.83 145.76L141.32 144.79L142.82 143.83L144.32 142.89L145.81 141.96L147.31 141.05L148.80 140.14L150.30 139.25L151.79 138.37L153.29 137.50L154.79 136.65L156.28 135.80L157.78 134.97L159.27 134.15L160.77 133.34L162.26 132.55L163.76 131.76L165.26 130.99L166.75 130.22L168.25 129.47L169.74 128.73L171.24 128.01L172.74 127.29L174.23 126.58L175.73 125.89L177.22 125.20L178.72 124.53L180.21 123.87L181.71 123.21L183.21 122.57L184.70 121.94L186.20 121.32L187.69 120.71L189.19 120.11L190.68 119.52L192.18 118.94L193.68 118.37L195.17 117.80L196.67 117.25L198.16 116.71L199.66 116.18L201.15 115.66L202.65 115.15L204.15 114.64L205.64 114.15L207.14 113.66L208.63 113.19L210.13 112.72L211.62 112.26L213.12 111.81L214.62 111.37L216.11 110.94L217.61 110.52L219.10 110.10L220.60 109.70L222.09 109.30L223.59 108.91L225.09 108.53L226.58 108.15L228.08 107.79L229.57 107.43L231.07 107.08L232.56 106.74L234.06 106.41L235.56 106.08L237.05 105.76L238.55 105.45L240.04 105.15L241.54 104.85L243.03 104.56L244.53 104.28L246.03 104.00L247.52 103.73L249.02 103.47L250.51 103.22L252.01 102.97L253.50 102.73L255.00 102.49L256.50 102.26L257.99 102.04L259.49 101.83L260.98 101.62L262.48 101.41L263.97 101.22L265.47 101.02L266.97 100.84L268.46 100.66L269.96 100.48L271.45 100.32L272.95 100.15L274.44 99.99L275.94 99.84L277.44 99.70L278.93 99.55L280.43 99.42L281.92 99.29L283.42 99.16L284.91 99.04L286.41 98.92L287.91 98.81L289.40 98.70L290.90 98.60L292.39 98.50L293.89 98.40L295.38 98.31L296.88 98.23L298.38 98.15L299.87 98.07L301.37 98.00L302.86 97.93L304.36 97.86L305.85 97.80L307.35 97.74L308.85 97.68L310.34 97.63L311.84 97.58L313.33 97.54L314.83 97.50L316.32 97.46L317.82 97.42L319.32 97.39L320.81 97.36L322.31 97.33L323.80 97.31L325.30 97.29L326.79 97.27L328.29 97.25L329.79 97.24L331.28 97.23L332.78 97.22L334.27 97.21L335.77 97.21L337.26 97.20L338.76 97.20L339.26 97.20L340.26 97.20L341.75 97.22L343.25 97.24L344.74 97.28L346.24 97.32L347.74 97.38L349.23 97.45L350.73 97.53L352.22 97.63L353.72 97.73L355.21 97.84L356.71 97.97L358.21 98.11L359.70 98.26L361.20 98.42L362.69 98.59L364.19 98.77L365.68 98.97L367.18 99.17L368.68 99.39L370.17 99.62L371.67 99.86L373.16 100.11L374.66 100.37L376.15 100.65L377.65 100.93L379.15 101.23L380.64 101.54L382.14 101.86L383.63 102.19L385.13 102.53L386.62 102.88L388.12 103.25L389.62 103.62L391.11 104.01L392.61 104.41L394.10 104.82L395.60 105.24L397.09 105.67L398.59 106.12L400.09 106.57L401.58 107.04L403.08 107.52L404.57 108.00L406.07 108.50L407.56 109.02L409.06 109.54L410.56 110.07L412.05 110.62L413.55 111.18L415.04 111.75L416.54 112.33L418.03 112.92L419.53 113.52L421.03 114.13L422.52 114.76L424.02 115.40L425.51 116.04L427.01 116.70L428.50 117.37L430.00 118.05L431.50 118.75L432.99 119.45L434.49 120.17L435.98 120.90L437.48 121.63L438.97 122.38L440.47 123.14L441.97 123.92L443.46 124.70L444.96 125.50L446.45 126.30L447.95 127.12L449.44 127.95L450.94 128.79L452.44 129.64L453.93 130.51L455.43 131.38L456.92 132.27L458.42 133.16L459.91 134.07L461.41 134.99L462.91 135.92L464.40 136.86L465.90 137.82L467.39 138.78L468.89 139.76L468.89 310L80 310Z"/><path class="tt-curve tt-main" data-series="ductile" d="M80.00 310.00L80.00 310.00L81.50 187.23L81.62 177.00L82.99 177.00L84.49 177.00L85.98 177.00L87.48 177.00L88.97 177.00L90.47 177.00L91.97 177.00L93.46 177.00L94.96 177.00L96.45 177.00L97.95 177.00L99.44 177.00L99.44 177.00L100.94 175.66L102.44 174.33L103.93 173.02L105.43 171.72L106.92 170.43L108.42 169.17L109.91 167.91L111.41 166.67L112.91 165.45L114.40 164.23L115.90 163.04L117.39 161.86L118.89 160.69L120.38 159.53L121.88 158.39L123.38 157.26L124.87 156.15L126.37 155.05L127.86 153.97L129.36 152.89L130.85 151.83L132.35 150.79L133.85 149.76L135.34 148.74L136.84 147.73L138.33 146.74L139.83 145.76L141.32 144.79L142.82 143.83L144.32 142.89L145.81 141.96L147.31 141.05L148.80 140.14L150.30 139.25L151.79 138.37L153.29 137.50L154.79 136.65L156.28 135.80L157.78 134.97L159.27 134.15L160.77 133.34L162.26 132.55L163.76 131.76L165.26 130.99L166.75 130.22L168.25 129.47L169.74 128.73L171.24 128.01L172.74 127.29L174.23 126.58L175.73 125.89L177.22 125.20L178.72 124.53L180.21 123.87L181.71 123.21L183.21 122.57L184.70 121.94L186.20 121.32L187.69 120.71L189.19 120.11L190.68 119.52L192.18 118.94L193.68 118.37L195.17 117.80L196.67 117.25L198.16 116.71L199.66 116.18L201.15 115.66L202.65 115.15L204.15 114.64L205.64 114.15L207.14 113.66L208.63 113.19L210.13 112.72L211.62 112.26L213.12 111.81L214.62 111.37L216.11 110.94L217.61 110.52L219.10 110.10L220.60 109.70L222.09 109.30L223.59 108.91L225.09 108.53L226.58 108.15L228.08 107.79L229.57 107.43L231.07 107.08L232.56 106.74L234.06 106.41L235.56 106.08L237.05 105.76L238.55 105.45L240.04 105.15L241.54 104.85L243.03 104.56L244.53 104.28L246.03 104.00L247.52 103.73L249.02 103.47L250.51 103.22L252.01 102.97L253.50 102.73L255.00 102.49L256.50 102.26L257.99 102.04L259.49 101.83L260.98 101.62L262.48 101.41L263.97 101.22L265.47 101.02L266.97 100.84L268.46 100.66L269.96 100.48L271.45 100.32L272.95 100.15L274.44 99.99L275.94 99.84L277.44 99.70L278.93 99.55L280.43 99.42L281.92 99.29L283.42 99.16L284.91 99.04L286.41 98.92L287.91 98.81L289.40 98.70L290.90 98.60L292.39 98.50L293.89 98.40L295.38 98.31L296.88 98.23L298.38 98.15L299.87 98.07L301.37 98.00L302.86 97.93L304.36 97.86L305.85 97.80L307.35 97.74L308.85 97.68L310.34 97.63L311.84 97.58L313.33 97.54L314.83 97.50L316.32 97.46L317.82 97.42L319.32 97.39L320.81 97.36L322.31 97.33L323.80 97.31L325.30 97.29L326.79 97.27L328.29 97.25L329.79 97.24L331.28 97.23L332.78 97.22L334.27 97.21L335.77 97.21L337.26 97.20L338.76 97.20L339.26 97.20L340.26 97.20L341.75 97.22L343.25 97.24L344.74 97.28L346.24 97.32L347.74 97.38L349.23 97.45L350.73 97.53L352.22 97.63L353.72 97.73L355.21 97.84L356.71 97.97L358.21 98.11L359.70 98.26L361.20 98.42L362.69 98.59L364.19 98.77L365.68 98.97L367.18 99.17L368.68 99.39L370.17 99.62L371.67 99.86L373.16 100.11L374.66 100.37L376.15 100.65L377.65 100.93L379.15 101.23L380.64 101.54L382.14 101.86L383.63 102.19L385.13 102.53L386.62 102.88L388.12 103.25L389.62 103.62L391.11 104.01L392.61 104.41L394.10 104.82L395.60 105.24L397.09 105.67L398.59 106.12L400.09 106.57L401.58 107.04L403.08 107.52L404.57 108.00L406.07 108.50L407.56 109.02L409.06 109.54L410.56 110.07L412.05 110.62L413.55 111.18L415.04 111.75L416.54 112.33L418.03 112.92L419.53 113.52L421.03 114.13L422.52 114.76L424.02 115.40L425.51 116.04L427.01 116.70L428.50 117.37L430.00 118.05L431.50 118.75L432.99 119.45L434.49 120.17L435.98 120.90L437.48 121.63L438.97 122.38L440.47 123.14L441.97 123.92L443.46 124.70L444.96 125.50L446.45 126.30L447.95 127.12L449.44 127.95L450.94 128.79L452.44 129.64L453.93 130.51L455.43 131.38L456.92 132.27L458.42 133.16L459.91 134.07L461.41 134.99L462.91 135.92L464.40 136.86L465.90 137.82L467.39 138.78L468.89 139.76" fill="none" stroke="currentColor"/><path class="tt-unload" data-tt-unload d="M209.63 112.87L207.23 310.00"/><path class="tt-mark-uts" data-tt-mark="uts" d="M339.3 89.2l8 8l-8 8l-8 -8z"/><path class="tt-mark-fracture" data-tt-mark="fracture" d="M461.88888888888886 132.76l14 14m0 -14l-14 14"/></g><path class="tt-set" data-tt-set d="M207.23 310l-8 -15h16z"/><text class="tt-marklabel" x="350.3" y="83.2" text-anchor="start"><tspan x="350.3" dy="0">UTS 400 MPa</tspan></text><text class="tt-marklabel" x="457.9" y="161.8" text-anchor="end"><tspan x="457.9" dy="0">Fracture</tspan></text></svg><svg class="tt-plot" viewBox="0 0 520 380" role="img" aria-label="The first 1.00% of strain for specimen A, showing the elastic slope and the 0.2% offset construction." data-xmax="0.01" data-ymax="500"><defs><clipPath id="tt-static-zoom-clip"><rect x="80" y="40" width="424" height="270"/></clipPath></defs><path class="tt-grid" d="M80.0 44V310"/><text class="tt-tick" x="80.0" y="332" text-anchor="middle">0.0</text><path class="tt-grid" d="M164.0 44V310"/><text class="tt-tick" x="164.0" y="332" text-anchor="middle">0.2</text><path class="tt-grid" d="M248.0 44V310"/><text class="tt-tick" x="248.0" y="332" text-anchor="middle">0.4</text><path class="tt-grid" d="M332.0 44V310"/><text class="tt-tick" x="332.0" y="332" text-anchor="middle">0.6</text><path class="tt-grid" d="M416.0 44V310"/><text class="tt-tick" x="416.0" y="332" text-anchor="middle">0.8</text><path class="tt-grid" d="M500.0 44V310"/><text class="tt-tick" x="500.0" y="332" text-anchor="middle">1.0</text><path class="tt-grid" d="M80 310.0H500"/><text class="tt-tick" x="72" y="316" text-anchor="end">0</text><path class="tt-grid" d="M80 256.8H500"/><text class="tt-tick" x="72" y="262.8" text-anchor="end">100</text><path class="tt-grid" d="M80 203.6H500"/><text class="tt-tick" x="72" y="209.6" text-anchor="end">200</text><path class="tt-grid" d="M80 150.4H500"/><text class="tt-tick" x="72" y="156.4" text-anchor="end">300</text><path class="tt-grid" d="M80 97.2H500"/><text class="tt-tick" x="72" y="103.2" text-anchor="end">400</text><path class="tt-grid" d="M80 44.0H500"/><text class="tt-tick" x="72" y="50" text-anchor="end">500</text><path class="tt-axis" d="M80 44V310H500" fill="none" stroke="currentColor"/><text class="tt-label" x="290" y="368" text-anchor="middle">Engineering strain (%)</text><text class="tt-label" transform="translate(22 177) rotate(-90)" text-anchor="middle">Engineering stress (MPa)</text><text class="tt-ptitle" x="80" y="28">Start of the test, magnified</text><g clip-path="url(#tt-static-zoom-clip)"><path class="tt-area" d="M80.00 310.00L80.00 310.00L81.70 305.70L83.39 301.41L85.09 297.11L86.78 292.81L88.48 288.52L90.18 284.22L91.87 279.92L93.57 275.62L95.27 271.33L96.96 267.03L98.66 262.73L100.35 258.44L102.05 254.14L103.75 249.84L105.44 245.55L107.14 241.25L108.83 236.95L110.53 232.66L112.23 228.36L113.92 224.06L115.62 219.76L117.32 215.47L119.01 211.17L120.71 206.87L122.40 202.58L124.10 198.28L125.80 193.98L127.49 189.69L129.19 185.39L130.88 181.09L132.50 177.00L132.58 177.00L134.28 177.00L135.97 177.00L137.67 177.00L139.37 177.00L141.06 177.00L142.76 177.00L144.45 177.00L146.15 177.00L147.85 177.00L149.54 177.00L151.24 177.00L152.93 177.00L154.63 177.00L156.33 177.00L158.02 177.00L159.72 177.00L161.42 177.00L163.11 177.00L164.81 177.00L166.50 177.00L168.20 177.00L169.90 177.00L171.59 177.00L173.29 177.00L174.98 177.00L176.68 177.00L178.38 177.00L180.07 177.00L181.77 177.00L183.47 177.00L185.16 177.00L186.86 177.00L188.55 177.00L190.25 177.00L191.95 177.00L193.64 177.00L195.34 177.00L197.03 177.00L198.73 177.00L200.43 177.00L202.12 177.00L203.82 177.00L205.52 177.00L207.21 177.00L208.91 177.00L210.60 177.00L212.30 177.00L214.00 177.00L215.69 177.00L217.39 177.00L219.08 177.00L220.78 177.00L222.48 177.00L224.17 177.00L225.87 177.00L227.57 177.00L229.26 177.00L230.96 177.00L232.65 177.00L234.35 177.00L236.05 177.00L237.74 177.00L239.44 177.00L241.13 177.00L242.83 177.00L244.53 177.00L246.22 177.00L247.92 177.00L249.62 177.00L251.31 177.00L253.01 177.00L254.70 177.00L256.40 177.00L258.10 177.00L259.79 177.00L261.49 177.00L263.18 177.00L264.88 177.00L266.58 177.00L268.27 177.00L269.97 177.00L271.67 177.00L273.36 177.00L275.06 177.00L276.75 177.00L278.45 177.00L280.15 177.00L281.84 177.00L283.54 177.00L285.23 177.00L286.93 177.00L288.63 177.00L290.32 177.00L292.02 177.00L293.72 177.00L295.41 177.00L297.11 177.00L298.80 177.00L300.50 177.00L302.20 177.00L303.89 177.00L305.59 177.00L307.28 177.00L308.98 177.00L310.68 177.00L312.37 177.00L314.07 177.00L315.77 177.00L317.46 177.00L319.16 177.00L320.85 177.00L322.55 177.00L324.25 177.00L325.94 177.00L327.64 177.00L329.33 177.00L331.03 177.00L332.73 177.00L334.42 177.00L336.12 177.00L337.82 177.00L339.51 177.00L341.21 177.00L342.90 177.00L344.60 177.00L346.30 177.00L347.99 177.00L349.69 177.00L351.38 177.00L353.08 177.00L354.78 177.00L356.47 177.00L358.17 177.00L359.87 177.00L361.56 177.00L363.26 177.00L364.95 177.00L366.65 177.00L368.35 177.00L370.04 177.00L371.74 177.00L373.43 177.00L375.13 177.00L376.83 177.00L378.52 177.00L380.22 177.00L381.92 177.00L383.61 177.00L385.31 177.00L387.00 177.00L388.70 177.00L390.40 177.00L392.09 177.00L393.79 177.00L395.48 177.00L397.18 177.00L398.88 177.00L400.57 177.00L402.27 177.00L403.97 177.00L405.66 177.00L407.36 177.00L409.05 177.00L410.75 177.00L412.45 177.00L414.14 177.00L415.84 177.00L417.53 177.00L419.23 177.00L420.93 177.00L422.62 177.00L424.32 177.00L426.02 177.00L427.71 177.00L429.41 177.00L431.10 177.00L432.80 177.00L434.50 177.00L436.19 177.00L437.89 177.00L439.58 177.00L441.28 177.00L442.98 177.00L444.67 177.00L446.37 177.00L448.07 177.00L449.76 177.00L451.46 177.00L453.15 177.00L454.85 177.00L456.55 177.00L458.24 177.00L459.94 177.00L461.63 177.00L463.33 177.00L465.03 177.00L466.72 177.00L468.42 177.00L470.12 177.00L471.81 177.00L473.51 177.00L475.20 177.00L476.90 177.00L478.60 177.00L480.29 177.00L481.99 177.00L483.68 177.00L485.38 177.00L487.08 177.00L488.77 177.00L490.47 177.00L492.17 177.00L493.86 177.00L495.56 177.00L497.25 177.00L498.95 177.00L500.65 177.00L502.34 177.00L504.04 177.00L505.73 177.00L507.43 177.00L509.13 177.00L510.82 177.00L512.52 177.00L514.22 177.00L515.91 177.00L517.61 177.00L519.30 177.00L521.00 177.00L521.00 310L80 310Z"/><path class="tt-offset" d="M164.00 310L225.95 153.06"/><path class="tt-offset-base" d="M80 303H164.00"/><path class="tt-curve tt-main" data-series="ductile" d="M80.00 310.00L80.00 310.00L81.70 305.70L83.39 301.41L85.09 297.11L86.78 292.81L88.48 288.52L90.18 284.22L91.87 279.92L93.57 275.62L95.27 271.33L96.96 267.03L98.66 262.73L100.35 258.44L102.05 254.14L103.75 249.84L105.44 245.55L107.14 241.25L108.83 236.95L110.53 232.66L112.23 228.36L113.92 224.06L115.62 219.76L117.32 215.47L119.01 211.17L120.71 206.87L122.40 202.58L124.10 198.28L125.80 193.98L127.49 189.69L129.19 185.39L130.88 181.09L132.50 177.00L132.58 177.00L134.28 177.00L135.97 177.00L137.67 177.00L139.37 177.00L141.06 177.00L142.76 177.00L144.45 177.00L146.15 177.00L147.85 177.00L149.54 177.00L151.24 177.00L152.93 177.00L154.63 177.00L156.33 177.00L158.02 177.00L159.72 177.00L161.42 177.00L163.11 177.00L164.81 177.00L166.50 177.00L168.20 177.00L169.90 177.00L171.59 177.00L173.29 177.00L174.98 177.00L176.68 177.00L178.38 177.00L180.07 177.00L181.77 177.00L183.47 177.00L185.16 177.00L186.86 177.00L188.55 177.00L190.25 177.00L191.95 177.00L193.64 177.00L195.34 177.00L197.03 177.00L198.73 177.00L200.43 177.00L202.12 177.00L203.82 177.00L205.52 177.00L207.21 177.00L208.91 177.00L210.60 177.00L212.30 177.00L214.00 177.00L215.69 177.00L217.39 177.00L219.08 177.00L220.78 177.00L222.48 177.00L224.17 177.00L225.87 177.00L227.57 177.00L229.26 177.00L230.96 177.00L232.65 177.00L234.35 177.00L236.05 177.00L237.74 177.00L239.44 177.00L241.13 177.00L242.83 177.00L244.53 177.00L246.22 177.00L247.92 177.00L249.62 177.00L251.31 177.00L253.01 177.00L254.70 177.00L256.40 177.00L258.10 177.00L259.79 177.00L261.49 177.00L263.18 177.00L264.88 177.00L266.58 177.00L268.27 177.00L269.97 177.00L271.67 177.00L273.36 177.00L275.06 177.00L276.75 177.00L278.45 177.00L280.15 177.00L281.84 177.00L283.54 177.00L285.23 177.00L286.93 177.00L288.63 177.00L290.32 177.00L292.02 177.00L293.72 177.00L295.41 177.00L297.11 177.00L298.80 177.00L300.50 177.00L302.20 177.00L303.89 177.00L305.59 177.00L307.28 177.00L308.98 177.00L310.68 177.00L312.37 177.00L314.07 177.00L315.77 177.00L317.46 177.00L319.16 177.00L320.85 177.00L322.55 177.00L324.25 177.00L325.94 177.00L327.64 177.00L329.33 177.00L331.03 177.00L332.73 177.00L334.42 177.00L336.12 177.00L337.82 177.00L339.51 177.00L341.21 177.00L342.90 177.00L344.60 177.00L346.30 177.00L347.99 177.00L349.69 177.00L351.38 177.00L353.08 177.00L354.78 177.00L356.47 177.00L358.17 177.00L359.87 177.00L361.56 177.00L363.26 177.00L364.95 177.00L366.65 177.00L368.35 177.00L370.04 177.00L371.74 177.00L373.43 177.00L375.13 177.00L376.83 177.00L378.52 177.00L380.22 177.00L381.92 177.00L383.61 177.00L385.31 177.00L387.00 177.00L388.70 177.00L390.40 177.00L392.09 177.00L393.79 177.00L395.48 177.00L397.18 177.00L398.88 177.00L400.57 177.00L402.27 177.00L403.97 177.00L405.66 177.00L407.36 177.00L409.05 177.00L410.75 177.00L412.45 177.00L414.14 177.00L415.84 177.00L417.53 177.00L419.23 177.00L420.93 177.00L422.62 177.00L424.32 177.00L426.02 177.00L427.71 177.00L429.41 177.00L431.10 177.00L432.80 177.00L434.50 177.00L436.19 177.00L437.89 177.00L439.58 177.00L441.28 177.00L442.98 177.00L444.67 177.00L446.37 177.00L448.07 177.00L449.76 177.00L451.46 177.00L453.15 177.00L454.85 177.00L456.55 177.00L458.24 177.00L459.94 177.00L461.63 177.00L463.33 177.00L465.03 177.00L466.72 177.00L468.42 177.00L470.12 177.00L471.81 177.00L473.51 177.00L475.20 177.00L476.90 177.00L478.60 177.00L480.29 177.00L481.99 177.00L483.68 177.00L485.38 177.00L487.08 177.00L488.77 177.00L490.47 177.00L492.17 177.00L493.86 177.00L495.56 177.00L497.25 177.00L498.95 177.00L500.65 177.00L502.34 177.00L504.04 177.00L505.73 177.00L507.43 177.00L509.13 177.00L510.82 177.00L512.52 177.00L514.22 177.00L515.91 177.00L517.61 177.00L519.30 177.00L521.00 177.00" fill="none" stroke="currentColor"/><path class="tt-unload" data-tt-unload d="M4280.00 112.87L4202.19 310.00"/><circle class="tt-mark-yield" data-tt-mark="yield" cx="216.5" cy="177.0" r="6.5"/><text class="tt-marklabel" x="187.1" y="294.8">slope = E</text></g><path class="tt-set" data-tt-set d="M4202.19 310l-8 -15h16z"/><text class="tt-marklabel" x="227.5" y="205.0" text-anchor="start"><tspan x="227.5" dy="0">0.2% offset yield</tspan><tspan x="227.5" dy="21">250 MPa</tspan></text></svg></div></figure><ul class="tt-readlist"><li><strong>Stiffness:</strong> the elastic slope, Young’s modulus <em>E</em> = σ/ε = 200 MPa ÷ 0.001 = 200 000 MPa = 200 GPa.</li><li><strong>Yield strength (0.2% offset):</strong> draw a line with slope <em>E</em> starting at 0.2% strain; where it meets the curve, σ<sub>y</sub> ≈ 250 MPa (at 0.325% strain). Specimen A then stretches along a level yield plateau (stress constant at 250 MPa up to 1.5% strain) before strain hardening makes the curve rise again.</li><li><strong>Ultimate tensile strength (UTS):</strong> the highest engineering stress, 400 MPa at 20% strain. A neck begins to form after this peak.</li><li><strong>Ductility:</strong> elongation after fracture ≈ ε<sub>f</sub> − σ<sub>f</sub>/<em>E</em> = 30% − 0.16% = 29.84%.</li><li><strong>Toughness (tensile):</strong> the area under the curve to fracture, ∫σ dε ≈ 107 MJ/m³ (1 MPa × 1 = 1 MJ/m³ = 1 J/cm³) of work per original volume. For this gauge volume that is about 659 J. This is not fracture toughness <em>K</em><sub>IC</sub>, which is measured on a cracked specimen.</li></ul><p><strong>Worked example: unloading leaves permanent set.</strong> Stop at ε = 10.0%, where σ = 371 MPa. Removing the load follows a straight line parallel to the elastic slope, so the elastic part σ/<em>E</em> = 371/200 000 = 0.185% springs back. Permanent set = 10.0% − 0.185% = <strong>9.815%</strong>, or 4.91 mm on the 50 mm gauge length. Below the yield point the same rule gives zero set: at 0.1% strain and 200 MPa, 0.1% − 200/200 000 = 0.</p><figure class="tt-figure"><figcaption>The same specimen at four moments. Length to scale; the neck shape is illustrative only.</figcaption><div class="tt-shots"><div class="tt-shot"><p class="tt-shotcap"><strong>Before loading.</strong> Gauge length 50.0 mm (original L₀ = 50.0 mm). Drawn to scale.</p><svg class="tt-specimen" viewBox="0 0 720 190" role="img" data-neck="0" data-fractured="0" aria-label="Specimen A: gauge length 50.0 mm. Drawn to scale; neck shape illustrative."><path class="tt-spec" d="M46 54H126C142.8 54 142.8 72.75 154 72.75L154.0 72.8L156.8 72.8L159.6 72.8L162.3 72.8L165.1 72.8L167.9 72.8L170.7 72.8L173.4 72.8L176.2 72.8L179.0 72.8L181.8 72.8L184.6 72.8L187.3 72.8L190.1 72.8L192.9 72.8L195.7 72.8L198.4 72.8L201.2 72.8L204.0 72.8L206.8 72.8L209.6 72.8L212.3 72.8L215.1 72.8L217.9 72.8L220.7 72.8L223.4 72.8L226.2 72.8L229.0 72.8L231.8 72.8L234.6 72.8L237.3 72.8L240.1 72.8L242.9 72.8L245.7 72.8L248.4 72.8L251.2 72.8L254.0 72.8L256.8 72.8L259.6 72.8L262.3 72.8L265.1 72.8L267.9 72.8L270.7 72.8L273.4 72.8L276.2 72.8L279.0 72.8L281.8 72.8L284.6 72.8L287.3 72.8L290.1 72.8L292.9 72.8L295.7 72.8L298.4 72.8L301.2 72.8L304.0 72.8L306.8 72.8L309.6 72.8L312.3 72.8L315.1 72.8L317.9 72.8L320.7 72.8L323.4 72.8L326.2 72.8L329.0 72.8L331.8 72.8L334.6 72.8L337.3 72.8L340.1 72.8L342.9 72.8L345.7 72.8L348.4 72.8L351.2 72.8L354.0 72.8L356.8 72.8L359.6 72.8L362.3 72.8L365.1 72.8L367.9 72.8L370.7 72.8L373.4 72.8L376.2 72.8L379.0 72.8L381.8 72.8L384.6 72.8L387.3 72.8L390.1 72.8L392.9 72.8L395.7 72.8L398.4 72.8L401.2 72.8L404.0 72.8C415.2 72.75 415.2 54 432 54H512V154H432C415.2 154 415.2 135.25 404 135.25L404.0 135.3L401.2 135.3L398.4 135.3L395.7 135.3L392.9 135.3L390.1 135.3L387.3 135.3L384.6 135.3L381.8 135.3L379.0 135.3L376.2 135.3L373.4 135.3L370.7 135.3L367.9 135.3L365.1 135.3L362.3 135.3L359.6 135.3L356.8 135.3L354.0 135.3L351.2 135.3L348.4 135.3L345.7 135.3L342.9 135.3L340.1 135.3L337.3 135.3L334.6 135.3L331.8 135.3L329.0 135.3L326.2 135.3L323.4 135.3L320.7 135.3L317.9 135.3L315.1 135.3L312.3 135.3L309.6 135.3L306.8 135.3L304.0 135.3L301.2 135.3L298.4 135.3L295.7 135.3L292.9 135.3L290.1 135.3L287.3 135.3L284.6 135.3L281.8 135.3L279.0 135.3L276.2 135.3L273.4 135.3L270.7 135.3L267.9 135.3L265.1 135.3L262.3 135.3L259.6 135.3L256.8 135.3L254.0 135.3L251.2 135.3L248.4 135.3L245.7 135.3L242.9 135.3L240.1 135.3L237.3 135.3L234.6 135.3L231.8 135.3L229.0 135.3L226.2 135.3L223.4 135.3L220.7 135.3L217.9 135.3L215.1 135.3L212.3 135.3L209.6 135.3L206.8 135.3L204.0 135.3L201.2 135.3L198.4 135.3L195.7 135.3L192.9 135.3L190.1 135.3L187.3 135.3L184.6 135.3L181.8 135.3L179.0 135.3L176.2 135.3L173.4 135.3L170.7 135.3L167.9 135.3L165.1 135.3L162.3 135.3L159.6 135.3L156.8 135.3L154.0 135.3C142.8 135.25 142.8 154 126 154H46Z"/><rect class="tt-grip" x="16" y="40" width="102" height="128"/><text class="tt-slabel" x="16" y="32">Fixed grip</text><rect class="tt-grip tt-crosshead" data-tt-crosshead x="424" y="40" width="110" height="128"/><text class="tt-slabel" x="530" y="32" text-anchor="end">Crosshead →</text><path class="tt-gauge" d="M154 58.75v10M404.0 58.75v10"/></svg></div><div class="tt-shot"><p class="tt-shotcap"><strong>At the peak (UTS): stretched uniformly, no neck yet.</strong> Gauge length 60.0 mm (original L₀ = 50.0 mm). Drawn to scale.</p><svg class="tt-specimen" viewBox="0 0 720 190" role="img" data-neck="0" data-fractured="0" aria-label="Specimen A: gauge length 60.0 mm. Drawn to scale; neck shape illustrative."><path class="tt-spec" d="M46 54H126C142.8 54 142.8 75.44898102564247 154 75.44898102564247L154.0 75.4L157.3 75.4L160.7 75.4L164.0 75.4L167.3 75.4L170.7 75.4L174.0 75.4L177.3 75.4L180.7 75.4L184.0 75.4L187.3 75.4L190.7 75.4L194.0 75.4L197.3 75.4L200.7 75.4L204.0 75.4L207.3 75.4L210.7 75.4L214.0 75.4L217.3 75.4L220.7 75.4L224.0 75.4L227.3 75.4L230.7 75.4L234.0 75.4L237.3 75.4L240.7 75.4L244.0 75.4L247.3 75.4L250.7 75.4L254.0 75.4L257.3 75.4L260.7 75.4L264.0 75.4L267.3 75.4L270.7 75.4L274.0 75.4L277.3 75.4L280.7 75.4L284.0 75.4L287.3 75.4L290.7 75.4L294.0 75.4L297.3 75.4L300.7 75.4L304.0 75.4L307.3 75.4L310.7 75.4L314.0 75.4L317.3 75.4L320.7 75.4L324.0 75.4L327.3 75.4L330.7 75.4L334.0 75.4L337.3 75.4L340.7 75.4L344.0 75.4L347.3 75.4L350.7 75.4L354.0 75.4L357.3 75.4L360.7 75.4L364.0 75.4L367.3 75.4L370.7 75.4L374.0 75.4L377.3 75.4L380.7 75.4L384.0 75.4L387.3 75.4L390.7 75.4L394.0 75.4L397.3 75.4L400.7 75.4L404.0 75.4L407.3 75.4L410.7 75.4L414.0 75.4L417.3 75.4L420.7 75.4L424.0 75.4L427.3 75.4L430.7 75.4L434.0 75.4L437.3 75.4L440.7 75.4L444.0 75.4L447.3 75.4L450.7 75.4L454.0 75.4C465.2 75.44898102564247 465.2 54 482 54H562V154H482C465.2 154 465.2 132.55101897435753 454 132.55101897435753L454.0 132.6L450.7 132.6L447.3 132.6L444.0 132.6L440.7 132.6L437.3 132.6L434.0 132.6L430.7 132.6L427.3 132.6L424.0 132.6L420.7 132.6L417.3 132.6L414.0 132.6L410.7 132.6L407.3 132.6L404.0 132.6L400.7 132.6L397.3 132.6L394.0 132.6L390.7 132.6L387.3 132.6L384.0 132.6L380.7 132.6L377.3 132.6L374.0 132.6L370.7 132.6L367.3 132.6L364.0 132.6L360.7 132.6L357.3 132.6L354.0 132.6L350.7 132.6L347.3 132.6L344.0 132.6L340.7 132.6L337.3 132.6L334.0 132.6L330.7 132.6L327.3 132.6L324.0 132.6L320.7 132.6L317.3 132.6L314.0 132.6L310.7 132.6L307.3 132.6L304.0 132.6L300.7 132.6L297.3 132.6L294.0 132.6L290.7 132.6L287.3 132.6L284.0 132.6L280.7 132.6L277.3 132.6L274.0 132.6L270.7 132.6L267.3 132.6L264.0 132.6L260.7 132.6L257.3 132.6L254.0 132.6L250.7 132.6L247.3 132.6L244.0 132.6L240.7 132.6L237.3 132.6L234.0 132.6L230.7 132.6L227.3 132.6L224.0 132.6L220.7 132.6L217.3 132.6L214.0 132.6L210.7 132.6L207.3 132.6L204.0 132.6L200.7 132.6L197.3 132.6L194.0 132.6L190.7 132.6L187.3 132.6L184.0 132.6L180.7 132.6L177.3 132.6L174.0 132.6L170.7 132.6L167.3 132.6L164.0 132.6L160.7 132.6L157.3 132.6L154.0 132.6C142.8 132.55101897435753 142.8 154 126 154H46Z"/><rect class="tt-grip" x="16" y="40" width="102" height="128"/><text class="tt-slabel" x="16" y="32">Fixed grip</text><rect class="tt-grip tt-crosshead" data-tt-crosshead x="474" y="40" width="110" height="128"/><text class="tt-slabel" x="580" y="32" text-anchor="end">Crosshead →</text><path class="tt-gauge" d="M154 58.75v10M454.0 58.75v10"/></svg></div><div class="tt-shot"><p class="tt-shotcap"><strong>After the peak: deformation concentrates in a neck.</strong> Gauge length 63.5 mm (original L₀ = 50.0 mm). Drawn to scale; neck shape illustrative.</p><svg class="tt-specimen" viewBox="0 0 720 190" role="img" data-neck="1" data-fractured="0" aria-label="Specimen A, necking: gauge length 63.5 mm. Drawn to scale; neck shape illustrative."><path class="tt-spec" d="M46 54H126C142.8 54 142.8 75.44898102564247 154 75.44898102564247L154.0 75.4L157.5 75.4L161.1 75.4L164.6 75.4L168.1 75.4L171.6 75.4L175.2 75.4L178.7 75.4L182.2 75.4L185.8 75.4L189.3 75.4L192.8 75.4L196.3 75.4L199.9 75.4L203.4 75.4L206.9 75.4L210.4 75.4L214.0 75.4L217.5 75.4L221.0 75.4L224.6 75.4L228.1 75.4L231.6 75.4L235.1 75.4L238.7 75.4L242.2 75.4L245.7 75.4L249.3 75.4L252.8 75.4L256.3 75.4L259.8 75.4L263.4 75.4L266.9 75.4L270.4 75.4L273.9 75.5L277.5 75.5L281.0 75.5L284.5 75.5L288.1 75.7L291.6 75.9L295.1 76.5L298.6 77.4L302.2 78.6L305.7 79.8L309.2 80.9L312.8 81.2L316.3 80.9L319.8 79.8L323.3 78.6L326.9 77.4L330.4 76.5L333.9 75.9L337.4 75.7L341.0 75.5L344.5 75.5L348.0 75.5L351.6 75.5L355.1 75.4L358.6 75.4L362.1 75.4L365.7 75.4L369.2 75.4L372.7 75.4L376.3 75.4L379.8 75.4L383.3 75.4L386.8 75.4L390.4 75.4L393.9 75.4L397.4 75.4L400.9 75.4L404.5 75.4L408.0 75.4L411.5 75.4L415.1 75.4L418.6 75.4L422.1 75.4L425.6 75.4L429.2 75.4L432.7 75.4L436.2 75.4L439.8 75.4L443.3 75.4L446.8 75.4L450.3 75.4L453.9 75.4L457.4 75.4L460.9 75.4L464.4 75.4L468.0 75.4L471.5 75.4C482.7 75.44898102564247 482.7 54 499.5 54H579.5V154H499.5C482.7 154 482.7 132.55101897435753 471.5 132.55101897435753L471.5 132.6L468.0 132.6L464.4 132.6L460.9 132.6L457.4 132.6L453.9 132.6L450.3 132.6L446.8 132.6L443.3 132.6L439.8 132.6L436.2 132.6L432.7 132.6L429.2 132.6L425.6 132.6L422.1 132.6L418.6 132.6L415.1 132.6L411.5 132.6L408.0 132.6L404.5 132.6L400.9 132.6L397.4 132.6L393.9 132.6L390.4 132.6L386.8 132.6L383.3 132.6L379.8 132.6L376.3 132.6L372.7 132.6L369.2 132.6L365.7 132.6L362.1 132.6L358.6 132.6L355.1 132.6L351.6 132.5L348.0 132.5L344.5 132.5L341.0 132.5L337.4 132.3L333.9 132.1L330.4 131.5L326.9 130.6L323.3 129.4L319.8 128.2L316.3 127.1L312.8 126.8L309.2 127.1L305.7 128.2L302.2 129.4L298.6 130.6L295.1 131.5L291.6 132.1L288.1 132.3L284.5 132.5L281.0 132.5L277.5 132.5L273.9 132.5L270.4 132.6L266.9 132.6L263.4 132.6L259.8 132.6L256.3 132.6L252.8 132.6L249.3 132.6L245.7 132.6L242.2 132.6L238.7 132.6L235.1 132.6L231.6 132.6L228.1 132.6L224.6 132.6L221.0 132.6L217.5 132.6L214.0 132.6L210.4 132.6L206.9 132.6L203.4 132.6L199.9 132.6L196.3 132.6L192.8 132.6L189.3 132.6L185.8 132.6L182.2 132.6L178.7 132.6L175.2 132.6L171.6 132.6L168.1 132.6L164.6 132.6L161.1 132.6L157.5 132.6L154.0 132.6C142.8 132.55101897435753 142.8 154 126 154H46Z"/><g data-tt-neck="1"><path class="tt-neckmark" d="M312.8 142.6v14"/><text class="tt-slabel" x="312.8" y="172.6" text-anchor="middle">neck (illustrative)</text></g><rect class="tt-grip" x="16" y="40" width="102" height="128"/><text class="tt-slabel" x="16" y="32">Fixed grip</text><rect class="tt-grip tt-crosshead" data-tt-crosshead x="491.5" y="40" width="110" height="128"/><text class="tt-slabel" x="597.5" y="32" text-anchor="end">Crosshead →</text></svg></div><div class="tt-shot"><p class="tt-shotcap"><strong>Fractured; pieces fitted together.</strong> Broken pieces fitted back together: gauge length 64.9 mm (original L₀ = 50.0 mm). Drawn to scale; neck shape illustrative.</p><svg class="tt-specimen" viewBox="0 0 720 190" role="img" data-neck="1" data-fractured="1" aria-label="Specimen A, fractured: gauge length 64.9 mm. Drawn to scale; neck shape illustrative."><path class="tt-spec tt-broken" d="M46 54H126C142.8 54 142.8 75.44898102564247 154 75.44898102564247L154.0 75.4L155.7 75.4L157.5 75.4L159.2 75.4L161.0 75.4L162.7 75.4L164.5 75.4L166.2 75.4L168.0 75.4L169.7 75.4L171.5 75.4L173.2 75.4L175.0 75.4L176.7 75.4L178.5 75.4L180.2 75.4L182.0 75.4L183.7 75.4L185.5 75.4L187.2 75.4L189.0 75.4L190.7 75.4L192.5 75.4L194.2 75.4L195.9 75.4L197.7 75.4L199.4 75.4L201.2 75.4L202.9 75.4L204.7 75.4L206.4 75.4L208.2 75.4L209.9 75.4L211.7 75.4L213.4 75.4L215.2 75.4L216.9 75.4L218.7 75.4L220.4 75.4L222.2 75.4L223.9 75.4L225.7 75.4L227.4 75.4L229.2 75.4L230.9 75.4L232.7 75.4L234.4 75.4L236.1 75.4L237.9 75.4L239.6 75.4L241.4 75.4L243.1 75.4L244.9 75.4L246.6 75.4L248.4 75.4L250.1 75.4L251.9 75.4L253.6 75.4L255.4 75.4L257.1 75.4L258.9 75.4L260.6 75.4L262.4 75.4L264.1 75.4L265.9 75.4L267.6 75.4L269.4 75.4L271.1 75.4L272.8 75.4L274.6 75.4L276.3 75.5L278.1 75.5L279.8 75.5L281.6 75.5L283.3 75.5L285.1 75.5L286.8 75.5L288.6 75.6L290.3 75.7L292.1 75.9L293.8 76.1L295.6 76.4L297.3 76.9L299.1 77.5L300.8 78.3L302.6 79.2L304.3 80.2L306.1 81.3L307.8 82.5L309.6 83.6L311.3 84.6L308.3 93.3L313.3 104L308.3 114.7L311.3 123.4L311.3 123.4L309.6 124.4L307.8 125.5L306.1 126.7L304.3 127.8L302.6 128.8L300.8 129.7L299.1 130.5L297.3 131.1L295.6 131.6L293.8 131.9L292.1 132.1L290.3 132.3L288.6 132.4L286.8 132.5L285.1 132.5L283.3 132.5L281.6 132.5L279.8 132.5L278.1 132.5L276.3 132.5L274.6 132.6L272.8 132.6L271.1 132.6L269.4 132.6L267.6 132.6L265.9 132.6L264.1 132.6L262.4 132.6L260.6 132.6L258.9 132.6L257.1 132.6L255.4 132.6L253.6 132.6L251.9 132.6L250.1 132.6L248.4 132.6L246.6 132.6L244.9 132.6L243.1 132.6L241.4 132.6L239.6 132.6L237.9 132.6L236.1 132.6L234.4 132.6L232.7 132.6L230.9 132.6L229.2 132.6L227.4 132.6L225.7 132.6L223.9 132.6L222.2 132.6L220.4 132.6L218.7 132.6L216.9 132.6L215.2 132.6L213.4 132.6L211.7 132.6L209.9 132.6L208.2 132.6L206.4 132.6L204.7 132.6L202.9 132.6L201.2 132.6L199.4 132.6L197.7 132.6L195.9 132.6L194.2 132.6L192.5 132.6L190.7 132.6L189.0 132.6L187.2 132.6L185.5 132.6L183.7 132.6L182.0 132.6L180.2 132.6L178.5 132.6L176.7 132.6L175.0 132.6L173.2 132.6L171.5 132.6L169.7 132.6L168.0 132.6L166.2 132.6L164.5 132.6L162.7 132.6L161.0 132.6L159.2 132.6L157.5 132.6L155.7 132.6L154.0 132.6C142.8 132.55101897435753 142.8 154 126 154H46Z"/><path class="tt-spec tt-broken" d="M321.3 81.5L321.3 84.6L323.0 83.6L324.8 82.5L326.5 81.3L328.3 80.2L330.0 79.2L331.8 78.3L333.5 77.5L335.3 76.9L337.0 76.4L338.8 76.1L340.5 75.9L342.3 75.7L344.0 75.6L345.8 75.5L347.5 75.5L349.3 75.5L351.0 75.5L352.8 75.5L354.5 75.5L356.3 75.5L358.0 75.4L359.8 75.4L361.5 75.4L363.2 75.4L365.0 75.4L366.7 75.4L368.5 75.4L370.2 75.4L372.0 75.4L373.7 75.4L375.5 75.4L377.2 75.4L379.0 75.4L380.7 75.4L382.5 75.4L384.2 75.4L386.0 75.4L387.7 75.4L389.5 75.4L391.2 75.4L393.0 75.4L394.7 75.4L396.5 75.4L398.2 75.4L400.0 75.4L401.7 75.4L403.4 75.4L405.2 75.4L406.9 75.4L408.7 75.4L410.4 75.4L412.2 75.4L413.9 75.4L415.7 75.4L417.4 75.4L419.2 75.4L420.9 75.4L422.7 75.4L424.4 75.4L426.2 75.4L427.9 75.4L429.7 75.4L431.4 75.4L433.2 75.4L434.9 75.4L436.7 75.4L438.4 75.4L440.1 75.4L441.9 75.4L443.6 75.4L445.4 75.4L447.1 75.4L448.9 75.4L450.6 75.4L452.4 75.4L454.1 75.4L455.9 75.4L457.6 75.4L459.4 75.4L461.1 75.4L462.9 75.4L464.6 75.4L466.4 75.4L468.1 75.4L469.9 75.4L471.6 75.4L473.4 75.4L475.1 75.4L476.9 75.4L478.6 75.4C489.8 75.44898102564247 489.8 54 506.6 54H586.6V154H506.6C489.8 154 489.8 132.55101897435753 478.6 132.55101897435753L478.6 132.6L476.9 132.6L475.1 132.6L473.4 132.6L471.6 132.6L469.9 132.6L468.1 132.6L466.4 132.6L464.6 132.6L462.9 132.6L461.1 132.6L459.4 132.6L457.6 132.6L455.9 132.6L454.1 132.6L452.4 132.6L450.6 132.6L448.9 132.6L447.1 132.6L445.4 132.6L443.6 132.6L441.9 132.6L440.1 132.6L438.4 132.6L436.7 132.6L434.9 132.6L433.2 132.6L431.4 132.6L429.7 132.6L427.9 132.6L426.2 132.6L424.4 132.6L422.7 132.6L420.9 132.6L419.2 132.6L417.4 132.6L415.7 132.6L413.9 132.6L412.2 132.6L410.4 132.6L408.7 132.6L406.9 132.6L405.2 132.6L403.4 132.6L401.7 132.6L400.0 132.6L398.2 132.6L396.5 132.6L394.7 132.6L393.0 132.6L391.2 132.6L389.5 132.6L387.7 132.6L386.0 132.6L384.2 132.6L382.5 132.6L380.7 132.6L379.0 132.6L377.2 132.6L375.5 132.6L373.7 132.6L372.0 132.6L370.2 132.6L368.5 132.6L366.7 132.6L365.0 132.6L363.2 132.6L361.5 132.6L359.8 132.6L358.0 132.6L356.3 132.5L354.5 132.5L352.8 132.5L351.0 132.5L349.3 132.5L347.5 132.5L345.8 132.5L344.0 132.4L342.3 132.3L340.5 132.1L338.8 131.9L337.0 131.6L335.3 131.1L333.5 130.5L331.8 129.7L330.0 128.8L328.3 127.8L326.5 126.7L324.8 125.5L323.0 124.4L321.3 123.4L326.3 114.7L321.3 104L326.3 93.3Z"/><g data-tt-neck="1"><path class="tt-neckmark" d="M316.3 142.6v14"/><text class="tt-slabel" x="316.3" y="172.6" text-anchor="middle">neck (illustrative)</text></g><rect class="tt-grip" x="16" y="40" width="102" height="128"/><text class="tt-slabel" x="16" y="32">Fixed grip</text><rect class="tt-grip tt-crosshead" data-tt-crosshead x="498.6" y="40" width="110" height="128"/><text class="tt-slabel" x="604.6" y="32" text-anchor="end">Crosshead →</text></svg></div></div></figure><p><strong>Compare the four synthetic specimens.</strong> Each ranks differently on each property: the stiffest is not always the strongest, and the most ductile is not the toughest.</p><figure class="tt-figure"><figcaption>All four synthetic curves on one set of axes; the right panel magnifies the first 1% of strain, where the elastic slopes differ.</figcaption><div class="tt-plots"><svg class="tt-plot" viewBox="0 0 520 380" role="img" aria-label="Engineering stress-strain curves of synthetic specimens A, B, C, D, to fracture." data-xmax="0.6" data-ymax="450"><defs><clipPath id="tt-static-cmp-clip"><rect x="80" y="40" width="424" height="270"/></clipPath></defs><path class="tt-grid" d="M80.0 44V310"/><text class="tt-tick" x="80.0" y="332" text-anchor="middle">0</text><path class="tt-grid" d="M220.0 44V310"/><text class="tt-tick" x="220.0" y="332" text-anchor="middle">20</text><path class="tt-grid" d="M360.0 44V310"/><text class="tt-tick" x="360.0" y="332" text-anchor="middle">40</text><path class="tt-grid" d="M500.0 44V310"/><text class="tt-tick" x="500.0" y="332" text-anchor="middle">60</text><path class="tt-grid" d="M80 310.0H500"/><text class="tt-tick" x="72" y="316" text-anchor="end">0</text><path class="tt-grid" d="M80 250.9H500"/><text class="tt-tick" x="72" y="256.9" text-anchor="end">100</text><path class="tt-grid" d="M80 191.8H500"/><text class="tt-tick" x="72" y="197.8" text-anchor="end">200</text><path class="tt-grid" d="M80 132.7H500"/><text class="tt-tick" x="72" y="138.7" text-anchor="end">300</text><path class="tt-grid" d="M80 73.6H500"/><text class="tt-tick" x="72" y="79.6" text-anchor="end">400</text><path class="tt-axis" d="M80 44V310H500" fill="none" stroke="currentColor"/><text class="tt-label" x="290" y="368" text-anchor="middle">Engineering strain (%)</text><text class="tt-label" transform="translate(22 177) rotate(-90)" text-anchor="middle">Engineering stress (MPa)</text><text class="tt-ptitle" x="80" y="28">Complete synthetic curves</text><g clip-path="url(#tt-static-cmp-clip)"><path class="tt-curve tt-s-a" data-series="ductile" d="M80.00 310.00L80.00 310.00L80.81 173.59L80.88 162.22L81.62 162.22L82.42 162.22L83.23 162.22L84.04 162.22L84.85 162.22L85.65 162.22L86.46 162.22L87.27 162.22L88.08 162.22L88.88 162.22L89.69 162.22L90.50 162.22L90.50 162.22L91.31 160.73L92.12 159.25L92.92 157.80L93.73 156.35L94.54 154.93L95.35 153.52L96.15 152.12L96.96 150.75L97.77 149.38L98.58 148.04L99.38 146.71L100.19 145.39L101.00 144.10L101.81 142.81L102.62 141.55L103.42 140.29L104.23 139.06L105.04 137.84L105.85 136.63L106.65 135.44L107.46 134.26L108.27 133.10L109.08 131.95L109.88 130.82L110.69 129.70L111.50 128.60L112.31 127.51L113.12 126.43L113.92 125.37L114.73 124.33L115.54 123.29L116.35 122.27L117.15 121.27L117.96 120.28L118.77 119.30L119.58 118.34L120.38 117.38L121.19 116.45L122.00 115.52L122.81 114.61L123.62 113.71L124.42 112.83L125.23 111.96L126.04 111.10L126.85 110.25L127.65 109.42L128.46 108.59L129.27 107.78L130.08 106.99L130.88 106.20L131.69 105.43L132.50 104.67L133.31 103.92L134.12 103.18L134.92 102.46L135.73 101.75L136.54 101.05L137.35 100.35L138.15 99.68L138.96 99.01L139.77 98.35L140.58 97.71L141.38 97.07L142.19 96.45L143.00 95.84L143.81 95.24L144.62 94.65L145.42 94.06L146.23 93.50L147.04 92.94L147.85 92.39L148.65 91.85L149.46 91.32L150.27 90.80L151.08 90.29L151.88 89.79L152.69 89.30L153.50 88.82L154.31 88.35L155.12 87.89L155.92 87.44L156.73 87.00L157.54 86.57L158.35 86.14L159.15 85.73L159.96 85.32L160.77 84.92L161.58 84.54L162.38 84.16L163.19 83.79L164.00 83.42L164.81 83.07L165.62 82.72L166.42 82.39L167.23 82.06L168.04 81.73L168.85 81.42L169.65 81.11L170.46 80.82L171.27 80.52L172.08 80.24L172.88 79.97L173.69 79.70L174.50 79.44L175.31 79.18L176.12 78.94L176.92 78.70L177.73 78.46L178.54 78.24L179.35 78.02L180.15 77.80L180.96 77.60L181.77 77.40L182.58 77.20L183.38 77.02L184.19 76.84L185.00 76.66L185.81 76.49L186.62 76.33L187.42 76.17L188.23 76.02L189.04 75.87L189.85 75.73L190.65 75.60L191.46 75.47L192.27 75.34L193.08 75.22L193.88 75.11L194.69 75.00L195.50 74.89L196.31 74.79L197.12 74.70L197.92 74.61L198.73 74.52L199.54 74.44L200.35 74.36L201.15 74.29L201.96 74.22L202.77 74.15L203.58 74.09L204.38 74.04L205.19 73.98L206.00 73.93L206.81 73.89L207.62 73.84L208.42 73.80L209.23 73.77L210.04 73.73L210.85 73.70L211.65 73.68L212.46 73.65L213.27 73.63L214.08 73.61L214.88 73.60L215.69 73.59L216.50 73.58L217.31 73.57L218.12 73.56L218.92 73.56L219.73 73.56L220.00 73.56L220.54 73.56L221.35 73.57L222.15 73.60L222.96 73.64L223.77 73.69L224.58 73.76L225.38 73.84L226.19 73.93L227.00 74.03L227.81 74.14L228.62 74.27L229.42 74.41L230.23 74.57L231.04 74.73L231.85 74.91L232.65 75.10L233.46 75.30L234.27 75.52L235.08 75.75L235.88 75.99L236.69 76.24L237.50 76.51L238.31 76.79L239.12 77.08L239.92 77.39L240.73 77.70L241.54 78.03L242.35 78.37L243.15 78.73L243.96 79.10L244.77 79.48L245.58 79.87L246.38 80.27L247.19 80.69L248.00 81.12L248.81 81.56L249.62 82.02L250.42 82.49L251.23 82.97L252.04 83.46L252.85 83.97L253.65 84.49L254.46 85.02L255.27 85.56L256.08 86.12L256.88 86.69L257.69 87.27L258.50 87.86L259.31 88.47L260.12 89.09L260.92 89.72L261.73 90.36L262.54 91.02L263.35 91.69L264.15 92.37L264.96 93.07L265.77 93.77L266.58 94.49L267.38 95.22L268.19 95.97L269.00 96.73L269.81 97.50L270.62 98.28L271.42 99.08L272.23 99.88L273.04 100.70L273.85 101.54L274.65 102.38L275.46 103.24L276.27 104.11L277.08 105.00L277.88 105.89L278.69 106.80L279.50 107.72L280.31 108.66L281.12 109.60L281.92 110.56L282.73 111.53L283.54 112.52L284.35 113.51L285.15 114.52L285.96 115.55L286.77 116.58L287.58 117.63L288.38 118.69L289.19 119.76L290.00 120.84" fill="none" stroke="currentColor"/><text class="tt-endlabel tt-s-a" x="296.0" y="112.8">A</text><path class="tt-fracture tt-s-a" d="M284 114.84444444444443l12 12m0 -12l-12 12"/><path class="tt-curve tt-s-b" data-series="alloy" d="M80.00 310.00L80.00 310.00L80.35 289.31L80.70 268.62L81.05 247.93L81.40 227.24L81.75 206.56L81.75 206.56L82.10 189.24L82.45 177.18L82.80 168.13L82.80 168.13L83.15 161.21L83.50 156.60L83.85 153.69L84.20 151.89L84.55 150.60L84.90 149.22L84.90 149.22L85.25 147.74L85.60 146.54L85.95 145.58L86.30 144.81L86.65 144.19L87.00 143.70L87.35 143.28L87.70 142.91L88.05 142.54L88.40 142.12L88.40 142.12L88.75 141.69L89.10 141.28L89.45 140.89L89.80 140.53L90.15 140.18L90.50 139.85L90.85 139.54L91.20 139.25L91.55 138.97L91.90 138.71L92.25 138.47L92.60 138.24L92.95 138.02L93.30 137.82L93.65 137.62L94.00 137.44L94.35 137.27L94.70 137.11L95.05 136.96L95.40 136.82L95.75 136.69L96.10 136.56L96.45 136.44L96.80 136.32L97.15 136.21L97.50 136.10L97.85 135.99L98.20 135.89L98.55 135.78L98.90 135.68L99.25 135.58L99.60 135.47L99.95 135.37L100.30 135.26L100.65 135.15L101.00 135.03L101.00 135.03L101.35 134.91L101.70 134.80L102.05 134.68L102.40 134.56L102.75 134.45L103.10 134.33L103.45 134.22L103.80 134.10L104.15 133.99L104.50 133.87L104.85 133.76L105.20 133.65L105.55 133.54L105.90 133.43L106.25 133.32L106.60 133.21L106.95 133.10L107.30 132.99L107.65 132.88L108.00 132.78L108.35 132.67L108.70 132.56L109.05 132.46L109.40 132.35L109.75 132.25L110.10 132.15L110.45 132.05L110.80 131.94L111.15 131.84L111.50 131.74L111.85 131.64L112.20 131.55L112.55 131.45L112.90 131.35L113.25 131.25L113.60 131.16L113.95 131.06L114.30 130.97L114.65 130.88L115.00 130.78L115.35 130.69L115.70 130.60L116.05 130.51L116.40 130.42L116.75 130.33L117.10 130.25L117.45 130.16L117.80 130.08L118.15 129.99L118.50 129.91L118.85 129.82L119.20 129.74L119.55 129.66L119.90 129.58L120.25 129.50L120.60 129.42L120.95 129.35L121.30 129.27L121.65 129.19L122.00 129.12L122.35 129.05L122.70 128.97L123.05 128.90L123.40 128.83L123.75 128.76L124.10 128.69L124.45 128.63L124.80 128.56L125.15 128.50L125.50 128.43L125.85 128.37L126.20 128.31L126.55 128.25L126.90 128.19L127.25 128.13L127.60 128.07L127.95 128.01L128.30 127.96L128.65 127.90L129.00 127.85L129.35 127.80L129.70 127.75L130.05 127.70L130.40 127.65L130.75 127.60L131.10 127.56L131.45 127.51L131.80 127.47L132.15 127.42L132.50 127.38L132.85 127.34L133.20 127.30L133.55 127.27L133.90 127.23L134.25 127.20L134.60 127.16L134.95 127.13L135.30 127.10L135.65 127.07L136.00 127.04L136.35 127.01L136.70 126.99L137.05 126.96L137.40 126.94L137.75 126.92L138.10 126.90L138.45 126.88L138.80 126.86L139.15 126.84L139.50 126.83L139.85 126.81L140.20 126.80L140.55 126.79L140.90 126.78L141.25 126.77L141.60 126.77L141.95 126.76L142.30 126.76L142.65 126.76L143.00 126.76L143.00 126.76L143.35 126.76L143.70 126.77L144.05 126.78L144.40 126.80L144.75 126.82L145.10 126.85L145.45 126.88L145.80 126.92L146.15 126.97L146.50 127.01L146.85 127.07L147.20 127.13L147.55 127.19L147.90 127.26L148.25 127.34L148.60 127.42L148.95 127.50L149.30 127.59L149.65 127.69L150.00 127.79L150.35 127.90L150.70 128.01L151.05 128.12L151.40 128.25L151.75 128.37L152.10 128.50L152.45 128.64L152.80 128.78L153.15 128.93L153.50 129.08L153.85 129.24L154.20 129.40L154.55 129.57L154.90 129.75L155.25 129.92L155.60 130.11L155.95 130.30L156.30 130.49L156.65 130.69L157.00 130.89L157.35 131.10L157.70 131.32L158.05 131.54L158.40 131.76L158.75 131.99L159.10 132.23L159.45 132.47L159.80 132.71L160.15 132.96L160.50 133.22L160.85 133.48L161.20 133.75L161.55 134.02L161.90 134.30L162.25 134.58L162.60 134.87L162.95 135.16L163.30 135.46L163.65 135.76L164.00 136.07L164.35 136.38L164.70 136.70L165.05 137.02L165.40 137.35L165.75 137.68L166.10 138.02L166.45 138.36L166.80 138.71L167.15 139.07L167.50 139.43L167.85 139.79L168.20 140.16L168.55 140.54L168.90 140.92L169.25 141.30L169.60 141.69L169.95 142.09L170.30 142.49L170.65 142.90L171.00 143.31" fill="none" stroke="currentColor"/><text class="tt-endlabel tt-s-b" x="177.0" y="135.3">B</text><path class="tt-fracture tt-s-b" d="M165 137.30666666666664l12 12m0 -12l-12 12"/><path class="tt-curve tt-s-c" data-series="brittle" d="M80.00 310.00L80.00 310.00L80.01 309.27L80.02 308.54L80.03 307.82L80.03 307.09L80.04 306.36L80.05 305.63L80.06 304.91L80.07 304.18L80.08 303.45L80.09 302.72L80.09 302.00L80.10 301.27L80.11 300.54L80.12 299.81L80.13 299.09L80.14 298.36L80.15 297.63L80.16 296.90L80.16 296.18L80.17 295.45L80.18 294.72L80.19 293.99L80.20 293.27L80.21 292.54L80.22 291.81L80.22 291.08L80.23 290.36L80.24 289.63L80.25 288.90L80.26 288.17L80.27 287.45L80.28 286.72L80.28 285.99L80.29 285.26L80.30 284.54L80.31 283.81L80.32 283.08L80.33 282.35L80.34 281.63L80.34 280.90L80.35 280.17L80.36 279.44L80.37 278.72L80.38 277.99L80.39 277.26L80.40 276.53L80.40 275.81L80.41 275.08L80.42 274.35L80.43 273.62L80.44 272.90L80.45 272.17L80.46 271.44L80.47 270.71L80.47 269.99L80.48 269.26L80.49 268.53L80.50 267.80L80.51 267.08L80.52 266.35L80.53 265.62L80.53 264.89L80.54 264.17L80.55 263.44L80.56 262.71L80.57 261.98L80.58 261.26L80.59 260.53L80.59 259.80L80.60 259.07L80.61 258.35L80.62 257.62L80.63 256.89L80.64 256.16L80.65 255.44L80.65 254.71L80.66 253.98L80.67 253.25L80.68 252.53L80.69 251.80L80.70 251.07L80.70 250.89L80.71 250.34L80.72 249.62L80.72 248.91L80.73 248.20L80.74 247.50L80.75 246.80L80.76 246.11L80.77 245.43L80.78 244.75L80.78 244.07L80.79 243.41L80.80 242.74L80.81 242.09L80.82 241.43L80.83 240.79L80.84 240.15L80.84 239.51L80.85 238.88L80.86 238.26L80.87 237.64L80.88 237.02L80.89 236.41L80.90 235.81L80.90 235.21L80.91 234.62L80.92 234.03L80.93 233.45L80.94 232.87L80.95 232.30L80.96 231.73L80.96 231.17L80.97 230.61L80.98 230.05L80.99 229.50L81.00 228.96L81.01 228.42L81.02 227.89L81.03 227.36L81.03 226.83L81.04 226.31L81.05 225.80L81.06 225.28L81.07 224.78L81.08 224.28L81.09 223.78L81.09 223.28L81.10 222.79L81.11 222.31L81.12 221.83L81.13 221.35L81.14 220.88L81.15 220.41L81.15 219.95L81.16 219.49L81.17 219.03L81.18 218.58L81.19 218.14L81.20 217.69L81.21 217.25L81.21 216.82L81.22 216.38L81.23 215.96L81.24 215.53L81.25 215.11L81.26 214.70L81.27 214.28L81.28 213.87L81.28 213.47L81.29 213.07L81.30 212.67L81.31 212.27L81.32 211.88L81.33 211.49L81.34 211.11L81.34 210.73L81.35 210.35L81.36 209.98L81.37 209.61L81.38 209.24L81.39 208.87L81.40 208.51L81.40 208.15L81.41 207.80L81.42 207.45L81.43 207.10L81.44 206.75L81.45 206.41L81.46 206.07L81.46 205.73L81.47 205.40L81.48 205.06L81.49 204.74L81.50 204.41L81.51 204.09L81.52 203.77L81.52 203.45L81.53 203.13L81.54 202.82L81.55 202.51L81.56 202.20L81.57 201.90L81.58 201.60L81.59 201.29L81.59 201.00L81.60 200.70L81.61 200.41L81.62 200.12L81.63 199.83L81.64 199.54L81.65 199.26L81.65 198.98L81.66 198.70L81.67 198.42L81.68 198.14L81.69 197.87L81.70 197.60L81.71 197.33L81.71 197.06L81.72 196.79L81.73 196.53L81.74 196.27L81.75 196.00L81.76 195.75L81.77 195.49L81.77 195.23L81.78 194.98L81.79 194.73L81.80 194.47L81.81 194.22L81.82 193.98L81.83 193.73L81.84 193.48L81.84 193.24L81.85 193.00L81.86 192.76L81.87 192.52L81.88 192.28L81.89 192.04L81.90 191.81L81.90 191.57L81.91 191.34L81.92 191.10L81.93 190.87L81.94 190.64L81.95 190.41L81.96 190.18L81.96 189.95L81.97 189.73L81.98 189.50L81.99 189.27L82.00 189.05L82.01 188.82L82.02 188.60L82.02 188.38L82.03 188.15L82.04 187.93L82.05 187.71L82.06 187.49L82.07 187.27L82.08 187.05L82.08 186.83L82.09 186.61L82.10 186.39L82.11 186.18L82.12 185.96L82.13 185.74L82.14 185.52L82.15 185.30L82.15 185.09L82.16 184.87L82.17 184.65L82.18 184.43L82.19 184.22L82.20 184.00L82.21 183.78L82.21 183.56L82.22 183.35L82.23 183.13L82.24 182.91" fill="none" stroke="currentColor"/><text class="tt-endlabel tt-s-c" x="88.2" y="174.9">C</text><path class="tt-fracture tt-s-c" d="M76.24 176.9111111111111l12 12m0 -12l-12 12"/><path class="tt-curve tt-s-d" data-series="polymer" d="M80.00 310.00L80.00 310.00L81.48 306.87L82.96 303.75L84.44 300.62L85.92 297.50L87.00 295.22L87.40 294.39L88.88 291.77L90.37 289.71L91.85 288.14L93.33 286.94L94.81 286.04L96.29 285.35L97.77 284.76L99.25 284.18L100.73 283.53L101.00 283.40L102.21 282.84L103.69 282.30L105.17 281.92L106.65 281.69L108.00 281.63L108.13 281.63L109.62 281.75L111.10 282.04L112.58 282.49L114.06 283.06L115.54 283.71L117.02 284.43L118.50 285.17L119.98 285.92L121.46 286.63L122.94 287.29L124.42 287.86L125.90 288.30L127.38 288.60L128.87 288.72L129.00 288.72L130.35 288.72L131.83 288.72L133.31 288.72L134.79 288.72L136.27 288.72L137.75 288.72L139.23 288.72L140.71 288.72L142.19 288.72L143.67 288.72L145.15 288.72L146.63 288.72L148.12 288.72L149.60 288.71L151.08 288.71L152.56 288.71L154.04 288.71L155.52 288.71L157.00 288.71L158.48 288.71L159.96 288.71L161.44 288.71L162.92 288.70L164.40 288.70L165.88 288.70L167.37 288.70L168.85 288.70L170.33 288.70L171.81 288.70L173.29 288.69L174.77 288.69L176.25 288.69L177.73 288.69L179.21 288.68L180.69 288.68L182.17 288.68L183.65 288.68L185.13 288.68L186.62 288.67L188.10 288.67L189.58 288.67L191.06 288.66L192.54 288.66L194.02 288.66L195.50 288.66L196.98 288.65L198.46 288.65L199.94 288.65L201.42 288.64L202.90 288.64L204.38 288.63L205.87 288.63L207.35 288.63L208.83 288.62L210.31 288.62L211.79 288.61L213.27 288.61L214.75 288.61L216.23 288.60L217.71 288.60L219.19 288.59L220.67 288.59L222.15 288.58L223.63 288.58L225.12 288.57L226.60 288.57L228.08 288.56L229.56 288.56L231.04 288.55L232.52 288.54L234.00 288.54L235.48 288.53L236.96 288.53L238.44 288.52L239.92 288.51L241.40 288.51L242.88 288.50L244.37 288.50L245.85 288.49L247.33 288.48L248.81 288.47L250.29 288.47L251.77 288.46L253.25 288.45L254.73 288.45L256.21 288.44L257.69 288.43L259.17 288.42L260.65 288.41L262.13 288.41L263.62 288.40L265.10 288.39L266.58 288.38L268.06 288.37L269.54 288.36L271.02 288.35L272.50 288.35L273.98 288.34L275.46 288.33L276.94 288.32L278.42 288.31L279.90 288.30L281.38 288.29L282.87 288.28L284.35 288.27L285.83 288.26L287.31 288.25L288.79 288.24L290.27 288.23L291.75 288.22L293.23 288.20L294.71 288.19L296.19 288.18L297.67 288.17L299.15 288.16L300.63 288.15L302.12 288.14L303.60 288.12L305.08 288.11L306.56 288.10L308.04 288.09L309.52 288.07L311.00 288.06L312.48 288.05L313.96 288.03L315.44 288.02L316.92 288.01L318.40 287.99L319.88 287.98L321.37 287.97L322.85 287.95L324.33 287.94L325.81 287.92L327.29 287.91L328.77 287.89L330.25 287.88L331.73 287.86L333.21 287.85L334.69 287.83L336.17 287.82L337.65 287.80L339.13 287.78L340.62 287.77L342.10 287.75L343.58 287.73L345.06 287.72L346.54 287.70L348.02 287.68L349.50 287.67L350.98 287.65L352.46 287.63L353.94 287.61L355.42 287.59L356.90 287.58L358.38 287.56L359.87 287.54L360.00 287.54L361.35 287.52L362.83 287.50L364.31 287.48L365.79 287.46L367.27 287.43L368.75 287.41L370.23 287.38L371.71 287.36L373.19 287.33L374.67 287.30L376.15 287.27L377.63 287.24L379.12 287.21L380.60 287.18L382.08 287.14L383.56 287.11L385.04 287.08L386.52 287.04L388.00 287.00L389.48 286.96L390.96 286.93L392.44 286.89L393.92 286.85L395.40 286.80L396.88 286.76L398.37 286.72L399.85 286.67L401.33 286.63L402.81 286.58L404.29 286.54L405.77 286.49L407.25 286.44L408.73 286.39L410.21 286.34L411.69 286.29L413.17 286.24L414.65 286.19L416.13 286.13L417.62 286.08L419.10 286.03L420.58 285.97L422.06 285.91L423.54 285.86L425.02 285.80L426.50 285.74L427.98 285.68L429.46 285.62L430.94 285.56L432.42 285.50L433.90 285.44L435.38 285.38L436.87 285.31L438.35 285.25L439.83 285.18L441.31 285.12L442.79 285.05L444.27 284.99L445.75 284.92L447.23 284.85L448.71 284.78L450.19 284.71L451.67 284.64L453.15 284.57L454.63 284.50L456.12 284.43L457.60 284.36L459.08 284.29L460.56 284.21L462.04 284.14L463.52 284.07L465.00 283.99" fill="none" stroke="currentColor"/><text class="tt-endlabel tt-s-d" x="471.0" y="276.0">D</text><path class="tt-fracture tt-s-d" d="M459.00000000000006 277.9911111111111l12 12m0 -12l-12 12"/></g></svg><svg class="tt-plot" viewBox="0 0 520 380" role="img" aria-label="Engineering stress-strain curves of synthetic specimens A, B, C, D, first 1% of strain." data-xmax="0.01" data-ymax="450"><defs><clipPath id="tt-static-cmpz-clip"><rect x="80" y="40" width="424" height="270"/></clipPath></defs><path class="tt-grid" d="M80.0 44V310"/><text class="tt-tick" x="80.0" y="332" text-anchor="middle">0.0</text><path class="tt-grid" d="M164.0 44V310"/><text class="tt-tick" x="164.0" y="332" text-anchor="middle">0.2</text><path class="tt-grid" d="M248.0 44V310"/><text class="tt-tick" x="248.0" y="332" text-anchor="middle">0.4</text><path class="tt-grid" d="M332.0 44V310"/><text class="tt-tick" x="332.0" y="332" text-anchor="middle">0.6</text><path class="tt-grid" d="M416.0 44V310"/><text class="tt-tick" x="416.0" y="332" text-anchor="middle">0.8</text><path class="tt-grid" d="M500.0 44V310"/><text class="tt-tick" x="500.0" y="332" text-anchor="middle">1.0</text><path class="tt-grid" d="M80 310.0H500"/><text class="tt-tick" x="72" y="316" text-anchor="end">0</text><path class="tt-grid" d="M80 250.9H500"/><text class="tt-tick" x="72" y="256.9" text-anchor="end">100</text><path class="tt-grid" d="M80 191.8H500"/><text class="tt-tick" x="72" y="197.8" text-anchor="end">200</text><path class="tt-grid" d="M80 132.7H500"/><text class="tt-tick" x="72" y="138.7" text-anchor="end">300</text><path class="tt-grid" d="M80 73.6H500"/><text class="tt-tick" x="72" y="79.6" text-anchor="end">400</text><path class="tt-axis" d="M80 44V310H500" fill="none" stroke="currentColor"/><text class="tt-label" x="290" y="368" text-anchor="middle">Engineering strain (%)</text><text class="tt-label" transform="translate(22 177) rotate(-90)" text-anchor="middle">Engineering stress (MPa)</text><text class="tt-ptitle" x="80" y="28">First 1% of strain</text><g clip-path="url(#tt-static-cmpz-clip)"><path class="tt-curve tt-s-a" data-series="ductile" d="M80.00 310.00L80.00 310.00L81.70 305.23L83.39 300.45L85.09 295.68L86.78 290.90L88.48 286.13L90.18 281.35L91.87 276.58L93.57 271.81L95.27 267.03L96.96 262.26L98.66 257.48L100.35 252.71L102.05 247.93L103.75 243.16L105.44 238.38L107.14 233.61L108.83 228.84L110.53 224.06L112.23 219.29L113.92 214.51L115.62 209.74L117.32 204.96L119.01 200.19L120.71 195.42L122.40 190.64L124.10 185.87L125.80 181.09L127.49 176.32L129.19 171.54L130.88 166.77L132.50 162.22L132.58 162.22L134.28 162.22L135.97 162.22L137.67 162.22L139.37 162.22L141.06 162.22L142.76 162.22L144.45 162.22L146.15 162.22L147.85 162.22L149.54 162.22L151.24 162.22L152.93 162.22L154.63 162.22L156.33 162.22L158.02 162.22L159.72 162.22L161.42 162.22L163.11 162.22L164.81 162.22L166.50 162.22L168.20 162.22L169.90 162.22L171.59 162.22L173.29 162.22L174.98 162.22L176.68 162.22L178.38 162.22L180.07 162.22L181.77 162.22L183.47 162.22L185.16 162.22L186.86 162.22L188.55 162.22L190.25 162.22L191.95 162.22L193.64 162.22L195.34 162.22L197.03 162.22L198.73 162.22L200.43 162.22L202.12 162.22L203.82 162.22L205.52 162.22L207.21 162.22L208.91 162.22L210.60 162.22L212.30 162.22L214.00 162.22L215.69 162.22L217.39 162.22L219.08 162.22L220.78 162.22L222.48 162.22L224.17 162.22L225.87 162.22L227.57 162.22L229.26 162.22L230.96 162.22L232.65 162.22L234.35 162.22L236.05 162.22L237.74 162.22L239.44 162.22L241.13 162.22L242.83 162.22L244.53 162.22L246.22 162.22L247.92 162.22L249.62 162.22L251.31 162.22L253.01 162.22L254.70 162.22L256.40 162.22L258.10 162.22L259.79 162.22L261.49 162.22L263.18 162.22L264.88 162.22L266.58 162.22L268.27 162.22L269.97 162.22L271.67 162.22L273.36 162.22L275.06 162.22L276.75 162.22L278.45 162.22L280.15 162.22L281.84 162.22L283.54 162.22L285.23 162.22L286.93 162.22L288.63 162.22L290.32 162.22L292.02 162.22L293.72 162.22L295.41 162.22L297.11 162.22L298.80 162.22L300.50 162.22L302.20 162.22L303.89 162.22L305.59 162.22L307.28 162.22L308.98 162.22L310.68 162.22L312.37 162.22L314.07 162.22L315.77 162.22L317.46 162.22L319.16 162.22L320.85 162.22L322.55 162.22L324.25 162.22L325.94 162.22L327.64 162.22L329.33 162.22L331.03 162.22L332.73 162.22L334.42 162.22L336.12 162.22L337.82 162.22L339.51 162.22L341.21 162.22L342.90 162.22L344.60 162.22L346.30 162.22L347.99 162.22L349.69 162.22L351.38 162.22L353.08 162.22L354.78 162.22L356.47 162.22L358.17 162.22L359.87 162.22L361.56 162.22L363.26 162.22L364.95 162.22L366.65 162.22L368.35 162.22L370.04 162.22L371.74 162.22L373.43 162.22L375.13 162.22L376.83 162.22L378.52 162.22L380.22 162.22L381.92 162.22L383.61 162.22L385.31 162.22L387.00 162.22L388.70 162.22L390.40 162.22L392.09 162.22L393.79 162.22L395.48 162.22L397.18 162.22L398.88 162.22L400.57 162.22L402.27 162.22L403.97 162.22L405.66 162.22L407.36 162.22L409.05 162.22L410.75 162.22L412.45 162.22L414.14 162.22L415.84 162.22L417.53 162.22L419.23 162.22L420.93 162.22L422.62 162.22L424.32 162.22L426.02 162.22L427.71 162.22L429.41 162.22L431.10 162.22L432.80 162.22L434.50 162.22L436.19 162.22L437.89 162.22L439.58 162.22L441.28 162.22L442.98 162.22L444.67 162.22L446.37 162.22L448.07 162.22L449.76 162.22L451.46 162.22L453.15 162.22L454.85 162.22L456.55 162.22L458.24 162.22L459.94 162.22L461.63 162.22L463.33 162.22L465.03 162.22L466.72 162.22L468.42 162.22L470.12 162.22L471.81 162.22L473.51 162.22L475.20 162.22L476.90 162.22L478.60 162.22L480.29 162.22L481.99 162.22L483.68 162.22L485.38 162.22L487.08 162.22L488.77 162.22L490.47 162.22L492.17 162.22L493.86 162.22L495.56 162.22L497.25 162.22L498.95 162.22L500.65 162.22L502.34 162.22L504.04 162.22L505.73 162.22L507.43 162.22L509.13 162.22L510.82 162.22L512.52 162.22L514.22 162.22L515.91 162.22L517.61 162.22L519.30 162.22L521.00 162.22" fill="none" stroke="currentColor"/><text class="tt-endlabel tt-s-a" x="486.0" y="154.2">A</text><path class="tt-curve tt-s-b" data-series="alloy" d="M80.00 310.00L80.00 310.00L81.70 308.33L83.39 306.66L85.09 304.99L86.78 303.32L88.48 301.64L90.18 299.97L91.87 298.30L93.57 296.63L95.27 294.96L96.96 293.29L98.66 291.62L100.35 289.95L102.05 288.28L103.75 286.61L105.44 284.93L107.14 283.26L108.83 281.59L110.53 279.92L112.23 278.25L113.92 276.58L115.62 274.91L117.32 273.24L119.01 271.57L120.71 269.90L122.40 268.22L124.10 266.55L125.80 264.88L127.49 263.21L129.19 261.54L130.88 259.87L132.58 258.20L134.28 256.53L135.97 254.86L137.67 253.19L139.37 251.51L141.06 249.84L142.76 248.17L144.45 246.50L146.15 244.83L147.85 243.16L149.54 241.49L151.24 239.82L152.93 238.15L154.63 236.47L156.33 234.80L158.02 233.13L159.72 231.46L161.42 229.79L163.11 228.12L164.81 226.45L166.50 224.78L168.20 223.11L169.90 221.44L171.59 219.76L173.29 218.09L174.98 216.42L176.68 214.75L178.38 213.08L180.07 211.41L181.77 209.74L183.47 208.07L185.00 206.56L185.16 206.40L186.86 204.75L188.55 203.16L190.25 201.61L191.95 200.11L193.64 198.65L195.34 197.23L197.03 195.86L198.73 194.52L200.43 193.23L202.12 191.97L203.82 190.75L205.52 189.57L207.21 188.42L208.91 187.31L210.60 186.22L212.30 185.17L214.00 184.15L215.69 183.15L217.39 182.19L219.08 181.25L220.78 180.33L222.48 179.44L224.17 178.57L225.87 177.73L227.57 176.90L229.26 176.10L230.96 175.31L232.65 174.54L234.35 173.78L236.05 173.04L237.74 172.31L239.44 171.60L241.13 170.89L242.83 170.20L244.53 169.51L246.22 168.84L247.92 168.17L248.00 168.13L249.62 167.51L251.31 166.86L253.01 166.24L254.70 165.64L256.40 165.05L258.10 164.48L259.79 163.93L261.49 163.39L263.18 162.87L264.88 162.37L266.58 161.88L268.27 161.41L269.97 160.95L271.67 160.51L273.36 160.08L275.06 159.67L276.75 159.27L278.45 158.88L280.15 158.51L281.84 158.15L283.54 157.81L285.23 157.47L286.93 157.15L288.63 156.84L290.32 156.54L292.02 156.25L293.72 155.97L295.41 155.71L297.11 155.45L298.80 155.20L300.50 154.97L302.20 154.74L303.89 154.52L305.59 154.31L307.28 154.10L308.98 153.91L310.68 153.72L312.37 153.54L314.07 153.37L315.77 153.20L317.46 153.04L319.16 152.89L320.85 152.74L322.55 152.60L324.25 152.46L325.94 152.33L327.64 152.20L329.33 152.08L331.03 151.96L332.73 151.84L334.42 151.73L336.12 151.61L337.82 151.51L339.51 151.40L341.21 151.30L342.90 151.19L344.60 151.09L346.30 150.99L347.99 150.89L349.69 150.79L351.38 150.69L353.08 150.59L354.78 150.49L356.47 150.39L358.17 150.29L359.87 150.19L361.56 150.08L363.26 149.97L364.95 149.86L366.65 149.75L368.35 149.63L370.04 149.51L371.74 149.39L373.43 149.26L374.00 149.22L375.13 149.13L376.83 149.00L378.52 148.87L380.22 148.75L381.92 148.63L383.61 148.51L385.31 148.39L387.00 148.27L388.70 148.15L390.40 148.04L392.09 147.93L393.79 147.82L395.48 147.71L397.18 147.61L398.88 147.50L400.57 147.40L402.27 147.30L403.97 147.20L405.66 147.10L407.36 147.00L409.05 146.91L410.75 146.82L412.45 146.73L414.14 146.64L415.84 146.55L417.53 146.46L419.23 146.38L420.93 146.29L422.62 146.21L424.32 146.13L426.02 146.05L427.71 145.98L429.41 145.90L431.10 145.83L432.80 145.75L434.50 145.68L436.19 145.61L437.89 145.54L439.58 145.47L441.28 145.40L442.98 145.34L444.67 145.27L446.37 145.21L448.07 145.15L449.76 145.09L451.46 145.03L453.15 144.97L454.85 144.91L456.55 144.85L458.24 144.80L459.94 144.74L461.63 144.69L463.33 144.64L465.03 144.59L466.72 144.53L468.42 144.48L470.12 144.44L471.81 144.39L473.51 144.34L475.20 144.29L476.90 144.25L478.60 144.20L480.29 144.16L481.99 144.12L483.68 144.07L485.38 144.03L487.08 143.99L488.77 143.95L490.47 143.91L492.17 143.87L493.86 143.83L495.56 143.80L497.25 143.76L498.95 143.72L500.65 143.69L502.34 143.65L504.04 143.61L505.73 143.58L507.43 143.55L509.13 143.51L510.82 143.48L512.52 143.44L514.22 143.41L515.91 143.38L517.61 143.35L519.30 143.32L521.00 143.28" fill="none" stroke="currentColor"/><text class="tt-endlabel tt-s-b" x="486.0" y="135.7">B</text><path class="tt-curve tt-s-c" data-series="brittle" d="M80.00 310.00L80.00 310.00L80.52 309.27L81.03 308.54L81.55 307.82L82.07 307.09L82.58 306.36L83.10 305.63L83.62 304.91L84.14 304.18L84.65 303.45L85.17 302.72L85.69 302.00L86.20 301.27L86.72 300.54L87.24 299.81L87.75 299.09L88.27 298.36L88.79 297.63L89.30 296.90L89.82 296.18L90.34 295.45L90.86 294.72L91.37 293.99L91.89 293.27L92.41 292.54L92.92 291.81L93.44 291.08L93.96 290.36L94.47 289.63L94.99 288.90L95.51 288.17L96.02 287.45L96.54 286.72L97.06 285.99L97.58 285.26L98.09 284.54L98.61 283.81L99.13 283.08L99.64 282.35L100.16 281.63L100.68 280.90L101.19 280.17L101.71 279.44L102.23 278.72L102.74 277.99L103.26 277.26L103.78 276.53L104.30 275.81L104.81 275.08L105.33 274.35L105.85 273.62L106.36 272.90L106.88 272.17L107.40 271.44L107.91 270.71L108.43 269.99L108.95 269.26L109.46 268.53L109.98 267.80L110.50 267.08L111.02 266.35L111.53 265.62L112.05 264.89L112.57 264.17L113.08 263.44L113.60 262.71L114.12 261.98L114.63 261.26L115.15 260.53L115.67 259.80L116.18 259.07L116.70 258.35L117.22 257.62L117.74 256.89L118.25 256.16L118.77 255.44L119.29 254.71L119.80 253.98L120.32 253.25L120.84 252.53L121.35 251.80L121.87 251.07L122.00 250.89L122.39 250.34L122.90 249.62L123.42 248.91L123.94 248.20L124.46 247.50L124.97 246.80L125.49 246.11L126.01 245.43L126.52 244.75L127.04 244.07L127.56 243.41L128.07 242.74L128.59 242.09L129.11 241.43L129.62 240.79L130.14 240.15L130.66 239.51L131.18 238.88L131.69 238.26L132.21 237.64L132.73 237.02L133.24 236.41L133.76 235.81L134.28 235.21L134.79 234.62L135.31 234.03L135.83 233.45L136.34 232.87L136.86 232.30L137.38 231.73L137.90 231.17L138.41 230.61L138.93 230.05L139.45 229.50L139.96 228.96L140.48 228.42L141.00 227.89L141.51 227.36L142.03 226.83L142.55 226.31L143.06 225.80L143.58 225.28L144.10 224.78L144.62 224.28L145.13 223.78L145.65 223.28L146.17 222.79L146.68 222.31L147.20 221.83L147.72 221.35L148.23 220.88L148.75 220.41L149.27 219.95L149.78 219.49L150.30 219.03L150.82 218.58L151.34 218.14L151.85 217.69L152.37 217.25L152.89 216.82L153.40 216.38L153.92 215.96L154.44 215.53L154.95 215.11L155.47 214.70L155.99 214.28L156.50 213.87L157.02 213.47L157.54 213.07L158.06 212.67L158.57 212.27L159.09 211.88L159.61 211.49L160.12 211.11L160.64 210.73L161.16 210.35L161.67 209.98L162.19 209.61L162.71 209.24L163.22 208.87L163.74 208.51L164.26 208.15L164.78 207.80L165.29 207.45L165.81 207.10L166.33 206.75L166.84 206.41L167.36 206.07L167.88 205.73L168.39 205.40L168.91 205.06L169.43 204.74L169.94 204.41L170.46 204.09L170.98 203.77L171.50 203.45L172.01 203.13L172.53 202.82L173.05 202.51L173.56 202.20L174.08 201.90L174.60 201.60L175.11 201.29L175.63 201.00L176.15 200.70L176.66 200.41L177.18 200.12L177.70 199.83L178.22 199.54L178.73 199.26L179.25 198.98L179.77 198.70L180.28 198.42L180.80 198.14L181.32 197.87L181.83 197.60L182.35 197.33L182.87 197.06L183.38 196.79L183.90 196.53L184.42 196.27L184.94 196.00L185.45 195.75L185.97 195.49L186.49 195.23L187.00 194.98L187.52 194.73L188.04 194.47L188.55 194.22L189.07 193.98L189.59 193.73L190.10 193.48L190.62 193.24L191.14 193.00L191.66 192.76L192.17 192.52L192.69 192.28L193.21 192.04L193.72 191.81L194.24 191.57L194.76 191.34L195.27 191.10L195.79 190.87L196.31 190.64L196.82 190.41L197.34 190.18L197.86 189.95L198.38 189.73L198.89 189.50L199.41 189.27L199.93 189.05L200.44 188.82L200.96 188.60L201.48 188.38L201.99 188.15L202.51 187.93L203.03 187.71L203.54 187.49L204.06 187.27L204.58 187.05L205.10 186.83L205.61 186.61L206.13 186.39L206.65 186.18L207.16 185.96L207.68 185.74L208.20 185.52L208.71 185.30L209.23 185.09L209.75 184.87L210.26 184.65L210.78 184.43L211.30 184.22L211.82 184.00L212.33 183.78L212.85 183.56L213.37 183.35L213.88 183.13L214.40 182.91" fill="none" stroke="currentColor"/><text class="tt-endlabel tt-s-c" x="220.4" y="174.9">C</text><path class="tt-fracture tt-s-c" d="M208.4 176.9111111111111l12 12m0 -12l-12 12"/><path class="tt-curve tt-s-d" data-series="polymer" d="M80.00 310.00L80.00 310.00L81.70 309.94L83.39 309.88L85.09 309.82L86.78 309.76L88.48 309.70L90.18 309.64L91.87 309.58L93.57 309.52L95.27 309.46L96.96 309.40L98.66 309.34L100.35 309.28L102.05 309.22L103.75 309.16L105.44 309.10L107.14 309.05L108.83 308.99L110.53 308.93L112.23 308.87L113.92 308.81L115.62 308.75L117.32 308.69L119.01 308.63L120.71 308.57L122.40 308.51L124.10 308.45L125.80 308.39L127.49 308.33L129.19 308.27L130.88 308.21L132.58 308.15L134.28 308.09L135.97 308.03L137.67 307.97L139.37 307.91L141.06 307.85L142.76 307.79L144.45 307.73L146.15 307.67L147.85 307.61L149.54 307.55L151.24 307.49L152.93 307.43L154.63 307.37L156.33 307.31L158.02 307.25L159.72 307.20L161.42 307.14L163.11 307.08L164.81 307.02L166.50 306.96L168.20 306.90L169.90 306.84L171.59 306.78L173.29 306.72L174.98 306.66L176.68 306.60L178.38 306.54L180.07 306.48L181.77 306.42L183.47 306.36L185.16 306.30L186.86 306.24L188.55 306.18L190.25 306.12L191.95 306.06L193.64 306.00L195.34 305.94L197.03 305.88L198.73 305.82L200.43 305.76L202.12 305.70L203.82 305.64L205.52 305.58L207.21 305.52L208.91 305.46L210.60 305.40L212.30 305.35L214.00 305.29L215.69 305.23L217.39 305.17L219.08 305.11L220.78 305.05L222.48 304.99L224.17 304.93L225.87 304.87L227.57 304.81L229.26 304.75L230.96 304.69L232.65 304.63L234.35 304.57L236.05 304.51L237.74 304.45L239.44 304.39L241.13 304.33L242.83 304.27L244.53 304.21L246.22 304.15L247.92 304.09L249.62 304.03L251.31 303.97L253.01 303.91L254.70 303.85L256.40 303.79L258.10 303.73L259.79 303.67L261.49 303.61L263.18 303.55L264.88 303.49L266.58 303.44L268.27 303.38L269.97 303.32L271.67 303.26L273.36 303.20L275.06 303.14L276.75 303.08L278.45 303.02L280.15 302.96L281.84 302.90L283.54 302.84L285.23 302.78L286.93 302.72L288.63 302.66L290.32 302.60L292.02 302.54L293.72 302.48L295.41 302.42L297.11 302.36L298.80 302.30L300.50 302.24L302.20 302.18L303.89 302.12L305.59 302.06L307.28 302.00L308.98 301.94L310.68 301.88L312.37 301.82L314.07 301.76L315.77 301.70L317.46 301.64L319.16 301.59L320.85 301.53L322.55 301.47L324.25 301.41L325.94 301.35L327.64 301.29L329.33 301.23L331.03 301.17L332.73 301.11L334.42 301.05L336.12 300.99L337.82 300.93L339.51 300.87L341.21 300.81L342.90 300.75L344.60 300.69L346.30 300.63L347.99 300.57L349.69 300.51L351.38 300.45L353.08 300.39L354.78 300.33L356.47 300.27L358.17 300.21L359.87 300.15L361.56 300.09L363.26 300.03L364.95 299.97L366.65 299.91L368.35 299.85L370.04 299.79L371.74 299.74L373.43 299.68L375.13 299.62L376.83 299.56L378.52 299.50L380.22 299.44L381.92 299.38L383.61 299.32L385.31 299.26L387.00 299.20L388.70 299.14L390.40 299.08L392.09 299.02L393.79 298.96L395.48 298.90L397.18 298.84L398.88 298.78L400.57 298.72L402.27 298.66L403.97 298.60L405.66 298.54L407.36 298.48L409.05 298.42L410.75 298.36L412.45 298.30L414.14 298.24L415.84 298.18L417.53 298.12L419.23 298.06L420.93 298.00L422.62 297.94L424.32 297.89L426.02 297.83L427.71 297.77L429.41 297.71L431.10 297.65L432.80 297.59L434.50 297.53L436.19 297.47L437.89 297.41L439.58 297.35L441.28 297.29L442.98 297.23L444.67 297.17L446.37 297.11L448.07 297.05L449.76 296.99L451.46 296.93L453.15 296.87L454.85 296.81L456.55 296.75L458.24 296.69L459.94 296.63L461.63 296.57L463.33 296.51L465.03 296.45L466.72 296.39L468.42 296.33L470.12 296.27L471.81 296.21L473.51 296.15L475.20 296.09L476.90 296.03L478.60 295.98L480.29 295.92L481.99 295.86L483.68 295.80L485.38 295.74L487.08 295.68L488.77 295.62L490.47 295.56L492.17 295.50L493.86 295.44L495.56 295.38L497.25 295.32L498.95 295.26L500.00 295.22L500.65 295.20L502.34 295.14L504.04 295.08L505.73 295.02L507.43 294.96L509.13 294.90L510.82 294.85L512.52 294.79L514.22 294.73L515.91 294.67L517.61 294.62L519.30 294.56L521.00 294.50" fill="none" stroke="currentColor"/><text class="tt-endlabel tt-s-d" x="486.0" y="287.2">D</text></g></svg></div><ul class="tt-legend"><li><svg viewBox="0 0 40 12" aria-hidden="true"><path class="tt-curve tt-s-a" d="M2 6H38" stroke="currentColor"/></svg> <strong>A</strong> Ductile, low-carbon-steel-like</li><li><svg viewBox="0 0 40 12" aria-hidden="true"><path class="tt-curve tt-s-b" d="M2 6H38" stroke="currentColor"/></svg> <strong>B</strong> Aluminium-alloy-like</li><li><svg viewBox="0 0 40 12" aria-hidden="true"><path class="tt-curve tt-s-c" d="M2 6H38" stroke="currentColor"/></svg> <strong>C</strong> Brittle, gray-iron-like</li><li><svg viewBox="0 0 40 12" aria-hidden="true"><path class="tt-curve tt-s-d" d="M2 6H38" stroke="currentColor"/></svg> <strong>D</strong> Polymer-like (cold drawing)</li></ul></figure><div class="tt-tablewrap" tabindex="0" role="region" aria-label="Synthetic specimen properties"><table class="tt-table"><caption>Read from the four synthetic curves (illustrative; not material data)</caption><thead><tr><th scope="col">Specimen</th><th scope="col">Stiffness E (GPa)</th><th scope="col">0.2% offset yield (MPa)</th><th scope="col">UTS (MPa)</th><th scope="col">Elongation after fracture (%)</th><th scope="col">Area to fracture (MJ/m³)</th></tr></thead><tbody><tr><th scope="row">A: Ductile, low-carbon-steel-like</th><td>200</td><td>250</td><td>400</td><td>29.8</td><td>107</td></tr><tr><th scope="row">B: Aluminium-alloy-like</th><td>70</td><td>266</td><td>310</td><td>12.6</td><td>38</td></tr><tr><th scope="row">C: Brittle, gray-iron-like</th><td>100</td><td>none: fractures first</td><td>215</td><td>0.1</td><td>0.42</td></tr><tr><th scope="row">D: Polymer-like (cold drawing)</th><td>2.5</td><td>36.7</td><td>48.0</td><td>53.2</td><td>21</td></tr></tbody></table></div><p>Specimen C fractures before the 0.2% offset line reaches its curve, so it has <strong>no offset yield strength in this test</strong>: the value is undefined, not zero. Specimen D (polymer-like) reaches its peak stress early and then draws a neck along the specimen; its offset value is shown only for comparison.</p><details class="tt-limits"><summary>Model, assumptions and sources</summary><p>The four curves are <strong>synthetic</strong>: piecewise cubic curves through chosen points, shaped to resemble common behaviour. They are not measurements, grades, certification values or design allowables. Real results depend on composition, processing, specimen geometry, test speed and temperature, none of which are modelled.</p><p>Unloading and reloading follow a straight line with the initial elastic slope <em>E</em> (an ideal elastic approximation, no hysteresis). The load never goes below zero: once the unload line reaches zero load the specimen is slack. Permanent set = ε − σ/<em>E</em>, never negative. Elongation after fracture uses the same rule at the fracture point.</p><p>The specimen length is drawn to scale. Its thinning before the peak keeps volume constant; the neck and the fracture are drawn only to show where deformation concentrates, not calculated from a necking or fracture law. True stress, strain rate, temperature and hardness are outside this lab.</p><p>The area under the curve is work per original volume in this tension test (MPa = MJ/m³). Impact and fracture-toughness tests measure related but different behaviour.</p><p>Sources: ASTM E8/E8M, <em>Standard Test Methods for Tension Testing of Metallic Materials</em> (the test method and its definitions; consult the current edition). W. D. Callister Jr. and D. G. Rethwisch, <em>Materials Science and Engineering: An Introduction</em>, chapter “Mechanical Properties of Metals” (engineering stress and strain, modulus, 0.2% offset yield, tensile strength and necking, ductility, toughness as area under the curve, elastic recovery on unloading).</p></details></div>
+    <!-- /TENSILE-TEST-STATIC -->
+  </div>
     </div>
   </details>
   <details class="xcard deck-slide" id="metals-and-their-properties--density-conductivity-and-corrosion-can-decide-the-choice" data-card="metals-and-their-properties--density-conductivity-and-corrosion-can-decide-the-choice">
@@ -5301,6 +5490,854 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     });
   })();
 })();
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiTensileTest = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  // Bounded teaching model: engineering stress-strain curves for four SYNTHETIC specimens.
+  // Stress in MPa, strain as a ratio (mm/mm), modulus in MPa, area under the curve in MPa = MJ/m^3.
+  // Curves are piecewise cubic Hermite segments through stated knots: chosen illustrative shapes,
+  // not measured data, grades, allowables or certification values.
+  const GEOMETRY = Object.freeze({ gaugeLength: 50, diameter: 12.5 }); // mm, chosen for illustration
+  const AREA = Math.PI * GEOMETRY.diameter * GEOMETRY.diameter / 4;      // mm^2
+  const OFFSET = 0.002;                                                  // 0.2 % offset strain
+
+  // Knot: [strain, stress, slope in, slope out]; slope out defaults to slope in.
+  const DEFS = [
+    { id: 'ductile', letter: 'A', label: 'Ductile, low-carbon-steel-like', E: 200000, neck: 'local', neckRA: 0.6,
+      zoom: 0.01, linear: 0.00125,
+      knots: [[0, 0, 200000], [0.00125, 250, 200000, 0], [0.015, 250, 0, 2200], [0.2, 400, 0], [0.3, 320, -1600]],
+      note: 'Linear to a flat yield plateau, then strain hardening, a peak and a long fall to fracture.' },
+    { id: 'alloy', letter: 'B', label: 'Aluminium-alloy-like', E: 70000, neck: 'local', neckRA: 0.35,
+      zoom: 0.01, linear: 0.0025,
+      knots: [[0, 0, 70000], [0.0025, 175, 70000], [0.004, 240, 28000], [0.007, 272, 5500], [0.012, 284, 1500],
+        [0.03, 296, 400], [0.09, 310, 0], [0.13, 282, -1400]],
+      note: 'No plateau: the curve bends gradually away from the elastic line, so the offset rule is needed.' },
+    { id: 'brittle', letter: 'C', label: 'Brittle, gray-iron-like', E: 100000, neck: 'none', neckRA: 0,
+      zoom: 0.004, linear: 0.001,
+      knots: [[0, 0, 100000], [0.001, 100, 100000], [0.0032, 215, 30000]],
+      note: 'Curves slightly, then fractures at its highest stress with very little permanent strain.' },
+    { id: 'polymer', letter: 'D', label: 'Polymer-like (cold drawing)', E: 2500, neck: 'draw', neckRA: 0.45,
+      zoom: 0.06, linear: 0.01,
+      knots: [[0, 0, 2500], [0.01, 25, 2500], [0.03, 45, 600], [0.04, 48, 0], [0.07, 36, 0], [0.4, 38, 15], [0.55, 44, 60]],
+      note: 'Very low stiffness; a stress peak, a drop as a neck forms, then the neck draws along the gauge length.' }
+  ];
+
+  function finite(value, name) {
+    if (typeof value !== 'number' || !Number.isFinite(value)) throw new RangeError(name + ' must be a finite number.');
+  }
+  function build(def) {
+    const knots = def.knots.map(k => ({ e: k[0], s: k[1], mIn: k[2], mOut: k.length > 3 ? k[3] : k[2] }));
+    for (let i = 1; i < knots.length; i++) if (!(knots[i].e > knots[i - 1].e)) throw new Error(def.id + ': knots must increase in strain');
+    if (knots[0].e !== 0 || knots[0].s !== 0) throw new Error(def.id + ': curve must start at the origin');
+    const c = Object.assign({}, def, { knots });
+    c.fractureStrain = knots[knots.length - 1].e;
+    c.fractureStress = knots[knots.length - 1].s;
+    return c;
+  }
+  const CURVES = Object.freeze(DEFS.map(build));
+  function curveById(id) {
+    const c = CURVES.find(x => x.id === id);
+    if (!c) throw new RangeError('Unknown specimen: ' + id);
+    return c;
+  }
+  function segmentIndex(c, e) {
+    finite(e, 'Strain');
+    if (e < 0 || e > c.fractureStrain + 1e-15) throw new RangeError('Strain must be between 0 and the fracture strain.');
+    const k = c.knots;
+    for (let i = 0; i < k.length - 2; i++) if (e <= k[i + 1].e) return i;
+    return k.length - 2;
+  }
+  function seg(c, i) {
+    const a = c.knots[i], b = c.knots[i + 1];
+    return { x0: a.e, h: b.e - a.e, y0: a.s, y1: b.s, m0: a.mOut, m1: b.mIn };
+  }
+  function evalSeg(g, t) {
+    const t2 = t * t, t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * g.y0 + (t3 - 2 * t2 + t) * g.h * g.m0 + (-2 * t3 + 3 * t2) * g.y1 + (t3 - t2) * g.h * g.m1;
+  }
+  function slopeSeg(g, t) {
+    const t2 = t * t;
+    return (6 * t2 - 6 * t) / g.h * g.y0 + (3 * t2 - 4 * t + 1) * g.m0 + (-6 * t2 + 6 * t) / g.h * g.y1 + (3 * t2 - 2 * t) * g.m1;
+  }
+  function areaSeg(g, t) { // integral from x0 to x0 + t h, exact for the cubic
+    const t2 = t * t, t3 = t2 * t, t4 = t3 * t;
+    return g.h * (g.y0 * (t4 / 2 - t3 + t) + g.h * g.m0 * (t4 / 4 - 2 * t3 / 3 + t2 / 2) + g.y1 * (-t4 / 2 + t3) + g.h * g.m1 * (t4 / 4 - t3 / 3));
+  }
+  function stress(c, e) {
+    const i = segmentIndex(c, e), g = seg(c, i);
+    return evalSeg(g, Math.min(1, Math.max(0, (e - g.x0) / g.h)));
+  }
+  function slope(c, e) {
+    const i = segmentIndex(c, e), g = seg(c, i);
+    return slopeSeg(g, Math.min(1, Math.max(0, (e - g.x0) / g.h)));
+  }
+  // Work per original volume under the loading envelope from 0 to e (MPa = MJ/m^3). Nondecreasing in e
+  // because every envelope stress is nonnegative; the unloading path is not part of this integral.
+  function area(c, e) {
+    const last = segmentIndex(c, e);
+    let total = 0;
+    for (let i = 0; i < last; i++) total += areaSeg(seg(c, i), 1);
+    const g = seg(c, last);
+    return total + areaSeg(g, Math.min(1, Math.max(0, (e - g.x0) / g.h)));
+  }
+  // Highest engineering stress on the curve (the ultimate tensile strength in this test).
+  function peak(c) {
+    let best = { strain: 0, stress: 0 };
+    const consider = (e) => { const s = stress(c, e); if (s > best.stress + 1e-9) best = { strain: e, stress: s }; };
+    c.knots.forEach(k => consider(k.e));
+    for (let i = 0; i < c.knots.length - 1; i++) {
+      const g = seg(c, i);
+      // Roots of the derivative: a quadratic in t.
+      const A = 6 * g.y0 / g.h + 3 * g.m0 - 6 * g.y1 / g.h + 3 * g.m1;
+      const B = -6 * g.y0 / g.h - 4 * g.m0 + 6 * g.y1 / g.h - 2 * g.m1;
+      const C = g.m0;
+      const roots = [];
+      if (Math.abs(A) < 1e-12) { if (Math.abs(B) > 1e-12) roots.push(-C / B); }
+      else { const d = B * B - 4 * A * C; if (d >= 0) { roots.push((-B + Math.sqrt(d)) / (2 * A), (-B - Math.sqrt(d)) / (2 * A)); } }
+      roots.filter(t => t > 0 && t < 1).forEach(t => consider(g.x0 + t * g.h));
+    }
+    return best;
+  }
+  // 0.2 % offset yield: first intersection of sigma = E (e - offset) with the curve. Returns null when
+  // the specimen fractures before the offset line meets the curve (undefined for this test, not zero).
+  function offsetYield(c, offset) {
+    const off = offset === undefined ? OFFSET : offset;
+    finite(off, 'Offset');
+    if (off <= 0) throw new RangeError('Offset must be positive.');
+    if (off >= c.fractureStrain) return null;
+    const g = e => stress(c, e) - c.E * (e - off);
+    const points = [off];
+    c.knots.forEach(k => { if (k.e > off) points.push(k.e); });
+    for (let p = 0; p < points.length - 1; p++) {
+      const a0 = points[p], b0 = points[p + 1], n = 400;
+      for (let j = 0; j < n; j++) {
+        let a = a0 + (b0 - a0) * j / n, b = a0 + (b0 - a0) * (j + 1) / n;
+        if (g(a) > 0 && g(b) <= 0) {
+          for (let it = 0; it < 80; it++) { const m = (a + b) / 2; if (g(m) > 0) a = m; else b = m; }
+          const e = (a + b) / 2;
+          return { strain: e, stress: stress(c, e) };
+        }
+      }
+    }
+    return null;
+  }
+  // Ideal elastic unloading: a straight line of slope E from (e, s) to zero load.
+  // Permanent set = e - s/E, clamped so it can never be negative (an elastic state recovers fully).
+  function residualStrain(e, s, E) {
+    finite(e, 'Strain'); finite(s, 'Stress'); finite(E, 'Modulus');
+    if (E <= 0) throw new RangeError('Modulus must be greater than zero.');
+    if (e < 0 || s < 0) throw new RangeError('This tension model accepts only nonnegative strain and stress.');
+    const r = e - s / E;
+    return r > 1e-12 ? r : 0;
+  }
+  function properties(c) {
+    const p = peak(c), y = offsetYield(c);
+    const elongation = residualStrain(c.fractureStrain, c.fractureStress, c.E);
+    return {
+      id: c.id, E: c.E, yield: y ? y.stress : null, yieldStrain: y ? y.strain : null,
+      uts: p.stress, utsStrain: p.strain, fractureStrain: c.fractureStrain, fractureStress: c.fractureStress,
+      elongation, toughness: area(c, c.fractureStrain), necks: c.neck !== 'none' && p.strain < c.fractureStrain
+    };
+  }
+  const PROPERTY_KEYS = { stiffness: 'E', strength: 'uts', ductility: 'elongation', toughness: 'toughness' };
+  function ranking(key) {
+    const field = PROPERTY_KEYS[key];
+    if (!field) throw new RangeError('Unknown property: ' + key);
+    return CURVES.map(c => ({ id: c.id, value: properties(c)[field] })).sort((a, b) => b.value - a.value);
+  }
+
+  // ---- the test as a state machine -------------------------------------------------------------
+  // eMax: furthest strain reached on the loading envelope. e: current strain. Below eMax the specimen
+  // sits on the elastic unload/reload line through (eMax, sigma(eMax)); it cannot go below zero load
+  // (the model does not push it into compression), and reloading rejoins the envelope at eMax.
+  function createTest(id) { curveById(id); return Object.freeze({ id, eMax: 0, e: 0, fractured: false }); }
+  function moveTo(state, target) {
+    const c = curveById(state.id);
+    finite(target, 'Crosshead strain');
+    if (state.fractured) return state;
+    const t = Math.max(0, target);
+    if (t >= c.fractureStrain) return Object.freeze({ id: state.id, eMax: c.fractureStrain, e: c.fractureStrain, fractured: true });
+    if (t >= state.eMax) return Object.freeze({ id: state.id, eMax: t, e: t, fractured: false });
+    const floor = residualStrain(state.eMax, stress(c, state.eMax), c.E);
+    return Object.freeze({ id: state.id, eMax: state.eMax, e: Math.max(t, floor), fractured: false });
+  }
+  function reading(state) {
+    const c = curveById(state.id);
+    const sEnv = stress(c, state.eMax), set = residualStrain(state.eMax, sEnv, c.E);
+    const p = peak(c), y = offsetYield(c);
+    let s, stage;
+    if (state.fractured) { s = 0; stage = 'fractured'; }
+    else if (state.e < state.eMax) { s = sEnv - c.E * (state.eMax - state.e); if (s < 1e-9) s = 0; stage = s > 0 ? 'unloaded' : 'slack'; }
+    else {
+      s = sEnv;
+      if (state.e <= c.linear + 1e-12) stage = 'elastic';
+      else if (state.e <= p.strain + 1e-12) stage = 'plastic';
+      else stage = 'necking';
+    }
+    const workDensity = area(c, state.eMax);
+    return {
+      strain: state.e, stress: s, force: s * AREA / 1000, extension: state.e * GEOMETRY.gaugeLength,
+      envelopeStrain: state.eMax, envelopeStress: sEnv, permanentSet: state.fractured ? residualStrain(c.fractureStrain, c.fractureStress, c.E) : set,
+      stage, workDensity, work: workDensity * AREA * GEOMETRY.gaugeLength / 1000, // MJ/m^3 x mm^3 -> J
+      recoverable: state.fractured ? 0 : s * s / (2 * c.E),
+      pastYield: !!y && state.eMax >= y.strain, pastPeak: state.eMax > p.strain + 1e-12 || (state.fractured && p.strain >= c.fractureStrain - 1e-12),
+      fractured: state.fractured
+    };
+  }
+  // Which part of the curve the current point is on, read from the actual local slope rather than the
+  // stage alone: a level yield plateau is not strain hardening, and the approach to the peak flattens.
+  function phase(state) {
+    const c = curveById(state.id), r = reading(state);
+    if (r.stage !== 'plastic') return r.stage;
+    if (c.id === 'brittle') return 'nonlinear';
+    if (c.neck === 'draw') return 'toward-peak';
+    const p = peak(c), y = offsetYield(c), k = slope(c, state.e);
+    if (!y || state.e < y.strain) return k <= 0.0005 * c.E ? 'plateau' : 'leaving-linear';
+    if (k <= 0.0005 * c.E && r.stress < 0.97 * p.stress) return 'plateau';
+    if (r.stress >= 0.97 * p.stress) return 'near-peak';
+    return 'hardening';
+  }
+  // Scoring a permanent-set prediction (entered in percent). Tolerance is 10 % of the elastic recovery
+  // sigma/E, never below 0.005 percentage points, so ignoring recovery or predicting zero falls outside.
+  function scorePrediction(predictedPercent, state) {
+    if (typeof predictedPercent !== 'number' || !Number.isFinite(predictedPercent) || predictedPercent < 0)
+      return { status: 'invalid' };
+    const c = curveById(state.id);
+    if (state.fractured) return { status: 'invalid' };
+    const s = stress(c, state.eMax);
+    const actual = residualStrain(state.eMax, s, c.E) * 100;
+    const recovery = (state.eMax * 100) - actual;
+    const tol = Math.max(0.005, 0.1 * recovery);
+    const diff = Math.abs(predictedPercent - actual);
+    let status = diff <= tol ? 'match' : Math.abs(predictedPercent * 100 - actual) <= tol && actual > 0 ? 'match-ratio' : diff <= 3 * tol ? 'close' : 'miss';
+    return { status, actual, tolerance: tol, recovery, difference: predictedPercent - actual };
+  }
+
+  // Crosshead control: a slider position u in [0, 1] maps to strain e = ef u^k, with k chosen so the
+  // end of the linear region sits at u = 0.15. This only spaces the control; it is not a rate model.
+  function exponent(c) { return Math.log(c.linear / c.fractureStrain) / Math.log(0.15); }
+  function strainAt(c, u) { finite(u, 'Slider position'); const v = Math.min(1, Math.max(0, u)); return c.fractureStrain * Math.pow(v, exponent(c)); }
+  function sliderAt(c, e) { finite(e, 'Strain'); if (e <= 0) return 0; return Math.min(1, Math.pow(e / c.fractureStrain, 1 / exponent(c))); }
+
+  // Illustrative specimen outline. Length follows the strain exactly (gauge length L0 (1 + e)).
+  // Uniform plastic thinning keeps volume; the neck depth and shape after the peak are drawn only to
+  // show where deformation localizes. They are not a necking mechanics model or a failure prediction.
+  function specimen(state) {
+    const c = curveById(state.id), r = reading(state), p = peak(c);
+    const uniformLimit = residualStrain(p.strain, p.stress, c.E);
+    const plastic = state.fractured ? residualStrain(c.fractureStrain, c.fractureStress, c.E) : r.permanentSet;
+    const uniform = Math.min(plastic, uniformLimit);
+    const diameter = GEOMETRY.diameter / Math.sqrt(1 + uniform);
+    let neck = 0;
+    if (c.neck !== 'none' && state.eMax > p.strain + 1e-12) neck = Math.min(1, (state.eMax - p.strain) / (c.fractureStrain - p.strain));
+    const neckDiameter = neck > 0 ? diameter * Math.sqrt(1 - c.neckRA * (c.neck === 'draw' ? Math.min(1, neck * 8) : Math.pow(neck, 1.4))) : diameter;
+    const neckLength = c.neck === 'draw' && neck > 0 ? GEOMETRY.gaugeLength * (0.08 + 0.85 * neck) : GEOMETRY.gaugeLength * 0.16;
+    return {
+      length: GEOMETRY.gaugeLength * (1 + (state.fractured ? plastic : r.strain)), diameter, neck, neckDiameter, neckLength,
+      neckStyle: c.neck, fractured: state.fractured
+    };
+  }
+
+  function nice(value, digits) {
+    if (!Number.isFinite(value)) return '—';
+    const d = digits === undefined ? 3 : digits;
+    return Number(value.toFixed(d)).toFixed(d);
+  }
+  return {
+    GEOMETRY, AREA, OFFSET, CURVES, PROPERTY_KEYS, curveById, stress, slope, area, peak, offsetYield,
+    residualStrain, properties, ranking, createTest, moveTo, reading, phase, scorePrediction, strainAt, sliderAt,
+    specimen, nice
+  };
+});
+
+(function (root, factory) {
+  'use strict';
+  const node = typeof module === 'object' && module.exports;
+  const api = factory(node ? require('./model.js') : root.CourseWikiTensileTest);
+  if (node) module.exports = api; else root.CourseWikiTensileTestRender = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  // Pure string renderer shared by the live lab and the static/print fallback.
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const n1 = v => Number(v).toFixed(1);
+  function pct(strain, digits) { return (strain * 100).toFixed(digits === undefined ? (strain < 0.01 ? 3 : strain < 0.1 ? 2 : 1) : digits); }
+  function mpa(v) { return v >= 100 ? v.toFixed(0) : v.toFixed(1); }
+  function gpa(E) { return E >= 10000 ? (E / 1000).toFixed(0) : (E / 1000).toFixed(1); }
+  function niceStep(max, count) {
+    const raw = max / count, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+  }
+  function decimals(step) { return Math.max(0, Math.min(4, -Math.floor(Math.log10(step) + 1e-9))); }
+  function letterOf(id) { return M.curveById(id).letter; }
+
+  // ---- stress-strain plot ------------------------------------------------------------------------
+  const W = 520, H = 380, L = 80, R = 20, T = 44, B = 70;
+  function plot(o) {
+    const HH = o.H || H, xMax = o.xMax, yMax = o.yMax, pw = W - L - R, ph = HH - T - B;
+    const X = e => L + e / xMax * pw, Y = s => T + ph - s / yMax * ph;
+    const clip = esc(o.prefix) + '-clip';
+    const xs = niceStep(xMax * 100, 5), ys = niceStep(yMax, 5), xd = decimals(xs);
+    let g = '<defs><clipPath id="' + clip + '"><rect x="' + L + '" y="' + (T - 4) + '" width="' + (pw + 4) + '" height="' + (ph + 4) + '"/></clipPath></defs>';
+    for (let v = 0; v <= xMax * 100 + 1e-9; v += xs) {
+      const x = X(v / 100).toFixed(1);
+      g += '<path class="tt-grid" d="M' + x + ' ' + T + 'V' + (T + ph) + '"/><text class="tt-tick" x="' + x + '" y="' + (T + ph + 22) + '" text-anchor="middle">' + v.toFixed(xd) + '</text>';
+    }
+    for (let v = 0; v <= yMax + 1e-9; v += ys) {
+      const y = Y(v).toFixed(1);
+      g += '<path class="tt-grid" d="M' + L + ' ' + y + 'H' + (L + pw) + '"/><text class="tt-tick" x="' + (L - 8) + '" y="' + (Number(y) + 6) + '" text-anchor="end">' + Number(v.toFixed(2)) + '</text>';
+    }
+    g += '<path class="tt-axis" d="M' + L + ' ' + T + 'V' + (T + ph) + 'H' + (L + pw) + '" fill="none" stroke="currentColor"/>';
+    g += '<text class="tt-label" x="' + (L + pw / 2) + '" y="' + (HH - 12) + '" text-anchor="middle">Engineering strain (%)</text>';
+    g += '<text class="tt-label" transform="translate(22 ' + (T + ph / 2) + ') rotate(-90)" text-anchor="middle">Engineering stress (MPa)</text>';
+    if (o.title) g += '<text class="tt-ptitle" x="' + L + '" y="28">' + esc(o.title) + '</text>';
+    let body = '', outside = '';
+    const path = (c, to) => {
+      const end = Math.min(to, xMax * 1.05, c.fractureStrain), pts = [];
+      const n = 260;
+      for (let i = 0; i <= n; i++) pts.push(end * i / n);
+      c.knots.forEach(k => { if (k.e < end) pts.push(k.e); });
+      pts.sort((a, b) => a - b);
+      return pts.map((e, i) => (i ? 'L' : 'M') + X(e).toFixed(2) + ' ' + Y(M.stress(c, e)).toFixed(2)).join('');
+    };
+    if (o.area && o.area.to > 0) {
+      const d = path(o.area.c, o.area.to), end = Math.min(o.area.to, xMax * 1.05, o.area.c.fractureStrain);
+      body += '<path class="tt-area" d="' + d + 'L' + X(end).toFixed(2) + ' ' + Y(0) + 'L' + X(0) + ' ' + Y(0) + 'Z"/>';
+    }
+    if (o.offset) {
+      const c = o.offset.c, top = o.offset.y ? o.offset.y.stress * 1.18 : Math.min(yMax, M.peak(c).stress * 1.3);
+      const e0 = M.OFFSET, e1 = e0 + top / c.E;
+      body += '<path class="tt-offset" d="M' + X(e0).toFixed(2) + ' ' + Y(0) + 'L' + X(e1).toFixed(2) + ' ' + Y(top).toFixed(2) + '"/>';
+      body += '<path class="tt-offset-base" d="M' + X(0) + ' ' + (Y(0) - 7) + 'H' + X(e0).toFixed(2) + '"/>';
+    }
+    (o.series || []).forEach(sr => {
+      if (sr.to <= 0) return;
+      body += '<path class="tt-curve ' + (sr.cls || '') + '" data-series="' + sr.c.id + '" d="' + path(sr.c, sr.to) + '" fill="none" stroke="currentColor"/>';
+      if (sr.end) {
+        const e = Math.min(sr.c.fractureStrain, xMax), x = X(e), y = Y(M.stress(sr.c, e));
+        const lx = Math.min(x + 6, L + pw - 14), ly = Math.max(T + 14, y - 8);
+        body += '<text class="tt-endlabel ' + (sr.cls || '') + '" x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '">' + sr.c.letter + '</text>';
+        if (sr.c.fractureStrain <= xMax) body += '<path class="tt-fracture ' + (sr.cls || '') + '" d="M' + (x - 6) + ' ' + (y - 6) + 'l12 12m0 -12l-12 12"/>';
+      }
+    });
+    if (o.unload) {
+      const u = o.unload;
+      body += '<path class="tt-unload" data-tt-unload d="M' + X(u.e0).toFixed(2) + ' ' + Y(u.s0).toFixed(2) + 'L' + X(u.e1).toFixed(2) + ' ' + Y(u.s1 || 0).toFixed(2) + '"/>';
+    }
+    if (o.setMark !== undefined && o.setMark !== null) outside += '<path class="tt-set" data-tt-set d="M' + X(o.setMark).toFixed(2) + ' ' + Y(0) + 'l-8 -15h16z"/>';
+    if (o.prediction !== undefined && o.prediction !== null && o.prediction <= xMax * 1.05)
+      outside += '<path class="tt-pred" data-tt-pred d="M' + X(o.prediction).toFixed(2) + ' ' + (Y(0) + 1) + 'l-8 15h16z"/>';
+    (o.marks || []).forEach(m => {
+      const x = X(m.e), y = Y(m.s);
+      if (m.e > xMax * 1.02) return;
+      if (m.kind === 'yield') body += '<circle class="tt-mark-yield" data-tt-mark="yield" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="6.5"/>';
+      else if (m.kind === 'uts') body += '<path class="tt-mark-uts" data-tt-mark="uts" d="M' + x.toFixed(1) + ' ' + (y - 8).toFixed(1) + 'l8 8l-8 8l-8 -8z"/>';
+      else if (m.kind === 'fracture') body += '<path class="tt-mark-fracture" data-tt-mark="fracture" d="M' + (x - 7) + ' ' + (y - 7) + 'l14 14m0 -14l-14 14"/>';
+      if (m.label) {
+        const lines = m.label.split('\n'), w = Math.max(...lines.map(s => s.length)) * 10.5, right = x + 11 + w <= L + pw || x - 11 - w < L;
+        const ty = Math.max(T + 16, Math.min(T + ph - 8, y + (m.dy || -14)));
+        outside += '<text class="tt-marklabel" x="' + (right ? x + 11 : x - 11).toFixed(1) + '" y="' + ty.toFixed(1) + '" text-anchor="' + (right ? 'start' : 'end') + '">' + lines.map((s, i) => '<tspan x="' + (right ? x + 11 : x - 11).toFixed(1) + '" dy="' + (i ? 21 : 0) + '">' + esc(s) + '</tspan>').join('') + '</text>';
+      }
+    });
+    if (o.point) body += '<circle class="tt-point" data-tt-point cx="' + X(o.point.e).toFixed(1) + '" cy="' + Y(o.point.s).toFixed(1) + '" r="7"/>';
+    if (o.annotations) body += o.annotations(X, Y);
+    return '<svg class="tt-plot" viewBox="0 0 ' + W + ' ' + HH + '" role="img" aria-label="' + esc(o.aria) + '" data-xmax="' + xMax + '" data-ymax="' + yMax + '">' + g +
+      '<g clip-path="url(#' + clip + ')">' + body + '</g>' + outside + '</svg>';
+  }
+  function axisMax(c) {
+    const p = M.peak(c);
+    const yStep = niceStep(p.stress * 1.15, 5);
+    return { full: Math.ceil(c.fractureStrain * 1.08 * 1000) / 1000, zoom: c.zoom, y: Math.ceil(p.stress * 1.15 / yStep) * yStep };
+  }
+  // Main test view: the live curve so far, its area, landmarks reached, the unload line and the offset construction.
+  function testPlots(state, extra) {
+    const x = extra || {}, c = M.curveById(state.id), r = M.reading(state), ax = axisMax(c);
+    const props = M.properties(c), y = M.offsetYield(c), p = M.peak(c);
+    const marks = [];
+    if (r.pastYield && y) marks.push({ kind: 'yield', e: y.strain, s: y.stress, label: '0.2% offset yield\n' + mpa(y.stress) + ' MPa', zoomOnly: true, dy: 28 });
+    if (r.pastPeak) marks.push({ kind: 'uts', e: p.strain, s: p.stress, label: 'UTS ' + mpa(p.stress) + ' MPa' });
+    if (state.fractured && props.necks) marks.push({ kind: 'fracture', e: c.fractureStrain, s: c.fractureStress, label: 'Fracture', dy: 22 });
+    if (state.fractured && !props.necks) marks.push({ kind: 'fracture', e: c.fractureStrain, s: c.fractureStress, label: '', dy: 22 });
+    const unloading = !state.fractured && state.e < state.eMax - 1e-12;
+    const unload = x.unloadPreview || (unloading ? { e0: state.eMax, s0: r.envelopeStress, e1: r.strain, s1: r.stress } : null);
+    const set = unloading && r.stress <= 0 ? r.permanentSet : (x.setMark !== undefined ? x.setMark : null);
+    const point = state.fractured ? null : { e: r.strain, s: r.stress };
+    const common = { series: [{ c, to: state.eMax, cls: 'tt-main' }], area: x.hideArea ? null : { c, to: state.eMax }, unload, point, setMark: set, prediction: x.prediction };
+    const zoomMarks = marks.filter(m => m.e <= ax.zoom);
+    // The offset line is drawn once yield is reached, or after fracture to show it never meets a brittle curve.
+    const offsetShown = x.offset !== false && ((y && r.pastYield) || (!y && state.fractured));
+    const slopeNote = (X, Y) => {
+      // Label the slope on the offset line when it is drawn (it is parallel to the elastic line), clear of other labels.
+      let e = Math.min(ax.zoom * 0.3, c.linear * 0.4), s = M.stress(c, e);
+      if (offsetShown) { s = 0.25 * (y ? y.stress : p.stress); e = M.OFFSET + s / c.E; }
+      let t = '<text class="tt-marklabel" x="' + (X(e) + 10).toFixed(1) + '" y="' + (Y(s) + 18).toFixed(1) + '">slope = E</text>';
+      return t;
+    };
+    const full = plot(Object.assign({}, common, {
+      prefix: (x.prefix || 'tt') + '-full', xMax: ax.full, yMax: ax.y, title: 'Whole test',
+      marks: marks.filter(m => !m.zoomOnly || ax.zoom >= ax.full), offset: offsetShown && ax.zoom >= ax.full ? { c, y } : null,
+      annotations: ax.zoom >= ax.full ? slopeNote : null,
+      aria: 'Engineering stress against strain for specimen ' + c.letter + ' to ' + pct(state.eMax) + '% strain' + (state.fractured ? ', to fracture.' : '.')
+    }));
+    const zoom = ax.zoom >= ax.full ? '' : plot(Object.assign({}, common, {
+      prefix: (x.prefix || 'tt') + '-zoom', xMax: ax.zoom, yMax: ax.y, title: 'Start of the test, magnified',
+      marks: zoomMarks, offset: offsetShown ? { c, y } : null,
+      annotations: slopeNote,
+      aria: 'The first ' + pct(ax.zoom) + '% of strain for specimen ' + c.letter + ', showing the elastic slope' + (offsetShown ? ' and the 0.2% offset construction.' : '.')
+    }));
+    return { full, zoom };
+  }
+
+  // ---- the specimen ------------------------------------------------------------------------------
+  const SW = 720, SH = 190, CY = 104, PX = 5; // 5 px per mm, drawn to scale
+  function specimen(state, opts) {
+    const o = opts || {}, sp = M.specimen(state), c = M.curveById(state.id);
+    const endW = 80, fil = 28, R0 = M.GEOMETRY.diameter * PX / 2, Rend = 20 * PX / 2;
+    const x0 = 46, g0 = x0 + endW + fil, gL = sp.length * PX, g1 = g0 + gL, xEnd = g1 + fil + endW;
+    const R = sp.diameter * PX / 2, Rn = sp.neckDiameter * PX / 2, mid = (g0 + g1) / 2, halfNeck = sp.neckLength * PX / 2;
+    function radius(x) {
+      if (sp.neck <= 0) return R;
+      const z = (x - mid) / halfNeck;
+      if (sp.neckStyle === 'draw') { const a = Math.abs(z); const w = a <= 1 ? 1 : a >= 1.6 ? 0 : 0.5 + 0.5 * Math.cos(Math.PI * (a - 1) / 0.6); return R - (R - Rn) * w; }
+      return R - (R - Rn) * Math.exp(-z * z * 2.2);
+    }
+    function profile(xa, xb, sign) {
+      const pts = [], n = 90;
+      for (let i = 0; i <= n; i++) { const x = xa + (xb - xa) * i / n; pts.push([x, CY + sign * radius(x)]); }
+      return pts;
+    }
+    const gap = sp.fractured ? 10 : 0;
+    function half(side) {
+      // side -1: left piece (or whole specimen when not fractured), +1: right piece
+      const whole = !sp.fractured;
+      const a = side < 0 ? g0 : mid + gap / 2, b = side < 0 ? (whole ? g1 : mid - gap / 2) : g1;
+      let d = '';
+      if (side < 0) d += 'M' + x0 + ' ' + (CY - Rend) + 'H' + (x0 + endW) + 'C' + (x0 + endW + fil * 0.6) + ' ' + (CY - Rend) + ' ' + (g0 - fil * 0.4) + ' ' + (CY - R) + ' ' + g0 + ' ' + (CY - R);
+      else d += 'M' + a.toFixed(1) + ' ' + (CY - radius(a + gap / 2)).toFixed(1);
+      const top = profile(side < 0 ? g0 : a, b, -1).map(p => 'L' + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+      d += top;
+      if (side > 0 || whole) d += 'C' + (g1 + fil * 0.4) + ' ' + (CY - R) + ' ' + (g1 + fil * 0.4) + ' ' + (CY - Rend) + ' ' + (g1 + fil) + ' ' + (CY - Rend) + 'H' + xEnd + 'V' + (CY + Rend) + 'H' + (g1 + fil) + 'C' + (g1 + fil * 0.4) + ' ' + (CY + Rend) + ' ' + (g1 + fil * 0.4) + ' ' + (CY + R) + ' ' + g1 + ' ' + (CY + R);
+      else {
+        // broken face of the left piece: a ductile cup/cone hint or a flat brittle face
+        const rr = radius(b);
+        d += sp.neckStyle === 'none' ? 'L' + (b + 1.5).toFixed(1) + ' ' + (CY - rr * 0.3).toFixed(1) + 'L' + (b - 1).toFixed(1) + ' ' + (CY + rr * 0.2).toFixed(1) + 'L' + b.toFixed(1) + ' ' + (CY + rr).toFixed(1)
+          : 'L' + (b - 3).toFixed(1) + ' ' + (CY - rr * 0.55).toFixed(1) + 'L' + (b + 2).toFixed(1) + ' ' + CY + 'L' + (b - 3).toFixed(1) + ' ' + (CY + rr * 0.55).toFixed(1) + 'L' + b.toFixed(1) + ' ' + (CY + rr).toFixed(1);
+      }
+      const bottom = profile(side < 0 ? g0 : a, b, 1).reverse().map(p => 'L' + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+      if (side > 0 && !whole) {
+        d += bottom;
+        const rr = radius(a);
+        d += sp.neckStyle === 'none' ? 'L' + (a + 1.5).toFixed(1) + ' ' + (CY + rr * 0.2).toFixed(1) + 'L' + (a + 3.5).toFixed(1) + ' ' + (CY - rr * 0.3).toFixed(1)
+          : 'L' + (a + 5).toFixed(1) + ' ' + (CY + rr * 0.55).toFixed(1) + 'L' + a.toFixed(1) + ' ' + CY + 'L' + (a + 5).toFixed(1) + ' ' + (CY - rr * 0.55).toFixed(1);
+        return d + 'Z';
+      }
+      d += bottom;
+      d += 'C' + (g0 - fil * 0.4) + ' ' + (CY + R) + ' ' + (x0 + endW + fil * 0.6) + ' ' + (CY + Rend) + ' ' + (x0 + endW) + ' ' + (CY + Rend) + 'H' + x0 + 'Z';
+      return d;
+    }
+    let s = '';
+    // frame: fixed grip (left) and moving crosshead (right)
+    const gripH = Rend * 2 + 28;
+    s += '<path class="tt-spec' + (sp.fractured ? ' tt-broken' : '') + '" d="' + half(-1) + '"/>';
+    if (sp.fractured) s += '<path class="tt-spec tt-broken" d="' + half(1) + '"/>';
+    if (sp.neck > 0) s += '<g data-tt-neck="1"><path class="tt-neckmark" d="M' + mid.toFixed(1) + ' ' + (CY + R + 10).toFixed(1) + 'v14"/><text class="tt-slabel" x="' + mid.toFixed(1) + '" y="' + (CY + R + 40).toFixed(1) + '" text-anchor="middle">' + (sp.neckStyle === 'draw' ? 'drawn neck (illustrative)' : 'neck (illustrative)') + '</text></g>';
+    s += '<rect class="tt-grip" x="' + (x0 - 30) + '" y="' + (CY - gripH / 2) + '" width="' + (endW + 22) + '" height="' + gripH + '"/>';
+    s += '<text class="tt-slabel" x="' + (x0 - 30) + '" y="' + (CY - gripH / 2 - 8) + '">Fixed grip</text>';
+    const xh = xEnd - endW - 8;
+    s += '<rect class="tt-grip tt-crosshead" data-tt-crosshead x="' + xh + '" y="' + (CY - gripH / 2) + '" width="' + (endW + 30) + '" height="' + gripH + '"/>';
+    s += '<text class="tt-slabel" x="' + (xh + endW + 26) + '" y="' + (CY - gripH / 2 - 8) + '" text-anchor="end">Crosshead →</text>';
+    // gauge length dimension
+    const dy = CY - R0 - 2;
+    if (!sp.neck && !sp.fractured) s += '<path class="tt-gauge" d="M' + g0 + ' ' + (dy - 12) + 'v10M' + g1.toFixed(1) + ' ' + (dy - 12) + 'v10"/>';
+    return '<svg class="tt-specimen" viewBox="0 0 ' + SW + ' ' + SH + '" role="img" data-neck="' + (sp.neck > 0 ? 1 : 0) + '" data-fractured="' + (sp.fractured ? 1 : 0) + '" aria-label="' +
+      esc('Specimen ' + c.letter + (sp.fractured ? ', fractured' : sp.neck > 0 ? ', necking' : '') + ': gauge length ' + n1(sp.length) + ' mm. Drawn to scale; neck shape illustrative.') + '">' + s + '</svg>';
+  }
+
+  function specimenCaption(state) {
+    const sp = M.specimen(state);
+    return (sp.fractured ? 'Broken pieces fitted back together: gauge length ' : 'Gauge length ') + n1(sp.length) + ' mm (original L₀ = 50.0 mm). Drawn to scale' + (sp.neck > 0 ? '; neck shape illustrative.' : '.');
+  }
+  // ---- live text: follows the actual curve segment (model phase), shared by the lab and the tests ----
+  const STAGE_TEXT = { elastic: 'Elastic', plateau: 'Yield plateau', 'leaving-linear': 'Leaving the straight line', hardening: 'Plastic, hardening',
+    'near-peak': 'Near the peak', nonlinear: 'Nonlinear', 'toward-peak': 'Toward the peak', necking: 'After the peak (neck)', fractured: 'Fractured',
+    unloaded: 'Unloading / reloading (elastic)', slack: 'Zero load (slack)' };
+  function stageText(state) {
+    const ph = M.phase(state);
+    return ph === 'necking' && M.curveById(state.id).neck === 'draw' ? 'Neck drawing' : STAGE_TEXT[ph];
+  }
+  function statusText(state) {
+    const c = M.curveById(state.id), r = M.reading(state);
+    switch (M.phase(state)) {
+      case 'elastic': return state.eMax === 0 ? 'Ready. Stress is zero until the crosshead moves.' : 'Elastic: stress rises in proportion to strain (slope E). Unload now and the specimen returns to its original length.';
+      case 'plateau': return 'Yield plateau: the stress stays level at about ' + mpa(r.stress) + ' MPa while the specimen keeps stretching. This stretch is permanent; the curve has not started to rise again yet.';
+      case 'leaving-linear': return 'The curve is leaving the straight line. The 0.2% offset rule marks where yield is taken.';
+      case 'hardening': return 'Plastic: permanent stretching continues, and the curve rises because the material strain-hardens.';
+      case 'near-peak': return 'Near the peak: the curve is flattening as strain hardening runs out. A neck forms once the peak is passed.';
+      case 'nonlinear': return 'Past the straight part, the curve bends slightly. Keep pulling and watch for fracture.';
+      case 'toward-peak': return 'The curve bends over toward a stress peak. Part of this stretch is now permanent.';
+      case 'necking': return c.neck === 'draw' ? 'After the peak the stress dropped as a neck formed; the neck now draws along the specimen (illustrative).' : 'Past the peak: a neck has formed, so force and engineering stress fall while stretching concentrates there (illustrative neck).';
+      case 'fractured': return 'Fractured. The load drops to zero and each piece springs back by σ/E. Elongation after fracture ≈ ' + pct(r.permanentSet, 2) + '%.' + (c.neck === 'none' ? ' No neck formed: this curve peaks at fracture. The dashed 0.2% offset line never meets the curve, so there is no offset yield strength (undefined, not zero).' : '');
+      case 'unloaded': return 'On the elastic unload/reload line (slope E). Reloading follows the same line back to the curve.';
+      case 'slack': return 'Zero load: the specimen is slack with ' + pct(r.permanentSet, 3) + '% permanent set. This model does not push it into compression.';
+    }
+    return '';
+  }
+  // Compact paired view for the prediction panel: the specimen and the unloading line framed together,
+  // so the check stays beside the answer box. The window is the magnified start when it holds the test.
+  function unloadView(state, opts) {
+    const o = opts || {}, c = M.curveById(state.id), r = M.reading(state), ax = axisMax(c);
+    const xMax = state.eMax <= ax.zoom * 0.97 ? ax.zoom : ax.full;
+    const unloading = state.e < state.eMax - 1e-12;
+    const svg = plot({
+      prefix: (o.prefix || 'tt') + '-uv', xMax, yMax: ax.y, H: 300, title: xMax === ax.zoom && ax.zoom < ax.full ? 'Unloading (start of test, magnified)' : 'Unloading',
+      series: [{ c, to: state.eMax, cls: 'tt-main' }],
+      unload: unloading ? { e0: state.eMax, s0: r.envelopeStress, e1: r.strain, s1: r.stress } : null,
+      point: { e: r.strain, s: r.stress }, setMark: unloading && r.stress <= 0 ? r.permanentSet : null, prediction: o.prediction,
+      aria: 'Unloading check for specimen ' + c.letter + ': strain ' + pct(r.strain, 3) + '%, stress ' + mpa(r.stress) + ' MPa.'
+    });
+    return '<div class="tt-uv-spec">' + specimen(state) + '</div><p class="tt-uv-read" data-tt-uv-read>L = ' + (M.specimen(state).length).toFixed(3) + ' mm · σ = ' + mpa(r.stress) + ' MPa · ε = ' + pct(r.strain, 3) + '%</p>' + svg;
+  }
+  // ---- comparison ----------------------------------------------------------------------------------
+  function comparePlot(ids, zoom, prefix) {
+    const cs = ids.map(M.curveById);
+    const xMax = zoom ? 0.01 : 0.6, yMax = 450;
+    return plot({
+      prefix: prefix || 'tt-cmp', xMax, yMax, title: zoom ? 'First 1% of strain' : 'Complete synthetic curves',
+      series: cs.map(c => ({ c, to: c.fractureStrain, cls: 'tt-s-' + c.letter.toLowerCase(), end: true })),
+      aria: 'Engineering stress-strain curves of synthetic specimens ' + cs.map(c => c.letter).join(', ') + (zoom ? ', first 1% of strain.' : ', to fracture.')
+    });
+  }
+  function legend(ids) {
+    return '<ul class="tt-legend">' + ids.map(id => { const c = M.curveById(id); return '<li><svg viewBox="0 0 40 12" aria-hidden="true"><path class="tt-curve tt-s-' + c.letter.toLowerCase() + '" d="M2 6H38" stroke="currentColor"/></svg> <strong>' + c.letter + '</strong> ' + esc(c.label) + '</li>'; }).join('') + '</ul>';
+  }
+  function propertyTable() {
+    const rows = M.CURVES.map(c => {
+      const p = M.properties(c);
+      return '<tr><th scope="row">' + c.letter + ': ' + esc(c.label) + '</th><td>' + gpa(p.E) + '</td><td>' + (p.yield === null ? 'none: fractures first' : mpa(p.yield)) + '</td><td>' + mpa(p.uts) + '</td><td>' + pct(p.elongation, 1) + '</td><td>' + p.toughness.toFixed(p.toughness < 1 ? 2 : 0) + '</td></tr>';
+    }).join('');
+    return '<div class="tt-tablewrap" tabindex="0" role="region" aria-label="Synthetic specimen properties"><table class="tt-table"><caption>Read from the four synthetic curves (illustrative; not material data)</caption><thead><tr><th scope="col">Specimen</th><th scope="col">Stiffness E (GPa)</th><th scope="col">0.2% offset yield (MPa)</th><th scope="col">UTS (MPa)</th><th scope="col">Elongation after fracture (%)</th><th scope="col">Area to fracture (MJ/m³)</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+  const PROPERTY_TEXT = {
+    stiffness: { name: 'Stiffness', unit: 'GPa', fmt: v => gpa(v), raw: v => v / 1000, q: 'steepest elastic slope (highest E)' },
+    strength: { name: 'Ultimate tensile strength', unit: 'MPa', fmt: mpa, raw: v => v, q: 'highest ultimate tensile strength' },
+    ductility: { name: 'Ductility', unit: '% elongation', fmt: v => pct(v, 1), raw: v => v * 100, q: 'most elongation after fracture' },
+    toughness: { name: 'Area under the curve', unit: 'MJ/m³', fmt: v => v.toFixed(v < 1 ? 2 : 0), raw: v => v, q: 'largest area under the curve to fracture' }
+  };
+  function rankingBars(key) {
+    const t = PROPERTY_TEXT[key], list = M.ranking(key), max = list[0].value;
+    return '<figure class="tt-rank"><figcaption>' + esc(t.name) + ' (' + esc(t.unit) + ')</figcaption><ol>' + list.map(r => {
+      const c = M.curveById(r.id), w = Math.max(0.6, r.value / max * 100);
+      return '<li><span class="tt-rank-name">' + c.letter + '</span><span class="tt-bar"><span class="tt-bar-fill tt-s-' + c.letter.toLowerCase() + '" style="width:' + w.toFixed(1) + '%"></span></span><span class="tt-rank-val">' + t.fmt(r.value) + '</span></li>';
+    }).join('') + '</ol></figure>';
+  }
+
+  // ---- static lesson (no-JS, search and print) ---------------------------------------------------------
+  function staticLesson() {
+    const c = M.curveById('ductile'), p = M.properties(c);
+    const done = { id: 'ductile', eMax: c.fractureStrain, e: c.fractureStrain, fractured: true };
+    const at10 = M.stress(c, 0.10), set10 = M.residualStrain(0.10, at10, c.E);
+    const plots = testPlots(done, { prefix: 'tt-static', unloadPreview: { e0: 0.10, s0: at10, e1: set10, s1: 0 }, setMark: set10 });
+    const shots = [
+      { id: 'ductile', eMax: 0, e: 0, fractured: false, cap: 'Before loading' },
+      { id: 'ductile', eMax: p.utsStrain, e: p.utsStrain, fractured: false, cap: 'At the peak (UTS): stretched uniformly, no neck yet' },
+      { id: 'ductile', eMax: 0.27, e: 0.27, fractured: false, cap: 'After the peak: deformation concentrates in a neck' },
+      done
+    ];
+    shots[3] = Object.assign({}, done, { cap: 'Fractured; pieces fitted together' });
+    return '<div class="tt-static">' +
+      '<p><strong>Tensile test: one curve, four different properties.</strong> This fallback shows the same synthetic curves and calculations as the live lab.</p>' +
+      '<p>A round specimen with a chosen gauge length <em>L</em><sub>0</sub> = 50 mm and diameter 12.5 mm (original area <em>A</em><sub>0</sub> = ' + M.AREA.toFixed(1) + ' mm²) is pulled by a moving crosshead. Engineering stress σ = <em>F</em>/<em>A</em><sub>0</sub> (N/mm² = MPa). Engineering strain ε = Δ<em>L</em>/<em>L</em><sub>0</sub> (mm/mm, shown here in %). Both use the <em>original</em> dimensions, so engineering stress falls after the neck forms even though the force is concentrated on a shrinking section.</p>' +
+      '<figure class="tt-figure"><figcaption>Synthetic specimen A (ductile, low-carbon-steel-like; illustrative, not a grade). Shaded: area under the curve to fracture. Dashed red line: unloading from 10% strain.</figcaption><div class="tt-plots">' + plots.full + plots.zoom + '</div></figure>' +
+      '<ul class="tt-readlist">' +
+      '<li><strong>Stiffness:</strong> the elastic slope, Young’s modulus <em>E</em> = σ/ε = 200 MPa ÷ 0.001 = 200 000 MPa = 200 GPa.</li>' +
+      '<li><strong>Yield strength (0.2% offset):</strong> draw a line with slope <em>E</em> starting at 0.2% strain; where it meets the curve, σ<sub>y</sub> ≈ ' + mpa(p.yield) + ' MPa (at ' + pct(p.yieldStrain, 3) + '% strain). Specimen A then stretches along a level yield plateau (stress constant at 250 MPa up to 1.5% strain) before strain hardening makes the curve rise again.</li>' +
+      '<li><strong>Ultimate tensile strength (UTS):</strong> the highest engineering stress, ' + mpa(p.uts) + ' MPa at ' + pct(p.utsStrain, 0) + '% strain. A neck begins to form after this peak.</li>' +
+      '<li><strong>Ductility:</strong> elongation after fracture ≈ ε<sub>f</sub> − σ<sub>f</sub>/<em>E</em> = 30% − 0.16% = ' + pct(p.elongation, 2) + '%.</li>' +
+      '<li><strong>Toughness (tensile):</strong> the area under the curve to fracture, ∫σ dε ≈ ' + p.toughness.toFixed(0) + ' MJ/m³ (1 MPa × 1 = 1 MJ/m³ = 1 J/cm³) of work per original volume. For this gauge volume that is about ' + (p.toughness * M.AREA * M.GEOMETRY.gaugeLength / 1000).toFixed(0) + ' J. This is not fracture toughness <em>K</em><sub>IC</sub>, which is measured on a cracked specimen.</li>' +
+      '</ul>' +
+      '<p><strong>Worked example: unloading leaves permanent set.</strong> Stop at ε = 10.0%, where σ = ' + mpa(at10) + ' MPa. Removing the load follows a straight line parallel to the elastic slope, so the elastic part σ/<em>E</em> = ' + mpa(at10) + '/200 000 = ' + pct(at10 / c.E, 3) + '% springs back. Permanent set = 10.0% − ' + pct(at10 / c.E, 3) + '% = <strong>' + pct(set10, 3) + '%</strong>, or ' + (set10 * M.GEOMETRY.gaugeLength).toFixed(2) + ' mm on the 50 mm gauge length. Below the yield point the same rule gives zero set: at 0.1% strain and 200 MPa, 0.1% − 200/200 000 = 0.</p>' +
+      '<figure class="tt-figure"><figcaption>The same specimen at four moments. Length to scale; the neck shape is illustrative only.</figcaption><div class="tt-shots">' +
+      shots.map(st => '<div class="tt-shot"><p class="tt-shotcap"><strong>' + esc(st.cap) + '.</strong> ' + esc(specimenCaption(st)) + '</p>' + specimen(st) + '</div>').join('') + '</div></figure>' +
+      '<p><strong>Compare the four synthetic specimens.</strong> Each ranks differently on each property: the stiffest is not always the strongest, and the most ductile is not the toughest.</p>' +
+      '<figure class="tt-figure"><figcaption>All four synthetic curves on one set of axes; the right panel magnifies the first 1% of strain, where the elastic slopes differ.</figcaption><div class="tt-plots">' + comparePlot(['ductile', 'alloy', 'brittle', 'polymer'], false, 'tt-static-cmp') + comparePlot(['ductile', 'alloy', 'brittle', 'polymer'], true, 'tt-static-cmpz') + '</div>' + legend(['ductile', 'alloy', 'brittle', 'polymer']) + '</figure>' +
+      propertyTable() +
+      '<p>Specimen C fractures before the 0.2% offset line reaches its curve, so it has <strong>no offset yield strength in this test</strong>: the value is undefined, not zero. Specimen D (polymer-like) reaches its peak stress early and then draws a neck along the specimen; its offset value is shown only for comparison.</p>' +
+      limits() + '</div>';
+  }
+  function limits() {
+    return '<details class="tt-limits"><summary>Model, assumptions and sources</summary>' +
+      '<p>The four curves are <strong>synthetic</strong>: piecewise cubic curves through chosen points, shaped to resemble common behaviour. They are not measurements, grades, certification values or design allowables. Real results depend on composition, processing, specimen geometry, test speed and temperature, none of which are modelled.</p>' +
+      '<p>Unloading and reloading follow a straight line with the initial elastic slope <em>E</em> (an ideal elastic approximation, no hysteresis). The load never goes below zero: once the unload line reaches zero load the specimen is slack. Permanent set = ε − σ/<em>E</em>, never negative. Elongation after fracture uses the same rule at the fracture point.</p>' +
+      '<p>The specimen length is drawn to scale. Its thinning before the peak keeps volume constant; the neck and the fracture are drawn only to show where deformation concentrates, not calculated from a necking or fracture law. True stress, strain rate, temperature and hardness are outside this lab.</p>' +
+      '<p>The area under the curve is work per original volume in this tension test (MPa = MJ/m³). Impact and fracture-toughness tests measure related but different behaviour.</p>' +
+      '<p>Sources: ASTM E8/E8M, <em>Standard Test Methods for Tension Testing of Metallic Materials</em> (the test method and its definitions; consult the current edition). W. D. Callister Jr. and D. G. Rethwisch, <em>Materials Science and Engineering: An Introduction</em>, chapter “Mechanical Properties of Metals” (engineering stress and strain, modulus, 0.2% offset yield, tensile strength and necking, ductility, toughness as area under the curve, elastic recovery on unloading).</p></details>';
+  }
+  const PLOT = Object.freeze({ W, L, R });
+  return { PLOT, stageText, statusText, unloadView, plot, testPlots, specimen, specimenCaption, comparePlot, legend, propertyTable, rankingBars, PROPERTY_TEXT, staticLesson, limits, pct, mpa, gpa, axisMax, esc };
+});
+
+(function () {
+  'use strict';
+  const M = globalThis.CourseWikiTensileTest, R = globalThis.CourseWikiTensileTestRender;
+  if (!M || !R) return;
+  const reduced = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false, addEventListener() {} };
+  const pct = R.pct, mpa = R.mpa;
+  const PROPS = ['stiffness', 'strength', 'ductility', 'toughness'];
+
+  document.querySelectorAll('[data-interactive="tensile-test"]').forEach(function (root) {
+    if (root.dataset.ttReady) return;
+    root.dataset.ttReady = 'true';
+    M._instances = (M._instances || 0) + 1;
+    const uid = 'tt' + M._instances;
+    const lab = document.createElement('div');
+    lab.className = 'tt-lab';
+    const options = M.CURVES.map(c => '<option value="' + c.id + '">' + c.letter + ': ' + R.esc(c.label) + '</option>').join('');
+    lab.innerHTML =
+      '<div class="tt-challenge"><strong>Challenge: pull the specimen past yield, stop, and predict how much permanent stretch is left when you unload.</strong>Drag the specimen sideways or use the crosshead slider; the stress–strain curve draws as you pull.</div>' +
+      '<div class="tt-toolbar"><label>Specimen (synthetic curve)<select data-tt-curve>' + options + '</select></label>' +
+      '<button type="button" class="tt-primary" data-tt-run>Run test</button><button type="button" data-tt-reset>Reset</button></div>' +
+      '<div class="tt-stage" data-tt-stage></div><p class="tt-speccap" data-tt-speccap></p>' +
+      '<label class="tt-crosshead-control">Crosshead position<input type="range" min="0" max="1000" step="1" value="0" data-tt-slider></label>' +
+      '<p class="tt-hint">Moving back unloads the specimen. The slider spacing is stretched near zero so the tiny elastic region is easy to reach.</p>' +
+      '<div class="tt-plots" data-tt-plots></div>' +
+      '<p class="tt-pointer" data-tt-pointer>Point at a plot to read the curve.</p>' +
+      '<ul class="tt-readouts" aria-label="Live readings">' +
+      '<li><span>Force F</span><strong data-r="force"></strong></li><li><span>Extension ΔL</span><strong data-r="extension"></strong></li>' +
+      '<li><span>Stress σ = F/A₀</span><strong data-r="stress"></strong></li><li><span>Strain ε = ΔL/L₀</span><strong data-r="strain"></strong></li>' +
+      '<li><span>Area under curve so far</span><strong data-r="area"></strong></li><li><span>Stage</span><strong data-r="stage"></strong></li></ul>' +
+      '<p class="tt-status" data-tt-status role="status" aria-live="polite" aria-atomic="true"></p>' +
+      '<div class="tt-actions"><button type="button" class="tt-primary" data-tt-predict>Stop and predict the permanent set</button></div>' +
+      '<div class="tt-predict" data-tt-predictbox hidden><p data-tt-context></p>' +
+      '<div class="tt-uv" data-tt-uv></div>' +
+      '<p class="tt-feedback" data-tt-feedback role="status" aria-live="polite">Your result appears here after unloading.</p>' +
+      '<div class="tt-answer"><label>Permanent strain left at zero load (%)<input type="number" min="0" step="any" inputmode="decimal" data-tt-guess></label>' +
+      '<button type="button" class="tt-primary" data-tt-check>Unload to check</button></div>' +
+      '<div class="tt-actions"><button type="button" data-tt-cancel>Keep pulling instead</button></div>' +
+      '<p class="tt-hint" data-tt-score></p>' +
+      '<details><summary>Hint</summary><p>When the load is removed, the specimen springs back along a straight line parallel to the elastic slope. The spring-back is σ/E; whatever strain remains is permanent.</p></details></div>' +
+      '<ul class="tt-found" aria-label="Properties read from this test" data-tt-found></ul>' +
+      '<h3 class="tt-section-title">Compare the four synthetic specimens</h3>' +
+      '<fieldset class="tt-compare-toggles"><legend>Curves shown</legend>' + M.CURVES.map(c => '<label><input type="checkbox" checked value="' + c.id + '" data-tt-show> ' + c.letter + '</label>').join('') + '</fieldset>' +
+      '<div class="tt-plots tt-compare" data-tt-compare></div><div data-tt-legend></div>' +
+      '<p><strong>Predict, then check.</strong> From the curves alone, which specimen has the…</p>' +
+      '<div class="tt-quiz">' + PROPS.map(k => '<label>' + R.PROPERTY_TEXT[k].q + '?<select data-tt-quiz="' + k + '"><option value="">Choose…</option>' + M.CURVES.map(c => '<option value="' + c.id + '">' + c.letter + ': ' + R.esc(c.label) + '</option>').join('') + '</select></label>').join('') + '</div>' +
+      '<div class="tt-actions"><button type="button" class="tt-primary" data-tt-quizcheck>Check my picks</button></div>' +
+      '<ul class="tt-quiz-result" data-tt-quizresult aria-live="polite"></ul>' +
+      '<div data-tt-ranks hidden><div class="tt-ranks">' + PROPS.map(R.rankingBars).join('') + '</div>' + R.propertyTable() +
+      '<p>Specimen C fractures before the 0.2% offset line reaches its curve, so its offset yield strength is undefined in this test, not zero.</p></div>' +
+      R.limits();
+    root.append(lab);
+    root.classList.add('tt-ready');
+    lab.addEventListener('keydown', function (event) { if (event.target.closest('input, select, button, summary')) event.stopPropagation(); });
+
+    const q = s => lab.querySelector(s);
+    const els = {
+      curve: q('[data-tt-curve]'), run: q('[data-tt-run]'), reset: q('[data-tt-reset]'), stage: q('[data-tt-stage]'), slider: q('[data-tt-slider]'),
+      status: q('[data-tt-status]'), plots: q('[data-tt-plots]'), pointer: q('[data-tt-pointer]'), predict: q('[data-tt-predict]'),
+      box: q('[data-tt-predictbox]'), uv: q('[data-tt-uv]'), context: q('[data-tt-context]'), guess: q('[data-tt-guess]'), check: q('[data-tt-check]'), cancel: q('[data-tt-cancel]'),
+      feedback: q('[data-tt-feedback]'), score: q('[data-tt-score]'), found: q('[data-tt-found]'), compare: q('[data-tt-compare]'), legend: q('[data-tt-legend]')
+    };
+    let checked = false, state = M.createTest('ductile'), running = false, frame = 0, last = 0, anim = null, prediction = null, tally = { tried: 0, matched: 0 }, statusNote = '';
+    const curve = () => M.curveById(state.id);
+
+    function landmarks() {
+      const c = curve(), y = M.offsetYield(c), p = M.peak(c), list = [];
+      if (y) list.push({ e: y.strain, text: 'Paused at the 0.2% offset yield: ' + mpa(y.stress) + ' MPa. Beyond here, part of the stretch is permanent.' });
+      else list.push({ e: c.linear, text: 'Paused at the end of the straight elastic line. Will an offset yield appear before fracture?' });
+      if (p.strain < c.fractureStrain) list.push({ e: p.strain, text: 'Paused at the peak: UTS = ' + mpa(p.stress) + ' MPa. From here a neck forms and the engineering stress falls.' });
+      list.push({ e: c.fractureStrain, text: '' });
+      return list;
+    }
+    function foundList(r) {
+      const c = curve(), props = M.properties(c), items = [];
+      items.push([state.eMax > 0, 'Stiffness E', R.gpa(c.E) + ' GPa', 'start pulling']);
+      if (props.yield !== null) items.push([r.pastYield, '0.2% offset yield', mpa(props.yield) + ' MPa', 'not reached yet']);
+      else items.push([state.fractured, '0.2% offset yield', 'None: fractured before the offset line met the curve (undefined, not zero)', 'not reached yet']);
+      items.push([r.pastPeak, 'Ultimate tensile strength', mpa(props.uts) + ' MPa at ' + pct(props.utsStrain, props.utsStrain < 0.01 ? 2 : 1) + '%' + (props.necks ? '' : ', at fracture'), 'peak not passed']);
+      items.push([state.fractured, 'Elongation after fracture', pct(props.elongation, props.elongation < 0.01 ? 2 : 1) + '%', 'needs fracture']);
+      items.push([state.fractured, 'Area to fracture (toughness)', props.toughness.toFixed(props.toughness < 1 ? 2 : 0) + ' MJ/m³', 'needs fracture']);
+      return items.map(i => '<li class="' + (i[0] ? 'is-found' : '') + '"><strong>' + i[1] + '</strong>' + (i[0] ? R.esc(i[2]) : i[3]) + '</li>').join('');
+    }
+    function render() {
+      const c = curve(), r = M.reading(state);
+      els.stage.innerHTML = R.specimen(state);
+      q('[data-tt-speccap]').textContent = R.specimenCaption(state);
+      const p = R.testPlots(state, { prefix: uid, prediction: prediction });
+      els.plots.innerHTML = p.full + p.zoom;
+      const set = (k, v) => { lab.querySelector('[data-r="' + k + '"]').textContent = v; };
+      set('force', r.force.toFixed(r.force < 10 ? 2 : 1) + ' kN');
+      set('extension', r.extension.toFixed(r.extension < 1 ? 3 : 2) + ' mm');
+      set('stress', mpa(r.stress) + ' MPa');
+      set('strain', pct(r.strain, r.strain < 0.01 ? 3 : 2) + '%');
+      set('area', r.workDensity.toFixed(r.workDensity < 1 ? 3 : 1) + ' MJ/m³');
+      set('stage', R.stageText(state));
+      els.status.textContent = statusNote || R.statusText(state);
+      if (!els.box.hidden) els.uv.innerHTML = R.unloadView(state, { prefix: uid, prediction: checked ? prediction : null });
+      els.slider.value = String(Math.round(M.sliderAt(c, state.e) * 1000));
+      els.slider.disabled = state.fractured;
+      els.slider.setAttribute('aria-valuetext', 'Strain ' + pct(r.strain, 3) + ' percent, stress ' + mpa(r.stress) + ' megapascals' + (state.fractured ? ', fractured' : ''));
+      els.predict.disabled = state.fractured || state.eMax <= 0 || state.e < state.eMax || !!anim;
+      els.run.disabled = state.fractured || !!anim;
+      els.run.textContent = running ? 'Pause' : reduced.matches ? 'Step to next event' : state.eMax > 0 ? 'Continue test' : 'Run test';
+      els.found.innerHTML = foundList(r);
+      root.dataset.ttStage = r.stage;
+    }
+    function move(target) {
+      const before = state.eMax;
+      state = M.moveTo(state, target);
+      if (state.eMax > before) prediction = null;
+      closePredict(); // any crosshead move by the learner ends the current prediction
+      render();
+    }
+    function stop() { running = false; if (frame) cancelAnimationFrame(frame); frame = 0; }
+    function tick(time) {
+      frame = 0;
+      if (!running) return;
+      const c = curve(), dt = Math.min(64, time - (last || time)); last = time;
+      const u = M.sliderAt(c, state.e) + dt / 14000;
+      let target = M.strainAt(c, u);
+      const mark = landmarks().find(l => l.e > state.eMax + 1e-12 && l.e <= target);
+      if (mark) { target = mark.e; stop(); statusNote = mark.text; move(target); statusNote = ''; if (mark.text) els.status.textContent = mark.text; return; }
+      move(target);
+      if (state.fractured) { stop(); render(); return; }
+      frame = requestAnimationFrame(tick);
+    }
+    function run() {
+      if (running) { stop(); render(); return; }
+      if (state.fractured) return;
+      closePredict();
+      if (reduced.matches) {
+        const mark = landmarks().find(l => l.e > state.eMax + 1e-12) || { e: curve().fractureStrain, text: '' };
+        move(mark.e); if (mark.text) els.status.textContent = mark.text; return;
+      }
+      running = true; last = 0; render();
+      frame = requestAnimationFrame(tick);
+    }
+    function closePredict() { els.box.hidden = true; checked = false; els.uv.innerHTML = ''; }
+    function resetAll(id) {
+      stop(); if (anim) { cancelAnimationFrame(anim); anim = null; }
+      state = M.createTest(id || state.id); prediction = null; closePredict();
+      els.pointer.textContent = 'Point at a plot to read the curve.';
+      render();
+    }
+    function openPredict() {
+      stop();
+      const c = curve(), r = M.reading(state);
+      els.context.textContent = 'Stopped at ε = ' + pct(r.strain, 3) + '% and σ = ' + r.stress.toFixed(1) + ' MPa. E = ' + R.gpa(c.E) + ' GPa (' + c.E.toLocaleString() + ' MPa). Predict the strain that remains when the load reaches zero.';
+      els.guess.value = ''; els.guess.readOnly = false; els.check.hidden = false; els.cancel.textContent = 'Keep pulling instead';
+      els.feedback.textContent = 'Your result appears here after unloading.'; delete els.feedback.dataset.result;
+      els.box.hidden = false; checked = false; prediction = null;
+      render(); els.guess.focus();
+    }
+    function feedbackText(score, guess, r0) {
+      const actual = pct(score.actual / 100, 3), recov = pct(score.recovery / 100, 3);
+      const tail = ' Zero load at ' + actual + '% along the dashed line (slope E): σ/E = ' + recov + '% sprang back.';
+      if (score.actual === 0) {
+        return (score.status === 'match' ? 'Prediction matches. ' : 'Not this time. ') + 'Still elastic: it returned along the loading line to zero strain, no permanent set.';
+      }
+      if (score.status === 'match') return 'Prediction matches.' + tail;
+      if (score.status === 'match-ratio') return 'That matches if ' + guess + ' is a strain ratio (mm/mm). This box asks for percent, so it counts.' + tail;
+      const toFull = Math.abs(guess - r0.strain * 100), toZero = Math.abs(guess);
+      let why = '';
+      if (toFull < score.tolerance * 2) why = ' You left out the spring-back.';
+      else if (toZero < score.tolerance * 2) why = ' Past yield most of the stretch stays.';
+      return (score.status === 'close' ? 'Close: off by ' + Math.abs(score.difference).toFixed(3) + ' percentage points.' : 'Not this time.') + why + tail;
+    }
+    function check() {
+      const raw = els.guess.value.trim().replace(',', '.');
+      const guess = raw === '' ? NaN : Number(raw);
+      const score = M.scorePrediction(guess, state);
+      if (score.status === 'invalid') { els.feedback.dataset.result = 'invalid'; els.feedback.textContent = 'Enter the permanent strain as a percentage of 0 or more, for example 1.25.'; els.guess.focus(); return; }
+      const r0 = M.reading(state), from = state.eMax, to = score.actual / 100;
+      prediction = guess / 100 * (score.status === 'match-ratio' ? 100 : 1);
+      checked = true; els.check.hidden = true; els.guess.readOnly = true; els.cancel.textContent = 'Close and keep pulling';
+      els.cancel.focus({ preventScroll: true });
+      els.feedback.textContent = 'Unloading…'; delete els.feedback.dataset.result;
+      tally.tried++; if (score.status === 'match' || score.status === 'match-ratio') tally.matched++;
+      const finish = () => {
+        anim = null; state = M.moveTo(state, to); render();
+        els.feedback.dataset.result = score.status; els.feedback.textContent = feedbackText(score, guess, r0);
+        els.score.textContent = 'Predictions within tolerance: ' + tally.matched + ' of ' + tally.tried + '. Hollow triangle: your prediction. Filled triangle: actual permanent set.';
+      };
+      if (reduced.matches || from - to <= 0) { finish(); return; }
+      const t0 = performance.now();
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / 900);
+        state = M.moveTo(state, from - (from - to) * k); render();
+        if (k < 1) anim = requestAnimationFrame(step); else finish();
+      };
+      anim = requestAnimationFrame(step); render();
+    }
+    function pointerRead(event) {
+      const svg = event.target.closest && event.target.closest('svg.tt-plot');
+      if (!svg) return;
+      const rect = svg.getBoundingClientRect(), xMax = Number(svg.dataset.xmax);
+      const P = R.PLOT, xs = (event.clientX - rect.left) / rect.width * P.W, e = (xs - P.L) / (P.W - P.L - P.R) * xMax;
+      const c = curve();
+      if (e < 0 || e > xMax) return;
+      if (e > state.eMax + 1e-12) { els.pointer.textContent = 'At ' + pct(e, 3) + '% strain: not tested yet. Keep pulling to find out.'; return; }
+      const s = M.stress(c, e), y = M.offsetYield(c);
+      let text = 'On the curve at ' + pct(e, e < 0.01 ? 3 : 2) + '% strain: σ = ' + mpa(s) + ' MPa, F = ' + (s * M.AREA / 1000).toFixed(1) + ' kN.';
+      if (y && Math.abs(e - y.strain) < xMax * 0.03 && M.reading(state).pastYield) text += ' 0.2% offset yield: the dashed line has slope E and starts at 0.2% strain; it meets the curve at ' + mpa(y.stress) + ' MPa.';
+      els.pointer.textContent = text;
+    }
+    // Drag on the specimen moves the same crosshead control.
+    let drag = null;
+    els.stage.addEventListener('pointerdown', function (event) {
+      if (state.fractured || anim) return;
+      stop(); closePredict();
+      drag = { x: event.clientX, u: M.sliderAt(curve(), state.e), id: event.pointerId };
+      try { els.stage.setPointerCapture(event.pointerId); } catch (e) { /* synthetic pointers */ }
+    });
+    els.stage.addEventListener('pointermove', function (event) {
+      if (!drag || event.pointerId !== drag.id) return;
+      const du = (event.clientX - drag.x) / Math.max(200, els.stage.clientWidth * 0.75);
+      move(M.strainAt(curve(), drag.u + du));
+    });
+    const endDrag = function () { drag = null; render(); };
+    els.stage.addEventListener('pointerup', endDrag);
+    els.stage.addEventListener('pointercancel', endDrag);
+    els.slider.addEventListener('input', function () { stop(); move(M.strainAt(curve(), Number(els.slider.value) / 1000)); });
+    els.run.addEventListener('click', run);
+    els.reset.addEventListener('click', function () { resetAll(); els.status.textContent = 'Reset: a fresh specimen ' + curve().letter + '.'; });
+    els.curve.addEventListener('change', function () { resetAll(els.curve.value); els.status.textContent = 'Specimen ' + curve().letter + ' loaded: ' + curve().note; });
+    els.predict.addEventListener('click', openPredict);
+    els.check.addEventListener('click', check);
+    els.guess.addEventListener('keydown', function (event) { if (event.key === 'Enter') { event.preventDefault(); check(); } });
+    els.cancel.addEventListener('click', function () { closePredict(); els.slider.focus(); });
+    els.plots.addEventListener('pointermove', pointerRead);
+    els.plots.addEventListener('pointerleave', function () { els.pointer.textContent = 'Point at a plot to read the curve.'; });
+    document.addEventListener('visibilitychange', function () { if (document.hidden && running) { stop(); render(); } });
+    reduced.addEventListener('change', function () { if (reduced.matches && running) { stop(); } render(); });
+
+    // Comparison: overlay, prediction quiz and revealed rankings.
+    function renderCompare() {
+      const ids = [...lab.querySelectorAll('[data-tt-show]')].filter(n => n.checked).map(n => n.value);
+      els.compare.innerHTML = ids.length ? R.comparePlot(ids, false, uid + '-cmp') + R.comparePlot(ids, true, uid + '-cmpz') : '<p>Tick at least one curve to compare.</p>';
+      els.legend.innerHTML = ids.length ? R.legend(ids) : '';
+    }
+    lab.querySelectorAll('[data-tt-show]').forEach(n => n.addEventListener('change', renderCompare));
+    q('[data-tt-quizcheck]').addEventListener('click', function () {
+      const out = q('[data-tt-quizresult]'), lines = [];
+      let missing = false;
+      PROPS.forEach(k => {
+        const pick = lab.querySelector('[data-tt-quiz="' + k + '"]').value, rank = M.ranking(k), best = M.curveById(rank[0].id), t = R.PROPERTY_TEXT[k];
+        if (!pick) { missing = true; return; }
+        const second = M.curveById(rank[1].id);
+        lines.push('<li><strong>' + t.name + ':</strong> ' + (pick === best.id ? 'Yes, ' : 'Not ' + M.curveById(pick).letter + '. It is ') + best.letter + ' (' + t.fmt(rank[0].value) + ' ' + t.unit + '; next ' + second.letter + ' at ' + t.fmt(rank[1].value) + ').</li>');
+      });
+      if (missing) { out.innerHTML = '<li>Choose a specimen for each property first.</li>'; return; }
+      out.innerHTML = lines.join('') + '<li>Four properties, four different rankings: C is stiffer than B but weaker; D stretches furthest yet absorbs far less energy than A.</li>';
+      q('[data-tt-ranks]').hidden = false;
+    });
+    render();
+    renderCompare();
+  });
+})();
+
 </script>
 </body>
 </html>
