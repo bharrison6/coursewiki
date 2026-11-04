@@ -33,6 +33,7 @@
   ]);
 
   function fmtSigned(v) { const x = Math.abs(v) < 0.005 ? 0 : v; return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(2); }
+  function deg(v) { return Math.round(v) % 360; }
   function uniqueId() { let id; do { id = 'dmcc-' + (++sequence); } while (document.getElementById(id + '-angle')); return id; }
 
   function init(root) {
@@ -127,14 +128,14 @@
       const nearPole = o.field === 1 ? 'N' : 'S', farPole = o.field === 1 ? 'S' : 'N';
       q('[data-cut-caption]').textContent = 'Cutaway side view: the ' + nearPole + ' pole in front is cut away and the ' + farPole + ' pole is behind the coil, so B points ' +
         (o.field === 1 ? 'away from you' : 'toward you') + '. The glowing path shows conventional current; dark arrows are the forces F = BIL.';
-      out('theta').textContent = Math.round(th) + '°';
+      out('theta').textContent = deg(th) + '°';
       out('current').textContent = c1.current > 0 ? 'toward you (⊙)' : c1.current < 0 ? 'away from you (⊗)' : 'none: brushes on the gaps';
       out('force').textContent = c1.current ? 'BIL, same size at every angle' : '0 (no current)';
       out('lever').textContent = (c1.lever < 0.005 ? '0' : c1.lever.toFixed(2)) + ' × r';
       out('torque').textContent = fmtSigned(r.total) + ' NBIA' + (o.coils === 2 ? ' (' + fmtSigned(r.coils[0].torque) + ' ' + fmtSigned(r.coils[1].torque) + ')' : '');
       out('sense').textContent = r.sense === 'none' ? 'none' : r.sense;
-      if (document.activeElement !== slider) slider.value = String(Math.round(th) % 360);
-      slider.setAttribute('aria-valuetext', Math.round(th) + ' degrees, torque ' + fmtSigned(r.total) + ' of one coil’s peak');
+      if (document.activeElement !== slider) slider.value = String(deg(th));
+      slider.setAttribute('aria-valuetext', deg(th) + ' degrees, torque ' + fmtSigned(r.total) + ' of one coil’s peak');
       act('supply').setAttribute('aria-pressed', String(o.supply === -1));
       act('field').setAttribute('aria-pressed', String(o.field === -1));
       live.querySelectorAll('input[name="' + id + '-mode"]').forEach(i => { i.checked = i.value === o.mode; });
@@ -184,10 +185,10 @@
       S.flow += dt * 2.2;
       const r = M.analyze(S.alpha, opts());
       if (Math.abs(S.omega) < 0.02 && Math.abs(r.total) < 0.02 && dt > 0) {
-        S.alpha = M.alphaFromTheta(Math.round(theta()), S.options.field);
+        S.alpha = M.alphaFromTheta(deg(theta()), S.options.field);
         stop(r.coils.every(c => c.current === 0) || S.options.mode === 'commutator'
-          ? 'The coil has stopped at a dead spot, θ = ' + Math.round(theta()) + '°: zero torque there. Nudge it with +15° or add the second coil.'
-          : 'Illustrative motion: with the assumed friction the coil comes to rest at θ = ' + Math.round(theta()) + '°, where the torque is zero and the torque on either side pushes it back.');
+          ? 'The coil has stopped at a dead spot, θ = ' + deg(theta()) + '°: zero torque there. Nudge it with +15° or add the second coil.'
+          : 'Illustrative motion: with the assumed friction the coil comes to rest at θ = ' + deg(theta()) + '°, where the torque is zero and the torque on either side pushes it back.');
         return;
       }
       render();
@@ -196,7 +197,7 @@
     function run() {
       if (reduced.matches) return;
       const r = M.analyze(S.alpha, opts());
-      if (r.total === 0 && Math.abs(S.omega) < 0.02) { say('Dead spot: the torque is zero at θ = ' + Math.round(theta()) + '°, so a coil at rest here cannot start. Nudge it with +15° or add the second coil.'); return; }
+      if (r.total === 0 && Math.abs(S.omega) < 0.02) { say('Dead spot: the torque is zero at θ = ' + deg(theta()) + '°, so a coil at rest here cannot start. Nudge it with +15° or add the second coil.'); return; }
       S.running = true;
       act('run').setAttribute('aria-pressed', 'true');
       act('run').textContent = 'Pause';
@@ -218,8 +219,8 @@
       const r = M.analyze(S.alpha, opts()), th = theta();
       if (r.total === 0) {
         say(S.options.mode === 'slip' && r.coils[0].current !== 0
-          ? 'No torque at θ = ' + Math.round(th) + '°. With slip rings the torque on either side of this angle points back toward it, so stepping stops here.'
-          : 'Dead spot at θ = ' + Math.round(th) + '°: no torque, so stepping cannot move the coil. Use +15° to nudge it, or add the second coil.');
+          ? 'No torque at θ = ' + deg(th) + '°. With slip rings the torque on either side of this angle points back toward it, so stepping stops here.'
+          : 'Dead spot at θ = ' + deg(th) + '°: no torque, so stepping cannot move the coil. Use +15° to nudge it, or add the second coil.');
         return;
       }
       const dir = r.total > 0 ? 1 : -1;
@@ -229,7 +230,7 @@
       S.omega = 0;
       record(before, theta(), dir);
       const now = M.analyze(S.alpha, opts());
-      say('Torque ' + fmtSigned(r.total) + ' NBIA turned the coil ' + (dir > 0 ? 'counter-clockwise' : 'clockwise') + ' to θ = ' + Math.round(theta()) + '°. Torque here: ' + fmtSigned(now.total) + '.');
+      say('Torque ' + fmtSigned(r.total) + ' NBIA turned the coil ' + (dir > 0 ? 'counter-clockwise' : 'clockwise') + ' to θ = ' + deg(theta()) + '°. Torque here: ' + fmtSigned(now.total) + '.');
       render();
     }
     function setOptions(change, message) {
@@ -289,10 +290,10 @@
     }
 
     // ---- Wiring ------------------------------------------------------------
-    act('run').addEventListener('click', () => { if (S.running) stop('Paused at θ = ' + Math.round(theta()) + '°.'); else run(); });
+    act('run').addEventListener('click', () => { if (S.running) stop('Paused at θ = ' + deg(theta()) + '°.'); else run(); });
     act('step').addEventListener('click', step);
-    act('back').addEventListener('click', () => { if (S.running) stop(); setTheta(theta() - 15, 'Turned back to θ = ' + Math.round(M.wrap(theta() - 15)) + '°.'); });
-    act('fwd').addEventListener('click', () => { if (S.running) stop(); setTheta(theta() + 15, 'Turned on to θ = ' + Math.round(M.wrap(theta() + 15)) + '°.'); });
+    act('back').addEventListener('click', () => { if (S.running) stop(); setTheta(theta() - 15, 'Turned back to θ = ' + deg(M.wrap(theta() - 15)) + '°.'); });
+    act('fwd').addEventListener('click', () => { if (S.running) stop(); setTheta(theta() + 15, 'Turned on to θ = ' + deg(M.wrap(theta() + 15)) + '°.'); });
     act('reset').addEventListener('click', () => {
       if (S.running) stop();
       S.options = Object.assign({}, BASE); S.alpha = 30; S.omega = 0; S.revealed = false; S.visited = [];
@@ -303,7 +304,7 @@
     slider.addEventListener('input', () => { if (S.running) stop(); setTheta(Number(slider.value)); });
     slider.addEventListener('change', () => {
       const r = M.analyze(S.alpha, opts());
-      say('θ = ' + Math.round(theta()) + '°: torque ' + fmtSigned(r.total) + ' NBIA, ' + (r.sense === 'none' ? 'no turning effect' : r.sense) + '.');
+      say('θ = ' + deg(theta()) + '°: torque ' + fmtSigned(r.total) + ' NBIA, ' + (r.sense === 'none' ? 'no turning effect' : r.sense) + '.');
     });
     live.querySelectorAll('input[name="' + id + '-mode"]').forEach(input => input.addEventListener('change', () => {
       setOptions({ mode: input.value }, input.value === 'slip'
@@ -318,7 +319,7 @@
     act('supply').addEventListener('click', () => setOptions({ supply: -S.options.supply }, 'Supply reversed: every coil current reverses, so every force reverses.'));
     act('field').addEventListener('click', () => {
       setOptions({ field: -S.options.field });
-      say('Magnets swapped: B now points ' + (S.options.field === 1 ? 'right' : 'left') + '. The coil has not moved, but θ, measured from B, is now ' + Math.round(theta()) + '°.');
+      say('Magnets swapped: B now points ' + (S.options.field === 1 ? 'right' : 'left') + '. The coil has not moved, but θ, measured from B, is now ' + deg(theta()) + '°.');
     });
     act('reveal').addEventListener('click', () => { S.revealed = true; say('Full curve revealed for the current setup.'); render(); });
     act('clear').addEventListener('click', () => { S.visited = []; record(theta(), theta(), 1); render(); say('Trace cleared.'); });

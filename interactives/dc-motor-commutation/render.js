@@ -170,7 +170,7 @@
     const labels = poleLabels(o.field);
     const c1 = r.coils[0];
     let svg = '<svg class="dmcc-svg dmcc-endview" viewBox="0 0 360 312" role="img" focusable="false" aria-label="End view at theta ' +
-      Math.round(r.theta) + ' degrees. Each coil side carries ' + (c1.current ? 'current ' + (c1.current > 0 ? 'toward' : 'away from') + ' the viewer in side 1' : 'no current: the brushes are on the gaps') +
+      (Math.round(r.theta) % 360) + ' degrees. Each coil side carries ' + (c1.current ? 'current ' + (c1.current > 0 ? 'toward' : 'away from') + ' the viewer in side 1' : 'no current: the brushes are on the gaps') +
       '. Total torque ' + f2(r.total) + ' of one coil\'s peak, ' + (r.sense === 'none' ? 'no turning effect' : r.sense) + '.">';
     // Pole shoes with curved faces.
     const shoe = sideSign => {
@@ -245,7 +245,7 @@
     } else {
       svg += '<text class="dmcc-small dmcc-halo" x="' + (gx + 18) + '" y="' + (gy + 5) + '" text-anchor="end">τ = 0</text>';
     }
-    svg += '<text class="dmcc-label" x="8" y="24">θ = ' + Math.round(r.theta) + '°</text>';
+    svg += '<text class="dmcc-label" x="8" y="24">θ = ' + (Math.round(r.theta) % 360) + '°</text>';
     svg += '</svg>';
     return svg;
   }
