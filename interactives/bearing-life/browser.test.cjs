@@ -35,7 +35,9 @@ test('bearing-life browser acceptance', { skip }, async () => {
   await navigate(url);
   await evaluate(`document.querySelectorAll('details').forEach(d=>d.open=true)`);
   const root = '[data-interactive="bearing-life"]';
-  assert.equal(await evaluate(`document.querySelectorAll('.xcard').length`),6);
+  // Other bearing lessons may add cards; this consumer must still have one calculator in its card.
+  assert.equal(await evaluate(`document.querySelectorAll('${root}').length`),1);
+  assert.equal(await evaluate(`!!document.querySelector('${root}').closest('details.xcard')`),true);
   assert.equal(await evaluate(`document.querySelector('${root}').dataset.blReady`),'true');
   assert.match(await evaluate(`document.querySelector('[data-results]').textContent`),/3811/);
   assert.equal(await evaluate(`document.querySelector('.bl-static').checkVisibility()`),false);

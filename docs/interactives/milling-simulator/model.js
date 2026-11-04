@@ -26,10 +26,10 @@
    Z0 by the facing allowance.
    ==========================================================================*/
 (function (root, factory) {
-  var api = factory();
+  var api = factory(typeof module === 'object' && module.exports ? require('../planar-cut-geometry/model.js') : root.CourseWikiPlanarCut);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.CourseWikiMillingSim = api;
-})(typeof self !== 'undefined' ? self : this, function () {
+})(typeof self !== 'undefined' ? self : this, function (Planar) {
   'use strict';
 
   var EPS = 1e-6;
@@ -149,12 +149,7 @@
   function q4(v) { return Math.round(v * 1e4) / 1e4; }
 
   /* ---- plane geometry ----------------------------------------------------*/
-  function segDist(px, py, ax, ay, bx, by) {
-    var dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy, t = 0;
-    if (l2 > 0) { t = ((px - ax) * dx + (py - ay) * dy) / l2; t = t < 0 ? 0 : t > 1 ? 1 : t; }
-    var ex = px - (ax + t * dx), ey = py - (ay + t * dy);
-    return Math.sqrt(ex * ex + ey * ey);
-  }
+  var segDist = Planar.segDist;
   function pointRectDist(px, py, r) {
     var dx = Math.max(r.x0 - px, 0, px - r.x1), dy = Math.max(r.y0 - py, 0, py - r.y1);
     return Math.sqrt(dx * dx + dy * dy);
@@ -189,7 +184,7 @@
     return Math.sqrt(ox * ox + oy * oy) + Math.min(Math.max(qx, qy), 0) - rc;
   }
   function sdCircle(px, py, cx, cy, r) { return Math.hypot(px - cx, py - cy) - r; }
-  function sdCapsule(px, py, ax, ay, bx, by, r) { return segDist(px, py, ax, ay, bx, by) - r; }
+  var sdCapsule = Planar.sdCapsule;
 
   /* ======================================================================
      The simulation

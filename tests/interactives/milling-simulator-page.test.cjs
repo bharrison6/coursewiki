@@ -15,7 +15,7 @@ test('milling page uses the topic loader and has a real no-JavaScript lesson',()
   const conf=fs.readFileSync(path.join(mod,'interactive.conf'),'utf8');
   const assets=[...conf.matchAll(/^@@(?:JS|CSS):\s*(.*)$/gm)].flatMap(m=>m[1].split(',').map(s=>s.trim()));
   assert.deepEqual(assets,['demo.css','model.js','inspect.js','jobs.js','draw.js','geometry-bundle.js','mesh.js','mesh-worker-source.js','target-mesh.js','scene3d.js','demo.js']);
-  assert.match(conf,/^@@REQUIRES: three-runtime$/m);
+  assert.deepEqual(conf.match(/^@@REQUIRES: (.+)$/m)[1].split(',').map(s=>s.trim()).sort(),['planar-cut-geometry','three-runtime']);
   for(const file of assets)assert.ok(fs.readdirSync(mod).includes(file),'case-sensitive asset '+file);
 });
 test('shared renderer retains pinned Three and OrbitControls without a milling-local copy',()=>{

@@ -1,9 +1,9 @@
 (function (root, factory) {
   'use strict';
-  var api = factory();
+  var api = factory(typeof module === 'object' && module.exports ? require('../backlash-kinematics/model.js') : root.CourseWikiBacklashKinematics);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.CourseWikiBacklash = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (K) {
   'use strict';
   // Rigid kinematic dead band for an axially fixed screw driving a non-rotating nut.
   // Units: millimetres for travel and clearance, degrees for screw rotation.
@@ -27,7 +27,7 @@
   // The contract rule, stated once: c = min(max(c, s - B/2), s + B/2).
   function clampToBand(c, s, B) {
     if (![c, s, B].every(finite) || B < 0) throw new RangeError('Carriage, phase and clearance must be finite numbers.');
-    return Math.min(Math.max(c, s - B / 2), s + B / 2);
+    return K.clampToBand(c, s, B);
   }
   function deadBand(lead, clearance) {
     check(lead, clearance);
@@ -54,7 +54,7 @@
     if (target === state.turn) return state;
     var d = target * state.lead / DIVISIONS;
     // Lower edge of the band is the reading itself; upper edge is reading + B (s -/+ B/2).
-    var c = Math.min(Math.max(state.carriage, d), d + state.clearance);
+    var c = K.clampBetween(state.carriage, d, d + state.clearance);
     return Object.freeze({ lead: state.lead, clearance: state.clearance, turn: target, carriage: c, lastDirection: target > state.turn ? 1 : -1 });
   }
   function atTravelLimit(state) {

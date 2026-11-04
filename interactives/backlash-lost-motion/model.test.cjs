@@ -127,7 +127,8 @@ test('shared renderer: static lesson is ID-free, complete and matches the page; 
 
 test('manifest and scene follow the shared runtime pattern without moving the screw', () => {
   const conf = fs.readFileSync(path.join(__dirname, 'interactive.conf'), 'utf8');
-  assert.match(conf, /^@@REQUIRES: three-runtime$/m); assert.match(conf, /^@@JS: model-asset\.js, model\.js, render\.js, scene3d\.js, demo\.js$/m);
+  assert.deepEqual(conf.match(/^@@REQUIRES: (.+)$/m)[1].split(',').map(s => s.trim()).sort(), ['backlash-kinematics', 'three-runtime']);
+  assert.match(conf, /^@@JS: model-asset\.js, model\.js, render\.js, scene3d\.js, demo\.js$/m);
   const scene = fs.readFileSync(path.join(__dirname, 'scene3d.js'), 'utf8');
   assert.match(scene, /CourseWikiThree/); assert.match(scene, /GLTFLoader/); assert.doesNotMatch(scene, /setAnimationLoop|three-bundle|milling-simulator/);
   assert.doesNotMatch(scene, /screw\.position\.(x|y|z)\s*[-+*/]?=(?!=)|screw\.position\.(set|copy|add)|screw\.(scale|translate)|carriage\.rotation|carriage\.scale/);
