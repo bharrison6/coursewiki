@@ -100,6 +100,7 @@
 .dmcc-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
 .dmcc-live button, .dmcc-seg label { min-height: 44px; min-width: 44px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .45rem .75rem; font: inherit; cursor: pointer; }
 .dmcc-live button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); font-weight: 750; }
+.dmcc-live button[hidden] { display: none; }
 .dmcc-live button.dmcc-primary { background: var(--accent); color: var(--surface); border-color: var(--accent); font-weight: 750; }
 .dmcc-live button:disabled { opacity: .55; cursor: not-allowed; }
 .dmcc-live :is(button, input, summary):focus-visible, .dmcc-seg label:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
@@ -111,7 +112,10 @@
 .dmcc-seg label { display: inline-flex; align-items: center; gap: .4rem; }
 .dmcc-seg label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); font-weight: 750; }
 .dmcc-seg input { margin: 0; accent-color: var(--accent); width: 1.1rem; height: 1.1rem; }
-.dmcc-setup { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+.dmcc-setup { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+.dmcc-polarity { grid-column: 1 / -1; }
+.dmcc-viewpick { display: none; }
+.dmcc-stage, .dmcc-viewpick { scroll-margin-top: 4.5rem; }
 .dmcc-note { margin: 0; color: var(--ink-soft); font-size: .88rem; }
 .dmcc-status { margin: 0; border-left: 4px solid var(--flag); padding: .55rem .75rem; background: var(--surface-2); min-height: 2.9em; }
 .dmcc-trace-figure { margin: 0; border: 1px solid var(--rule); background: var(--surface); padding: .4rem; }
@@ -126,16 +130,37 @@
 .dmcc-choices label { display: flex; align-items: center; gap: .55rem; min-height: 44px; border: 1px solid var(--rule); padding: .35rem .6rem; background: var(--surface); cursor: pointer; }
 .dmcc-choices label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
 .dmcc-choices input { margin: 0; flex: none; width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
-.dmcc-feedback { margin: 0; padding: .5rem .7rem; border-left: 4px solid var(--rule); background: var(--surface-2); }
-.dmcc-feedback[data-result="right"] { border-left-color: var(--accent); }
-.dmcc-feedback[data-result="wrong"] { border-left-color: var(--flag); }
-.dmcc-feedback:empty { display: none; }
+.dmcc-predict-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; align-items: start; }
+.dmcc-result-figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--rule); padding: .3rem .4rem; }
+.dmcc-result-figure[data-result-state="right"] { border-left-color: var(--accent); }
+.dmcc-result-figure[data-result-state="wrong"] { border-left-color: var(--flag); }
+.dmcc-result-figure .dmcc-endview { max-width: 17rem; margin-inline: auto; }
+.dmcc-result-figure figcaption { font-size: .86rem; line-height: 1.35; margin-top: .2rem; color: var(--ink-soft); }
+.dmcc-result-figure .dmcc-verdict { color: var(--ink); }
+.dmcc-result-figure .dmcc-verdict:empty { display: none; }
+/* Marks after checking change borders only, so nothing above the Check button moves. */
+.dmcc-choices label[data-mark="answer"] { border-color: var(--accent); box-shadow: inset 6px 0 0 var(--accent); }
+.dmcc-choices label[data-mark="wrong"] { border-color: var(--flag); border-style: dashed; }
+.dmcc-result { border-left: 4px solid var(--rule); background: var(--surface-2); padding: .55rem .7rem; }
+.dmcc-result[data-result="right"] { border-left-color: var(--accent); }
+.dmcc-result[data-result="wrong"] { border-left-color: var(--flag); }
+.dmcc-result[hidden] { display: none; }
+.dmcc-result p { margin: 0 0 .4rem; }
+.dmcc-result p:last-child { margin-bottom: 0; }
 .dmcc-limit { margin: 0; color: var(--ink-soft); font-size: .88rem; }
 .dmcc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @container dmcc (min-width: 40rem) {
   .dmcc-stage { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); align-items: start; }
   .dmcc-setup { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dmcc-predict-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+}
+/* Narrow: one view at a time, chosen by the learner, so the view and the
+   Run/Step controls fit on one screen together. */
+@container dmcc (max-width: 39.99rem) {
+  .dmcc-viewpick { display: block; }
+  .dmcc-stage[data-show="end"] .dmcc-view-cut, .dmcc-stage[data-show="cut"] .dmcc-view-end { display: none; }
+  .dmcc-stage .dmcc-view-end .dmcc-svg { max-width: 21rem; margin-inline: auto; }
 }
 @container dmcc (max-width: 34rem) {
   .dmcc-trace text, .dmcc-trace .dmcc-small { font-size: 24px; }

@@ -95,20 +95,43 @@ test('dc-motor-commutation browser acceptance', { skip }, async () => {
     // ---- Predictions are scored on the first try ----------------------------
     await page.check(MOUNT + ' [data-choices] input[value="across"]');
     await page.click(MOUNT + ' [data-act="check"]');
-    assert.match(await text(page, '[data-feedback]'), /^Yes\./);
+    assert.match(await text(page, '[data-verdict]'), /^✓ Yes/);
     assert.match(await text(page, '[data-score]'), /1 of 1/);
-    assert.equal(await page.locator(MOUNT + ' .dmcc-live .dmcc-trace .dmcc-curve').count(), 1, 'trace revealed');
+    assert.equal(await theta(page), 30, 'checking alone changes nothing in the lab');
+    await page.click(MOUNT + ' [data-act="trylab"]');
+    assert.equal(await page.locator(MOUNT + ' .dmcc-live .dmcc-trace-figure .dmcc-curve').count(), 1, 'trace revealed');
     assert.equal(await theta(page), 0);
+    assert.equal(await page.evaluate(s => document.activeElement === document.querySelector(s + ' [data-act="run"]'), MOUNT), true, 'focus moves to the lab controls');
+    // v2 teaching consistency at theta = 0 with the ideal split ring: the lab shows no
+    // current and no force at the gap instant, and the feedback says exactly that.
+    assert.match(await text(page, '[data-out="current"]'), /none: brushes on the gaps/);
+    assert.match(await text(page, '[data-out="force"]'), /^0/);
+    const why = await text(page, '[data-feedback]');
+    assert.match(why, /brushes on the gaps/);
+    assert.match(why, /no current and feels no force/);
+    assert.doesNotMatch(why, /still have their full size/);
+    assert.match(await text(page, '[data-result-caption]'), /^Result: θ = 10°/);
+    assert.match(await page.locator(MOUNT + ' [data-result-figure] svg').getAttribute('aria-label'), /theta 10 degrees/);
     await page.click(MOUNT + ' [data-act="nextq"]');
     await page.check(MOUNT + ' [data-choices] input[value="same"]');
     await page.click(MOUNT + ' [data-act="check"]');
-    assert.match(await text(page, '[data-feedback]'), /^Not quite\./);
+    assert.match(await text(page, '[data-verdict]'), /^✗ Not quite/);
+    assert.equal(await page.locator(MOUNT + ' [data-choices] label[data-mark="wrong"]').count(), 1);
+    assert.equal(await page.locator(MOUNT + ' [data-choices] label[data-mark="answer"]').count(), 1);
     await page.check(MOUNT + ' [data-choices] input[value="along"]');
     await page.click(MOUNT + ' [data-act="check"]');
     assert.match(await text(page, '[data-score]'), /1 of 2/, 'a retry does not change the first-try score');
-    for (let i = 0; i < 2; i += 1) await page.click(MOUNT + ' [data-act="nextq"]');
+    await page.click(MOUNT + ' [data-act="nextq"]');
+    await page.check(MOUNT + ' [data-choices] input[value="reverses"]');
+    await page.click(MOUNT + ' [data-act="check"]');
+    assert.equal(await page.locator(MOUNT + ' [data-act="run"]').getAttribute('aria-pressed'), 'false', 'checking never starts an animation');
+    await page.click(MOUNT + ' [data-act="trylab"]');
+    assert.equal(await page.locator(MOUNT + ' [data-act="run"]').getAttribute('aria-pressed'), 'false', 'trying in the lab sets up but does not start it');
+    assert.match(await text(page, '[data-status]'), /slip rings/);
+    await page.click(MOUNT + ' [data-act="nextq"]');
     await page.check(MOUNT + ' [data-choices] input[value="ripple"]');
     await page.click(MOUNT + ' [data-act="check"]');
+    await page.click(MOUNT + ' [data-act="trylab"]');
     assert.match(await text(page, '[data-averages]'), /0\.71/);
     assert.match(await text(page, '[data-out="torque"]'), /\(/, 'two-coil torque shows both coils');
     await page.locator(MOUNT).first().screenshot({ path: path.join(out, 'desktop-two-coils-revealed.png') });
@@ -136,11 +159,72 @@ test('dc-motor-commutation browser acceptance', { skip }, async () => {
     await page.check(MOUNT + ' input[value="slip"]');
     await page.locator(MOUNT + ' input[type="range"]').fill('180');
     await page.click(MOUNT + ' [data-act="step"]');
-    assert.match(await text(page, '[data-status]'), /No torque at θ = 180°/);
+    assert.match(await text(page, '[data-status]'), /No torque at θ = 180°.*stable rest position/);
     await page.locator(MOUNT + ' input[type="range"]').fill('195');
     await page.click(MOUNT + ' [data-act="step"]');
     assert.equal(await theta(page), 180, 'slip-ring torque steps the coil back');
+    // v2: rest-angle explanations come from the torque either side, for the actual polarity.
+    const restAt = async deg => { await page.locator(MOUNT + ' input[type="range"]').fill(String(deg)); await page.click(MOUNT + ' [data-act="step"]'); return text(page, '[data-status]'); };
+    let msg = await restAt(0);
+    assert.match(msg, /unstable/); assert.match(msg, /toward the stable angle, θ = 180°/); assert.doesNotMatch(msg, /points back toward this angle/);
+    await page.click(MOUNT + ' [data-act="supply"]');
+    msg = await restAt(0);
+    assert.match(msg, /stable rest position/); assert.doesNotMatch(msg, /unstable/);
+    msg = await restAt(180);
+    assert.match(msg, /unstable/); assert.match(msg, /θ = 0°/);
+    await page.click(MOUNT + ' [data-act="supply"]');
+    await page.click(MOUNT + ' [data-act="field"]');
+    msg = await restAt(180);
+    assert.match(msg, /stable rest position/, 'with the magnets swapped, theta from B = 180 is still the stable angle for this supply');
+    await page.click(MOUNT + ' [data-act="field"]');
+    await page.check(MOUNT + ' input[value="commutator"]');
+    msg = await restAt(0);
+    assert.match(msg, /Dead spot at θ = 0°/); assert.match(msg, /the same way, counter-clockwise/);
     await context.close();
+
+    // ---- v2: every action shows its consequence on screen ------------------
+    for (const [width, height] of [[1280, 900], [390, 844]]) {
+      ({ context, page } = await open({ viewport: { width, height } }));
+      const visible = sel => page.evaluate(s => {
+        const e = document.querySelector(s); if (!e) return null;
+        const r = e.getBoundingClientRect(), header = document.querySelector('.appbar');
+        const top = header ? header.getBoundingClientRect().bottom : 0;
+        return { ok: r.height > 0 && r.top >= top - 1 && r.bottom <= innerHeight + 1, top: Math.round(r.top), bottom: Math.round(r.bottom), header: Math.round(top) };
+      }, sel);
+      // Click Run the normal way (Playwright scrolls it into view): the motor must be fully visible.
+      await page.click(MOUNT + ' [data-act="run"]');
+      let v = await visible(MOUNT + ' .dmcc-view-end svg');
+      assert.ok(v.ok, width + ' end view visible after Run ' + JSON.stringify(v));
+      if (width >= 1000) { v = await visible(MOUNT + ' .dmcc-view-cut svg'); assert.ok(v.ok, 'cutaway visible after Run ' + JSON.stringify(v)); }
+      assert.ok((await visible(MOUNT + ' [data-status]')).ok, 'status visible after Run');
+      await page.screenshot({ path: path.join(out, 'v2-after-run-' + width + 'x' + height + '.png') });
+      await page.click(MOUNT + ' [data-act="run"]');
+      // A reading position: the lab's setup at the top of the screen, then Run.
+      await page.evaluate(s => { const e = document.querySelector(s + ' .dmcc-setup'); scrollTo(0, scrollY + e.getBoundingClientRect().top - 70); }, MOUNT);
+      await page.click(MOUNT + ' [data-act="step"]');
+      assert.ok((await visible(MOUNT + ' .dmcc-view-end svg')).ok, width + ' end view visible after Step from reading position');
+      // Check a prediction the normal way: the result figure and verdict must be on screen.
+      await page.check(MOUNT + ' [data-choices] input[value="along"]');
+      await page.click(MOUNT + ' [data-act="check"]');
+      for (const sel of [' [data-result-figure] svg', ' [data-verdict]']) {
+        v = await visible(MOUNT + sel);
+        assert.ok(v.ok, width + sel + ' visible after Check ' + JSON.stringify(v));
+      }
+      await page.screenshot({ path: path.join(out, 'v2-after-check-' + width + 'x' + height + '.png') });
+      await page.click(MOUNT + ' [data-act="trylab"]');
+      await page.waitForTimeout(900); // the requested smooth scroll
+      assert.ok((await visible(MOUNT + ' .dmcc-view-end svg')).ok, width + ' lab view visible after Try this in the lab ' + JSON.stringify(await visible(MOUNT + ' .dmcc-view-end svg')));
+      assert.ok((await visible(MOUNT + ' [data-act="run"]')).ok);
+      await page.screenshot({ path: path.join(out, 'v2-after-trylab-' + width + 'x' + height + '.png') });
+      if (width < 1000) {
+        // Narrow: one view at a time, chosen by the learner.
+        assert.equal(await page.locator(MOUNT + ' .dmcc-view-cut').isVisible(), false);
+        await page.check(MOUNT + ' input[value="cut"]');
+        assert.equal(await page.locator(MOUNT + ' .dmcc-view-cut').isVisible(), true);
+        assert.equal(await page.locator(MOUNT + ' .dmcc-view-end').isVisible(), false);
+      }
+      await context.close();
+    }
 
     // ---- Phone widths, both themes; presentation mode ------------------------
     for (const scheme of ['light', 'dark']) {
@@ -165,6 +249,8 @@ test('dc-motor-commutation browser acceptance', { skip }, async () => {
     assert.equal(staticInfo.svgs, 3, 'two views and the torque-angle figure');
     assert.match(staticInfo.text, /τ = N·B·I·A·sin θ/);
     assert.match(staticInfo.text, /0\.024 N·m/);
+    assert.match(staticInfo.text, /Whenever current flows/);
+    assert.match(staticInfo.text, /brushes sit on the gaps at that instant/);
     await context.close();
 
     // ---- Print: static figures replace the live lab --------------------------
@@ -183,6 +269,6 @@ test('dc-motor-commutation browser acceptance', { skip }, async () => {
     await context.close();
 
     assert.deepEqual(problems, []);
-    console.log('PASS: structure, keyboard, 44px targets, commutator run, slip reversal, direction rules, scored predictions, two mounts, reduced-motion steps, phone light/dark, presentation, no-JS static, print media, offline aggregate. Evidence: ' + out);
+    console.log('PASS: structure, keyboard, 44px targets, commutator run, slip reversal, direction rules, scored predictions, theta-0 gap consistency, polarity-derived rest messages, Run/Step/Check/Try-in-lab outcomes on screen at 1280x900 and 390x844, two mounts, reduced-motion steps, phone light/dark, presentation, no-JS static, print media, offline aggregate. Evidence: ' + out);
   } finally { await browser.close(); }
 });

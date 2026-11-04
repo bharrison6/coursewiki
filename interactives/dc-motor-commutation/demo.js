@@ -4,30 +4,38 @@
   if (!M || !D || typeof document === 'undefined') return;
   let sequence = 0;
   const BASE = Object.freeze({ mode: 'commutator', coils: 1, supply: 1, field: 1 });
-  // Each prediction sets up the lab before it is asked and demonstrates after it is checked.
+  // Each prediction is checked against a result figure drawn, by the same
+  // renderer, directly above the Check button. Checking changes nothing else on
+  // the page; "Try this in the lab" sets the lab to that case on request.
   const QUESTIONS = Object.freeze([
-    { id: 'zero', before: { options: BASE, alpha: 30 }, after: { options: BASE, reveal: true, theta: 0 },
+    { id: 'zero', preview: { view: 'end', options: BASE, theta: 30, caption: 'Before: one coil, split ring, at θ = 30°.' }, after: { options: BASE, theta: 0, reveal: true },
+      result: { view: 'end', options: BASE, theta: 10, caption: 'θ = 10°, split ring: each side feels the full force BIL, but the lever arm is only 0.17 r, so τ = 0.17 NBIA.' },
       q: 'As the coil turns, at which angles is the torque zero?',
       choices: [['across', 'When the coil face is across the field: θ = 0° and 180°'], ['along', 'When the coil face lies along the field: θ = 90° and 270°'], ['never', 'Never: a coil carrying current is always pushed round']],
-      answer: 'across', why: 'At θ = 0° and 180° the forces on sides 1 and 2 still have their full size, BIL, but each line of force passes through the shaft. Zero lever arm means zero torque. The coil is in the neutral plane, shown at θ = 0° now.' },
-    { id: 'peak', before: { options: BASE, alpha: 30 }, after: { options: BASE, reveal: true, theta: 90 },
+      answer: 'across', why: 'At θ = 0° and 180° the coil face lies across the field, in the neutral plane, and the torque is zero. In the figure, at θ = 10°, each side still carries current and feels the full force BIL, but its line of force passes close to the shaft. As θ goes to 0°, that lever arm, r·sin θ, shrinks to zero, and so does the torque. Exactly at 0° an ideal split ring has its brushes on the gaps, so at that instant the coil carries no current and feels no force at all. With slip rings the current would still flow there, and both forces would point straight through the shaft.' },
+    { id: 'peak', preview: { view: 'end', options: BASE, theta: 30, caption: 'Before: one coil, split ring, at θ = 30°.' }, after: { options: BASE, theta: 90, reveal: true },
+      result: { view: 'end', options: BASE, theta: 90, caption: 'θ = 90°: the lever arm is the full half-width r, so τ = NBIA, the peak.' },
       q: 'At which angles is the torque largest?',
       choices: [['along', 'When the coil face lies along the field: θ = 90° and 270°'], ['across', 'When the coil face is across the field: θ = 0° and 180°'], ['same', 'At every angle: the force on each side never changes size']],
-      answer: 'along', why: 'The force on each side is BIL at every angle, but its lever arm is r·sin θ. The lever arm, and so the torque, is largest at 90° and 270°, shown at θ = 90° now.' },
-    { id: 'slip', before: { options: BASE, alpha: 150 }, after: { options: { mode: 'slip' }, alpha: 150, run: true },
+      answer: 'along', why: 'Whenever current flows, the force on each side is BIL, the same size at every angle. What changes is its lever arm, r·sin θ. That is largest at 90° and 270°, where the coil face lies along the field, as in the figure, so the torque is largest there too.' },
+    { id: 'slip', preview: { view: 'end', options: { mode: 'slip' }, theta: 150, caption: 'Before: slip rings at θ = 150°, with the torque turning the coil counter-clockwise toward 180°.' }, after: { options: { mode: 'slip' }, theta: 150 },
+      result: { view: 'trace', options: { mode: 'slip' }, theta: 210, caption: 'Slip rings, N on the left, top brush positive: the torque is positive up to 180° and negative after it. The marker at θ = 210° shows −0.50 NBIA, clockwise.' },
       q: 'Swap the split ring for slip rings, so the current in the coil never reverses. What happens to the torque once the coil passes θ = 180°?',
       choices: [['reverses', 'It reverses and pushes the coil back'], ['same', 'It keeps pushing the same way'], ['zero', 'It drops to zero and stays zero']],
-      answer: 'reverses', why: 'With a fixed current, τ = NBIA·sin θ changes sign at 180°, so the torque pushes the coil back toward the neutral plane. Over a whole turn it averages zero. The split ring reverses the current exactly there, so the torque keeps one direction.' },
-    { id: 'two', before: { options: BASE, alpha: 30 }, after: { options: { coils: 2 }, alpha: 30, reveal: true },
+      answer: 'reverses', why: 'With a fixed current, τ = NBIA·sin θ changes sign at 180°, as the curve shows. With this polarity, past 180° the torque pushes the coil back toward θ = 180°, and over a whole turn it averages zero. The split ring reverses the current exactly at the neutral plane, so the torque keeps one direction.' },
+    { id: 'two', preview: { view: 'end', options: { coils: 2 }, theta: 30, caption: 'Before: two coils, 90° apart, each with its own split ring, at θ = 30°.' }, after: { options: { coils: 2 }, theta: 30, reveal: true },
+      result: { view: 'trace', options: { coils: 2 }, theta: 0, caption: 'Two commutated coils 90° apart: the total runs from 1 to 1.41 NBIA. The marker at θ = 0° shows the smallest total, 1.00.' },
       q: 'Add a second coil 90° ahead of the first, each with its own split ring. What is the smallest total torque over a turn?',
       choices: [['zero', 'Zero, at the same angles as one coil'], ['ripple', 'About 0.71 of the largest total, and never zero'], ['flat', 'Exactly constant: no ripple at all']],
       answer: 'ripple', why: 'When one coil is in the neutral plane, the other is at its peak. The sum |sin θ| + |cos θ| runs from 1 to √2, so the smallest total is 1/√2 ≈ 0.71 of the largest. The ripple is smaller and the zero-torque dead spot is gone.' },
-    { id: 'current', before: { options: BASE, alpha: 30, run: true }, after: { options: { supply: -1 }, alpha: 30, run: true },
-      q: 'With the N pole on the left, this motor turns counter-clockwise, as seen from the commutator end. Reverse only the supply current. Which way does it turn now?',
+    { id: 'current', preview: { view: 'end', options: BASE, theta: 30, caption: 'Before: N on the left, top brush positive. The torque arrow turns counter-clockwise.' }, after: { options: { supply: -1 }, theta: 30 },
+      result: { view: 'end', options: { supply: -1 }, theta: 30, caption: 'Current reversed: every current mark and force arrow has flipped, and the torque arrow now turns clockwise.' },
+      q: 'With the N pole on the left and the top brush positive, this motor turns counter-clockwise, as seen from the commutator end. Reverse only the supply current. Which way does it turn now?',
       choices: [['ccw', 'Counter-clockwise, as before'], ['cw', 'Clockwise'], ['stop', 'It stops']],
       answer: 'cw', why: 'Reversing I reverses the force on every side (F = I L × B), so the torque reverses and the motor turns clockwise.' },
-    { id: 'both', before: { options: { mode: 'commutator', coils: 1, supply: -1, field: 1 }, alpha: 30, run: true }, after: { options: { supply: -1, field: -1 }, alpha: 30, run: true },
-      q: 'Keep the current reversed and swap the magnets too, so B also reverses. Which way does it turn?',
+    { id: 'both', preview: { view: 'end', options: { supply: -1 }, theta: 30, caption: 'Before: current reversed, N still on the left. The torque arrow turns clockwise.' }, after: { options: { supply: -1, field: -1 }, alpha: 30 },
+      result: { view: 'end', options: { supply: -1, field: -1 }, alpha: 30, caption: 'Current reversed and magnets swapped (N now on the right): the torque arrow turns counter-clockwise again.' },
+      q: 'Start from the reversed current of the last question, which turns clockwise. Now swap the magnets too, so B also reverses. Which way does it turn?',
       choices: [['ccw', 'Counter-clockwise, as at the start'], ['cw', 'Clockwise'], ['stop', 'It stops']],
       answer: 'ccw', why: 'Reversing B reverses the force again. Two reversals cancel, so the motor turns counter-clockwise, as it did at the start.' }
   ]);
@@ -47,18 +55,23 @@
     live.className = 'dmcc-live';
     live.innerHTML =
       '<p class="dmcc-challenge"><strong>Challenge:</strong> a current-carrying coil between magnets gets a push, but not at every angle. Turn the coil, find where the push vanishes, then see how the split ring keeps the motor turning one way.</p>' +
-      '<div class="dmcc-stage">' +
-        '<figure class="dmcc-view"><div data-dmcc-cut></div><figcaption data-cut-caption></figcaption></figure>' +
-        '<figure class="dmcc-view"><div data-dmcc-end></div><figcaption>End view from the commutator end: ⊙ current toward you, ⊗ away. n is the coil’s marked normal; θ is measured from B to n. The dashed line is the lever arm of side 1.</figcaption></figure>' +
+      '<div class="dmcc-setup">' +
+        '<fieldset class="dmcc-seg"><legend>Contacts</legend><div>' +
+          '<label><input type="radio" name="' + id + '-mode" value="commutator" checked> Split ring (commutator)</label>' +
+          '<label><input type="radio" name="' + id + '-mode" value="slip"> Slip rings</label></div></fieldset>' +
+        '<fieldset class="dmcc-seg"><legend>Coils</legend><div>' +
+          '<label><input type="radio" name="' + id + '-coils" value="1" checked> One</label>' +
+          '<label><input type="radio" name="' + id + '-coils" value="2"> Two, 90° apart</label></div></fieldset>' +
+        '<div class="dmcc-row dmcc-polarity"><button type="button" data-act="supply" aria-pressed="false">Reverse the current</button>' +
+          '<button type="button" data-act="field" aria-pressed="false">Swap the magnets</button></div>' +
       '</div>' +
-      '<dl class="dmcc-readout">' +
-        '<div><dt>Coil angle θ</dt><dd data-out="theta"></dd></div>' +
-        '<div><dt>Current in side 1</dt><dd data-out="current"></dd></div>' +
-        '<div><dt>Force on each side</dt><dd data-out="force"></dd></div>' +
-        '<div><dt>Lever arm of each force</dt><dd data-out="lever"></dd></div>' +
-        '<div><dt>Torque τ</dt><dd data-out="torque"></dd></div>' +
-        '<div><dt>Turning effect</dt><dd data-out="sense"></dd></div>' +
-      '</dl>' +
+      '<fieldset class="dmcc-seg dmcc-viewpick"><legend>Show</legend><div>' +
+        '<label><input type="radio" name="' + id + '-view" value="end" checked> End view</label>' +
+        '<label><input type="radio" name="' + id + '-view" value="cut"> Cutaway</label></div></fieldset>' +
+      '<div class="dmcc-stage" data-show="end">' +
+        '<figure class="dmcc-view dmcc-view-cut"><div data-dmcc-cut></div><figcaption data-cut-caption></figcaption></figure>' +
+        '<figure class="dmcc-view dmcc-view-end"><div data-dmcc-end></div><figcaption>End view from the commutator end: ⊙ current toward you, ⊗ away.</figcaption></figure>' +
+      '</div>' +
       '<div class="dmcc-controls">' +
         '<div class="dmcc-row"><button type="button" class="dmcc-primary" data-act="run" aria-pressed="false">Run</button>' +
           '<button type="button" data-act="step">Step with the torque</button>' +
@@ -66,19 +79,17 @@
           '<button type="button" data-act="fwd" aria-label="Turn the coil on 15 degrees">+15°</button>' +
           '<button type="button" data-act="reset">Reset</button></div>' +
         '<div class="dmcc-angle-control"><label for="' + id + '-angle">Coil angle θ</label><input id="' + id + '-angle" type="range" min="0" max="359" step="1" value="30"></div>' +
-        '<p class="dmcc-note" data-motion-note></p>' +
-        '<div class="dmcc-setup">' +
-          '<fieldset class="dmcc-seg"><legend>Contacts</legend><div>' +
-            '<label><input type="radio" name="' + id + '-mode" value="commutator" checked> Split ring (commutator)</label>' +
-            '<label><input type="radio" name="' + id + '-mode" value="slip"> Slip rings</label></div></fieldset>' +
-          '<fieldset class="dmcc-seg"><legend>Coils</legend><div>' +
-            '<label><input type="radio" name="' + id + '-coils" value="1" checked> One</label>' +
-            '<label><input type="radio" name="' + id + '-coils" value="2"> Two, 90° apart</label></div></fieldset>' +
-        '</div>' +
-        '<div class="dmcc-row"><button type="button" data-act="supply" aria-pressed="false">Reverse the current</button>' +
-          '<button type="button" data-act="field" aria-pressed="false">Swap the magnets</button></div>' +
       '</div>' +
       '<p class="dmcc-status" role="status" aria-live="polite" data-status></p>' +
+      '<dl class="dmcc-readout">' +
+        '<div><dt>Coil angle θ</dt><dd data-out="theta"></dd></div>' +
+        '<div><dt>Torque τ</dt><dd data-out="torque"></dd></div>' +
+        '<div><dt>Turning effect</dt><dd data-out="sense"></dd></div>' +
+        '<div><dt>Current in side 1</dt><dd data-out="current"></dd></div>' +
+        '<div><dt>Force on each side</dt><dd data-out="force"></dd></div>' +
+        '<div><dt>Lever arm of each force</dt><dd data-out="lever"></dd></div>' +
+      '</dl>' +
+      '<p class="dmcc-note"><strong>Key:</strong> the glowing path is conventional current; dark arrows are the forces F = BIL; the dashed line is the lever arm of side 1; n is the coil’s marked normal, and θ is measured from B to n. <span data-motion-note></span></p>' +
       '<figure class="dmcc-trace-figure"><div data-dmcc-trace></div>' +
         '<figcaption data-trace-caption></figcaption>' +
         '<div class="dmcc-row"><button type="button" data-act="reveal" aria-pressed="false">Reveal the full curve</button><button type="button" data-act="clear">Clear the trace</button></div>' +
@@ -86,10 +97,17 @@
       '<section class="dmcc-predict" aria-labelledby="' + id + '-ph">' +
         '<div class="dmcc-predict-head"><h3 id="' + id + '-ph">Predict, then check</h3><span class="dmcc-score" data-score></span></div>' +
         '<p class="dmcc-note" data-qnum></p>' +
-        '<fieldset class="dmcc-choices"><legend class="dmcc-question" data-question></legend><div class="dmcc-choices" data-choices></div></fieldset>' +
+        '<div class="dmcc-predict-grid">' +
+          '<fieldset class="dmcc-choices"><legend class="dmcc-question" data-question></legend><div class="dmcc-choices" data-choices></div></fieldset>' +
+          // The result appears in this reserved figure, directly above the Check button.
+          '<figure class="dmcc-result-figure" data-result-state="before"><div data-result-figure></div>' +
+            '<figcaption><strong class="dmcc-verdict" data-verdict></strong> <span data-result-caption></span></figcaption></figure>' +
+        '</div>' +
         '<div class="dmcc-row"><button type="button" class="dmcc-primary" data-act="check" disabled>Check my prediction</button>' +
+          '<button type="button" data-act="trylab" hidden>Try this in the lab</button>' +
           '<button type="button" data-act="prevq">Previous question</button><button type="button" data-act="nextq">Next question</button></div>' +
-        '<p class="dmcc-feedback" data-feedback role="status" aria-live="polite"></p>' +
+        '<div class="dmcc-result" data-result-box hidden><p data-feedback></p><p class="dmcc-note" data-lab-note></p></div>' +
+        '<p class="dmcc-sr" role="status" aria-live="polite" data-announce></p>' +
       '</section>' +
       '<p class="dmcc-limit"><strong>Model limits:</strong> an ideal rectangular coil in a uniform field, τ = N·B·I·A·sin θ, with torque shown as a fraction of one coil’s peak NBIA. ' +
         'The ideal split ring reverses the current exactly at the neutral plane. The motion is illustrative: its inertia and friction are assumed values chosen to make the torque visible, not a calibrated speed. ' +
@@ -130,7 +148,7 @@
         (o.field === 1 ? 'away from you' : 'toward you') + '. The glowing path shows conventional current; dark arrows are the forces F = BIL.';
       out('theta').textContent = deg(th) + '°';
       out('current').textContent = c1.current > 0 ? 'toward you (⊙)' : c1.current < 0 ? 'away from you (⊗)' : 'none: brushes on the gaps';
-      out('force').textContent = c1.current ? 'BIL, same size at every angle' : '0 (no current)';
+      out('force').textContent = c1.current ? 'BIL, same size at every angle' : '0: no current at this instant';
       out('lever').textContent = (c1.lever < 0.005 ? '0' : c1.lever.toFixed(2)) + ' × r';
       out('torque').textContent = fmtSigned(r.total) + ' NBIA' + (o.coils === 2 ? ' (' + fmtSigned(r.coils[0].torque) + ' ' + fmtSigned(r.coils[1].torque) + ')' : '');
       out('sense').textContent = r.sense === 'none' ? 'none' : r.sense;
@@ -159,8 +177,8 @@
       const note = q('[data-motion-note]');
       act('run').hidden = !!reduced.matches;
       note.textContent = reduced.matches
-        ? 'Reduced motion is on: use “Step with the torque” to move the coil 15° in the direction the torque pushes, or set the angle directly.'
-        : 'Run releases the coil with illustrative inertia and friction. Step and the angle slider work without animation.';
+        ? 'Reduced motion is on: “Step with the torque” moves the coil 15° the way the torque pushes; the slider sets the angle directly.'
+        : 'Run releases the coil with illustrative, assumed inertia and friction; Step and the slider work without animation.';
     }
 
     function stop(message) {
@@ -186,9 +204,10 @@
       const r = M.analyze(S.alpha, opts());
       if (Math.abs(S.omega) < 0.02 && Math.abs(r.total) < 0.02 && dt > 0) {
         S.alpha = M.alphaFromTheta(deg(theta()), S.options.field);
-        stop(r.coils.every(c => c.current === 0) || S.options.mode === 'commutator'
-          ? 'The coil has stopped at a dead spot, θ = ' + deg(theta()) + '°: zero torque there. Nudge it with +15° or add the second coil.'
-          : 'Illustrative motion: with the assumed friction the coil comes to rest at θ = ' + deg(theta()) + '°, where the torque is zero and the torque on either side pushes it back.');
+        const nb = M.neighbourhood(S.alpha, opts());
+        stop(nb.kind === 'stable'
+          ? 'Illustrative motion: with the assumed friction the coil comes to rest at θ = ' + deg(theta()) + '°. ' + restMessage()
+          : 'The coil has stopped at θ = ' + deg(theta()) + '°. ' + restMessage());
         return;
       }
       render();
@@ -197,7 +216,7 @@
     function run() {
       if (reduced.matches) return;
       const r = M.analyze(S.alpha, opts());
-      if (r.total === 0 && Math.abs(S.omega) < 0.02) { say('Dead spot: the torque is zero at θ = ' + deg(theta()) + '°, so a coil at rest here cannot start. Nudge it with +15° or add the second coil.'); return; }
+      if (r.total === 0 && Math.abs(S.omega) < 0.02) { say(restMessage() + ' Released from rest here, it does not move.'); return; }
       S.running = true;
       act('run').setAttribute('aria-pressed', 'true');
       act('run').textContent = 'Pause';
@@ -214,15 +233,32 @@
       if (message) say(message);
       render();
     }
+    // Explain a zero-torque angle from the torque just either side of it,
+    // for the current setup (contacts, coils, supply and magnet polarity).
+    function restMessage() {
+      const o = opts(), nb = M.neighbourhood(S.alpha, o), r = M.analyze(S.alpha, o), th = deg(theta());
+      const c1 = r.coils[0];
+      const cur = c1.current > 0 ? 'toward you' : c1.current < 0 ? 'away from you' : 'nowhere: the brushes are on the gaps';
+      const turn = dir => dir === 'counterclockwise' ? 'counter-clockwise' : 'clockwise';
+      if (nb.kind === 'stable') {
+        return 'No torque at θ = ' + th + '°. ' + (o.mode === 'slip' ? 'With slip rings and this polarity, current in side 1 flows ' + cur + ' throughout. ' : '') +
+          'Just either side, the torque points back toward this angle, so this is a stable rest position: stepping stops here.';
+      }
+      if (nb.kind === 'unstable') {
+        const away = deg(th + 180);
+        return 'No torque at θ = ' + th + '°, but this balance is unstable. ' + (o.mode === 'slip' ? 'With slip rings and this polarity, current in side 1 flows ' + cur + ' throughout. ' : '') +
+          'Just either side, the torque points away from this angle, so a nudge (±15°) sends the coil swinging toward the stable angle, θ = ' + away + '°.';
+      }
+      if (nb.kind === 'through') {
+        return 'Dead spot at θ = ' + th + '°: the torque is zero exactly here' + (c1.current === 0 ? ' (current flows ' + cur + ')' : '') +
+          ', but just either side it points the same way, ' + turn(nb.direction) + '. A coil at rest here cannot start itself; a nudge, or a running motor\u2019s momentum, carries it through. A second coil removes the dead spot.';
+      }
+      return 'No torque at θ = ' + th + '° or just either side of it.';
+    }
     function step() {
       if (S.running) stop();
       const r = M.analyze(S.alpha, opts()), th = theta();
-      if (r.total === 0) {
-        say(S.options.mode === 'slip' && r.coils[0].current !== 0
-          ? 'No torque at θ = ' + deg(th) + '°. With slip rings the torque on either side of this angle points back toward it, so stepping stops here.'
-          : 'Dead spot at θ = ' + deg(th) + '°: no torque, so stepping cannot move the coil. Use +15° to nudge it, or add the second coil.');
-        return;
-      }
+      if (r.total === 0) { say(restMessage()); return; }
       const dir = r.total > 0 ? 1 : -1;
       const target = dir > 0 ? Math.floor(th / 15 + 1e-9) * 15 + 15 : Math.ceil(th / 15 - 1e-9) * 15 - 15;
       const before = th;
@@ -253,12 +289,16 @@
       S.visited = [];
       record(theta(), theta(), 1);
       render();
-      if (setup.run && !reduced.matches) run();
     }
-    function showQuestion(index, setUp) {
+    function resultFigure(spec) {
+      const o = M.options(Object.assign({}, BASE, spec.options || {}));
+      const alpha = typeof spec.alpha === 'number' ? spec.alpha : M.alphaFromTheta(spec.theta, o.field);
+      return spec.view === 'trace' ? D.trace({ alpha, options: o, revealed: true }) : D.endView({ alpha, options: o });
+    }
+    function showQuestion(index) {
       S.q = Math.max(0, Math.min(QUESTIONS.length - 1, index));
       const item = QUESTIONS[S.q];
-      q('[data-qnum]').textContent = 'Question ' + (S.q + 1) + ' of ' + QUESTIONS.length + '. Choosing a question sets up the lab for it.';
+      q('[data-qnum]').textContent = 'Question ' + (S.q + 1) + ' of ' + QUESTIONS.length + '.';
       q('[data-question]').textContent = item.q;
       const box = q('[data-choices]');
       box.innerHTML = item.choices.map(ch => '<label><input type="radio" name="' + id + '-q' + item.id + '" value="' + ch[0] + '"> <span>' + ch[1] + '</span></label>').join('');
@@ -266,11 +306,14 @@
       act('check').disabled = !S.picked[item.id];
       act('prevq').disabled = S.q === 0;
       act('nextq').disabled = S.q === QUESTIONS.length - 1;
-      const fb = q('[data-feedback]'); fb.textContent = ''; fb.removeAttribute('data-result');
-      if (setUp) {
-        applySetup(item.before);
-        if (item.before.run && reduced.matches) say('Set up for question ' + (S.q + 1) + '. Use “Step with the torque” to see which way it turns.');
-      }
+      q('[data-result-box]').hidden = true;
+      q('[data-feedback]').textContent = '';
+      act('trylab').hidden = true;
+      const fig = q('.dmcc-result-figure');
+      fig.dataset.resultState = 'before';
+      q('[data-result-figure]').innerHTML = resultFigure(item.preview);
+      q('[data-verdict]').textContent = '';
+      q('[data-result-caption]').textContent = item.preview.caption + ' Check your prediction to see the result here.';
       score();
     }
     function score() {
@@ -283,10 +326,22 @@
       const right = pick === item.answer;
       if (!(item.id in S.first)) S.first[item.id] = right;
       score();
-      const fb = q('[data-feedback]');
-      fb.dataset.result = right ? 'right' : 'wrong';
-      fb.textContent = (right ? 'Yes. ' : 'Not quite. ') + item.why;
-      applySetup(item.after);
+      const box = q('[data-result-box]'), fig = q('.dmcc-result-figure');
+      box.dataset.result = right ? 'right' : 'wrong';
+      fig.dataset.resultState = right ? 'right' : 'wrong';
+      const answerText = item.choices.find(ch => ch[0] === item.answer)[1];
+      q('[data-verdict]').textContent = (right ? '✓ Yes: ' : '✗ Not quite. The answer is: ') + answerText.charAt(0).toLowerCase() + answerText.slice(1) + '.';
+      q('[data-result-figure]').innerHTML = resultFigure(item.result);
+      q('[data-result-caption]').textContent = 'Result: ' + item.result.caption;
+      q('[data-choices]').querySelectorAll('label').forEach(label => {
+        const v = label.querySelector('input').value;
+        label.dataset.mark = v === item.answer ? 'answer' : v === pick ? 'wrong' : '';
+      });
+      q('[data-feedback]').textContent = item.why;
+      q('[data-lab-note]').textContent = '“Try this in the lab” sets the lab to this case and takes you to its controls.';
+      act('trylab').hidden = false;
+      box.hidden = false;
+      q('[data-announce]').textContent = q('[data-verdict]').textContent + ' ' + item.why;
     }
 
     // ---- Wiring ------------------------------------------------------------
@@ -304,7 +359,7 @@
     slider.addEventListener('input', () => { if (S.running) stop(); setTheta(Number(slider.value)); });
     slider.addEventListener('change', () => {
       const r = M.analyze(S.alpha, opts());
-      say('θ = ' + deg(theta()) + '°: torque ' + fmtSigned(r.total) + ' NBIA, ' + (r.sense === 'none' ? 'no turning effect' : r.sense) + '.');
+      say(r.total === 0 ? restMessage() : 'θ = ' + deg(theta()) + '°: torque ' + fmtSigned(r.total) + ' NBIA, ' + r.sense + '.');
     });
     live.querySelectorAll('input[name="' + id + '-mode"]').forEach(input => input.addEventListener('change', () => {
       setOptions({ mode: input.value }, input.value === 'slip'
@@ -321,6 +376,9 @@
       setOptions({ field: -S.options.field });
       say('Magnets swapped: B now points ' + (S.options.field === 1 ? 'right' : 'left') + '. The coil has not moved, but θ, measured from B, is now ' + deg(theta()) + '°.');
     });
+    live.querySelectorAll('input[name="' + id + '-view"]').forEach(input => input.addEventListener('change', () => {
+      q('.dmcc-stage').dataset.show = input.value;
+    }));
     act('reveal').addEventListener('click', () => { S.revealed = true; say('Full curve revealed for the current setup.'); render(); });
     act('clear').addEventListener('click', () => { S.visited = []; record(theta(), theta(), 1); render(); say('Trace cleared.'); });
     q('[data-choices]').addEventListener('change', event => {
@@ -328,8 +386,20 @@
       if (t && t.type === 'radio') { S.picked[QUESTIONS[S.q].id] = t.value; act('check').disabled = false; }
     });
     act('check').addEventListener('click', check);
-    act('prevq').addEventListener('click', () => showQuestion(S.q - 1, true));
-    act('nextq').addEventListener('click', () => showQuestion(S.q + 1, true));
+    act('trylab').addEventListener('click', () => {
+      const item = QUESTIONS[S.q];
+      applySetup(item.after);
+      say('Set up from question ' + (S.q + 1) + ': θ = ' + deg(theta()) + '°, ' + (S.options.mode === 'slip' ? 'slip rings' : 'split ring') +
+        (S.options.coils === 2 ? ', two coils' : '') + (S.options.supply === -1 ? ', current reversed' : '') + (S.options.field === -1 ? ', magnets swapped' : '') +
+        '. ' + (reduced.matches ? 'Use Step to move it.' : 'Press Run or Step to watch it.'));
+      // An intentional, requested move: bring the motor and its controls into
+      // view together, then focus the first motion control.
+      const pick = q('.dmcc-viewpick'), target = pick.offsetParent !== null ? pick : q('.dmcc-stage');
+      target.scrollIntoView({ block: 'start', behavior: reduced.matches ? 'auto' : 'smooth' });
+      (reduced.matches ? act('step') : act('run')).focus({ preventScroll: true });
+    });
+    act('prevq').addEventListener('click', () => showQuestion(S.q - 1));
+    act('nextq').addEventListener('click', () => showQuestion(S.q + 1));
     if (reduced.addEventListener) reduced.addEventListener('change', () => { if (reduced.matches && S.running) stop('Motion stopped for your reduced-motion setting. Step mode still works.'); updateMotionNote(); });
     document.addEventListener('visibilitychange', schedule);
     if ('IntersectionObserver' in window) {
@@ -338,7 +408,7 @@
 
     record(30, 30, 1);
     updateMotionNote();
-    showQuestion(0, false);
+    showQuestion(0);
     say('Predict first, then turn the coil with Run, Step or the slider and watch the torque.');
     render();
   }
