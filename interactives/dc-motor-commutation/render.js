@@ -92,7 +92,7 @@
       const from = P(-1.3 * o.field, -1.12, z), to = P(1.3 * o.field, -1.12, z);
       svg += arrow(from, to, 'dmcc-field', 8);
     });
-    const bTip = P(1.3 * o.field, -1.12, 1.0);
+    const bTip = P(1.3 * o.field, -1.12, -1.0);
     svg += '<text class="dmcc-small dmcc-halo" x="' + f1(bTip[0] + (o.field === 1 ? 6 : -16)) + '" y="' + f1(bTip[1] + (o.field === 1 ? 4 : 18)) + '">B</text>';
     const zEnd = slip ? SLIP_Z0 + SLIP_STEP * (2 * o.coils) : SPLIT_Z0 + SPLIT_STEP * o.coils;
     svg += '<path class="dmcc-shaft" d="' + pathOf([P(0, 0, -2.2), P(0, 0, zEnd)]) + '"/>';
@@ -217,8 +217,9 @@
           const from = [p[0], p[1] - 14 * s.force], to = [p[0], p[1] - 52 * s.force];
           svg += arrow(from, to, 'dmcc-force', 10);
         }
-        const out = E(s.x * 1.38, s.y * 1.38);
-        svg += '<text class="dmcc-small dmcc-tag dmcc-halo" x="' + f1(out[0]) + '" y="' + f1(out[1] + 5) + '" text-anchor="middle">' + item[3] + '</text>';
+        // Side label beside the conductor, horizontally clear of its vertical force arrow.
+        const side = s.x < -0.05 ? -1 : 1;
+        svg += '<text class="dmcc-small dmcc-tag dmcc-halo" x="' + f1(p[0] + side * 22) + '" y="' + f1(p[1] + 5) + '" text-anchor="' + (side < 0 ? 'end' : 'start') + '">' + item[3] + '</text>';
       });
     });
     // Marked normal n of coil 1 and the angle theta from B to n.
@@ -232,14 +233,17 @@
       for (let i = 0; i <= steps; i += 1) { const a = (bDir + sweep * i / steps) * DEG; arc.push(E(Math.cos(a), Math.sin(a), 24)); }
       svg += '<path class="dmcc-angle" fill="none" d="' + pathOf(arc) + '"/>';
     }
-    // Torque arrow above the shaft: length grows with |tau|, direction follows its sign.
+    // Torque indicator in the top-right corner: a curved arrow about a shaft dot,
+    // its sweep growing with |tau| and its direction following the sign.
+    const gx = 318, gy = 34, gr = 17;
+    svg += '<circle class="dmcc-shaft-dot" cx="' + gx + '" cy="' + gy + '" r="3.5"/>';
     if (r.total !== 0) {
-      const span = 26 * Math.min(1.5, Math.abs(r.total)), dir = r.total > 0 ? 1 : -1, arc = [];
-      for (let i = 0; i <= 12; i += 1) { const a = (90 - dir * span + 2 * dir * span * i / 12) * DEG; arc.push(E(Math.cos(a), Math.sin(a), 126)); }
-      svg += '<path class="dmcc-torque" fill="none" d="' + pathOf(arc) + '"/>' + arrowHead(arc[12], arc[10], 12, 'dmcc-torque-head');
-      svg += '<text class="dmcc-label dmcc-torque-text" x="' + EV.cx + '" y="' + (EV.cy - 133) + '" text-anchor="middle">τ</text>';
+      const span = Math.min(300, 70 + 150 * Math.abs(r.total)), dir = r.total > 0 ? 1 : -1, arc = [];
+      for (let i = 0; i <= 24; i += 1) { const t = (90 - dir * span / 2 + dir * span * i / 24) * DEG; arc.push([gx + gr * Math.cos(t), gy - gr * Math.sin(t)]); }
+      svg += '<path class="dmcc-torque" fill="none" d="' + pathOf(arc) + '"/>' + arrowHead(arc[24], arc[21], 10, 'dmcc-torque-head');
+      svg += '<text class="dmcc-label dmcc-torque-text" x="' + (gx - 26) + '" y="' + (gy + 6) + '" text-anchor="end">τ</text>';
     } else {
-      svg += '<text class="dmcc-small dmcc-soft" x="' + EV.cx + '" y="' + (EV.cy - 133) + '" text-anchor="middle">τ = 0</text>';
+      svg += '<text class="dmcc-small dmcc-halo" x="' + (gx + 18) + '" y="' + (gy + 5) + '" text-anchor="end">τ = 0</text>';
     }
     svg += '<text class="dmcc-label" x="8" y="24">θ = ' + Math.round(r.theta) + '°</text>';
     svg += '</svg>';
@@ -271,8 +275,8 @@
         '<text class="dmcc-small" x="' + f1(tx(d)) + '' + '" y="' + (ty(-1.55) + 18) + '" text-anchor="middle">' + d + '°</text>';
     });
     svg += '<path class="dmcc-axis" d="M' + TR.x0 + ' ' + ty(0) + 'H' + TR.x1 + '"/>';
-    [[1, '1'], [0, '0'], [-1, '−1']].forEach(t => { svg += '<text class="dmcc-small" x="' + (TR.x0 - 8) + '" y="' + f1(ty(t[0]) + 5) + '" text-anchor="end">' + t[1] + '</text>'; });
-    if (st.compare || (st.revealed && o.coils === 2)) svg += '<text class="dmcc-small" x="' + (TR.x0 - 8) + '" y="' + f1(ty(Math.SQRT2) + 5) + '" text-anchor="end">1.41</text>';
+    [[1, '1'], [0, '0'], [-1, '−1']].forEach(t => { svg += '<text class="dmcc-small" x="' + (TR.x0 - 12) + '" y="' + f1(ty(t[0]) + 5) + '" text-anchor="end">' + t[1] + '</text>'; });
+    if (st.compare || (st.revealed && o.coils === 2)) svg += '<text class="dmcc-small" x="' + (TR.x0 - 12) + '" y="' + f1(ty(Math.SQRT2) + 5) + '" text-anchor="end">1.41</text>';
     svg += '<text class="dmcc-small" x="' + (TR.x0 - 50) + '" y="16">Torque ÷ one coil’s peak NBIA</text>';
     svg += '<text class="dmcc-small" x="' + TR.x1 + '" y="' + (ty(-1.55) + 38) + '" text-anchor="end">θ, angle from B to the coil normal n</text>';
     if (st.compare) {
@@ -305,7 +309,7 @@
       highAt.forEach(p => { svg += '<circle class="dmcc-peak" cx="' + f1(tx(p[0])) + '" cy="' + f1(ty(p[1])) + '" r="5"/>'; });
       const lowLabel = rp.oneDirection && o.coils === 2 ? 'smallest ' + f2(Math.min(Math.abs(rp.min), Math.abs(rp.max))) : 'zero';
       const firstLow = lowAt.find(p => p[0] === 180) || lowAt[1] || lowAt[0];
-      if (firstLow) svg += '<text class="dmcc-small dmcc-halo" x="' + f1(tx(firstLow[0])) + '" y="' + f1(ty(firstLow[1]) + (firstLow[1] <= 0 ? 24 : -12)) + '" text-anchor="middle">' + lowLabel + '</text>';
+      if (firstLow) svg += '<text class="dmcc-small dmcc-halo" x="' + f1(tx(firstLow[0])) + '" y="' + f1(ty(firstLow[1]) + 26) + '" text-anchor="middle">' + lowLabel + '</text>';
       const firstHigh = highAt[0];
       if (firstHigh) svg += '<text class="dmcc-small dmcc-halo" x="' + f1(tx(firstHigh[0])) + '" y="' + f1(ty(firstHigh[1]) + (firstHigh[1] < 0 ? 24 : -12)) + '" text-anchor="middle">peak ' + f2(Math.abs(firstHigh[1])) + '</text>';
     }

@@ -149,7 +149,9 @@
         const rp = M.ripple(o), mean = M.turnAverage(o, 3600);
         avg.hidden = false;
         avg.textContent = 'Average over one turn: ' + fmtSigned(mean) + ' NBIA. ' +
-          (rp.oneDirection ? 'One direction throughout; smallest ÷ largest = ' + rp.ratio.toFixed(2) + '.' : 'The torque changes sign during the turn.');
+          (!rp.oneDirection ? 'The torque reverses during every turn.'
+            : rp.ratio === 0 ? 'It never reverses, but it falls to zero twice a turn.'
+            : 'It never reverses and never reaches zero: smallest ÷ largest = ' + rp.ratio.toFixed(2) + '.');
       } else avg.hidden = true;
     }
     function updateMotionNote() {
