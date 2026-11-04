@@ -3348,6 +3348,190 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   [data-interactive="motor-load-matching"] .mlm-table-scroll :is(th, td) { padding: .25rem; overflow-wrap: anywhere; }
 }
 
+/* DC motor commutation: scoped to its mount. Colours derive from theme tokens;
+   the few module colours below have light, dark and print values. */
+[data-interactive="dc-motor-commutation"] {
+  --dmcc-current: #A8440A;
+  --dmcc-copper: #B9772F;
+  --dmcc-n: #F2A58E;
+  --dmcc-s: #9CD3EC;
+  --dmcc-pole-ink: #002144;
+  --dmcc-force: var(--accent);
+  min-width: 0; margin-block: 1rem;
+}
+:root[data-theme="dark"] [data-interactive="dc-motor-commutation"] { --dmcc-current: #FF9F57; --dmcc-copper: #D49A5A; --dmcc-n: #7B3A2A; --dmcc-s: #1D4F69; --dmcc-pole-ink: #F4F1EC; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-interactive="dc-motor-commutation"] { --dmcc-current: #FF9F57; --dmcc-copper: #D49A5A; --dmcc-n: #7B3A2A; --dmcc-s: #1D4F69; --dmcc-pole-ink: #F4F1EC; }
+}
+@media print {
+  [data-interactive="dc-motor-commutation"] { --dmcc-current: #A8440A !important; --dmcc-copper: #B9772F !important; --dmcc-n: #F2A58E !important; --dmcc-s: #9CD3EC !important; --dmcc-pole-ink: #002144 !important; }
+}
+[data-interactive="dc-motor-commutation"] * { box-sizing: border-box; }
+
+/* ---- SVG drawing (live and static share these classes) ------------------- */
+.dmcc-svg { display: block; width: 100%; height: auto; color: var(--ink); overflow: visible; }
+.dmcc-svg text { fill: var(--ink); font-family: var(--f-display); font-size: 15px; }
+.dmcc-svg .dmcc-small { font-size: 14px; }
+.dmcc-cutaway text, .dmcc-cutaway .dmcc-small { font-size: 17px; }
+.dmcc-endview .dmcc-small { font-size: 15px; }
+.dmcc-svg .dmcc-soft { fill: var(--ink-soft); }
+.dmcc-svg .dmcc-tag { font-weight: 750; }
+.dmcc-svg .dmcc-halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.dmcc-svg .dmcc-label { font-size: 18px; font-weight: 750; }
+.dmcc-pole-n .dmcc-face, polygon.dmcc-pole-n { fill: var(--dmcc-n); stroke: var(--ink-soft); stroke-width: 1.2; }
+.dmcc-pole-s .dmcc-face, polygon.dmcc-pole-s { fill: var(--dmcc-s); stroke: var(--ink-soft); stroke-width: 1.2; }
+.dmcc-cutaway polygon.dmcc-pole { fill-opacity: .72; }
+.dmcc-svg .dmcc-pole-text { fill: var(--dmcc-pole-ink); font-size: 24px; font-weight: 800; }
+.dmcc-field, .dmcc-fieldline { stroke: var(--ink-soft); stroke-width: 1.4; fill: none; opacity: .8; }
+.dmcc-field-head, .dmcc-fieldline-head { fill: var(--ink-soft); opacity: .8; }
+.dmcc-neutral { stroke: var(--ink-soft); stroke-width: 1.2; stroke-dasharray: 2 5; fill: none; }
+.dmcc-shaft { stroke: var(--ink-soft); stroke-width: 7; stroke-linecap: round; fill: none; }
+.dmcc-wire, .dmcc-coil-edge { stroke: var(--dmcc-copper); stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; fill: none; }
+.dmcc-wire-2 { stroke-dasharray: 10 5; }
+.dmcc-coil-edge.dmcc-wire-2 { stroke-dasharray: none; opacity: .7; }
+.dmcc-glow { stroke: var(--dmcc-current); stroke-width: 12; stroke-opacity: .22; stroke-linejoin: round; stroke-linecap: round; }
+.dmcc-flow { stroke: var(--dmcc-current); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.dmcc-current-head { fill: var(--dmcc-current); stroke: var(--surface); stroke-width: 1; }
+.dmcc-force { stroke: var(--dmcc-force); stroke-width: 3.4; fill: none; }
+.dmcc-force-head { fill: var(--dmcc-force); }
+.dmcc-ring, .dmcc-segment { fill: var(--dmcc-copper); stroke: var(--ink); stroke-width: .9; fill-opacity: .55; }
+.dmcc-ring.is-live, .dmcc-segment.is-live { fill-opacity: .9; }
+.dmcc-segment-b { fill: var(--surface-2); fill-opacity: 1; }
+.dmcc-segment-b.is-live { fill: var(--dmcc-copper); fill-opacity: .55; }
+.dmcc-brush { stroke: var(--ink-soft); stroke-width: 10; fill: none; }
+.dmcc-cut { stroke: var(--ink-soft); stroke-width: 1.6; stroke-dasharray: 6 5; }
+.dmcc-cut-n { stroke: #C4583A; } .dmcc-cut-s { stroke: #2E86B5; }
+.dmcc-brush.is-live { stroke: var(--ink); }
+.dmcc-lead { stroke: var(--ink-soft); stroke-width: 1.6; fill: none; }
+.dmcc-cell-long, .dmcc-cell-short { stroke: var(--ink); fill: none; stroke-width: 3; }
+.dmcc-cell-short { stroke-width: 6; }
+.dmcc-conductor { fill: var(--surface); stroke: var(--dmcc-copper); stroke-width: 3; }
+.dmcc-conductor.is-live { stroke: var(--dmcc-current); stroke-width: 3.6; }
+.dmcc-dot { fill: var(--dmcc-current); }
+.dmcc-cross { stroke: var(--dmcc-current); stroke-width: 3; fill: none; }
+.dmcc-lever { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 5 4; fill: none; }
+.dmcc-lever-line { stroke: var(--dmcc-force); stroke-width: 1; stroke-dasharray: 3 5; fill: none; opacity: .75; }
+.dmcc-normal { stroke: var(--ink); stroke-width: 2; fill: none; }
+.dmcc-normal-head { fill: var(--ink); }
+.dmcc-svg .dmcc-normal-text { font-style: italic; font-weight: 700; }
+.dmcc-angle { stroke: var(--ink); stroke-width: 1.6; }
+.dmcc-torque { stroke: var(--ink); stroke-width: 3.6; stroke-linecap: round; }
+.dmcc-shaft-dot { fill: var(--ink-soft); }
+.dmcc-torque-head { fill: var(--ink); }
+.dmcc-grid { stroke: var(--rule); stroke-width: 1; fill: none; }
+.dmcc-axis { stroke: var(--ink-soft); stroke-width: 1.6; fill: none; }
+.dmcc-curve { stroke: var(--ink); stroke-width: 3; }
+.dmcc-curve-slip { stroke: var(--ink-soft); stroke-width: 2.6; stroke-dasharray: 9 6; }
+.dmcc-curve-two { stroke: var(--accent); stroke-width: 5; }
+.dmcc-curve-part { stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 4 5; }
+.dmcc-curve-part-2 { stroke-dasharray: 10 5; }
+.dmcc-zero { fill: var(--surface); stroke: var(--ink); stroke-width: 2.4; }
+.dmcc-peak { fill: var(--ink); }
+.dmcc-visited { stroke: var(--dmcc-current); stroke-width: 6; stroke-linecap: round; fill: none; opacity: .85; }
+.dmcc-now-line { stroke: var(--dmcc-current); stroke-width: 1.2; stroke-dasharray: 3 4; fill: none; }
+.dmcc-now { fill: var(--dmcc-current); stroke: var(--ink); stroke-width: 2; }
+
+/* ---- Static fallback figures --------------------------------------------- */
+.dmcc-static-figure { margin: 1rem 0; }
+.dmcc-static-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: .75rem; align-items: center; }
+.dmcc-static-figure .dmcc-svg { max-width: 40rem; margin-inline: auto; }
+
+/* ---- Live lab ------------------------------------------------------------ */
+.dmcc-live { container: dmcc / inline-size; display: grid; gap: .8rem; font: .97rem/1.45 var(--f-display); }
+.dmcc-challenge { margin: 0; border-left: 4px solid var(--accent); padding: .6rem .8rem; background: var(--surface-2); }
+.dmcc-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+.dmcc-view { margin: 0; border: 1px solid var(--rule); background: var(--surface); padding: .4rem; min-width: 0; }
+.dmcc-view > figcaption, .dmcc-trace-figure > figcaption { margin: .25rem .2rem 0; color: var(--ink-soft); font-size: .86rem; line-height: 1.35; }
+.dmcc-readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: .4rem; margin: 0; }
+.dmcc-readout > div { border: 1px solid var(--rule); background: var(--surface); padding: .4rem .55rem; min-width: 0; }
+.dmcc-readout dt { font-size: .78rem; color: var(--ink-soft); letter-spacing: .02em; }
+.dmcc-readout dd { margin: 0; font-weight: 750; font-variant-numeric: tabular-nums; }
+.dmcc-controls { display: grid; gap: .6rem; }
+.dmcc-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.dmcc-live button, .dmcc-seg label { min-height: 44px; min-width: 44px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .45rem .75rem; font: inherit; cursor: pointer; }
+.dmcc-live button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); font-weight: 750; }
+.dmcc-live button[hidden] { display: none; }
+.dmcc-live button.dmcc-primary { background: var(--accent); color: var(--surface); border-color: var(--accent); font-weight: 750; }
+.dmcc-live button:disabled { opacity: .55; cursor: not-allowed; }
+.dmcc-live :is(button, input, summary):focus-visible, .dmcc-seg label:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+.dmcc-angle-control { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .3rem .7rem; align-items: center; font-weight: 650; }
+.dmcc-angle-control input[type="range"] { width: 100%; min-height: 44px; accent-color: var(--accent); margin: 0; }
+.dmcc-seg { border: 1px solid var(--rule); padding: .45rem .6rem .6rem; margin: 0; min-width: 0; }
+.dmcc-seg legend { font-weight: 750; padding: 0 .25rem; }
+.dmcc-seg > div { display: flex; flex-wrap: wrap; gap: .4rem; }
+.dmcc-seg label { display: inline-flex; align-items: center; gap: .4rem; }
+.dmcc-seg label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); font-weight: 750; }
+.dmcc-seg input { margin: 0; accent-color: var(--accent); width: 1.1rem; height: 1.1rem; }
+.dmcc-setup { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+.dmcc-polarity { grid-column: 1 / -1; }
+.dmcc-viewpick { display: none; }
+.dmcc-stage, .dmcc-viewpick { scroll-margin-top: 4.5rem; }
+.dmcc-note { margin: 0; color: var(--ink-soft); font-size: .88rem; }
+.dmcc-status { margin: 0; border-left: 4px solid var(--flag); padding: .55rem .75rem; background: var(--surface-2); min-height: 2.9em; }
+.dmcc-trace-figure { margin: 0; border: 1px solid var(--rule); background: var(--surface); padding: .4rem; }
+.dmcc-trace-figure .dmcc-svg { max-width: 46rem; margin-inline: auto; }
+.dmcc-averages { margin: .35rem .2rem 0; font-variant-numeric: tabular-nums; }
+.dmcc-predict { border: 1px solid var(--rule); padding: .6rem .75rem .75rem; margin: 0; min-width: 0; display: grid; gap: .5rem; }
+.dmcc-predict-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem; align-items: baseline; }
+.dmcc-predict-head h3 { margin: 0; font-size: 1.02rem; }
+.dmcc-score { font-weight: 750; font-variant-numeric: tabular-nums; }
+.dmcc-question { margin: 0; font-weight: 650; }
+.dmcc-choices { display: grid; gap: .4rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+.dmcc-choices label { display: flex; align-items: center; gap: .55rem; min-height: 44px; border: 1px solid var(--rule); padding: .35rem .6rem; background: var(--surface); cursor: pointer; }
+.dmcc-choices label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.dmcc-choices input { margin: 0; flex: none; width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.dmcc-predict-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; align-items: start; }
+.dmcc-result-figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--rule); padding: .3rem .4rem; }
+.dmcc-result-figure[data-result-state="right"] { border-left-color: var(--accent); }
+.dmcc-result-figure[data-result-state="wrong"] { border-left-color: var(--flag); }
+.dmcc-result-figure .dmcc-endview { max-width: 17rem; margin-inline: auto; }
+.dmcc-result-figure figcaption { font-size: .86rem; line-height: 1.35; margin-top: .2rem; color: var(--ink-soft); }
+.dmcc-result-figure .dmcc-verdict { color: var(--ink); }
+.dmcc-result-figure .dmcc-verdict:empty { display: none; }
+/* Marks after checking change borders only, so nothing above the Check button moves. */
+.dmcc-choices label[data-mark="answer"] { border-color: var(--accent); box-shadow: inset 6px 0 0 var(--accent); }
+.dmcc-choices label[data-mark="wrong"] { border-color: var(--flag); border-style: dashed; }
+.dmcc-result { border-left: 4px solid var(--rule); background: var(--surface-2); padding: .55rem .7rem; }
+.dmcc-result[data-result="right"] { border-left-color: var(--accent); }
+.dmcc-result[data-result="wrong"] { border-left-color: var(--flag); }
+.dmcc-result[hidden] { display: none; }
+.dmcc-result p { margin: 0 0 .4rem; }
+.dmcc-result p:last-child { margin-bottom: 0; }
+.dmcc-limit { margin: 0; color: var(--ink-soft); font-size: .88rem; }
+.dmcc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@container dmcc (min-width: 40rem) {
+  .dmcc-stage { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); align-items: start; }
+  .dmcc-setup { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dmcc-predict-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+}
+/* Narrow: one view at a time, chosen by the learner, so the view and the
+   Run/Step controls fit on one screen together. */
+@container dmcc (max-width: 39.99rem) {
+  .dmcc-viewpick { display: block; }
+  .dmcc-stage[data-show="end"] .dmcc-view-cut, .dmcc-stage[data-show="cut"] .dmcc-view-end { display: none; }
+  .dmcc-stage .dmcc-view-end .dmcc-svg { max-width: 21rem; margin-inline: auto; }
+}
+@container dmcc (max-width: 34rem) {
+  .dmcc-trace text, .dmcc-trace .dmcc-small { font-size: 24px; }
+  .dmcc-trace .dmcc-curve { stroke-width: 4.5; }
+  .dmcc-trace .dmcc-visited { stroke-width: 9; }
+  .dmcc-cutaway text, .dmcc-cutaway .dmcc-small { font-size: 19px; }
+}
+.presenting .dmcc-live { font-size: 1rem; }
+
+@media screen {
+  [data-interactive="dc-motor-commutation"][data-dmcc-ready] > .dmcc-static { display: none; }
+}
+@media print {
+  /* The static lesson is longer than a page: let it flow, keep each figure whole. */
+  [data-interactive="dc-motor-commutation"] { break-inside: auto !important; }
+  [data-interactive="dc-motor-commutation"] .dmcc-live { display: none !important; }
+  [data-interactive="dc-motor-commutation"] > .dmcc-static { display: block !important; }
+  .dmcc-static-figure { break-inside: avoid; page-break-inside: avoid; }
+  .dmcc-static-pair { grid-template-columns: 1fr 1fr; }
+}
+
 [data-interactive="diagram-views"] svg { display: block; width: 100%; height: auto; max-width: 46rem; margin: auto; }
 [data-interactive="diagram-views"] figure { margin: 1rem 0; break-inside: avoid; }
 [data-interactive="diagram-views"] .dv-views,
@@ -6412,6 +6596,33 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="deeper-ref" id="deeper-ref-65">Supporting detail: <a href="#deeper-addendum-65"><strong>Addendum 65</strong></a> &mdash; Where the alignment picture needs care.</p>
     </div>
   </details>
+  <details class="xcard deck-slide is-interactive" id="electric-motor-principles--why-a-dc-motor-keeps-turning-coil-field-and-commutator" data-card="electric-motor-principles--why-a-dc-motor-keeps-turning-coil-field-and-commutator" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
+    <summary>Why a DC motor keeps turning: coil, field and commutator<span class="card-tags"><span class="card-tag" data-marker="interactive" style="--card-marker:var(--mark-interactive)"><span class="marker-separator">; </span>Interactive</span></span><span class="chev"></span></summary>
+    <div class="body">
+      <h2>Why a DC motor keeps turning: coil, field and commutator</h2>
+  <p>The simplest brushed DC motor is one rectangular coil on a shaft between two magnet poles. Turn the coil, find where the field stops pushing it, and see how a split-ring commutator keeps the push going one way.</p>
+  <div data-interactive="dc-motor-commutation">
+    <div class="dmcc-static">
+      <p><strong>Predict first:</strong> a coil carrying current sits between a north and a south pole. At which angles does the field give it no turning push at all, and where is the push largest?</p>
+      <p><strong>Torque on the coil.</strong> For an ideal rectangular coil in a uniform field, the torque about the shaft is <code>τ = N·B·I·A·sin θ</code>. N is the number of turns, B the field (T), I the current (A) and A the coil's area (m²), so τ is in N·m. <strong>θ is the angle from the field B to the coil's normal n</strong>, the line perpendicular to the coil's face. The coil's magnetic moment lies along n or against it, depending on which way the current circulates. That sets the direction of the torque, not its size.</p>
+      <!-- DC-MOTOR-COMMUTATION-VIEWS -->
+        <figure class="dmcc-static-figure"><div class="dmcc-static-pair"><svg class="dmcc-svg dmcc-cutaway" viewBox="0 0 420 280" role="img" focusable="false" aria-label="Cutaway side view: the N pole is cut away in front, the S pole face is behind the coil. One rectangular coil turns on a shaft with a split-ring commutator and brushes at the right-hand end, fed from a DC supply."><polygon class="dmcc-pole dmcc-pole-s" points="76.6,188.4 268.6,188.4 268.6,48.9 76.6,48.9"/><text class="dmcc-pole-text" x="91.6" y="70.9">S</text><path class="dmcc-field" fill="none" stroke="currentColor" d="M69.7 240.6L110.3 184.4"/><path class="dmcc-field-head" d="M110.3 184.4L109.2 193.5L102 188.3Z"/><path class="dmcc-field" fill="none" stroke="currentColor" d="M129.7 240.6L170.3 184.4"/><path class="dmcc-field-head" d="M170.3 184.4L169.2 193.5L162 188.3Z"/><path class="dmcc-field" fill="none" stroke="currentColor" d="M189.7 240.6L230.3 184.4"/><path class="dmcc-field-head" d="M230.3 184.4L229.2 193.5L222 188.3Z"/><text class="dmcc-small dmcc-halo" x="116.3" y="188.4">B</text><path class="dmcc-shaft" d="M18 150 L297 150"/><path class="dmcc-wire" fill="none" d="M276.7 131 L232.2 112.5 L52.2 112.5 L67.8 187.5 L247.8 187.5 L274.1 169"/><path class="dmcc-glow" fill="none" d="M276.7 131 L232.2 112.5 L52.2 112.5 L67.8 187.5 L247.8 187.5 L274.1 169"/><path class="dmcc-flow" fill="none" stroke-dasharray="7 11" stroke-dashoffset="0" d="M276.7 131 L232.2 112.5 L52.2 112.5 L67.8 187.5 L247.8 187.5 L274.1 169"/><path class="dmcc-current-head" d="M134.2 112.5L149.2 104.2L149.2 120.7Z"/><path class="dmcc-current-head" d="M165.8 187.5L150.8 195.8L150.8 179.3Z"/><path class="dmcc-force" fill="none" stroke="currentColor" d="M142.2 112.5L142.2 151.5"/><path class="dmcc-force-head" d="M142.2 151.5L136.1 140.5L148.3 140.5Z"/><text class="dmcc-small dmcc-tag dmcc-halo" x="39" y="117.5" text-anchor="middle">1</text><path class="dmcc-force" fill="none" stroke="currentColor" d="M157.8 187.5L157.8 148.5"/><path class="dmcc-force-head" d="M157.8 148.5L163.9 159.5L151.8 159.5Z"/><text class="dmcc-small dmcc-tag dmcc-halo" x="54.6" y="192.5" text-anchor="middle">2</text><polygon class="dmcc-segment dmcc-segment-a is-live" points="283.8,132.1 283.3,132.9 282.8,133.8 282.4,134.8 281.9,136 265.1,136 265.6,134.8 266,133.8 266.5,132.9 267,132.1"/><polygon class="dmcc-segment dmcc-segment-a is-live" points="283.8,132.1 283.3,132.9 282.8,133.8 282.4,134.8 281.9,136 265.1,136 265.6,134.8 266,133.8 266.5,132.9 267,132.1"/><polygon class="dmcc-segment dmcc-segment-b is-live" points="280.7,140.2 280.3,141.9 280,143.8 279.7,145.7 279.4,147.6 279.2,149.6 279,151.6 278.9,153.5 278.8,155.4 278.8,157.3 278.8,159.1 278.9,160.8 279.1,162.3 279.3,163.8 279.5,165.1 279.8,166.2 280.1,167.2 280.5,168 280.9,168.6 281.3,168.9 281.8,169.1 282.3,169.1 282.8,168.9 283.3,168.5 283.8,167.9 267,167.9 266.5,168.5 266,168.9 265.5,169.1 265,169.1 264.5,168.9 264.1,168.6 263.7,168 263.3,167.2 263,166.2 262.7,165.1 262.5,163.8 262.3,162.3 262.1,160.8 262,159.1 262,157.3 262,155.4 262.1,153.5 262.2,151.6 262.4,149.6 262.6,147.6 262.9,145.7 263.2,143.8 263.5,141.9 263.9,140.2"/><polygon class="dmcc-segment dmcc-segment-b is-live" points="280.7,140.2 280.3,141.9 280,143.8 279.7,145.7 279.4,147.6 279.2,149.6 279,151.6 278.9,153.5 278.8,155.4 278.8,157.3 278.8,159.1 278.9,160.8 279.1,162.3 279.3,163.8 279.5,165.1 279.8,166.2 280.1,167.2 280.5,168 280.9,168.6 281.3,168.9 281.8,169.1 282.3,169.1 282.8,168.9 283.3,168.5 283.8,167.9 267,167.9 266.5,168.5 266,168.9 265.5,169.1 265,169.1 264.5,168.9 264.1,168.6 263.7,168 263.3,167.2 263,166.2 262.7,165.1 262.5,163.8 262.3,162.3 262.1,160.8 262,159.1 262,157.3 262,155.4 262.1,153.5 262.2,151.6 262.4,149.6 262.6,147.6 262.9,145.7 263.2,143.8 263.5,141.9 263.9,140.2"/><path class="dmcc-brush is-live" d="M275.4 131.4 L275.4 105.4"/><path class="dmcc-lead" fill="none" d="M275.4 105.4 L275.4 75 L342 75"/><path class="dmcc-brush is-live" d="M275.4 168.6 L275.4 194.6"/><path class="dmcc-lead" fill="none" d="M275.4 194.6 L275.4 225 L342 225"/><g class="dmcc-battery"><path class="dmcc-lead" fill="none" d="M342 75V144M342 156V225"/><path class="dmcc-cell-long" d="M327 144h30"/><path class="dmcc-cell-short" d="M334 156h16"/><text class="dmcc-small" x="362" y="140">+</text><text class="dmcc-small" x="362" y="170">−</text></g><text class="dmcc-small dmcc-halo" x="350" y="65" text-anchor="end">DC supply</text><text class="dmcc-small dmcc-halo" x="276" y="245" text-anchor="middle">split ring</text><polygon class="dmcc-cut dmcc-cut-n" fill="none" points="31.4,251.1 223.4,251.1 223.4,111.6 31.4,111.6"/><text class="dmcc-small dmcc-halo" x="31.4" y="271.1">N, cut away</text></svg><svg class="dmcc-svg dmcc-endview" viewBox="0 0 360 312" role="img" focusable="false" aria-label="End view at theta 30 degrees. Each coil side carries current away from the viewer in side 1. Total torque 0.50 of one coil's peak, counterclockwise."><polygon class="dmcc-pole dmcc-pole-n" points="14,243.8 108,243.8 96.3,232.5 86.4,219.5 78.5,205.3 72.7,190.1 69.2,174.2 68,158 69.2,141.8 72.7,125.9 78.5,110.7 86.4,96.5 96.3,83.5 108,72.2 14,72.2"/><polygon class="dmcc-pole dmcc-pole-s" points="346,243.8 252,243.8 263.7,232.5 273.6,219.5 281.5,205.3 287.3,190.1 290.8,174.2 292,158 290.8,141.8 287.3,125.9 281.5,110.7 273.6,96.5 263.7,83.5 252,72.2 346,72.2"/><text class="dmcc-pole-text" x="40" y="167" text-anchor="middle">N</text><text class="dmcc-pole-text" x="320" y="167" text-anchor="middle">S</text><path class="dmcc-fieldline" d="M87 102L271 102"/><path class="dmcc-fieldline-head" d="M214 102L207 105.9L207 98.2Z"/><path class="dmcc-fieldline" d="M75.6 130L282.4 130"/><path class="dmcc-fieldline-head" d="M214 130L207 133.9L207 126.2Z"/><path class="dmcc-fieldline" d="M72 158L286 158"/><path class="dmcc-fieldline-head" d="M214 158L207 161.9L207 154.2Z"/><path class="dmcc-fieldline" d="M75.6 186L282.4 186"/><path class="dmcc-fieldline-head" d="M214 186L207 189.9L207 182.2Z"/><path class="dmcc-fieldline" d="M87 214L271 214"/><path class="dmcc-fieldline-head" d="M214 214L207 217.9L207 210.2Z"/><text class="dmcc-small dmcc-halo" x="242" y="90" text-anchor="middle">B</text><path class="dmcc-neutral" d="M180 46V270"/><text class="dmcc-small dmcc-soft dmcc-halo" x="180" y="308" text-anchor="middle">neutral plane</text><path class="dmcc-lever" d="M180 90.5H141"/><path class="dmcc-lever-line" d="M141 54V262"/><path class="dmcc-coil-edge" d="M141 90.5L219 225.5"/><circle class="dmcc-conductor is-live" cx="141" cy="90.5" r="12"/><path class="dmcc-cross" d="M135 84.5l12 12M147 84.5l-12 12"/><path class="dmcc-force" fill="none" stroke="currentColor" d="M141 104.5L141 142.5"/><path class="dmcc-force-head" d="M141 142.5L135.5 132.5L146.5 132.5Z"/><text class="dmcc-small dmcc-tag dmcc-halo" x="119" y="95.5" text-anchor="end">1</text><circle class="dmcc-conductor is-live" cx="219" cy="225.5" r="12"/><circle class="dmcc-dot" cx="219" cy="225.5" r="3.6"/><path class="dmcc-force" fill="none" stroke="currentColor" d="M219 211.5L219 173.5"/><path class="dmcc-force-head" d="M219 173.5L224.5 183.5L213.5 183.5Z"/><text class="dmcc-small dmcc-tag dmcc-halo" x="241" y="230.5" text-anchor="start">2</text><path class="dmcc-normal" fill="none" stroke="currentColor" d="M180 158L219.8 135"/><path class="dmcc-normal-head" d="M219.8 135L215.7 141.8L211.8 135.2Z"/><text class="dmcc-small dmcc-normal-text dmcc-halo" x="232" y="133" text-anchor="middle">n</text><path class="dmcc-angle" fill="none" d="M204 158 L203.9 155.5 L203.5 153 L202.8 150.6 L201.9 148.2 L200.8 146"/><circle class="dmcc-shaft-dot" cx="318" cy="34" r="3.5"/><path class="dmcc-torque" fill="none" d="M334.2 28.9 L333.6 27.2 L332.8 25.6 L331.8 24.1 L330.7 22.7 L329.4 21.4 L328.1 20.3 L326.6 19.3 L325 18.5 L323.3 17.8 L321.6 17.4 L319.8 17.1 L318 17 L316.2 17.1 L314.4 17.4 L312.7 17.8 L311 18.5 L309.4 19.3 L307.9 20.3 L306.6 21.4 L305.3 22.7 L304.2 24.1 L303.2 25.6 L302.4 27.2 L301.8 28.9"/><path class="dmcc-torque-head" d="M301.8 28.9L301.3 17.5L311.2 22.4Z"/><text class="dmcc-label dmcc-torque-text" x="292" y="40" text-anchor="end">τ</text><text class="dmcc-label" x="8" y="24">θ = 30°</text></svg></div><figcaption>One coil at θ = 30°. Left, a cutaway side view: the N pole in front is cut away, the S pole is behind the coil, and B points away from you. Right, the end view from the commutator end, with the top brush positive. In the end view, current runs away from you along side 1 (⊗) and back toward you along side 2 (⊙). F = BIL pushes side 1 down and side 2 up. The two forces are equal and opposite, so there is no net force, but they form a couple. Each acts at a lever arm of r·sin 30° = 0.5r from the shaft, where r is half the coil width. So τ = 0.5·NBIA, counter-clockwise as seen from the commutator end.</figcaption></figure>
+        <!-- /DC-MOTOR-COMMUTATION-VIEWS -->
+      <p><strong>Why the angle matters.</strong> Whenever current flows, each long side of the coil feels a force F = BIL, the same size at every angle. What changes is its lever arm about the shaft, r·sin θ, where r is half the coil's width. As the coil approaches θ = 0° or 180°, with its face across the field in the <strong>neutral plane</strong>, the forces point almost straight through the shaft. The lever arm shrinks to zero, and so does the torque. With slip rings the current still flows at those angles and the forces point straight through the shaft. With an ideal split ring the brushes sit on the gaps at that instant, so there is momentarily no current and no force at all. Either way the torque there is zero. At θ = 90° and 270° the lever arm, and the torque, are largest.</p>
+      <p><strong>Why a commutator.</strong> If the coil were fed through <strong>slip rings</strong>, its current would never reverse. With the polarity drawn here, past 180° the torque would reverse too, pushing the coil back toward that neutral-plane position, and over a whole turn it would average zero. Reverse the supply or the magnets and the coil's resting position moves half a turn. A <strong>split-ring commutator</strong> turns with the coil. Its brushes change segments exactly as the coil crosses the neutral plane, which reverses the coil current. The torque becomes N·B·I·A·|sin θ|: it never points backward, but it still falls to zero twice a turn.</p>
+      <!-- DC-MOTOR-COMMUTATION-TRACE -->
+        <figure class="dmcc-static-figure"><svg class="dmcc-svg dmcc-trace" viewBox="0 0 640 290" role="img" focusable="false" aria-label="Torque against coil angle theta, from 0 to 360 degrees: slip rings alternate sign, a commutated coil stays positive, and two commutated coils never reach zero."><path class="dmcc-grid" d="M64 206H620"/><path class="dmcc-grid" d="M64 78H620"/><path class="dmcc-grid" d="M64 51.5H620"/><path class="dmcc-grid" d="M64 42.8V241.2"/><text class="dmcc-small" x="64" y="259.2" text-anchor="middle">0°</text><path class="dmcc-grid" d="M203 42.8V241.2"/><text class="dmcc-small" x="203" y="259.2" text-anchor="middle">90°</text><path class="dmcc-grid" d="M342 42.8V241.2"/><text class="dmcc-small" x="342" y="259.2" text-anchor="middle">180°</text><path class="dmcc-grid" d="M481 42.8V241.2"/><text class="dmcc-small" x="481" y="259.2" text-anchor="middle">270°</text><path class="dmcc-grid" d="M620 42.8V241.2"/><text class="dmcc-small" x="620" y="259.2" text-anchor="middle">360°</text><path class="dmcc-axis" d="M64 142H620"/><text class="dmcc-small" x="52" y="83" text-anchor="end">1</text><text class="dmcc-small" x="52" y="147" text-anchor="end">0</text><text class="dmcc-small" x="52" y="211" text-anchor="end">−1</text><text class="dmcc-small" x="52" y="56.5" text-anchor="end">1.41</text><text class="dmcc-small" x="14" y="16">Torque ÷ one coil’s peak NBIA</text><text class="dmcc-small" x="620" y="279.2" text-anchor="end">θ, angle from B to the coil normal n</text><path class="dmcc-curve-slip" fill="none" d="M64 142 L65.5 140.9 L67.1 139.8 L68.6 138.7 L70.2 137.5 L71.7 136.4 L73.3 135.3 L74.8 134.2 L76.4 133.1 L77.9 132 L79.4 130.9 L81 129.8 L82.5 128.7 L84.1 127.6 L85.6 126.5 L87.2 125.4 L88.7 124.4 L90.3 123.3 L91.8 122.2 L93.3 121.2 L94.9 120.1 L96.4 119.1 L98 118 L99.5 117 L101.1 116 L102.6 115 L104.2 113.9 L105.7 112.9 L107.2 112 L108.8 111 L110.3 110 L111.9 109 L113.4 108.1 L115 107.1 L116.5 106.2 L118.1 105.3 L119.6 104.4 L121.1 103.5 L122.7 102.6 L124.2 101.7 L125.8 100.9 L127.3 100 L128.9 99.2 L130.4 98.4 L132 97.5 L133.5 96.7 L135 96 L136.6 95.2 L138.1 94.4 L139.7 93.7 L141.2 93 L142.8 92.3 L144.3 91.6 L145.9 90.9 L147.4 90.2 L148.9 89.6 L150.5 88.9 L152 88.3 L153.6 87.7 L155.1 87.1 L156.7 86.6 L158.2 86 L159.8 85.5 L161.3 85 L162.8 84.5 L164.4 84 L165.9 83.5 L167.5 83.1 L169 82.7 L170.6 82.3 L172.1 81.9 L173.7 81.5 L175.2 81.1 L176.7 80.8 L178.3 80.5 L179.8 80.2 L181.4 79.9 L182.9 79.6 L184.5 79.4 L186 79.2 L187.6 79 L189.1 78.8 L190.6 78.6 L192.2 78.5 L193.7 78.4 L195.3 78.2 L196.8 78.2 L198.4 78.1 L199.9 78 L201.5 78 L203 78 L204.5 78 L206.1 78 L207.6 78.1 L209.2 78.2 L210.7 78.2 L212.3 78.4 L213.8 78.5 L215.4 78.6 L216.9 78.8 L218.4 79 L220 79.2 L221.5 79.4 L223.1 79.6 L224.6 79.9 L226.2 80.2 L227.7 80.5 L229.3 80.8 L230.8 81.1 L232.3 81.5 L233.9 81.9 L235.4 82.3 L237 82.7 L238.5 83.1 L240.1 83.5 L241.6 84 L243.2 84.5 L244.7 85 L246.2 85.5 L247.8 86 L249.3 86.6 L250.9 87.1 L252.4 87.7 L254 88.3 L255.5 88.9 L257.1 89.6 L258.6 90.2 L260.1 90.9 L261.7 91.6 L263.2 92.3 L264.8 93 L266.3 93.7 L267.9 94.4 L269.4 95.2 L271 96 L272.5 96.7 L274 97.5 L275.6 98.4 L277.1 99.2 L278.7 100 L280.2 100.9 L281.8 101.7 L283.3 102.6 L284.9 103.5 L286.4 104.4 L287.9 105.3 L289.5 106.2 L291 107.1 L292.6 108.1 L294.1 109 L295.7 110 L297.2 111 L298.8 112 L300.3 112.9 L301.8 113.9 L303.4 115 L304.9 116 L306.5 117 L308 118 L309.6 119.1 L311.1 120.1 L312.7 121.2 L314.2 122.2 L315.7 123.3 L317.3 124.4 L318.8 125.4 L320.4 126.5 L321.9 127.6 L323.5 128.7 L325 129.8 L326.6 130.9 L328.1 132 L329.6 133.1 L331.2 134.2 L332.7 135.3 L334.3 136.4 L335.8 137.5 L337.4 138.7 L338.9 139.8 L340.5 140.9 L342 142 L343.5 143.1 L345.1 144.2 L346.6 145.3 L348.2 146.5 L349.7 147.6 L351.3 148.7 L352.8 149.8 L354.4 150.9 L355.9 152 L357.4 153.1 L359 154.2 L360.5 155.3 L362.1 156.4 L363.6 157.5 L365.2 158.6 L366.7 159.6 L368.3 160.7 L369.8 161.8 L371.3 162.8 L372.9 163.9 L374.4 164.9 L376 166 L377.5 167 L379.1 168 L380.6 169 L382.2 170.1 L383.7 171.1 L385.2 172 L386.8 173 L388.3 174 L389.9 175 L391.4 175.9 L393 176.9 L394.5 177.8 L396.1 178.7 L397.6 179.6 L399.1 180.5 L400.7 181.4 L402.2 182.3 L403.8 183.1 L405.3 184 L406.9 184.8 L408.4 185.6 L410 186.5 L411.5 187.3 L413 188 L414.6 188.8 L416.1 189.6 L417.7 190.3 L419.2 191 L420.8 191.7 L422.3 192.4 L423.9 193.1 L425.4 193.8 L426.9 194.4 L428.5 195.1 L430 195.7 L431.6 196.3 L433.1 196.9 L434.7 197.4 L436.2 198 L437.8 198.5 L439.3 199 L440.8 199.5 L442.4 200 L443.9 200.5 L445.5 200.9 L447 201.3 L448.6 201.7 L450.1 202.1 L451.7 202.5 L453.2 202.9 L454.7 203.2 L456.3 203.5 L457.8 203.8 L459.4 204.1 L460.9 204.4 L462.5 204.6 L464 204.8 L465.6 205 L467.1 205.2 L468.6 205.4 L470.2 205.5 L471.7 205.6 L473.3 205.8 L474.8 205.8 L476.4 205.9 L477.9 206 L479.5 206 L481 206 L482.5 206 L484.1 206 L485.6 205.9 L487.2 205.8 L488.7 205.8 L490.3 205.6 L491.8 205.5 L493.4 205.4 L494.9 205.2 L496.4 205 L498 204.8 L499.5 204.6 L501.1 204.4 L502.6 204.1 L504.2 203.8 L505.7 203.5 L507.3 203.2 L508.8 202.9 L510.3 202.5 L511.9 202.1 L513.4 201.7 L515 201.3 L516.5 200.9 L518.1 200.5 L519.6 200 L521.2 199.5 L522.7 199 L524.2 198.5 L525.8 198 L527.3 197.4 L528.9 196.9 L530.4 196.3 L532 195.7 L533.5 195.1 L535.1 194.4 L536.6 193.8 L538.1 193.1 L539.7 192.4 L541.2 191.7 L542.8 191 L544.3 190.3 L545.9 189.6 L547.4 188.8 L549 188 L550.5 187.3 L552 186.5 L553.6 185.6 L555.1 184.8 L556.7 184 L558.2 183.1 L559.8 182.3 L561.3 181.4 L562.9 180.5 L564.4 179.6 L565.9 178.7 L567.5 177.8 L569 176.9 L570.6 175.9 L572.1 175 L573.7 174 L575.2 173 L576.8 172 L578.3 171.1 L579.8 170.1 L581.4 169 L582.9 168 L584.5 167 L586 166 L587.6 164.9 L589.1 163.9 L590.7 162.8 L592.2 161.8 L593.7 160.7 L595.3 159.6 L596.8 158.6 L598.4 157.5 L599.9 156.4 L601.5 155.3 L603 154.2 L604.6 153.1 L606.1 152 L607.6 150.9 L609.2 149.8 L610.7 148.7 L612.3 147.6 L613.8 146.5 L615.4 145.3 L616.9 144.2 L618.5 143.1 L620 142"/><path class="dmcc-curve" fill="none" d="M64 142 L65.5 140.9 L67.1 139.8 L68.6 138.7 L70.2 137.5 L71.7 136.4 L73.3 135.3 L74.8 134.2 L76.4 133.1 L77.9 132 L79.4 130.9 L81 129.8 L82.5 128.7 L84.1 127.6 L85.6 126.5 L87.2 125.4 L88.7 124.4 L90.3 123.3 L91.8 122.2 L93.3 121.2 L94.9 120.1 L96.4 119.1 L98 118 L99.5 117 L101.1 116 L102.6 115 L104.2 113.9 L105.7 112.9 L107.2 112 L108.8 111 L110.3 110 L111.9 109 L113.4 108.1 L115 107.1 L116.5 106.2 L118.1 105.3 L119.6 104.4 L121.1 103.5 L122.7 102.6 L124.2 101.7 L125.8 100.9 L127.3 100 L128.9 99.2 L130.4 98.4 L132 97.5 L133.5 96.7 L135 96 L136.6 95.2 L138.1 94.4 L139.7 93.7 L141.2 93 L142.8 92.3 L144.3 91.6 L145.9 90.9 L147.4 90.2 L148.9 89.6 L150.5 88.9 L152 88.3 L153.6 87.7 L155.1 87.1 L156.7 86.6 L158.2 86 L159.8 85.5 L161.3 85 L162.8 84.5 L164.4 84 L165.9 83.5 L167.5 83.1 L169 82.7 L170.6 82.3 L172.1 81.9 L173.7 81.5 L175.2 81.1 L176.7 80.8 L178.3 80.5 L179.8 80.2 L181.4 79.9 L182.9 79.6 L184.5 79.4 L186 79.2 L187.6 79 L189.1 78.8 L190.6 78.6 L192.2 78.5 L193.7 78.4 L195.3 78.2 L196.8 78.2 L198.4 78.1 L199.9 78 L201.5 78 L203 78 L204.5 78 L206.1 78 L207.6 78.1 L209.2 78.2 L210.7 78.2 L212.3 78.4 L213.8 78.5 L215.4 78.6 L216.9 78.8 L218.4 79 L220 79.2 L221.5 79.4 L223.1 79.6 L224.6 79.9 L226.2 80.2 L227.7 80.5 L229.3 80.8 L230.8 81.1 L232.3 81.5 L233.9 81.9 L235.4 82.3 L237 82.7 L238.5 83.1 L240.1 83.5 L241.6 84 L243.2 84.5 L244.7 85 L246.2 85.5 L247.8 86 L249.3 86.6 L250.9 87.1 L252.4 87.7 L254 88.3 L255.5 88.9 L257.1 89.6 L258.6 90.2 L260.1 90.9 L261.7 91.6 L263.2 92.3 L264.8 93 L266.3 93.7 L267.9 94.4 L269.4 95.2 L271 96 L272.5 96.7 L274 97.5 L275.6 98.4 L277.1 99.2 L278.7 100 L280.2 100.9 L281.8 101.7 L283.3 102.6 L284.9 103.5 L286.4 104.4 L287.9 105.3 L289.5 106.2 L291 107.1 L292.6 108.1 L294.1 109 L295.7 110 L297.2 111 L298.8 112 L300.3 112.9 L301.8 113.9 L303.4 115 L304.9 116 L306.5 117 L308 118 L309.6 119.1 L311.1 120.1 L312.7 121.2 L314.2 122.2 L315.7 123.3 L317.3 124.4 L318.8 125.4 L320.4 126.5 L321.9 127.6 L323.5 128.7 L325 129.8 L326.6 130.9 L328.1 132 L329.6 133.1 L331.2 134.2 L332.7 135.3 L334.3 136.4 L335.8 137.5 L337.4 138.7 L338.9 139.8 L340.5 140.9 L342 142 L343.5 140.9 L345.1 139.8 L346.6 138.7 L348.2 137.5 L349.7 136.4 L351.3 135.3 L352.8 134.2 L354.4 133.1 L355.9 132 L357.4 130.9 L359 129.8 L360.5 128.7 L362.1 127.6 L363.6 126.5 L365.2 125.4 L366.7 124.4 L368.3 123.3 L369.8 122.2 L371.3 121.2 L372.9 120.1 L374.4 119.1 L376 118 L377.5 117 L379.1 116 L380.6 115 L382.2 113.9 L383.7 112.9 L385.2 112 L386.8 111 L388.3 110 L389.9 109 L391.4 108.1 L393 107.1 L394.5 106.2 L396.1 105.3 L397.6 104.4 L399.1 103.5 L400.7 102.6 L402.2 101.7 L403.8 100.9 L405.3 100 L406.9 99.2 L408.4 98.4 L410 97.5 L411.5 96.7 L413 96 L414.6 95.2 L416.1 94.4 L417.7 93.7 L419.2 93 L420.8 92.3 L422.3 91.6 L423.9 90.9 L425.4 90.2 L426.9 89.6 L428.5 88.9 L430 88.3 L431.6 87.7 L433.1 87.1 L434.7 86.6 L436.2 86 L437.8 85.5 L439.3 85 L440.8 84.5 L442.4 84 L443.9 83.5 L445.5 83.1 L447 82.7 L448.6 82.3 L450.1 81.9 L451.7 81.5 L453.2 81.1 L454.7 80.8 L456.3 80.5 L457.8 80.2 L459.4 79.9 L460.9 79.6 L462.5 79.4 L464 79.2 L465.6 79 L467.1 78.8 L468.6 78.6 L470.2 78.5 L471.7 78.4 L473.3 78.2 L474.8 78.2 L476.4 78.1 L477.9 78 L479.5 78 L481 78 L482.5 78 L484.1 78 L485.6 78.1 L487.2 78.2 L488.7 78.2 L490.3 78.4 L491.8 78.5 L493.4 78.6 L494.9 78.8 L496.4 79 L498 79.2 L499.5 79.4 L501.1 79.6 L502.6 79.9 L504.2 80.2 L505.7 80.5 L507.3 80.8 L508.8 81.1 L510.3 81.5 L511.9 81.9 L513.4 82.3 L515 82.7 L516.5 83.1 L518.1 83.5 L519.6 84 L521.2 84.5 L522.7 85 L524.2 85.5 L525.8 86 L527.3 86.6 L528.9 87.1 L530.4 87.7 L532 88.3 L533.5 88.9 L535.1 89.6 L536.6 90.2 L538.1 90.9 L539.7 91.6 L541.2 92.3 L542.8 93 L544.3 93.7 L545.9 94.4 L547.4 95.2 L549 96 L550.5 96.7 L552 97.5 L553.6 98.4 L555.1 99.2 L556.7 100 L558.2 100.9 L559.8 101.7 L561.3 102.6 L562.9 103.5 L564.4 104.4 L565.9 105.3 L567.5 106.2 L569 107.1 L570.6 108.1 L572.1 109 L573.7 110 L575.2 111 L576.8 112 L578.3 112.9 L579.8 113.9 L581.4 115 L582.9 116 L584.5 117 L586 118 L587.6 119.1 L589.1 120.1 L590.7 121.2 L592.2 122.2 L593.7 123.3 L595.3 124.4 L596.8 125.4 L598.4 126.5 L599.9 127.6 L601.5 128.7 L603 129.8 L604.6 130.9 L606.1 132 L607.6 133.1 L609.2 134.2 L610.7 135.3 L612.3 136.4 L613.8 137.5 L615.4 138.7 L616.9 139.8 L618.5 140.9 L620 142"/><path class="dmcc-curve-two" fill="none" d="M64 78 L65.5 76.9 L67.1 75.8 L68.6 74.7 L70.2 73.7 L71.7 72.7 L73.3 71.7 L74.8 70.7 L76.4 69.7 L77.9 68.8 L79.4 67.9 L81 67 L82.5 66.1 L84.1 65.2 L85.6 64.4 L87.2 63.6 L88.7 62.8 L90.3 62.1 L91.8 61.4 L93.3 60.7 L94.9 60 L96.4 59.3 L98 58.7 L99.5 58.1 L101.1 57.5 L102.6 56.9 L104.2 56.4 L105.7 55.9 L107.2 55.4 L108.8 55 L110.3 54.6 L111.9 54.2 L113.4 53.8 L115 53.5 L116.5 53.2 L118.1 52.9 L119.6 52.6 L121.1 52.4 L122.7 52.2 L124.2 52 L125.8 51.8 L127.3 51.7 L128.9 51.6 L130.4 51.5 L132 51.5 L133.5 51.5 L135 51.5 L136.6 51.5 L138.1 51.6 L139.7 51.7 L141.2 51.8 L142.8 52 L144.3 52.2 L145.9 52.4 L147.4 52.6 L148.9 52.9 L150.5 53.2 L152 53.5 L153.6 53.8 L155.1 54.2 L156.7 54.6 L158.2 55 L159.8 55.4 L161.3 55.9 L162.8 56.4 L164.4 56.9 L165.9 57.5 L167.5 58.1 L169 58.7 L170.6 59.3 L172.1 60 L173.7 60.7 L175.2 61.4 L176.7 62.1 L178.3 62.8 L179.8 63.6 L181.4 64.4 L182.9 65.2 L184.5 66.1 L186 67 L187.6 67.9 L189.1 68.8 L190.6 69.7 L192.2 70.7 L193.7 71.7 L195.3 72.7 L196.8 73.7 L198.4 74.7 L199.9 75.8 L201.5 76.9 L203 78 L204.5 76.9 L206.1 75.8 L207.6 74.7 L209.2 73.7 L210.7 72.7 L212.3 71.7 L213.8 70.7 L215.4 69.7 L216.9 68.8 L218.4 67.9 L220 67 L221.5 66.1 L223.1 65.2 L224.6 64.4 L226.2 63.6 L227.7 62.8 L229.3 62.1 L230.8 61.4 L232.3 60.7 L233.9 60 L235.4 59.3 L237 58.7 L238.5 58.1 L240.1 57.5 L241.6 56.9 L243.2 56.4 L244.7 55.9 L246.2 55.4 L247.8 55 L249.3 54.6 L250.9 54.2 L252.4 53.8 L254 53.5 L255.5 53.2 L257.1 52.9 L258.6 52.6 L260.1 52.4 L261.7 52.2 L263.2 52 L264.8 51.8 L266.3 51.7 L267.9 51.6 L269.4 51.5 L271 51.5 L272.5 51.5 L274 51.5 L275.6 51.5 L277.1 51.6 L278.7 51.7 L280.2 51.8 L281.8 52 L283.3 52.2 L284.9 52.4 L286.4 52.6 L287.9 52.9 L289.5 53.2 L291 53.5 L292.6 53.8 L294.1 54.2 L295.7 54.6 L297.2 55 L298.8 55.4 L300.3 55.9 L301.8 56.4 L303.4 56.9 L304.9 57.5 L306.5 58.1 L308 58.7 L309.6 59.3 L311.1 60 L312.7 60.7 L314.2 61.4 L315.7 62.1 L317.3 62.8 L318.8 63.6 L320.4 64.4 L321.9 65.2 L323.5 66.1 L325 67 L326.6 67.9 L328.1 68.8 L329.6 69.7 L331.2 70.7 L332.7 71.7 L334.3 72.7 L335.8 73.7 L337.4 74.7 L338.9 75.8 L340.5 76.9 L342 78 L343.5 76.9 L345.1 75.8 L346.6 74.7 L348.2 73.7 L349.7 72.7 L351.3 71.7 L352.8 70.7 L354.4 69.7 L355.9 68.8 L357.4 67.9 L359 67 L360.5 66.1 L362.1 65.2 L363.6 64.4 L365.2 63.6 L366.7 62.8 L368.3 62.1 L369.8 61.4 L371.3 60.7 L372.9 60 L374.4 59.3 L376 58.7 L377.5 58.1 L379.1 57.5 L380.6 56.9 L382.2 56.4 L383.7 55.9 L385.2 55.4 L386.8 55 L388.3 54.6 L389.9 54.2 L391.4 53.8 L393 53.5 L394.5 53.2 L396.1 52.9 L397.6 52.6 L399.1 52.4 L400.7 52.2 L402.2 52 L403.8 51.8 L405.3 51.7 L406.9 51.6 L408.4 51.5 L410 51.5 L411.5 51.5 L413 51.5 L414.6 51.5 L416.1 51.6 L417.7 51.7 L419.2 51.8 L420.8 52 L422.3 52.2 L423.9 52.4 L425.4 52.6 L426.9 52.9 L428.5 53.2 L430 53.5 L431.6 53.8 L433.1 54.2 L434.7 54.6 L436.2 55 L437.8 55.4 L439.3 55.9 L440.8 56.4 L442.4 56.9 L443.9 57.5 L445.5 58.1 L447 58.7 L448.6 59.3 L450.1 60 L451.7 60.7 L453.2 61.4 L454.7 62.1 L456.3 62.8 L457.8 63.6 L459.4 64.4 L460.9 65.2 L462.5 66.1 L464 67 L465.6 67.9 L467.1 68.8 L468.6 69.7 L470.2 70.7 L471.7 71.7 L473.3 72.7 L474.8 73.7 L476.4 74.7 L477.9 75.8 L479.5 76.9 L481 78 L482.5 76.9 L484.1 75.8 L485.6 74.7 L487.2 73.7 L488.7 72.7 L490.3 71.7 L491.8 70.7 L493.4 69.7 L494.9 68.8 L496.4 67.9 L498 67 L499.5 66.1 L501.1 65.2 L502.6 64.4 L504.2 63.6 L505.7 62.8 L507.3 62.1 L508.8 61.4 L510.3 60.7 L511.9 60 L513.4 59.3 L515 58.7 L516.5 58.1 L518.1 57.5 L519.6 56.9 L521.2 56.4 L522.7 55.9 L524.2 55.4 L525.8 55 L527.3 54.6 L528.9 54.2 L530.4 53.8 L532 53.5 L533.5 53.2 L535.1 52.9 L536.6 52.6 L538.1 52.4 L539.7 52.2 L541.2 52 L542.8 51.8 L544.3 51.7 L545.9 51.6 L547.4 51.5 L549 51.5 L550.5 51.5 L552 51.5 L553.6 51.5 L555.1 51.6 L556.7 51.7 L558.2 51.8 L559.8 52 L561.3 52.2 L562.9 52.4 L564.4 52.6 L565.9 52.9 L567.5 53.2 L569 53.5 L570.6 53.8 L572.1 54.2 L573.7 54.6 L575.2 55 L576.8 55.4 L578.3 55.9 L579.8 56.4 L581.4 56.9 L582.9 57.5 L584.5 58.1 L586 58.7 L587.6 59.3 L589.1 60 L590.7 60.7 L592.2 61.4 L593.7 62.1 L595.3 62.8 L596.8 63.6 L598.4 64.4 L599.9 65.2 L601.5 66.1 L603 67 L604.6 67.9 L606.1 68.8 L607.6 69.7 L609.2 70.7 L610.7 71.7 L612.3 72.7 L613.8 73.7 L615.4 74.7 L616.9 75.8 L618.5 76.9 L620 78"/><text class="dmcc-small dmcc-halo" x="272.5" y="43.8" text-anchor="middle">two coils (thick)</text><text class="dmcc-small dmcc-halo" x="203" y="110" text-anchor="middle">one coil, commutator</text><text class="dmcc-small dmcc-halo" x="481" y="226" text-anchor="middle">one coil, slip rings (dashed)</text><circle class="dmcc-zero" cx="64" cy="142" r="5"/><circle class="dmcc-zero" cx="342" cy="142" r="5"/><circle class="dmcc-zero" cx="620" cy="142" r="5"/><text class="dmcc-small dmcc-halo" x="342" y="164" text-anchor="middle">zero</text></svg><figcaption>Torque against θ for one turn, as a fraction of one coil’s peak NBIA. Slip rings (dashed): the torque reverses every half turn and averages zero. Split-ring commutator (solid): the current reverses at the neutral plane, so the torque is |sin θ|, never negative, averaging 2/π ≈ 0.64; it is still zero at 0° and 180°. Two commutated coils 90° apart (thick): the sum runs from 1 to √2 ≈ 1.41, so the smallest torque is 0.71 of the largest and never zero.</figcaption></figure>
+        <!-- /DC-MOTOR-COMMUTATION-TRACE -->
+      <p><strong>Two coils.</strong> Add a second coil 90° ahead of the first, each with its own split ring. When one coil is in the neutral plane, the other is at its peak. The total, |sin θ| + |cos θ| in units of one coil's peak, runs from 1 to √2. Its smallest value is 1/√2 ≈ 0.71 of its largest, so the ripple shrinks and the zero-torque dead spot disappears.</p>
+      <p><strong>Worked example, with illustrative numbers rather than a real motor rating:</strong> N = 50 turns, B = 0.20 T, I = 2.0 A, and a coil 40 mm × 30 mm, so A = 1.2 × 10⁻³ m². The peak torque is N·B·I·A = 50 × 0.20 × 2.0 × 0.0012 = <strong>0.024 N·m</strong>. At θ = 30°, τ = 0.024 × sin 30° = <strong>0.012 N·m</strong>.</p>
+      <p><strong>Direction.</strong> Reversing the current reverses every force (F = I L × B), so the motor turns the other way. Swapping the magnets reverses B and does the same. Reversing both restores the original direction.</p>
+      <p><strong>Model limits.</strong> This is an ideal teaching model: one or two rectangular coils, a uniform field, and current switched exactly at the neutral plane. Torque is shown as a fraction of one coil's peak, N·B·I·A. It does not model back EMF, speed, magnetic saturation or brush sparking.</p>
+    </div>
+  </div>
+  <p>For how a DC motor's speed falls as its load torque rises, see <a class="xref-page" href="#p-dc-motor-curves">DC Motor Torque, Speed, and Power</a>.</p>
+  <p class="deeper-ref" id="deeper-ref-66">Supporting detail: <a href="#deeper-addendum-66"><strong>Addendum 66</strong></a> &mdash; Sources for the torque formula and the commutator.</p>
+    </div>
+  </details>
   <details class="xcard deck-slide" id="electric-motor-principles--separate-turning-effort-speed-and-power" data-card="electric-motor-principles--separate-turning-effort-speed-and-power">
     <summary>Separate turning effort, speed, and power<span class="chev"></span></summary>
     <div class="body">
@@ -6449,7 +6660,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>Stator windings arranged around the motor produce a rotating magnetic field. In a three-phase motor, the currents reach their peaks at different times, moving the combined field around the stator. That moving field induces current in conducting rotor bars. The rotor current and stator field interact to produce torque.</p>
   <p><strong>The rotor runs slightly slower than the field during normal motoring.</strong> The difference is called <strong>slip</strong>. If the rotor caught the field exactly, there would be no relative motion to induce the rotor current needed for torque. For example, a field at 1,800 rpm and a rotor at 1,740 rpm differ by 60 rpm, or 3.33% of field speed.</p>
   <p><strong>Strength:</strong> a squirrel-cage induction rotor needs neither brushes nor permanent magnets, making it useful for pumps, fans, and conveyors. <strong>Weak points:</strong> speed changes with load and slip; a variable-frequency drive is normally used when adjustable speed is needed.</p>
-  <p class="deeper-ref" id="deeper-ref-66">Supporting detail: <a href="#deeper-addendum-66"><strong>Addendum 66</strong></a> &mdash; Why alternating current alone is not the full explanation.</p>
+  <p class="deeper-ref" id="deeper-ref-67">Supporting detail: <a href="#deeper-addendum-67"><strong>Addendum 67</strong></a> &mdash; Why alternating current alone is not the full explanation.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="electric-motor-types--brushless-permanent-magnet-motors-switch-the-stator-current" data-card="electric-motor-types--brushless-permanent-magnet-motors-switch-the-stator-current">
@@ -6564,7 +6775,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p class="lede">A generator does not create energy. It takes mechanical work at a shaft and delivers electrical energy to a circuit, with some energy becoming heat along the way.</p>
   <p>A turbine is a rotating machine driven by a moving fluid. Steam, flowing water, wind, or hot combustion gases can turn its blades. The turbine turns the generator; the generator supplies electricity. An engine can also drive a generator without a turbine.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjU1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5Ij4KPHRpdGxlPlN0ZWFtIGdlbmVyYXRpb246IGhlYXQgdG8gbW90aW9uIHRvIGVsZWN0cmljaXR5PC90aXRsZT48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjI1NSIgZmlsbD0iI2ZmZmZmZiIvPgo8ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgcmVmWD0iNyIgcmVmWT0iMyIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwwLDYgTDcsMyBaIiBmaWxsPSIjMTgzMjRiIi8+PC9tYXJrZXI+PC9kZWZzPgo8c3R5bGU+dGV4dHtmb250OjIwcHggc2Fucy1zZXJpZjtmaWxsOiMxODMyNGJ9IC5ib3h7ZmlsbDojZWRmNGY4O3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDoyfSAuZmxvd3tmaWxsOm5vbmU7c3Ryb2tlOiMxODMyNGI7c3Ryb2tlLXdpZHRoOjM7bWFya2VyLWVuZDp1cmwoI2Fycm93KX0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojMTgzMjRiO3N0cm9rZS13aWR0aDozfTwvc3R5bGU+Cgo8dGV4dCB4PSIzMCIgeT0iMzUiPlN0ZWFtIHJvdXRlOiBoZWF0IOKGkiBmbHVpZCBtb3Rpb24g4oaSIHNoYWZ0IHdvcmsg4oaSIGVsZWN0cmljaXR5PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSIyNSIgeT0iNzAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNzAiLz48dGV4dCB4PSI0NSIgeT0iMTAwIj5IZWF0IHNvdXJjZTwvdGV4dD48dGV4dCB4PSI0NSIgeT0iMTI2Ij4rIGJvaWxlcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik0xNjUgMTA1IEgyMjAiLz48dGV4dCB4PSIxNzAiIHk9IjY1Ij5TdGVhbTwvdGV4dD4KPHJlY3QgY2xhc3M9ImJveCIgeD0iMjMwIiB5PSI3MCIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjI1NSIgeT0iMTEyIj5UdXJiaW5lPC90ZXh0Pgo8cGF0aCBjbGFzcz0iZmxvdyIgZD0iTTM2MCAxMDUgSDQyNSIvPjx0ZXh0IHg9IjM2NiIgeT0iNjUiPlNoYWZ0PC90ZXh0Pgo8cmVjdCBjbGFzcz0iYm94IiB4PSI0MzUiIHk9IjcwIiB3aWR0aD0iMTQ1IiBoZWlnaHQ9IjcwIi8+PHRleHQgeD0iNDUwIiB5PSIxMTIiPkdlbmVyYXRvcjwvdGV4dD4KPHBhdGggY2xhc3M9ImZsb3ciIGQ9Ik01ODAgMTA1IEg2NDAiLz4KPHJlY3QgY2xhc3M9ImJveCIgeD0iNjUwIiB5PSI3MCIgd2lkdGg9IjEyNSIgaGVpZ2h0PSI3MCIvPjx0ZXh0IHg9IjY2MyIgeT0iMTEyIj5FbGVjdHJpY2l0eTwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjE5MCI+V2F0ZXIsIHdpbmQgb3IgY29tYnVzdGlvbiBnYXNlcyBjYW4gZHJpdmUgYSB0dXJiaW5lIGRpcmVjdGx5LjwvdGV4dD4KPHRleHQgeD0iMzAiIHk9IjIyNSI+UFYgdGFrZXMgYSBkaWZmZXJlbnQgcm91dGU6IGxpZ2h0IOKGkiBwaG90b3ZvbHRhaWMgY2VsbCDihpIgREMgZWxlY3RyaWNpdHkuPC90ZXh0Pgo8L3N2Zz4=" alt="Heat makes steam; steam turns a turbine; the turbine turns a generator; the generator supplies electricity. Water, wind and combustion gases can drive turbines too." data-natural-width="800" data-natural-height="255"></p>
-  <p class="deeper-ref" id="deeper-ref-67">Supporting detail: <a href="#deeper-addendum-67"><strong>Addendum 67</strong></a> &mdash; How rotation produces electricity.</p>
+  <p class="deeper-ref" id="deeper-ref-68">Supporting detail: <a href="#deeper-addendum-68"><strong>Addendum 68</strong></a> &mdash; How rotation produces electricity.</p>
   <p>See <a class="xref-page" href="#p-power-and-efficiency">Power and Efficiency</a> for losses and <a class="xref-page" href="#p-ac-and-dc">AC and DC</a> for the electrical output forms.</p>
     </div>
   </details>
@@ -6680,7 +6891,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
       <h2>Heat both parts, then feed solder into the joint</h2>
   <p>Prepare the iron and bench using <a class="xref-page" href="#p-soldering-equipment">Soldering Equipment and Setup</a>. The iron heats the parts; the heated parts melt the solder. Touch the tinned working face to both wires, or to both the pad and the component lead. Feed solder into the joint, away from the iron's contact point when access allows.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkhlYXQgcGFkIGFuZCBsZWFkLCBmZWVkIHNvbGRlciwgdGhlbiB3aXRoZHJhdyBhbmQgY29vbDwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+MS4gSGVhdCBib3RoIHBhcnRzPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNNTUgOTBMODAgNzBMMTc1IDE2NVYxODBIMTUzWiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Jcm9uIGZhY2UgdG91Y2hlcyBwYWQgYW5kIGxlYWQuPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDI4MCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjIuIEZlZWQgaW50byB0aGUgam9pbnQ8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik01NSA5MEw4MCA3MEwxNzUgMTY1VjE4MEgxNTNaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik0zMDAgODBMMjEwIDE2NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTI2YjgzIiBzdHJva2Utd2lkdGg9IjciLz48cGF0aCBkPSJNMTkwIDE0MFEyMDAgMTczIDI1MCAxODBIMTkwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjI0MCIgeT0iNjIiPlNvbGRlcjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5LZWVwIGhlYXRpbmcgYXMgc29sZGVyIHdldHMgYm90aC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gV2l0aGRyYXcgYW5kIGNvb2w8L3RleHQ+PHBhdGggZD0iTTQwIDE5MEgzMjBWMjE1SDQwWiIgY2xhc3M9ImJvYXJkIi8+PHBhdGggZD0iTTg1IDE4MEgyNzVWMTkwSDg1WiIgY2xhc3M9InBhZCIvPjxwYXRoIGQ9Ik0xNzUgNjVIMTkwVjIxNUgxNzVaIiBjbGFzcz0ibGVhZCIvPjxwYXRoIGQ9Ik05NSAxODBRMTcwIDE3NCAxNzUgMTEwVjE4MFogTTE5MCAxMTBRMjAwIDE3NCAyNjUgMTgwSDE5MFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5Tb2xkZXIgYXdheSwgdGhlbiBpcm9uLiBIb2xkIHN0aWxsLjwvdGV4dD48L2c+PC9zdmc+" alt="First the iron contacts both pad and lead. Then solder wire approaches the heated joint from the other side while the iron stays in contact. Finally remove solder, remove iron, and hold still." data-natural-width="360" data-natural-height="840"></p>
-  <p class="deeper-ref" id="deeper-ref-68">Supporting detail: <a href="#deeper-addendum-68"><strong>Addendum 68</strong></a> &mdash; A one-second count is a rhythm, not a temperature test.</p>
+  <p class="deeper-ref" id="deeper-ref-69">Supporting detail: <a href="#deeper-addendum-69"><strong>Addendum 69</strong></a> &mdash; A one-second count is a rhythm, not a temperature test.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="soldering-joints--work-through-the-joint-in-this-order" data-card="soldering-joints--work-through-the-joint-in-this-order" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
@@ -6705,7 +6916,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
     <div class="body">
       <h2>Look for wetting and shape; shine alone is not a verdict</h2>
   <p>A good joint flows onto both surfaces. On a typical through-hole pad, look for a smooth transition from pad to lead, often a concave fillet (an inward-curving slope). Tin-lead joints are often shiny. A sound lead-free joint may be dull; dullness alone does not diagnose a cold joint.</p>
-  <p class="deeper-ref" id="deeper-ref-69">Supporting detail: <a href="#deeper-addendum-69"><strong>Addendum 69</strong></a> &mdash; Why lead-free solder may look different.</p>
+  <p class="deeper-ref" id="deeper-ref-70">Supporting detail: <a href="#deeper-addendum-70"><strong>Addendum 70</strong></a> &mdash; Why lead-free solder may look different.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkpvaW50IGluc3BlY3Rpb246IHNjaGVtYXRpYyBjcm9zcy1zZWN0aW9uczwvdGl0bGU+PHJlY3Qgd2lkdGg9IjM2MCIgaGVpZ2h0PSI4NDAiIGZpbGw9IndoaXRlIi8+PHN0eWxlPnRleHR7Zm9udDoxOHB4IHNhbnMtc2VyaWY7ZmlsbDojMTcyYjRkfSAuaGVhZHtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToyMnB4fSAud2lyZXtmaWxsOm5vbmU7c3Ryb2tlOiM5YTUxMTk7c3Ryb2tlLXdpZHRoOjk7c3Ryb2tlLWxpbmVjYXA6cm91bmR9IC5sZWFke2ZpbGw6I2NjYztzdHJva2U6IzE3MmI0ZDtzdHJva2Utd2lkdGg6Mn0gLnNvbGRlcntmaWxsOiNiOGQ5ZWE7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5wYWR7ZmlsbDojYjg3MzMzO3N0cm9rZTojMTcyYjRkfSAuYm9hcmR7ZmlsbDojZTJlZGRmO3N0cm9rZTojMTcyYjRkfTwvc3R5bGU+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+R29vZDogd2V0dGVkPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik04NSAxODBIMjc1VjE5MEg4NVoiIGNsYXNzPSJwYWQiLz48cGF0aCBkPSJNMTc1IDY1SDE5MFYyMTVIMTc1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNOTUgMTgwUTE3MCAxNzQgMTc1IDExMFYxODBaIE0xOTAgMTEwUTIwMCAxNzQgMjY1IDE4MEgxOTBaIiBjbGFzcz0ic29sZGVyIi8+PHRleHQgeD0iMjAiIHk9IjI0NSI+U29sZGVyIHNsb3BlcyBmcm9tIHBhZCB0byBsZWFkLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj5Db2xkIC8gcG9vcmx5IHdldHRlZDwvdGV4dD48cGF0aCBkPSJNNDAgMTkwSDMyMFYyMTVINDBaIiBjbGFzcz0iYm9hcmQiLz48cGF0aCBkPSJNODUgMTgwSDI3NVYxOTBIODVaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTE3NSA2NUgxOTBWMjE1SDE3NVoiIGNsYXNzPSJsZWFkIi8+PGVsbGlwc2UgY3g9IjEzMCIgY3k9IjE1NSIgcng9IjM3IiByeT0iMjQiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5CZWFkIGZhaWxzIHRvIHdldCB0aGUgbGVhZC48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+QnJpZGdlOiB1bndhbnRlZCBwYXRoPC90ZXh0PjxwYXRoIGQ9Ik00MCAxOTBIMzIwVjIxNUg0MFoiIGNsYXNzPSJib2FyZCIvPjxwYXRoIGQ9Ik02NSAxODBIMTUwVjE5MEg2NVogTTIxMCAxODBIMjk1VjE5MEgyMTBaIiBjbGFzcz0icGFkIi8+PHBhdGggZD0iTTEwNSA2NUgxMjBWMjE1SDEwNVogTTI0MCA2NUgyNTVWMjE1SDI0MFoiIGNsYXNzPSJsZWFkIi8+PHBhdGggZD0iTTc1IDE4MFExMDAgMTY1IDEwNSAxMzBWMTYwUTE4MCAxNDAgMjQwIDE2MFYxMzBRMjcwIDE3MCAyODUgMTgwWiIgY2xhc3M9InNvbGRlciIvPjx0ZXh0IHg9IjIwIiB5PSIyNDUiPlNvbGRlciBqb2lucyBzZXBhcmF0ZSBwYWRzLjwvdGV4dD48L2c+PC9zdmc+" alt="Conceptual cross-sections: wetted solder slopes from pad to lead; a cold poorly wetted bead sits on the pad; a solder bridge connects two pads that should be separate." data-natural-width="360" data-natural-height="840"></p>
   <dl class="dims">
     <div><dt>Cold or poorly wetted</dt><dd>Solder balls up or fails to bond to one surface, often because the parts were not heated adequately. A rough or dull appearance can be a clue, but inspect the contact and shape too.</dd></div>
@@ -6745,7 +6956,7 @@ img[data-alt-missing] { outline: 3px dashed var(--cat3); outline-offset: 2px; }
   <p>A <strong>voltmeter</strong> measures the potential difference between two points. Connect it across the component, in parallel. A <strong>series ammeter</strong> becomes part of the current path: open the path and insert it in series with the element whose current you want.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NjAgMzYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkFtbWV0ZXIgaW4gc2VyaWVzIGFuZCB2b2x0bWV0ZXIgaW4gcGFyYWxsZWwiPjx0aXRsZT5BbW1ldGVyIGluIHNlcmllcyBhbmQgdm9sdG1ldGVyIGluIHBhcmFsbGVsPC90aXRsZT48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MTdweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0NX0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojMTcyYjQ1O3N0cm9rZS13aWR0aDozfTwvc3R5bGU+PHBhdGggY2xhc3M9IndpcmUiIGQ9Ik04MCA4MEgyMzUgTTI4NSA4MEg0MTAgTTQ5MCA4MEg2NjBWMjgwSDgwVjIwMCBNODAgMTUwVjgwIE0zNjUgODBWMTgwSDQyNSBNNDc1IDE4MEg1NTBWODAiLz48Y2lyY2xlIGNsYXNzPSJ3aXJlIiBjeD0iODAiIGN5PSIxNzUiIHI9IjI1Ii8+PHRleHQgeD0iNjgiIHk9IjE4MiI+REM8L3RleHQ+PGNpcmNsZSBjbGFzcz0id2lyZSIgY3g9IjI2MCIgY3k9IjgwIiByPSIyNSIvPjx0ZXh0IHg9IjI1NCIgeT0iODciPkE8L3RleHQ+PHJlY3QgY2xhc3M9IndpcmUiIHg9IjQxMCIgeT0iNjgiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNCIvPjx0ZXh0IHg9IjQxMCIgeT0iNTMiPlJlc2lzdG9yPC90ZXh0PjxjaXJjbGUgY2xhc3M9IndpcmUiIGN4PSI0NTAiIGN5PSIxODAiIHI9IjI1Ii8+PHRleHQgeD0iNDQ0IiB5PSIxODciPlY8L3RleHQ+PGNpcmNsZSBjeD0iMzY1IiBjeT0iODAiIHI9IjQiLz48Y2lyY2xlIGN4PSI1NTAiIGN5PSI4MCIgcj0iNCIvPjx0ZXh0IHg9IjE3NSIgeT0iMTMwIj5DdXJyZW50IGZsb3dzIHRocm91Z2ggQTwvdGV4dD48dGV4dCB4PSIzMzAiIHk9IjIzNSI+ViBtZWFzdXJlcyBiZXR3ZWVuIHRoZXNlIHR3byBub2RlczwvdGV4dD48dGV4dCB4PSIxODAiIHk9IjMyNSI+SWRlYWwgbWV0ZXJzOiBBIGhhcyB6ZXJvIHJlc2lzdGFuY2U7IFYgZHJhd3Mgbm8gY3VycmVudDwvdGV4dD48L3N2Zz4=" alt="A DC source supplies an ammeter and resistor in series. A voltmeter connects across the resistor, on two separate parallel leads." data-natural-width="760" data-natural-height="360"></p>
   <p>A meter set for current has a low-resistance input; connecting that input across a source makes a short circuit. Read <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a> before making physical measurements. The diagrams here explain connections, not a procedure for working on mains wiring.</p>
-  <p class="deeper-ref" id="deeper-ref-70">Supporting detail: <a href="#deeper-addendum-70"><strong>Addendum 70</strong></a> &mdash; Real meters change the circuit a little.</p>
+  <p class="deeper-ref" id="deeper-ref-71">Supporting detail: <a href="#deeper-addendum-71"><strong>Addendum 71</strong></a> &mdash; Real meters change the circuit a little.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="measuring-electric-circuits--place-both-voltage-probes-predict-the-sign-then-reveal" data-card="measuring-electric-circuits--place-both-voltage-probes-predict-the-sign-then-reveal" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -6857,7 +7068,7 @@ void loop() {
   digitalWrite(LED_BUILTIN, pressed ? HIGH : LOW);
 }</code></pre>
   <p>The pull-up supplies a small current through the closed switch to ground. The switch sinks that current. A physical switch can bounce between states briefly; counting presses reliably needs debouncing beyond this simple state display.</p>
-  <p class="deeper-ref" id="deeper-ref-71">Supporting detail: <a href="#deeper-addendum-71"><strong>Addendum 71</strong></a> &mdash; Pull-up resistance and current.</p>
+  <p class="deeper-ref" id="deeper-ref-72">Supporting detail: <a href="#deeper-addendum-72"><strong>Addendum 72</strong></a> &mdash; Pull-up resistance and current.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-checklist" id="microcontroller-basics--use-the-official-ide-and-function-reference" data-card="microcontroller-basics--use-the-official-ide-and-function-reference" data-card-edge="checklist" style="--card-marker:var(--mark-checklist)">
@@ -6898,7 +7109,7 @@ void loop() {
       <h2>The stock Uno R3 uses six PWM pins</h2>
   <p>Use digital pins <strong>3, 5, 6, 9, 10 and 11</strong>. Default PWM is approximately <strong>490 Hz on 3, 9, 10 and 11</strong>, and <strong>980 Hz on 5 and 6</strong>. These correspond to periods of about 2.04 ms and 1.02 ms.</p>
   <p><code>analogWrite(pin, value)</code> requests duty using values from 0 (always off) to 255 (always on). A useful nominal mapping is <code>value = round(255 × D)</code>: 25% gives 64. Hardware timer modes introduce small differences in the exact duty, particularly near the ends of the range.</p>
-  <p class="deeper-ref" id="deeper-ref-72">Supporting detail: <a href="#deeper-addendum-72"><strong>Addendum 72</strong></a> &mdash; Official frequency table and timer limitations.</p>
+  <p class="deeper-ref" id="deeper-ref-73">Supporting detail: <a href="#deeper-addendum-73"><strong>Addendum 73</strong></a> &mdash; Official frequency table and timer limitations.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="pulse-width-modulation--change-duty-and-frequency-then-compare-an-adc-reading" data-card="pulse-width-modulation--change-duty-and-frequency-then-compare-an-adc-reading" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -6920,7 +7131,7 @@ void loop() {
     <noscript><p>The controls require JavaScript. The equations, duty-cycle figure and worked example remain available.</p></noscript>
   </div>
   <p>The explorer is a model, not a board connection. Its frequency and sampling controls do not configure an Uno or claim a board throughput. A raw sample uses normalized phase with HIGH on <code>[0, D)</code> and LOW on <code>[D, 1)</code>; the stated finite sample count defines the reported sample mean. ADC controls use the ideal bin convention on <a class="xref-page" href="#p-analog-to-digital-conversion">Analog-to-Digital Conversion</a>; 5.000 V is assumed exact.</p>
-  <p class="deeper-ref" id="deeper-ref-73">Supporting detail: <a href="#deeper-addendum-73"><strong>Addendum 73</strong></a> &mdash; Why more samples can still give the wrong mean.</p>
+  <p class="deeper-ref" id="deeper-ref-74">Supporting detail: <a href="#deeper-addendum-74"><strong>Addendum 74</strong></a> &mdash; Why more samples can still give the wrong mean.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="pulse-width-modulation--an-rc-filter-smooths-pwm-but-leaves-ripple" data-card="pulse-width-modulation--an-rc-filter-smooths-pwm-but-leaves-ripple">
@@ -6930,7 +7141,7 @@ void loop() {
   <p>Put a resistor in series with the PWM signal and a capacitor from the output node to ground; measure the voltage across the capacitor. This <strong>RC low-pass filter</strong> slows voltage changes. The capacitor charges while PWM is HIGH and discharges while it is LOW.</p>
   <p>The time constant is <code>τ = R × C</code>. A longer time constant relative to the PWM period reduces ripple but makes the output respond more slowly when duty changes. The explorer shows the settled waveform with τ = 10 ms, assuming an ideal source and no load. A load changes the result; the filter is not a motor power supply.</p>
   <p>Microchip's <a href="https://onlinedocs.microchip.com/oxy/GUID-15F56EF1-EBFF-405A-9412-E41CC95BAACF-en-US-2/GUID-34AC5DDB-B9AE-4272-842B-E2A1CEE69B6B.html">AVR131 PWM filtering note</a> explains the tradeoff: the low-pass filter must reject PWM base-frequency ripple without removing the slower signal of interest, and a low-impedance load can discharge the capacitor unless buffered. This explorer deliberately assumes no load.</p>
-  <p class="deeper-ref" id="deeper-ref-74">Supporting detail: <a href="#deeper-addendum-74"><strong>Addendum 74</strong></a> &mdash; What the smoothed trace calculates.</p>
+  <p class="deeper-ref" id="deeper-ref-75">Supporting detail: <a href="#deeper-addendum-75"><strong>Addendum 75</strong></a> &mdash; What the smoothed trace calculates.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="pulse-width-modulation--pwm-changes-led-brightness-and-motor-drive" data-card="pulse-width-modulation--pwm-changes-led-brightness-and-motor-drive">
@@ -6994,7 +7205,7 @@ void loop() {
       <h2>Count four nodes with the switch open, three with it closed</h2>
 <p>Trace this small component schematic with S1 open. Stop at each component terminal; do not count through the battery, resistor, or LED.</p>
 <figure class="fig-narrow"><p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMjkwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlNjaGVtYXRpYzogQjEgcG9zaXRpdmUgdG8gb3BlbiBTMSwgdGhlbiBSMSwgRDEgYW5vZGUsIEQxIGNhdGhvZGUgYW5kIEIxIG5lZ2F0aXZlIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE3MmI0ZCIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBkPSJNMjAgNjBINjggTTkyIDYwSDIxNSBNMjY1IDYwSDMwMFYyMDBIMjcwIE0yMTAgMjAwSDEwNSBNNTUgMjAwSDIwVjYwIi8+PGcgZGF0YS1jb21wb25lbnQ9ImJhdHRlcnkiPjxwYXRoIGQ9Ik02OCA0NVY3NSBNNzYgMzVWODUgTTg0IDQ1Vjc1IE05MiAzNVY4NSIvPjx0ZXh0IHg9IjEwNiIgeT0iNDIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPis8L3RleHQ+PHRleHQgeD0iODAiIHk9IjExNCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+QjEgYmF0dGVyeTwvdGV4dD48L2c+PGcgZGF0YS1jb21wb25lbnQ9InN3aXRjaCI+PGNpcmNsZSBjeD0iMjE1IiBjeT0iNjAiIHI9IjMiLz48Y2lyY2xlIGN4PSIyNjUiIGN5PSI2MCIgcj0iMyIvPjxwYXRoIGQ9Ik0yMTggNThMMjU5IDM1Ii8+PHRleHQgeD0iMjQwIiB5PSIxMTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlMxIG9wZW48L3RleHQ+PC9nPjxnIGRhdGEtY29tcG9uZW50PSJyZXNpc3RvciI+PHBhdGggZD0iTTIxMCAyMDBsNS0xMCAxMCAyMCAxMC0yMCAxMCAyMCAxMC0yMCAxMCAyMCA1LTEwIi8+PHRleHQgeD0iMjQwIiB5PSIyNTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyYjRkIiBzdHJva2U9Im5vbmUiPlIxIHJlc2lzdG9yPC90ZXh0PjwvZz48ZyBkYXRhLWNvbXBvbmVudD0ibGVkIj48cGF0aCBkPSJNMTA1IDIwMEg5NSBNOTUgMTgzVjIxN0w2NSAyMDBaIE02NSAxODNWMjE3IE02NSAyMDBINTUgTTgzIDE3NmwtMTUtMThtMCA4di04aDggTTEwMCAxNzZsLTE1LTE4bTAgOHYtOGg4Ii8+PHRleHQgeD0iODAiIHk9IjI1NCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzJiNGQiIHN0cm9rZT0ibm9uZSI+RDEgTEVEPC90ZXh0PjwvZz48L2c+PC9zdmc+Cg==" alt="Battery B1, open switch S1, resistor R1 and LED D1 form a loop." data-natural-width="320" data-natural-height="290"></p><figcaption>The same generic circuit as the drawing comparison. No off-page connections are implied.</figcaption></figure>
-<p class="deeper-ref" id="deeper-ref-75">Supporting detail: <a href="#deeper-addendum-75"><strong>Addendum 75</strong></a> &mdash; Check the node count terminal by terminal.</p>
+<p class="deeper-ref" id="deeper-ref-76">Supporting detail: <a href="#deeper-addendum-76"><strong>Addendum 76</strong></a> &mdash; Check the node count terminal by terminal.</p>
 <p><a class="button" data-practice-add="diagram-component-nodes" href="../practice.html#diagram-component-nodes">Practice counting schematic nodes</a></p>
     </div>
   </details>
@@ -7031,7 +7242,7 @@ void loop() {
     <li>Two parallel resistors: <code>R<sub>eq</sub> = R<sub>1</sub>R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>)</code>.</li>
   </ul>
   <p>Check the result: series resistance is greater than any one positive resistor; parallel resistance is smaller than the smallest connected resistor when two or more branches are connected. An open circuit has no conducting path and is represented by infinite equivalent resistance.</p>
-  <p class="deeper-ref" id="deeper-ref-76">Supporting detail: <a href="#deeper-addendum-76"><strong>Addendum 76</strong></a> &mdash; Why the parallel formula uses reciprocals.</p>
+  <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; Why the parallel formula uses reciprocals.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="series-and-parallel-circuits--change-a-resistor-or-open-a-switch-and-predict-what-changes" data-card="series-and-parallel-circuits--change-a-resistor-or-open-a-switch-and-predict-what-changes" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -7091,7 +7302,7 @@ void loop() {
       <h2>Choose the tip for contact, not just access</h2>
   <p>A temperature-controlled station regulates the iron's tip temperature. A basic iron may have no temperature control; a cordless iron changes how it is powered, not how a joint is made. Check the tool's instructions and choose settings suitable for the solder and components.</p>
   <p>Tip shape and size matter. A fine point reaches small spaces, but a chisel's broad face often transfers heat more effectively. Use the largest tinned contact face that fits the joint without touching neighboring connections. Interchangeable tips let one iron handle different work; change them according to the tool's instructions.</p>
-  <p class="deeper-ref" id="deeper-ref-77">Supporting detail: <a href="#deeper-addendum-77"><strong>Addendum 77</strong></a> &mdash; What the iron's “sweet spot” means.</p>
+  <p class="deeper-ref" id="deeper-ref-78">Supporting detail: <a href="#deeper-addendum-78"><strong>Addendum 78</strong></a> &mdash; What the iron's “sweet spot” means.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-equipment--match-the-solder-and-flux-to-electrical-work" data-card="soldering-equipment--match-the-solder-and-flux-to-electrical-work">
@@ -7115,9 +7326,9 @@ void loop() {
   <p>Helping hands or a PCB vise hold the parts still while your hands hold the iron and solder. Keep a proper stand or cradle within reach. Use a damp soldering sponge or brass wool for tip cleaning, and have solder wick (copper braid) or a desoldering pump available for removing excess solder.</p>
   <p><strong>It gets hot. Really hot.</strong> Park the iron in its stand, and allow the work to cool before touching it. Use ventilation or fume extraction that keeps the plume away from your face and other people; most visible fume comes from flux. Wash your hands after handling leaded solder, and do not eat or drink at the bench.</p>
   <p><strong>SHOP RULE: NEVER SOLDER BATTERIES.</strong></p>
-  <p class="deeper-ref" id="deeper-ref-78">Supporting detail: <a href="#deeper-addendum-78"><strong>Addendum 78</strong></a> &mdash; Why the battery rule stays absolute.</p>
+  <p class="deeper-ref" id="deeper-ref-79">Supporting detail: <a href="#deeper-addendum-79"><strong>Addendum 79</strong></a> &mdash; Why the battery rule stays absolute.</p>
   <p>Work on disconnected circuits. Follow <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/electrical-safety.html" target="_blank" rel="noopener">Electrical Safety</a> and <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/ppe.html" target="_blank" rel="noopener">Personal Protective Equipment</a>; flux and fume handling belongs with <a class="xref-out" href="https://bharrison6.github.io/coursewiki/safety/chemicals-and-sds.html" target="_blank" rel="noopener">Chemicals and Safety Data Sheets</a>.</p>
-  <p class="deeper-ref" id="deeper-ref-79">Supporting detail: <a href="#deeper-addendum-79"><strong>Addendum 79</strong></a> &mdash; Further reading on flux fume.</p>
+  <p class="deeper-ref" id="deeper-ref-80">Supporting detail: <a href="#deeper-addendum-80"><strong>Addendum 80</strong></a> &mdash; Further reading on flux fume.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-equipment--clean-tin-and-keep-the-working-face-coated" data-card="soldering-equipment--clean-tin-and-keep-the-working-face-coated">
@@ -7126,7 +7337,7 @@ void loop() {
       <h2>Clean, tin, and keep the working face coated</h2>
   <p>With the iron at working temperature, briefly clean the tip on brass wool or a damp soldering sponge. Apply fresh solder to coat its working face, then remove the excess on the cleaner. Leave a thin coating; do not wipe it bare and let it sit hot. Re-tin as needed and before storage as directed by the tool manufacturer.</p>
   <p><img class="content-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjAgODQwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUiPjx0aXRsZSBpZD0idGl0bGUiPkNsZWFuLCBjb2F0LCBhbmQgcmV0YWluIGEgdGhpbiBsYXllciBvZiBzb2xkZXI8L3RpdGxlPjxyZWN0IHdpZHRoPSIzNjAiIGhlaWdodD0iODQwIiBmaWxsPSJ3aGl0ZSIvPjxzdHlsZT50ZXh0e2ZvbnQ6MThweCBzYW5zLXNlcmlmO2ZpbGw6IzE3MmI0ZH0gLmhlYWR7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MjJweH0gLndpcmV7ZmlsbDpub25lO3N0cm9rZTojOWE1MTE5O3N0cm9rZS13aWR0aDo5O3N0cm9rZS1saW5lY2FwOnJvdW5kfSAubGVhZHtmaWxsOiNjY2M7c3Ryb2tlOiMxNzJiNGQ7c3Ryb2tlLXdpZHRoOjJ9IC5zb2xkZXJ7ZmlsbDojYjhkOWVhO3N0cm9rZTojMTcyYjRkO3N0cm9rZS13aWR0aDoyfSAucGFke2ZpbGw6I2I4NzMzMztzdHJva2U6IzE3MmI0ZH0gLmJvYXJke2ZpbGw6I2UyZWRkZjtzdHJva2U6IzE3MmI0ZH08L3N0eWxlPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkiPjx0ZXh0IHg9IjIwIiB5PSIzMCIgY2xhc3M9ImhlYWQiPjEuIENsZWFuIGJyaWVmbHk8L3RleHQ+PHBhdGggZD0iTTgwIDE5NUgyODBWMjIwSDgwWiIgZmlsbD0iI2VjYWMwMCIgc3Ryb2tlPSIjMTcyYjRkIi8+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48dGV4dCB4PSIyMCIgeT0iMjUwIj5EYW1wIHNwb25nZSBvciBicmFzcyB3b29sLjwvdGV4dD48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAyODApIj48dGV4dCB4PSIyMCIgeT0iMzAiIGNsYXNzPSJoZWFkIj4yLiBBcHBseSBmcmVzaCBzb2xkZXI8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48cGF0aCBkPSJNMzAwIDkwTDIxMCAxODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzUyNmI4MyIgc3Ryb2tlLXdpZHRoPSI3Ii8+PHRleHQgeD0iMjAiIHk9IjI1MCI+Q29hdCB0aGUgaG90IHdvcmtpbmcgZmFjZS48L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNTYwKSI+PHRleHQgeD0iMjAiIHk9IjMwIiBjbGFzcz0iaGVhZCI+My4gTGVhdmUgYSB0aGluIGNvYXRpbmc8L3RleHQ+PHBhdGggZD0iTTEzMCA2NUgxNzBMMjIwIDE5MEwxOTAgMjA1WiIgY2xhc3M9ImxlYWQiLz48cGF0aCBkPSJNMTg5IDE3OEwyMjAgMTkwTDE5MCAyMDVMMTc5IDE3OFoiIGNsYXNzPSJzb2xkZXIiLz48dGV4dCB4PSIyMCIgeT0iMjQ1Ij5SZW1vdmUgZXhjZXNzIG9uIHRoZSBjbGVhbmVyLjwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjcwIj5EbyBub3QgbGVhdmUgdGhlIGhvdCBmYWNlIGJhcmUuPC90ZXh0PjwvZz48L3N2Zz4=" alt="Three stages: clean the working face, melt fresh solder onto it, and leave a thin solder coating after removing excess." data-natural-width="360" data-natural-height="840"></p>
-  <p class="deeper-ref" id="deeper-ref-80">Supporting detail: <a href="#deeper-addendum-80"><strong>Addendum 80</strong></a> &mdash; Why tinning helps heat transfer.</p>
+  <p class="deeper-ref" id="deeper-ref-81">Supporting detail: <a href="#deeper-addendum-81"><strong>Addendum 81</strong></a> &mdash; Why tinning helps heat transfer.</p>
     </div>
   </details>
 </div>
@@ -7162,7 +7373,7 @@ void loop() {
       <h2>Put heat-shrink on before closing the splice</h2>
   <p>Slide suitable heat-shrink tubing onto a wire before joining it, and keep it away from the soldering heat. After soldering, allow the joint to cool and inspect it. Move the tubing over all exposed conductor, overlapping intact insulation at both ends of an inline splice, then shrink it with the appropriate heat source according to its instructions.</p>
   <p>Choose tubing whose unshrunk size passes over the splice and whose recovered size fits the wire. Avoid sharp wire ends that could puncture it. Ordinary heat-shrink provides insulation; do not assume it makes a waterproof connection or replaces strain relief.</p>
-  <p class="deeper-ref" id="deeper-ref-81">Supporting detail: <a href="#deeper-addendum-81"><strong>Addendum 81</strong></a> &mdash; When pre-tinning helps.</p>
+  <p class="deeper-ref" id="deeper-ref-82">Supporting detail: <a href="#deeper-addendum-82"><strong>Addendum 82</strong></a> &mdash; When pre-tinning helps.</p>
     </div>
   </details>
   <details class="xcard deck-slide" id="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together" data-card="soldering-wires-and-pcbs--on-a-pcb-heat-the-copper-pad-and-component-lead-together">
@@ -7202,7 +7413,7 @@ void loop() {
       <h2>A smaller AWG number means a thicker conductor</h2>
   <p><strong>American Wire Gauge (AWG)</strong> uses smaller numbers for larger conductor cross sections. For the same material, length and temperature, a thicker conductor has less resistance. See <a href="https://learn.adafruit.com/wires-and-connections/wire-gauges">Adafruit’s wire-gauge explanation</a>. Under comparable installation and temperature conditions, it can carry more current without exceeding its temperature limit.</p>
   <p><strong>Ampacity</strong> means the allowable current under specified conditions. Gauge alone is not an ampacity rating: material, insulation temperature rating, ambient temperature, bundling and installation all matter. Use the applicable manufacturer data and installation requirements for a real selection; this page is not a wire-sizing table. <a href="https://www.iewc.com/resources/technical-guide/suggested-ampacities">IEWC explains these ampacity factors</a>. Choosing a wire involves voltage drop as well as allowable current.</p>
-  <p class="deeper-ref" id="deeper-ref-82">Supporting detail: <a href="#deeper-addendum-82"><strong>Addendum 82</strong></a> &mdash; Why a long wire can matter even below its current limit.</p>
+  <p class="deeper-ref" id="deeper-ref-83">Supporting detail: <a href="#deeper-addendum-83"><strong>Addendum 83</strong></a> &mdash; Why a long wire can matter even below its current limit.</p>
     </div>
   </details>
   <details class="xcard deck-slide is-interactive" id="wire-and-wire-gauge--count-the-return-wire-explore-voltage-drop-and-heating" data-card="wire-and-wire-gauge--count-the-return-wire-explore-voltage-drop-and-heating" data-card-edge="interactive" style="--card-marker:var(--mark-interactive)">
@@ -7219,7 +7430,7 @@ void loop() {
     <noscript><p>The worked table and comparison above work without JavaScript. Enable JavaScript to vary the inputs.</p></noscript>
   </div>
   <p>This model assumes solid copper at 20 °C, equal outgoing and return wires, and DC/resistive behavior. Current is an input, not a prediction of how a particular load responds. Heating loss is not a temperature prediction; copper resistance rises with temperature (approx. 0.393%/°C near 20 °C). Connections and AC reactance are omitted.</p>
-  <p class="deeper-ref" id="deeper-ref-83">Supporting detail: <a href="#deeper-addendum-83"><strong>Addendum 83</strong></a> &mdash; Definitions used to calculate every result.</p>
+  <p class="deeper-ref" id="deeper-ref-84">Supporting detail: <a href="#deeper-addendum-84"><strong>Addendum 84</strong></a> &mdash; Definitions used to calculate every result.</p>
   <p>Practice:
     <a data-practice-add="wire-loop-resistance" href="../practice.html#wire-loop-resistance">Loop resistance</a> ·
     <a data-practice-add="wire-run-drop" href="../practice.html#wire-run-drop">Voltage drop</a> ·
@@ -7941,148 +8152,156 @@ void loop() {
     </li>
     <li class="deeper-addendum" id="deeper-addendum-66" value="66">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electric-motor-types">Electric Motor Types</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 66.</span> Why alternating current alone is not the full explanation</h2>
-        <p>A single winding supplied by single-phase AC makes a field that pulses back and forth; that alone does not establish a starting direction. Single-phase induction motors use an additional starting arrangement. The rotating field, rotor current, and relative speed explain rotation more clearly than saying the rotor field simply opposes the stator field.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electric-motor-principles">Electric Motor Principles</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 66.</span> Sources for the torque formula and the commutator</h2>
+        <p>OpenStax, <a href="https://openstax.org/books/university-physics-volume-2/pages/11-5-force-and-torque-on-a-current-loop"><cite>University Physics Volume 2</cite>, section 11.5, Force and Torque on a Current Loop</a>, derives the torque on a rectangular loop in a uniform field (equations 11.19 to 11.22). It defines the magnetic moment of an N-turn loop as N·I·A along the loop's normal and describes brushes and a commutator reversing the current. HyperPhysics (Georgia State University), <a href="http://hyperphysics.phy-astr.gsu.edu/hbase/magnetic/comtat.html">Commutator and Brushes on DC Motor</a>, describes <q>a split-ring device called a commutator</q> that reverses the current as the coil passes the plane perpendicular to the field. Its <a href="http://hyperphysics.phy-astr.gsu.edu/hbase/magnetic/magmom.html">Torque on a Current Loop</a> page gives the same torque in terms of the magnetic moment.</p>
         <p class="deeper-back"><a href="#deeper-ref-66">Back to reference 66</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-67" value="67">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electrical-generation">Electrical Generation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 67.</span> How rotation produces electricity</h2>
-        <p>Relative motion between a magnetic field and conductors induces a voltage. With a closed circuit, current flows and the shaft must supply work against the electrical load. Motor action and generator action reverse the direction of energy conversion; see <a class="xref-page" href="#p-electric-motor-principles">Electric Motor Principles</a>. Actual machines and controls determine how they can operate in either direction.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electric-motor-types">Electric Motor Types</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 67.</span> Why alternating current alone is not the full explanation</h2>
+        <p>A single winding supplied by single-phase AC makes a field that pulses back and forth; that alone does not establish a starting direction. Single-phase induction motors use an additional starting arrangement. The rotating field, rotor current, and relative speed explain rotation more clearly than saying the rotor field simply opposes the stator field.</p>
         <p class="deeper-back"><a href="#deeper-ref-67">Back to reference 67</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-68" value="68">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 68.</span> A one-second count is a rhythm, not a temperature test</h2>
-        <p>“Apply iron, one-second count, apply solder” reminds you to heat before feeding. The actual time depends on the joint, tip, alloy, and component limits. Look for solder flowing onto both surfaces. If it will not flow, stop and check cleanliness, flux, contact, and tool settings rather than holding the iron there indefinitely.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-electrical-generation">Electrical Generation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 68.</span> How rotation produces electricity</h2>
+        <p>Relative motion between a magnetic field and conductors induces a voltage. With a closed circuit, current flows and the shaft must supply work against the electrical load. Motor action and generator action reverse the direction of energy conversion; see <a class="xref-page" href="#p-electric-motor-principles">Electric Motor Principles</a>. Actual machines and controls determine how they can operate in either direction.</p>
         <p class="deeper-back"><a href="#deeper-ref-68">Back to reference 68</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-69" value="69">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 69.</span> Why lead-free solder may look different</h2>
-        <p>Kester's <a href="https://www.kester.com/knowledge-base/faq">soldering FAQ</a>, under lead-free joint appearance, explains that tin-silver-copper joints can have a dull surface without being poor joints. Judge the connection, not shine alone.</p>
+        <h2><span class="deeper-addendum-number">Addendum 69.</span> A one-second count is a rhythm, not a temperature test</h2>
+        <p>“Apply iron, one-second count, apply solder” reminds you to heat before feeding. The actual time depends on the joint, tip, alloy, and component limits. Look for solder flowing onto both surfaces. If it will not flow, stop and check cleanliness, flux, contact, and tool settings rather than holding the iron there indefinitely.</p>
         <p class="deeper-back"><a href="#deeper-ref-69">Back to reference 69</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-70" value="70">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-measuring-electric-circuits">Measuring Electric Circuits</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 70.</span> Real meters change the circuit a little</h2>
-        <p>An ideal voltmeter draws no current. A real one has high but finite input resistance. An ideal ammeter drops no voltage. A real one has some resistance and a voltage drop, sometimes called burden voltage. The practice problems use ideal meters unless stated otherwise.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-joints">Making and Inspecting Solder Joints</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 70.</span> Why lead-free solder may look different</h2>
+        <p>Kester's <a href="https://www.kester.com/knowledge-base/faq">soldering FAQ</a>, under lead-free joint appearance, explains that tin-silver-copper joints can have a dull surface without being poor joints. Judge the connection, not shine alone.</p>
         <p class="deeper-back"><a href="#deeper-ref-70">Back to reference 70</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-71" value="71">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-microcontroller-basics">Microcontroller Basics</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 71.</span> Pull-up resistance and current</h2>
-        <p>The Uno's internal pull-up is approximately <strong>20–50 kΩ</strong>, not a fixed 10 kΩ. Arduino's <a href="https://docs.arduino.cc/retired/boards/arduino-uno-rev3-with-long-pins/">Uno R3 documentation</a> specifies “20-50k ohm.” At nominal 5 V, a closed switch carries about 0.10–0.25 mA through that resistor, using <code>I = V/R</code>. See <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a>.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-measuring-electric-circuits">Measuring Electric Circuits</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 71.</span> Real meters change the circuit a little</h2>
+        <p>An ideal voltmeter draws no current. A real one has high but finite input resistance. An ideal ammeter drops no voltage. A real one has some resistance and a voltage drop, sometimes called burden voltage. The practice problems use ideal meters unless stated otherwise.</p>
         <p class="deeper-back"><a href="#deeper-ref-71">Back to reference 71</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-72" value="72">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 72.</span> Official frequency table and timer limitations</h2>
-        <p>The Uno R3 row of Arduino's <a href="https://github.com/arduino/reference-en/blob/master/Language/Functions/Analog%20IO/analogWrite.adoc">analogWrite reference source</a> states “490 Hz (pins 5 and 6: 980 Hz)”. See also the <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/">published analogWrite reference</a>. A frequency near 31 kHz requires changing timer configuration; it is not the stock setting. <code>analogWrite</code> sets duty, not frequency. Arduino's <a href="https://docs.arduino.cc/tutorials/generic/secrets-of-arduino-pwm/">Secrets of Arduino PWM</a> explains prescalers and timer modes. Changing timers can also affect other functions and libraries.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-microcontroller-basics">Microcontroller Basics</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 72.</span> Pull-up resistance and current</h2>
+        <p>The Uno's internal pull-up is approximately <strong>20–50 kΩ</strong>, not a fixed 10 kΩ. Arduino's <a href="https://docs.arduino.cc/retired/boards/arduino-uno-rev3-with-long-pins/">Uno R3 documentation</a> specifies “20-50k ohm.” At nominal 5 V, a closed switch carries about 0.10–0.25 mA through that resistor, using <code>I = V/R</code>. See <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a>.</p>
         <p class="deeper-back"><a href="#deeper-ref-72">Back to reference 72</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-73" value="73">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 73.</span> Why more samples can still give the wrong mean</h2>
-        <p>If the sample clock repeatedly lands at the same PWM phase, every point can read HIGH or every point can read LOW even though the full-cycle time mean is 1.25 V. A sample-and-hold output keeps the most recent point value between samples; holding is not averaging. A carefully spaced finite set can match the cycle mean, but a higher rate or larger count alone does not guarantee an unbiased result. This bounded comparison does not claim reconstruction of an unbandlimited switching edge from a Nyquist test.</p>
+        <h2><span class="deeper-addendum-number">Addendum 73.</span> Official frequency table and timer limitations</h2>
+        <p>The Uno R3 row of Arduino's <a href="https://github.com/arduino/reference-en/blob/master/Language/Functions/Analog%20IO/analogWrite.adoc">analogWrite reference source</a> states “490 Hz (pins 5 and 6: 980 Hz)”. See also the <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/">published analogWrite reference</a>. A frequency near 31 kHz requires changing timer configuration; it is not the stock setting. <code>analogWrite</code> sets duty, not frequency. Arduino's <a href="https://docs.arduino.cc/tutorials/generic/secrets-of-arduino-pwm/">Secrets of Arduino PWM</a> explains prescalers and timer modes. Changing timers can also affect other functions and libraries.</p>
         <p class="deeper-back"><a href="#deeper-ref-73">Back to reference 73</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-74" value="74">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 74.</span> What the smoothed trace calculates</h2>
-        <p>During each constant input interval, <code>V(t) = V<sub>target</sub> + (V<sub>start</sub> − V<sub>target</sub>)e<sup>−t/τ</sup></code>. The model solves for a repeating steady state, then draws the charging and discharging curves. It omits startup, output resistance, component tolerances and loading. At 0% or 100%, the settled output is simply 0 V or 5 V.</p>
+        <h2><span class="deeper-addendum-number">Addendum 74.</span> Why more samples can still give the wrong mean</h2>
+        <p>If the sample clock repeatedly lands at the same PWM phase, every point can read HIGH or every point can read LOW even though the full-cycle time mean is 1.25 V. A sample-and-hold output keeps the most recent point value between samples; holding is not averaging. A carefully spaced finite set can match the cycle mean, but a higher rate or larger count alone does not guarantee an unbiased result. This bounded comparison does not claim reconstruction of an unbandlimited switching edge from a Nyquist test.</p>
         <p class="deeper-back"><a href="#deeper-ref-74">Back to reference 74</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-75" value="75">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-reading-electrical-connections">Reading Electrical Connections</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 75.</span> Check the node count terminal by terminal</h2>
-        <p>The four separate conductor groups are B1+ to S1; the other side of S1 to R1; the other side of R1 to D1 anode; and D1 cathode to B1−. Closing an ideal S1 merges the first two groups into one, leaving three nodes. None of the component bodies is an extra node.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-pulse-width-modulation">Pulse-Width Modulation</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 75.</span> What the smoothed trace calculates</h2>
+        <p>During each constant input interval, <code>V(t) = V<sub>target</sub> + (V<sub>start</sub> − V<sub>target</sub>)e<sup>−t/τ</sup></code>. The model solves for a repeating steady state, then draws the charging and discharging curves. It omits startup, output resistance, component tolerances and loading. At 0% or 100%, the settled output is simply 0 V or 5 V.</p>
         <p class="deeper-back"><a href="#deeper-ref-75">Back to reference 75</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-76" value="76">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 76.</span> Why the parallel formula uses reciprocals</h2>
-        <p>Each branch draws the supply voltage divided by its resistance. Add those branch currents, then divide by the common voltage. The result is a sum of <code>1/R</code> terms. This reciprocal of resistance is called conductance: parallel branches add ways for current to flow.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-reading-electrical-connections">Reading Electrical Connections</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 76.</span> Check the node count terminal by terminal</h2>
+        <p>The four separate conductor groups are B1+ to S1; the other side of S1 to R1; the other side of R1 to D1 anode; and D1 cathode to B1−. Closing an ideal S1 merges the first two groups into one, leaving three nodes. None of the component bodies is an extra node.</p>
         <p class="deeper-back"><a href="#deeper-ref-76">Back to reference 76</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-77" value="77">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 77.</span> What the iron's “sweet spot” means</h2>
-        <p>Use the broad, clean, solder-coated working face of the tip against both parts. Do not interpret “side of the iron” as the barrel or an uncoated surface. The useful contact area, not the sharpest point or the highest temperature setting, delivers heat into the joint. A tiny point can be hot and still transfer heat poorly.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-series-and-parallel-circuits">Series and Parallel Circuits</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 77.</span> Why the parallel formula uses reciprocals</h2>
+        <p>Each branch draws the supply voltage divided by its resistance. Add those branch currents, then divide by the common voltage. The result is a sum of <code>1/R</code> terms. This reciprocal of resistance is called conductance: parallel branches add ways for current to flow.</p>
         <p class="deeper-back"><a href="#deeper-ref-77">Back to reference 77</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-78" value="78">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 78.</span> Why the battery rule stays absolute</h2>
-        <p>Heat applied to a cell can damage its seals and internal parts. Lithium cells in particular can fail dangerously if damaged. Use the intended battery holder or connector instead of applying a soldering iron to a battery.</p>
+        <h2><span class="deeper-addendum-number">Addendum 78.</span> What the iron's “sweet spot” means</h2>
+        <p>Use the broad, clean, solder-coated working face of the tip against both parts. Do not interpret “side of the iron” as the barrel or an uncoated surface. The useful contact area, not the sharpest point or the highest temperature setting, delivers heat into the joint. A tiny point can be hot and still transfer heat poorly.</p>
         <p class="deeper-back"><a href="#deeper-ref-78">Back to reference 78</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-79" value="79">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 79.</span> Further reading on flux fume</h2>
-        <p>The UK Health and Safety Executive's <a href="https://www.hse.gov.uk/asthma/solderers.htm">guidance for solderers</a> describes rosin-based flux fume and recommends extraction and keeping your head out of the plume.</p>
+        <h2><span class="deeper-addendum-number">Addendum 79.</span> Why the battery rule stays absolute</h2>
+        <p>Heat applied to a cell can damage its seals and internal parts. Lithium cells in particular can fail dangerously if damaged. Use the intended battery holder or connector instead of applying a soldering iron to a battery.</p>
         <p class="deeper-back"><a href="#deeper-ref-79">Back to reference 79</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-80" value="80">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 80.</span> Why tinning helps heat transfer</h2>
-        <p>A hot tip oxidizes. Oxide interferes with wetting, while a solder coating protects the working face and helps make thermal contact with the joint. Tinning the tip is the time to feed solder onto the tip. Making a joint is different: feed solder into the heated joint.</p>
-    <p>See HAKKO's <a href="https://www.hakko.com/english/support/maintenance/detail.php?seq=163">tip-life guidance</a> for the construction of plated tips and the effects of oxidation.</p>
+        <h2><span class="deeper-addendum-number">Addendum 80.</span> Further reading on flux fume</h2>
+        <p>The UK Health and Safety Executive's <a href="https://www.hse.gov.uk/asthma/solderers.htm">guidance for solderers</a> describes rosin-based flux fume and recommends extraction and keeping your head out of the plume.</p>
         <p class="deeper-back"><a href="#deeper-ref-80">Back to reference 80</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-81" value="81">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-wires-and-pcbs">Soldering Wire Splices and Through-Hole PCBs</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 81.</span> When pre-tinning helps</h2>
-        <p>Some wires and terminals are pre-tinned: a small amount of solder wets the surface before final assembly. This can help the final joint flow, but too much solder makes a wire end stiff and bulky. Follow the connection's assembly method and still heat both parts when making the final bond.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-equipment">Soldering Equipment and Setup</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 81.</span> Why tinning helps heat transfer</h2>
+        <p>A hot tip oxidizes. Oxide interferes with wetting, while a solder coating protects the working face and helps make thermal contact with the joint. Tinning the tip is the time to feed solder onto the tip. Making a joint is different: feed solder into the heated joint.</p>
+    <p>See HAKKO's <a href="https://www.hakko.com/english/support/maintenance/detail.php?seq=163">tip-life guidance</a> for the construction of plated tips and the effects of oxidation.</p>
         <p class="deeper-back"><a href="#deeper-ref-81">Back to reference 81</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-82" value="82">
       <article>
-        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 82.</span> Why a long wire can matter even below its current limit</h2>
-        <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> shows the calculation.</p>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-soldering-wires-and-pcbs">Soldering Wire Splices and Through-Hole PCBs</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 82.</span> When pre-tinning helps</h2>
+        <p>Some wires and terminals are pre-tinned: a small amount of solder wets the surface before final assembly. This can help the final joint flow, but too much solder makes a wire end stiff and bulky. Follow the connection's assembly method and still heat both parts when making the final bond.</p>
         <p class="deeper-back"><a href="#deeper-ref-82">Back to reference 82</a></p>
       </article>
     </li>
     <li class="deeper-addendum" id="deeper-addendum-83" value="83">
       <article>
         <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
-        <h2><span class="deeper-addendum-number">Addendum 83.</span> Definitions used to calculate every result</h2>
+        <h2><span class="deeper-addendum-number">Addendum 83.</span> Why a long wire can matter even below its current limit</h2>
+        <p>A wire can stay within its temperature limit yet drop too much voltage for its load. Length increases resistance, and both voltage drop and heating follow from that resistance. The worked cord example in <a class="xref-page" href="#p-current-voltage-and-resistance">Current, Voltage, and Resistance</a> shows the calculation.</p>
+        <p class="deeper-back"><a href="#deeper-ref-83">Back to reference 83</a></p>
+      </article>
+    </li>
+    <li class="deeper-addendum" id="deeper-addendum-84" value="84">
+      <article>
+        <div class="crumb"><span>Engineering Fundamentals</span><span class="sep">/</span><span>Electrical Systems</span><span class="sep">/</span><a href="#p-wire-and-wire-gauge">Wire and Wire Gauge</a></div>
+        <h2><span class="deeper-addendum-number">Addendum 84.</span> Definitions used to calculate every result</h2>
         <p>For AWG number n, diameter d = 0.127 × 92<sup>(36 − n)/39</sup> mm. Convert d to meters, then A = πd²/4 in m². Using annealed-copper resistivity ρ = 1.724 × 10<sup>−8</sup> Ω·m at 20 °C, R = ρL/A. One foot is exactly 0.3048 m.</p>
     <p>With one-way run ℓ, L = 2ℓ and R<sub>loop</sub> = ρ(2ℓ)/A. V<sub>drop</sub> = IR<sub>loop</sub>; percent drop = 100V<sub>drop</sub>/V<sub>source</sub>; V<sub>load</sub> = V<sub>source</sub> − V<sub>drop</sub>; wire loss P = I²R<sub>loop</sub>. A two-wire single-phase resistive approximation uses the same return path, but this model does not include AC effects.</p>
-        <p class="deeper-back"><a href="#deeper-ref-83">Back to reference 83</a></p>
+        <p class="deeper-back"><a href="#deeper-ref-84">Back to reference 84</a></p>
       </article>
     </li>
   </ol>
@@ -11365,6 +11584,1028 @@ void loop() {
     });
   }
   function initAll() { document.querySelectorAll('[data-interactive="motor-load-matching"]').forEach(init); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll, { once: true });
+  else initAll();
+})();
+
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiCommutation = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  // Bounded teaching model: ideal rectangular coil(s) in a uniform field.
+  //
+  // Geometry. x points from the left magnet face to the right one, y is up, and
+  // z runs along the shaft toward the commutator end, where the end view looks
+  // from. The rotor angle `alpha` is the direction of the coil's marked normal
+  // n, measured counter-clockwise from +x as seen from the commutator end.
+  // Side A of a coil sits at r(-sin alpha, cos alpha); side B is opposite.
+  // The drawings label coil 1's sides 1 (A) and 2 (B), and coil 2's sides 3 and 4.
+  //
+  // theta, the angle the learner sees, is the angle from B to n. With the
+  // default magnets B points along +x, so theta = alpha. Swapping the magnets
+  // reverses B, so the same rotor position has theta = alpha + 180 degrees.
+  //
+  // Current is signed per coil side A: +1 flows toward the commutator end
+  // (out of the end view), -1 flows away. Side B always carries the opposite.
+  // F = I L x B gives a force along +/-y on each side; the torque about the
+  // shaft, positive counter-clockwise from the commutator end, is
+  //   tau = -sA * N B I A * sin(theta).
+  // All results are normalized to one coil's peak N B I A.
+  const DEG = Math.PI / 180;
+  const MODES = Object.freeze(['commutator', 'slip']);
+
+  function finite(name, value) {
+    if (typeof value !== 'number' || !Number.isFinite(value)) throw new RangeError(name + ' must be a finite number.');
+    return value;
+  }
+  function wrap(deg) {
+    finite('Angle', deg);
+    let d = deg % 360;
+    if (d < 0) d += 360;
+    if (d === 360 || Object.is(d, -0)) d = 0;
+    return d;
+  }
+  // Exact zeros and ones at the quarter turns keep the boundary cases honest.
+  function sinDeg(deg) {
+    const w = wrap(deg);
+    if (w === 0 || w === 180) return 0;
+    if (w === 90) return 1;
+    if (w === 270) return -1;
+    return Math.sin(w * DEG);
+  }
+  function cosDeg(deg) { return sinDeg(deg + 90); }
+  function sign(v) { return v > 0 ? 1 : v < 0 ? -1 : 0; }
+
+  function options(input) {
+    const o = Object.assign({ mode: 'commutator', coils: 1, supply: 1, field: 1 }, input || {});
+    if (!MODES.includes(o.mode)) throw new RangeError('Use mode "commutator" or "slip".');
+    if (o.coils !== 1 && o.coils !== 2) throw new RangeError('Use one coil or two coils.');
+    if (o.supply !== 1 && o.supply !== -1) throw new RangeError('Supply polarity must be +1 or -1.');
+    if (o.field !== 1 && o.field !== -1) throw new RangeError('Magnet polarity must be +1 or -1.');
+    return Object.freeze({ mode: o.mode, coils: o.coils, supply: o.supply, field: o.field });
+  }
+  function thetaFromAlpha(alpha, field) { return wrap(alpha + (field === -1 ? 180 : 0)); }
+  function alphaFromTheta(theta, field) { return wrap(theta - (field === -1 ? 180 : 0)); }
+
+  // Signed current in side A of a coil whose normal is at rotor angle alpha.
+  // Slip rings: fixed by the supply. Split ring: the brushes change segment
+  // as the coil passes the neutral plane (sin alpha = 0); exactly there the
+  // brushes sit on the gaps and the coil carries no current.
+  function sideCurrent(alpha, opts) {
+    const o = options(opts);
+    if (o.mode === 'slip') return -o.supply;
+    const s = sign(sinDeg(alpha));
+    return s === 0 ? 0 : -o.supply * s;
+  }
+
+  function coil(alpha, o, index) {
+    const a = wrap(alpha + 90 * index);
+    const theta = thetaFromAlpha(a, o.field);
+    const current = sideCurrent(a, o);
+    const s = sinDeg(a), c = cosDeg(a);
+    // Force per unit B I L on each long side: F = I L x B, along y only.
+    const forceA = current * o.field, forceB = -forceA;
+    // Torque per unit N B I A; A = 2 r L, so each side contributes half.
+    const torque = -current * sinDeg(theta) + 0;
+    return Object.freeze({
+      index, alpha: a, theta, current,
+      normal: Object.freeze({ x: c, y: s }),
+      sideA: Object.freeze({ x: -s, y: c, force: forceA }),
+      sideB: Object.freeze({ x: s, y: -c, force: forceB }),
+      // Perpendicular distance from the shaft to each force's line of action,
+      // as a fraction of the coil half-width.
+      lever: Math.abs(s),
+      torque: torque === 0 ? 0 : torque,
+      // Split ring: brushes press on the top and bottom of the commutator. The
+      // segment joined to side A spans alpha-90..alpha+90 (centred on n), so it
+      // meets the top brush while sin(alpha) > 0 and the bottom brush while
+      // sin(alpha) < 0; at the neutral plane both brushes sit on the gaps.
+      segmentABrush: o.mode === 'slip' ? 'ring' : (s > 0 ? 'top' : s < 0 ? 'bottom' : 'gap')
+    });
+  }
+
+  function analyze(alpha, opts) {
+    const o = options(opts);
+    const a = wrap(finite('Rotor angle', alpha));
+    const coils = [coil(a, o, 0)];
+    if (o.coils === 2) coils.push(coil(a, o, 1));
+    const total = coils.reduce((sum, k) => sum + k.torque, 0);
+    return Object.freeze({
+      alpha: a, theta: thetaFromAlpha(a, o.field), options: o,
+      coils: Object.freeze(coils), total: Math.abs(total) < 1e-12 ? 0 : total,
+      // Which way the torque turns the rotor, seen from the commutator end.
+      sense: total > 1e-12 ? 'counterclockwise' : total < -1e-12 ? 'clockwise' : 'none',
+      // The top brush (split ring) or side-A ring brush (slip rings) is the
+      // supply's positive side when supply = +1.
+      topBrush: o.supply === 1 ? '+' : '-'
+    });
+  }
+  function torqueAtTheta(theta, opts) {
+    const o = options(opts);
+    return analyze(alphaFromTheta(wrap(theta), o.field), o).total;
+  }
+
+  function sweep(opts, count) {
+    const n = count === undefined ? 3600 : count;
+    if (!Number.isInteger(n) || n < 4 || n > 36000) throw new RangeError('Use 4 to 36,000 samples per turn.');
+    const o = options(opts), out = [];
+    for (let i = 0; i < n; i += 1) out.push(torqueAtTheta(360 * (i + 0.5) / n, o));
+    return out;
+  }
+  // Average torque over one full turn (midpoint rule), normalized.
+  function turnAverage(opts, count) {
+    const values = sweep(opts, count);
+    return values.reduce((s, v) => s + v, 0) / values.length;
+  }
+  // Smallest and largest total torque magnitude over a turn, sampled on
+  // whole-degree and half-degree angles so the exact extremes are included.
+  function ripple(opts) {
+    const o = options(opts);
+    let min = Infinity, max = -Infinity;
+    for (let i = 0; i < 720; i += 1) {
+      const v = torqueAtTheta(i / 2, o);
+      if (v < min) min = v;
+      if (v > max) max = v;
+    }
+    const oneSign = min >= 0 || max <= 0;
+    const lo = oneSign ? Math.min(Math.abs(min), Math.abs(max)) : 0;
+    const hi = Math.max(Math.abs(min), Math.abs(max));
+    return Object.freeze({ min, max, oneDirection: oneSign, ratio: oneSign && hi > 0 ? lo / hi : null });
+  }
+
+  // Ideal torque in SI units: tau = N B I A sin(theta), commutated |sin|.
+  // These are the formula's inputs, not a motor rating.
+  function torqueSI(input) {
+    const v = input || {};
+    const turns = v.turns, field = finite('Field', v.fieldT), current = finite('Current', v.currentA), area = finite('Area', v.areaM2);
+    const theta = finite('Angle', v.thetaDeg);
+    if (!Number.isInteger(turns) || turns < 1 || turns > 10000) throw new RangeError('Use 1 to 10,000 whole turns.');
+    if (field < 0 || field > 3) throw new RangeError('Use a field magnitude from 0 to 3 T.');
+    if (current < 0 || current > 1000) throw new RangeError('Use a current magnitude from 0 to 1,000 A.');
+    if (area <= 0 || area > 1) throw new RangeError('Use a coil area above 0 and at most 1 square metre.');
+    const mode = v.mode === undefined ? 'commutator' : v.mode;
+    if (!MODES.includes(mode)) throw new RangeError('Use mode "commutator" or "slip".');
+    const peak = turns * field * current * area;
+    const s = sinDeg(theta);
+    return Object.freeze({ peak, torque: mode === 'slip' ? peak * s : peak * Math.abs(s) });
+  }
+
+  // What the torque does just either side of a rotor angle. Angles grow
+  // counter-clockwise and positive torque is counter-clockwise, so torque > 0
+  // just before and < 0 just after pushes the rotor back: a stable rest angle.
+  //   driven      torque is not zero here
+  //   stable      zero here, both neighbours push back toward it
+  //   unstable    zero here, both neighbours push away from it
+  //   through     zero here, both neighbours push the same way (a dead spot
+  //               that a moving rotor passes through); see direction
+  //   none        zero here and on both sides
+  function neighbourhood(alpha, opts, probeDeg) {
+    const o = options(opts);
+    const p = probeDeg === undefined ? 1 : finite('Probe angle', probeDeg);
+    if (p <= 0 || p > 10) throw new RangeError('Use a probe angle above 0 and at most 10 degrees.');
+    const a = wrap(finite('Rotor angle', alpha));
+    const at = analyze(a, o).total, before = analyze(a - p, o).total, after = analyze(a + p, o).total;
+    let kind = 'none', direction = 'none';
+    if (at !== 0) { kind = 'driven'; direction = at > 0 ? 'counterclockwise' : 'clockwise'; }
+    else if (before > 0 && after < 0) kind = 'stable';
+    else if (before < 0 && after > 0) kind = 'unstable';
+    else if (before > 0 && after > 0) { kind = 'through'; direction = 'counterclockwise'; }
+    else if (before < 0 && after < 0) { kind = 'through'; direction = 'clockwise'; }
+    return Object.freeze({ kind, direction, at, before, after });
+  }
+
+  // Qualitative motion for the animation only. The inertia and friction
+  // constants are illustrative choices that make the torque visible; they are
+  // not measured, and the result is not a speed prediction (no back EMF).
+  const ILLUSTRATIVE = Object.freeze({ gain: 9, friction: 2 });
+  function illustrativeStep(state, dt, opts) {
+    const o = options(opts);
+    let alpha = wrap(finite('Rotor angle', state.alpha)), omega = finite('Angular velocity', state.omega);
+    finite('Time step', dt);
+    if (dt < 0 || dt > 0.25) throw new RangeError('Use a time step from 0 to 0.25 s.');
+    const steps = Math.max(1, Math.ceil(dt / (1 / 240)));
+    const h = dt / steps;
+    for (let i = 0; i < steps; i += 1) {
+      const tau = analyze(alpha, o).total;
+      omega += (ILLUSTRATIVE.gain * tau - ILLUSTRATIVE.friction * omega) * h;
+      alpha = wrap(alpha + omega * h / DEG);
+    }
+    return Object.freeze({ alpha, omega });
+  }
+
+  return Object.freeze({
+    MODES, ILLUSTRATIVE, wrap, sinDeg, cosDeg, options, thetaFromAlpha, alphaFromTheta,
+    sideCurrent, analyze, neighbourhood, torqueAtTheta, sweep, turnAverage, ripple, torqueSI, illustrativeStep
+  });
+});
+
+(function (root, factory) {
+  'use strict';
+  const api = factory(root.CourseWikiCommutation || (typeof require === 'function' ? require('./model.js') : null));
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.CourseWikiCommutationDraw = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
+  'use strict';
+  if (!M) throw new Error('The commutation model is required.');
+  // One pure SVG renderer serves the live views and the static/print figures.
+  // Only model numbers and fixed strings enter the markup.
+  const DEG = Math.PI / 180;
+  const f1 = v => (Math.round(v * 10) / 10).toString();
+  const f2 = v => (Math.abs(v) < 0.005 ? 0 : v).toFixed(2);
+  const pts = list => list.map(p => f1(p[0]) + ',' + f1(p[1])).join(' ');
+  const pathOf = list => list.map((p, i) => (i ? 'L' : 'M') + f1(p[0]) + ' ' + f1(p[1])).join(' ');
+
+  function arrowHead(tip, from, size, cls) {
+    const dx = tip[0] - from[0], dy = tip[1] - from[1], len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len, s = size || 9;
+    const a = [tip[0] - ux * s - uy * s * 0.55, tip[1] - uy * s + ux * s * 0.55];
+    const b = [tip[0] - ux * s + uy * s * 0.55, tip[1] - uy * s - ux * s * 0.55];
+    return '<path class="' + cls + '" d="M' + f1(tip[0]) + ' ' + f1(tip[1]) + 'L' + f1(a[0]) + ' ' + f1(a[1]) + 'L' + f1(b[0]) + ' ' + f1(b[1]) + 'Z"/>';
+  }
+  function arrow(from, to, cls, size) {
+    return '<path class="' + cls + '" fill="none" stroke="currentColor" d="M' + f1(from[0]) + ' ' + f1(from[1]) + 'L' + f1(to[0]) + ' ' + f1(to[1]) + '"/>' +
+      arrowHead(to, from, size, cls + '-head');
+  }
+  function poleLabels(field) { return field === 1 ? ['N', 'S'] : ['S', 'N']; }
+
+  // ---- Cutaway side view ----------------------------------------------------
+  // Looking across the gap from the near pole (cut away) toward the far pole,
+  // slightly from above: the shaft runs left to right, the commutator end is on
+  // the right. Farther points (larger x) sit a little higher and to the right.
+  const SV = Object.freeze({ S: 60, OX: 150, OY: 150, kx: 0.26, ky: 0.36, cy: 0.93 });
+  function P(x, y, z) { return [SV.OX + SV.S * (z + SV.kx * x), SV.OY - SV.S * (SV.cy * y + SV.ky * x)]; }
+  const COIL_Z = 1.5, RING_R = 0.32, SHAFT_R = 0.12;
+  const SPLIT_Z0 = 1.95, SPLIT_STEP = 0.5, SPLIT_W = 0.28, SPLIT_GAP = 8;
+  const SLIP_Z0 = 1.9, SLIP_STEP = 0.3, SLIP_W = 0.2;
+  const unit = deg => [Math.cos(deg * DEG), Math.sin(deg * DEG)];
+  // Where each coil end joins its contact, in 3D, for every coil.
+  // Split ring: segment A (joined to side A) spans alpha-90..alpha+90, centred
+  // on n; segment B is opposite. Each lead lands well inside its own conducting
+  // segment (45 degrees from its centre, 37 from the nearest gap), never on a gap.
+  // Slip rings: side A goes to its own ring and side B to the next ring out.
+  // A lead to a contact beyond the first one runs along the shaft, under the
+  // nearer rings (insulated), then rises to its own contact.
+  function wiring(alpha, opts) {
+    const o = M.options(opts), r = M.analyze(alpha, o), slip = o.mode === 'slip';
+    const firstZ = slip ? SLIP_Z0 : SPLIT_Z0;
+    return r.coils.map(c => {
+      let a, b;
+      if (slip) {
+        const za = SLIP_Z0 + SLIP_STEP * (2 * c.index), zb = za + SLIP_STEP;
+        a = { angle: M.wrap(c.alpha + 90), z: za + SLIP_W / 2, band: [za, za + SLIP_W], element: 'ring A' };
+        b = { angle: M.wrap(c.alpha + 270), z: zb + SLIP_W / 2, band: [zb, zb + SLIP_W], element: 'ring B' };
+      } else {
+        const z0 = SPLIT_Z0 + SPLIT_STEP * c.index;
+        a = { angle: M.wrap(c.alpha + 45), z: z0 + SPLIT_W / 2, band: [z0, z0 + SPLIT_W], element: 'segment A' };
+        b = { angle: M.wrap(c.alpha + 225), z: z0 + SPLIT_W / 2, band: [z0, z0 + SPLIT_W], element: 'segment B' };
+      }
+      const route = (end, corner) => {
+        const d = unit(end.angle), pts3 = [corner];
+        if (end.z > firstZ + 0.05 + (slip ? SLIP_W : SPLIT_W)) {
+          pts3.push([SHAFT_R * d[0], SHAFT_R * d[1], firstZ - 0.08], [SHAFT_R * d[0], SHAFT_R * d[1], end.z]);
+        }
+        pts3.push([RING_R * d[0], RING_R * d[1], end.z]);
+        return pts3;
+      };
+      const A = c.sideA, B = c.sideB;
+      const aF = [A.x, A.y, COIL_Z], aB = [A.x, A.y, -COIL_Z], bB = [B.x, B.y, -COIL_Z], bF = [B.x, B.y, COIL_Z];
+      const leadA = route(a, aF).reverse(), leadB = route(b, bF);
+      // forward: contact A ... front A, back A, back B, front B ... contact B.
+      const forward = leadA.concat([aB, bB]).concat(leadB);
+      return { index: c.index, current: c.current, a, b, corners: { aF, aB, bB, bF }, forward };
+    });
+  }
+  function project(p) { return P(p[0], p[1], p[2]); }
+  // Ordered path of conventional current through one coil, from the contact of
+  // the side it enters to the contact of the side it leaves.
+  function coilPath(w) {
+    const forward = w.forward.map(project);
+    // Side A current -1 flows away from the commutator end: contact A -> front A -> back A.
+    const flow = w.current < 0 ? forward : forward.slice().reverse();
+    const aF = project(w.corners.aF), aB = project(w.corners.aB), bB = project(w.corners.bB), bF = project(w.corners.bF);
+    const sides = w.current < 0 ? [[aF, aB], [bB, bF]] : [[bF, bB], [aB, aF]];
+    return { forward, flow, sides };
+  }
+  function chevron(p, q, cls) {
+    const mid = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    const dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy) || 1;
+    const tip = [mid[0] + dx / len * 8, mid[1] + dy / len * 8];
+    return arrowHead(tip, mid, 15, cls);
+  }
+  // A cylinder band of the commutator from rotor angle a0 to a1 (degrees), z0..z1,
+  // drawn only where it faces the viewer (x < 0 side) for a solid look.
+  function band(a0, a1, z0, z1, cls) {
+    const n = Math.max(4, Math.ceil(Math.abs(a1 - a0) / 6)), near = [], far = [];
+    for (let i = 0; i <= n; i += 1) {
+      const t = (a0 + (a1 - a0) * i / n) * DEG;
+      near.push(P(RING_R * Math.cos(t), RING_R * Math.sin(t), z1));
+      far.push(P(RING_R * Math.cos(t), RING_R * Math.sin(t), z0));
+    }
+    return '<polygon class="' + cls + '" points="' + pts(near.concat(far.reverse())) + '"/>';
+  }
+  // Clip a rotor-frame arc to the half facing the viewer (angles 90..270 have x < 0).
+  function visibleArcs(a0, a1) {
+    const out = [];
+    const lo = 90, hi = 270;
+    for (let k = -1; k <= 1; k += 1) {
+      const s0 = Math.max(a0, lo + 360 * k), s1 = Math.min(a1, hi + 360 * k);
+      if (s1 > s0) out.push([s0, s1]);
+    }
+    return out;
+  }
+  function cutaway(state) {
+    const st = state || {};
+    const o = M.options(st.options), r = M.analyze(st.alpha || 0, o);
+    const slip = o.mode === 'slip';
+    const near = o.field === 1 ? 'N' : 'S', far = o.field === 1 ? 'S' : 'N';
+    let svg = '<svg class="dmcc-svg dmcc-cutaway" viewBox="0 0 420 280" role="img" focusable="false" aria-label="' +
+      'Cutaway side view: the ' + near + ' pole is cut away in front, the ' + far + ' pole face is behind the coil. ' +
+      (o.coils === 2 ? 'Two coils at right angles turn' : 'One rectangular coil turns') + ' on a shaft with ' +
+      (slip ? 'slip rings' : 'a split-ring commutator') + ' and brushes at the right-hand end, fed from a DC supply.' + '">';
+    // Far pole face, behind everything.
+    const fx = 1.45;
+    const farFace = [P(fx, -1.25, -1.6), P(fx, -1.25, 1.6), P(fx, 1.25, 1.6), P(fx, 1.25, -1.6)];
+    svg += '<polygon class="dmcc-pole dmcc-pole-' + far.toLowerCase() + '" points="' + pts(farFace) + '"/>';
+    const fl = P(fx, 1.0, -1.35);
+    svg += '<text class="dmcc-pole-text" x="' + f1(fl[0]) + '" y="' + f1(fl[1] + 8) + '">' + far + '</text>';
+    // Field: from N to S, here across the gap (into or out of the picture).
+    [-1.0, 0, 1.0].forEach(z => {
+      const from = P(-1.3 * o.field, -1.12, z), to = P(1.3 * o.field, -1.12, z);
+      svg += arrow(from, to, 'dmcc-field', 8);
+    });
+    const bTip = P(1.3 * o.field, -1.12, -1.0);
+    svg += '<text class="dmcc-small dmcc-halo" x="' + f1(bTip[0] + (o.field === 1 ? 6 : -16)) + '" y="' + f1(bTip[1] + (o.field === 1 ? 4 : 18)) + '">B</text>';
+    const zEnd = slip ? SLIP_Z0 + SLIP_STEP * (2 * o.coils) : SPLIT_Z0 + SPLIT_STEP * o.coils;
+    svg += '<path class="dmcc-shaft" d="' + pathOf([P(0, 0, -2.2), P(0, 0, zEnd)]) + '"/>';
+    // Coils: the second coil first so coil 1 reads on top.
+    const wires = wiring(r.alpha, o);
+    r.coils.slice().reverse().forEach(c => {
+      const p = coilPath(wires[c.index]);
+      svg += '<path class="dmcc-wire' + (c.index ? ' dmcc-wire-2' : '') + '" fill="none" d="' + pathOf(p.forward) + '"/>';
+      if (c.current !== 0) {
+        svg += '<path class="dmcc-glow" fill="none" d="' + pathOf(p.flow) + '"/>';
+        svg += '<path class="dmcc-flow" fill="none" stroke-dasharray="7 11" stroke-dashoffset="' + f1(-(st.flowPhase || 0) * 18) + '" d="' + pathOf(p.flow) + '"/>';
+        svg += chevron(p.sides[0][0], p.sides[0][1], 'dmcc-current-head') + chevron(p.sides[1][0], p.sides[1][1], 'dmcc-current-head');
+      }
+      [[c.index ? '3' : '1', c.sideA], [c.index ? '4' : '2', c.sideB]].forEach(pair => {
+        const sd = pair[1];
+        if (sd.force) svg += arrow(P(sd.x, sd.y, 0), P(sd.x, sd.y + 0.7 * sd.force, 0), 'dmcc-force', 11);
+        const t = P(sd.x, sd.y, -COIL_Z - 0.22);
+        svg += '<text class="dmcc-small dmcc-tag dmcc-halo" x="' + f1(t[0]) + '" y="' + f1(t[1] + 5) + '" text-anchor="middle">' + pair[0] + '</text>';
+      });
+    });
+    // Contacts. Brushes press from above and below; wires run to the supply on the right.
+    const contacts = [];
+    r.coils.forEach(c => {
+      if (slip) {
+        [0, 1].forEach(sideIndex => {
+          const z0 = SLIP_Z0 + SLIP_STEP * (2 * c.index + sideIndex), z1 = z0 + SLIP_W;
+          svg += band(90, 270, z0, z1, 'dmcc-ring' + (c.current !== 0 ? ' is-live' : ''));
+          // Ring for side A takes the top brush, ring for side B the bottom brush.
+          contacts.push({ top: sideIndex === 0, z: (z0 + z1) / 2, live: c.current !== 0 });
+        });
+      } else {
+        const z0 = SPLIT_Z0 + SPLIT_STEP * c.index, z1 = z0 + SPLIT_W, gap = SPLIT_GAP, a = c.alpha;
+        // Segment A is centred on n: alpha-90..alpha+90. Segment B is opposite.
+        visibleArcs(a - 90 + gap, a + 90 - gap).concat(visibleArcs(a - 90 + gap + 360, a + 90 - gap + 360))
+          .forEach(seg => { svg += band(seg[0], seg[1], z0, z1, 'dmcc-segment dmcc-segment-a' + (c.current ? ' is-live' : '')); });
+        visibleArcs(a + 90 + gap, a + 270 - gap).concat(visibleArcs(a + 90 + gap - 360, a + 270 - gap - 360))
+          .forEach(seg => { svg += band(seg[0], seg[1], z0, z1, 'dmcc-segment dmcc-segment-b' + (c.current ? ' is-live' : '')); });
+        contacts.push({ top: true, z: (z0 + z1) / 2, live: c.current !== 0 });
+        contacts.push({ top: false, z: (z0 + z1) / 2, live: c.current !== 0 });
+      }
+    });
+    const batX = SV.OX + SV.S * (zEnd + 0.75), topY = SV.OY - SV.S * 1.25, botY = SV.OY + SV.S * 1.25, midY = SV.OY;
+    contacts.forEach(k => {
+      const touch = P(0, (k.top ? 1 : -1) * (RING_R * 1.04), k.z), end = [touch[0], touch[1] + (k.top ? -26 : 26)];
+      svg += '<path class="dmcc-brush' + (k.live ? ' is-live' : '') + '" d="' + pathOf([touch, end]) + '"/>';
+      const busY = k.top ? topY : botY;
+      svg += '<path class="dmcc-lead" fill="none" d="' + pathOf([end, [end[0], busY], [batX, busY]]) + '"/>';
+    });
+    const topSign = r.topBrush === '+' ? '+' : '−', botSign = topSign === '+' ? '−' : '+';
+    const longUp = topSign === '+';
+    svg += '<g class="dmcc-battery"><path class="dmcc-lead" fill="none" d="M' + f1(batX) + ' ' + f1(topY) + 'V' + f1(midY - 6) + 'M' + f1(batX) + ' ' + f1(midY + 6) + 'V' + f1(botY) + '"/>' +
+      '<path class="dmcc-cell-long" d="M' + f1(batX - 15) + ' ' + f1(midY + (longUp ? -6 : 6)) + 'h30"/>' +
+      '<path class="dmcc-cell-short" d="M' + f1(batX - 8) + ' ' + f1(midY + (longUp ? 6 : -6)) + 'h16"/>' +
+      '<text class="dmcc-small" x="' + f1(batX + 20) + '" y="' + f1(midY - 10) + '">' + topSign + '</text>' +
+      '<text class="dmcc-small" x="' + f1(batX + 20) + '" y="' + f1(midY + 20) + '">' + botSign + '</text></g>';
+    svg += '<text class="dmcc-small dmcc-halo" x="' + f1(batX + 8) + '" y="' + f1(topY - 10) + '" text-anchor="end">DC supply</text>';
+    const hw = P(0, 0, (SPLIT_Z0 + zEnd) / 2 - 0.1);
+    svg += '<text class="dmcc-small dmcc-halo" x="' + f1(hw[0]) + '" y="' + f1(botY + 20) + '" text-anchor="middle">' + (slip ? 'slip rings' : 'split ring') + '</text>';
+    // Near pole, cut away: outline only, drawn last.
+    const nx = -1.45;
+    const nearFace = [P(nx, -1.25, -1.6), P(nx, -1.25, 1.6), P(nx, 1.25, 1.6), P(nx, 1.25, -1.6)];
+    svg += '<polygon class="dmcc-cut dmcc-cut-' + near.toLowerCase() + '" fill="none" points="' + pts(nearFace) + '"/>';
+    const nl = P(nx, -1.25, -1.6);
+    svg += '<text class="dmcc-small dmcc-halo" x="' + f1(nl[0]) + '" y="' + f1(nl[1] + 20) + '">' + near + ', cut away</text>';
+    svg += '</svg>';
+    return svg;
+  }
+
+  // ---- End view, looking at the commutator end -------------------------------
+  const EV = Object.freeze({ cx: 180, cy: 158, r: 78, face: 112 });
+  function E(x, y, scale) { const s = scale === undefined ? EV.r : scale; return [EV.cx + s * x, EV.cy - s * y]; }
+  function endView(state) {
+    const st = state || {};
+    const o = M.options(st.options), r = M.analyze(st.alpha || 0, o);
+    const labels = poleLabels(o.field);
+    const c1 = r.coils[0];
+    let svg = '<svg class="dmcc-svg dmcc-endview" viewBox="0 0 360 312" role="img" focusable="false" aria-label="End view at theta ' +
+      (Math.round(r.theta) % 360) + ' degrees. Each coil side carries ' + (c1.current ? 'current ' + (c1.current > 0 ? 'toward' : 'away from') + ' the viewer in side 1' : 'no current: the brushes are on the gaps') +
+      '. Total torque ' + f2(r.total) + ' of one coil\'s peak, ' + (r.sense === 'none' ? 'no turning effect' : r.sense) + '.">';
+    // Pole shoes with curved faces.
+    const shoe = sideSign => {
+      const pts2 = [];
+      for (let i = 0; i <= 12; i += 1) {
+        const a = (-50 + 100 * i / 12) * DEG;
+        pts2.push([EV.cx + sideSign * EV.face * Math.cos(a), EV.cy - EV.face * Math.sin(a)]);
+      }
+      const outer = EV.cx + sideSign * 166;
+      return [[outer, pts2[0][1]]].concat(pts2).concat([[outer, pts2[pts2.length - 1][1]]]);
+    };
+    svg += '<polygon class="dmcc-pole dmcc-pole-' + labels[0].toLowerCase() + '" points="' + pts(shoe(-1)) + '"/>';
+    svg += '<polygon class="dmcc-pole dmcc-pole-' + labels[1].toLowerCase() + '" points="' + pts(shoe(1)) + '"/>';
+    svg += '<text class="dmcc-pole-text" x="' + (EV.cx - 140) + '" y="' + (EV.cy + 9) + '" text-anchor="middle">' + labels[0] + '</text>';
+    svg += '<text class="dmcc-pole-text" x="' + (EV.cx + 140) + '" y="' + (EV.cy + 9) + '" text-anchor="middle">' + labels[1] + '</text>';
+    // Field lines from N to S.
+    [-56, -28, 0, 28, 56].forEach(dy => {
+      const half = Math.sqrt(EV.face * EV.face - dy * dy) - 4;
+      const y = EV.cy + dy;
+      const a = [EV.cx - o.field * half, y], b = [EV.cx + o.field * (half - 2), y];
+      svg += '<path class="dmcc-fieldline" d="M' + f1(a[0]) + ' ' + f1(y) + 'L' + f1(b[0]) + ' ' + f1(y) + '"/>' +
+        arrowHead([EV.cx + o.field * 34, y], [EV.cx, y], 7, 'dmcc-fieldline-head');
+    });
+    svg += '<text class="dmcc-small dmcc-halo" x="' + (EV.cx + o.field * 62) + '" y="' + (EV.cy - 68) + '" text-anchor="middle">B</text>';
+    // Neutral plane: the coil face lies here when theta is 0 or 180 degrees.
+    svg += '<path class="dmcc-neutral" d="M' + EV.cx + ' ' + (EV.cy - 112) + 'V' + (EV.cy + 112) + '"/>' +
+      '<text class="dmcc-small dmcc-soft dmcc-halo" x="' + EV.cx + '" y="' + (EV.cy + 150) + '" text-anchor="middle">neutral plane</text>';
+    // Lever arm of coil 1: horizontal distance from the shaft to each force line.
+    if (c1.current !== 0 && c1.lever > 0.02) {
+      const a = E(c1.sideA.x, c1.sideA.y);
+      svg += '<path class="dmcc-lever" d="M' + EV.cx + ' ' + f1(a[1]) + 'H' + f1(a[0]) + '"/>' +
+        '<path class="dmcc-lever-line" d="M' + f1(a[0]) + ' ' + (EV.cy - 104) + 'V' + (EV.cy + 104) + '"/>';
+    }
+    // Coils edge-on, with conductor ends.
+    r.coils.slice().reverse().forEach(c => {
+      const a = E(c.sideA.x, c.sideA.y), b = E(c.sideB.x, c.sideB.y);
+      svg += '<path class="dmcc-coil-edge' + (c.index ? ' dmcc-wire-2' : '') + '" d="M' + f1(a[0]) + ' ' + f1(a[1]) + 'L' + f1(b[0]) + ' ' + f1(b[1]) + '"/>';
+      [[c.sideA, a, c.current, c.index ? '3' : '1'], [c.sideB, b, -c.current, c.index ? '4' : '2']].forEach(item => {
+        const s = item[0], p = item[1], cur = item[2];
+        svg += '<circle class="dmcc-conductor' + (cur ? ' is-live' : '') + '" cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="12"/>';
+        if (cur > 0) svg += '<circle class="dmcc-dot" cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="3.6"/>';
+        else if (cur < 0) svg += '<path class="dmcc-cross" d="M' + f1(p[0] - 6) + ' ' + f1(p[1] - 6) + 'l12 12M' + f1(p[0] + 6) + ' ' + f1(p[1] - 6) + 'l-12 12"/>';
+        if (s.force) {
+          const from = [p[0], p[1] - 14 * s.force], to = [p[0], p[1] - 52 * s.force];
+          svg += arrow(from, to, 'dmcc-force', 10);
+        }
+        // Side label beside the conductor, horizontally clear of its vertical force arrow.
+        const side = s.x < -0.05 ? -1 : 1;
+        svg += '<text class="dmcc-small dmcc-tag dmcc-halo" x="' + f1(p[0] + side * 22) + '" y="' + f1(p[1] + 5) + '" text-anchor="' + (side < 0 ? 'end' : 'start') + '">' + item[3] + '</text>';
+      });
+    });
+    // Marked normal n of coil 1 and the angle theta from B to n.
+    const nTip = E(c1.normal.x, c1.normal.y, 46);
+    svg += arrow([EV.cx, EV.cy], nTip, 'dmcc-normal', 7);
+    const nl = E(c1.normal.x, c1.normal.y, 60);
+    svg += '<text class="dmcc-small dmcc-normal-text dmcc-halo" x="' + f1(nl[0]) + '" y="' + f1(nl[1] + 5) + '" text-anchor="middle">n</text>';
+    const bDir = o.field === 1 ? 0 : 180, sweep = r.theta;
+    if (sweep > 0.5) {
+      const steps = Math.max(2, Math.ceil(sweep / 6)), arc = [];
+      for (let i = 0; i <= steps; i += 1) { const a = (bDir + sweep * i / steps) * DEG; arc.push(E(Math.cos(a), Math.sin(a), 24)); }
+      svg += '<path class="dmcc-angle" fill="none" d="' + pathOf(arc) + '"/>';
+    }
+    // Torque indicator in the top-right corner: a curved arrow about a shaft dot,
+    // its sweep growing with |tau| and its direction following the sign.
+    const gx = 318, gy = 34, gr = 17;
+    svg += '<circle class="dmcc-shaft-dot" cx="' + gx + '" cy="' + gy + '" r="3.5"/>';
+    if (r.total !== 0) {
+      const span = Math.min(300, 70 + 150 * Math.abs(r.total)), dir = r.total > 0 ? 1 : -1, arc = [];
+      for (let i = 0; i <= 24; i += 1) { const t = (90 - dir * span / 2 + dir * span * i / 24) * DEG; arc.push([gx + gr * Math.cos(t), gy - gr * Math.sin(t)]); }
+      svg += '<path class="dmcc-torque" fill="none" d="' + pathOf(arc) + '"/>' + arrowHead(arc[24], arc[21], 10, 'dmcc-torque-head');
+      svg += '<text class="dmcc-label dmcc-torque-text" x="' + (gx - 26) + '" y="' + (gy + 6) + '" text-anchor="end">τ</text>';
+    } else {
+      svg += '<text class="dmcc-small dmcc-halo" x="' + (gx + 18) + '" y="' + (gy + 5) + '" text-anchor="end">τ = 0</text>';
+    }
+    svg += '<text class="dmcc-label" x="8" y="24">θ = ' + (Math.round(r.theta) % 360) + '°</text>';
+    svg += '</svg>';
+    return svg;
+  }
+
+  // ---- Torque against angle --------------------------------------------------
+  const TR = Object.freeze({ x0: 64, x1: 620, yc: 142, sy: 64 });
+  const tx = theta => TR.x0 + (TR.x1 - TR.x0) * theta / 360;
+  const ty = v => TR.yc - TR.sy * v;
+  function curve(opts, pick) {
+    const list = [];
+    for (let i = 0; i <= 360; i += 1) {
+      const r = M.analyze(M.alphaFromTheta(i === 360 ? 0 : i, opts.field), opts);
+      list.push([tx(i), ty(pick(r))]);
+    }
+    return pathOf(list);
+  }
+  function trace(state) {
+    const st = state || {};
+    const o = M.options(st.options);
+    let svg = '<svg class="dmcc-svg dmcc-trace" viewBox="0 0 640 290" role="img" focusable="false" aria-label="Torque against coil angle theta, from 0 to 360 degrees' +
+      (st.compare ? ': slip rings alternate sign, a commutated coil stays positive, and two commutated coils never reach zero.' : st.revealed ? ', full curve shown.' : ', showing the angles visited so far.') + '">';
+    // Axes and grid.
+    [-1, 1].forEach(v => { svg += '<path class="dmcc-grid" d="M' + TR.x0 + ' ' + ty(v) + 'H' + TR.x1 + '"/>'; });
+    if (st.compare || (st.revealed && o.coils === 2)) svg += '<path class="dmcc-grid" d="M' + TR.x0 + ' ' + f1(ty(Math.SQRT2)) + 'H' + TR.x1 + '"/>';
+    [0, 90, 180, 270, 360].forEach(d => {
+      svg += '<path class="dmcc-grid" d="M' + f1(tx(d)) + ' ' + ty(1.55) + 'V' + ty(-1.55) + '"/>' +
+        '<text class="dmcc-small" x="' + f1(tx(d)) + '' + '" y="' + (ty(-1.55) + 18) + '" text-anchor="middle">' + d + '°</text>';
+    });
+    svg += '<path class="dmcc-axis" d="M' + TR.x0 + ' ' + ty(0) + 'H' + TR.x1 + '"/>';
+    [[1, '1'], [0, '0'], [-1, '−1']].forEach(t => { svg += '<text class="dmcc-small" x="' + (TR.x0 - 12) + '" y="' + f1(ty(t[0]) + 5) + '" text-anchor="end">' + t[1] + '</text>'; });
+    if (st.compare || (st.revealed && o.coils === 2)) svg += '<text class="dmcc-small" x="' + (TR.x0 - 12) + '" y="' + f1(ty(Math.SQRT2) + 5) + '" text-anchor="end">1.41</text>';
+    svg += '<text class="dmcc-small" x="' + (TR.x0 - 50) + '" y="16">Torque ÷ one coil’s peak NBIA</text>';
+    svg += '<text class="dmcc-small" x="' + TR.x1 + '" y="' + (ty(-1.55) + 38) + '" text-anchor="end">θ, angle from B to the coil normal n</text>';
+    if (st.compare) {
+      const slip = M.options({ mode: 'slip', field: 1, supply: 1 }), one = M.options({ field: 1, supply: 1 }), two = M.options({ coils: 2, field: 1, supply: 1 });
+      svg += '<path class="dmcc-curve-slip" fill="none" d="' + curve(slip, r => r.total) + '"/>';
+      svg += '<path class="dmcc-curve" fill="none" d="' + curve(one, r => r.total) + '"/>';
+      svg += '<path class="dmcc-curve-two" fill="none" d="' + curve(two, r => r.total) + '"/>';
+      svg += '<text class="dmcc-small dmcc-halo" x="' + f1(tx(135)) + '" y="' + f1(ty(1.41) - 8) + '" text-anchor="middle">two coils (thick)</text>' +
+        '<text class="dmcc-small dmcc-halo" x="' + f1(tx(90)) + '" y="' + f1(ty(0.5)) + '" text-anchor="middle">one coil, commutator</text>' +
+        '<text class="dmcc-small dmcc-halo" x="' + f1(tx(270)) + '" y="' + f1(ty(-1) + 20) + '" text-anchor="middle">one coil, slip rings (dashed)</text>';
+      [0, 180, 360].forEach(d => { svg += '<circle class="dmcc-zero" cx="' + f1(tx(d)) + '" cy="' + ty(0) + '" r="5"/>'; });
+      svg += '<text class="dmcc-small dmcc-halo" x="' + f1(tx(180)) + '" y="' + (ty(0) + 22) + '" text-anchor="middle">zero</text>';
+      svg += '</svg>';
+      return svg;
+    }
+    if (st.revealed) {
+      if (o.coils === 2) {
+        svg += '<path class="dmcc-curve-part" fill="none" d="' + curve(o, r => r.coils[0].torque) + '"/>';
+        svg += '<path class="dmcc-curve-part dmcc-curve-part-2" fill="none" d="' + curve(o, r => r.coils[1].torque) + '"/>';
+      }
+      svg += '<path class="dmcc-curve" fill="none" d="' + curve(o, r => r.total) + '"/>';
+      const rp = M.ripple(o), lowAt = [], highAt = [];
+      for (let d = 0; d <= 360; d += 45) {
+        const v = M.torqueAtTheta(d === 360 ? 0 : d, o);
+        if (Math.abs(Math.abs(v) - Math.min(Math.abs(rp.min), Math.abs(rp.max))) < 1e-9 && rp.oneDirection) lowAt.push([d, v]);
+        if (Math.abs(Math.abs(v) - Math.max(Math.abs(rp.min), Math.abs(rp.max))) < 1e-9) highAt.push([d, v]);
+        if (!rp.oneDirection && Math.abs(v) < 1e-9) lowAt.push([d, 0]);
+      }
+      lowAt.forEach(p => { svg += '<circle class="dmcc-zero" cx="' + f1(tx(p[0])) + '" cy="' + f1(ty(p[1])) + '" r="5"/>'; });
+      highAt.forEach(p => { svg += '<circle class="dmcc-peak" cx="' + f1(tx(p[0])) + '" cy="' + f1(ty(p[1])) + '" r="5"/>'; });
+      const lowLabel = rp.oneDirection && o.coils === 2 ? 'smallest ' + f2(Math.min(Math.abs(rp.min), Math.abs(rp.max))) : 'zero';
+      const firstLow = lowAt.find(p => p[0] === 180) || lowAt[1] || lowAt[0];
+      if (firstLow) svg += '<text class="dmcc-small dmcc-halo" x="' + f1(tx(firstLow[0])) + '" y="' + f1(ty(firstLow[1]) + 26) + '" text-anchor="middle">' + lowLabel + '</text>';
+      const firstHigh = highAt[0];
+      if (firstHigh) svg += '<text class="dmcc-small dmcc-halo" x="' + f1(tx(firstHigh[0])) + '" y="' + f1(ty(firstHigh[1]) + (firstHigh[1] < 0 ? 24 : -12)) + '" text-anchor="middle">peak ' + f2(Math.abs(firstHigh[1])) + '</text>';
+    }
+    // Angles visited by the rotor so far: one value per whole degree.
+    const visited = st.visited || [];
+    let d = '';
+    for (let i = 0; i < 360; i += 1) if (typeof visited[i] === 'number') d += 'M' + f1(tx(i)) + ' ' + f1(ty(visited[i])) + 'h0.1';
+    if (d) svg += '<path class="dmcc-visited" d="' + d + '"/>';
+    if (typeof st.alpha === 'number') {
+      const now = M.analyze(st.alpha, o);
+      svg += '<path class="dmcc-now-line" d="M' + f1(tx(now.theta)) + ' ' + ty(1.55) + 'V' + ty(-1.55) + '"/>' +
+        '<circle class="dmcc-now" cx="' + f1(tx(now.theta)) + '" cy="' + f1(ty(now.total)) + '" r="7"/>';
+    }
+    svg += '</svg>';
+    return svg;
+  }
+
+  // ---- Static lesson figures -------------------------------------------------
+  const STATIC_ALPHA = 30;
+  function staticViews() {
+    const s = { alpha: STATIC_ALPHA, options: { mode: 'commutator', coils: 1, supply: 1, field: 1 } };
+    return '<figure class="dmcc-static-figure"><div class="dmcc-static-pair">' + cutaway(s) + endView(s) + '</div>' +
+      '<figcaption>One coil at θ = 30°. Left, a cutaway side view: the N pole in front is cut away, the S pole is behind the coil, and B points away from you. Right, the end view from the commutator end, with the top brush positive. In the end view, current runs away from you along side 1 (⊗) and back toward you along side 2 (⊙). ' +
+      'F = BIL pushes side 1 down and side 2 up. The two forces are equal and opposite, so there is no net force, but they form a couple. Each acts at a lever arm of r·sin 30° = 0.5r from the shaft, where r is half the coil width. So τ = 0.5·NBIA, counter-clockwise as seen from the commutator end.</figcaption></figure>';
+  }
+  function staticTrace() {
+    return '<figure class="dmcc-static-figure">' + trace({ compare: true }) +
+      '<figcaption>Torque against θ for one turn, as a fraction of one coil’s peak NBIA. Slip rings (dashed): the torque reverses every half turn and averages zero. ' +
+      'Split-ring commutator (solid): the current reverses at the neutral plane, so the torque is |sin θ|, never negative, averaging 2/π ≈ 0.64; it is still zero at 0° and 180°. ' +
+      'Two commutated coils 90° apart (thick): the sum runs from 1 to √2 ≈ 1.41, so the smallest torque is 0.71 of the largest and never zero.</figcaption></figure>';
+  }
+
+  return Object.freeze({ cutaway, endView, trace, staticViews, staticTrace, wiring, project, STATIC_ALPHA,
+    GEOMETRY: Object.freeze({ COIL_Z, RING_R, SPLIT_Z0, SPLIT_STEP, SPLIT_W, SPLIT_GAP, SLIP_Z0, SLIP_STEP, SLIP_W }) });
+});
+
+(function () {
+  'use strict';
+  const M = globalThis.CourseWikiCommutation, D = globalThis.CourseWikiCommutationDraw;
+  if (!M || !D || typeof document === 'undefined') return;
+  let sequence = 0;
+  const BASE = Object.freeze({ mode: 'commutator', coils: 1, supply: 1, field: 1 });
+  // Each prediction is checked against a result figure drawn, by the same
+  // renderer, directly above the Check button. Checking changes nothing else on
+  // the page; "Try this in the lab" sets the lab to that case on request.
+  const QUESTIONS = Object.freeze([
+    { id: 'zero', preview: { view: 'end', options: BASE, theta: 30, caption: 'Before: one coil, split ring, at θ = 30°.' }, after: { options: BASE, theta: 0, reveal: true },
+      result: { view: 'end', options: BASE, theta: 10, caption: 'θ = 10°, split ring: each side feels the full force BIL, but the lever arm is only 0.17 r, so τ = 0.17 NBIA.' },
+      q: 'As the coil turns, at which angles is the torque zero?',
+      choices: [['across', 'When the coil face is across the field: θ = 0° and 180°'], ['along', 'When the coil face lies along the field: θ = 90° and 270°'], ['never', 'Never: a coil carrying current is always pushed round']],
+      answer: 'across', why: 'At θ = 0° and 180° the coil face lies across the field, in the neutral plane, and the torque is zero. In the figure, at θ = 10°, each side still carries current and feels the full force BIL, but its line of force passes close to the shaft. As θ goes to 0°, that lever arm, r·sin θ, shrinks to zero, and so does the torque. Exactly at 0° an ideal split ring has its brushes on the gaps, so at that instant the coil carries no current and feels no force at all. With slip rings the current would still flow there, and both forces would point straight through the shaft.' },
+    { id: 'peak', preview: { view: 'end', options: BASE, theta: 30, caption: 'Before: one coil, split ring, at θ = 30°.' }, after: { options: BASE, theta: 90, reveal: true },
+      result: { view: 'end', options: BASE, theta: 90, caption: 'θ = 90°: the lever arm is the full half-width r, so τ = NBIA, the peak.' },
+      q: 'At which angles is the torque largest?',
+      choices: [['along', 'When the coil face lies along the field: θ = 90° and 270°'], ['across', 'When the coil face is across the field: θ = 0° and 180°'], ['same', 'At every angle: the force on each side never changes size']],
+      answer: 'along', why: 'Whenever current flows, the force on each side is BIL, the same size at every angle. What changes is its lever arm, r·sin θ. That is largest at 90° and 270°, where the coil face lies along the field, as in the figure, so the torque is largest there too.' },
+    { id: 'slip', preview: { view: 'end', options: { mode: 'slip' }, theta: 150, caption: 'Before: slip rings at θ = 150°, with the torque turning the coil counter-clockwise toward 180°.' }, after: { options: { mode: 'slip' }, theta: 150 },
+      result: { view: 'trace', options: { mode: 'slip' }, theta: 210, caption: 'Slip rings, N on the left, top brush positive: the torque is positive up to 180° and negative after it. The marker at θ = 210° shows −0.50 NBIA, clockwise.' },
+      q: 'Swap the split ring for slip rings, so the current in the coil never reverses. What happens to the torque once the coil passes θ = 180°?',
+      choices: [['reverses', 'It reverses and pushes the coil back'], ['same', 'It keeps pushing the same way'], ['zero', 'It drops to zero and stays zero']],
+      answer: 'reverses', why: 'With a fixed current, τ = NBIA·sin θ changes sign at 180°, as the curve shows. With this polarity, past 180° the torque pushes the coil back toward θ = 180°, and over a whole turn it averages zero. The split ring reverses the current exactly at the neutral plane, so the torque keeps one direction.' },
+    { id: 'two', preview: { view: 'end', options: { coils: 2 }, theta: 30, caption: 'Before: two coils, 90° apart, each with its own split ring, at θ = 30°.' }, after: { options: { coils: 2 }, theta: 30, reveal: true },
+      result: { view: 'trace', options: { coils: 2 }, theta: 0, caption: 'Two commutated coils 90° apart: the total runs from 1 to 1.41 NBIA. The marker at θ = 0° shows the smallest total, 1.00.' },
+      q: 'Add a second coil 90° ahead of the first, each with its own split ring. What is the smallest total torque over a turn?',
+      choices: [['zero', 'Zero, at the same angles as one coil'], ['ripple', 'About 0.71 of the largest total, and never zero'], ['flat', 'Exactly constant: no ripple at all']],
+      answer: 'ripple', why: 'When one coil is in the neutral plane, the other is at its peak. The sum |sin θ| + |cos θ| runs from 1 to √2, so the smallest total is 1/√2 ≈ 0.71 of the largest. The ripple is smaller and the zero-torque dead spot is gone.' },
+    { id: 'current', preview: { view: 'end', options: BASE, theta: 30, caption: 'Before: N on the left, top brush positive. The torque arrow turns counter-clockwise.' }, after: { options: { supply: -1 }, theta: 30 },
+      result: { view: 'end', options: { supply: -1 }, theta: 30, caption: 'Current reversed: every current mark and force arrow has flipped, and the torque arrow now turns clockwise.' },
+      q: 'With the N pole on the left and the top brush positive, this motor turns counter-clockwise, as seen from the commutator end. Reverse only the supply current. Which way does it turn now?',
+      choices: [['ccw', 'Counter-clockwise, as before'], ['cw', 'Clockwise'], ['stop', 'It stops']],
+      answer: 'cw', why: 'Reversing I reverses the force on every side (F = I L × B), so the torque reverses and the motor turns clockwise.' },
+    { id: 'both', preview: { view: 'end', options: { supply: -1 }, theta: 30, caption: 'Before: current reversed, N still on the left. The torque arrow turns clockwise.' }, after: { options: { supply: -1, field: -1 }, alpha: 30 },
+      result: { view: 'end', options: { supply: -1, field: -1 }, alpha: 30, caption: 'Current reversed and magnets swapped (N now on the right): the torque arrow turns counter-clockwise again.' },
+      q: 'Start from the reversed current of the last question, which turns clockwise. Now swap the magnets too, so B also reverses. Which way does it turn?',
+      choices: [['ccw', 'Counter-clockwise, as at the start'], ['cw', 'Clockwise'], ['stop', 'It stops']],
+      answer: 'ccw', why: 'Reversing B reverses the force again. Two reversals cancel, so the motor turns counter-clockwise, as it did at the start.' }
+  ]);
+
+  function fmtSigned(v) { const x = Math.abs(v) < 0.005 ? 0 : v; return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(2); }
+  function deg(v) { return Math.round(v) % 360; }
+  function uniqueId() { let id; do { id = 'dmcc-' + (++sequence); } while (document.getElementById(id + '-angle')); return id; }
+
+  function init(root) {
+    if (root.dataset.dmccReady) return;
+    root.dataset.dmccReady = 'true';
+    const id = uniqueId();
+    const reduced = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+    const S = { alpha: 30, omega: 0, options: Object.assign({}, BASE), visited: [], revealed: false, running: false, flow: 0, frame: 0, last: null, visible: true, q: 0, first: {}, picked: {} };
+
+    const live = document.createElement('div');
+    live.className = 'dmcc-live';
+    live.innerHTML =
+      '<p class="dmcc-challenge"><strong>Challenge:</strong> a current-carrying coil between magnets gets a push, but not at every angle. Turn the coil, find where the push vanishes, then see how the split ring keeps the motor turning one way.</p>' +
+      '<div class="dmcc-setup">' +
+        '<fieldset class="dmcc-seg"><legend>Contacts</legend><div>' +
+          '<label><input type="radio" name="' + id + '-mode" value="commutator" checked> Split ring (commutator)</label>' +
+          '<label><input type="radio" name="' + id + '-mode" value="slip"> Slip rings</label></div></fieldset>' +
+        '<fieldset class="dmcc-seg"><legend>Coils</legend><div>' +
+          '<label><input type="radio" name="' + id + '-coils" value="1" checked> One</label>' +
+          '<label><input type="radio" name="' + id + '-coils" value="2"> Two, 90° apart</label></div></fieldset>' +
+        '<div class="dmcc-row dmcc-polarity"><button type="button" data-act="supply" aria-pressed="false">Reverse the current</button>' +
+          '<button type="button" data-act="field" aria-pressed="false">Swap the magnets</button></div>' +
+      '</div>' +
+      '<fieldset class="dmcc-seg dmcc-viewpick"><legend>Show</legend><div>' +
+        '<label><input type="radio" name="' + id + '-view" value="end" checked> End view</label>' +
+        '<label><input type="radio" name="' + id + '-view" value="cut"> Cutaway</label></div></fieldset>' +
+      '<div class="dmcc-stage" data-show="end">' +
+        '<figure class="dmcc-view dmcc-view-cut"><div data-dmcc-cut></div><figcaption data-cut-caption></figcaption></figure>' +
+        '<figure class="dmcc-view dmcc-view-end"><div data-dmcc-end></div><figcaption>End view from the commutator end: ⊙ current toward you, ⊗ away.</figcaption></figure>' +
+      '</div>' +
+      '<div class="dmcc-controls">' +
+        '<div class="dmcc-row"><button type="button" class="dmcc-primary" data-act="run" aria-pressed="false">Run</button>' +
+          '<button type="button" data-act="step">Step with the torque</button>' +
+          '<button type="button" data-act="back" aria-label="Turn the coil back 15 degrees">−15°</button>' +
+          '<button type="button" data-act="fwd" aria-label="Turn the coil on 15 degrees">+15°</button>' +
+          '<button type="button" data-act="reset">Reset</button></div>' +
+        '<div class="dmcc-angle-control"><label for="' + id + '-angle">Coil angle θ</label><input id="' + id + '-angle" type="range" min="0" max="359" step="1" value="30"></div>' +
+      '</div>' +
+      '<p class="dmcc-status" role="status" aria-live="polite" data-status></p>' +
+      '<dl class="dmcc-readout">' +
+        '<div><dt>Coil angle θ</dt><dd data-out="theta"></dd></div>' +
+        '<div><dt>Torque τ</dt><dd data-out="torque"></dd></div>' +
+        '<div><dt>Turning effect</dt><dd data-out="sense"></dd></div>' +
+        '<div><dt>Current in side 1</dt><dd data-out="current"></dd></div>' +
+        '<div><dt>Force on each side</dt><dd data-out="force"></dd></div>' +
+        '<div><dt>Lever arm of each force</dt><dd data-out="lever"></dd></div>' +
+      '</dl>' +
+      '<p class="dmcc-note"><strong>Key:</strong> the glowing path is conventional current; dark arrows are the forces F = BIL; the dashed line is the lever arm of side 1; n is the coil’s marked normal, and θ is measured from B to n. <span data-motion-note></span></p>' +
+      '<figure class="dmcc-trace-figure"><div data-dmcc-trace></div>' +
+        '<figcaption data-trace-caption></figcaption>' +
+        '<div class="dmcc-row"><button type="button" data-act="reveal" aria-pressed="false">Reveal the full curve</button><button type="button" data-act="clear">Clear the trace</button></div>' +
+        '<p class="dmcc-averages" data-averages hidden></p></figure>' +
+      '<section class="dmcc-predict" aria-labelledby="' + id + '-ph">' +
+        '<div class="dmcc-predict-head"><h3 id="' + id + '-ph">Predict, then check</h3><span class="dmcc-score" data-score></span></div>' +
+        '<p class="dmcc-note" data-qnum></p>' +
+        '<div class="dmcc-predict-grid">' +
+          '<fieldset class="dmcc-choices"><legend class="dmcc-question" data-question></legend><div class="dmcc-choices" data-choices></div></fieldset>' +
+          // The result appears in this reserved figure, directly above the Check button.
+          '<figure class="dmcc-result-figure" data-result-state="before"><div data-result-figure></div>' +
+            '<figcaption><strong class="dmcc-verdict" data-verdict></strong> <span data-result-caption></span></figcaption></figure>' +
+        '</div>' +
+        '<div class="dmcc-row"><button type="button" class="dmcc-primary" data-act="check" disabled>Check my prediction</button>' +
+          '<button type="button" data-act="trylab" hidden>Try this in the lab</button>' +
+          '<button type="button" data-act="prevq">Previous question</button><button type="button" data-act="nextq">Next question</button></div>' +
+        '<div class="dmcc-result" data-result-box hidden><p data-feedback></p><p class="dmcc-note" data-lab-note></p></div>' +
+        '<p class="dmcc-sr" role="status" aria-live="polite" data-announce></p>' +
+      '</section>' +
+      '<p class="dmcc-limit"><strong>Model limits:</strong> an ideal rectangular coil in a uniform field, τ = N·B·I·A·sin θ, with torque shown as a fraction of one coil’s peak NBIA. ' +
+        'The ideal split ring reverses the current exactly at the neutral plane. The motion is illustrative: its inertia and friction are assumed values chosen to make the torque visible, not a calibrated speed. ' +
+        'Back EMF, speed–torque behaviour, saturation and brush sparking are not modelled; see the DC motor torque–speed lesson for load and speed.</p>';
+    root.insertBefore(live, root.firstChild);
+
+    const q = sel => live.querySelector(sel);
+    const act = name => q('[data-act="' + name + '"]');
+    const out = name => q('[data-out="' + name + '"]');
+    const slider = q('#' + id + '-angle'), status = q('[data-status]');
+    const views = { cut: q('[data-dmcc-cut]'), end: q('[data-dmcc-end]'), trace: q('[data-dmcc-trace]') };
+
+    function opts() { return M.options(S.options); }
+    function theta() { return M.thetaFromAlpha(S.alpha, S.options.field); }
+    function say(text) { status.textContent = text; }
+    function record(fromTheta, toTheta, dir) {
+      // Mark every whole degree passed, along the direction of travel.
+      const o = opts();
+      let a = Math.round(fromTheta), b = Math.round(toTheta);
+      if (dir === 0) { const d = ((b - a) % 360 + 540) % 360 - 180; dir = d >= 0 ? 1 : -1; }
+      let guard = 0;
+      while (guard++ < 361) {
+        const k = ((a % 360) + 360) % 360;
+        S.visited[k] = M.torqueAtTheta(k, o);
+        if (k === ((b % 360) + 360) % 360) break;
+        a += dir;
+      }
+    }
+
+    function render() {
+      const o = opts(), r = M.analyze(S.alpha, o), th = r.theta, c1 = r.coils[0];
+      const st = { alpha: S.alpha, options: o, flowPhase: S.flow, visited: S.visited, revealed: S.revealed };
+      views.cut.innerHTML = D.cutaway(st);
+      views.end.innerHTML = D.endView(st);
+      views.trace.innerHTML = D.trace(st);
+      const nearPole = o.field === 1 ? 'N' : 'S', farPole = o.field === 1 ? 'S' : 'N';
+      q('[data-cut-caption]').textContent = 'Cutaway side view: the ' + nearPole + ' pole in front is cut away and the ' + farPole + ' pole is behind the coil, so B points ' +
+        (o.field === 1 ? 'away from you' : 'toward you') + '. The glowing path shows conventional current; dark arrows are the forces F = BIL.';
+      out('theta').textContent = deg(th) + '°';
+      out('current').textContent = c1.current > 0 ? 'toward you (⊙)' : c1.current < 0 ? 'away from you (⊗)' : 'none: brushes on the gaps';
+      out('force').textContent = c1.current ? 'BIL, same size at every angle' : '0: no current at this instant';
+      out('lever').textContent = (c1.lever < 0.005 ? '0' : c1.lever.toFixed(2)) + ' × r';
+      out('torque').textContent = fmtSigned(r.total) + ' NBIA' + (o.coils === 2 ? ' (' + fmtSigned(r.coils[0].torque) + ' ' + fmtSigned(r.coils[1].torque) + ')' : '');
+      out('sense').textContent = r.sense === 'none' ? 'none' : r.sense;
+      if (document.activeElement !== slider) slider.value = String(deg(th));
+      slider.setAttribute('aria-valuetext', deg(th) + ' degrees, torque ' + fmtSigned(r.total) + ' of one coil’s peak');
+      act('supply').setAttribute('aria-pressed', String(o.supply === -1));
+      act('field').setAttribute('aria-pressed', String(o.field === -1));
+      live.querySelectorAll('input[name="' + id + '-mode"]').forEach(i => { i.checked = i.value === o.mode; });
+      live.querySelectorAll('input[name="' + id + '-coils"]').forEach(i => { i.checked = Number(i.value) === o.coils; });
+      act('reveal').setAttribute('aria-pressed', String(S.revealed));
+      act('reveal').disabled = S.revealed;
+      q('[data-trace-caption]').textContent = S.revealed
+        ? 'Full curve for the current setup. Open circles mark the smallest torque, filled dots the largest; the orange marker is the coil now.'
+        : 'Torque against θ. Orange dots trace the angles the coil has visited; predict below, then reveal the full curve.';
+      const avg = q('[data-averages]');
+      if (S.revealed) {
+        const rp = M.ripple(o), mean = M.turnAverage(o, 3600);
+        avg.hidden = false;
+        avg.textContent = 'Average over one turn: ' + fmtSigned(mean) + ' NBIA. ' +
+          (!rp.oneDirection ? 'The torque reverses during every turn.'
+            : rp.ratio === 0 ? 'It never reverses, but it falls to zero twice a turn.'
+            : 'It never reverses and never reaches zero: smallest ÷ largest = ' + rp.ratio.toFixed(2) + '.');
+      } else avg.hidden = true;
+    }
+    function updateMotionNote() {
+      const note = q('[data-motion-note]');
+      act('run').hidden = !!reduced.matches;
+      note.textContent = reduced.matches
+        ? 'Reduced motion is on: “Step with the torque” moves the coil 15° the way the torque pushes; the slider sets the angle directly.'
+        : 'Run releases the coil with illustrative, assumed inertia and friction; Step and the slider work without animation.';
+    }
+
+    function stop(message) {
+      S.running = false;
+      if (S.frame) cancelAnimationFrame(S.frame);
+      S.frame = 0; S.last = null;
+      act('run').setAttribute('aria-pressed', 'false');
+      act('run').textContent = 'Run';
+      if (message) say(message);
+      render();
+    }
+    function schedule() { if (S.running && S.visible && !document.hidden && !S.frame) S.frame = requestAnimationFrame(tick); }
+    function tick(ts) {
+      S.frame = 0;
+      if (!S.running) return;
+      const dt = S.last === null ? 0 : Math.min(0.05, (ts - S.last) / 1000);
+      S.last = ts;
+      const before = theta();
+      const next = M.illustrativeStep({ alpha: S.alpha, omega: S.omega }, dt, opts());
+      S.alpha = next.alpha; S.omega = next.omega;
+      record(before, theta(), S.omega >= 0 ? 1 : -1);
+      S.flow += dt * 2.2;
+      const r = M.analyze(S.alpha, opts());
+      if (Math.abs(S.omega) < 0.02 && Math.abs(r.total) < 0.02 && dt > 0) {
+        S.alpha = M.alphaFromTheta(deg(theta()), S.options.field);
+        const nb = M.neighbourhood(S.alpha, opts());
+        stop(nb.kind === 'stable'
+          ? 'Illustrative motion: with the assumed friction the coil comes to rest at θ = ' + deg(theta()) + '°. ' + restMessage()
+          : 'The coil has stopped at θ = ' + deg(theta()) + '°. ' + restMessage());
+        return;
+      }
+      render();
+      schedule();
+    }
+    function run() {
+      if (reduced.matches) return;
+      const r = M.analyze(S.alpha, opts());
+      if (r.total === 0 && Math.abs(S.omega) < 0.02) { say(restMessage() + ' Released from rest here, it does not move.'); return; }
+      S.running = true;
+      act('run').setAttribute('aria-pressed', 'true');
+      act('run').textContent = 'Pause';
+      say(S.options.mode === 'slip'
+        ? 'Released with slip rings: watch the torque arrow reverse each time the coil swings through the neutral plane.'
+        : 'Released with the split ring: the current reverses at the neutral plane, so the torque keeps one direction.');
+      schedule();
+    }
+    function setTheta(th, message) {
+      const before = theta();
+      S.alpha = M.alphaFromTheta(M.wrap(th), S.options.field);
+      S.omega = 0;
+      record(before, theta(), 0);
+      if (message) say(message);
+      render();
+    }
+    // Explain a zero-torque angle from the torque just either side of it,
+    // for the current setup (contacts, coils, supply and magnet polarity).
+    function restMessage() {
+      const o = opts(), nb = M.neighbourhood(S.alpha, o), r = M.analyze(S.alpha, o), th = deg(theta());
+      const c1 = r.coils[0];
+      const cur = c1.current > 0 ? 'toward you' : c1.current < 0 ? 'away from you' : 'nowhere: the brushes are on the gaps';
+      const turn = dir => dir === 'counterclockwise' ? 'counter-clockwise' : 'clockwise';
+      if (nb.kind === 'stable') {
+        return 'No torque at θ = ' + th + '°. ' + (o.mode === 'slip' ? 'With slip rings and this polarity, current in side 1 flows ' + cur + ' throughout. ' : '') +
+          'Just either side, the torque points back toward this angle, so this is a stable rest position: stepping stops here.';
+      }
+      if (nb.kind === 'unstable') {
+        const away = deg(th + 180);
+        return 'No torque at θ = ' + th + '°, but this balance is unstable. ' + (o.mode === 'slip' ? 'With slip rings and this polarity, current in side 1 flows ' + cur + ' throughout. ' : '') +
+          'Just either side, the torque points away from this angle, so a nudge (±15°) sends the coil swinging toward the stable angle, θ = ' + away + '°.';
+      }
+      if (nb.kind === 'through') {
+        return 'Dead spot at θ = ' + th + '°: the torque is zero exactly here' + (c1.current === 0 ? ' (current flows ' + cur + ')' : '') +
+          ', but just either side it points the same way, ' + turn(nb.direction) + '. A coil at rest here cannot start itself; a nudge, or a running motor\u2019s momentum, carries it through. A second coil removes the dead spot.';
+      }
+      return 'No torque at θ = ' + th + '° or just either side of it.';
+    }
+    function step() {
+      if (S.running) stop();
+      const r = M.analyze(S.alpha, opts()), th = theta();
+      if (r.total === 0) { say(restMessage()); return; }
+      const dir = r.total > 0 ? 1 : -1;
+      const target = dir > 0 ? Math.floor(th / 15 + 1e-9) * 15 + 15 : Math.ceil(th / 15 - 1e-9) * 15 - 15;
+      const before = th;
+      S.alpha = M.alphaFromTheta(M.wrap(target), S.options.field);
+      S.omega = 0;
+      record(before, theta(), dir);
+      const now = M.analyze(S.alpha, opts());
+      say('Torque ' + fmtSigned(r.total) + ' NBIA turned the coil ' + (dir > 0 ? 'counter-clockwise' : 'clockwise') + ' to θ = ' + deg(theta()) + '°. Torque here: ' + fmtSigned(now.total) + '.');
+      render();
+    }
+    function setOptions(change, message) {
+      S.options = Object.assign({}, S.options, change);
+      S.visited = [];
+      record(theta(), theta(), 1);
+      if (message) say(message);
+      render();
+    }
+
+    // ---- Predictions -------------------------------------------------------
+    function applySetup(setup) {
+      if (!setup) return;
+      if (S.running) stop();
+      // Every setup is absolute, so an explanation always matches what is shown.
+      S.options = Object.assign({}, BASE, setup.options || {});
+      if (typeof setup.alpha === 'number') { S.alpha = setup.alpha; S.omega = 0; }
+      if (typeof setup.theta === 'number') { S.alpha = M.alphaFromTheta(setup.theta, S.options.field); S.omega = 0; }
+      if (setup.reveal) S.revealed = true;
+      S.visited = [];
+      record(theta(), theta(), 1);
+      render();
+    }
+    function resultFigure(spec) {
+      const o = M.options(Object.assign({}, BASE, spec.options || {}));
+      const alpha = typeof spec.alpha === 'number' ? spec.alpha : M.alphaFromTheta(spec.theta, o.field);
+      return spec.view === 'trace' ? D.trace({ alpha, options: o, revealed: true }) : D.endView({ alpha, options: o });
+    }
+    function showQuestion(index) {
+      S.q = Math.max(0, Math.min(QUESTIONS.length - 1, index));
+      const item = QUESTIONS[S.q];
+      q('[data-qnum]').textContent = 'Question ' + (S.q + 1) + ' of ' + QUESTIONS.length + '.';
+      q('[data-question]').textContent = item.q;
+      const box = q('[data-choices]');
+      box.innerHTML = item.choices.map(ch => '<label><input type="radio" name="' + id + '-q' + item.id + '" value="' + ch[0] + '"> <span>' + ch[1] + '</span></label>').join('');
+      if (S.picked[item.id]) { const p = box.querySelector('input[value="' + S.picked[item.id] + '"]'); if (p) p.checked = true; }
+      act('check').disabled = !S.picked[item.id];
+      act('prevq').disabled = S.q === 0;
+      act('nextq').disabled = S.q === QUESTIONS.length - 1;
+      q('[data-result-box]').hidden = true;
+      q('[data-feedback]').textContent = '';
+      act('trylab').hidden = true;
+      const fig = q('.dmcc-result-figure');
+      fig.dataset.resultState = 'before';
+      q('[data-result-figure]').innerHTML = resultFigure(item.preview);
+      q('[data-verdict]').textContent = '';
+      q('[data-result-caption]').textContent = item.preview.caption + ' Check your prediction to see the result here.';
+      score();
+    }
+    function score() {
+      const done = QUESTIONS.filter(x => x.id in S.first).length, right = QUESTIONS.filter(x => S.first[x.id]).length;
+      q('[data-score]').textContent = 'First-try score: ' + right + ' of ' + done + (done < QUESTIONS.length ? ' (' + (QUESTIONS.length - done) + ' to go)' : '');
+    }
+    function check() {
+      const item = QUESTIONS[S.q], pick = S.picked[item.id];
+      if (!pick) return;
+      const right = pick === item.answer;
+      if (!(item.id in S.first)) S.first[item.id] = right;
+      score();
+      const box = q('[data-result-box]'), fig = q('.dmcc-result-figure');
+      box.dataset.result = right ? 'right' : 'wrong';
+      fig.dataset.resultState = right ? 'right' : 'wrong';
+      const answerText = item.choices.find(ch => ch[0] === item.answer)[1];
+      q('[data-verdict]').textContent = (right ? '✓ Yes: ' : '✗ Not quite. The answer is: ') + answerText.charAt(0).toLowerCase() + answerText.slice(1) + '.';
+      q('[data-result-figure]').innerHTML = resultFigure(item.result);
+      q('[data-result-caption]').textContent = 'Result: ' + item.result.caption;
+      q('[data-choices]').querySelectorAll('label').forEach(label => {
+        const v = label.querySelector('input').value;
+        label.dataset.mark = v === item.answer ? 'answer' : v === pick ? 'wrong' : '';
+      });
+      q('[data-feedback]').textContent = item.why;
+      q('[data-lab-note]').textContent = '“Try this in the lab” sets the lab to this case and takes you to its controls.';
+      act('trylab').hidden = false;
+      box.hidden = false;
+      q('[data-announce]').textContent = q('[data-verdict]').textContent + ' ' + item.why;
+    }
+
+    // ---- Wiring ------------------------------------------------------------
+    act('run').addEventListener('click', () => { if (S.running) stop('Paused at θ = ' + deg(theta()) + '°.'); else run(); });
+    act('step').addEventListener('click', step);
+    act('back').addEventListener('click', () => { if (S.running) stop(); setTheta(theta() - 15, 'Turned back to θ = ' + deg(M.wrap(theta() - 15)) + '°.'); });
+    act('fwd').addEventListener('click', () => { if (S.running) stop(); setTheta(theta() + 15, 'Turned on to θ = ' + deg(M.wrap(theta() + 15)) + '°.'); });
+    act('reset').addEventListener('click', () => {
+      if (S.running) stop();
+      S.options = Object.assign({}, BASE); S.alpha = 30; S.omega = 0; S.revealed = false; S.visited = [];
+      record(30, 30, 1);
+      say('Reset: one coil, split ring, N pole on the left, θ = 30°.');
+      render();
+    });
+    slider.addEventListener('input', () => { if (S.running) stop(); setTheta(Number(slider.value)); });
+    slider.addEventListener('change', () => {
+      const r = M.analyze(S.alpha, opts());
+      say(r.total === 0 ? restMessage() : 'θ = ' + deg(theta()) + '°: torque ' + fmtSigned(r.total) + ' NBIA, ' + r.sense + '.');
+    });
+    live.querySelectorAll('input[name="' + id + '-mode"]').forEach(input => input.addEventListener('change', () => {
+      setOptions({ mode: input.value }, input.value === 'slip'
+        ? 'Slip rings: each coil end always meets the same brush, so the current in the coil never reverses.'
+        : 'Split ring: the brushes change segments as the coil crosses the neutral plane, reversing the coil current.');
+    }));
+    live.querySelectorAll('input[name="' + id + '-coils"]').forEach(input => input.addEventListener('change', () => {
+      setOptions({ coils: Number(input.value) }, Number(input.value) === 2
+        ? 'Second coil added, 90° ahead of the first (sides 3 and 4), with its own contacts.'
+        : 'Back to one coil.');
+    }));
+    act('supply').addEventListener('click', () => setOptions({ supply: -S.options.supply }, 'Supply reversed: every coil current reverses, so every force reverses.'));
+    act('field').addEventListener('click', () => {
+      setOptions({ field: -S.options.field });
+      say('Magnets swapped: B now points ' + (S.options.field === 1 ? 'right' : 'left') + '. The coil has not moved, but θ, measured from B, is now ' + deg(theta()) + '°.');
+    });
+    live.querySelectorAll('input[name="' + id + '-view"]').forEach(input => input.addEventListener('change', () => {
+      q('.dmcc-stage').dataset.show = input.value;
+    }));
+    act('reveal').addEventListener('click', () => { S.revealed = true; say('Full curve revealed for the current setup.'); render(); });
+    act('clear').addEventListener('click', () => { S.visited = []; record(theta(), theta(), 1); render(); say('Trace cleared.'); });
+    q('[data-choices]').addEventListener('change', event => {
+      const t = event.target;
+      if (t && t.type === 'radio') { S.picked[QUESTIONS[S.q].id] = t.value; act('check').disabled = false; }
+    });
+    act('check').addEventListener('click', check);
+    act('trylab').addEventListener('click', () => {
+      const item = QUESTIONS[S.q];
+      applySetup(item.after);
+      say('Set up from question ' + (S.q + 1) + ': θ = ' + deg(theta()) + '°, ' + (S.options.mode === 'slip' ? 'slip rings' : 'split ring') +
+        (S.options.coils === 2 ? ', two coils' : '') + (S.options.supply === -1 ? ', current reversed' : '') + (S.options.field === -1 ? ', magnets swapped' : '') +
+        '. ' + (reduced.matches ? 'Use Step to move it.' : 'Press Run or Step to watch it.'));
+      // An intentional, requested move: bring the motor and its controls into
+      // view together, then focus the first motion control.
+      const pick = q('.dmcc-viewpick'), target = pick.offsetParent !== null ? pick : q('.dmcc-stage');
+      target.scrollIntoView({ block: 'start', behavior: reduced.matches ? 'auto' : 'smooth' });
+      (reduced.matches ? act('step') : act('run')).focus({ preventScroll: true });
+    });
+    act('prevq').addEventListener('click', () => showQuestion(S.q - 1));
+    act('nextq').addEventListener('click', () => showQuestion(S.q + 1));
+    if (reduced.addEventListener) reduced.addEventListener('change', () => { if (reduced.matches && S.running) stop('Motion stopped for your reduced-motion setting. Step mode still works.'); updateMotionNote(); });
+    document.addEventListener('visibilitychange', schedule);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(entries => { S.visible = entries.some(e => e.isIntersecting); if (S.visible) { S.last = null; schedule(); } }).observe(live);
+    }
+
+    record(30, 30, 1);
+    updateMotionNote();
+    showQuestion(0);
+    say('Predict first, then turn the coil with Run, Step or the slider and watch the torque.');
+    render();
+  }
+
+  function initAll() { document.querySelectorAll('[data-interactive="dc-motor-commutation"]').forEach(init); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll, { once: true });
   else initAll();
 })();
