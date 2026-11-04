@@ -33,17 +33,57 @@
   // the right. Farther points (larger x) sit a little higher and to the right.
   const SV = Object.freeze({ S: 60, OX: 150, OY: 150, kx: 0.26, ky: 0.36, cy: 0.93 });
   function P(x, y, z) { return [SV.OX + SV.S * (z + SV.kx * x), SV.OY - SV.S * (SV.cy * y + SV.ky * x)]; }
-  const COIL_Z = 1.5, RING_R = 0.32;
-  const SPLIT_Z0 = 1.95, SPLIT_STEP = 0.5, SLIP_Z0 = 1.9, SLIP_STEP = 0.3;
-  // Ordered path of conventional current through one coil, from the
-  // commutator lead of the side it enters to the lead of the side it leaves.
-  function coilPath(c, zLead) {
-    const A = c.sideA, B = c.sideB;
-    const leadA = P(RING_R * A.x, RING_R * A.y, zLead), leadB = P(RING_R * B.x, RING_R * B.y, zLead);
-    const aF = P(A.x, A.y, COIL_Z), aB = P(A.x, A.y, -COIL_Z), bB = P(B.x, B.y, -COIL_Z), bF = P(B.x, B.y, COIL_Z);
-    // Side A current -1 flows away from the commutator end: lead A -> front A -> back A.
-    const forward = [leadA, aF, aB, bB, bF, leadB];
-    return { forward, flow: c.current < 0 ? forward : forward.slice().reverse() };
+  const COIL_Z = 1.5, RING_R = 0.32, SHAFT_R = 0.12;
+  const SPLIT_Z0 = 1.95, SPLIT_STEP = 0.5, SPLIT_W = 0.28, SPLIT_GAP = 8;
+  const SLIP_Z0 = 1.9, SLIP_STEP = 0.3, SLIP_W = 0.2;
+  const unit = deg => [Math.cos(deg * DEG), Math.sin(deg * DEG)];
+  // Where each coil end joins its contact, in 3D, for every coil.
+  // Split ring: segment A (joined to side A) spans alpha-90..alpha+90, centred
+  // on n; segment B is opposite. Each lead lands well inside its own conducting
+  // segment (45 degrees from its centre, 37 from the nearest gap), never on a gap.
+  // Slip rings: side A goes to its own ring and side B to the next ring out.
+  // A lead to a contact beyond the first one runs along the shaft, under the
+  // nearer rings (insulated), then rises to its own contact.
+  function wiring(alpha, opts) {
+    const o = M.options(opts), r = M.analyze(alpha, o), slip = o.mode === 'slip';
+    const firstZ = slip ? SLIP_Z0 : SPLIT_Z0;
+    return r.coils.map(c => {
+      let a, b;
+      if (slip) {
+        const za = SLIP_Z0 + SLIP_STEP * (2 * c.index), zb = za + SLIP_STEP;
+        a = { angle: M.wrap(c.alpha + 90), z: za + SLIP_W / 2, band: [za, za + SLIP_W], element: 'ring A' };
+        b = { angle: M.wrap(c.alpha + 270), z: zb + SLIP_W / 2, band: [zb, zb + SLIP_W], element: 'ring B' };
+      } else {
+        const z0 = SPLIT_Z0 + SPLIT_STEP * c.index;
+        a = { angle: M.wrap(c.alpha + 45), z: z0 + SPLIT_W / 2, band: [z0, z0 + SPLIT_W], element: 'segment A' };
+        b = { angle: M.wrap(c.alpha + 225), z: z0 + SPLIT_W / 2, band: [z0, z0 + SPLIT_W], element: 'segment B' };
+      }
+      const route = (end, corner) => {
+        const d = unit(end.angle), pts3 = [corner];
+        if (end.z > firstZ + 0.05 + (slip ? SLIP_W : SPLIT_W)) {
+          pts3.push([SHAFT_R * d[0], SHAFT_R * d[1], firstZ - 0.08], [SHAFT_R * d[0], SHAFT_R * d[1], end.z]);
+        }
+        pts3.push([RING_R * d[0], RING_R * d[1], end.z]);
+        return pts3;
+      };
+      const A = c.sideA, B = c.sideB;
+      const aF = [A.x, A.y, COIL_Z], aB = [A.x, A.y, -COIL_Z], bB = [B.x, B.y, -COIL_Z], bF = [B.x, B.y, COIL_Z];
+      const leadA = route(a, aF).reverse(), leadB = route(b, bF);
+      // forward: contact A ... front A, back A, back B, front B ... contact B.
+      const forward = leadA.concat([aB, bB]).concat(leadB);
+      return { index: c.index, current: c.current, a, b, corners: { aF, aB, bB, bF }, forward };
+    });
+  }
+  function project(p) { return P(p[0], p[1], p[2]); }
+  // Ordered path of conventional current through one coil, from the contact of
+  // the side it enters to the contact of the side it leaves.
+  function coilPath(w) {
+    const forward = w.forward.map(project);
+    // Side A current -1 flows away from the commutator end: contact A -> front A -> back A.
+    const flow = w.current < 0 ? forward : forward.slice().reverse();
+    const aF = project(w.corners.aF), aB = project(w.corners.aB), bB = project(w.corners.bB), bF = project(w.corners.bF);
+    const sides = w.current < 0 ? [[aF, aB], [bB, bF]] : [[bF, bB], [aB, aF]];
+    return { forward, flow, sides };
   }
   function chevron(p, q, cls) {
     const mid = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
@@ -96,15 +136,15 @@
     svg += '<text class="dmcc-small dmcc-halo" x="' + f1(bTip[0] + (o.field === 1 ? 6 : -16)) + '" y="' + f1(bTip[1] + (o.field === 1 ? 4 : 18)) + '">B</text>';
     const zEnd = slip ? SLIP_Z0 + SLIP_STEP * (2 * o.coils) : SPLIT_Z0 + SPLIT_STEP * o.coils;
     svg += '<path class="dmcc-shaft" d="' + pathOf([P(0, 0, -2.2), P(0, 0, zEnd)]) + '"/>';
-    // Coils: the second coil first so coil 1 reads on top; the far long side of each first.
+    // Coils: the second coil first so coil 1 reads on top.
+    const wires = wiring(r.alpha, o);
     r.coils.slice().reverse().forEach(c => {
-      const zLead = slip ? SLIP_Z0 + 2 * SLIP_STEP * c.index : SPLIT_Z0 + SPLIT_STEP * c.index;
-      const p = coilPath(c, zLead);
+      const p = coilPath(wires[c.index]);
       svg += '<path class="dmcc-wire' + (c.index ? ' dmcc-wire-2' : '') + '" fill="none" d="' + pathOf(p.forward) + '"/>';
       if (c.current !== 0) {
         svg += '<path class="dmcc-glow" fill="none" d="' + pathOf(p.flow) + '"/>';
         svg += '<path class="dmcc-flow" fill="none" stroke-dasharray="7 11" stroke-dashoffset="' + f1(-(st.flowPhase || 0) * 18) + '" d="' + pathOf(p.flow) + '"/>';
-        svg += chevron(p.flow[1], p.flow[2], 'dmcc-current-head') + chevron(p.flow[3], p.flow[4], 'dmcc-current-head');
+        svg += chevron(p.sides[0][0], p.sides[0][1], 'dmcc-current-head') + chevron(p.sides[1][0], p.sides[1][1], 'dmcc-current-head');
       }
       [[c.index ? '3' : '1', c.sideA], [c.index ? '4' : '2', c.sideB]].forEach(pair => {
         const sd = pair[1];
@@ -118,13 +158,13 @@
     r.coils.forEach(c => {
       if (slip) {
         [0, 1].forEach(sideIndex => {
-          const z0 = SLIP_Z0 + SLIP_STEP * (2 * c.index + sideIndex), z1 = z0 + 0.2;
+          const z0 = SLIP_Z0 + SLIP_STEP * (2 * c.index + sideIndex), z1 = z0 + SLIP_W;
           svg += band(90, 270, z0, z1, 'dmcc-ring' + (c.current !== 0 ? ' is-live' : ''));
           // Ring for side A takes the top brush, ring for side B the bottom brush.
           contacts.push({ top: sideIndex === 0, z: (z0 + z1) / 2, live: c.current !== 0 });
         });
       } else {
-        const z0 = SPLIT_Z0 + SPLIT_STEP * c.index, z1 = z0 + 0.28, gap = 8, a = c.alpha;
+        const z0 = SPLIT_Z0 + SPLIT_STEP * c.index, z1 = z0 + SPLIT_W, gap = SPLIT_GAP, a = c.alpha;
         // Segment A is centred on n: alpha-90..alpha+90. Segment B is opposite.
         visibleArcs(a - 90 + gap, a + 90 - gap).concat(visibleArcs(a - 90 + gap + 360, a + 90 - gap + 360))
           .forEach(seg => { svg += band(seg[0], seg[1], z0, z1, 'dmcc-segment dmcc-segment-a' + (c.current ? ' is-live' : '')); });
@@ -342,5 +382,6 @@
       'Two commutated coils 90° apart (thick): the sum runs from 1 to √2 ≈ 1.41, so the smallest torque is 0.71 of the largest and never zero.</figcaption></figure>';
   }
 
-  return Object.freeze({ cutaway, endView, trace, staticViews, staticTrace, STATIC_ALPHA });
+  return Object.freeze({ cutaway, endView, trace, staticViews, staticTrace, wiring, project, STATIC_ALPHA,
+    GEOMETRY: Object.freeze({ COIL_Z, RING_R, SPLIT_Z0, SPLIT_STEP, SPLIT_W, SPLIT_GAP, SLIP_Z0, SLIP_STEP, SLIP_W }) });
 });

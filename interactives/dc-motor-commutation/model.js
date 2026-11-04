@@ -163,6 +163,30 @@
     return Object.freeze({ peak, torque: mode === 'slip' ? peak * s : peak * Math.abs(s) });
   }
 
+  // What the torque does just either side of a rotor angle. Angles grow
+  // counter-clockwise and positive torque is counter-clockwise, so torque > 0
+  // just before and < 0 just after pushes the rotor back: a stable rest angle.
+  //   driven      torque is not zero here
+  //   stable      zero here, both neighbours push back toward it
+  //   unstable    zero here, both neighbours push away from it
+  //   through     zero here, both neighbours push the same way (a dead spot
+  //               that a moving rotor passes through); see direction
+  //   none        zero here and on both sides
+  function neighbourhood(alpha, opts, probeDeg) {
+    const o = options(opts);
+    const p = probeDeg === undefined ? 1 : finite('Probe angle', probeDeg);
+    if (p <= 0 || p > 10) throw new RangeError('Use a probe angle above 0 and at most 10 degrees.');
+    const a = wrap(finite('Rotor angle', alpha));
+    const at = analyze(a, o).total, before = analyze(a - p, o).total, after = analyze(a + p, o).total;
+    let kind = 'none', direction = 'none';
+    if (at !== 0) { kind = 'driven'; direction = at > 0 ? 'counterclockwise' : 'clockwise'; }
+    else if (before > 0 && after < 0) kind = 'stable';
+    else if (before < 0 && after > 0) kind = 'unstable';
+    else if (before > 0 && after > 0) { kind = 'through'; direction = 'counterclockwise'; }
+    else if (before < 0 && after < 0) { kind = 'through'; direction = 'clockwise'; }
+    return Object.freeze({ kind, direction, at, before, after });
+  }
+
   // Qualitative motion for the animation only. The inertia and friction
   // constants are illustrative choices that make the torque visible; they are
   // not measured, and the result is not a speed prediction (no back EMF).
@@ -184,6 +208,6 @@
 
   return Object.freeze({
     MODES, ILLUSTRATIVE, wrap, sinDeg, cosDeg, options, thetaFromAlpha, alphaFromTheta,
-    sideCurrent, analyze, torqueAtTheta, sweep, turnAverage, ripple, torqueSI, illustrativeStep
+    sideCurrent, analyze, neighbourhood, torqueAtTheta, sweep, turnAverage, ripple, torqueSI, illustrativeStep
   });
 });
