@@ -1,0 +1,156 @@
+/* DC motor commutation: scoped to its mount. Colours derive from theme tokens;
+   the few module colours below have light, dark and print values. */
+[data-interactive="dc-motor-commutation"] {
+  --dmcc-current: #A8440A;
+  --dmcc-copper: #B9772F;
+  --dmcc-n: #F2A58E;
+  --dmcc-s: #9CD3EC;
+  --dmcc-pole-ink: #002144;
+  --dmcc-force: var(--accent);
+  min-width: 0; margin-block: 1rem;
+}
+:root[data-theme="dark"] [data-interactive="dc-motor-commutation"] { --dmcc-current: #FF9F57; --dmcc-copper: #D49A5A; --dmcc-n: #7B3A2A; --dmcc-s: #1D4F69; --dmcc-pole-ink: #F4F1EC; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-interactive="dc-motor-commutation"] { --dmcc-current: #FF9F57; --dmcc-copper: #D49A5A; --dmcc-n: #7B3A2A; --dmcc-s: #1D4F69; --dmcc-pole-ink: #F4F1EC; }
+}
+@media print {
+  [data-interactive="dc-motor-commutation"] { --dmcc-current: #A8440A !important; --dmcc-copper: #B9772F !important; --dmcc-n: #F2A58E !important; --dmcc-s: #9CD3EC !important; --dmcc-pole-ink: #002144 !important; }
+}
+[data-interactive="dc-motor-commutation"] * { box-sizing: border-box; }
+
+/* ---- SVG drawing (live and static share these classes) ------------------- */
+.dmcc-svg { display: block; width: 100%; height: auto; color: var(--ink); overflow: visible; }
+.dmcc-svg text { fill: var(--ink); font-family: var(--f-display); font-size: 15px; }
+.dmcc-svg .dmcc-small { font-size: 14px; }
+.dmcc-cutaway text, .dmcc-cutaway .dmcc-small { font-size: 17px; }
+.dmcc-endview .dmcc-small { font-size: 15px; }
+.dmcc-svg .dmcc-soft { fill: var(--ink-soft); }
+.dmcc-svg .dmcc-tag { font-weight: 750; }
+.dmcc-svg .dmcc-halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.dmcc-svg .dmcc-label { font-size: 18px; font-weight: 750; }
+.dmcc-pole-n .dmcc-face, polygon.dmcc-pole-n { fill: var(--dmcc-n); stroke: var(--ink-soft); stroke-width: 1.2; }
+.dmcc-pole-s .dmcc-face, polygon.dmcc-pole-s { fill: var(--dmcc-s); stroke: var(--ink-soft); stroke-width: 1.2; }
+.dmcc-cutaway polygon.dmcc-pole { fill-opacity: .72; }
+.dmcc-svg .dmcc-pole-text { fill: var(--dmcc-pole-ink); font-size: 24px; font-weight: 800; }
+.dmcc-field, .dmcc-fieldline { stroke: var(--ink-soft); stroke-width: 1.4; fill: none; opacity: .8; }
+.dmcc-field-head, .dmcc-fieldline-head { fill: var(--ink-soft); opacity: .8; }
+.dmcc-neutral { stroke: var(--ink-soft); stroke-width: 1.2; stroke-dasharray: 2 5; fill: none; }
+.dmcc-shaft { stroke: var(--ink-soft); stroke-width: 7; stroke-linecap: round; fill: none; }
+.dmcc-wire, .dmcc-coil-edge { stroke: var(--dmcc-copper); stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; fill: none; }
+.dmcc-wire-2 { stroke-dasharray: 10 5; }
+.dmcc-coil-edge.dmcc-wire-2 { stroke-dasharray: none; opacity: .7; }
+.dmcc-glow { stroke: var(--dmcc-current); stroke-width: 12; stroke-opacity: .22; stroke-linejoin: round; stroke-linecap: round; }
+.dmcc-flow { stroke: var(--dmcc-current); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.dmcc-current-head { fill: var(--dmcc-current); stroke: var(--surface); stroke-width: 1; }
+.dmcc-force { stroke: var(--dmcc-force); stroke-width: 3.4; fill: none; }
+.dmcc-force-head { fill: var(--dmcc-force); }
+.dmcc-ring, .dmcc-segment { fill: var(--dmcc-copper); stroke: var(--ink); stroke-width: .9; fill-opacity: .55; }
+.dmcc-ring.is-live, .dmcc-segment.is-live { fill-opacity: .9; }
+.dmcc-segment-b { fill: var(--surface-2); fill-opacity: 1; }
+.dmcc-segment-b.is-live { fill: var(--dmcc-copper); fill-opacity: .55; }
+.dmcc-brush { stroke: var(--ink-soft); stroke-width: 10; fill: none; }
+.dmcc-cut { stroke: var(--ink-soft); stroke-width: 1.6; stroke-dasharray: 6 5; }
+.dmcc-cut-n { stroke: #C4583A; } .dmcc-cut-s { stroke: #2E86B5; }
+.dmcc-brush.is-live { stroke: var(--ink); }
+.dmcc-lead { stroke: var(--ink-soft); stroke-width: 1.6; fill: none; }
+.dmcc-cell-long, .dmcc-cell-short { stroke: var(--ink); fill: none; stroke-width: 3; }
+.dmcc-cell-short { stroke-width: 6; }
+.dmcc-conductor { fill: var(--surface); stroke: var(--dmcc-copper); stroke-width: 3; }
+.dmcc-conductor.is-live { stroke: var(--dmcc-current); stroke-width: 3.6; }
+.dmcc-dot { fill: var(--dmcc-current); }
+.dmcc-cross { stroke: var(--dmcc-current); stroke-width: 3; fill: none; }
+.dmcc-lever { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 5 4; fill: none; }
+.dmcc-lever-line { stroke: var(--dmcc-force); stroke-width: 1; stroke-dasharray: 3 5; fill: none; opacity: .75; }
+.dmcc-normal { stroke: var(--ink); stroke-width: 2; fill: none; }
+.dmcc-normal-head { fill: var(--ink); }
+.dmcc-svg .dmcc-normal-text { font-style: italic; font-weight: 700; }
+.dmcc-angle { stroke: var(--ink); stroke-width: 1.6; }
+.dmcc-torque { stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.dmcc-torque-head { fill: var(--ink); }
+.dmcc-grid { stroke: var(--rule); stroke-width: 1; fill: none; }
+.dmcc-axis { stroke: var(--ink-soft); stroke-width: 1.6; fill: none; }
+.dmcc-curve { stroke: var(--ink); stroke-width: 3; }
+.dmcc-curve-slip { stroke: var(--ink-soft); stroke-width: 2.6; stroke-dasharray: 9 6; }
+.dmcc-curve-two { stroke: var(--accent); stroke-width: 5; }
+.dmcc-curve-part { stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 4 5; }
+.dmcc-curve-part-2 { stroke-dasharray: 10 5; }
+.dmcc-zero { fill: var(--surface); stroke: var(--ink); stroke-width: 2.4; }
+.dmcc-peak { fill: var(--ink); }
+.dmcc-visited { stroke: var(--dmcc-current); stroke-width: 6; stroke-linecap: round; fill: none; opacity: .85; }
+.dmcc-now-line { stroke: var(--dmcc-current); stroke-width: 1.2; stroke-dasharray: 3 4; fill: none; }
+.dmcc-now { fill: var(--dmcc-current); stroke: var(--ink); stroke-width: 2; }
+
+/* ---- Static fallback figures --------------------------------------------- */
+.dmcc-static-figure { margin: 1rem 0; }
+.dmcc-static-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: .75rem; align-items: center; }
+.dmcc-static-figure .dmcc-svg { max-width: 40rem; margin-inline: auto; }
+
+/* ---- Live lab ------------------------------------------------------------ */
+.dmcc-live { container: dmcc / inline-size; display: grid; gap: .8rem; font: .97rem/1.45 var(--f-display); }
+.dmcc-challenge { margin: 0; border-left: 4px solid var(--accent); padding: .6rem .8rem; background: var(--surface-2); }
+.dmcc-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+.dmcc-view { margin: 0; border: 1px solid var(--rule); background: var(--surface); padding: .4rem; min-width: 0; }
+.dmcc-view > figcaption, .dmcc-trace-figure > figcaption { margin: .25rem .2rem 0; color: var(--ink-soft); font-size: .86rem; line-height: 1.35; }
+.dmcc-readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: .4rem; margin: 0; }
+.dmcc-readout > div { border: 1px solid var(--rule); background: var(--surface); padding: .4rem .55rem; min-width: 0; }
+.dmcc-readout dt { font-size: .78rem; color: var(--ink-soft); letter-spacing: .02em; }
+.dmcc-readout dd { margin: 0; font-weight: 750; font-variant-numeric: tabular-nums; }
+.dmcc-controls { display: grid; gap: .6rem; }
+.dmcc-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.dmcc-live button, .dmcc-seg label { min-height: 44px; min-width: 44px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-xs); padding: .45rem .75rem; font: inherit; cursor: pointer; }
+.dmcc-live button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); font-weight: 750; }
+.dmcc-live button.dmcc-primary { background: var(--accent); color: var(--surface); border-color: var(--accent); font-weight: 750; }
+.dmcc-live button:disabled { opacity: .55; cursor: not-allowed; }
+.dmcc-live :is(button, input, summary):focus-visible, .dmcc-seg label:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+.dmcc-angle-control { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .3rem .7rem; align-items: center; font-weight: 650; }
+.dmcc-angle-control input[type="range"] { width: 100%; min-height: 44px; accent-color: var(--accent); margin: 0; }
+.dmcc-seg { border: 1px solid var(--rule); padding: .45rem .6rem .6rem; margin: 0; min-width: 0; }
+.dmcc-seg legend { font-weight: 750; padding: 0 .25rem; }
+.dmcc-seg > div { display: flex; flex-wrap: wrap; gap: .4rem; }
+.dmcc-seg label { display: inline-flex; align-items: center; gap: .4rem; }
+.dmcc-seg label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); font-weight: 750; }
+.dmcc-seg input { margin: 0; accent-color: var(--accent); width: 1.1rem; height: 1.1rem; }
+.dmcc-setup { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+.dmcc-note { margin: 0; color: var(--ink-soft); font-size: .88rem; }
+.dmcc-status { margin: 0; border-left: 4px solid var(--flag); padding: .55rem .75rem; background: var(--surface-2); min-height: 2.9em; }
+.dmcc-trace-figure { margin: 0; border: 1px solid var(--rule); background: var(--surface); padding: .4rem; }
+.dmcc-averages { margin: .35rem .2rem 0; font-variant-numeric: tabular-nums; }
+.dmcc-predict { border: 1px solid var(--rule); padding: .6rem .75rem .75rem; margin: 0; min-width: 0; display: grid; gap: .5rem; }
+.dmcc-predict-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem; align-items: baseline; }
+.dmcc-predict-head h3 { margin: 0; font-size: 1.02rem; }
+.dmcc-score { font-weight: 750; font-variant-numeric: tabular-nums; }
+.dmcc-question { margin: 0; font-weight: 650; }
+.dmcc-choices { display: grid; gap: .4rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+.dmcc-choices label { display: flex; align-items: center; gap: .55rem; min-height: 44px; border: 1px solid var(--rule); padding: .35rem .6rem; background: var(--surface); cursor: pointer; }
+.dmcc-choices label:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.dmcc-choices input { margin: 0; flex: none; width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.dmcc-feedback { margin: 0; padding: .5rem .7rem; border-left: 4px solid var(--rule); background: var(--surface-2); }
+.dmcc-feedback[data-result="right"] { border-left-color: var(--accent); }
+.dmcc-feedback[data-result="wrong"] { border-left-color: var(--flag); }
+.dmcc-feedback:empty { display: none; }
+.dmcc-limit { margin: 0; color: var(--ink-soft); font-size: .88rem; }
+.dmcc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@container dmcc (min-width: 40rem) {
+  .dmcc-stage { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); align-items: start; }
+  .dmcc-setup { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container dmcc (max-width: 34rem) {
+  .dmcc-trace text, .dmcc-trace .dmcc-small { font-size: 24px; }
+  .dmcc-trace .dmcc-curve { stroke-width: 4.5; }
+  .dmcc-trace .dmcc-visited { stroke-width: 9; }
+  .dmcc-cutaway text, .dmcc-cutaway .dmcc-small { font-size: 19px; }
+}
+.presenting .dmcc-live { font-size: 1rem; }
+
+@media screen {
+  [data-interactive="dc-motor-commutation"][data-dmcc-ready] > .dmcc-static { display: none; }
+}
+@media print {
+  /* The static lesson is longer than a page: let it flow, keep each figure whole. */
+  [data-interactive="dc-motor-commutation"] { break-inside: auto !important; }
+  [data-interactive="dc-motor-commutation"] .dmcc-live { display: none !important; }
+  [data-interactive="dc-motor-commutation"] > .dmcc-static { display: block !important; }
+  .dmcc-static-figure { break-inside: avoid; page-break-inside: avoid; }
+  .dmcc-static-pair { grid-template-columns: 1fr 1fr; }
+}
